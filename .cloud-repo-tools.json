@@ -1,0 +1,30 @@
+{
+  "requiresKeyFile": true,
+  "requiresProjectId": true,
+  "product": "bigquery",
+  "client_reference_url": "https://googlecloudplatform.github.io/google-cloud-node/#/docs/bigquery/latest/bigquery",
+  "release_quality": "beta",
+  "samples": [
+    {
+      "id": "datasets",
+      "name": "Datasets",
+      "file": "datasets.js",
+      "docs_link": "https://googlecloudplatform.github.io/google-cloud-node/#/docs/bigquery/latest/bigquery/dataset",
+      "usage": "node datasets.js --help"
+    },
+    {
+      "id": "tables",
+      "name": "Tables",
+      "file": "tables.js",
+      "docs_link": "https://googlecloudplatform.github.io/google-cloud-node/#/docs/google-cloud/latest/bigquery/table",
+      "usage": "node tables.js --help"
+    },
+    {
+      "id": "queries",
+      "name": "Queries",
+      "file": "queries.js",
+      "docs_link": "https://googlecloudplatform.github.io/google-cloud-node/#/docs/bigquery/latest/bigquery",
+      "usage": "node queries.js --help"
+    }
+  ]
+}
