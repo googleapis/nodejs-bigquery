@@ -166,7 +166,7 @@ function Dataset(bigQuery, id) {
      *   var apiResponse = data[0];
      * });
      */
-    setMetadata: true
+    setMetadata: true,
   };
 
   common.ServiceObject.call(this, {
@@ -174,7 +174,7 @@ function Dataset(bigQuery, id) {
     baseUrl: '/datasets',
     id: id,
     createMethod: bigQuery.createDataset.bind(bigQuery),
-    methods: methods
+    methods: methods,
   });
 
   this.bigQuery = bigQuery;
@@ -189,7 +189,7 @@ function Dataset(bigQuery, id) {
       }
 
       return reqOpts;
-    }
+    },
   });
 }
 
@@ -204,14 +204,14 @@ util.inherits(Dataset, common.ServiceObject);
 Dataset.prototype.createQueryStream = function(options) {
   if (is.string(options)) {
     options = {
-      query: options
+      query: options,
     };
   }
 
   options = extend(true, {}, options, {
     defaultDataset: {
-      datasetId: this.id
-    }
+      datasetId: this.id,
+    },
   });
 
   return this.bigQuery.createQueryStream(options);
@@ -267,24 +267,27 @@ Dataset.prototype.createTable = function(id, options, callback) {
   body.tableReference = {
     datasetId: this.id,
     projectId: this.bigQuery.projectId,
-    tableId: id
+    tableId: id,
   };
 
-  this.request({
-    method: 'POST',
-    uri: '/tables',
-    json: body
-  }, function(err, resp) {
-    if (err) {
-      callback(err, null, resp);
-      return;
+  this.request(
+    {
+      method: 'POST',
+      uri: '/tables',
+      json: body,
+    },
+    function(err, resp) {
+      if (err) {
+        callback(err, null, resp);
+        return;
+      }
+
+      var table = self.table(resp.tableReference.tableId);
+      table.metadata = resp;
+
+      callback(null, table, resp);
     }
-
-    var table = self.table(resp.tableReference.tableId);
-    table.metadata = resp;
-
-    callback(null, table, resp);
-  });
+  );
 };
 
 /**
@@ -324,14 +327,17 @@ Dataset.prototype.delete = function(options, callback) {
   }
 
   var query = {
-    deleteContents: !!options.force
+    deleteContents: !!options.force,
   };
 
-  this.request({
-    method: 'DELETE',
-    uri: '',
-    qs: query
-  }, callback);
+  this.request(
+    {
+      method: 'DELETE',
+      uri: '',
+      qs: query,
+    },
+    callback
+  );
 };
 
 /**
@@ -388,30 +394,33 @@ Dataset.prototype.getTables = function(query, callback) {
 
   query = query || {};
 
-  this.request({
-    uri: '/tables',
-    qs: query
-  }, function(err, resp) {
-    if (err) {
-      callback(err, null, null, resp);
-      return;
-    }
+  this.request(
+    {
+      uri: '/tables',
+      qs: query,
+    },
+    function(err, resp) {
+      if (err) {
+        callback(err, null, null, resp);
+        return;
+      }
 
-    var nextQuery = null;
-    if (resp.nextPageToken) {
-      nextQuery = extend({}, query, {
-        pageToken: resp.nextPageToken
+      var nextQuery = null;
+      if (resp.nextPageToken) {
+        nextQuery = extend({}, query, {
+          pageToken: resp.nextPageToken,
+        });
+      }
+
+      var tables = (resp.tables || []).map(function(tableObject) {
+        var table = that.table(tableObject.tableReference.tableId);
+        table.metadata = tableObject;
+        return table;
       });
+
+      callback(null, tables, nextQuery, resp);
     }
-
-    var tables = (resp.tables || []).map(function(tableObject) {
-      var table = that.table(tableObject.tableReference.tableId);
-      table.metadata = tableObject;
-      return table;
-    });
-
-    callback(null, tables, nextQuery, resp);
-  });
+  );
 };
 
 /**
@@ -449,14 +458,14 @@ Dataset.prototype.getTablesStream = common.paginator.streamify('getTables');
 Dataset.prototype.query = function(options, callback) {
   if (is.string(options)) {
     options = {
-      query: options
+      query: options,
     };
   }
 
   options = extend(true, {}, options, {
     defaultDataset: {
-      datasetId: this.id
-    }
+      datasetId: this.id,
+    },
   });
 
   return this.bigQuery.query(options, callback);
@@ -470,14 +479,14 @@ Dataset.prototype.query = function(options, callback) {
 Dataset.prototype.startQuery = function(options, callback) {
   if (is.string(options)) {
     options = {
-      query: options
+      query: options,
     };
   }
 
   options = extend(true, {}, options, {
     defaultDataset: {
-      datasetId: this.id
-    }
+      datasetId: this.id,
+    },
   });
 
   return this.bigQuery.startQuery(options, callback);
@@ -508,7 +517,7 @@ common.paginator.extend(Dataset, ['getTables']);
  * that a callback is omitted.
  */
 common.util.promisifyAll(Dataset, {
-  exclude: ['table']
+  exclude: ['table'],
 });
 
 module.exports = Dataset;

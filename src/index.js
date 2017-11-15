@@ -70,7 +70,7 @@ function BigQuery(options) {
   var config = {
     baseUrl: 'https://www.googleapis.com/bigquery/v2',
     scopes: ['https://www.googleapis.com/auth/bigquery'],
-    packageJson: require('../package.json')
+    packageJson: require('../package.json'),
   };
 
   common.Service.call(this, config, options);
@@ -87,9 +87,13 @@ util.inherits(BigQuery, common.Service);
  * @param {array} rows
  * @return {array} Fields using their matching names from the table's schema.
  */
-BigQuery.mergeSchemaWithRows_ =
-BigQuery.prototype.mergeSchemaWithRows_ = function(schema, rows) {
-  return arrify(rows).map(mergeSchema).map(flattenRows);
+BigQuery.mergeSchemaWithRows_ = BigQuery.prototype.mergeSchemaWithRows_ = function(
+  schema,
+  rows
+) {
+  return arrify(rows)
+    .map(mergeSchema)
+    .map(flattenRows);
 
   function mergeSchema(row) {
     return row.f.map(function(field, index) {
@@ -195,8 +199,7 @@ BigQuery.prototype.mergeSchemaWithRows_ = function(schema, rows) {
  *   day: 1
  * });
  */
-BigQuery.date =
-BigQuery.prototype.date = function BigQueryDate(value) {
+BigQuery.date = BigQuery.prototype.date = function BigQueryDate(value) {
   if (!(this instanceof BigQuery.date)) {
     return new BigQuery.date(value);
   }
@@ -240,8 +243,9 @@ BigQuery.prototype.date = function BigQueryDate(value) {
  *   seconds: 0
  * });
  */
-BigQuery.datetime =
-BigQuery.prototype.datetime = function BigQueryDatetime(value) {
+BigQuery.datetime = BigQuery.prototype.datetime = function BigQueryDatetime(
+  value
+) {
   if (!(this instanceof BigQuery.datetime)) {
     return new BigQuery.datetime(value);
   }
@@ -257,7 +261,7 @@ BigQuery.prototype.datetime = function BigQueryDatetime(value) {
       y: value.year,
       m: value.month,
       d: value.day,
-      time: time ? ' ' + time : ''
+      time: time ? ' ' + time : '',
     });
   } else {
     value = value.replace(/^(.*)T(.*)Z$/, '$1 $2');
@@ -290,8 +294,7 @@ BigQuery.prototype.datetime = function BigQueryDatetime(value) {
  *   seconds: 0
  * });
  */
-BigQuery.time =
-BigQuery.prototype.time = function BigQueryTime(value) {
+BigQuery.time = BigQuery.prototype.time = function BigQueryTime(value) {
   if (!(this instanceof BigQuery.time)) {
     return new BigQuery.time(value);
   }
@@ -301,7 +304,7 @@ BigQuery.prototype.time = function BigQueryTime(value) {
       h: value.hours,
       m: value.minutes || 0,
       s: value.seconds || 0,
-      f: is.defined(value.fractional) ? '.' + value.fractional : ''
+      f: is.defined(value.fractional) ? '.' + value.fractional : '',
     });
   }
 
@@ -317,8 +320,9 @@ BigQuery.prototype.time = function BigQueryTime(value) {
  * @example
  * var timestamp = bigquery.timestamp(new Date());
  */
-BigQuery.timestamp =
-BigQuery.prototype.timestamp = function BigQueryTimestamp(value) {
+BigQuery.timestamp = BigQuery.prototype.timestamp = function BigQueryTimestamp(
+  value
+) {
   if (!(this instanceof BigQuery.timestamp)) {
     return new BigQuery.timestamp(value);
   }
@@ -354,7 +358,7 @@ BigQuery.getType_ = function(value) {
   } else if (is.array(value)) {
     return {
       type: 'ARRAY',
-      arrayType: BigQuery.getType_(value[0])
+      arrayType: BigQuery.getType_(value[0]),
     };
   } else if (is.bool(value)) {
     typeName = 'BOOL';
@@ -366,23 +370,25 @@ BigQuery.getType_ = function(value) {
       structTypes: Object.keys(value).map(function(prop) {
         return {
           name: prop,
-          type: BigQuery.getType_(value[prop])
+          type: BigQuery.getType_(value[prop]),
         };
-      })
+      }),
     };
   } else if (is.string(value)) {
     typeName = 'STRING';
   }
 
   if (!typeName) {
-    throw new Error([
-      'This value could not be translated to a BigQuery data type.',
-      value
-    ].join('\n'));
+    throw new Error(
+      [
+        'This value could not be translated to a BigQuery data type.',
+        value,
+      ].join('\n')
+    );
   }
 
   return {
-    type: typeName
+    type: typeName,
   };
 };
 
@@ -403,7 +409,7 @@ BigQuery.valueToQueryParameter_ = function(value) {
 
   var queryParameter = {
     parameterType: BigQuery.getType_(value),
-    parameterValue: {}
+    parameterValue: {},
   };
 
   var typeName = queryParameter.parameterType.type;
@@ -415,16 +421,18 @@ BigQuery.valueToQueryParameter_ = function(value) {
   if (typeName === 'ARRAY') {
     queryParameter.parameterValue.arrayValues = value.map(function(value) {
       return {
-        value: value
+        value: value,
       };
     });
   } else if (typeName === 'STRUCT') {
-    queryParameter.parameterValue.structValues = Object.keys(value)
-      .reduce(function(structValues, prop) {
+    queryParameter.parameterValue.structValues = Object.keys(value).reduce(
+      function(structValues, prop) {
         var nestedQueryParameter = BigQuery.valueToQueryParameter_(value[prop]);
         structValues[prop] = nestedQueryParameter.parameterValue;
         return structValues;
-      }, {});
+      },
+      {}
+    );
   } else {
     queryParameter.parameterValue.value = value;
   }
@@ -464,25 +472,28 @@ BigQuery.prototype.createDataset = function(id, options, callback) {
     options = {};
   }
 
-  this.request({
-    method: 'POST',
-    uri: '/datasets',
-    json: extend(true, {}, options, {
-      datasetReference: {
-        datasetId: id
+  this.request(
+    {
+      method: 'POST',
+      uri: '/datasets',
+      json: extend(true, {}, options, {
+        datasetReference: {
+          datasetId: id,
+        },
+      }),
+    },
+    function(err, resp) {
+      if (err) {
+        callback(err, null, resp);
+        return;
       }
-    })
-  }, function(err, resp) {
-    if (err) {
-      callback(err, null, resp);
-      return;
+
+      var dataset = that.dataset(id);
+      dataset.metadata = resp;
+
+      callback(null, dataset, resp);
     }
-
-    var dataset = that.dataset(id);
-    dataset.metadata = resp;
-
-    callback(null, dataset, resp);
-  });
+  );
 };
 
 /**
@@ -578,24 +589,27 @@ BigQuery.prototype.createJob = function(options, callback) {
 
   reqOpts.jobReference = {
     projectId: this.projectId,
-    jobId: jobId
+    jobId: jobId,
   };
 
-  this.request({
-    method: 'POST',
-    uri: '/jobs',
-    json: reqOpts
-  }, function(err, resp) {
-    if (err) {
-      callback(err, null, resp);
-      return;
+  this.request(
+    {
+      method: 'POST',
+      uri: '/jobs',
+      json: reqOpts,
+    },
+    function(err, resp) {
+      if (err) {
+        callback(err, null, resp);
+        return;
+      }
+
+      var job = self.job(jobId);
+      job.metadata = resp;
+
+      callback(null, job, resp);
     }
-
-    var job = self.job(jobId);
-    job.metadata = resp;
-
-    callback(null, job, resp);
-  });
+  );
 };
 
 /**
@@ -666,31 +680,34 @@ BigQuery.prototype.getDatasets = function(query, callback) {
 
   query = query || {};
 
-  this.request({
-    uri: '/datasets',
-    qs: query
-  }, function(err, resp) {
-    if (err) {
-      callback(err, null, null, resp);
-      return;
-    }
+  this.request(
+    {
+      uri: '/datasets',
+      qs: query,
+    },
+    function(err, resp) {
+      if (err) {
+        callback(err, null, null, resp);
+        return;
+      }
 
-    var nextQuery = null;
+      var nextQuery = null;
 
-    if (resp.nextPageToken) {
-      nextQuery = extend({}, query, {
-        pageToken: resp.nextPageToken
+      if (resp.nextPageToken) {
+        nextQuery = extend({}, query, {
+          pageToken: resp.nextPageToken,
+        });
+      }
+
+      var datasets = (resp.datasets || []).map(function(dataset) {
+        var ds = that.dataset(dataset.datasetReference.datasetId);
+        ds.metadata = dataset;
+        return ds;
       });
+
+      callback(null, datasets, nextQuery, resp);
     }
-
-    var datasets = (resp.datasets || []).map(function(dataset) {
-      var ds = that.dataset(dataset.datasetReference.datasetId);
-      ds.metadata = dataset;
-      return ds;
-    });
-
-    callback(null, datasets, nextQuery, resp);
-  });
+  );
 };
 
 /**
@@ -720,8 +737,9 @@ BigQuery.prototype.getDatasets = function(query, callback) {
  *     this.end();
  *   });
  */
-BigQuery.prototype.getDatasetsStream =
-  common.paginator.streamify('getDatasets');
+BigQuery.prototype.getDatasetsStream = common.paginator.streamify(
+  'getDatasets'
+);
 
 /**
  * Get all of the jobs from your project.
@@ -787,32 +805,35 @@ BigQuery.prototype.getJobs = function(options, callback) {
 
   options = options || {};
 
-  this.request({
-    uri: '/jobs',
-    qs: options,
-    useQuerystring: true
-  }, function(err, resp) {
-    if (err) {
-      callback(err, null, null, resp);
-      return;
-    }
+  this.request(
+    {
+      uri: '/jobs',
+      qs: options,
+      useQuerystring: true,
+    },
+    function(err, resp) {
+      if (err) {
+        callback(err, null, null, resp);
+        return;
+      }
 
-    var nextQuery = null;
+      var nextQuery = null;
 
-    if (resp.nextPageToken) {
-      nextQuery = extend({}, options, {
-        pageToken: resp.nextPageToken
+      if (resp.nextPageToken) {
+        nextQuery = extend({}, options, {
+          pageToken: resp.nextPageToken,
+        });
+      }
+
+      var jobs = (resp.jobs || []).map(function(jobObject) {
+        var job = that.job(jobObject.jobReference.jobId);
+        job.metadata = jobObject;
+        return job;
       });
+
+      callback(null, jobs, nextQuery, resp);
     }
-
-    var jobs = (resp.jobs || []).map(function(jobObject) {
-      var job = that.job(jobObject.jobReference.jobId);
-      job.metadata = jobObject;
-      return job;
-    });
-
-    callback(null, jobs, nextQuery, resp);
-  });
+  );
 };
 
 /**
@@ -1043,7 +1064,7 @@ BigQuery.prototype.query = function(query, options, callback) {
 BigQuery.prototype.startQuery = function(options, callback) {
   if (is.string(options)) {
     options = {
-      query: options
+      query: options,
     };
   }
 
@@ -1051,9 +1072,13 @@ BigQuery.prototype.startQuery = function(options, callback) {
     throw new Error('A SQL query string is required.');
   }
 
-  var query = extend(true, {
-    useLegacySql: false
-  }, options);
+  var query = extend(
+    true,
+    {
+      useLegacySql: false,
+    },
+    options
+  );
 
   if (options.destination) {
     if (!(options.destination instanceof Table)) {
@@ -1063,7 +1088,7 @@ BigQuery.prototype.startQuery = function(options, callback) {
     query.destinationTable = {
       datasetId: options.destination.dataset.id,
       projectId: options.destination.dataset.bigQuery.projectId,
-      tableId: options.destination.id
+      tableId: options.destination.id,
     };
 
     delete query.destination;
@@ -1082,8 +1107,7 @@ BigQuery.prototype.startQuery = function(options, callback) {
         query.queryParameters.push(queryParameter);
       }
     } else {
-      query.queryParameters = query.params
-        .map(BigQuery.valueToQueryParameter_);
+      query.queryParameters = query.params.map(BigQuery.valueToQueryParameter_);
     }
 
     delete query.params;
@@ -1091,8 +1115,8 @@ BigQuery.prototype.startQuery = function(options, callback) {
 
   var reqOpts = {
     configuration: {
-      query: query
-    }
+      query: query,
+    },
   };
 
   if (query.dryRun) {
@@ -1120,14 +1144,7 @@ common.paginator.extend(BigQuery, ['getDatasets', 'getJobs']);
  * that a callback is omitted.
  */
 common.util.promisifyAll(BigQuery, {
-  exclude: [
-    'dataset',
-    'date',
-    'datetime',
-    'job',
-    'time',
-    'timestamp'
-  ]
+  exclude: ['dataset', 'date', 'datetime', 'job', 'time', 'timestamp'],
 });
 
 BigQuery.Dataset = Dataset;

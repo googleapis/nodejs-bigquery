@@ -41,7 +41,7 @@ var uuid = require('uuid');
 var FORMATS = {
   avro: 'AVRO',
   csv: 'CSV',
-  json: 'NEWLINE_DELIMITED_JSON'
+  json: 'NEWLINE_DELIMITED_JSON',
 };
 
 /*! Developer Documentation
@@ -207,7 +207,7 @@ function Table(dataset, id) {
      *   var apiResponse = data[0];
      * });
      */
-    setMetadata: true
+    setMetadata: true,
   };
 
   common.ServiceObject.call(this, {
@@ -215,7 +215,7 @@ function Table(dataset, id) {
     baseUrl: '/tables',
     id: id,
     createMethod: dataset.createTable.bind(dataset),
-    methods: methods
+    methods: methods,
   });
 
   this.bigQuery = dataset.bigQuery;
@@ -231,7 +231,7 @@ function Table(dataset, id) {
       }
 
       return reqOpts;
-    }
+    },
   });
 }
 
@@ -247,16 +247,19 @@ util.inherits(Table, common.ServiceObject);
  * @return {object} Table schema in the format the API expects.
  */
 Table.createSchemaFromString_ = function(str) {
-  return str.split(/\s*,\s*/).reduce(function(acc, pair) {
-    acc.fields.push({
-      name: pair.split(':')[0],
-      type: (pair.split(':')[1] || 'STRING').toUpperCase()
-    });
+  return str.split(/\s*,\s*/).reduce(
+    function(acc, pair) {
+      acc.fields.push({
+        name: pair.split(':')[0],
+        type: (pair.split(':')[1] || 'STRING').toUpperCase(),
+      });
 
-    return acc;
-  }, {
-    fields: []
-  });
+      return acc;
+    },
+    {
+      fields: [],
+    }
+  );
 };
 
 /**
@@ -322,7 +325,7 @@ Table.formatMetadata_ = function(options) {
 
   if (is.array(options.schema)) {
     body.schema = {
-      fields: options.schema
+      fields: options.schema,
     };
   }
 
@@ -338,14 +341,14 @@ Table.formatMetadata_ = function(options) {
 
   if (is.string(body.partitioning)) {
     body.timePartitioning = {
-      type: body.partitioning.toUpperCase()
+      type: body.partitioning.toUpperCase(),
     };
   }
 
   if (is.string(body.view)) {
     body.view = {
       query: body.view,
-      useLegacySql: false
+      useLegacySql: false,
     };
   }
 
@@ -399,11 +402,9 @@ Table.prototype.copy = function(destination, metadata, callback) {
       return;
     }
 
-    job
-      .on('error', callback)
-      .on('complete', function(metadata) {
-        callback(null, metadata);
-      });
+    job.on('error', callback).on('complete', function(metadata) {
+      callback(null, metadata);
+    });
   });
 };
 
@@ -459,11 +460,9 @@ Table.prototype.copyFrom = function(sourceTables, metadata, callback) {
       return;
     }
 
-    job
-      .on('error', callback)
-      .on('complete', function(metadata) {
-        callback(null, metadata);
-      });
+    job.on('error', callback).on('complete', function(metadata) {
+      callback(null, metadata);
+    });
   });
 };
 
@@ -558,7 +557,7 @@ Table.prototype.createWriteStream = function(metadata) {
 
   if (is.string(metadata)) {
     metadata = {
-      sourceFormat: FORMATS[metadata.toLowerCase()]
+      sourceFormat: FORMATS[metadata.toLowerCase()],
     };
   }
 
@@ -570,8 +569,8 @@ Table.prototype.createWriteStream = function(metadata) {
     destinationTable: {
       projectId: self.bigQuery.projectId,
       datasetId: self.dataset.id,
-      tableId: self.id
-    }
+      tableId: self.id,
+    },
   });
 
   var jobId = uuid.v4();
@@ -581,37 +580,43 @@ Table.prototype.createWriteStream = function(metadata) {
     delete metadata.jobPrefix;
   }
 
-  if (metadata.hasOwnProperty('sourceFormat') &&
-      fileTypes.indexOf(metadata.sourceFormat) < 0) {
+  if (
+    metadata.hasOwnProperty('sourceFormat') &&
+    fileTypes.indexOf(metadata.sourceFormat) < 0
+  ) {
     throw new Error('Source format not recognized: ' + metadata.sourceFormat);
   }
 
   var dup = streamEvents(duplexify());
 
   dup.once('writing', function() {
-    common.util.makeWritableStream(dup, {
-      makeAuthenticatedRequest: self.bigQuery.makeAuthenticatedRequest,
-      metadata: {
-        configuration: {
-          load: metadata
+    common.util.makeWritableStream(
+      dup,
+      {
+        makeAuthenticatedRequest: self.bigQuery.makeAuthenticatedRequest,
+        metadata: {
+          configuration: {
+            load: metadata,
+          },
+          jobReference: {
+            jobId: jobId,
+            projectId: self.bigQuery.projectId,
+          },
         },
-        jobReference: {
-          jobId: jobId,
-          projectId: self.bigQuery.projectId
-        }
+        request: {
+          uri: format('{base}/{projectId}/jobs', {
+            base: 'https://www.googleapis.com/upload/bigquery/v2/projects',
+            projectId: self.bigQuery.projectId,
+          }),
+        },
       },
-      request: {
-        uri: format('{base}/{projectId}/jobs', {
-          base: 'https://www.googleapis.com/upload/bigquery/v2/projects',
-          projectId: self.bigQuery.projectId
-        })
-      }
-    }, function(data) {
-      var job = self.bigQuery.job(data.jobReference.jobId);
-      job.metadata = data;
+      function(data) {
+        var job = self.bigQuery.job(data.jobReference.jobId);
+        job.metadata = data;
 
-      dup.emit('complete', job);
-    });
+        dup.emit('complete', job);
+      }
+    );
   });
 
   return dup;
@@ -686,11 +691,9 @@ Table.prototype.export = function(destination, options, callback) {
       return;
     }
 
-    job
-      .on('error', callback)
-      .on('complete', function(metadata) {
-        callback(null, metadata);
-      });
+    job.on('error', callback).on('complete', function(metadata) {
+      callback(null, metadata);
+    });
   });
 };
 
@@ -746,39 +749,42 @@ Table.prototype.getRows = function(options, callback) {
     options = {};
   }
 
-  this.request({
-    uri: '/data',
-    qs: options
-  }, function(err, resp) {
-    if (err) {
-      onComplete(err, null, null, resp);
-      return;
+  this.request(
+    {
+      uri: '/data',
+      qs: options,
+    },
+    function(err, resp) {
+      if (err) {
+        onComplete(err, null, null, resp);
+        return;
+      }
+
+      var nextQuery = null;
+
+      if (resp.pageToken) {
+        nextQuery = extend({}, options, {
+          pageToken: resp.pageToken,
+        });
+      }
+
+      if (resp.rows && resp.rows.length > 0 && !self.metadata.schema) {
+        // We don't know the schema for this table yet. Do a quick stat.
+        self.getMetadata(function(err, metadata, apiResponse) {
+          if (err) {
+            onComplete(err, null, null, apiResponse);
+            return;
+          }
+
+          onComplete(null, resp.rows, nextQuery, resp);
+        });
+
+        return;
+      }
+
+      onComplete(null, resp.rows, nextQuery, resp);
     }
-
-    var nextQuery = null;
-
-    if (resp.pageToken) {
-      nextQuery = extend({}, options, {
-        pageToken: resp.pageToken
-      });
-    }
-
-    if (resp.rows && resp.rows.length > 0 && !self.metadata.schema) {
-      // We don't know the schema for this table yet. Do a quick stat.
-      self.getMetadata(function(err, metadata, apiResponse) {
-        if (err) {
-          onComplete(err, null, null, apiResponse);
-          return;
-        }
-
-        onComplete(null, resp.rows, nextQuery, resp);
-      });
-
-      return;
-    }
-
-    onComplete(null, resp.rows, nextQuery, resp);
-  });
+  );
 
   function onComplete(err, rows, nextQuery, resp) {
     if (err) {
@@ -866,11 +872,9 @@ Table.prototype.import = function(source, metadata, callback) {
       return;
     }
 
-    job
-      .on('error', callback)
-      .on('complete', function(metadata) {
-        callback(null, metadata);
-      });
+    job.on('error', callback).on('complete', function(metadata) {
+      callback(null, metadata);
+    });
   });
 };
 
@@ -1014,13 +1018,13 @@ Table.prototype.insert = function(rows, options, callback) {
   }
 
   var json = extend(true, {}, options, {
-    rows: rows
+    rows: rows,
   });
 
   if (!options.raw) {
     json.rows = arrify(rows).map(function(row) {
       return {
-        json: Table.encodeValue_(row)
+        json: Table.encodeValue_(row),
       };
     });
   }
@@ -1041,55 +1045,63 @@ Table.prototype.insert = function(rows, options, callback) {
     delete json.schema;
   }
 
-  this.request({
-    method: 'POST',
-    uri: '/insertAll',
-    json: json
-  }, function(err, resp) {
-    if (err) {
-      if (err.code === 404 && autoCreate) {
-        setTimeout(createTableAndRetry, Math.random() * 60000);
-      } else {
-        callback(err, resp);
-      }
-      return;
-    }
-
-    var partialFailures = (resp.insertErrors || []).map(function(insertError) {
-      return {
-        errors: insertError.errors.map(function(error) {
-          return {
-            message: error.message,
-            reason: error.reason
-          };
-        }),
-        row: rows[insertError.index]
-      };
-    });
-
-    if (partialFailures.length > 0) {
-      err = new common.util.PartialFailureError({
-        errors: partialFailures,
-        response: resp
-      });
-    }
-
-    callback(err, resp);
-  });
-
-  function createTableAndRetry() {
-    self.create({
-      schema: schema
-    }, function(err, table, resp) {
-      if (err && err.code !== 409) {
-        callback(err, resp);
+  this.request(
+    {
+      method: 'POST',
+      uri: '/insertAll',
+      json: json,
+    },
+    function(err, resp) {
+      if (err) {
+        if (err.code === 404 && autoCreate) {
+          setTimeout(createTableAndRetry, Math.random() * 60000);
+        } else {
+          callback(err, resp);
+        }
         return;
       }
 
-      setTimeout(function() {
-        self.insert(rows, options, callback);
-      }, 60000);
-    });
+      var partialFailures = (resp.insertErrors || []).map(function(
+        insertError
+      ) {
+        return {
+          errors: insertError.errors.map(function(error) {
+            return {
+              message: error.message,
+              reason: error.reason,
+            };
+          }),
+          row: rows[insertError.index],
+        };
+      });
+
+      if (partialFailures.length > 0) {
+        err = new common.util.PartialFailureError({
+          errors: partialFailures,
+          response: resp,
+        });
+      }
+
+      callback(err, resp);
+    }
+  );
+
+  function createTableAndRetry() {
+    self.create(
+      {
+        schema: schema,
+      },
+      function(err, table, resp) {
+        if (err && err.code !== 409) {
+          callback(err, resp);
+          return;
+        }
+
+        setTimeout(function() {
+          self.insert(rows, options, callback);
+        }, 60000);
+      }
+    );
   }
 };
 
@@ -1120,7 +1132,7 @@ Table.prototype.query = function(query, callback) {
  *     information.
  * @param {function} callback - The callback function.
  * @param {?error} callback.err - An error returned while making this request.
-  * @param {object} callback.apiResponse - The full API response.
+ * @param {object} callback.apiResponse - The full API response.
  *
  * @example
  * var metadata = {
@@ -1203,15 +1215,15 @@ Table.prototype.startCopy = function(destination, metadata, callback) {
         destinationTable: {
           datasetId: destination.dataset.id,
           projectId: destination.bigQuery.projectId,
-          tableId: destination.id
+          tableId: destination.id,
         },
         sourceTable: {
           datasetId: this.dataset.id,
           projectId: this.bigQuery.projectId,
-          tableId: this.id
-        }
-      })
-    }
+          tableId: this.id,
+        },
+      }),
+    },
   };
 
   if (metadata.jobPrefix) {
@@ -1291,18 +1303,18 @@ Table.prototype.startCopyFrom = function(sourceTables, metadata, callback) {
         destinationTable: {
           datasetId: this.dataset.id,
           projectId: this.bigQuery.projectId,
-          tableId: this.id
+          tableId: this.id,
         },
 
         sourceTables: sourceTables.map(function(sourceTable) {
           return {
             datasetId: sourceTable.dataset.id,
             projectId: sourceTable.bigQuery.projectId,
-            tableId: sourceTable.id
+            tableId: sourceTable.id,
           };
-        })
-      })
-    }
+        }),
+      }),
+    },
   };
 
   if (metadata.jobPrefix) {
@@ -1391,13 +1403,16 @@ Table.prototype.startExport = function(destination, options, callback) {
 
       // If no explicit format was provided, attempt to find a match from the
       // file's extension. If no match, don't set, and default upstream to CSV.
-      var format = path.extname(dest.name).substr(1).toLowerCase();
+      var format = path
+        .extname(dest.name)
+        .substr(1)
+        .toLowerCase();
       if (!options.destinationFormat && !options.format && FORMATS[format]) {
         options.destinationFormat = FORMATS[format];
       }
 
       return 'gs://' + dest.bucket.name + '/' + dest.name;
-    })
+    }),
   });
 
   if (options.format) {
@@ -1422,10 +1437,10 @@ Table.prototype.startExport = function(destination, options, callback) {
         sourceTable: {
           datasetId: this.dataset.id,
           projectId: this.bigQuery.projectId,
-          tableId: this.id
-        }
-      })
-    }
+          tableId: this.id,
+        },
+      }),
+    },
   };
 
   if (options.jobPrefix) {
@@ -1525,13 +1540,20 @@ Table.prototype.startImport = function(source, metadata, callback) {
   if (is.string(source)) {
     // A path to a file was given. If a sourceFormat wasn't specified, try to
     // find a match from the file's extension.
-    var detectedFormat = FORMATS[path.extname(source).substr(1).toLowerCase()];
+    var detectedFormat =
+      FORMATS[
+        path
+          .extname(source)
+          .substr(1)
+          .toLowerCase()
+      ];
     if (!metadata.sourceFormat && detectedFormat) {
       metadata.sourceFormat = detectedFormat;
     }
 
     // Read the file into a new write stream.
-    return fs.createReadStream(source)
+    return fs
+      .createReadStream(source)
       .pipe(this.createWriteStream(metadata))
       .on('error', callback)
       .on('complete', function(job) {
@@ -1545,10 +1567,10 @@ Table.prototype.startImport = function(source, metadata, callback) {
         destinationTable: {
           projectId: this.bigQuery.projectId,
           datasetId: this.dataset.id,
-          tableId: this.id
-        }
-      }
-    }
+          tableId: this.id,
+        },
+      },
+    },
   };
 
   if (metadata.jobPrefix) {
@@ -1565,13 +1587,19 @@ Table.prototype.startImport = function(source, metadata, callback) {
       // If no explicit format was provided, attempt to find a match from
       // the file's extension. If no match, don't set, and default upstream
       // to CSV.
-      var format = FORMATS[path.extname(src.name).substr(1).toLowerCase()];
+      var format =
+        FORMATS[
+          path
+            .extname(src.name)
+            .substr(1)
+            .toLowerCase()
+        ];
       if (!metadata.sourceFormat && format) {
         body.configuration.load.sourceFormat = format;
       }
 
       return 'gs://' + src.bucket.name + '/' + src.name;
-    })
+    }),
   });
 
   this.bigQuery.createJob(body, callback);

@@ -35,7 +35,7 @@ var utilOverrides = {
     if (Class.name === 'Job') {
       promisified = true;
     }
-  }
+  },
 };
 
 var extended = false;
@@ -51,7 +51,7 @@ var fakePaginator = {
   },
   streamify: function(methodName) {
     return methodName;
-  }
+  },
 };
 
 var fakeUtil = Object.keys(util).reduce(function(fakeUtil, methodName) {
@@ -65,7 +65,7 @@ var fakeUtil = Object.keys(util).reduce(function(fakeUtil, methodName) {
 describe('BigQuery/Job', function() {
   var BIGQUERY = {
     projectId: 'my-project',
-    Promise: Promise
+    Promise: Promise,
   };
   var JOB_ID = 'job_XYrk_3z';
   var Job;
@@ -76,8 +76,8 @@ describe('BigQuery/Job', function() {
       '@google-cloud/common': {
         Operation: FakeOperation,
         paginator: fakePaginator,
-        util: fakeUtil
-      }
+        util: fakeUtil,
+      },
     });
   });
 
@@ -111,7 +111,7 @@ describe('BigQuery/Job', function() {
         exists: true,
         get: true,
         getMetadata: true,
-        setMetadata: true
+        setMetadata: true,
       });
     });
 
@@ -123,10 +123,10 @@ describe('BigQuery/Job', function() {
 
       it('should transform `projects` -> `project` for /cancel', function() {
         var reqOpts = {
-          uri: '/bigquery/v2/projects/projectId/jobs/jobId/cancel'
+          uri: '/bigquery/v2/projects/projectId/jobs/jobId/cancel',
         };
         var expectedReqOpts = {
-          uri: '/bigquery/v2/project/projectId/jobs/jobId/cancel'
+          uri: '/bigquery/v2/project/projectId/jobs/jobId/cancel',
         };
 
         var requestInterceptor = job.interceptors.pop().request;
@@ -135,10 +135,10 @@ describe('BigQuery/Job', function() {
 
       it('should not affect non-cancel requests', function() {
         var reqOpts = {
-          uri: '/bigquery/v2/projects/projectId/jobs/jobId/getQueryResults'
+          uri: '/bigquery/v2/projects/projectId/jobs/jobId/getQueryResults',
         };
         var expectedReqOpts = {
-          uri: '/bigquery/v2/projects/projectId/jobs/jobId/getQueryResults'
+          uri: '/bigquery/v2/projects/projectId/jobs/jobId/getQueryResults',
         };
 
         var requestInterceptor = job.interceptors.pop().request;
@@ -191,12 +191,12 @@ describe('BigQuery/Job', function() {
     var pageToken = 'token';
     var options = {
       a: 'a',
-      b: 'b'
+      b: 'b',
     };
 
     var RESPONSE = {
       pageToken: pageToken,
-      jobReference: { jobId: JOB_ID }
+      jobReference: {jobId: JOB_ID},
     };
 
     beforeEach(function() {
@@ -259,7 +259,7 @@ describe('BigQuery/Job', function() {
     it('should merge the rows with the schema', function(done) {
       var response = {
         schema: {},
-        rows: []
+        rows: [],
       };
 
       var mergedRows = [];
@@ -284,7 +284,7 @@ describe('BigQuery/Job', function() {
     it('should return the query when the job is not complete', function(done) {
       BIGQUERY.request = function(reqOpts, callback) {
         callback(null, {
-          jobComplete: false
+          jobComplete: false,
         });
       };
 
@@ -341,8 +341,8 @@ describe('BigQuery/Job', function() {
       var error = new Error('Error.');
       var apiResponse = {
         status: {
-          errors: error
-        }
+          errors: error,
+        },
       };
 
       beforeEach(function() {
@@ -368,8 +368,8 @@ describe('BigQuery/Job', function() {
     describe('job pending', function() {
       var apiResponse = {
         status: {
-          state: 'PENDING'
-        }
+          state: 'PENDING',
+        },
       };
 
       beforeEach(function() {
@@ -390,8 +390,8 @@ describe('BigQuery/Job', function() {
     describe('job complete', function() {
       var apiResponse = {
         status: {
-          state: 'DONE'
-        }
+          state: 'DONE',
+        },
       };
 
       beforeEach(function() {

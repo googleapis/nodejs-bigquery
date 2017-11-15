@@ -23,34 +23,36 @@ const uuid = require(`uuid`);
 
 const cwd = path.join(__dirname, `..`);
 const cmd = `node datasets.js`;
-const datasetId = (`nodejs-docs-samples-test-${uuid.v4()}`).replace(/-/gi, '_');
+const datasetId = `nodejs-docs-samples-test-${uuid.v4()}`.replace(/-/gi, '_');
 
 test.before(tools.checkCredentials);
 test.beforeEach(tools.stubConsole);
 test.afterEach.always(tools.restoreConsole);
 test.after.always(async () => {
   try {
-    await bigquery.dataset(datasetId).delete({ force: true });
+    await bigquery.dataset(datasetId).delete({force: true});
   } catch (err) {} // ignore error
 });
 
-test.serial(`should create a dataset`, async (t) => {
+test.serial(`should create a dataset`, async t => {
   const output = await tools.runAsync(`${cmd} create ${datasetId}`, cwd);
   t.is(output, `Dataset ${datasetId} created.`);
   const [exists] = await bigquery.dataset(datasetId).exists();
   t.true(exists);
 });
 
-test.serial(`should list datasets`, async (t) => {
+test.serial(`should list datasets`, async t => {
   t.plan(0);
-  await tools.tryTest(async (assert) => {
-    const output = await tools.runAsync(`${cmd} list`, cwd);
-    assert(output.includes(`Datasets:`));
-    assert(output.includes(datasetId));
-  }).start();
+  await tools
+    .tryTest(async assert => {
+      const output = await tools.runAsync(`${cmd} list`, cwd);
+      assert(output.includes(`Datasets:`));
+      assert(output.includes(datasetId));
+    })
+    .start();
 });
 
-test.serial(`should delete a dataset`, async (t) => {
+test.serial(`should delete a dataset`, async t => {
   const output = await tools.runAsync(`${cmd} delete ${datasetId}`, cwd);
   t.is(output, `Dataset ${datasetId} deleted.`);
   const [exists] = await bigquery.dataset(datasetId).exists();
