@@ -15,7 +15,7 @@
 
 'use strict';
 
-function createTable (datasetId, tableId, schema, projectId) {
+function createTable(datasetId, tableId, schema, projectId) {
   // [START bigquery_create_table]
   // Imports the Google Cloud client library
   const BigQuery = require('@google-cloud/bigquery');
@@ -34,29 +34,29 @@ function createTable (datasetId, tableId, schema, projectId) {
 
   // Instantiates a client
   const bigquery = BigQuery({
-    projectId: projectId
+    projectId: projectId,
   });
 
   // For all options, see https://cloud.google.com/bigquery/docs/reference/v2/tables#resource
   const options = {
-    schema: schema
+    schema: schema,
   };
 
   // Create a new table in the dataset
   bigquery
     .dataset(datasetId)
     .createTable(tableId, options)
-    .then((results) => {
+    .then(results => {
       const table = results[0];
       console.log(`Table ${table.id} created.`);
     })
-    .catch((err) => {
+    .catch(err => {
       console.error('ERROR:', err);
     });
   // [END bigquery_create_table]
 }
 
-function deleteTable (datasetId, tableId, projectId) {
+function deleteTable(datasetId, tableId, projectId) {
   // [START bigquery_delete_table]
   // Imports the Google Cloud client library
   const BigQuery = require('@google-cloud/bigquery');
@@ -72,7 +72,7 @@ function deleteTable (datasetId, tableId, projectId) {
 
   // Instantiates a client
   const bigquery = BigQuery({
-    projectId: projectId
+    projectId: projectId,
   });
 
   // Deletes the table
@@ -83,13 +83,13 @@ function deleteTable (datasetId, tableId, projectId) {
     .then(() => {
       console.log(`Table ${tableId} deleted.`);
     })
-    .catch((err) => {
+    .catch(err => {
       console.error('ERROR:', err);
     });
   // [END bigquery_delete_table]
 }
 
-function listTables (datasetId, projectId) {
+function listTables(datasetId, projectId) {
   // [START bigquery_list_tables]
   // Imports the Google Cloud client library
   const BigQuery = require('@google-cloud/bigquery');
@@ -102,25 +102,25 @@ function listTables (datasetId, projectId) {
 
   // Instantiates a client
   const bigquery = BigQuery({
-    projectId: projectId
+    projectId: projectId,
   });
 
   // Lists all tables in the dataset
   bigquery
     .dataset(datasetId)
     .getTables()
-    .then((results) => {
+    .then(results => {
       const tables = results[0];
       console.log('Tables:');
-      tables.forEach((table) => console.log(table.id));
+      tables.forEach(table => console.log(table.id));
     })
-    .catch((err) => {
+    .catch(err => {
       console.error('ERROR:', err);
     });
   // [END bigquery_list_tables]
 }
 
-function browseRows (datasetId, tableId, projectId) {
+function browseRows(datasetId, tableId, projectId) {
   // [START bigquery_browse_table]
   // Imports the Google Cloud client library
   const BigQuery = require('@google-cloud/bigquery');
@@ -136,7 +136,7 @@ function browseRows (datasetId, tableId, projectId) {
 
   // Instantiates a client
   const bigquery = BigQuery({
-    projectId: projectId
+    projectId: projectId,
   });
 
   // Lists rows in the table
@@ -144,18 +144,24 @@ function browseRows (datasetId, tableId, projectId) {
     .dataset(datasetId)
     .table(tableId)
     .getRows()
-    .then((results) => {
+    .then(results => {
       const rows = results[0];
       console.log('Rows:');
-      rows.forEach((row) => console.log(row));
+      rows.forEach(row => console.log(row));
     })
-    .catch((err) => {
+    .catch(err => {
       console.error('ERROR:', err);
     });
   // [END bigquery_browse_table]
 }
 
-function copyTable (srcDatasetId, srcTableId, destDatasetId, destTableId, projectId) {
+function copyTable(
+  srcDatasetId,
+  srcTableId,
+  destDatasetId,
+  destTableId,
+  projectId
+) {
   // [START bigquery_copy_table]
   // Imports the Google Cloud client library
   const BigQuery = require('@google-cloud/bigquery');
@@ -177,7 +183,7 @@ function copyTable (srcDatasetId, srcTableId, destDatasetId, destTableId, projec
 
   // Instantiates a client
   const bigquery = BigQuery({
-    projectId: projectId
+    projectId: projectId,
   });
 
   let job;
@@ -187,32 +193,34 @@ function copyTable (srcDatasetId, srcTableId, destDatasetId, destTableId, projec
     .dataset(srcDatasetId)
     .table(srcTableId)
     .copy(bigquery.dataset(destDatasetId).table(destTableId))
-    .then((results) => {
+    .then(results => {
       job = results[0];
       console.log(`Job ${job.id} started.`);
 
       // Wait for the job to finish
       return job.promise();
     })
-    .then((results) => {
+    .then(results => {
       // Get the job's status
       return job.getMetadata();
-    }).then((metadata) => {
+    })
+    .then(metadata => {
       // Check the job's status for errors
       const errors = metadata[0].status.errors;
       if (errors && errors.length > 0) {
         throw errors;
       }
-    }).then(() => {
+    })
+    .then(() => {
       console.log(`Job ${job.id} completed.`);
     })
-    .catch((err) => {
+    .catch(err => {
       console.error('ERROR:', err);
     });
   // [END bigquery_copy_table]
 }
 
-function importLocalFile (datasetId, tableId, filename, projectId) {
+function importLocalFile(datasetId, tableId, filename, projectId) {
   // [START bigquery_import_from_file]
   // Imports the Google Cloud client library
   const BigQuery = require('@google-cloud/bigquery');
@@ -231,7 +239,7 @@ function importLocalFile (datasetId, tableId, filename, projectId) {
 
   // Instantiates a client
   const bigquery = BigQuery({
-    projectId: projectId
+    projectId: projectId,
   });
 
   let job;
@@ -241,32 +249,40 @@ function importLocalFile (datasetId, tableId, filename, projectId) {
     .dataset(datasetId)
     .table(tableId)
     .import(filename)
-    .then((results) => {
+    .then(results => {
       job = results[0];
       console.log(`Job ${job.id} started.`);
 
       // Wait for the job to finish
       return job.promise();
     })
-    .then((results) => {
+    .then(results => {
       // Get the job's status
       return job.getMetadata();
-    }).then((metadata) => {
+    })
+    .then(metadata => {
       // Check the job's status for errors
       const errors = metadata[0].status.errors;
       if (errors && errors.length > 0) {
         throw errors;
       }
-    }).then(() => {
+    })
+    .then(() => {
       console.log(`Job ${job.id} completed.`);
     })
-    .catch((err) => {
+    .catch(err => {
       console.error('ERROR:', err);
     });
   // [END bigquery_import_from_file]
 }
 
-function importFileFromGCS (datasetId, tableId, bucketName, filename, projectId) {
+function importFileFromGCS(
+  datasetId,
+  tableId,
+  bucketName,
+  filename,
+  projectId
+) {
   // [START bigquery_import_from_gcs]
   // Imports the Google Cloud client libraries
   const BigQuery = require('@google-cloud/bigquery');
@@ -289,11 +305,11 @@ function importFileFromGCS (datasetId, tableId, bucketName, filename, projectId)
 
   // Instantiates clients
   const bigquery = BigQuery({
-    projectId: projectId
+    projectId: projectId,
   });
 
   const storage = Storage({
-    projectId: projectId
+    projectId: projectId,
   });
 
   let job;
@@ -303,32 +319,34 @@ function importFileFromGCS (datasetId, tableId, bucketName, filename, projectId)
     .dataset(datasetId)
     .table(tableId)
     .import(storage.bucket(bucketName).file(filename))
-    .then((results) => {
+    .then(results => {
       job = results[0];
       console.log(`Job ${job.id} started.`);
 
       // Wait for the job to finish
       return job.promise();
     })
-    .then((results) => {
+    .then(results => {
       // Get the job's status
       return job.getMetadata();
-    }).then((metadata) => {
+    })
+    .then(metadata => {
       // Check the job's status for errors
       const errors = metadata[0].status.errors;
       if (errors && errors.length > 0) {
         throw errors;
       }
-    }).then(() => {
+    })
+    .then(() => {
       console.log(`Job ${job.id} completed.`);
     })
-    .catch((err) => {
+    .catch(err => {
       console.error('ERROR:', err);
     });
   // [END bigquery_import_from_gcs]
 }
 
-function exportTableToGCS (datasetId, tableId, bucketName, filename, projectId) {
+function exportTableToGCS(datasetId, tableId, bucketName, filename, projectId) {
   // [START bigquery_export_gcs]
   // Imports the Google Cloud client libraries
   const BigQuery = require('@google-cloud/bigquery');
@@ -351,11 +369,11 @@ function exportTableToGCS (datasetId, tableId, bucketName, filename, projectId) 
 
   // Instantiates clients
   const bigquery = BigQuery({
-    projectId: projectId
+    projectId: projectId,
   });
 
   const storage = Storage({
-    projectId: projectId
+    projectId: projectId,
   });
 
   let job;
@@ -365,32 +383,34 @@ function exportTableToGCS (datasetId, tableId, bucketName, filename, projectId) 
     .dataset(datasetId)
     .table(tableId)
     .export(storage.bucket(bucketName).file(filename))
-    .then((results) => {
+    .then(results => {
       job = results[0];
       console.log(`Job ${job.id} started.`);
 
       // Wait for the job to finish
       return job.promise();
     })
-    .then((results) => {
+    .then(results => {
       // Get the job's status
       return job.getMetadata();
-    }).then((metadata) => {
+    })
+    .then(metadata => {
       // Check the job's status for errors
       const errors = metadata[0].status.errors;
       if (errors && errors.length > 0) {
         throw errors;
       }
-    }).then(() => {
+    })
+    .then(() => {
       console.log(`Job ${job.id} completed.`);
     })
-    .catch((err) => {
+    .catch(err => {
       console.error('ERROR:', err);
     });
   // [END bigquery_export_gcs]
 }
 
-function insertRowsAsStream (datasetId, tableId, rows, projectId) {
+function insertRowsAsStream(datasetId, tableId, rows, projectId) {
   // [START bigquery_insert_stream]
   // Imports the Google Cloud client library
   const BigQuery = require('@google-cloud/bigquery');
@@ -410,7 +430,7 @@ function insertRowsAsStream (datasetId, tableId, rows, projectId) {
 
   // Instantiates a client
   const bigquery = BigQuery({
-    projectId: projectId
+    projectId: projectId,
   });
 
   // Inserts data into a table
@@ -418,16 +438,16 @@ function insertRowsAsStream (datasetId, tableId, rows, projectId) {
     .dataset(datasetId)
     .table(tableId)
     .insert(rows)
-    .then((insertErrors) => {
+    .then(insertErrors => {
       console.log('Inserted:');
-      rows.forEach((row) => console.log(row));
+      rows.forEach(row => console.log(row));
 
       if (insertErrors && insertErrors.length > 0) {
         console.log('Insert errors:');
-        insertErrors.forEach((err) => console.error(err));
+        insertErrors.forEach(err => console.error(err));
       }
     })
-    .catch((err) => {
+    .catch(err => {
       console.error('ERROR:', err);
     });
   // [END bigquery_insert_stream]
@@ -441,38 +461,94 @@ const cli = require(`yargs`)
     projectId: {
       alias: 'p',
       default: process.env.GCLOUD_PROJECT || process.env.GOOGLE_CLOUD_PROJECT,
-      description: 'The Project ID to use. Defaults to the value of the GCLOUD_PROJECT or GOOGLE_CLOUD_PROJECT environment variables.',
+      description:
+        'The Project ID to use. Defaults to the value of the GCLOUD_PROJECT or GOOGLE_CLOUD_PROJECT environment variables.',
       requiresArg: true,
-      type: 'string'
+      type: 'string',
+    },
+  })
+  .command(
+    `create <datasetId> <tableId> <schema>`,
+    `Creates a new table.`,
+    {},
+    opts => {
+      createTable(opts.datasetId, opts.tableId, opts.schema, opts.projectId);
     }
-  })
-  .command(`create <datasetId> <tableId> <schema>`, `Creates a new table.`, {}, (opts) => {
-    createTable(opts.datasetId, opts.tableId, opts.schema, opts.projectId);
-  })
-  .command(`list <datasetId>`, `Lists all tables in a dataset.`, {}, (opts) => {
+  )
+  .command(`list <datasetId>`, `Lists all tables in a dataset.`, {}, opts => {
     listTables(opts.datasetId, opts.projectId);
   })
-  .command(`delete <datasetId> <tableId>`, `Deletes a table.`, {}, (opts) => {
+  .command(`delete <datasetId> <tableId>`, `Deletes a table.`, {}, opts => {
     deleteTable(opts.datasetId, opts.tableId, opts.projectId);
   })
-  .command(`copy <srcDatasetId> <srcTableId> <destDatasetId> <destTableId>`, `Makes a copy of a table.`, {}, (opts) => {
-    copyTable(opts.srcDatasetId, opts.srcTableId, opts.destDatasetId, opts.destTableId, opts.projectId);
-  })
-  .command(`browse <datasetId> <tableId>`, `Lists rows in a table.`, {}, (opts) => {
-    browseRows(opts.datasetId, opts.tableId, opts.projectId);
-  })
-  .command(`import <datasetId> <tableId> <fileName>`, `Imports data from a local file into a table.`, {}, (opts) => {
-    importLocalFile(opts.datasetId, opts.tableId, opts.fileName, opts.projectId);
-  })
-  .command(`import-gcs <datasetId> <tableId> <bucketName> <fileName>`, `Imports data from a Google Cloud Storage file into a table.`, {}, (opts) => {
-    importFileFromGCS(opts.datasetId, opts.tableId, opts.bucketName, opts.fileName, opts.projectId);
-  })
-  .command(`export <datasetId> <tableId> <bucketName> <fileName>`, `Export a table from BigQuery to Google Cloud Storage.`, {}, (opts) => {
-    exportTableToGCS(opts.datasetId, opts.tableId, opts.bucketName, opts.fileName, opts.projectId);
-  })
-  .command(`insert <datasetId> <tableId> <json_or_file>`,
-    `Insert a JSON array (as a string or newline-delimited file) into a BigQuery table.`, {},
-    (opts) => {
+  .command(
+    `copy <srcDatasetId> <srcTableId> <destDatasetId> <destTableId>`,
+    `Makes a copy of a table.`,
+    {},
+    opts => {
+      copyTable(
+        opts.srcDatasetId,
+        opts.srcTableId,
+        opts.destDatasetId,
+        opts.destTableId,
+        opts.projectId
+      );
+    }
+  )
+  .command(
+    `browse <datasetId> <tableId>`,
+    `Lists rows in a table.`,
+    {},
+    opts => {
+      browseRows(opts.datasetId, opts.tableId, opts.projectId);
+    }
+  )
+  .command(
+    `import <datasetId> <tableId> <fileName>`,
+    `Imports data from a local file into a table.`,
+    {},
+    opts => {
+      importLocalFile(
+        opts.datasetId,
+        opts.tableId,
+        opts.fileName,
+        opts.projectId
+      );
+    }
+  )
+  .command(
+    `import-gcs <datasetId> <tableId> <bucketName> <fileName>`,
+    `Imports data from a Google Cloud Storage file into a table.`,
+    {},
+    opts => {
+      importFileFromGCS(
+        opts.datasetId,
+        opts.tableId,
+        opts.bucketName,
+        opts.fileName,
+        opts.projectId
+      );
+    }
+  )
+  .command(
+    `export <datasetId> <tableId> <bucketName> <fileName>`,
+    `Export a table from BigQuery to Google Cloud Storage.`,
+    {},
+    opts => {
+      exportTableToGCS(
+        opts.datasetId,
+        opts.tableId,
+        opts.bucketName,
+        opts.fileName,
+        opts.projectId
+      );
+    }
+  )
+  .command(
+    `insert <datasetId> <tableId> <json_or_file>`,
+    `Insert a JSON array (as a string or newline-delimited file) into a BigQuery table.`,
+    {},
+    opts => {
       let content;
       try {
         content = fs.readFileSync(opts.json_or_file);
@@ -486,20 +562,24 @@ const cli = require(`yargs`)
       } catch (err) {}
 
       if (!Array.isArray(rows)) {
-        throw new Error(`"json_or_file" (or the file it points to) is not a valid JSON array.`);
+        throw new Error(
+          `"json_or_file" (or the file it points to) is not a valid JSON array.`
+        );
       }
 
-      insertRowsAsStream(opts.datasetId, opts.tableId, rows, opts.projectId || process.env.GCLOUD_PROJECT);
+      insertRowsAsStream(
+        opts.datasetId,
+        opts.tableId,
+        rows,
+        opts.projectId || process.env.GCLOUD_PROJECT
+      );
     }
   )
   .example(
     `node $0 create my_dataset my_table "Name:string, Age:integer, Weight:float, IsMagic:boolean"`,
     `Creates a new table named "my_table" in "my_dataset".`
   )
-  .example(
-    `node $0 list my_dataset`,
-    `Lists tables in "my_dataset".`
-  )
+  .example(`node $0 list my_dataset`, `Lists tables in "my_dataset".`)
   .example(
     `node $0 browse my_dataset my_table`,
     `Displays rows from "my_table" in "my_dataset".`

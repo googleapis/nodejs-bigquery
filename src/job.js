@@ -173,14 +173,14 @@ function Job(bigQuery, id) {
      *   var apiResponse = data[0];
      * });
      */
-    setMetadata: true
+    setMetadata: true,
   };
 
   common.Operation.call(this, {
     parent: bigQuery,
     baseUrl: '/jobs',
     id: id,
-    methods: methods
+    methods: methods,
   });
 
   this.bigQuery = bigQuery;
@@ -194,7 +194,7 @@ function Job(bigQuery, id) {
         reqOpts.uri = reqOpts.uri.replace('/projects/', '/project/');
       }
       return reqOpts;
-    }
+    },
   });
 }
 
@@ -227,12 +227,15 @@ util.inherits(Job, common.Operation);
 Job.prototype.cancel = function(callback) {
   callback = callback || common.util.noop;
 
-  this.request({
-    method: 'POST',
-    uri: '/cancel'
-  }, function(err, resp) {
-    callback(err, resp);
-  });
+  this.request(
+    {
+      method: 'POST',
+      uri: '/cancel',
+    },
+    function(err, resp) {
+      callback(err, resp);
+    }
+  );
 };
 
 /**
@@ -306,34 +309,37 @@ Job.prototype.getQueryResults = function(options, callback) {
     options = {};
   }
 
-  this.bigQuery.request({
-    uri: '/queries/' + this.id,
-    qs: options
-  }, function(err, resp) {
-    if (err) {
-      callback(err, null, null, resp);
-      return;
+  this.bigQuery.request(
+    {
+      uri: '/queries/' + this.id,
+      qs: options,
+    },
+    function(err, resp) {
+      if (err) {
+        callback(err, null, null, resp);
+        return;
+      }
+
+      var rows = [];
+
+      if (resp.schema && resp.rows) {
+        rows = self.bigQuery.mergeSchemaWithRows_(resp.schema, resp.rows);
+      }
+
+      var nextQuery = null;
+      if (resp.jobComplete === false) {
+        // Query is still running.
+        nextQuery = extend({}, options);
+      } else if (resp.pageToken) {
+        // More results exist.
+        nextQuery = extend({}, options, {
+          pageToken: resp.pageToken,
+        });
+      }
+
+      callback(null, rows, nextQuery, resp);
     }
-
-    var rows = [];
-
-    if (resp.schema && resp.rows) {
-      rows = self.bigQuery.mergeSchemaWithRows_(resp.schema, resp.rows);
-    }
-
-    var nextQuery = null;
-    if (resp.jobComplete === false) {
-      // Query is still running.
-      nextQuery = extend({}, options);
-    } else if (resp.pageToken) {
-      // More results exist.
-      nextQuery = extend({}, options, {
-        pageToken: resp.pageToken
-      });
-    }
-
-    callback(null, rows, nextQuery, resp);
-  });
+  );
 };
 
 /**
@@ -354,8 +360,9 @@ Job.prototype.getQueryResults = function(options, callback) {
  *   }))
  *   .pipe(fs.createWriteStream('./test/testdata/testfile.json'));
  */
-Job.prototype.getQueryResultsStream =
-  common.paginator.streamify('getQueryResults');
+Job.prototype.getQueryResultsStream = common.paginator.streamify(
+  'getQueryResults'
+);
 
 /**
  * Poll for a status update. Execute the callback:

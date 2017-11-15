@@ -24,20 +24,21 @@ const projectId = 'YOUR_PROJECT_ID';
 
 // Instantiates a client
 const bigquery = BigQuery({
-  projectId: projectId
+  projectId: projectId,
 });
 
 // The name for the new dataset
 const datasetName = 'my_new_dataset';
 
 // Creates the new dataset
-bigquery.createDataset(datasetName)
-  .then((results) => {
+bigquery
+  .createDataset(datasetName)
+  .then(results => {
     const dataset = results[0];
 
     console.log(`Dataset ${dataset.id} created.`);
   })
-  .catch((err) => {
+  .catch(err => {
     console.error('ERROR:', err);
   });
 // [END bigquery_quickstart]

@@ -44,9 +44,9 @@ var fakeUtil = extend({}, util, {
       'datetime',
       'job',
       'time',
-      'timestamp'
+      'timestamp',
     ]);
-  }
+  },
 });
 
 function FakeTable(a, b) {
@@ -56,8 +56,10 @@ function FakeTable(a, b) {
 var mergeSchemaWithRowsOverride;
 FakeTable.mergeSchemaWithRows_ = function() {
   var args = [].slice.apply(arguments);
-  return (mergeSchemaWithRowsOverride || Table.mergeSchemaWithRows_)
-    .apply(null, args);
+  return (mergeSchemaWithRowsOverride || Table.mergeSchemaWithRows_).apply(
+    null,
+    args
+  );
 };
 
 var extended = false;
@@ -74,7 +76,7 @@ var fakePaginator = {
   },
   streamify: function(methodName) {
     return methodName;
-  }
+  },
 };
 
 function FakeService() {
@@ -99,15 +101,15 @@ describe('BigQuery', function() {
       '@google-cloud/common': {
         Service: FakeService,
         paginator: fakePaginator,
-        util: fakeUtil
-      }
+        util: fakeUtil,
+      },
     });
     BigQueryCached = extend({}, BigQuery);
   });
 
   beforeEach(function() {
     BigQuery = extend(BigQuery, BigQueryCached);
-    bq = new BigQuery({ projectId: PROJECT_ID });
+    bq = new BigQuery({projectId: PROJECT_ID});
   });
 
   describe('instantiation', function() {
@@ -128,7 +130,7 @@ describe('BigQuery', function() {
     it('should normalize the arguments', function() {
       var normalizeArguments = fakeUtil.normalizeArguments;
       var normalizeArgumentsCalled = false;
-      var fakeOptions = { projectId: PROJECT_ID };
+      var fakeOptions = {projectId: PROJECT_ID};
       var fakeContext = {};
 
       fakeUtil.normalizeArguments = function(context, options) {
@@ -152,7 +154,7 @@ describe('BigQuery', function() {
       var baseUrl = 'https://www.googleapis.com/bigquery/v2';
       assert.strictEqual(calledWith.baseUrl, baseUrl);
       assert.deepEqual(calledWith.scopes, [
-        'https://www.googleapis.com/auth/bigquery'
+        'https://www.googleapis.com/auth/bigquery',
       ]);
       assert.deepEqual(calledWith.packageJson, require('../package.json'));
     });
@@ -161,42 +163,42 @@ describe('BigQuery', function() {
   describe('mergeSchemaWithRows_', function() {
     var SCHEMA_OBJECT = {
       fields: [
-        { name: 'id', type: 'INTEGER' },
-        { name: 'name', type: 'STRING' },
-        { name: 'dob', type: 'TIMESTAMP' },
-        { name: 'has_claws', type: 'BOOLEAN' },
-        { name: 'has_fangs', type: 'BOOL' },
-        { name: 'hair_count', type: 'FLOAT' },
-        { name: 'teeth_count', type: 'FLOAT64' }
-      ]
+        {name: 'id', type: 'INTEGER'},
+        {name: 'name', type: 'STRING'},
+        {name: 'dob', type: 'TIMESTAMP'},
+        {name: 'has_claws', type: 'BOOLEAN'},
+        {name: 'has_fangs', type: 'BOOL'},
+        {name: 'hair_count', type: 'FLOAT'},
+        {name: 'teeth_count', type: 'FLOAT64'},
+      ],
     };
 
     beforeEach(function() {
       BigQuery.date = function(input) {
         return {
           type: 'fakeDate',
-          input: input
+          input: input,
         };
       };
 
       BigQuery.datetime = function(input) {
         return {
           type: 'fakeDatetime',
-          input: input
+          input: input,
         };
       };
 
       BigQuery.time = function(input) {
         return {
           type: 'fakeTime',
-          input: input
+          input: input,
         };
       };
 
       BigQuery.timestamp = function(input) {
         return {
           type: 'fakeTimestamp',
-          input: input
+          input: input,
         };
       };
     });
@@ -209,29 +211,29 @@ describe('BigQuery', function() {
         {
           raw: {
             f: [
-              { v: '3' },
-              { v: 'Milo' },
-              { v: String(now.valueOf() / 1000) },
-              { v: 'false' },
-              { v: 'true' },
-              { v: '5.222330009847' },
-              { v: '30.2232138' },
+              {v: '3'},
+              {v: 'Milo'},
+              {v: String(now.valueOf() / 1000)},
+              {v: 'false'},
+              {v: 'true'},
+              {v: '5.222330009847'},
+              {v: '30.2232138'},
               {
                 v: [
                   {
-                    v: '10'
-                  }
-                ]
+                    v: '10',
+                  },
+                ],
               },
               {
                 v: [
                   {
-                    v: '2'
-                  }
-                ]
+                    v: '2',
+                  },
+                ],
               },
-              { v: null },
-              { v: buffer.toString('base64') },
+              {v: null},
+              {v: buffer.toString('base64')},
               {
                 v: [
                   {
@@ -241,27 +243,27 @@ describe('BigQuery', function() {
                           v: {
                             f: [
                               {
-                                v: 'nested_value'
-                              }
-                            ]
-                          }
-                        }
-                      ]
-                    }
-                  }
-                ]
+                                v: 'nested_value',
+                              },
+                            ],
+                          },
+                        },
+                      ],
+                    },
+                  },
+                ],
               },
-              { v: 'date-input' },
-              { v: 'datetime-input' },
-              { v: 'time-input' }
-            ]
+              {v: 'date-input'},
+              {v: 'datetime-input'},
+              {v: 'time-input'},
+            ],
           },
           expected: {
             id: 3,
             name: 'Milo',
             dob: {
               input: now,
-              type: 'fakeTimestamp'
+              type: 'fakeTimestamp',
             },
             has_claws: false,
             has_fangs: true,
@@ -274,24 +276,24 @@ describe('BigQuery', function() {
             objects: [
               {
                 nested_object: {
-                  nested_property: 'nested_value'
-                }
-              }
+                  nested_property: 'nested_value',
+                },
+              },
             ],
             date: {
               input: 'date-input',
-              type: 'fakeDate'
+              type: 'fakeDate',
             },
             datetime: {
               input: 'datetime-input',
-              type: 'fakeDatetime'
+              type: 'fakeDatetime',
             },
             time: {
               input: 'time-input',
-              type: 'fakeTime'
-            }
-          }
-        }
+              type: 'fakeTime',
+            },
+          },
+        },
       ];
 
       var schemaObject = extend(true, SCHEMA_OBJECT, {});
@@ -299,24 +301,24 @@ describe('BigQuery', function() {
       schemaObject.fields.push({
         name: 'arr',
         type: 'INTEGER',
-        mode: 'REPEATED'
+        mode: 'REPEATED',
       });
 
       schemaObject.fields.push({
         name: 'arr2',
         type: 'INT64',
-        mode: 'REPEATED'
+        mode: 'REPEATED',
       });
 
       schemaObject.fields.push({
         name: 'nullable',
         type: 'STRING',
-        mode: 'NULLABLE'
+        mode: 'NULLABLE',
       });
 
       schemaObject.fields.push({
         name: 'buffer',
-        type: 'BYTES'
+        type: 'BYTES',
       });
 
       schemaObject.fields.push({
@@ -330,26 +332,26 @@ describe('BigQuery', function() {
             fields: [
               {
                 name: 'nested_property',
-                type: 'STRING'
-              }
-            ]
-          }
-        ]
+                type: 'STRING',
+              },
+            ],
+          },
+        ],
       });
 
       schemaObject.fields.push({
         name: 'date',
-        type: 'DATE'
+        type: 'DATE',
       });
 
       schemaObject.fields.push({
         name: 'datetime',
-        type: 'DATETIME'
+        type: 'DATETIME',
       });
 
       schemaObject.fields.push({
         name: 'time',
-        type: 'TIME'
+        type: 'TIME',
       });
 
       var rawRows = rows.map(prop('raw'));
@@ -366,7 +368,7 @@ describe('BigQuery', function() {
     var INPUT_OBJ = {
       year: 2017,
       month: 1,
-      day: 1
+      day: 1,
     };
 
     it('should expose static and instance constructors', function() {
@@ -405,7 +407,7 @@ describe('BigQuery', function() {
       hours: 14,
       minutes: 2,
       seconds: 38,
-      fractional: 883388
+      fractional: 883388,
     };
 
     var EXPECTED_VALUE = '2017-1-1 14:2:38.883388';
@@ -434,7 +436,7 @@ describe('BigQuery', function() {
       var datetime = bq.datetime({
         year: 2016,
         month: 1,
-        day: 1
+        day: 1,
       });
 
       assert.strictEqual(datetime.value, '2016-1-1');
@@ -452,7 +454,7 @@ describe('BigQuery', function() {
       hours: 14,
       minutes: 2,
       seconds: 38,
-      fractional: 883388
+      fractional: 883388,
     };
 
     it('should expose static and instance constructors', function() {
@@ -482,7 +484,7 @@ describe('BigQuery', function() {
 
     it('should default minutes and seconds to 0', function() {
       var time = bq.time({
-        hours: 14
+        hours: 14,
       });
       assert.strictEqual(time.value, '14:0:0');
     });
@@ -546,13 +548,13 @@ describe('BigQuery', function() {
       assert.deepEqual(type, {
         type: 'ARRAY',
         arrayType: {
-          type: 'INT64'
-        }
+          type: 'INT64',
+        },
       });
     });
 
     it('should return correct type for a struct', function() {
-      var type = BigQuery.getType_({ prop: 1 });
+      var type = BigQuery.getType_({prop: 1});
 
       assert.deepEqual(type, {
         type: 'STRUCT',
@@ -560,18 +562,20 @@ describe('BigQuery', function() {
           {
             name: 'prop',
             type: {
-              type: 'INT64'
-            }
-          }
-        ]
+              type: 'INT64',
+            },
+          },
+        ],
       });
     });
 
     it('should throw if a type cannot be detected', function() {
-      var expectedError = new RegExp([
-        'This value could not be translated to a BigQuery data type.',
-        undefined
-      ].join('\n'));
+      var expectedError = new RegExp(
+        [
+          'This value could not be translated to a BigQuery data type.',
+          undefined,
+        ].join('\n')
+      );
 
       assert.throws(function() {
         BigQuery.getType_(undefined);
@@ -587,7 +591,7 @@ describe('BigQuery', function() {
         assert.strictEqual(value_, value);
         setImmediate(done);
         return {
-          type: ''
+          type: '',
         };
       };
 
@@ -601,13 +605,13 @@ describe('BigQuery', function() {
       BigQuery.timestamp = function(value) {
         assert.strictEqual(value, date);
         return {
-          value: expectedValue
+          value: expectedValue,
         };
       };
 
       BigQuery.getType_ = function() {
         return {
-          type: 'TIMESTAMP'
+          type: 'TIMESTAMP',
         };
       };
 
@@ -617,12 +621,12 @@ describe('BigQuery', function() {
 
     it('should locate the value on DATETIME objects', function() {
       var datetime = {
-        value: 'value'
+        value: 'value',
       };
 
       BigQuery.getType_ = function() {
         return {
-          type: 'DATETIME'
+          type: 'DATETIME',
         };
       };
 
@@ -632,12 +636,12 @@ describe('BigQuery', function() {
 
     it('should locate the value on TIME objects', function() {
       var time = {
-        value: 'value'
+        value: 'value',
       };
 
       BigQuery.getType_ = function() {
         return {
-          type: 'TIME'
+          type: 'TIME',
         };
       };
 
@@ -650,7 +654,7 @@ describe('BigQuery', function() {
 
       BigQuery.getType_ = function() {
         return {
-          type: 'ARRAY'
+          type: 'ARRAY',
         };
       };
 
@@ -659,14 +663,14 @@ describe('BigQuery', function() {
 
       assert.deepEqual(arrayValues, [
         {
-          value: array[0]
-        }
+          value: array[0],
+        },
       ]);
     });
 
     it('should format a struct', function() {
       var struct = {
-        key: 'value'
+        key: 'value',
       };
 
       var expectedParameterValue = {};
@@ -675,12 +679,12 @@ describe('BigQuery', function() {
         BigQuery.valueToQueryParameter_ = function(value) {
           assert.strictEqual(value, struct.key);
           return {
-            parameterValue: expectedParameterValue
+            parameterValue: expectedParameterValue,
           };
         };
 
         return {
-          type: 'STRUCT'
+          type: 'STRUCT',
         };
       };
 
@@ -695,17 +699,17 @@ describe('BigQuery', function() {
 
       BigQuery.getType_ = function() {
         return {
-          type: typeName
+          type: typeName,
         };
       };
 
       assert.deepEqual(BigQuery.valueToQueryParameter_(8), {
         parameterType: {
-          type: typeName
+          type: typeName,
         },
         parameterValue: {
-          value: 8
-        }
+          value: 8,
+        },
       });
     });
   });
@@ -719,8 +723,8 @@ describe('BigQuery', function() {
         assert.strictEqual(reqOpts.uri, '/datasets');
         assert.deepEqual(reqOpts.json, {
           datasetReference: {
-            datasetId: DATASET_ID
-          }
+            datasetId: DATASET_ID,
+          },
         });
 
         done();
@@ -732,7 +736,7 @@ describe('BigQuery', function() {
     it('should not modify the original options object', function(done) {
       var options = {
         a: 'b',
-        c: 'd'
+        c: 'd',
       };
 
       var originalOptions = extend({}, options);
@@ -772,7 +776,7 @@ describe('BigQuery', function() {
     });
 
     it('should return an apiResponse', function(done) {
-      var resp = { success: true };
+      var resp = {success: true};
 
       bq.request = function(reqOpts, callback) {
         callback(null, resp);
@@ -786,7 +790,7 @@ describe('BigQuery', function() {
     });
 
     it('should assign metadata to the Dataset object', function(done) {
-      var metadata = { a: 'b', c: 'd' };
+      var metadata = {a: 'b', c: 'd'};
 
       bq.request = function(reqOpts, callback) {
         callback(null, metadata);
@@ -813,14 +817,14 @@ describe('BigQuery', function() {
 
     it('should make the correct request', function(done) {
       var fakeOptions = {
-        a: 'b'
+        a: 'b',
       };
 
       var expectedOptions = extend({}, fakeOptions, {
         jobReference: {
           projectId: bq.projectId,
-          jobId: fakeJobId
-        }
+          jobId: fakeJobId,
+        },
       });
 
       bq.request = function(reqOpts) {
@@ -838,7 +842,7 @@ describe('BigQuery', function() {
       var jobPrefix = 'abc-';
       var expectedJobId = jobPrefix + fakeJobId;
       var options = {
-        jobPrefix: jobPrefix
+        jobPrefix: jobPrefix,
       };
 
       bq.request = function(reqOpts) {
@@ -917,7 +921,7 @@ describe('BigQuery', function() {
     });
 
     it('should accept query', function(done) {
-      var queryObject = { all: true, maxResults: 8, pageToken: 'token' };
+      var queryObject = {all: true, maxResults: 8, pageToken: 'token'};
 
       bq.request = function(reqOpts) {
         assert.strictEqual(reqOpts.qs, queryObject);
@@ -952,7 +956,7 @@ describe('BigQuery', function() {
     it('should return Dataset objects', function(done) {
       bq.request = function(reqOpts, callback) {
         callback(null, {
-          datasets: [{ datasetReference: { datasetId: 'datasetName' } }]
+          datasets: [{datasetReference: {datasetId: 'datasetName'}}],
         });
       };
 
@@ -964,7 +968,7 @@ describe('BigQuery', function() {
     });
 
     it('should return Dataset objects', function(done) {
-      var resp = { success: true };
+      var resp = {success: true};
 
       bq.request = function(reqOpts, callback) {
         callback(null, resp);
@@ -983,13 +987,13 @@ describe('BigQuery', function() {
           a: 'b',
           c: 'd',
           datasetReference: {
-            datasetId: 'datasetName'
-          }
-        }
+            datasetId: 'datasetName',
+          },
+        },
       ];
 
       bq.request = function(reqOpts, callback) {
-        callback(null, { datasets: datasetObjects });
+        callback(null, {datasets: datasetObjects});
       };
 
       bq.getDatasets(function(err, datasets) {
@@ -1003,12 +1007,12 @@ describe('BigQuery', function() {
       var token = 'token';
 
       bq.request = function(reqOpts, callback) {
-        callback(null, { nextPageToken: token });
+        callback(null, {nextPageToken: token});
       };
 
       bq.getDatasets(function(err, datasets, nextQuery) {
         assert.deepEqual(nextQuery, {
-          pageToken: token
+          pageToken: token,
         });
         done();
       });
@@ -1033,7 +1037,7 @@ describe('BigQuery', function() {
         maxResults: 8,
         pageToken: 'token',
         projection: 'full',
-        stateFilter: 'done'
+        stateFilter: 'done',
       };
 
       bq.request = function(reqOpts) {
@@ -1073,10 +1077,10 @@ describe('BigQuery', function() {
             {
               id: JOB_ID,
               jobReference: {
-                jobId: JOB_ID
-              }
-            }
-          ]
+                jobId: JOB_ID,
+              },
+            },
+          ],
         });
       };
 
@@ -1093,10 +1097,10 @@ describe('BigQuery', function() {
           {
             id: JOB_ID,
             jobReference: {
-              jobId: JOB_ID
-            }
-          }
-        ]
+              jobId: JOB_ID,
+            },
+          },
+        ],
       };
 
       bq.request = function(reqOpts, callback) {
@@ -1117,13 +1121,13 @@ describe('BigQuery', function() {
           c: 'd',
           id: JOB_ID,
           jobReference: {
-            jobId: JOB_ID
-          }
-        }
+            jobId: JOB_ID,
+          },
+        },
       ];
 
       bq.request = function(reqOpts, callback) {
-        callback(null, { jobs: jobObjects });
+        callback(null, {jobs: jobObjects});
       };
 
       bq.getJobs(function(err, jobs) {
@@ -1137,13 +1141,13 @@ describe('BigQuery', function() {
       var token = 'token';
 
       bq.request = function(reqOpts, callback) {
-        callback(null, { nextPageToken: token });
+        callback(null, {nextPageToken: token});
       };
 
       bq.getJobs(function(err, jobs, nextQuery) {
         assert.ifError(err);
         assert.deepEqual(nextQuery, {
-          pageToken: token
+          pageToken: token,
         });
         done();
       });
@@ -1188,7 +1192,7 @@ describe('BigQuery', function() {
         getQueryResults: function(options, callback) {
           assert.deepEqual(options, {});
           callback(null, FAKE_ROWS, FAKE_RESPONSE);
-        }
+        },
       };
 
       bq.startQuery = function(query, callback) {
@@ -1209,7 +1213,7 @@ describe('BigQuery', function() {
         getQueryResults: function(options) {
           assert.strictEqual(options, fakeOptions);
           done();
-        }
+        },
       };
 
       bq.startQuery = function(query, callback) {
@@ -1229,7 +1233,7 @@ describe('BigQuery', function() {
       }, /SQL query string is required/);
 
       assert.throws(function() {
-        bq.startQuery({ noQuery: 'here' });
+        bq.startQuery({noQuery: 'here'});
       }, /SQL query string is required/);
     });
 
@@ -1241,7 +1245,7 @@ describe('BigQuery', function() {
         dataset = {
           bigQuery: bq,
           id: 'dataset-id',
-          createTable: util.noop
+          createTable: util.noop,
         };
       });
 
@@ -1249,7 +1253,7 @@ describe('BigQuery', function() {
         assert.throws(function() {
           bq.startQuery({
             query: 'query',
-            destination: 'not a table'
+            destination: 'not a table',
           });
         }, /Destination must be a Table/);
       });
@@ -1259,7 +1263,7 @@ describe('BigQuery', function() {
           assert.deepEqual(reqOpts.json.configuration.query.destinationTable, {
             datasetId: dataset.id,
             projectId: dataset.bigQuery.projectId,
-            tableId: TABLE_ID
+            tableId: TABLE_ID,
           });
 
           done();
@@ -1267,7 +1271,7 @@ describe('BigQuery', function() {
 
         bq.startQuery({
           query: 'query',
-          destination: new FakeTable(dataset, TABLE_ID)
+          destination: new FakeTable(dataset, TABLE_ID),
         });
       });
 
@@ -1280,14 +1284,14 @@ describe('BigQuery', function() {
 
         bq.startQuery({
           query: 'query',
-          destination: new FakeTable(dataset, TABLE_ID)
+          destination: new FakeTable(dataset, TABLE_ID),
         });
       });
     });
 
     describe('SQL parameters', function() {
       var NAMED_PARAMS = {
-        key: 'value'
+        key: 'value',
       };
 
       var POSITIONAL_PARAMS = ['value'];
@@ -1298,10 +1302,13 @@ describe('BigQuery', function() {
           done();
         };
 
-        bq.startQuery({
-          query: QUERY_STRING,
-          params: NAMED_PARAMS
-        }, assert.ifError);
+        bq.startQuery(
+          {
+            query: QUERY_STRING,
+            params: NAMED_PARAMS,
+          },
+          assert.ifError
+        );
       });
 
       describe('named', function() {
@@ -1312,10 +1319,13 @@ describe('BigQuery', function() {
             done();
           };
 
-          bq.startQuery({
-            query: QUERY_STRING,
-            params: NAMED_PARAMS
-          }, assert.ifError);
+          bq.startQuery(
+            {
+              query: QUERY_STRING,
+              params: NAMED_PARAMS,
+            },
+            assert.ifError
+          );
         });
 
         it('should get set the correct query parameters', function(done) {
@@ -1333,10 +1343,13 @@ describe('BigQuery', function() {
             done();
           };
 
-          bq.startQuery({
-            query: QUERY_STRING,
-            params: NAMED_PARAMS
-          }, assert.ifError);
+          bq.startQuery(
+            {
+              query: QUERY_STRING,
+              params: NAMED_PARAMS,
+            },
+            assert.ifError
+          );
         });
       });
 
@@ -1348,10 +1361,13 @@ describe('BigQuery', function() {
             done();
           };
 
-          bq.startQuery({
-            query: QUERY_STRING,
-            params: POSITIONAL_PARAMS
-          }, assert.ifError);
+          bq.startQuery(
+            {
+              query: QUERY_STRING,
+              params: POSITIONAL_PARAMS,
+            },
+            assert.ifError
+          );
         });
 
         it('should get set the correct query parameters', function(done) {
@@ -1368,10 +1384,13 @@ describe('BigQuery', function() {
             done();
           };
 
-          bq.startQuery({
-            query: QUERY_STRING,
-            params: POSITIONAL_PARAMS
-          }, assert.ifError);
+          bq.startQuery(
+            {
+              query: QUERY_STRING,
+              params: POSITIONAL_PARAMS,
+            },
+            assert.ifError
+          );
         });
       });
     });
@@ -1379,7 +1398,7 @@ describe('BigQuery', function() {
     it('should accept the dryRun options', function(done) {
       var options = {
         query: QUERY_STRING,
-        dryRun: true
+        dryRun: true,
       };
 
       bq.createJob = function(reqOpts) {
@@ -1394,7 +1413,7 @@ describe('BigQuery', function() {
     it('should accept a job prefix', function(done) {
       var options = {
         query: QUERY_STRING,
-        jobPrefix: 'hi'
+        jobPrefix: 'hi',
       };
 
       bq.createJob = function(reqOpts) {
