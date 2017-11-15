@@ -23,12 +23,11 @@ var fs = require('fs');
 var uuid = require('uuid');
 
 var Dataset = require('../src/dataset.js');
-var env = require('./env.js');
 var Job = require('../src/job.js');
 var Table = require('../src/table.js');
 
-var bigquery = require('../')(env);
-var storage = require('@google-cloud/storage')(env);
+var bigquery = require('../')();
+var storage = require('@google-cloud/storage')();
 
 describe('BigQuery', function() {
   var GCLOUD_TESTS_PREFIX = 'gcloud_test_';
@@ -137,7 +136,7 @@ describe('BigQuery', function() {
     var maxApiCalls = 1;
     var numRequestsMade = 0;
 
-    var bigquery = require('../')(env);
+    var bigquery = require('../')();
 
     bigquery.interceptors.push({
       request: function(reqOpts) {
@@ -166,7 +165,7 @@ describe('BigQuery', function() {
     var maxApiCalls = 1;
     var numRequestsMade = 0;
 
-    var bigquery = require('../')(env);
+    var bigquery = require('../')();
 
     bigquery.interceptors.push({
       request: function(reqOpts) {
