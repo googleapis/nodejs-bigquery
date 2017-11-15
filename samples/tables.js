@@ -200,7 +200,7 @@ function copyTable(
       // Wait for the job to finish
       return job.promise();
     })
-    .then(results => {
+    .then(() => {
       // Get the job's status
       return job.getMetadata();
     })
@@ -256,7 +256,7 @@ function importLocalFile(datasetId, tableId, filename, projectId) {
       // Wait for the job to finish
       return job.promise();
     })
-    .then(results => {
+    .then(() => {
       // Get the job's status
       return job.getMetadata();
     })
@@ -326,7 +326,7 @@ function importFileFromGCS(
       // Wait for the job to finish
       return job.promise();
     })
-    .then(results => {
+    .then(() => {
       // Get the job's status
       return job.getMetadata();
     })
@@ -390,7 +390,7 @@ function exportTableToGCS(datasetId, tableId, bucketName, filename, projectId) {
       // Wait for the job to finish
       return job.promise();
     })
-    .then(results => {
+    .then(() => {
       // Get the job's status
       return job.getMetadata();
     })
@@ -559,7 +559,11 @@ const cli = require(`yargs`)
       let rows = null;
       try {
         rows = JSON.parse(content);
-      } catch (err) {}
+      } catch (err) {
+        throw new Error(
+          `"json_or_file" (or the file it points to) is not a valid JSON array.`
+        );
+      }
 
       if (!Array.isArray(rows)) {
         throw new Error(
