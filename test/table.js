@@ -43,7 +43,7 @@ var fakeUtil = extend({}, util, {
     if (Class.name === 'Table') {
       promisified = true;
     }
-  }
+  },
 });
 
 var extended = false;
@@ -60,7 +60,7 @@ var fakePaginator = {
   },
   streamify: function(methodName) {
     return methodName;
-  }
+  },
 };
 
 var fakeUuid = extend({}, uuid);
@@ -79,20 +79,20 @@ describe('BigQuery/Table', function() {
     bigQuery: {
       projectId: 'project-id',
       job: function(id) {
-        return { id: id };
+        return {id: id};
       },
-      request: util.noop
-    }
+      request: util.noop,
+    },
   };
 
   var SCHEMA_OBJECT = {
     fields: [
-      { name: 'id', type: 'INTEGER' },
-      { name: 'name', type: 'STRING' },
-      { name: 'dob', type: 'TIMESTAMP' },
-      { name: 'has_claws', type: 'BOOLEAN' },
-      { name: 'hair_count', type: 'FLOAT' }
-    ]
+      {name: 'id', type: 'INTEGER'},
+      {name: 'name', type: 'STRING'},
+      {name: 'dob', type: 'TIMESTAMP'},
+      {name: 'has_claws', type: 'BOOLEAN'},
+      {name: 'hair_count', type: 'FLOAT'},
+    ],
   };
 
   var SCHEMA_STRING = [
@@ -100,7 +100,7 @@ describe('BigQuery/Table', function() {
     'name',
     'dob:timestamp',
     'has_claws:boolean',
-    'hair_count:float'
+    'hair_count:float',
   ].join(',');
 
   var Table;
@@ -114,8 +114,8 @@ describe('BigQuery/Table', function() {
       '@google-cloud/common': {
         ServiceObject: FakeServiceObject,
         paginator: fakePaginator,
-        util: fakeUtil
-      }
+        util: fakeUtil,
+      },
     });
 
     var tableCached = extend(true, {}, Table);
@@ -128,8 +128,10 @@ describe('BigQuery/Table', function() {
       }
 
       Table[tableMethod] = function() {
-        return (tableOverrides[tableMethod] || tableCached[tableMethod])
-          .apply(this, arguments);
+        return (tableOverrides[tableMethod] || tableCached[tableMethod]).apply(
+          this,
+          arguments
+        );
       };
     });
   });
@@ -165,8 +167,8 @@ describe('BigQuery/Table', function() {
           bind: function(context) {
             assert.strictEqual(context, datasetInstance);
             done();
-          }
-        }
+          },
+        },
       });
 
       var table = new Table(datasetInstance, TABLE_ID);
@@ -183,7 +185,7 @@ describe('BigQuery/Table', function() {
         exists: true,
         get: true,
         getMetadata: true,
-        setMetadata: true
+        setMetadata: true,
       });
     });
 
@@ -196,12 +198,12 @@ describe('BigQuery/Table', function() {
         var fakeReqOpts = {
           method: 'PATCH',
           json: {
-            etag: FAKE_ETAG
-          }
+            etag: FAKE_ETAG,
+          },
         };
 
         var reqOpts = interceptor.request(fakeReqOpts);
-        assert.deepEqual(reqOpts.headers, { 'If-Match': FAKE_ETAG });
+        assert.deepEqual(reqOpts.headers, {'If-Match': FAKE_ETAG});
       });
 
       it('should respect already existing headers', function() {
@@ -210,15 +212,15 @@ describe('BigQuery/Table', function() {
         var fakeReqOpts = {
           method: 'PATCH',
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
           },
           json: {
-            etag: FAKE_ETAG
-          }
+            etag: FAKE_ETAG,
+          },
         };
 
         var expectedHeaders = extend({}, fakeReqOpts.headers, {
-          'If-Match': FAKE_ETAG
+          'If-Match': FAKE_ETAG,
         });
 
         var reqOpts = interceptor.request(fakeReqOpts);
@@ -231,8 +233,8 @@ describe('BigQuery/Table', function() {
         var fakeReqOpts = {
           method: 'POST',
           json: {
-            etag: FAKE_ETAG
-          }
+            etag: FAKE_ETAG,
+          },
         };
 
         var reqOpts = interceptor.request(fakeReqOpts);
@@ -244,13 +246,15 @@ describe('BigQuery/Table', function() {
   describe('createSchemaFromString_', function() {
     it('should create a schema object from a string', function() {
       assert.deepEqual(
-        Table.createSchemaFromString_(SCHEMA_STRING), SCHEMA_OBJECT);
+        Table.createSchemaFromString_(SCHEMA_STRING),
+        SCHEMA_OBJECT
+      );
     });
   });
 
   describe('encodeValue_', function() {
     it('should properly encode values', function() {
-      var buffer = new Buffer('test');
+      var buffer = Buffer.from('test');
       assert.strictEqual(Table.encodeValue_(buffer), buffer.toString('base64'));
 
       var date = new Date();
@@ -258,10 +262,18 @@ describe('BigQuery/Table', function() {
     });
 
     it('should properly encode custom types', function() {
-      function BigQueryDate(value) { this.value = value; }
-      function BigQueryDatetime(value) { this.value = value; }
-      function BigQueryTime(value) { this.value = value; }
-      function BigQueryTimestamp(value) { this.value = value; }
+      function BigQueryDate(value) {
+        this.value = value;
+      }
+      function BigQueryDatetime(value) {
+        this.value = value;
+      }
+      function BigQueryTime(value) {
+        this.value = value;
+      }
+      function BigQueryTimestamp(value) {
+        this.value = value;
+      }
 
       var date = new BigQueryDate('date');
       var datetime = new BigQueryDatetime('datetime');
@@ -275,40 +287,31 @@ describe('BigQuery/Table', function() {
     });
 
     it('should properly encode arrays', function() {
-      var buffer = new Buffer('test');
+      var buffer = Buffer.from('test');
       var date = new Date();
 
-      var array = [
-        buffer,
-        date
-      ];
+      var array = [buffer, date];
 
       assert.deepEqual(Table.encodeValue_(array), [
         buffer.toString('base64'),
-        date.toJSON()
+        date.toJSON(),
       ]);
     });
 
     it('should properly encode objects', function() {
-      var buffer = new Buffer('test');
+      var buffer = Buffer.from('test');
       var date = new Date();
 
       var object = {
         nested: {
-          array: [
-            buffer,
-            date
-          ]
-        }
+          array: [buffer, date],
+        },
       };
 
       assert.deepEqual(Table.encodeValue_(object), {
         nested: {
-          array: [
-            buffer.toString('base64'),
-            date.toJSON()
-          ]
-        }
+          array: [buffer.toString('base64'), date.toJSON()],
+        },
       });
     });
   });
@@ -317,8 +320,8 @@ describe('BigQuery/Table', function() {
     it('should return a deep copy', function() {
       var metadata = {
         a: {
-          b: 'c'
-        }
+          b: 'c',
+        },
       };
 
       var formatted = Table.formatMetadata_(metadata);
@@ -330,7 +333,7 @@ describe('BigQuery/Table', function() {
     it('should format the name option', function() {
       var NAME = 'name';
 
-      var formatted = Table.formatMetadata_({ name: NAME });
+      var formatted = Table.formatMetadata_({name: NAME});
 
       assert.strictEqual(formatted.name, undefined);
       assert.strictEqual(formatted.friendlyName, NAME);
@@ -344,7 +347,7 @@ describe('BigQuery/Table', function() {
         return fakeSchema;
       };
 
-      var formatted = Table.formatMetadata_({ schema: SCHEMA_STRING });
+      var formatted = Table.formatMetadata_({schema: SCHEMA_STRING});
 
       assert.strictEqual(formatted.schema, fakeSchema);
     });
@@ -352,7 +355,7 @@ describe('BigQuery/Table', function() {
     it('should accept an array of schema fields', function() {
       var fields = ['a', 'b', 'c'];
 
-      var formatted = Table.formatMetadata_({ schema: fields });
+      var formatted = Table.formatMetadata_({schema: fields});
 
       assert.deepEqual(formatted.schema.fields, fields);
     });
@@ -360,18 +363,18 @@ describe('BigQuery/Table', function() {
     it('should format the schema fields option', function() {
       var metadata = {
         schema: {
-          fields: ['a', { fields: [] }, 'b']
-        }
+          fields: ['a', {fields: []}, 'b'],
+        },
       };
 
-      var expectedFields = ['a', { fields: [], type: 'RECORD' }, 'b'];
+      var expectedFields = ['a', {fields: [], type: 'RECORD'}, 'b'];
       var formatted = Table.formatMetadata_(metadata);
 
       assert.deepEqual(formatted.schema.fields, expectedFields);
     });
 
     it('should format the time partitioning option', function() {
-      var formatted = Table.formatMetadata_({ partitioning: 'abc' });
+      var formatted = Table.formatMetadata_({partitioning: 'abc'});
 
       assert.strictEqual(formatted.timePartitioning.type, 'ABC');
     });
@@ -379,7 +382,7 @@ describe('BigQuery/Table', function() {
     it('should format the table view option', function() {
       var VIEW = 'abc';
 
-      var formatted = Table.formatMetadata_({ view: VIEW });
+      var formatted = Table.formatMetadata_({view: VIEW});
 
       assert.strictEqual(formatted.view.query, VIEW);
       assert.strictEqual(formatted.view.useLegacySql, false);
@@ -598,7 +601,7 @@ describe('BigQuery/Table', function() {
         done();
       };
 
-      table.createWriteStream({ schema: SCHEMA_STRING }).emit('writing');
+      table.createWriteStream({schema: SCHEMA_STRING}).emit('writing');
     });
 
     it('should throw if a given source format is not recognized', function() {
@@ -608,7 +611,7 @@ describe('BigQuery/Table', function() {
 
       assert.throws(function() {
         table.createWriteStream({
-          sourceFormat: 'zip'
+          sourceFormat: 'zip',
         });
       }, /Source format not recognized/);
 
@@ -664,25 +667,27 @@ describe('BigQuery/Table', function() {
                 destinationTable: {
                   projectId: table.bigQuery.projectId,
                   datasetId: table.dataset.id,
-                  tableId: table.id
-                }
-              }
+                  tableId: table.id,
+                },
+              },
             },
             jobReference: {
               projectId: table.bigQuery.projectId,
-              jobId: fakeJobId
-            }
+              jobId: fakeJobId,
+            },
           });
           done();
         };
 
-        table.createWriteStream({ a: 'b', c: 'd' }).emit('writing');
+        table.createWriteStream({a: 'b', c: 'd'}).emit('writing');
       });
 
       it('should pass the correct request uri', function(done) {
         makeWritableStreamOverride = function(stream, options) {
-          var uri = 'https://www.googleapis.com/upload/bigquery/v2/projects/' +
-            table.bigQuery.projectId + '/jobs';
+          var uri =
+            'https://www.googleapis.com/upload/bigquery/v2/projects/' +
+            table.bigQuery.projectId +
+            '/jobs';
           assert.equal(options.request.uri, uri);
           done();
         };
@@ -704,22 +709,23 @@ describe('BigQuery/Table', function() {
           done();
         };
 
-        table.createWriteStream({ jobPrefix: jobPrefix }).emit('writing');
+        table.createWriteStream({jobPrefix: jobPrefix}).emit('writing');
       });
 
       it('should create a job and emit it with complete', function(done) {
         var jobId = 'job-id';
-        var metadata = { jobReference: { jobId: jobId }, a: 'b', c: 'd' };
+        var metadata = {jobReference: {jobId: jobId}, a: 'b', c: 'd'};
 
         table.bigQuery.job = function(id) {
-          return { id: id };
+          return {id: id};
         };
 
         makeWritableStreamOverride = function(stream, options, callback) {
           callback(metadata);
         };
 
-        table.createWriteStream()
+        table
+          .createWriteStream()
           .on('complete', function(job) {
             assert.equal(job.id, jobId);
             assert.deepEqual(job.metadata, metadata);
@@ -810,7 +816,7 @@ describe('BigQuery/Table', function() {
     });
 
     it('should make correct API request', function(done) {
-      var options = { a: 'b', c: 'd' };
+      var options = {a: 'b', c: 'd'};
 
       table.request = function(reqOpts, callback) {
         assert.strictEqual(reqOpts.uri, '/data');
@@ -841,15 +847,15 @@ describe('BigQuery/Table', function() {
 
     describe('refreshing metadata', function() {
       // Using "Stephen" so you know who to blame for these tests.
-      var rows = [{ f: [{ v: 'stephen' }] }];
-      var schema = { fields: [{ name: 'name', type: 'string' }] };
-      var mergedRows = [{ name: 'stephen' }];
+      var rows = [{f: [{v: 'stephen'}]}];
+      var schema = {fields: [{name: 'name', type: 'string'}]};
+      var mergedRows = [{name: 'stephen'}];
 
       beforeEach(function() {
         table.request = function(reqOpts, callback) {
           // Respond with a row, so it grabs the schema.
           // Use setImmediate to let our getMetadata overwrite process.
-          setImmediate(callback, null, { rows: rows });
+          setImmediate(callback, null, {rows: rows});
         };
 
         table.bigQuery.mergeSchemaWithRows_ = function(schema_, rows_) {
@@ -865,7 +871,7 @@ describe('BigQuery/Table', function() {
 
         // Step 2: refreshes the metadata to pull down the schema.
         table.getMetadata = function(callback) {
-          table.metadata = { schema: schema };
+          table.metadata = {schema: schema};
           callback();
         };
 
@@ -901,14 +907,14 @@ describe('BigQuery/Table', function() {
     });
 
     it('should return schema-merged rows', function(done) {
-      var rows = [{ f: [{ v: 'stephen' }] }];
-      var schema = { fields: [{ name: 'name', type: 'string' }] };
-      var merged = [{ name: 'stephen' }];
+      var rows = [{f: [{v: 'stephen'}]}];
+      var schema = {fields: [{name: 'name', type: 'string'}]};
+      var merged = [{name: 'stephen'}];
 
-      table.metadata = { schema: schema };
+      table.metadata = {schema: schema};
 
       table.request = function(reqOpts, callback) {
-        callback(null, { rows: rows });
+        callback(null, {rows: rows});
       };
 
       table.bigQuery.mergeSchemaWithRows_ = function(schema_, rows_) {
@@ -925,37 +931,37 @@ describe('BigQuery/Table', function() {
     });
 
     it('should return apiResponse in callback', function(done) {
-      var rows = [{ f: [{ v: 'stephen' }] }];
-      var schema = { fields: [{ name: 'name', type: 'string' }] };
-      table.metadata = { schema: schema };
+      var rows = [{f: [{v: 'stephen'}]}];
+      var schema = {fields: [{name: 'name', type: 'string'}]};
+      table.metadata = {schema: schema};
 
       table.request = function(reqOpts, callback) {
-        callback(null, { rows: rows });
+        callback(null, {rows: rows});
       };
 
       table.getRows(function(err, rows, nextQuery, apiResponse) {
         assert.ifError(err);
-        assert.deepEqual(apiResponse, { rows: [{ f: [{ v: 'stephen' }] }] });
+        assert.deepEqual(apiResponse, {rows: [{f: [{v: 'stephen'}]}]});
         done();
       });
     });
 
     it('should pass nextQuery if pageToken is returned', function(done) {
-      var options = { a: 'b', c: 'd' };
+      var options = {a: 'b', c: 'd'};
       var pageToken = 'token';
 
       // Set a schema so it doesn't try to refresh the metadata.
-      table.metadata = { schema: {} };
+      table.metadata = {schema: {}};
 
       table.request = function(reqOpts, callback) {
-        callback(null, { pageToken: pageToken });
+        callback(null, {pageToken: pageToken});
       };
 
       table.getRows(options, function(err, rows, nextQuery) {
         assert.ifError(err);
-        assert.deepEqual(nextQuery, { a: 'b', c: 'd', pageToken: pageToken });
+        assert.deepEqual(nextQuery, {a: 'b', c: 'd', pageToken: pageToken});
         // Original object isn't affected.
-        assert.deepEqual(options, { a: 'b', c: 'd' });
+        assert.deepEqual(options, {a: 'b', c: 'd'});
         done();
       });
     });
@@ -1034,27 +1040,27 @@ describe('BigQuery/Table', function() {
 
   describe('insert', function() {
     var data = [
-      { state: 'MI', gender: 'M', year: '2015', name: 'Berkley', count: '0' },
-      { state: 'MI', gender: 'M', year: '2015', name: 'Berkley', count: '0' },
-      { state: 'MI', gender: 'M', year: '2015', name: 'Berkley', count: '0' },
-      { state: 'MI', gender: 'M', year: '2015', name: 'Berkley', count: '0' },
-      { state: 'MI', gender: 'M', year: '2015', name: 'Berkley', count: '0' }
+      {state: 'MI', gender: 'M', year: '2015', name: 'Berkley', count: '0'},
+      {state: 'MI', gender: 'M', year: '2015', name: 'Berkley', count: '0'},
+      {state: 'MI', gender: 'M', year: '2015', name: 'Berkley', count: '0'},
+      {state: 'MI', gender: 'M', year: '2015', name: 'Berkley', count: '0'},
+      {state: 'MI', gender: 'M', year: '2015', name: 'Berkley', count: '0'},
     ];
 
     var rawData = [
-      { insertId: 1, json: data[0] },
-      { insertId: 2, json: data[1] },
-      { insertId: 3, json: data[2] },
-      { insertId: 4, json: data[3] },
-      { insertId: 5, json: data[4] },
+      {insertId: 1, json: data[0]},
+      {insertId: 2, json: data[1]},
+      {insertId: 3, json: data[2]},
+      {insertId: 4, json: data[3]},
+      {insertId: 5, json: data[4]},
     ];
 
     var dataApiFormat = {
       rows: data.map(function(row) {
         return {
-          json: row
+          json: row,
         };
-      })
+      }),
     };
 
     it('should throw an error if rows is empty', function() {
@@ -1075,7 +1081,7 @@ describe('BigQuery/Table', function() {
     });
 
     it('should execute callback with API response', function(done) {
-      var apiResponse = { insertErrors: [] };
+      var apiResponse = {insertErrors: []};
 
       table.request = function(reqOpts, callback) {
         callback(null, apiResponse);
@@ -1104,15 +1110,15 @@ describe('BigQuery/Table', function() {
     });
 
     it('should return partial failures', function(done) {
-      var row0Error = { message: 'Error.', reason: 'notFound' };
-      var row1Error = { message: 'Error.', reason: 'notFound' };
+      var row0Error = {message: 'Error.', reason: 'notFound'};
+      var row1Error = {message: 'Error.', reason: 'notFound'};
 
       table.request = function(reqOpts, callback) {
         callback(null, {
           insertErrors: [
-            { index: 0, errors: [row0Error] },
-            { index: 1, errors: [row1Error] }
-          ]
+            {index: 0, errors: [row0Error]},
+            {index: 1, errors: [row1Error]},
+          ],
         });
       };
 
@@ -1122,12 +1128,12 @@ describe('BigQuery/Table', function() {
         assert.deepEqual(err.errors, [
           {
             row: dataApiFormat.rows[0].json,
-            errors: [row0Error]
+            errors: [row0Error],
           },
           {
             row: dataApiFormat.rows[1].json,
-            errors: [row1Error]
-          }
+            errors: [row1Error],
+          },
         ]);
 
         done();
@@ -1138,12 +1144,12 @@ describe('BigQuery/Table', function() {
       table.request = function(reqOpts) {
         assert.equal(reqOpts.method, 'POST');
         assert.equal(reqOpts.uri, '/insertAll');
-        assert.deepEqual(reqOpts.json, { rows: rawData });
+        assert.deepEqual(reqOpts.json, {rows: rawData});
         assert.strictEqual(reqOpts.json.raw, undefined);
         done();
       };
 
-      var opts = { raw: true };
+      var opts = {raw: true};
       table.insert(rawData, opts, done);
     });
 
@@ -1151,7 +1157,7 @@ describe('BigQuery/Table', function() {
       var opts = {
         ignoreUnknownValues: true,
         skipInvalidRows: true,
-        templateSuffix: 'test'
+        templateSuffix: 'test',
       };
 
       table.request = function(reqOpts) {
@@ -1162,14 +1168,8 @@ describe('BigQuery/Table', function() {
           reqOpts.json.ignoreUnknownValues,
           opts.ignoreUnknownValues
         );
-        assert.strictEqual(
-          reqOpts.json.skipInvalidRows,
-          opts.skipInvalidRows
-        );
-        assert.strictEqual(
-          reqOpts.json.templateSuffix,
-          opts.templateSuffix
-        );
+        assert.strictEqual(reqOpts.json.skipInvalidRows, opts.skipInvalidRows);
+        assert.strictEqual(reqOpts.json.templateSuffix, opts.templateSuffix);
 
         assert.deepEqual(reqOpts.json.rows, dataApiFormat.rows);
         done();
@@ -1179,9 +1179,9 @@ describe('BigQuery/Table', function() {
     });
 
     describe('create table and retry', function() {
-      var OPTIONS  = {
+      var OPTIONS = {
         autoCreate: true,
-        schema: SCHEMA_STRING
+        schema: SCHEMA_STRING,
       };
 
       var _setTimeout;
@@ -1200,7 +1200,7 @@ describe('BigQuery/Table', function() {
         Math.random = _random;
 
         table.request = function(reqOpts, callback) {
-          callback({ code: 404 });
+          callback({code: 404});
         };
 
         table.create = function(reqOpts, callback) {
@@ -1215,12 +1215,12 @@ describe('BigQuery/Table', function() {
 
       it('should throw if autoCreate is set with no schema', function() {
         var options = {
-          autoCreate: true
+          autoCreate: true,
         };
 
         assert.throws(function() {
           table.insert(data, options);
-        }, /Schema must be provided in order to auto\-create Table\./);
+        }, /Schema must be provided in order to auto-create Table\./);
       });
 
       it('should not include the schema in the insert request', function(done) {
@@ -1270,7 +1270,7 @@ describe('BigQuery/Table', function() {
 
       it('should ignore 409 errors', function(done) {
         table.create = function(reqOpts, callback) {
-          callback({ code: 409 });
+          callback({code: 409});
         };
 
         var timeouts = 0;
@@ -1301,7 +1301,7 @@ describe('BigQuery/Table', function() {
             return;
           }
 
-          callback({ code: 404 });
+          callback({code: 404});
         };
 
         table.insert(data, OPTIONS, function(err, resp) {
@@ -1377,27 +1377,27 @@ describe('BigQuery/Table', function() {
               destinationTable: {
                 datasetId: DEST_TABLE.dataset.id,
                 projectId: DEST_TABLE.bigQuery.projectId,
-                tableId: DEST_TABLE.id
+                tableId: DEST_TABLE.id,
               },
               sourceTable: {
                 datasetId: table.dataset.id,
                 projectId: table.bigQuery.projectId,
-                tableId: table.id
-              }
-            }
-          }
+                tableId: table.id,
+              },
+            },
+          },
         });
 
         done();
       };
 
-      table.startCopy(DEST_TABLE, { a: 'b', c: 'd' }, assert.ifError);
+      table.startCopy(DEST_TABLE, {a: 'b', c: 'd'}, assert.ifError);
     });
 
     it('should accept a job prefix', function(done) {
       var fakeJobPrefix = 'abc-';
       var options = {
-        jobPrefix: fakeJobPrefix
+        jobPrefix: fakeJobPrefix,
       };
 
       table.bigQuery.createJob = function(reqOpts, callback) {
@@ -1424,7 +1424,7 @@ describe('BigQuery/Table', function() {
         callback(); // the done fn
       };
 
-      table.startCopy(DEST_TABLE,done);
+      table.startCopy(DEST_TABLE, done);
     });
   });
 
@@ -1463,23 +1463,23 @@ describe('BigQuery/Table', function() {
               destinationTable: {
                 datasetId: table.dataset.id,
                 projectId: table.bigQuery.projectId,
-                tableId: table.id
+                tableId: table.id,
               },
               sourceTables: [
                 {
                   datasetId: SOURCE_TABLE.dataset.id,
                   projectId: SOURCE_TABLE.bigQuery.projectId,
-                  tableId: SOURCE_TABLE.id
-                }
-              ]
-            }
-          }
+                  tableId: SOURCE_TABLE.id,
+                },
+              ],
+            },
+          },
         });
 
         done();
       };
 
-      table.startCopyFrom(SOURCE_TABLE, { a: 'b', c: 'd' }, assert.ifError);
+      table.startCopyFrom(SOURCE_TABLE, {a: 'b', c: 'd'}, assert.ifError);
     });
 
     it('should accept multiple source tables', function(done) {
@@ -1488,28 +1488,25 @@ describe('BigQuery/Table', function() {
           {
             datasetId: SOURCE_TABLE.dataset.id,
             projectId: SOURCE_TABLE.bigQuery.projectId,
-            tableId: SOURCE_TABLE.id
+            tableId: SOURCE_TABLE.id,
           },
           {
             datasetId: SOURCE_TABLE.dataset.id,
             projectId: SOURCE_TABLE.bigQuery.projectId,
-            tableId: SOURCE_TABLE.id
-          }
+            tableId: SOURCE_TABLE.id,
+          },
         ]);
 
         done();
       };
 
-      table.startCopyFrom([
-        SOURCE_TABLE,
-        SOURCE_TABLE
-      ], assert.ifError);
+      table.startCopyFrom([SOURCE_TABLE, SOURCE_TABLE], assert.ifError);
     });
 
     it('should accept a job prefix', function(done) {
       var fakeJobPrefix = 'abc-';
       var options = {
-        jobPrefix: fakeJobPrefix
+        jobPrefix: fakeJobPrefix,
       };
 
       table.bigQuery.createJob = function(reqOpts, callback) {
@@ -1544,8 +1541,8 @@ describe('BigQuery/Table', function() {
     var FILE = {
       name: 'file-name.json',
       bucket: {
-        name: 'bucket-name'
-      }
+        name: 'bucket-name',
+      },
     };
 
     beforeEach(function() {
@@ -1554,7 +1551,7 @@ describe('BigQuery/Table', function() {
       };
 
       table.bigQuery.job = function(id) {
-        return { id: id };
+        return {id: id};
       };
 
       table.bigQuery.createJob = function() {};
@@ -1565,7 +1562,7 @@ describe('BigQuery/Table', function() {
         assert.deepEqual(reqOpts.configuration.extract.sourceTable, {
           datasetId: table.dataset.id,
           projectId: table.bigQuery.projectId,
-          tableId: table.id
+          tableId: table.id,
         });
 
         done();
@@ -1576,7 +1573,7 @@ describe('BigQuery/Table', function() {
 
     it('should accept just a destination and a callback', function(done) {
       table.bigQuery.createJob = function(reqOpts, callback) {
-        callback(null, { jobReference: { jobId: 'job-id' }});
+        callback(null, {jobReference: {jobId: 'job-id'}});
       };
 
       table.startExport(FILE, done);
@@ -1590,7 +1587,7 @@ describe('BigQuery/Table', function() {
           done();
         };
 
-        table.startExport(FILE, { format: 'csv' }, assert.ifError);
+        table.startExport(FILE, {format: 'csv'}, assert.ifError);
       });
 
       it('should accept json', function(done) {
@@ -1600,7 +1597,7 @@ describe('BigQuery/Table', function() {
           done();
         };
 
-        table.startExport(FILE, { format: 'json' }, assert.ifError);
+        table.startExport(FILE, {format: 'json'}, assert.ifError);
       });
 
       it('should accept avro', function(done) {
@@ -1610,14 +1607,14 @@ describe('BigQuery/Table', function() {
           done();
         };
 
-        table.startExport(FILE, { format: 'avro' }, assert.ifError);
+        table.startExport(FILE, {format: 'avro'}, assert.ifError);
       });
     });
 
     it('should parse out full gs:// urls from files', function(done) {
       table.bigQuery.createJob = function(reqOpts) {
         assert.deepEqual(reqOpts.configuration.extract.destinationUris, [
-          'gs://' + FILE.bucket.name + '/' + FILE.name
+          'gs://' + FILE.bucket.name + '/' + FILE.name,
         ]);
         done();
       };
@@ -1668,12 +1665,12 @@ describe('BigQuery/Table', function() {
         done();
       };
 
-      table.startExport(FILE, { format: 'csv' }, assert.ifError);
+      table.startExport(FILE, {format: 'csv'}, assert.ifError);
     });
 
     it('should throw if a provided format is not recognized', function() {
       assert.throws(function() {
-        table.startExport(FILE, { format: 'zip' }, util.noop);
+        table.startExport(FILE, {format: 'zip'}, util.noop);
       }, /Destination format not recognized/);
     });
 
@@ -1684,13 +1681,13 @@ describe('BigQuery/Table', function() {
         done();
       };
 
-      table.startExport(FILE, { gzip: true }, util.noop);
+      table.startExport(FILE, {gzip: true}, util.noop);
     });
 
     it('should accept a job prefix', function(done) {
       var fakeJobPrefix = 'abc-';
       var options = {
-        jobPrefix: fakeJobPrefix
+        jobPrefix: fakeJobPrefix,
       };
 
       table.bigQuery.createJob = function(reqOpts, callback) {
@@ -1726,13 +1723,13 @@ describe('BigQuery/Table', function() {
     var FILE = {
       name: 'file-name.json',
       bucket: {
-        name: 'bucket-name'
-      }
+        name: 'bucket-name',
+      },
     };
 
     var JOB = {
       id: 'foo',
-      metadata: {}
+      metadata: {},
     };
 
     beforeEach(function() {
@@ -1811,7 +1808,7 @@ describe('BigQuery/Table', function() {
         return ws;
       };
 
-      table.startImport(FILEPATH, { sourceFormat: 'CSV' }, done);
+      table.startImport(FILEPATH, {sourceFormat: 'CSV'}, done);
     });
 
     it('should check if a destination is a File', function(done) {
@@ -1862,9 +1859,13 @@ describe('BigQuery/Table', function() {
         done();
       };
 
-      table.startImport(FILE, {
-        sourceFormat: 'NEWLINE_DELIMITED_JSON'
-      }, assert.ifError);
+      table.startImport(
+        FILE,
+        {
+          sourceFormat: 'NEWLINE_DELIMITED_JSON',
+        },
+        assert.ifError
+      );
     });
 
     it('should pass the callback to createJob', function(done) {
@@ -1894,9 +1895,13 @@ describe('BigQuery/Table', function() {
         done();
       };
 
-      table.startImport(FILE, {
-        jobPrefix: fakeJobPrefix
-      }, assert.ifError);
+      table.startImport(
+        FILE,
+        {
+          jobPrefix: fakeJobPrefix,
+        },
+        assert.ifError
+      );
     });
 
     describe('formats', function() {
@@ -1907,7 +1912,7 @@ describe('BigQuery/Table', function() {
           done();
         };
 
-        table.startImport(FILE, { format: 'csv' }, assert.ifError);
+        table.startImport(FILE, {format: 'csv'}, assert.ifError);
       });
 
       it('should accept json', function(done) {
@@ -1917,7 +1922,7 @@ describe('BigQuery/Table', function() {
           done();
         };
 
-        table.startImport(FILE, { format: 'json' }, assert.ifError);
+        table.startImport(FILE, {format: 'json'}, assert.ifError);
       });
 
       it('should accept avro', function(done) {
@@ -1927,7 +1932,7 @@ describe('BigQuery/Table', function() {
           done();
         };
 
-        table.startImport(FILE, { format: 'avro' }, assert.ifError);
+        table.startImport(FILE, {format: 'avro'}, assert.ifError);
       });
     });
   });

@@ -29,27 +29,30 @@ datasetId = datasetId.replace(/-/gi, `_`);
 
 test.after.always(async () => {
   try {
-    bigquery.dataset(datasetId).delete({ force: true });
+    bigquery.dataset(datasetId).delete({force: true});
   } catch (err) {} // ignore error
 });
 
 test.beforeEach(tools.stubConsole);
 test.afterEach.always(tools.restoreConsole);
 
-test(`quickstart should create a dataset`, async (t) => {
+test(`quickstart should create a dataset`, async t => {
   await new Promise((resolve, reject) => {
     const bigqueryMock = {
-      createDataset: (_datasetId) => {
+      createDataset: _datasetId => {
         t.is(_datasetId, expectedDatasetId);
 
-        return bigquery.createDataset(datasetId)
+        return bigquery
+          .createDataset(datasetId)
           .then(([dataset]) => {
             t.not(dataset, undefined);
 
             setTimeout(() => {
               try {
                 t.true(console.log.calledOnce);
-                t.deepEqual(console.log.firstCall.args, [`Dataset ${dataset.id} created.`]);
+                t.deepEqual(console.log.firstCall.args, [
+                  `Dataset ${dataset.id} created.`,
+                ]);
                 resolve();
               } catch (err) {
                 reject(err);
@@ -57,12 +60,13 @@ test(`quickstart should create a dataset`, async (t) => {
             }, 200);
 
             return [dataset];
-          }).catch(reject);
-      }
+          })
+          .catch(reject);
+      },
     };
 
     proxyquire(`../quickstart`, {
-      '@google-cloud/bigquery': sinon.stub().returns(bigqueryMock)
+      '@google-cloud/bigquery': sinon.stub().returns(bigqueryMock),
     });
   });
 });

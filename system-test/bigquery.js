@@ -23,12 +23,11 @@ var fs = require('fs');
 var uuid = require('uuid');
 
 var Dataset = require('../src/dataset.js');
-var env = require('../../../system-test/env.js');
 var Job = require('../src/job.js');
 var Table = require('../src/table.js');
 
-var bigquery = require('../')(env);
-var storage = require('@google-cloud/storage')(env);
+var bigquery = require('../')();
+var storage = require('@google-cloud/storage')();
 
 describe('BigQuery', function() {
   var GCLOUD_TESTS_PREFIX = 'gcloud_test_';
@@ -42,32 +41,32 @@ describe('BigQuery', function() {
   var SCHEMA = [
     {
       name: 'id',
-      type: 'INTEGER'
+      type: 'INTEGER',
     },
     {
       name: 'breed',
-      type: 'STRING'
+      type: 'STRING',
     },
     {
       name: 'name',
-      type: 'STRING'
+      type: 'STRING',
     },
     {
       name: 'dob',
-      type: 'TIMESTAMP'
+      type: 'TIMESTAMP',
     },
     {
       name: 'around',
-      type: 'BOOLEAN'
+      type: 'BOOLEAN',
     },
     {
       name: 'buffer',
-      type: 'BYTES'
+      type: 'BYTES',
     },
     {
       name: 'arrayOfInts',
       type: 'INTEGER',
-      mode: 'REPEATED'
+      mode: 'REPEATED',
     },
     {
       name: 'recordOfRecords',
@@ -80,43 +79,49 @@ describe('BigQuery', function() {
           fields: [
             {
               name: 'record',
-              type: 'BOOLEAN'
-            }
-          ]
-        }
-      ]
-    }
+              type: 'BOOLEAN',
+            },
+          ],
+        },
+      ],
+    },
   ];
 
   before(function(done) {
-    async.series([
-      // Remove buckets created for the tests.
-      deleteBuckets,
+    async.series(
+      [
+        // Remove buckets created for the tests.
+        deleteBuckets,
 
-      // Remove datasets created for the tests.
-      deleteDatasets,
+        // Remove datasets created for the tests.
+        deleteDatasets,
 
-      // Create the test dataset.
-      dataset.create.bind(dataset),
+        // Create the test dataset.
+        dataset.create.bind(dataset),
 
-      // Create the test table.
-      table.create.bind(table, {
-        schema: SCHEMA
-      }),
+        // Create the test table.
+        table.create.bind(table, {
+          schema: SCHEMA,
+        }),
 
-      // Create a Bucket.
-      bucket.create.bind(bucket)
-    ], done);
+        // Create a Bucket.
+        bucket.create.bind(bucket),
+      ],
+      done
+    );
   });
 
   after(function(done) {
-    async.parallel([
-      // Remove buckets created for the tests.
-      deleteBuckets,
+    async.parallel(
+      [
+        // Remove buckets created for the tests.
+        deleteBuckets,
 
-      // Remove datasets created for the tests.
-      deleteDatasets
-    ], done);
+        // Remove datasets created for the tests.
+        deleteDatasets,
+      ],
+      done
+    );
   });
 
   it('should get a list of datasets', function(done) {
@@ -131,16 +136,16 @@ describe('BigQuery', function() {
     var maxApiCalls = 1;
     var numRequestsMade = 0;
 
-    var bigquery = require('../')(env);
+    var bigquery = require('../')();
 
     bigquery.interceptors.push({
       request: function(reqOpts) {
         numRequestsMade++;
         return reqOpts;
-      }
+      },
     });
 
-    bigquery.getDatasets({ maxApiCalls: maxApiCalls }, function(err) {
+    bigquery.getDatasets({maxApiCalls: maxApiCalls}, function(err) {
       assert.ifError(err);
       assert.strictEqual(numRequestsMade, 1);
       done();
@@ -160,40 +165,45 @@ describe('BigQuery', function() {
     var maxApiCalls = 1;
     var numRequestsMade = 0;
 
-    var bigquery = require('../')(env);
+    var bigquery = require('../')();
 
     bigquery.interceptors.push({
       request: function(reqOpts) {
         numRequestsMade++;
         return reqOpts;
-      }
+      },
     });
 
-    return bigquery.getDatasets({
-      maxApiCalls: maxApiCalls
-    }).then(function() {
-      assert.strictEqual(numRequestsMade, maxApiCalls);
-    });
+    return bigquery
+      .getDatasets({
+        maxApiCalls: maxApiCalls,
+      })
+      .then(function() {
+        assert.strictEqual(numRequestsMade, maxApiCalls);
+      });
   });
 
   it('should allow for manual pagination in promise mode', function() {
-    return bigquery.getDatasets({
-      autoPaginate: false
-    }).then(function(data) {
-      var datasets = data[0];
-      var nextQuery = data[1];
-      var apiResponse = data[2];
+    return bigquery
+      .getDatasets({
+        autoPaginate: false,
+      })
+      .then(function(data) {
+        var datasets = data[0];
+        var nextQuery = data[1];
+        var apiResponse = data[2];
 
-      assert(datasets[0] instanceof Dataset);
-      assert.strictEqual(nextQuery, null);
-      assert(apiResponse);
-    });
+        assert(datasets[0] instanceof Dataset);
+        assert.strictEqual(nextQuery, null);
+        assert(apiResponse);
+      });
   });
 
   it('should list datasets as a stream', function(done) {
     var datasetEmitted = false;
 
-    bigquery.getDatasetsStream()
+    bigquery
+      .getDatasetsStream()
       .on('error', done)
       .on('data', function(dataset) {
         datasetEmitted = dataset instanceof Dataset;
@@ -221,7 +231,8 @@ describe('BigQuery', function() {
   it('should run a query job as a promise', function() {
     var job;
 
-    return bigquery.startQuery(query)
+    return bigquery
+      .startQuery(query)
       .then(function(response) {
         job = response[0];
         return job.promise();
@@ -242,7 +253,8 @@ describe('BigQuery', function() {
 
       var rowsEmitted = [];
 
-      job.getQueryResultsStream()
+      job
+        .getQueryResultsStream()
         .on('error', done)
         .on('data', function(row) {
           rowsEmitted.push(row);
@@ -258,7 +270,7 @@ describe('BigQuery', function() {
   it('should honor the job prefix option', function(done) {
     var options = {
       query: query,
-      jobPrefix: 'hi-im-a-prefix'
+      jobPrefix: 'hi-im-a-prefix',
     };
 
     bigquery.startQuery(options, function(err, job) {
@@ -277,7 +289,7 @@ describe('BigQuery', function() {
   it('should honor the dryRun option', function(done) {
     var options = {
       query: query,
-      dryRun: true
+      dryRun: true,
     };
 
     bigquery.startQuery(options, function(err, job) {
@@ -290,7 +302,8 @@ describe('BigQuery', function() {
   it('should query as a stream', function(done) {
     var rowsEmitted = 0;
 
-    bigquery.createQueryStream(query)
+    bigquery
+      .createQueryStream(query)
       .on('data', function(row) {
         rowsEmitted++;
         assert.equal(typeof row.url, 'string');
@@ -311,14 +324,18 @@ describe('BigQuery', function() {
   });
 
   it('should allow querying in series', function(done) {
-    bigquery.query(query, {
-      maxResults: 10
-    }, function(err, rows, nextQuery) {
-      assert.ifError(err);
-      assert.equal(rows.length, 10);
-      assert.equal(typeof nextQuery.pageToken, 'string');
-      done();
-    });
+    bigquery.query(
+      query,
+      {
+        maxResults: 10,
+      },
+      function(err, rows, nextQuery) {
+        assert.ifError(err);
+        assert.equal(rows.length, 10);
+        assert.equal(typeof nextQuery.pageToken, 'string');
+        done();
+      }
+    );
   });
 
   it('should get a list of jobs', function(done) {
@@ -332,7 +349,8 @@ describe('BigQuery', function() {
   it('should list jobs as a stream', function(done) {
     var jobEmitted = false;
 
-    bigquery.getJobsStream()
+    bigquery
+      .getJobsStream()
       .on('error', done)
       .on('data', function(job) {
         jobEmitted = job instanceof Job;
@@ -352,28 +370,29 @@ describe('BigQuery', function() {
       job.cancel(function(err) {
         assert.ifError(err);
 
-        job
-          .on('error', done)
-          .on('complete', function() {
-            done();
-          });
+        job.on('error', done).on('complete', function() {
+          done();
+        });
       });
     });
   });
 
   describe('BigQuery/Dataset', function() {
     it('should set & get metadata', function(done) {
-      dataset.setMetadata({
-        description: 'yay description'
-      }, function(err) {
-        assert.ifError(err);
-
-        dataset.getMetadata(function(err, metadata) {
+      dataset.setMetadata(
+        {
+          description: 'yay description',
+        },
+        function(err) {
           assert.ifError(err);
-          assert.equal(metadata.description, 'yay description');
-          done();
-        });
-      });
+
+          dataset.getMetadata(function(err, metadata) {
+            assert.ifError(err);
+            assert.equal(metadata.description, 'yay description');
+            done();
+          });
+        }
+      );
     });
 
     it('should use etags for locking', function(done) {
@@ -382,26 +401,32 @@ describe('BigQuery', function() {
 
         var etag = dataset.metadata.etag;
 
-        dataset.setMetadata({
-          etag: etag,
-          description: 'another description'
-        }, function(err) {
-          assert.ifError(err);
-          // the etag should be updated
-          assert.notStrictEqual(etag, dataset.metadata.etag);
-          done();
-        });
+        dataset.setMetadata(
+          {
+            etag: etag,
+            description: 'another description',
+          },
+          function(err) {
+            assert.ifError(err);
+            // the etag should be updated
+            assert.notStrictEqual(etag, dataset.metadata.etag);
+            done();
+          }
+        );
       });
     });
 
     it('should error out for bad etags', function(done) {
-      dataset.setMetadata({
-        etag: 'a-fake-etag',
-        description: 'oh no!'
-      }, function(err) {
-        assert.strictEqual(err.code, 412); // precondition failed
-        done();
-      });
+      dataset.setMetadata(
+        {
+          etag: 'a-fake-etag',
+          description: 'oh no!',
+        },
+        function(err) {
+          assert.strictEqual(err.code, 412); // precondition failed
+          done();
+        }
+      );
     });
 
     it('should get tables', function(done) {
@@ -415,7 +440,8 @@ describe('BigQuery', function() {
     it('should get tables as a stream', function(done) {
       var tableEmitted = false;
 
-      dataset.getTablesStream()
+      dataset
+        .getTablesStream()
         .on('error', done)
         .on('data', function(table) {
           tableEmitted = table instanceof Table;
@@ -429,52 +455,55 @@ describe('BigQuery', function() {
     it('should create a Table with a nested schema', function(done) {
       var table = dataset.table(generateName('table'));
 
-      table.create({
-        schema: {
-          fields: [
-            {
-              name: 'id',
-              type: 'INTEGER'
-            },
-            {
-              name: 'details',
-              fields: [
-                {
-                  name: 'nested_id',
-                  type: 'INTEGER'
-                }
-              ]
-            }
-          ]
-        }
-      }, function(err) {
-        assert.ifError(err);
-
-        table.getMetadata(function(err, metadata) {
-          assert.ifError(err);
-
-          assert.deepEqual(metadata.schema, {
+      table.create(
+        {
+          schema: {
             fields: [
               {
                 name: 'id',
-                type: 'INTEGER'
+                type: 'INTEGER',
               },
               {
                 name: 'details',
-                type: 'RECORD',
                 fields: [
                   {
                     name: 'nested_id',
-                    type: 'INTEGER'
-                  }
-                ]
-              }
-            ]
-          });
+                    type: 'INTEGER',
+                  },
+                ],
+              },
+            ],
+          },
+        },
+        function(err) {
+          assert.ifError(err);
 
-          done();
-        });
-      });
+          table.getMetadata(function(err, metadata) {
+            assert.ifError(err);
+
+            assert.deepEqual(metadata.schema, {
+              fields: [
+                {
+                  name: 'id',
+                  type: 'INTEGER',
+                },
+                {
+                  name: 'details',
+                  type: 'RECORD',
+                  fields: [
+                    {
+                      name: 'nested_id',
+                      type: 'INTEGER',
+                    },
+                  ],
+                },
+              ],
+            });
+
+            done();
+          });
+        }
+      );
     });
   });
 
@@ -494,14 +523,16 @@ describe('BigQuery', function() {
     });
 
     it('should get the rows in a table via stream', function(done) {
-      table.createReadStream()
+      table
+        .createReadStream()
         .on('error', done)
         .on('data', function() {})
         .on('end', done);
     });
 
     it('should insert rows via stream', function(done) {
-      fs.createReadStream(TEST_DATA_JSON_PATH)
+      fs
+        .createReadStream(TEST_DATA_JSON_PATH)
         .pipe(table.createWriteStream('json'))
         .on('error', done)
         .on('complete', function() {
@@ -510,28 +541,31 @@ describe('BigQuery', function() {
     });
 
     it('should set & get metadata', function(done) {
-      table.setMetadata({
-        description: 'catsandstuff'
-      }, function(err) {
-        assert.ifError(err);
-
-        table.getMetadata(function(err, metadata) {
+      table.setMetadata(
+        {
+          description: 'catsandstuff',
+        },
+        function(err) {
           assert.ifError(err);
-          assert.equal(metadata.description, 'catsandstuff');
-          done();
-        });
-      });
+
+          table.getMetadata(function(err, metadata) {
+            assert.ifError(err);
+            assert.equal(metadata.description, 'catsandstuff');
+            done();
+          });
+        }
+      );
     });
 
     describe('copying', function() {
       var TABLES = {
         1: {
           data: {
-            tableId: 1
-          }
+            tableId: 1,
+          },
         },
 
-        2: {}
+        2: {},
       };
 
       var SCHEMA = 'tableId:integer';
@@ -540,21 +574,28 @@ describe('BigQuery', function() {
         TABLES[1].table = dataset.table(generateName('table'));
         TABLES[2].table = dataset.table(generateName('table'));
 
-        async.each(TABLES, function(tableObject, next) {
-          var tableInstance = tableObject.table;
+        async.each(
+          TABLES,
+          function(tableObject, next) {
+            var tableInstance = tableObject.table;
 
-          tableInstance.create({
-            schema: SCHEMA
-          }, next);
-        }, function(err) {
-          if (err) {
-            done(err);
-            return;
+            tableInstance.create(
+              {
+                schema: SCHEMA,
+              },
+              next
+            );
+          },
+          function(err) {
+            if (err) {
+              done(err);
+              return;
+            }
+
+            var table1Instance = TABLES[1].table;
+            table1Instance.insert(TABLES[1].data, done);
           }
-
-          var table1Instance = TABLES[1].table;
-          table1Instance.insert(TABLES[1].data, done);
-        });
+        );
       });
 
       it('should start copying data from current table', function(done) {
@@ -567,14 +608,12 @@ describe('BigQuery', function() {
         table1Instance.startCopy(table2Instance, function(err, job) {
           assert.ifError(err);
 
-          job
-            .on('error', done)
-            .on('complete', function() {
-              // Data may take up to 90 minutes to be copied*, so we cannot test
-              // to see that anything but the request was successful.
-              // *https://cloud.google.com/bigquery/streaming-data-into-bigquery
-              done();
-            });
+          job.on('error', done).on('complete', function() {
+            // Data may take up to 90 minutes to be copied*, so we cannot test
+            // to see that anything but the request was successful.
+            // *https://cloud.google.com/bigquery/streaming-data-into-bigquery
+            done();
+          });
         });
       });
 
@@ -602,14 +641,12 @@ describe('BigQuery', function() {
         table2Instance.startCopyFrom(table1Instance, function(err, job) {
           assert.ifError(err);
 
-          job
-            .on('error', done)
-            .on('complete', function() {
-              // Data may take up to 90 minutes to be copied*, so we cannot test
-              // to see that anything but the request was successful.
-              // *https://cloud.google.com/bigquery/streaming-data-into-bigquery
-              done();
-            });
+          job.on('error', done).on('complete', function() {
+            // Data may take up to 90 minutes to be copied*, so we cannot test
+            // to see that anything but the request was successful.
+            // *https://cloud.google.com/bigquery/streaming-data-into-bigquery
+            done();
+          });
         });
       });
 
@@ -632,7 +669,8 @@ describe('BigQuery', function() {
       var file = bucket.file('kitten-test-data-backup.json');
 
       before(function(done) {
-        fs.createReadStream(TEST_DATA_JSON_PATH)
+        fs
+          .createReadStream(TEST_DATA_JSON_PATH)
           .pipe(file.createWriteStream())
           .on('error', done)
           .on('finish', done);
@@ -646,11 +684,9 @@ describe('BigQuery', function() {
         table.startImport(file, function(err, job) {
           assert.ifError(err);
 
-          job
-            .on('error', done)
-            .on('complete', function() {
-              done();
-            });
+          job.on('error', done).on('complete', function() {
+            done();
+          });
         });
       });
 
@@ -663,20 +699,19 @@ describe('BigQuery', function() {
       });
 
       it('should import data from a file via promises', function() {
-        return table.import(file)
-          .then(function(results) {
-            var metadata = results[0];
-            assert.strictEqual(metadata.status.state, 'DONE');
-          });
+        return table.import(file).then(function(results) {
+          var metadata = results[0];
+          assert.strictEqual(metadata.status.state, 'DONE');
+        });
       });
 
       it('should return partial errors', function(done) {
         var data = {
-          name: 'dave'
+          name: 'dave',
         };
 
         var improperData = {
-          name: true
+          name: true,
         };
 
         table.insert([data, improperData], function(err) {
@@ -686,20 +721,20 @@ describe('BigQuery', function() {
             errors: [
               {
                 message: 'Conversion from bool to string is unsupported.',
-                reason: 'invalid'
-              }
+                reason: 'invalid',
+              },
             ],
-            row: improperData
+            row: improperData,
           });
 
           assert.deepEqual(err.errors[1], {
             errors: [
               {
                 message: '',
-                reason: 'stopped'
-              }
+                reason: 'stopped',
+              },
             ],
-            row: data
+            row: data,
           });
 
           done();
@@ -710,15 +745,16 @@ describe('BigQuery', function() {
         var table = dataset.table(generateName('does-not-exist'));
 
         var row = {
-          name: 'stephen'
+          name: 'stephen',
         };
 
         var options = {
           autoCreate: true,
-          schema: SCHEMA
+          schema: SCHEMA,
         };
 
-        return table.insert(row, options)
+        return table
+          .insert(row, options)
           .then(function() {
             // getting rows immediately after insert
             // results in an empty array
@@ -740,375 +776,417 @@ describe('BigQuery', function() {
       describe('SQL parameters', function() {
         describe('positional', function() {
           it('should work with strings', function(done) {
-            bigquery.query({
-              query: [
-                'SELECT url',
-                'FROM `publicdata.samples.github_nested`',
-                'WHERE repository.owner = ?',
-                'LIMIT 1'
-              ].join(' '),
-              params: ['google']
-            }, function(err, rows) {
-              assert.ifError(err);
-              assert.equal(rows.length, 1);
-              done();
-            });
+            bigquery.query(
+              {
+                query: [
+                  'SELECT url',
+                  'FROM `publicdata.samples.github_nested`',
+                  'WHERE repository.owner = ?',
+                  'LIMIT 1',
+                ].join(' '),
+                params: ['google'],
+              },
+              function(err, rows) {
+                assert.ifError(err);
+                assert.equal(rows.length, 1);
+                done();
+              }
+            );
           });
 
           it('should work with ints', function(done) {
-            bigquery.query({
-              query: [
-                'SELECT url',
-                'FROM `publicdata.samples.github_nested`',
-                'WHERE repository.forks > ?',
-                'LIMIT 1'
-              ].join(' '),
-              params: [1]
-            }, function(err, rows) {
-              assert.ifError(err);
-              assert.equal(rows.length, 1);
-              done();
-            });
+            bigquery.query(
+              {
+                query: [
+                  'SELECT url',
+                  'FROM `publicdata.samples.github_nested`',
+                  'WHERE repository.forks > ?',
+                  'LIMIT 1',
+                ].join(' '),
+                params: [1],
+              },
+              function(err, rows) {
+                assert.ifError(err);
+                assert.equal(rows.length, 1);
+                done();
+              }
+            );
           });
 
           it('should work with floats', function(done) {
-            bigquery.query({
-              query: [
-                'SELECT snow_depth',
-                'FROM `publicdata.samples.gsod`',
-                'WHERE snow_depth >= ?',
-                'LIMIT 1'
-              ].join(' '),
-              params: [12.5]
-            }, function(err, rows) {
-              assert.ifError(err);
-              assert.equal(rows.length, 1);
-              done();
-            });
+            bigquery.query(
+              {
+                query: [
+                  'SELECT snow_depth',
+                  'FROM `publicdata.samples.gsod`',
+                  'WHERE snow_depth >= ?',
+                  'LIMIT 1',
+                ].join(' '),
+                params: [12.5],
+              },
+              function(err, rows) {
+                assert.ifError(err);
+                assert.equal(rows.length, 1);
+                done();
+              }
+            );
           });
 
           it('should work with booleans', function(done) {
-            bigquery.query({
-              query: [
-                'SELECT url',
-                'FROM `publicdata.samples.github_nested`',
-                'WHERE public = ?',
-                'LIMIT 1'
-              ].join(' '),
-              params: [true]
-            }, function(err, rows) {
-              assert.ifError(err);
-              assert.equal(rows.length, 1);
-              done();
-            });
+            bigquery.query(
+              {
+                query: [
+                  'SELECT url',
+                  'FROM `publicdata.samples.github_nested`',
+                  'WHERE public = ?',
+                  'LIMIT 1',
+                ].join(' '),
+                params: [true],
+              },
+              function(err, rows) {
+                assert.ifError(err);
+                assert.equal(rows.length, 1);
+                done();
+              }
+            );
           });
 
           it('should work with arrays', function(done) {
-            bigquery.query({
-              query: 'SELECT * FROM UNNEST (?)',
-              params: [
-                [
-                  25,
-                  26,
-                  27,
-                  28,
-                  29
-                ]
-              ]
-            }, function(err, rows) {
-              assert.ifError(err);
-              assert.equal(rows.length, 5);
-              done();
-            });
+            bigquery.query(
+              {
+                query: 'SELECT * FROM UNNEST (?)',
+                params: [[25, 26, 27, 28, 29]],
+              },
+              function(err, rows) {
+                assert.ifError(err);
+                assert.equal(rows.length, 5);
+                done();
+              }
+            );
           });
 
           it('should work with structs', function(done) {
-            bigquery.query({
-              query: 'SELECT ? obj',
-              params: [
-                {
-                  b: true,
-                  arr: [2,3,4],
-                  d: bigquery.date('2016-12-7'),
-                  f: 3.14,
-                  nested: {
-                    a: 3
-                  }
-                }
-              ]
-            }, function(err, rows) {
-              assert.ifError(err);
-              assert.equal(rows.length, 1);
-              done();
-            });
+            bigquery.query(
+              {
+                query: 'SELECT ? obj',
+                params: [
+                  {
+                    b: true,
+                    arr: [2, 3, 4],
+                    d: bigquery.date('2016-12-7'),
+                    f: 3.14,
+                    nested: {
+                      a: 3,
+                    },
+                  },
+                ],
+              },
+              function(err, rows) {
+                assert.ifError(err);
+                assert.equal(rows.length, 1);
+                done();
+              }
+            );
           });
 
           it('should work with TIMESTAMP types', function(done) {
-            bigquery.query({
-              query: [
-                'SELECT subject',
-                'FROM `bigquery-public-data.github_repos.commits`',
-                'WHERE author.date < ?',
-                'LIMIT 1'
-              ].join(' '),
-              params: [new Date()]
-            }, function(err, rows) {
-              assert.ifError(err);
-              assert.equal(rows.length, 1);
-              done();
-            });
+            bigquery.query(
+              {
+                query: [
+                  'SELECT subject',
+                  'FROM `bigquery-public-data.github_repos.commits`',
+                  'WHERE author.date < ?',
+                  'LIMIT 1',
+                ].join(' '),
+                params: [new Date()],
+              },
+              function(err, rows) {
+                assert.ifError(err);
+                assert.equal(rows.length, 1);
+                done();
+              }
+            );
           });
 
           it('should work with DATE types', function(done) {
-            bigquery.query({
-              query: 'SELECT ? date',
-              params: [
-                bigquery.date('2016-12-7')
-              ]
-            }, function(err, rows) {
-              assert.ifError(err);
-              assert.equal(rows.length, 1);
-              done();
-            });
+            bigquery.query(
+              {
+                query: 'SELECT ? date',
+                params: [bigquery.date('2016-12-7')],
+              },
+              function(err, rows) {
+                assert.ifError(err);
+                assert.equal(rows.length, 1);
+                done();
+              }
+            );
           });
 
           it('should work with DATETIME types', function(done) {
-            bigquery.query({
-              query: 'SELECT ? datetime',
-              params: [
-                bigquery.datetime('2016-12-7 14:00:00')
-              ]
-            }, function(err, rows) {
-              assert.ifError(err);
-              assert.equal(rows.length, 1);
-              done();
-            });
+            bigquery.query(
+              {
+                query: 'SELECT ? datetime',
+                params: [bigquery.datetime('2016-12-7 14:00:00')],
+              },
+              function(err, rows) {
+                assert.ifError(err);
+                assert.equal(rows.length, 1);
+                done();
+              }
+            );
           });
 
           it('should work with TIME types', function(done) {
-            bigquery.query({
-              query: 'SELECT ? time',
-              params: [
-                bigquery.time('14:00:00')
-              ]
-            }, function(err, rows) {
-              assert.ifError(err);
-              assert.equal(rows.length, 1);
-              done();
-            });
+            bigquery.query(
+              {
+                query: 'SELECT ? time',
+                params: [bigquery.time('14:00:00')],
+              },
+              function(err, rows) {
+                assert.ifError(err);
+                assert.equal(rows.length, 1);
+                done();
+              }
+            );
           });
 
           it('should work with multiple types', function(done) {
-            bigquery.query({
-              query: [
-                'SELECT url FROM `publicdata.samples.github_nested`',
-                'WHERE repository.owner = ?',
-                'AND repository.forks > ?',
-                'AND public = ?',
-                'LIMIT 1'
-              ].join(' '),
-              params: [
-                'google',
-                1,
-                true
-              ]
-            }, function(err, rows) {
-              assert.ifError(err);
-              assert.equal(rows.length, 1);
-              done();
-            });
+            bigquery.query(
+              {
+                query: [
+                  'SELECT url FROM `publicdata.samples.github_nested`',
+                  'WHERE repository.owner = ?',
+                  'AND repository.forks > ?',
+                  'AND public = ?',
+                  'LIMIT 1',
+                ].join(' '),
+                params: ['google', 1, true],
+              },
+              function(err, rows) {
+                assert.ifError(err);
+                assert.equal(rows.length, 1);
+                done();
+              }
+            );
           });
         });
 
         describe('named', function() {
           it('should work with strings', function(done) {
-            bigquery.query({
-              query: [
-                'SELECT url FROM `publicdata.samples.github_nested`',
-                'WHERE repository.owner = @owner',
-                'LIMIT 1'
-              ].join(' '),
-              params: {
-                owner: 'google'
+            bigquery.query(
+              {
+                query: [
+                  'SELECT url FROM `publicdata.samples.github_nested`',
+                  'WHERE repository.owner = @owner',
+                  'LIMIT 1',
+                ].join(' '),
+                params: {
+                  owner: 'google',
+                },
+              },
+              function(err, rows) {
+                assert.ifError(err);
+                assert.equal(rows.length, 1);
+                done();
               }
-            }, function(err, rows) {
-              assert.ifError(err);
-              assert.equal(rows.length, 1);
-              done();
-            });
+            );
           });
 
           it('should work with ints', function(done) {
-            bigquery.query({
-              query: [
-                'SELECT url',
-                'FROM `publicdata.samples.github_nested`',
-                'WHERE repository.forks > @forks',
-                'LIMIT 1'
-              ].join(' '),
-              params: {
-                forks: 1
+            bigquery.query(
+              {
+                query: [
+                  'SELECT url',
+                  'FROM `publicdata.samples.github_nested`',
+                  'WHERE repository.forks > @forks',
+                  'LIMIT 1',
+                ].join(' '),
+                params: {
+                  forks: 1,
+                },
+              },
+              function(err, rows) {
+                assert.ifError(err);
+                assert.equal(rows.length, 1);
+                done();
               }
-            }, function(err, rows) {
-              assert.ifError(err);
-              assert.equal(rows.length, 1);
-              done();
-            });
+            );
           });
 
           it('should work with floats', function(done) {
-            bigquery.query({
-              query: [
-                'SELECT snow_depth',
-                'FROM `publicdata.samples.gsod`',
-                'WHERE snow_depth >= @depth',
-                'LIMIT 1'
-              ].join(' '),
-              params: {
-                depth: 12.5
+            bigquery.query(
+              {
+                query: [
+                  'SELECT snow_depth',
+                  'FROM `publicdata.samples.gsod`',
+                  'WHERE snow_depth >= @depth',
+                  'LIMIT 1',
+                ].join(' '),
+                params: {
+                  depth: 12.5,
+                },
+              },
+              function(err, rows) {
+                assert.ifError(err);
+                assert.equal(rows.length, 1);
+                done();
               }
-            }, function(err, rows) {
-              assert.ifError(err);
-              assert.equal(rows.length, 1);
-              done();
-            });
+            );
           });
 
           it('should work with booleans', function(done) {
-            bigquery.query({
-              query: [
-                'SELECT url',
-                'FROM `publicdata.samples.github_nested`',
-                'WHERE public = @isPublic',
-                'LIMIT 1'
-              ].join(' '),
-              params: {
-                isPublic: true
+            bigquery.query(
+              {
+                query: [
+                  'SELECT url',
+                  'FROM `publicdata.samples.github_nested`',
+                  'WHERE public = @isPublic',
+                  'LIMIT 1',
+                ].join(' '),
+                params: {
+                  isPublic: true,
+                },
+              },
+              function(err, rows) {
+                assert.ifError(err);
+                assert.equal(rows.length, 1);
+                done();
               }
-            }, function(err, rows) {
-              assert.ifError(err);
-              assert.equal(rows.length, 1);
-              done();
-            });
+            );
           });
 
           it('should work with arrays', function(done) {
-            bigquery.query({
-              query: 'SELECT * FROM UNNEST (@nums)',
-              params: {
-                nums: [
-                  25,
-                  26,
-                  27,
-                  28,
-                  29
-                ]
+            bigquery.query(
+              {
+                query: 'SELECT * FROM UNNEST (@nums)',
+                params: {
+                  nums: [25, 26, 27, 28, 29],
+                },
+              },
+              function(err, rows) {
+                assert.ifError(err);
+                assert.equal(rows.length, 5);
+                done();
               }
-            }, function(err, rows) {
-              assert.ifError(err);
-              assert.equal(rows.length, 5);
-              done();
-            });
+            );
           });
 
           it('should work with structs', function(done) {
-            bigquery.query({
-              query: 'SELECT @obj obj',
-              params: {
-                obj: {
-                  b: true,
-                  arr: [2,3,4],
-                  d: bigquery.date('2016-12-7'),
-                  f: 3.14,
-                  nested: {
-                    a: 3
-                  }
-                }
+            bigquery.query(
+              {
+                query: 'SELECT @obj obj',
+                params: {
+                  obj: {
+                    b: true,
+                    arr: [2, 3, 4],
+                    d: bigquery.date('2016-12-7'),
+                    f: 3.14,
+                    nested: {
+                      a: 3,
+                    },
+                  },
+                },
+              },
+              function(err, rows) {
+                assert.ifError(err);
+                assert.equal(rows.length, 1);
+                done();
               }
-            }, function(err, rows) {
-              assert.ifError(err);
-              assert.equal(rows.length, 1);
-              done();
-            });
+            );
           });
 
           it('should work with TIMESTAMP types', function(done) {
-            bigquery.query({
-              query: [
-                'SELECT subject',
-                'FROM `bigquery-public-data.github_repos.commits`',
-                'WHERE author.date < @time',
-                'LIMIT 1'
-              ].join(' '),
-              params: {
-                time: new Date()
+            bigquery.query(
+              {
+                query: [
+                  'SELECT subject',
+                  'FROM `bigquery-public-data.github_repos.commits`',
+                  'WHERE author.date < @time',
+                  'LIMIT 1',
+                ].join(' '),
+                params: {
+                  time: new Date(),
+                },
+              },
+              function(err, rows) {
+                assert.ifError(err);
+                assert.equal(rows.length, 1);
+                done();
               }
-            }, function(err, rows) {
-              assert.ifError(err);
-              assert.equal(rows.length, 1);
-              done();
-            });
+            );
           });
 
           it('should work with DATE types', function(done) {
-            bigquery.query({
-              query: 'SELECT @date date',
-              params: {
-                date: bigquery.date('2016-12-7')
+            bigquery.query(
+              {
+                query: 'SELECT @date date',
+                params: {
+                  date: bigquery.date('2016-12-7'),
+                },
+              },
+              function(err, rows) {
+                assert.ifError(err);
+                assert.equal(rows.length, 1);
+                done();
               }
-            }, function(err, rows) {
-              assert.ifError(err);
-              assert.equal(rows.length, 1);
-              done();
-            });
+            );
           });
 
           it('should work with DATETIME types', function(done) {
-            bigquery.query({
-              query: 'SELECT @datetime datetime',
-              params: {
-                datetime: bigquery.datetime('2016-12-7 14:00:00')
+            bigquery.query(
+              {
+                query: 'SELECT @datetime datetime',
+                params: {
+                  datetime: bigquery.datetime('2016-12-7 14:00:00'),
+                },
+              },
+              function(err, rows) {
+                assert.ifError(err);
+                assert.equal(rows.length, 1);
+                done();
               }
-            }, function(err, rows) {
-              assert.ifError(err);
-              assert.equal(rows.length, 1);
-              done();
-            });
+            );
           });
 
           it('should work with TIME types', function(done) {
-            bigquery.query({
-              query: 'SELECT @time time',
-              params: {
-                time: bigquery.time('14:00:00')
+            bigquery.query(
+              {
+                query: 'SELECT @time time',
+                params: {
+                  time: bigquery.time('14:00:00'),
+                },
+              },
+              function(err, rows) {
+                assert.ifError(err);
+                assert.equal(rows.length, 1);
+                done();
               }
-            }, function(err, rows) {
-              assert.ifError(err);
-              assert.equal(rows.length, 1);
-              done();
-            });
+            );
           });
 
           it('should work with multiple types', function(done) {
-            bigquery.query({
-              query: [
-                'SELECT url',
-                'FROM `publicdata.samples.github_nested`',
-                'WHERE repository.owner = @owner',
-                'AND repository.forks > @forks',
-                'AND public = @isPublic',
-                'LIMIT 1'
-              ].join(' '),
-              params: {
-                owner: 'google',
-                forks: 1,
-                isPublic: true
+            bigquery.query(
+              {
+                query: [
+                  'SELECT url',
+                  'FROM `publicdata.samples.github_nested`',
+                  'WHERE repository.owner = @owner',
+                  'AND repository.forks > @forks',
+                  'AND public = @isPublic',
+                  'LIMIT 1',
+                ].join(' '),
+                params: {
+                  owner: 'google',
+                  forks: 1,
+                  isPublic: true,
+                },
+              },
+              function(err, rows) {
+                assert.ifError(err);
+                assert.equal(rows.length, 1);
+                done();
               }
-            }, function(err, rows) {
-              assert.ifError(err);
-              assert.equal(rows.length, 1);
-              done();
-            });
+            );
           });
         });
       });
@@ -1119,11 +1197,9 @@ describe('BigQuery', function() {
         table.startExport(file, function(err, job) {
           assert.ifError(err);
 
-          job
-            .on('error', done)
-            .on('complete', function() {
-              done();
-            });
+          job.on('error', done).on('complete', function() {
+            done();
+          });
         });
       });
 
@@ -1150,7 +1226,7 @@ describe('BigQuery', function() {
     before(function() {
       table = dataset.table(generateName('table'));
       return table.create({
-        schema: 'date:DATE, datetime:DATETIME, time:TIME, timestamp:TIMESTAMP'
+        schema: 'date:DATE, datetime:DATETIME, time:TIME, timestamp:TIMESTAMP',
       });
     });
 
@@ -1159,7 +1235,7 @@ describe('BigQuery', function() {
         date: DATE,
         datetime: DATETIME,
         time: TIME,
-        timestamp: TIMESTAMP
+        timestamp: TIMESTAMP,
       });
     });
   });
@@ -1178,7 +1254,7 @@ describe('BigQuery', function() {
         Spells: [],
         TeaTime: bigquery.time('10:00:00'),
         NextVacation: bigquery.date('2017-09-22'),
-        FavoriteTime: bigquery.datetime('2031-04-01T05:09:27')
+        FavoriteTime: bigquery.datetime('2031-04-01T05:09:27'),
       },
 
       Gandalf: {
@@ -1194,23 +1270,23 @@ describe('BigQuery', function() {
             Properties: [
               {
                 Name: 'Flying',
-                Power: 1
+                Power: 1,
               },
               {
                 Name: 'Creature',
-                Power: 1
+                Power: 1,
               },
               {
                 Name: 'Explodey',
-                Power: 11
-              }
+                Power: 11,
+              },
             ],
-            Icon: new Buffer(testData[1].Spells[0].Icon, 'base64')
-          }
+            Icon: Buffer.from(testData[1].Spells[0].Icon, 'base64'),
+          },
         ],
         TeaTime: bigquery.time('15:00:00'),
         NextVacation: bigquery.date('2666-06-06'),
-        FavoriteTime: bigquery.datetime('2001-12-19T23:59:59')
+        FavoriteTime: bigquery.datetime('2001-12-19T23:59:59'),
       },
 
       Sabrina: {
@@ -1226,34 +1302,40 @@ describe('BigQuery', function() {
             Properties: [
               {
                 Name: 'Makes you look crazy',
-                Power: 1
-              }
+                Power: 1,
+              },
             ],
-            Icon: new Buffer(testData[2].Spells[0].Icon, 'base64')
-          }
+            Icon: Buffer.from(testData[2].Spells[0].Icon, 'base64'),
+          },
         ],
         TeaTime: bigquery.time('12:00:00'),
         NextVacation: bigquery.date('2017-03-14'),
-        FavoriteTime: bigquery.datetime('2000-10-31T23:27:46')
-      }
+        FavoriteTime: bigquery.datetime('2000-10-31T23:27:46'),
+      },
     };
 
     before(function(done) {
-      async.series([
-        function(next) {
-          table.create({
-            schema: schema
-          }, next);
-        },
+      async.series(
+        [
+          function(next) {
+            table.create(
+              {
+                schema: schema,
+              },
+              next
+            );
+          },
 
-        function(next) {
-          table.insert(testData, next);
-        },
+          function(next) {
+            table.insert(testData, next);
+          },
 
-        function(next) {
-          setTimeout(next, 15000);
-        }
-      ], done);
+          function(next) {
+            setTimeout(next, 15000);
+          },
+        ],
+        done
+      );
     });
 
     after(function(done) {
@@ -1280,8 +1362,10 @@ describe('BigQuery', function() {
   });
 
   function generateName(resourceType) {
-    return (GCLOUD_TESTS_PREFIX + resourceType + '_' + uuid.v1())
-      .replace(/-/g, '_');
+    return (GCLOUD_TESTS_PREFIX + resourceType + '_' + uuid.v1()).replace(
+      /-/g,
+      '_'
+    );
   }
 
   function deleteBuckets(callback) {
@@ -1303,28 +1387,34 @@ describe('BigQuery', function() {
       });
     }
 
-    storage.getBuckets({
-      prefix: GCLOUD_TESTS_PREFIX
-    }, function(err, buckets) {
-      if (err) {
-        callback(err);
-        return;
-      }
+    storage.getBuckets(
+      {
+        prefix: GCLOUD_TESTS_PREFIX,
+      },
+      function(err, buckets) {
+        if (err) {
+          callback(err);
+          return;
+        }
 
-      async.each(buckets, deleteBucket, callback);
-    });
+        async.each(buckets, deleteBucket, callback);
+      }
+    );
   }
 
   function deleteDatasets(callback) {
-    bigquery.getDatasets({
-      prefix: GCLOUD_TESTS_PREFIX
-    }, function(err, datasets) {
-      if (err) {
-        callback(err);
-        return;
-      }
+    bigquery.getDatasets(
+      {
+        prefix: GCLOUD_TESTS_PREFIX,
+      },
+      function(err, datasets) {
+        if (err) {
+          callback(err);
+          return;
+        }
 
-      async.each(datasets, exec('delete', { force: true }), callback);
-    });
+        async.each(datasets, exec('delete', {force: true}), callback);
+      }
+    );
   }
 });

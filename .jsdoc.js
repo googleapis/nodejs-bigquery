@@ -1,5 +1,5 @@
-/**
- * Copyright 2014 Google Inc. All Rights Reserved.
+/*!
+ * Copyright 2017 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,29 @@
 'use strict';
 
 module.exports = {
-  projectId: process.env.GCLOUD_TESTS_PROJECT_ID,
-  keyFilename: process.env.GCLOUD_TESTS_KEY,
-  apiKey: process.env.GCLOUD_TESTS_API_KEY,
-  projectNumber: process.env.GCLOUD_TESTS_PROJECT_NUMBER,
-  nonWhitelistProjectId: process.env.GCLOUD_TESTS_PROJECT_ID_NON_WHITELIST,
-  nonWhitelistKeyFilename: process.env.GCLOUD_TESTS_KEY_NON_WHITELIST
+  opts: {
+    readme: './README.md',
+    package: './package.json',
+    template: './node_modules/ink-docstrap/template',
+    recurse: true,
+    verbose: true,
+    destination: './docs/'
+  },
+  plugins: [
+    'plugins/markdown'
+  ],
+  source: {
+    excludePattern: '(^|\\/|\\\\)[._]',
+    include: [
+      'src'
+    ],
+    includePattern: '\\.js$'
+  },
+  templates: {
+    copyright: 'Copyright 2017 Google, Inc.',
+    includeDate: false,
+    sourceFiles: false,
+    systemName: '@google-cloud/bigquery',
+    theme: 'lumen'
+  }
 };

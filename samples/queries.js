@@ -16,10 +16,10 @@
 'use strict';
 
 // [START bigquery_simple_app_all]
-function printResult (rows) {
+function printResult(rows) {
   // [START bigquery_simple_app_print]
   console.log('Query Results:');
-  rows.forEach(function (row) {
+  rows.forEach(function(row) {
     let str = '';
     for (let key in row) {
       if (str) {
@@ -32,7 +32,7 @@ function printResult (rows) {
   // [END bigquery_simple_app_print]
 }
 
-function queryShakespeare (projectId) {
+function queryShakespeare(projectId) {
   // [START bigquery_simple_app_query]
   // Imports the Google Cloud client library
   const BigQuery = require('@google-cloud/bigquery');
@@ -51,30 +51,30 @@ function queryShakespeare (projectId) {
 
   // Instantiates a client
   const bigquery = BigQuery({
-    projectId: projectId
+    projectId: projectId,
   });
 
   // Query options list: https://cloud.google.com/bigquery/docs/reference/v2/jobs/query
   const options = {
     query: sqlQuery,
-    useLegacySql: false // Use standard SQL syntax for queries.
+    useLegacySql: false, // Use standard SQL syntax for queries.
   };
 
   // Runs the query
   bigquery
     .query(options)
-    .then((results) => {
+    .then(results => {
       const rows = results[0];
       printResult(rows);
     })
-    .catch((err) => {
+    .catch(err => {
       console.error('ERROR:', err);
     });
   // [END bigquery_simple_app_query]
 }
 // [END bigquery_simple_app_all]
 
-function syncQuery (sqlQuery, projectId) {
+function syncQuery(sqlQuery, projectId) {
   // [START bigquery_sync_query]
   // Imports the Google Cloud client library
   const BigQuery = require('@google-cloud/bigquery');
@@ -87,31 +87,31 @@ function syncQuery (sqlQuery, projectId) {
 
   // Instantiates a client
   const bigquery = BigQuery({
-    projectId: projectId
+    projectId: projectId,
   });
 
   // Query options list: https://cloud.google.com/bigquery/docs/reference/v2/jobs/query
   const options = {
     query: sqlQuery,
     timeoutMs: 10000, // Time out after 10 seconds.
-    useLegacySql: false // Use standard SQL syntax for queries.
+    useLegacySql: false, // Use standard SQL syntax for queries.
   };
 
   // Runs the query
   bigquery
     .query(options)
-    .then((results) => {
+    .then(results => {
       const rows = results[0];
       console.log('Rows:');
-      rows.forEach((row) => console.log(row));
+      rows.forEach(row => console.log(row));
     })
-    .catch((err) => {
+    .catch(err => {
       console.error('ERROR:', err);
     });
   // [END bigquery_sync_query]
 }
 
-function asyncQuery (sqlQuery, projectId) {
+function asyncQuery(sqlQuery, projectId) {
   // [START bigquery_async_query]
   // [START bigquery_build_client]
   // Imports the Google Cloud client library
@@ -122,7 +122,7 @@ function asyncQuery (sqlQuery, projectId) {
 
   // Instantiates a client
   const bigquery = BigQuery({
-    projectId: projectId
+    projectId: projectId,
   });
   // [END bigquery_build_client]
 
@@ -132,7 +132,7 @@ function asyncQuery (sqlQuery, projectId) {
   // Query options list: https://cloud.google.com/bigquery/docs/reference/v2/jobs/query
   const options = {
     query: sqlQuery,
-    useLegacySql: false // Use standard SQL syntax for queries.
+    useLegacySql: false, // Use standard SQL syntax for queries.
   };
 
   let job;
@@ -140,16 +140,16 @@ function asyncQuery (sqlQuery, projectId) {
   // Runs the query as a job
   bigquery
     .startQuery(options)
-    .then((results) => {
+    .then(results => {
       job = results[0];
       console.log(`Job ${job.id} started.`);
       return job.promise();
     })
-    .then((results) => {
+    .then(() => {
       // Get the job's status
       return job.getMetadata();
     })
-    .then((metadata) => {
+    .then(metadata => {
       // Check the job's status for errors
       const errors = metadata[0].status.errors;
       if (errors && errors.length > 0) {
@@ -160,12 +160,12 @@ function asyncQuery (sqlQuery, projectId) {
       console.log(`Job ${job.id} completed.`);
       return job.getQueryResults();
     })
-    .then((results) => {
+    .then(results => {
       const rows = results[0];
       console.log('Rows:');
-      rows.forEach((row) => console.log(row));
+      rows.forEach(row => console.log(row));
     })
-    .catch((err) => {
+    .catch(err => {
       console.error('ERROR:', err);
     });
   // [END bigquery_async_query]
@@ -177,28 +177,26 @@ const cli = require(`yargs`)
     projectId: {
       alias: 'p',
       default: process.env.GCLOUD_PROJECT || process.env.GOOGLE_CLOUD_PROJECT,
-      description: 'The Project ID to use. Defaults to the value of the GCLOUD_PROJECT or GOOGLE_CLOUD_PROJECT environment variables.',
+      description:
+        'The Project ID to use. Defaults to the value of the GCLOUD_PROJECT or GOOGLE_CLOUD_PROJECT environment variables.',
       requiresArg: true,
-      type: 'string'
-    }
+      type: 'string',
+    },
   })
   .command(
     `sync <sqlQuery>`,
     `Run the specified synchronous query.`,
     {},
-    (opts) => syncQuery(opts.sqlQuery, opts.projectId)
+    opts => syncQuery(opts.sqlQuery, opts.projectId)
   )
   .command(
     `async <sqlQuery>`,
     `Start the specified asynchronous query.`,
     {},
-    (opts) => asyncQuery(opts.sqlQuery, opts.projectId)
+    opts => asyncQuery(opts.sqlQuery, opts.projectId)
   )
-  .command(
-    `shakespeare`,
-    `Queries a public Shakespeare dataset.`,
-    {},
-    (opts) => queryShakespeare(opts.projectId)
+  .command(`shakespeare`, `Queries a public Shakespeare dataset.`, {}, opts =>
+    queryShakespeare(opts.projectId)
   )
   .example(
     `node $0 sync "SELECT * FROM publicdata.samples.natality LIMIT 5;"`,
@@ -208,10 +206,7 @@ const cli = require(`yargs`)
     `node $0 async "SELECT * FROM publicdata.samples.natality LIMIT 5;"`,
     `Queries the natality dataset as a job.`
   )
-  .example(
-    `node $0 shakespeare`,
-    `Queries a public Shakespeare dataset.`
-  )
+  .example(`node $0 shakespeare`, `Queries a public Shakespeare dataset.`)
   .wrap(120)
   .recommendCommands()
   .epilogue(`For more information, see https://cloud.google.com/bigquery/docs`)

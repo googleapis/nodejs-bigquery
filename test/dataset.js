@@ -34,7 +34,7 @@ var fakeUtil = extend({}, util, {
 
     promisified = true;
     assert.deepEqual(options.exclude, ['table']);
-  }
+  },
 });
 
 var extended = false;
@@ -51,7 +51,7 @@ var fakePaginator = {
   },
   streamify: function(methodName) {
     return methodName;
-  }
+  },
 };
 
 function FakeServiceObject() {
@@ -64,7 +64,7 @@ nodeutil.inherits(FakeServiceObject, ServiceObject);
 describe('BigQuery/Dataset', function() {
   var BIGQUERY = {
     projectId: 'my-project',
-    createDataset: util.noop
+    createDataset: util.noop,
   };
   var DATASET_ID = 'kittens';
   var Dataset;
@@ -76,8 +76,8 @@ describe('BigQuery/Dataset', function() {
       '@google-cloud/common': {
         paginator: fakePaginator,
         ServiceObject: FakeServiceObject,
-        util: fakeUtil
-      }
+        util: fakeUtil,
+      },
     });
     Table = require('../src/table.js');
   });
@@ -105,8 +105,8 @@ describe('BigQuery/Dataset', function() {
           bind: function(context) {
             assert.strictEqual(context, bigQueryInstance);
             done();
-          }
-        }
+          },
+        },
       });
 
       var ds = new Dataset(bigQueryInstance, DATASET_ID);
@@ -122,7 +122,7 @@ describe('BigQuery/Dataset', function() {
         exists: true,
         get: true,
         getMetadata: true,
-        setMetadata: true
+        setMetadata: true,
       });
     });
 
@@ -135,12 +135,12 @@ describe('BigQuery/Dataset', function() {
         var fakeReqOpts = {
           method: 'PATCH',
           json: {
-            etag: FAKE_ETAG
-          }
+            etag: FAKE_ETAG,
+          },
         };
 
         var reqOpts = interceptor.request(fakeReqOpts);
-        assert.deepEqual(reqOpts.headers, { 'If-Match': FAKE_ETAG });
+        assert.deepEqual(reqOpts.headers, {'If-Match': FAKE_ETAG});
       });
 
       it('should respect already existing headers', function() {
@@ -149,15 +149,15 @@ describe('BigQuery/Dataset', function() {
         var fakeReqOpts = {
           method: 'PATCH',
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
           },
           json: {
-            etag: FAKE_ETAG
-          }
+            etag: FAKE_ETAG,
+          },
         };
 
         var expectedHeaders = extend({}, fakeReqOpts.headers, {
-          'If-Match': FAKE_ETAG
+          'If-Match': FAKE_ETAG,
         });
 
         var reqOpts = interceptor.request(fakeReqOpts);
@@ -170,8 +170,8 @@ describe('BigQuery/Dataset', function() {
         var fakeReqOpts = {
           method: 'POST',
           json: {
-            etag: FAKE_ETAG
-          }
+            etag: FAKE_ETAG,
+          },
         };
 
         var reqOpts = interceptor.request(fakeReqOpts);
@@ -183,7 +183,7 @@ describe('BigQuery/Dataset', function() {
   describe('createQueryStream', function() {
     var options = {
       a: 'b',
-      c: 'd'
+      c: 'd',
     };
 
     it('should call through to bigQuery', function(done) {
@@ -197,7 +197,7 @@ describe('BigQuery/Dataset', function() {
     it('should return the result of the call to bq.query', function(done) {
       ds.bigQuery.createQueryStream = function() {
         return {
-          done: done
+          done: done,
         };
       };
 
@@ -227,7 +227,7 @@ describe('BigQuery/Dataset', function() {
 
     it('should extend options with defaultDataset', function(done) {
       ds.bigQuery.createQueryStream = function(opts) {
-        assert.deepEqual(opts.defaultDataset, { datasetId: ds.id });
+        assert.deepEqual(opts.defaultDataset, {datasetId: ds.id});
         done();
       };
 
@@ -236,7 +236,7 @@ describe('BigQuery/Dataset', function() {
 
     it('should not modify original options object', function(done) {
       ds.bigQuery.createQueryStream = function() {
-        assert.deepEqual(options, { a: 'b', c: 'd' });
+        assert.deepEqual(options, {a: 'b', c: 'd'});
         done();
       };
 
@@ -247,25 +247,25 @@ describe('BigQuery/Dataset', function() {
   describe('createTable', function() {
     var SCHEMA_OBJECT = {
       fields: [
-        { name: 'id', type: 'INTEGER' },
-        { name: 'breed', type: 'STRING' },
-        { name: 'name', type: 'STRING' },
-        { name: 'dob', type: 'TIMESTAMP' },
-        { name: 'around', type: 'BOOLEAN' }
-      ]
+        {name: 'id', type: 'INTEGER'},
+        {name: 'breed', type: 'STRING'},
+        {name: 'name', type: 'STRING'},
+        {name: 'dob', type: 'TIMESTAMP'},
+        {name: 'around', type: 'BOOLEAN'},
+      ],
     };
     var SCHEMA_STRING = 'id:integer,breed,name,dob:timestamp,around:boolean';
     var TABLE_ID = 'kittens';
 
     var API_RESPONSE = {
       tableReference: {
-        tableId: TABLE_ID
-      }
+        tableId: TABLE_ID,
+      },
     };
 
     it('should create a table', function(done) {
       var options = {
-        schema: SCHEMA_OBJECT
+        schema: SCHEMA_OBJECT,
       };
 
       ds.request = function(reqOpts) {
@@ -312,14 +312,13 @@ describe('BigQuery/Dataset', function() {
       ds.createTable(TABLE_ID, fakeOptions, assert.ifError);
     });
 
-
     it('should create a schema object from a string', function(done) {
       ds.request = function(reqOpts) {
         assert.deepEqual(reqOpts.json.schema, SCHEMA_OBJECT);
         done();
       };
 
-      ds.createTable(TABLE_ID, { schema: SCHEMA_STRING }, assert.ifError);
+      ds.createTable(TABLE_ID, {schema: SCHEMA_STRING}, assert.ifError);
     });
 
     it('should wrap an array schema', function(done) {
@@ -328,17 +327,19 @@ describe('BigQuery/Dataset', function() {
         done();
       };
 
-      ds.createTable(TABLE_ID, {
-        schema: SCHEMA_OBJECT.fields
-      }, assert.ifError);
+      ds.createTable(
+        TABLE_ID,
+        {
+          schema: SCHEMA_OBJECT.fields,
+        },
+        assert.ifError
+      );
     });
 
     it('should assign record type to nested schemas', function(done) {
       var nestedField = {
         id: 'nested',
-        fields: [
-          { id: 'nested_name', type: 'STRING' }
-        ]
+        fields: [{id: 'nested_name', type: 'STRING'}],
       };
 
       ds.request = function(reqOpts) {
@@ -346,14 +347,15 @@ describe('BigQuery/Dataset', function() {
         done();
       };
 
-      ds.createTable(TABLE_ID, {
-        schema: {
-          fields: [
-            { id: 'name', type: 'STRING' },
-            nestedField
-          ]
-        }
-      }, assert.ifError);
+      ds.createTable(
+        TABLE_ID,
+        {
+          schema: {
+            fields: [{id: 'name', type: 'STRING'}, nestedField],
+          },
+        },
+        assert.ifError
+      );
     });
 
     it('should return an error to the callback', function(done) {
@@ -363,7 +365,7 @@ describe('BigQuery/Dataset', function() {
         callback(error);
       };
 
-      ds.createTable(TABLE_ID, { schema: SCHEMA_OBJECT }, function(err) {
+      ds.createTable(TABLE_ID, {schema: SCHEMA_OBJECT}, function(err) {
         assert.strictEqual(err, error);
         done();
       });
@@ -374,7 +376,7 @@ describe('BigQuery/Dataset', function() {
         callback(null, API_RESPONSE);
       };
 
-      ds.createTable(TABLE_ID, { schema: SCHEMA_OBJECT }, function(err, table) {
+      ds.createTable(TABLE_ID, {schema: SCHEMA_OBJECT}, function(err, table) {
         assert.ifError(err);
         assert(table instanceof Table);
         done();
@@ -382,7 +384,7 @@ describe('BigQuery/Dataset', function() {
     });
 
     it('should return an apiResponse', function(done) {
-      var opts = { id: TABLE_ID, schema: SCHEMA_OBJECT };
+      var opts = {id: TABLE_ID, schema: SCHEMA_OBJECT};
 
       ds.request = function(reqOpts, callback) {
         callback(null, API_RESPONSE);
@@ -396,16 +398,19 @@ describe('BigQuery/Dataset', function() {
     });
 
     it('should assign metadata to the Table object', function(done) {
-      var apiResponse = extend({
-        a: 'b',
-        c: 'd'
-      }, API_RESPONSE);
+      var apiResponse = extend(
+        {
+          a: 'b',
+          c: 'd',
+        },
+        API_RESPONSE
+      );
 
       ds.request = function(reqOpts, callback) {
         callback(null, apiResponse);
       };
 
-      ds.createTable(TABLE_ID, { schema: SCHEMA_OBJECT }, function(err, table) {
+      ds.createTable(TABLE_ID, {schema: SCHEMA_OBJECT}, function(err, table) {
         assert.ifError(err);
         assert.strictEqual(table.metadata, apiResponse);
         done();
@@ -418,7 +423,7 @@ describe('BigQuery/Dataset', function() {
       ds.request = function(reqOpts) {
         assert.equal(reqOpts.method, 'DELETE');
         assert.equal(reqOpts.uri, '');
-        assert.deepEqual(reqOpts.qs, { deleteContents: false });
+        assert.deepEqual(reqOpts.qs, {deleteContents: false});
         done();
       };
 
@@ -427,11 +432,11 @@ describe('BigQuery/Dataset', function() {
 
     it('should allow a force delete', function(done) {
       ds.request = function(reqOpts) {
-        assert.deepEqual(reqOpts.qs, { deleteContents: true });
+        assert.deepEqual(reqOpts.qs, {deleteContents: true});
         done();
       };
 
-      ds.delete({ force: true }, assert.ifError);
+      ds.delete({force: true}, assert.ifError);
     });
 
     it('should execute callback when done', function(done) {
@@ -483,7 +488,7 @@ describe('BigQuery/Dataset', function() {
     it('should accept a query', function(done) {
       var query = {
         maxResults: 8,
-        pageToken: 'token'
+        pageToken: 'token',
       };
 
       ds.request = function(reqOpts) {
@@ -523,10 +528,10 @@ describe('BigQuery/Dataset', function() {
             a: 'b',
             c: 'd',
             tableReference: {
-              tableId: 'tableName'
-            }
-          }
-        ]
+              tableId: 'tableName',
+            },
+          },
+        ],
       };
 
       beforeEach(function() {
@@ -557,16 +562,16 @@ describe('BigQuery/Dataset', function() {
         var pageToken = 'token';
 
         var query = {
-          maxResults: 5
+          maxResults: 5,
         };
 
         var expectedNextQuery = {
           maxResults: 5,
-          pageToken: pageToken
+          pageToken: pageToken,
         };
 
         ds.request = function(reqOpts, callback) {
-          callback(null, { nextPageToken: pageToken });
+          callback(null, {nextPageToken: pageToken});
         };
 
         ds.getTables(query, function(err, tables, nextQuery) {
@@ -581,7 +586,7 @@ describe('BigQuery/Dataset', function() {
   describe('query', function() {
     var options = {
       a: 'b',
-      c: 'd'
+      c: 'd',
     };
 
     it('should call through to bigQuery', function(done) {
@@ -615,7 +620,7 @@ describe('BigQuery/Dataset', function() {
 
     it('should extend options with defaultDataset', function(done) {
       ds.bigQuery.query = function(opts) {
-        assert.deepEqual(opts.defaultDataset, { datasetId: ds.id });
+        assert.deepEqual(opts.defaultDataset, {datasetId: ds.id});
         done();
       };
 
@@ -624,7 +629,7 @@ describe('BigQuery/Dataset', function() {
 
     it('should not modify original options object', function(done) {
       ds.bigQuery.query = function() {
-        assert.deepEqual(options, { a: 'b', c: 'd' });
+        assert.deepEqual(options, {a: 'b', c: 'd'});
         done();
       };
 
@@ -649,13 +654,13 @@ describe('BigQuery/Dataset', function() {
     it('should extend the options', function(done) {
       var fakeOptions = {
         query: FAKE_QUERY,
-        a: { b: 'c' }
+        a: {b: 'c'},
       };
 
       var expectedOptions = extend(true, {}, fakeOptions, {
         defaultDataset: {
-          datasetId: ds.id
-        }
+          datasetId: ds.id,
+        },
       });
 
       ds.bigQuery.startQuery = function(options, callback) {
