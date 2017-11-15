@@ -22,5 +22,5 @@ module.exports = {
   apiKey: process.env.GCLOUD_TESTS_API_KEY,
   projectNumber: process.env.GCLOUD_TESTS_PROJECT_NUMBER,
   nonWhitelistProjectId: process.env.GCLOUD_TESTS_PROJECT_ID_NON_WHITELIST,
-  nonWhitelistKeyFilename: process.env.GCLOUD_TESTS_KEY_NON_WHITELIST
+  nonWhitelistKeyFilename: process.env.GCLOUD_TESTS_KEY_NON_WHITELIST,
 };

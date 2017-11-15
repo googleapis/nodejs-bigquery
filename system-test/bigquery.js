@@ -23,7 +23,7 @@ var fs = require('fs');
 var uuid = require('uuid');
 
 var Dataset = require('../src/dataset.js');
-var env = require('../../../system-test/env.js');
+var env = require('./env.js');
 var Job = require('../src/job.js');
 var Table = require('../src/table.js');
 
@@ -1282,7 +1282,7 @@ describe('BigQuery', function() {
                 Power: 11,
               },
             ],
-            Icon: new Buffer(testData[1].Spells[0].Icon, 'base64'),
+            Icon: Buffer.from(testData[1].Spells[0].Icon, 'base64'),
           },
         ],
         TeaTime: bigquery.time('15:00:00'),
@@ -1306,7 +1306,7 @@ describe('BigQuery', function() {
                 Power: 1,
               },
             ],
-            Icon: new Buffer(testData[2].Spells[0].Icon, 'base64'),
+            Icon: Buffer.from(testData[2].Spells[0].Icon, 'base64'),
           },
         ],
         TeaTime: bigquery.time('12:00:00'),

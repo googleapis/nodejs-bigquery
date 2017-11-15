@@ -254,7 +254,7 @@ describe('BigQuery/Table', function() {
 
   describe('encodeValue_', function() {
     it('should properly encode values', function() {
-      var buffer = new Buffer('test');
+      var buffer = Buffer.from('test');
       assert.strictEqual(Table.encodeValue_(buffer), buffer.toString('base64'));
 
       var date = new Date();
@@ -287,7 +287,7 @@ describe('BigQuery/Table', function() {
     });
 
     it('should properly encode arrays', function() {
-      var buffer = new Buffer('test');
+      var buffer = Buffer.from('test');
       var date = new Date();
 
       var array = [buffer, date];
@@ -299,7 +299,7 @@ describe('BigQuery/Table', function() {
     });
 
     it('should properly encode objects', function() {
-      var buffer = new Buffer('test');
+      var buffer = Buffer.from('test');
       var date = new Date();
 
       var object = {
@@ -1220,7 +1220,7 @@ describe('BigQuery/Table', function() {
 
         assert.throws(function() {
           table.insert(data, options);
-        }, /Schema must be provided in order to auto\-create Table\./);
+        }, /Schema must be provided in order to auto-create Table\./);
       });
 
       it('should not include the schema in the insert request', function(done) {

@@ -205,7 +205,7 @@ describe('BigQuery', function() {
 
     it('should merge the schema and flatten the rows', function() {
       var now = new Date();
-      var buffer = new Buffer('test');
+      var buffer = Buffer.from('test');
 
       var rows = [
         {
@@ -535,7 +535,7 @@ describe('BigQuery', function() {
       assert.strictEqual(BigQuery.getType_(bq.datetime('')).type, 'DATETIME');
       assert.strictEqual(BigQuery.getType_(bq.time()).type, 'TIME');
       assert.strictEqual(BigQuery.getType_(bq.timestamp(0)).type, 'TIMESTAMP');
-      assert.strictEqual(BigQuery.getType_(new Buffer(2)).type, 'BYTES');
+      assert.strictEqual(BigQuery.getType_(Buffer.alloc(2)).type, 'BYTES');
       assert.strictEqual(BigQuery.getType_(true).type, 'BOOL');
       assert.strictEqual(BigQuery.getType_(8).type, 'INT64');
       assert.strictEqual(BigQuery.getType_(8.1).type, 'FLOAT64');
