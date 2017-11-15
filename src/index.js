@@ -126,7 +126,7 @@ BigQuery.mergeSchemaWithRows_ = BigQuery.prototype.mergeSchemaWithRows_ = functi
         break;
       }
       case 'BYTES': {
-        value = new Buffer(value, 'base64');
+        value = Buffer.from(value, 'base64');
         break;
       }
       case 'FLOAT':

@@ -145,7 +145,7 @@ function asyncQuery(sqlQuery, projectId) {
       console.log(`Job ${job.id} started.`);
       return job.promise();
     })
-    .then(results => {
+    .then(() => {
       // Get the job's status
       return job.getMetadata();
     })
