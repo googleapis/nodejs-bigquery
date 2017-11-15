@@ -865,7 +865,7 @@ BigQuery.prototype.job = function(id) {
  * @param {string|object} query - A string SQL query or configuration object.
  *     For all available options, see
  *     [Jobs: query request body](https://cloud.google.com/bigquery/docs/reference/v2/jobs/query#request-body).
- * @param {object|*[]} query.params - For positional SQL parameters, provide
+ * @param {object|Array<*>} query.params - For positional SQL parameters, provide
  *     an array of values. For named SQL parameters, provide an object which
  *     maps each named parameter to its value. The supported types are integers,
  *     floats, {module:bigquery#date} objects, {module:bigquery#datetime}
