@@ -1,7 +1,7 @@
 {
   "name": "@google-cloud/bigquery",
   "description": "Google BigQuery Client Library for Node.js",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "license": "Apache-2.0",
   "author": "Google Inc.",
   "engines": {
@@ -46,7 +46,6 @@
   ],
   "scripts": {
     "generate-scaffolding": "repo-tools generate all && repo-tools generate lib_samples_readme -l samples/ --config ../.cloud-repo-tools.json",
-    "publish-module": "node ../../scripts/publish.js bigquery",
     "benchmark": "time node benchmark/bench.js benchmark/queries.json",
     "docs": "repo-tools exec -- jsdoc -c .jsdoc.js",
     "lint": "repo-tools lint --cmd eslint -- src/ samples/ system-test/ test/",
