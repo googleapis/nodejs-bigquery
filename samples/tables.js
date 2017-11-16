@@ -198,15 +198,11 @@ function copyTable(
       console.log(`Job ${job.id} started.`);
 
       // Wait for the job to finish
-      return job.promise();
-    })
-    .then(() => {
-      // Get the job's status
-      return job.getMetadata();
+      return job;
     })
     .then(metadata => {
       // Check the job's status for errors
-      const errors = metadata[0].status.errors;
+      const errors = metadata.status.errors;
       if (errors && errors.length > 0) {
         throw errors;
       }
@@ -254,15 +250,11 @@ function importLocalFile(datasetId, tableId, filename, projectId) {
       console.log(`Job ${job.id} started.`);
 
       // Wait for the job to finish
-      return job.promise();
-    })
-    .then(() => {
-      // Get the job's status
-      return job.getMetadata();
+      return job;
     })
     .then(metadata => {
       // Check the job's status for errors
-      const errors = metadata[0].status.errors;
+      const errors = metadata.status.errors;
       if (errors && errors.length > 0) {
         throw errors;
       }
@@ -324,15 +316,11 @@ function importFileFromGCS(
       console.log(`Job ${job.id} started.`);
 
       // Wait for the job to finish
-      return job.promise();
-    })
-    .then(() => {
-      // Get the job's status
-      return job.getMetadata();
+      return job;
     })
     .then(metadata => {
       // Check the job's status for errors
-      const errors = metadata[0].status.errors;
+      const errors = metadata.status.errors;
       if (errors && errors.length > 0) {
         throw errors;
       }
@@ -388,15 +376,11 @@ function exportTableToGCS(datasetId, tableId, bucketName, filename, projectId) {
       console.log(`Job ${job.id} started.`);
 
       // Wait for the job to finish
-      return job.promise();
-    })
-    .then(() => {
-      // Get the job's status
-      return job.getMetadata();
+      return job;
     })
     .then(metadata => {
       // Check the job's status for errors
-      const errors = metadata[0].status.errors;
+      const errors = metadata.status.errors;
       if (errors && errors.length > 0) {
         throw errors;
       }
