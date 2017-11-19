@@ -540,6 +540,13 @@ describe('BigQuery', function() {
         });
     });
 
+    it('should insert rows with null values', function() {
+      return table.insert({
+        id: 1,
+        name: null,
+      });
+    });
+
     it('should set & get metadata', function(done) {
       table.setMetadata(
         {
