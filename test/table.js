@@ -254,6 +254,11 @@ describe('BigQuery/Table', function() {
   });
 
   describe('encodeValue_', function() {
+    it('should return null if null or undefined', function() {
+      assert.strictEqual(Table.encodeValue_(null), null);
+      assert.strictEqual(Table.encodeValue_(undefined), null);
+    });
+
     it('should properly encode values', function() {
       var buffer = Buffer.from('test');
       assert.strictEqual(Table.encodeValue_(buffer), buffer.toString('base64'));

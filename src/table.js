@@ -273,11 +273,10 @@ Table.createSchemaFromString_ = function(str) {
  * @return {*} The converted value.
  */
 Table.encodeValue_ = function(value) {
-  
-  if (value === undefined || value === null) {
+  if (is.undefined(value) || is.null(value)) {
     return null;
   }
-  
+
   if (value instanceof Buffer) {
     return value.toString('base64');
   }
