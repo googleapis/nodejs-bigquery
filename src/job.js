@@ -378,7 +378,7 @@ Job.prototype.getQueryResultsStream = common.paginator.streamify(
 Job.prototype.poll_ = function(callback) {
   this.getMetadata(function(err, metadata, apiResponse) {
     if (!err && apiResponse.status && apiResponse.status.errors) {
-      err = common.util.ApiError(apiResponse.status);
+      err = new common.util.ApiError(apiResponse.status);
     }
 
     if (err) {
