@@ -21,6 +21,7 @@ const tools = require(`@google-cloud/nodejs-repo-tools`);
 
 const cwd = path.join(__dirname, `..`);
 const cmd = `node queries.js`;
+const projectId = process.env.GCLOUD_PROJECT;
 
 const expectedShakespeareResult = `Query Results:
 corpus: hamlet
@@ -47,27 +48,41 @@ unique_words: 4582`;
 const sqlQuery = `SELECT * FROM publicdata.samples.natality LIMIT 5;`;
 const badQuery = `SELECT * FROM INVALID`;
 
+test.before(tools.checkCredentials);
+
 test(`should query shakespeare`, async t => {
-  const output = await tools.runAsync(`${cmd} shakespeare`, cwd);
+  const output = await tools.runAsync(`${cmd} shakespeare ${projectId}`, cwd);
   t.is(output, expectedShakespeareResult);
 });
 
 test(`should run a sync query`, async t => {
-  const output = await tools.runAsync(`${cmd} sync "${sqlQuery}"`, cwd);
+  const output = await tools.runAsync(
+    `${cmd} sync ${projectId} "${sqlQuery}"`,
+    cwd
+  );
   t.true(output.includes(`Rows:`));
   t.true(output.includes(`source_year`));
 });
 
 test(`should run an async query`, async t => {
-  const output = await tools.runAsync(`${cmd} async "${sqlQuery}"`, cwd);
+  const output = await tools.runAsync(
+    `${cmd} async ${projectId} "${sqlQuery}"`,
+    cwd
+  );
   t.true(output.includes(`Rows:`));
   t.true(output.includes(`source_year`));
 });
 
 test.skip(`should handle sync query errors`, async t => {
-  await t.throws(tools.runAsync(`${cmd} sync "${badQuery}"`, cwd), /ERROR:/);
+  await t.throws(
+    tools.runAsync(`${cmd} sync ${projectId} "${badQuery}"`, cwd),
+    /ERROR:/
+  );
 });
 
 test.skip(`should handle async query errors`, async t => {
-  await t.throws(tools.runAsync(`${cmd} async "${badQuery}"`, cwd), /ERROR:/);
+  await t.throws(
+    tools.runAsync(`${cmd} async ${projectId} "${badQuery}"`, cwd),
+    /ERROR:/
+  );
 });

@@ -22,8 +22,8 @@ const BigQuery = require('@google-cloud/bigquery');
 // Your Google Cloud Platform project ID
 const projectId = 'YOUR_PROJECT_ID';
 
-// Instantiates a client
-const bigquery = BigQuery({
+// Creates a client
+const bigquery = new BigQuery({
   projectId: projectId,
 });
 

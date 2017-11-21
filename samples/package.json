@@ -6,24 +6,24 @@
   "author": "Google Inc.",
   "repository": "googleapis/nodejs-bigquery",
   "engines": {
-    "node": ">=4.3.2"
+    "node": ">=4"
   },
   "scripts": {
     "test": "repo-tools test run --cmd npm -- run cover",
-    "ava": "ava -T 20s --verbose test/*.test.js system-test/*.test.js",
-    "cover": "nyc --reporter=lcov --cache ava -T 20s --verbose test/*.test.js system-test/*.test.js && nyc report"
+    "ava": "ava -T 3m --verbose test/*.test.js system-test/*.test.js",
+    "cover": "nyc --reporter=lcov --cache ava -T 3m --verbose test/*.test.js system-test/*.test.js && nyc report"
   },
   "dependencies": {
     "@google-cloud/bigquery": "0.11.1",
-    "@google-cloud/storage": "1.2.1",
-    "yargs": "8.0.2"
+    "@google-cloud/storage": "1.4.0",
+    "yargs": "10.0.3"
   },
   "devDependencies": {
-    "@google-cloud/nodejs-repo-tools": "^2.1.2",
-    "ava": "^0.21.0",
-    "nyc": "^11.3.0",
+    "@google-cloud/nodejs-repo-tools": "2.1.3",
+    "ava": "0.23.0",
+    "nyc": "11.3.0",
     "proxyquire": "1.8.0",
-    "sinon": "3.2.0",
+    "sinon": "4.1.2",
     "uuid": "3.1.0"
   }
 }

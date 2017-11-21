@@ -20,16 +20,16 @@ function createDataset(datasetId, projectId) {
   // Imports the Google Cloud client library
   const BigQuery = require('@google-cloud/bigquery');
 
-  // The project ID to use, e.g. "your-project-id"
+  /**
+   * TODO(developer): Uncomment the following lines before running the sample.
+   */
   // const projectId = "your-project-id";
+  // const datasetId = "my_new_dataset";
 
-  // Instantiates a client
-  const bigquery = BigQuery({
+  // Creates a client
+  const bigquery = new BigQuery({
     projectId: projectId,
   });
-
-  // The ID for the new dataset, e.g. "my_new_dataset"
-  // const datasetId = "my_new_dataset";
 
   // Creates a new dataset
   bigquery
@@ -49,16 +49,16 @@ function deleteDataset(datasetId, projectId) {
   // Imports the Google Cloud client library
   const BigQuery = require('@google-cloud/bigquery');
 
-  // The project ID to use, e.g. "your-project-id"
+  /**
+   * TODO(developer): Uncomment the following lines before running the sample.
+   */
   // const projectId = "your-project-id";
+  // const datasetId = "my_dataset";
 
-  // Instantiates a client
-  const bigquery = BigQuery({
+  // Creates a client
+  const bigquery = new BigQuery({
     projectId: projectId,
   });
-
-  // The ID of the dataset to delete, e.g. "my_new_dataset"
-  // const datasetId = "my_new_dataset";
 
   // Creates a reference to the existing dataset
   const dataset = bigquery.dataset(datasetId);
@@ -80,11 +80,13 @@ function listDatasets(projectId) {
   // Imports the Google Cloud client library
   const BigQuery = require('@google-cloud/bigquery');
 
-  // The project ID to use, e.g. "your-project-id"
+  /**
+   * TODO(developer): Uncomment the following lines before running the sample.
+   */
   // const projectId = "your-project-id";
 
-  // Instantiates a client
-  const bigquery = BigQuery({
+  // Creates a client
+  const bigquery = new BigQuery({
     projectId: projectId,
   });
 
@@ -102,44 +104,31 @@ function listDatasets(projectId) {
   // [END bigquery_list_datasets]
 }
 
-const cli = require(`yargs`)
+require(`yargs`)
   .demand(1)
-  .options({
-    projectId: {
-      alias: 'p',
-      default: process.env.GCLOUD_PROJECT || process.env.GOOGLE_CLOUD_PROJECT,
-      description:
-        'The Project ID to use. Defaults to the value of the GCLOUD_PROJECT or GOOGLE_CLOUD_PROJECT environment variables.',
-      requiresArg: true,
-      type: 'string',
-    },
-  })
-  .command(`create <datasetId>`, `Creates a new dataset.`, {}, opts =>
-    createDataset(opts.datasetId, opts.projectId)
+  .command(
+    `create <projectId> <datasetId>`,
+    `Creates a new dataset.`,
+    {},
+    opts => createDataset(opts.datasetId, opts.projectId)
   )
-  .command(`delete <datasetId>`, `Deletes a dataset.`, {}, opts =>
+  .command(`delete <projectId> <datasetId>`, `Deletes a dataset.`, {}, opts =>
     deleteDataset(opts.datasetId, opts.projectId)
   )
-  .command(`list`, `Lists datasets.`, {}, opts => listDatasets(opts.projectId))
+  .command(`list <projectId>`, `Lists datasets.`, {}, opts =>
+    listDatasets(opts.projectId)
+  )
   .example(
-    `node $0 create my_dataset`,
+    `node $0 create my-project-id my_dataset`,
     `Creates a new dataset named "my_dataset".`
   )
-  .example(`node $0 delete my_dataset`, `Deletes a dataset named "my_dataset".`)
   .example(
-    `node $0 list`,
-    `Lists all datasets in the project specified by the GCLOUD_PROJECT or GOOGLE_CLOUD_PROJECT environments variables.`
+    `node $0 delete my-project-id my_dataset`,
+    `Deletes a dataset named "my_dataset".`
   )
-  .example(
-    `node $0 list --projectId=bigquery-public-data`,
-    `Lists all datasets in the "bigquery-public-data" project.`
-  )
+  .example(`node $0 list my-project-id`, `Lists all datasets in my-project-id.`)
   .wrap(120)
   .recommendCommands()
   .epilogue(`For more information, see https://cloud.google.com/bigquery/docs`)
   .help()
-  .strict();
-
-if (module === require.main) {
-  cli.parse(process.argv.slice(2));
-}
+  .strict().argv;

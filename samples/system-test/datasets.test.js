@@ -24,6 +24,7 @@ const uuid = require(`uuid`);
 const cwd = path.join(__dirname, `..`);
 const cmd = `node datasets.js`;
 const datasetId = `nodejs-docs-samples-test-${uuid.v4()}`.replace(/-/gi, '_');
+const projectId = process.env.GCLOUD_PROJECT;
 
 test.before(tools.checkCredentials);
 test.beforeEach(tools.stubConsole);
@@ -35,7 +36,10 @@ test.after.always(async () => {
 });
 
 test.serial(`should create a dataset`, async t => {
-  const output = await tools.runAsync(`${cmd} create ${datasetId}`, cwd);
+  const output = await tools.runAsync(
+    `${cmd} create ${projectId} ${datasetId}`,
+    cwd
+  );
   t.is(output, `Dataset ${datasetId} created.`);
   const [exists] = await bigquery.dataset(datasetId).exists();
   t.true(exists);
@@ -45,7 +49,7 @@ test.serial(`should list datasets`, async t => {
   t.plan(0);
   await tools
     .tryTest(async assert => {
-      const output = await tools.runAsync(`${cmd} list`, cwd);
+      const output = await tools.runAsync(`${cmd} list ${projectId}`, cwd);
       assert(output.includes(`Datasets:`));
       assert(output.includes(datasetId));
     })
@@ -53,7 +57,10 @@ test.serial(`should list datasets`, async t => {
 });
 
 test.serial(`should delete a dataset`, async t => {
-  const output = await tools.runAsync(`${cmd} delete ${datasetId}`, cwd);
+  const output = await tools.runAsync(
+    `${cmd} delete ${projectId} ${datasetId}`,
+    cwd
+  );
   t.is(output, `Dataset ${datasetId} deleted.`);
   const [exists] = await bigquery.dataset(datasetId).exists();
   t.false(exists);
