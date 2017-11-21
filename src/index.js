@@ -14,10 +14,6 @@
  * limitations under the License.
  */
 
-/*!
- * @module bigquery
- */
-
 'use strict';
 
 var arrify = require('arrify');
@@ -28,23 +24,34 @@ var is = require('is');
 var util = require('util');
 var uuid = require('uuid');
 
-/**
- * @type {module:bigquery/dataset}
- * @private
- */
 var Dataset = require('./dataset.js');
-
-/**
- * @type {module:bigquery/job}
- * @private
- */
 var Job = require('./job.js');
+var Table = require('./table.js');
 
 /**
- * @type {module:bigquery/table}
- * @private
+ * @typedef {object} ClientConfig
+ * @property {string} [projectId] The project ID from the Google Developer's
+ *     Console, e.g. 'grape-spaceship-123'. We will also check the environment
+ *     variable `GCLOUD_PROJECT` for your project ID. If your app is running in
+ *     an environment which supports {@link https://cloud.google.com/docs/authentication/production#providing_credentials_to_your_application Application Default Credentials},
+ *     your project ID will be detected automatically.
+ * @property {string} [keyFilename] Full path to the a .json, .pem, or .p12 key
+ *     downloaded from the Google Developers Console. If you provide a path to a
+ *     JSON file, the `projectId` option above is not necessary. NOTE: .pem and
+ *     .p12 require you to specify the `email` option as well.
+ * @property {string} [email] Account email address. Required when using a .pem
+ *     or .p12 keyFilename.
+ * @property {object} [credentials] Credentials object.
+ * @property {string} [credentials.client_email]
+ * @property {string} [credentials.private_key]
+ * @property {boolean} [autoRetry=true] Automatically retry requests if the
+ *     response is related to rate limits or certain intermittent server errors.
+ *     We will exponentially backoff subsequent requests by default.
+ * @property {number} [maxRetries=3] Maximum number of automatic retries
+ *     attempted before returning the error.
+ * @property {Constructor} [promise] Custom promise module to use instead of
+ *     native Promises.
  */
-var Table = require('./table.js');
 
 /**
  * In the following examples from this page and the other modules (`Dataset`,
@@ -54,12 +61,30 @@ var Table = require('./table.js');
  * We will create a table with the correct schema, import the public CSV file
  * into that table, and query it for data.
  *
- * @alias module:bigquery
- * @constructor
+ * @class
  *
- * @resource [What is BigQuery?]{@link https://cloud.google.com/bigquery/what-is-bigquery}
+ * @see [What is BigQuery?]{@link https://cloud.google.com/bigquery/what-is-bigquery}
  *
- * @param {object} options - [Configuration object](#/docs).
+ * @param {ClientConfig} options Configuration options.
+ *
+ * @example <caption>Install the client library with <a href="https://www.npmjs.com/">npm</a>:</caption>
+ * npm install --save @google-cloud/bigquery
+ *
+ * @example <caption>Import the client library</caption>
+ * const BigQuery = require('@google-cloud/bigquery');
+ *
+ * @example <caption>Create a client that uses <a href="https://cloud.google.com/docs/authentication/production#providing_credentials_to_your_application">Application Default Credentials (ADC)</a>:</caption>
+ * const bigquery = new BigQuery();
+ *
+ * @example <caption>Create a client with <a href="https://cloud.google.com/docs/authentication/production#obtaining_and_providing_service_account_credentials_manually">explicit credentials</a>:</caption>
+ * const bigquery = new BigQuery({
+ *   projectId: 'your-project-id',
+ *   keyFilename: '/path/to/keyfile.json'
+ * });
+ *
+ * @example <caption>include:samples/quickstart.js</caption>
+ * region_tag:bigquery_quickstart
+ * Full quickstart example:
  */
 function BigQuery(options) {
   if (!(this instanceof BigQuery)) {
@@ -85,7 +110,7 @@ util.inherits(BigQuery, common.Service);
  *
  * @param {object} schema
  * @param {array} rows
- * @return {array} Fields using their matching names from the table's schema.
+ * @returns {array} Fields using their matching names from the table's schema.
  */
 BigQuery.mergeSchemaWithRows_ = BigQuery.prototype.mergeSchemaWithRows_ = function(
   schema,
@@ -174,26 +199,52 @@ BigQuery.mergeSchemaWithRows_ = BigQuery.prototype.mergeSchemaWithRows_ = functi
 };
 
 /**
+ * @method BigQuery.date
+ * @param {object|string} value The date. If a string, this should be in the
+ *     format the API describes: `YYYY-[M]M-[D]D`.
+ *     Otherwise, provide an object.
+ * @param {string|number} value.year Four digits.
+ * @param {string|number} value.month One or two digits.
+ * @param {string|number} value.day One or two digits.
+ *
+ * @example
+ * const BigQuery = require('@google-cloud/bigquery');
+ * const date = BigQuery.date('2017-01-01');
+ *
+ * //-
+ * // Alternatively, provide an object.
+ * //-
+ * const date2 = BigQuery.date({
+ *   year: 2017,
+ *   month: 1,
+ *   day: 1
+ * });
+ */
+
+/**
  * The `DATE` type represents a logical calendar date, independent of time zone.
  * It does not represent a specific 24-hour time period. Rather, a given DATE
  * value represents a different 24-hour period when interpreted in different
  * time zones, and may represent a shorter or longer day during Daylight Savings
  * Time transitions.
  *
- * @param {object|string} value - The date. If a string, this should be in the
+ * @method BigQuery#date
+ * @param {object|string} value The date. If a string, this should be in the
  *     format the API describes: `YYYY-[M]M-[D]D`.
  *     Otherwise, provide an object.
- * @param {string|number} value.year - Four digits.
- * @param {string|number} value.month - One or two digits.
- * @param {string|number} value.day - One or two digits.
+ * @param {string|number} value.year Four digits.
+ * @param {string|number} value.month One or two digits.
+ * @param {string|number} value.day One or two digits.
  *
  * @example
- * var date = bigquery.date('2017-01-01');
+ * const BigQuery = require('@google-cloud/bigquery');
+ * const bigquery = new BigQuery();
+ * const date = bigquery.date('2017-01-01');
  *
  * //-
  * // Alternatively, provide an object.
  * //-
- * var date = bigquery.date({
+ * const date2 = bigquery.date({
  *   year: 2017,
  *   month: 1,
  *   day: 1
@@ -216,25 +267,63 @@ BigQuery.date = BigQuery.prototype.date = function BigQueryDate(value) {
  * this does not refer to an absolute instance in time. Instead, it is the civil
  * time, or the time that a user would see on a watch or calendar.
  *
- * @param {object|string} value - The time. If a string, this should be in the
+ * @method BigQuery.datetime
+ * @param {object|string} value The time. If a string, this should be in the
  *     format the API describes: `YYYY-[M]M-[D]D[ [H]H:[M]M:[S]S[.DDDDDD]]`.
  *     Otherwise, provide an object.
- * @param {string|number} value.year - Four digits.
- * @param {string|number} value.month - One or two digits.
- * @param {string|number} value.day - One or two digits.
- * @param {string=|number=} value.hours - One or two digits (`00` - `23`).
- * @param {string=|number=} value.minutes - One or two digits (`00` - `59`).
- * @param {string=|number=} value.seconds - One or two digits (`00` - `59`).
- * @param {string=|number=} value.fractional - Up to six digits for microsecond
+ * @param {string|number} value.year Four digits.
+ * @param {string|number} value.month One or two digits.
+ * @param {string|number} value.day One or two digits.
+ * @param {string|number} [value.hours] One or two digits (`00` - `23`).
+ * @param {string|number} [value.minutes] One or two digits (`00` - `59`).
+ * @param {string|number} [value.seconds] One or two digits (`00` - `59`).
+ * @param {string|number} [value.fractional] Up to six digits for microsecond
  *     precision.
  *
  * @example
- * var datetime = bigquery.datetime('2017-01-01 13:00:00');
+ * const BigQuery = require('@google-cloud/bigquery');
+ * const datetime = BigQuery.datetime('2017-01-01 13:00:00');
  *
  * //-
  * // Alternatively, provide an object.
  * //-
- * var datetime = bigquery.datetime({
+ * const datetime = BigQuery.datetime({
+ *   year: 2017,
+ *   month: 1,
+ *   day: 1,
+ *   hours: 14,
+ *   minutes: 0,
+ *   seconds: 0
+ * });
+ */
+
+/**
+ * A `DATETIME` data type represents a point in time. Unlike a `TIMESTAMP`,
+ * this does not refer to an absolute instance in time. Instead, it is the civil
+ * time, or the time that a user would see on a watch or calendar.
+ *
+ * @method BigQuery#datetime
+ * @param {object|string} value The time. If a string, this should be in the
+ *     format the API describes: `YYYY-[M]M-[D]D[ [H]H:[M]M:[S]S[.DDDDDD]]`.
+ *     Otherwise, provide an object.
+ * @param {string|number} value.year Four digits.
+ * @param {string|number} value.month One or two digits.
+ * @param {string|number} value.day One or two digits.
+ * @param {string|number} [value.hours] One or two digits (`00` - `23`).
+ * @param {string|number} [value.minutes] One or two digits (`00` - `59`).
+ * @param {string|number} [value.seconds] One or two digits (`00` - `59`).
+ * @param {string|number} [value.fractional] Up to six digits for microsecond
+ *     precision.
+ *
+ * @example
+ * const BigQuery = require('@google-cloud/bigquery');
+ * const bigquery = new BigQuery();
+ * const datetime = bigquery.datetime('2017-01-01 13:00:00');
+ *
+ * //-
+ * // Alternatively, provide an object.
+ * //-
+ * const datetime = bigquery.datetime({
  *   year: 2017,
  *   month: 1,
  *   day: 1,
@@ -273,22 +362,52 @@ BigQuery.datetime = BigQuery.prototype.datetime = function BigQueryDatetime(
 /**
  * A `TIME` data type represents a time, independent of a specific date.
  *
- * @param {object|string} value - The time. If a string, this should be in the
+ * @method BigQuery.time
+ * @param {object|string} value The time. If a string, this should be in the
  *     format the API describes: `[H]H:[M]M:[S]S[.DDDDDD]`. Otherwise, provide
  *     an object.
- * @param {string=|number=} value.hours - One or two digits (`00` - `23`).
- * @param {string=|number=} value.minutes - One or two digits (`00` - `59`).
- * @param {string=|number=} value.seconds - One or two digits (`00` - `59`).
- * @param {string=|number=} value.fractional - Up to six digits for microsecond
+ * @param {string|number} [value.hours] One or two digits (`00` - `23`).
+ * @param {string|number} [value.minutes] One or two digits (`00` - `59`).
+ * @param {string|number} [value.seconds] One or two digits (`00` - `59`).
+ * @param {string|number} [value.fractional] Up to six digits for microsecond
  *     precision.
  *
  * @example
- * var time = bigquery.time('14:00:00'); // 2:00 PM
+ * const BigQuery = require('@google-cloud/bigquery');
+ * const time = BigQuery.time('14:00:00'); // 2:00 PM
  *
  * //-
  * // Alternatively, provide an object.
  * //-
- * var time = bigquery.time({
+ * const time = BigQuery.time({
+ *   hours: 14,
+ *   minutes: 0,
+ *   seconds: 0
+ * });
+ */
+
+/**
+ * A `TIME` data type represents a time, independent of a specific date.
+ *
+ * @method BigQuery#time
+ * @param {object|string} value The time. If a string, this should be in the
+ *     format the API describes: `[H]H:[M]M:[S]S[.DDDDDD]`. Otherwise, provide
+ *     an object.
+ * @param {string|number} [value.hours] One or two digits (`00` - `23`).
+ * @param {string|number} [value.minutes] One or two digits (`00` - `59`).
+ * @param {string|number} [value.seconds] One or two digits (`00` - `59`).
+ * @param {string|number} [value.fractional] Up to six digits for microsecond
+ *     precision.
+ *
+ * @example
+ * const BigQuery = require('@google-cloud/bigquery');
+ * const bigquery = new BigQuery();
+ * const time = bigquery.time('14:00:00'); // 2:00 PM
+ *
+ * //-
+ * // Alternatively, provide an object.
+ * //-
+ * const time = bigquery.time({
  *   hours: 14,
  *   minutes: 0,
  *   seconds: 0
@@ -315,10 +434,25 @@ BigQuery.time = BigQuery.prototype.time = function BigQueryTime(value) {
  * A timestamp represents an absolute point in time, independent of any time
  * zone or convention such as Daylight Savings Time.
  *
- * @param {date} value - The time.
+ * @method BigQuery.timestamp
+ * @param {date} value The time.
  *
  * @example
- * var timestamp = bigquery.timestamp(new Date());
+ * const BigQuery = require('@google-cloud/bigquery');
+ * const timestamp = BigQuery.timestamp(new Date());
+ */
+
+/**
+ * A timestamp represents an absolute point in time, independent of any time
+ * zone or convention such as Daylight Savings Time.
+ *
+ * @method BigQuery#timestamp
+ * @param {date} value The time.
+ *
+ * @example
+ * const BigQuery = require('@google-cloud/bigquery');
+ * const bigquery = new BigQuery();
+ * const timestamp = bigquery.timestamp(new Date());
  */
 BigQuery.timestamp = BigQuery.prototype.timestamp = function BigQueryTimestamp(
   value
@@ -337,10 +471,10 @@ BigQuery.timestamp = BigQuery.prototype.timestamp = function BigQueryTimestamp(
  *
  * @throws {error} If the type could not be detected.
  *
- * @resource [Data Type]{@link https://cloud.google.com/bigquery/data-types}
+ * @see [Data Type]{@link https://cloud.google.com/bigquery/data-types}
  *
- * @param {*} value - The value.
- * @return {string} - The type detected from the value.
+ * @param {*} value The value.
+ * @returns {string} The type detected from the value.
  */
 BigQuery.getType_ = function(value) {
   var typeName;
@@ -397,10 +531,10 @@ BigQuery.getType_ = function(value) {
  *
  * @private
  *
- * @resource [Jobs.query API Reference Docs (see `queryParameters`)]{@link https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs/query#request-body}
+ * @see [Jobs.query API Reference Docs (see `queryParameters`)]{@link https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs/query#request-body}
  *
- * @param {*} value - The value.
- * @return {object} - A properly-formed `queryParameter` object.
+ * @param {*} value The value.
+ * @returns {object} A properly-formed `queryParameter` object.
  */
 BigQuery.valueToQueryParameter_ = function(value) {
   if (is.date(value)) {
@@ -443,25 +577,29 @@ BigQuery.valueToQueryParameter_ = function(value) {
 /**
  * Create a dataset.
  *
- * @resource [Datasets: insert API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/datasets/insert}
+ * @see [Datasets: insert API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/datasets/insert}
  *
- * @param {string} id - ID of the dataset to create.
- * @param {object=} options - See a
+ * @param {string} id ID of the dataset to create.
+ * @param {object} [options] See a
  *     [Dataset resource](https://cloud.google.com/bigquery/docs/reference/v2/datasets#resource).
- * @param {function} callback  - The callback function.
- * @param {?error} callback.err - An error returned while making this request
- * @param {module:bigquery/dataset} callback.dataset - The newly created dataset
- * @param {object} callback.apiResponse - The full API response.
+ * @param {function} [callback] The callback function.
+ * @param {?error} callback.err An error returned while making this request
+ * @param {Dataset} callback.dataset The newly created dataset
+ * @param {object} callback.apiResponse The full API response.
+ * @returns {Promise}
  *
  * @example
+ * const BigQuery = require('@google-cloud/bigquery');
+ * const bigquery = new BigQuery();
+ *
  * bigquery.createDataset('my-dataset', function(err, dataset, apiResponse) {});
  *
  * //-
  * // If the callback is omitted, we'll return a Promise.
  * //-
  * bigquery.createDataset('my-dataset').then(function(data) {
- *   var dataset = data[0];
- *   var apiResponse = data[1];
+ *   const dataset = data[0];
+ *   const apiResponse = data[1];
  * });
  */
 BigQuery.prototype.createDataset = function(id, options, callback) {
@@ -499,12 +637,15 @@ BigQuery.prototype.createDataset = function(id, options, callback) {
 /**
  * Run a query scoped to your project as a readable object stream.
  *
- * @param {object=} query - Configuration object. See
- *     {module:bigquery#query} for a complete list of options.
- * @return {stream}
+ * @param {object} query Configuration object. See {@link Query} for a complete
+ *     list of options.
+ * @returns {stream}
  *
  * @example
- * var query = 'SELECT url FROM [publicdata:samples.github_nested] LIMIT 100';
+ * const BigQuery = require('@google-cloud/bigquery');
+ * const bigquery = new BigQuery();
+ *
+ * cpmst query = 'SELECT url FROM [publicdata:samples.github_nested] LIMIT 100';
  *
  * bigquery.createQueryStream(query)
  *   .on('error', console.error)
@@ -530,28 +671,32 @@ BigQuery.prototype.createQueryStream = common.paginator.streamify('query');
  * Creates a job. Typically when creating a job you'll have a very specific task
  * in mind. For this we recommend one of the following methods:
  *
- * - {module:bigquery#startQuery}
- * - {module:bigquery/table#startCopy}
- * - {module:bigquery/table#startCopyFrom}
- * - {module:bigquery/table#startExport}
- * - {module:bigquery/table#startImport}
+ * - {@link BigQuery#startQuery}
+ * - {@link BigQuery/table#startCopy}
+ * - {@link BigQuery/table#startCopyFrom}
+ * - {@link BigQuery/table#startExport}
+ * - {@link BigQuery/table#startImport}
  *
  * However in the event you need a finer level of control over the job creation,
  * you can use this method to pass in a raw [Job resource](https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs)
  * object.
  *
- * @resource [Jobs Overview]{@link https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs}
- * @resource [Jobs: insert API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert}
+ * @see [Jobs Overview]{@link https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs}
+ * @see [Jobs: insert API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert}
  *
- * @param {object} options - Object in the form of a [Job resource](https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs);
- * @param {string=} options.jobPrefix - Prefix to apply to the job id.
- * @param {function} callback - The callback function.
- * @param {?error} callback.err - An error returned while making this request.
- * @param {module:bigquery/job} callback.job - The newly created job.
- * @param {object} callback.apiResponse - The full API response.
+ * @param {object} options Object in the form of a [Job resource](https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs);
+ * @param {string} [options.jobPrefix] Prefix to apply to the job id.
+ * @param {function} [callback] The callback function.
+ * @param {?error} callback.err An error returned while making this request.
+ * @param {Job} callback.job The newly created job.
+ * @param {object} callback.apiResponse The full API response.
+ * @returns {Promise}
  *
  * @example
- * var options = {
+ * const BigQuery = require('@google-cloud/bigquery');
+ * const bigquery = new BigQuery();
+ *
+ * const options = {
  *   configuration: {
  *     query: {
  *       query: 'SELECT url FROM [publicdata:samples.github_nested] LIMIT 100'
@@ -571,7 +716,7 @@ BigQuery.prototype.createQueryStream = common.paginator.streamify('query');
  * // If the callback is omitted, we'll return a Promise.
  * //-
  * bigquery.createJob(options).then(function(data) {
- *   var job = data[0];
+ *   const job = data[0];
  *
  *   return job.getQueryResults();
  * });
@@ -615,11 +760,13 @@ BigQuery.prototype.createJob = function(options, callback) {
 /**
  * Create a reference to a dataset.
  *
- * @param {string} id - ID of the dataset.
- * @return {module:bigquery/dataset}
+ * @param {string} id ID of the dataset.
+ * @returns {Dataset}
  *
  * @example
- * var dataset = bigquery.dataset('higher_education');
+ * const BigQuery = require('@google-cloud/bigquery');
+ * const bigquery = new BigQuery();
+ * const dataset = bigquery.dataset('higher_education');
  */
 BigQuery.prototype.dataset = function(id) {
   return new Dataset(this, id);
@@ -628,22 +775,25 @@ BigQuery.prototype.dataset = function(id) {
 /**
  * List all or some of the datasets in your project.
  *
- * @resource [Datasets: list API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/datasets/list}
+ * @see [Datasets: list API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/datasets/list}
  *
- * @param {object=} query - Configuration object.
- * @param {boolean} query.all - List all datasets, including hidden ones.
- * @param {boolean} query.autoPaginate - Have pagination handled automatically.
+ * @param {object} [query] Configuration object.
+ * @param {boolean} [query.all] List all datasets, including hidden ones.
+ * @param {boolean} [query.autoPaginate] Have pagination handled automatically.
  *     Default: true.
- * @param {number} query.maxApiCalls - Maximum number of API calls to make.
- * @param {number} query.maxResults - Maximum number of results to return.
- * @param {string} query.pageToken - Token returned from a previous call, to
+ * @param {number} [query.maxApiCalls] Maximum number of API calls to make.
+ * @param {number} [query.maxResults] Maximum number of results to return.
+ * @param {string} [query.pageToken] Token returned from a previous call, to
  *     request the next page of results.
- * @param {function} callback - The callback function.
- * @param {?error} callback.err - An error returned while making this request
- * @param {module:bigquery/dataset[]} callback.datasets - The list of datasets
- *     in your project.
+ * @param {function} [callback] The callback function.
+ * @param {?error} callback.err An error returned while making this request
+ * @param {Dataset[]} callback.datasets The list of datasets in your project.
+ * @returns {Promise}
  *
  * @example
+ * const BigQuery = require('@google-cloud/bigquery');
+ * const bigquery = new BigQuery();
+ *
  * bigquery.getDatasets(function(err, datasets) {
  *   if (!err) {
  *     // datasets is an array of Dataset objects.
@@ -711,14 +861,17 @@ BigQuery.prototype.getDatasets = function(query, callback) {
 };
 
 /**
- * List all or some of the {module:bigquery/dataset} objects in your project as
+ * List all or some of the {@link Dataset} objects in your project as
  * a readable object stream.
  *
- * @param {object=} query - Configuration object. See
- *     {module:bigquery#getDatasets} for a complete list of options.
- * @return {stream}
+ * @param {object} [query] Configuration object. See
+ *     {@link BigQuery#getDatasets} for a complete list of options.
+ * @returns {stream}
  *
  * @example
+ * const BigQuery = require('@google-cloud/bigquery');
+ * const bigquery = new BigQuery();
+ *
  * bigquery.getDatasetsStream()
  *   .on('error', console.error)
  *   .on('data', function(dataset) {
@@ -744,29 +897,33 @@ BigQuery.prototype.getDatasetsStream = common.paginator.streamify(
 /**
  * Get all of the jobs from your project.
  *
- * @resource [Jobs: list API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/list}
+ * @see [Jobs: list API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/list}
  *
- * @param {object=} options - Configuration object.
- * @param {boolean=} options.allUsers - Display jobs owned by all users in the
+ * @param {object} [options] Configuration object.
+ * @param {boolean} [options.allUsers] Display jobs owned by all users in the
  *     project.
- * @param {boolean} options.autoPaginate - Have pagination handled
+ * @param {boolean} [options.autoPaginate] Have pagination handled
  *     automatically. Default: true.
- * @param {number} options.maxApiCalls - Maximum number of API calls to make.
- * @param {number=} options.maxResults - Maximum number of results to return.
- * @param {string=} options.pageToken - Token returned from a previous call, to
+ * @param {number} [options.maxApiCalls] Maximum number of API calls to make.
+ * @param {number} [options.maxResults] Maximum number of results to return.
+ * @param {string} [options.pageToken] Token returned from a previous call, to
  *     request the next page of results.
- * @param {string=} options.projection - Restrict information returned to a set
+ * @param {string} [options.projection] Restrict information returned to a set
  *     of selected fields. Acceptable values are "full", for all job data, and
  *     "minimal", to not include the job configuration.
- * @param {string=} options.stateFilter - Filter for job state. Acceptable
+ * @param {string} [options.stateFilter] Filter for job state. Acceptable
  *     values are "done", "pending", and "running". Sending an array to this
  *     option performs a disjunction.
- * @param {function} callback - The callback function.
- * @param {?error} callback.err - An error returned while making this request
- * @param {module:bigquery/job[]} callback.jobs - The list of jobs in your
+ * @param {function} [callback] The callback function.
+ * @param {?error} callback.err An error returned while making this request
+ * @param {Job[]} callback.jobs The list of jobs in your
  *     project.
+ * @returns {Promise}
  *
  * @example
+ * const BigQuery = require('@google-cloud/bigquery');
+ * const bigquery = new BigQuery();
+ *
  * bigquery.getJobs(function(err, jobs) {
  *   if (!err) {
  *     // jobs is an array of Job objects.
@@ -792,7 +949,7 @@ BigQuery.prototype.getDatasetsStream = common.paginator.streamify(
  * // If the callback is omitted, we'll return a Promise.
  * //-
  * bigquery.getJobs().then(function(data) {
- *   var jobs = data[0];
+ *   const jobs = data[0];
  * });
  */
 BigQuery.prototype.getJobs = function(options, callback) {
@@ -837,14 +994,17 @@ BigQuery.prototype.getJobs = function(options, callback) {
 };
 
 /**
- * List all or some of the {module:bigquery/job} objects in your project as a
+ * List all or some of the {@link Job} objects in your project as a
  * readable object stream.
  *
- * @param {object=} query - Configuration object. See
- *     {module:bigquery#getJobs} for a complete list of options.
- * @return {stream}
+ * @param {object} [query] Configuration object. See
+ *     {@link BigQuery#getJobs} for a complete list of options.
+ * @returns {stream}
  *
  * @example
+ * const BigQuery = require('@google-cloud/bigquery');
+ * const bigquery = new BigQuery();
+ *
  * bigquery.getJobsStream()
  *   .on('error', console.error)
  *   .on('data', function(job) {
@@ -868,11 +1028,14 @@ BigQuery.prototype.getJobsStream = common.paginator.streamify('getJobs');
 /**
  * Create a reference to an existing job.
  *
- * @param {string} id - ID of the job.
- * @return {module:bigquery/job}
+ * @param {string} id ID of the job.
+ * @returns {Job}
  *
  * @example
- * var myExistingJob = bigquery.job('job-id');
+ * const BigQuery = require('@google-cloud/bigquery');
+ * const bigquery = new BigQuery();
+ *
+ * const myExistingJob = bigquery.job('job-id');
  */
 BigQuery.prototype.job = function(id) {
   return new Job(this, id);
@@ -881,36 +1044,39 @@ BigQuery.prototype.job = function(id) {
 /**
  * Run a query scoped to your project.
  *
- * @resource [Jobs: query API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/query}
+ * @see [Jobs: query API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/query}
  *
- * @param {string|object} query - A string SQL query or configuration object.
+ * @param {string|object} query A string SQL query or configuration object.
  *     For all available options, see
  *     [Jobs: query request body](https://cloud.google.com/bigquery/docs/reference/v2/jobs/query#request-body).
- * @param {object|Array<*>} query.params - For positional SQL parameters, provide
+ * @param {object|Array<*>} query.params For positional SQL parameters, provide
  *     an array of values. For named SQL parameters, provide an object which
  *     maps each named parameter to its value. The supported types are integers,
- *     floats, {module:bigquery#date} objects, {module:bigquery#datetime}
- *     objects, {module:bigquery#time} objects, {module:bigquery#timestamp}
+ *     floats, {@link BigQuery#date} objects, {@link BigQuery#datetime}
+ *     objects, {@link BigQuery#time} objects, {@link BigQuery#timestamp}
  *     objects, Strings, Booleans, and Objects.
- * @param {string} query.query - A query string, following the BigQuery query
+ * @param {string} query.query A query string, following the BigQuery query
  *     syntax, of the query to execute.
- * @param {boolean} query.useLegacySql - Option to use legacy sql syntax.
- *     Default: `false`.
- * @param {object=} options - Configuration object for query results.
- * @param {boolean} options.autoPaginate - Have pagination handled
+ * @param {boolean} [query.useLegacySql=false] Option to use legacy sql syntax.
+ * @param {object} [options] Configuration object for query results.
+ * @param {boolean} [options.autoPaginate] Have pagination handled
  *     automatically. Default: true.
- * @param {number} options.maxApiCalls - Maximum number of API calls to make.
- * @param {number} options.maxResults - Maximum number of results to read.
- * @param {number} options.timeoutMs - How long to wait for the query to
+ * @param {number} [options.maxApiCalls] Maximum number of API calls to make.
+ * @param {number} [options.maxResults] Maximum number of results to read.
+ * @param {number} [options.timeoutMs] How long to wait for the query to
  *     complete, in milliseconds, before returning. Default is to return
  *     immediately. If the timeout passes before the job completes, the request
  *     will fail with a `TIMEOUT` error.
- * @param {function} callback - The callback function.
- * @param {?error} callback.err - An error returned while making this request
- * @param {array} callback.rows - The list of results from your query.
+ * @param {function} [callback] The callback function.
+ * @param {?error} callback.err An error returned while making this request
+ * @param {array} callback.rows The list of results from your query.
+ * @returns {Promise}
  *
  * @example
- * var query = 'SELECT url FROM [publicdata:samples.github_nested] LIMIT 100';
+ * const BigQuery = require('@google-cloud/bigquery');
+ * const bigquery = new BigQuery();
+ *
+ * const query = 'SELECT url FROM [publicdata:samples.github_nested] LIMIT 100';
  *
  * bigquery.query(query, function(err, rows) {
  *   if (!err) {
@@ -950,8 +1116,8 @@ BigQuery.prototype.job = function(id) {
  *
  * //-
  * // If you need to use a `DATE`, `DATETIME`, `TIME`, or `TIMESTAMP` type in
- * // your query, see {module:bigquery#date}, {module:bigquery#datetime},
- * // {module:bigquery#time}, and {module:bigquery#timestamp}.
+ * // your query, see {@link BigQuery#date}, {@link BigQuery#datetime},
+ * // {@link BigQuery#time}, and {@link BigQuery#timestamp}.
  * //-
  *
  * //-
@@ -994,36 +1160,39 @@ BigQuery.prototype.query = function(query, options, callback) {
 
 /**
  * Run a query as a job. No results are immediately returned. Instead, your
- * callback will be executed with a {module:bigquery/job} object that you must
+ * callback will be executed with a {@link Job} object that you must
  * ping for the results. See the Job documentation for explanations of how to
  * check on the status of the job.
  *
- * @resource [Jobs: insert API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert}
+ * @see [Jobs: insert API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert}
  *
- * @param {object|string} options - The configuration object. This must be in
+ * @param {object|string} options The configuration object. This must be in
  *     the format of the [`configuration.query`](http://goo.gl/wRpHvR) property
  *     of a Jobs resource. If a string is provided, this is used as the query
  *     string, and all other options are defaulted.
- * @param {module:bigquery/table=} options.destination - The table to save the
+ * @param {Table} [options.destination] The table to save the
  *     query's results to. If omitted, a new table will be created.
- * @param {boolean} options.dryRun - If set, don't actually run this job. A
+ * @param {boolean} [options.dryRun] If set, don't actually run this job. A
  *     valid query will update the job with processing statistics. These can be
  *     accessed via `job.metadata`.
- * @param {string} options.query - A query string, following the BigQuery query
+ * @param {string} options.query A query string, following the BigQuery query
  *     syntax, of the query to execute.
- * @param {boolean} options.useLegacySql - Option to use legacy sql syntax.
- *     Default: `false`.
- * @param {function} callback - The callback function.
- * @param {?error} callback.err - An error returned while making this request.
- * @param {module:bigquery/job} callback.job - The newly created job for your
+ * @param {boolean} [options.useLegacySql=false] Option to use legacy sql syntax.
+ * @param {function} [callback] The callback function.
+ * @param {?error} callback.err An error returned while making this request.
+ * @param {Job} callback.job The newly created job for your
        query.
- * @param {object} callback.apiResponse - The full API response.
+ * @param {object} callback.apiResponse The full API response.
+ * @returns {Promise}
  *
  * @throws {Error} If a query is not specified.
  * @throws {Error} If a Table is not provided as a destination.
  *
  * @example
- * var query = 'SELECT url FROM [publicdata:samples.github_nested] LIMIT 100';
+ * const BigQuery = require('@google-cloud/bigquery');
+ * const bigquery = new BigQuery();
+ *
+ * const query = 'SELECT url FROM [publicdata:samples.github_nested] LIMIT 100';
  *
  * //-
  * // You may pass only a query string, having a new table created to store the
@@ -1033,7 +1202,7 @@ BigQuery.prototype.query = function(query, options, callback) {
  *
  * //-
  * // You can also control the destination table by providing a
- * // {module:bigquery/table} object.
+ * // {@link Table} object.
  * //-
  * bigquery.startQuery({
  *   destination: bigquery.dataset('higher_education').table('institutions'),
@@ -1042,7 +1211,7 @@ BigQuery.prototype.query = function(query, options, callback) {
  *
  * //-
  * // After you have run `startQuery`, your query will execute in a job. Your
- * // callback is executed with a {module:bigquery/job} object so that you may
+ * // callback is executed with a {@link Job} object so that you may
  * // check for the results.
  * //-
  * bigquery.startQuery(query, function(err, job) {
@@ -1147,8 +1316,60 @@ common.util.promisifyAll(BigQuery, {
   exclude: ['dataset', 'date', 'datetime', 'job', 'time', 'timestamp'],
 });
 
+/**
+ * {@link Dataset} class.
+ *
+ * @name BigQuery.Dataset
+ * @see Dataset
+ * @type {constructor}
+ */
 BigQuery.Dataset = Dataset;
+
+/**
+ * {@link Job} class.
+ *
+ * @name BigQuery.Job
+ * @see Job
+ * @type {constructor}
+ */
 BigQuery.Job = Job;
+
+/**
+ * {@link Table} class.
+ *
+ * @name BigQuery.Table
+ * @see Table
+ * @type {constructor}
+ */
 BigQuery.Table = Table;
 
+/**
+ * The default export of the `@google-cloud/bigquery` package is the {@link BigQuery}
+ * class.
+ *
+ * See {@link BigQuery} and {@link ClientConfig} for client methods and
+ * configuration options.
+ *
+ * @module {constructor} @google-cloud/bigquery
+ * @alias nodejs-bigquery
+ *
+ * @example <caption>Install the client library with <a href="https://www.npmjs.com/">npm</a>:</caption>
+ * npm install --save @google-cloud/bigquery
+ *
+ * @example <caption>Import the client library</caption>
+ * const BigQuery = require('@google-cloud/bigquery');
+ *
+ * @example <caption>Create a client that uses <a href="https://cloud.google.com/docs/authentication/production#providing_credentials_to_your_application">Application Default Credentials (ADC)</a>:</caption>
+ * const bigquery = new BigQuery();
+ *
+ * @example <caption>Create a client with <a href="https://cloud.google.com/docs/authentication/production#obtaining_and_providing_service_account_credentials_manually">explicit credentials</a>:</caption>
+ * const bigquery = new BigQuery({
+ *   projectId: 'your-project-id',
+ *   keyFilename: '/path/to/keyfile.json'
+ * });
+ *
+ * @example <caption>include:samples/quickstart.js</caption>
+ * region_tag:bigquery_quickstart
+ * Full quickstart example:
+ */
 module.exports = BigQuery;

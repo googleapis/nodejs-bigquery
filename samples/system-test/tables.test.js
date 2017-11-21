@@ -26,6 +26,7 @@ const cwd = path.join(__dirname, `..`);
 const cmd = `node tables.js`;
 const generateUuid = () =>
   `nodejs_docs_samples_${uuid.v4().replace(/-/gi, '_')}`;
+const projectId = process.env.GCLOUD_PROJECT;
 
 const datasetId = generateUuid();
 const srcDatasetId = datasetId;
@@ -78,7 +79,7 @@ test.after.always(async () => {
 
 test.serial(`should create a table`, async t => {
   const output = await tools.runAsync(
-    `${cmd} create ${datasetId} ${tableId} "${schema}"`,
+    `${cmd} create ${projectId} ${datasetId} ${tableId} "${schema}"`,
     cwd
   );
   t.is(output, `Table ${tableId} created.`);
@@ -93,7 +94,10 @@ test.serial(`should list tables`, async t => {
   t.plan(0);
   await tools
     .tryTest(async assert => {
-      const output = await tools.runAsync(`${cmd} list ${datasetId}`, cwd);
+      const output = await tools.runAsync(
+        `${cmd} list ${projectId} ${datasetId}`,
+        cwd
+      );
       assert(output.includes(`Tables:`));
       assert(output.includes(tableId));
     })
@@ -103,7 +107,7 @@ test.serial(`should list tables`, async t => {
 test.serial(`should import a local file`, async t => {
   t.plan(2);
   const output = await tools.runAsync(
-    `${cmd} import ${datasetId} ${tableId} ${localFilePath}`,
+    `${cmd} import ${projectId} ${datasetId} ${tableId} ${localFilePath}`,
     cwd
   );
   t.true(output.includes(`started.`));
@@ -121,7 +125,7 @@ test.serial(`should import a local file`, async t => {
 
 test.serial(`should browse table rows`, async t => {
   const output = await tools.runAsync(
-    `${cmd} browse ${datasetId} ${tableId}`,
+    `${cmd} browse ${projectId} ${datasetId} ${tableId}`,
     cwd
   );
   t.is(
@@ -133,7 +137,9 @@ test.serial(`should browse table rows`, async t => {
 test.serial(`should export a table to GCS`, async t => {
   t.plan(2);
   const output = await tools.runAsync(
-    `${cmd} export ${datasetId} ${tableId} ${bucketName} ${exportFileName}`,
+    `${cmd} export ${projectId} ${datasetId} ${tableId} ${bucketName} ${
+      exportFileName
+    }`,
     cwd
   );
   t.true(output.includes(`started.`));
@@ -152,7 +158,9 @@ test.serial(`should export a table to GCS`, async t => {
 test.serial(`should import a GCS file`, async t => {
   t.plan(2);
   const output = await tools.runAsync(
-    `${cmd} import-gcs ${datasetId} ${tableId} ${bucketName} ${importFileName}`,
+    `${cmd} import-gcs ${projectId} ${datasetId} ${tableId} ${bucketName} ${
+      importFileName
+    }`,
     cwd
   );
   t.true(output.includes(`started.`));
@@ -171,7 +179,9 @@ test.serial(`should import a GCS file`, async t => {
 test.serial(`should copy a table`, async t => {
   t.plan(2);
   const output = await tools.runAsync(
-    `${cmd} copy ${srcDatasetId} ${srcTableId} ${destDatasetId} ${destTableId}`,
+    `${cmd} copy ${projectId} ${srcDatasetId} ${srcTableId} ${destDatasetId} ${
+      destTableId
+    }`,
     cwd
   );
   t.true(output.includes(`started.`));
@@ -190,7 +200,10 @@ test.serial(`should copy a table`, async t => {
 test.serial(`should insert rows`, async t => {
   t.plan(3);
   const err = await t.throws(
-    tools.runAsync(`${cmd} insert ${datasetId} ${tableId} 'foo.bar'`, cwd)
+    tools.runAsync(
+      `${cmd} insert ${projectId} ${datasetId} ${tableId} 'foo.bar'`,
+      cwd
+    )
   );
   t.true(
     err.message.includes(
@@ -198,7 +211,9 @@ test.serial(`should insert rows`, async t => {
     )
   );
   const output = await tools.runAsync(
-    `${cmd} insert ${datasetId} ${tableId} '${JSON.stringify(rows)}'`,
+    `${cmd} insert ${projectId} ${datasetId} ${tableId} '${JSON.stringify(
+      rows
+    )}'`,
     cwd
   );
   t.is(
@@ -220,7 +235,7 @@ test.serial(`should insert rows`, async t => {
 
 test.serial(`should delete a table`, async t => {
   const output = await tools.runAsync(
-    `${cmd} delete ${datasetId} ${tableId}`,
+    `${cmd} delete ${projectId} ${datasetId} ${tableId}`,
     cwd
   );
   t.is(output, `Table ${tableId} deleted.`);

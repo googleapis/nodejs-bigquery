@@ -14,10 +14,6 @@
  * limitations under the License.
  */
 
-/*!
- * @module bigquery/table
- */
-
 'use strict';
 
 var arrify = require('arrify');
@@ -44,32 +40,43 @@ var FORMATS = {
   json: 'NEWLINE_DELIMITED_JSON',
 };
 
-/*! Developer Documentation
- *
- * @param {module:bigquery/dataset} dataset - Dataset instance.
- * @param {string} id - The ID of the table.
- */
 /**
  * Table objects are returned by methods such as
- * {module:bigquery/dataset#table}, {module:bigquery/dataset#createTable}, and
- * {module:bigquery/dataset#getTables}.
+ * {@link BigQuery/dataset#table}, {@link BigQuery/dataset#createTable}, and
+ * {@link BigQuery/dataset#getTables}.
  *
- * @alias module:bigquery/table
- * @constructor
+ * @class
+ * @param {Dataset} dataset {@link Dataset} instance.
+ * @param {string} id The ID of the table.
  *
  * @example
- * var dataset = bigquery.dataset('my-dataset');
+ * const BigQuery = require('@google-cloud/bigquery');
+ * const bigquery = new BigQuery();
+ * const dataset = bigquery.dataset('my-dataset');
  *
- * var table = dataset.table('my-table');
+ * const table = dataset.table('my-table');
  */
 function Table(dataset, id) {
   var methods = {
     /**
      * Create a table.
      *
-     * @param {object=} options - See {module:bigquery/dataset#createTable}.
+     * @method Table#create
+     * @param {object} [options] See {@link Dataset#createTable}.
+     * @param {function} [callback]
+     * @param {?error} callback.err An error returned while making this
+     *     request.
+     * @param {Table} callback.table The new {@link Table}.
+     * @param {object} callback.apiResponse The full API response.
+     * @returns {Promise}
      *
      * @example
+     * const BigQuery = require('@google-cloud/bigquery');
+     * const bigquery = new BigQuery();
+     * const dataset = bigquery.dataset('my-dataset');
+     *
+     * const table = dataset.table('my-table');
+     *
      * table.create(function(err, table, apiResponse) {
      *   if (!err) {
      *     // The table was created successfully.
@@ -80,8 +87,8 @@ function Table(dataset, id) {
      * // If the callback is omitted, we'll return a Promise.
      * //-
      * table.create().then(function(data) {
-     *   var table = data[0];
-     *   var apiResponse = data[1];
+     *   const table = data[0];
+     *   const apiResponse = data[1];
      * });
      */
     create: true,
@@ -89,21 +96,29 @@ function Table(dataset, id) {
     /**
      * Delete a table and all its data.
      *
-     * @resource [Tables: delete API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/tables/delete}
+     * @see [Tables: delete API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/tables/delete}
      *
-     * @param {function} callback - The callback function.
-     * @param {?error} callback.err - An error returned while making this
+     * @method Table#delete
+     * @param {function} [callback]
+     * @param {?error} callback.err An error returned while making this
      *     request.
-     * @param {object} callback.apiResponse - The full API response.
+     * @param {object} callback.apiResponse The full API response.
+     * @returns {Promise}
      *
      * @example
+     * const BigQuery = require('@google-cloud/bigquery');
+     * const bigquery = new BigQuery();
+     * const dataset = bigquery.dataset('my-dataset');
+     *
+     * const table = dataset.table('my-table');
+     *
      * table.delete(function(err, apiResponse) {});
      *
      * //-
      * // If the callback is omitted, we'll return a Promise.
      * //-
      * table.delete().then(function(data) {
-     *   var apiResponse = data[0];
+     *   const apiResponse = data[0];
      * });
      */
     delete: true,
@@ -111,19 +126,27 @@ function Table(dataset, id) {
     /**
      * Check if the table exists.
      *
-     * @param {function} callback - The callback function.
-     * @param {?error} callback.err - An error returned while making this
+     * @method Table#exists
+     * @param {function} [callback]
+     * @param {?error} callback.err An error returned while making this
      *     request.
-     * @param {boolean} callback.exists - Whether the table exists or not.
+     * @param {boolean} callback.exists Whether the table exists or not.
+     * @returns {Promise}
      *
      * @example
+     * const BigQuery = require('@google-cloud/bigquery');
+     * const bigquery = new BigQuery();
+     * const dataset = bigquery.dataset('my-dataset');
+     *
+     * const table = dataset.table('my-table');
+     *
      * table.exists(function(err, exists) {});
      *
      * //-
      * // If the callback is omitted, we'll return a Promise.
      * //-
      * table.exists().then(function(data) {
-     *   var exists = data[0];
+     *   const exists = data[0];
      * });
      */
     exists: true,
@@ -136,11 +159,24 @@ function Table(dataset, id) {
      * normally required for the `create` method must be contained within this
      * object as well.
      *
-     * @param {options=} options - Configuration object.
-     * @param {boolean} options.autoCreate - Automatically create the object if
-     *     it does not exist. Default: `false`
+     * @method Table#get
+     * @param {options} [options] Configuration object.
+     * @param {boolean} [options.autoCreate=false] Automatically create the
+     *     object if it does not exist.
+     * @param {function} [callback]
+     * @param {?error} callback.err An error returned while making this
+     *     request.
+     * @param {Table} callback.table The {@link Table}.
+     * @param {object} callback.apiResponse The full API response.
+     * @returns {Promise}
      *
      * @example
+     * const BigQuery = require('@google-cloud/bigquery');
+     * const bigquery = new BigQuery();
+     * const dataset = bigquery.dataset('my-dataset');
+     *
+     * const table = dataset.table('my-table');
+     *
      * table.get(function(err, table, apiResponse) {
      *   // `table.metadata` has been populated.
      * });
@@ -149,8 +185,8 @@ function Table(dataset, id) {
      * // If the callback is omitted, we'll return a Promise.
      * //-
      * table.get().then(function(data) {
-     *   var table = data[0];
-     *   var apiResponse = data[1];
+     *   const table = data[0];
+     *   const apiResponse = data[1];
      * });
      */
     get: true,
@@ -158,23 +194,31 @@ function Table(dataset, id) {
     /**
      * Return the metadata associated with the Table.
      *
-     * @resource [Tables: get API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/tables/get}
+     * @see [Tables: get API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/tables/get}
      *
-     * @param {function} callback - The callback function.
-     * @param {?error} callback.err - An error returned while making this
+     * @method Table#getMetadata
+     * @param {function} [callback] The callback function.
+     * @param {?error} callback.err An error returned while making this
      *     request.
-     * @param {object} callback.metadata - The metadata of the Table.
-     * @param {object} callback.apiResponse - The full API response.
+     * @param {object} callback.metadata The metadata of the Table.
+     * @param {object} callback.apiResponse The full API response.
+     * @returns {Promise}
      *
      * @example
+     * const BigQuery = require('@google-cloud/bigquery');
+     * const bigquery = new BigQuery();
+     * const dataset = bigquery.dataset('my-dataset');
+     *
+     * const table = dataset.table('my-table');
+     *
      * table.getMetadata(function(err, metadata, apiResponse) {});
      *
      * //-
      * // If the callback is omitted, we'll return a Promise.
      * //-
      * table.getMetadata().then(function(data) {
-     *   var metadata = data[0];
-     *   var apiResponse = data[1];
+     *   const metadata = data[0];
+     *   const apiResponse = data[1];
      * });
      */
     getMetadata: true,
@@ -183,16 +227,24 @@ function Table(dataset, id) {
      * Set the metadata for this Table. This can be useful for updating table
      * labels.
      *
-     * @resource [Tables: patch API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/tables/patch}
+     * @see [Tables: patch API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/tables/patch}
      *
-     * @param {object} metadata - Metadata to save on the Table.
-     * @param {function} callback - The callback function.
-     * @param {?error} callback.err - An error returned while making this
+     * @method Table#setMetadata
+     * @param {object} metadata Metadata to save on the Table.
+     * @param {function} [callback] The callback function.
+     * @param {?error} callback.err An error returned while making this
      *     request.
-     * @param {object} callback.apiResponse - The full API response.
+     * @param {object} callback.apiResponse The full API response.
+     * @returns {Promise}
      *
      * @example
-     * var metadata = {
+     * const BigQuery = require('@google-cloud/bigquery');
+     * const bigquery = new BigQuery();
+     * const dataset = bigquery.dataset('my-dataset');
+     *
+     * const table = dataset.table('my-table');
+     *
+     * const metadata = {
      *   labels: {
      *     foo: 'bar'
      *   }
@@ -204,7 +256,7 @@ function Table(dataset, id) {
      * // If the callback is omitted, we'll return a Promise.
      * //-
      * table.setMetadata(metadata).then(function(data) {
-     *   var apiResponse = data[0];
+     *   const apiResponse = data[0];
      * });
      */
     setMetadata: true,
@@ -243,8 +295,8 @@ util.inherits(Table, common.ServiceObject);
  * @static
  * @private
  *
- * @param {string} str - Comma-separated schema string.
- * @return {object} Table schema in the format the API expects.
+ * @param {string} str Comma-separated schema string.
+ * @returns {object} Table schema in the format the API expects.
  */
 Table.createSchemaFromString_ = function(str) {
   return str.split(/\s*,\s*/).reduce(
@@ -269,8 +321,8 @@ Table.createSchemaFromString_ = function(str) {
  * @static
  * @private
  *
- * @param {*} value - The value to be converted.
- * @return {*} The converted value.
+ * @param {*} value The value to be converted.
+ * @returns {*} The converted value.
  */
 Table.encodeValue_ = function(value) {
   if (is.undefined(value) || is.null(value)) {
@@ -313,7 +365,7 @@ Table.encodeValue_ = function(value) {
 };
 
 /**
- *
+ * @private
  */
 Table.formatMetadata_ = function(options) {
   var body = extend(true, {}, options);
@@ -362,25 +414,32 @@ Table.formatMetadata_ = function(options) {
 /**
  * Copy data from one table to another, optionally creating that table.
  *
- * @param {module:bigquery/table} destination - The destination table.
- * @param {object=} metadata - Metadata to set with the copy operation. The
+ * @param {Table} destination The destination table.
+ * @param {object} [metadata] Metadata to set with the copy operation. The
  *     metadata object should be in the format of the
  *     [`configuration.copy`](http://goo.gl/dKWIyS) property of a Jobs resource.
- * @param {function} callback - The callback function.
- * @param {?error} callback.err - An error returned while making this request
- * @param {object} callback.apiResponse - The full API response.
+ * @param {function} [callback] The callback function.
+ * @param {?error} callback.err An error returned while making this request
+ * @param {object} callback.apiResponse The full API response.
+ * @returns {Promise}
  *
  * @throws {Error} If a destination other than a Table object is provided.
  *
  * @example
- * var yourTable = dataset.table('your-table');
+ * const BigQuery = require('@google-cloud/bigquery');
+ * const bigquery = new BigQuery();
+ * const dataset = bigquery.dataset('my-dataset');
+ *
+ * const table = dataset.table('my-table');
+ * const yourTable = dataset.table('your-table');
+ *
  * table.copy(yourTable, function(err, apiResponse) {});
  *
  * //-
  * // See the <a href="http://goo.gl/dKWIyS">`configuration.copy`</a> object for
  * // all available options.
  * //-
- * var metadata = {
+ * const metadata = {
  *   createDisposition: 'CREATE_NEVER',
  *   writeDisposition: 'WRITE_TRUNCATE'
  * };
@@ -391,7 +450,7 @@ Table.formatMetadata_ = function(options) {
  * // If the callback is omitted, we'll return a Promise.
  * //-
  * table.copy(yourTable, metadata).then(function(data) {
- *   var apiResponse = data[0];
+ *   const apiResponse = data[0];
  * });
  */
 Table.prototype.copy = function(destination, metadata, callback) {
@@ -415,19 +474,25 @@ Table.prototype.copy = function(destination, metadata, callback) {
 /**
  * Copy data from multiple tables into this table.
  *
- * @param {module:bigquery/table|module:bigquery/table[]} sourceTables - The
+ * @param {Table|Table[]} sourceTables The
  *     source table(s) to copy data from.
- * @param {object=} metadata - Metadata to set with the copy operation. The
+ * @param {object=} metadata Metadata to set with the copy operation. The
  *     metadata object should be in the format of the
  *     [`configuration.copy`](http://goo.gl/dKWIyS) property of a Jobs resource.
- * @param {function} callback - The callback function.
- * @param {?error} callback.err - An error returned while making this request
- * @param {object} callback.apiResponse - The full API response.
+ * @param {function} [callback] The callback function.
+ * @param {?error} callback.err An error returned while making this request
+ * @param {object} callback.apiResponse The full API response.
+ * @returns {Promise}
  *
  * @throws {Error} If a source other than a Table object is provided.
  *
  * @example
- * var sourceTables = [
+ * const BigQuery = require('@google-cloud/bigquery');
+ * const bigquery = new BigQuery();
+ * const dataset = bigquery.dataset('my-dataset');
+ * const table = bigquery.table('my-table');
+ *
+ * const sourceTables = [
  *   dataset.table('your-table'),
  *   dataset.table('your-second-table')
  * ];
@@ -438,7 +503,7 @@ Table.prototype.copy = function(destination, metadata, callback) {
  * // See the <a href="http://goo.gl/dKWIyS">`configuration.copy`</a> object for
  * // all available options.
  * //-
- * var metadata = {
+ * const metadata = {
  *   createDisposition: 'CREATE_NEVER',
  *   writeDisposition: 'WRITE_TRUNCATE'
  * };
@@ -449,7 +514,7 @@ Table.prototype.copy = function(destination, metadata, callback) {
  * // If the callback is omitted, we'll return a Promise.
  * //-
  * table.copyFrom(sourceTables, metadata).then(function(data) {
- *   var apiResponse = data[0];
+ *   const apiResponse = data[0];
  * });
  */
 Table.prototype.copyFrom = function(sourceTables, metadata, callback) {
@@ -473,8 +538,13 @@ Table.prototype.copyFrom = function(sourceTables, metadata, callback) {
 /**
  * Run a query scoped to your dataset as a readable object stream.
  *
- * See {module:bigquery#createQueryStream} for full documentation of this
+ * See {@link BigQuery#createQueryStream} for full documentation of this
  * method.
+ *
+ * @param {object} query See {@link BigQuery#createQueryStream} for full
+ *     documentation of this method.
+ * @returns {stream} See {@link BigQuery#createQueryStream} for full
+ *     documentation of this method.
  */
 Table.prototype.createQueryStream = function(query) {
   return this.dataset.createQueryStream(query);
@@ -482,13 +552,18 @@ Table.prototype.createQueryStream = function(query) {
 
 /**
  * Create a readable stream of the rows of data in your table. This method is
- * simply a wrapper around {module:bigquery/table#getRows}.
+ * simply a wrapper around {@link Table#getRows}.
  *
- * @resource [Tabledata: list API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/tabledata/list}
+ * @see [Tabledata: list API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/tabledata/list}
  *
- * @return {ReadableStream}
+ * @returns {ReadableStream}
  *
  * @example
+ * const BigQuery = require('@google-cloud/bigquery');
+ * const bigquery = new BigQuery();
+ * const dataset = bigquery.dataset('my-dataset');
+ * const table = bigquery.table('my-table');
+ *
  * table.createReadStream(options)
  *   .on('error', console.error)
  *   .on('data', function(row) {})
@@ -511,25 +586,30 @@ Table.prototype.createReadStream = common.paginator.streamify('getRows');
  * Load data into your table from a readable stream of JSON, CSV, or
  * AVRO data.
  *
- * @resource [Jobs: insert API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert}
+ * @see [Jobs: insert API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert}
  *
- * @param {string|object=} metadata - Metadata to set with the load operation.
+ * @param {string|object} [metadata] Metadata to set with the load operation.
  *     The metadata object should be in the format of the
  *     [`configuration.load`](http://goo.gl/BVcXk4) property of a Jobs resource.
  *     If a string is given, it will be used as the filetype.
- * @return {WritableStream}
+ * @returns {WritableStream}
  *
  * @throws {Error} If source format isn't recognized.
  *
  * @example
+ * const BigQuery = require('@google-cloud/bigquery');
+ * const bigquery = new BigQuery();
+ * const dataset = bigquery.dataset('my-dataset');
+ * const table = bigquery.table('my-table');
+ *
  * //-
  * // Load data from a CSV file.
  * //-
- * var request = require('request');
+ * const request = require('request');
  *
- * var csvUrl = 'http://goo.gl/kSE7z6';
+ * const csvUrl = 'http://goo.gl/kSE7z6';
  *
- * var metadata = {
+ * const metadata = {
  *   allowJaggedRows: true,
  *   skipLeadingRows: 1
  * };
@@ -544,7 +624,7 @@ Table.prototype.createReadStream = common.paginator.streamify('getRows');
  * //-
  * // Load data from a JSON file.
  * //-
- * var fs = require('fs');
+ * const fs = require('fs');
  *
  * fs.createReadStream('./test/testdata/testfile.json')
  *   .pipe(table.createWriteStream('json'))
@@ -629,28 +709,35 @@ Table.prototype.createWriteStream = function(metadata) {
 /**
  * Export table to Cloud Storage.
  *
- * @param {module:storage/file} destination - Where the file should be exported
- *     to.
- * @param {object=} options - The configuration object.
- * @param {string} options.format - The format to export the data in. Allowed
+ * @param {string|File} destination Where the file should be exported
+ *     to. A string or a {@link https://cloud.google.com/nodejs/docs/reference/storage/latest/File File}.
+ * @param {object} [options] The configuration object.
+ * @param {string} [options.format] The format to export the data in. Allowed
  *     options are "CSV", "JSON", or "AVRO". Default: "CSV".
- * @param {boolean} options.gzip - Specify if you would like the file compressed
+ * @param {boolean} [options.gzip] Specify if you would like the file compressed
  *     with GZIP. Default: false.
- * @param {function} callback - The callback function.
- * @param {?error} callback.err - An error returned while making this request
- * @param {object} callback.apiResponse - The full API response.
+ * @param {function} [callback] The callback function.
+ * @param {?error} callback.err An error returned while making this request
+ * @param {object} callback.apiResponse The full API response.
+ * @returns {Promise}
  *
  * @throws {Error} If destination isn't a File object.
  * @throws {Error} If destination format isn't recongized.
  *
  * @example
- * var gcs = require('@google-cloud/storage')({
+ * const Storage = require('@google-cloud/storage');
+ * const BigQuery = require('@google-cloud/bigquery');
+ * const bigquery = new BigQuery();
+ * const dataset = bigquery.dataset('my-dataset');
+ * const table = bigquery.table('my-table');
+ *
+ * const storage = new Storage({
  *   projectId: 'grape-spaceship-123'
  * });
- * var exportedFile = gcs.bucket('institutions').file('2014.csv');
+ * var exportedFile = storage.bucket('institutions').file('2014.csv');
  *
  * //-
- * // To use the default options, just pass a {module:storage/file} object.
+ * // To use the default options, just pass a {@link https://cloud.google.com/nodejs/docs/reference/storage/latest/File File} object.
  * //
  * // Note: The exported format type will be inferred by the file's extension.
  * // If you wish to override this, or provide an array of destination files,
@@ -672,8 +759,8 @@ Table.prototype.createWriteStream = function(metadata) {
  * // You can also specify multiple destination files.
  * //-
  * table.export([
- *   gcs.bucket('institutions').file('2014.json'),
- *   gcs.bucket('institutions-copy').file('2014.json')
+ *   storage.bucket('institutions').file('2014.json'),
+ *   storage.bucket('institutions-copy').file('2014.json')
  * ], options, function(err, apiResponse) {});
  *
  * //-
@@ -705,18 +792,24 @@ Table.prototype.export = function(destination, options, callback) {
  * Retrieves table data from a specified set of rows. The rows are returned to
  * your callback as an array of objects matching your table's schema.
  *
- * @resource [Tabledata: list API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/tabledata/list}
+ * @see [Tabledata: list API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/tabledata/list}
  *
- * @param {object=} options - The configuration object.
- * @param {boolean} options.autoPaginate - Have pagination handled
- *     automatically. Default: true.
- * @param {number} options.maxApiCalls - Maximum number of API calls to make.
- * @param {number} options.maxResults - Maximum number of results to return.
- * @param {function} callback - The callback function.
- * @param {?error} callback.err - An error returned while making this request
- * @param {array} callback.rows - The table data from specified set of rows.
+ * @param {object} [options] The configuration object.
+ * @param {boolean} [options.autoPaginate=true] Have pagination handled
+ *     automatically.
+ * @param {number} [options.maxApiCalls] Maximum number of API calls to make.
+ * @param {number} [options.maxResults] Maximum number of results to return.
+ * @param {function} [callback] The callback function.
+ * @param {?error} callback.err An error returned while making this request
+ * @param {array} callback.rows The table data from specified set of rows.
+ * @returns {Promise}
  *
  * @example
+ * const BigQuery = require('@google-cloud/bigquery');
+ * const bigquery = new BigQuery();
+ * const dataset = bigquery.dataset('my-dataset');
+ * const table = bigquery.table('my-table');
+ *
  * table.getRows(function(err, rows) {
  *   if (!err) {
  *     // rows is an array of results.
@@ -742,7 +835,7 @@ Table.prototype.export = function(destination, options, callback) {
  * // If the callback is omitted, we'll return a Promise.
  * //-
  * table.getRows().then(function(data) {
- *   var rows = data[0];
+ *   const rows = data[0];
 });
  */
 Table.prototype.getRows = function(options, callback) {
@@ -802,28 +895,35 @@ Table.prototype.getRows = function(options, callback) {
 };
 
 /**
- * Load data from a local file or Storage file ({module:storage/file}).
+ * Load data from a local file or Storage {@link https://cloud.google.com/nodejs/docs/reference/storage/latest/File File}.
  *
  * By loading data this way, you create a load job that will run your data load
  * asynchronously. If you would like instantaneous access to your data, insert
- * it using {module:bigquery/table#insert}.
+ * it using {@link Table#insert}.
  *
  * Note: The file type will be inferred by the given file's extension. If you
  * wish to override this, you must provide `metadata.format`.
  *
- * @param {string|module:storage/file} source - The source file to import.
- * @param {object=} metadata - Metadata to set with the load operation. The
+ * @param {string|File} source The source file to import. A string or a
+ *     {@link https://cloud.google.com/nodejs/docs/reference/storage/latest/File File} object.
+ * @param {object} [metadata] Metadata to set with the load operation. The
  *     metadata object should be in the format of the
  *     [`configuration.load`](http://goo.gl/BVcXk4) property of a Jobs resource.
- * @param {string} metadata.format - The format the data being imported is in.
+ * @param {string} [metadata.format] The format the data being imported is in.
  *     Allowed options are "CSV", "JSON", or "AVRO".
- * @param {function} callback - The callback function.
- * @param {?error} callback.err - An error returned while making this request
- * @param {object} callback.apiResponse - The full API response.
+ * @param {function} [callback] The callback function.
+ * @param {?error} callback.err An error returned while making this request
+ * @param {object} callback.apiResponse The full API response.
+ * @returns {Promise}
  *
  * @throws {Error} If the source isn't a string file name or a File instance.
  *
  * @example
+ * const BigQuery = require('@google-cloud/bigquery');
+ * const bigquery = new BigQuery();
+ * const dataset = bigquery.dataset('my-dataset');
+ * const table = bigquery.table('my-table');
+ *
  * //-
  * // Load data from a local file.
  * //-
@@ -887,45 +987,50 @@ Table.prototype.import = function(source, metadata, callback) {
  *
  * There are more strict quota limits using this method so it is highly
  * recommended that you load data into BigQuery using
- * {module:bigquery/table#import} instead.
+ * {@link Table#import} instead.
  *
- * @resource [Tabledata: insertAll API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/tabledata/insertAll}
- * @resource [Troubleshooting Errors]{@link https://developers.google.com/bigquery/troubleshooting-errors}
+ * @see [Tabledata: insertAll API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/tabledata/insertAll}
+ * @see [Troubleshooting Errors]{@link https://developers.google.com/bigquery/troubleshooting-errors}
  *
- * @param {object|object[]} rows - The rows to insert into the table.
- * @param {object=} options - Configuration object.
- * @param {boolean} options.autoCreate - Automatically create the table if it
+ * @param {object|object[]} rows The rows to insert into the table.
+ * @param {object} [options] Configuration object.
+ * @param {boolean} [options.autoCreate] Automatically create the table if it
  *     doesn't already exist. In order for this to succeed the `schema` option
  *     must also be set. Note that this can take longer than 2 minutes to
  *     complete.
- * @param {boolean} options.ignoreUnknownValues - Accept rows that contain
+ * @param {boolean} [options.ignoreUnknownValues=false] Accept rows that contain
  *     values that do not match the schema. The unknown values are ignored.
- *     Default: `false`.
- * @param {boolean} options.raw - If `true`, the `rows` argument is expected to
+ * @param {boolean} [options.raw] If `true`, the `rows` argument is expected to
  *     be formatted as according to the
  *     [specification](https://cloud.google.com/bigquery/docs/reference/v2/tabledata/insertAll).
- * @param {string|object} options.schema - A comma-separated list of name:type
+ * @param {string|object} [options.schema] A comma-separated list of name:type
  *     pairs. Valid types are "string", "integer", "float", "boolean", and
  *     "timestamp". If the type is omitted, it is assumed to be "string".
  *     Example: "name:string, age:integer". Schemas can also be specified as a
  *     JSON array of fields, which allows for nested and repeated fields. See
  *     a [Table resource](http://goo.gl/sl8Dmg) for more detailed information.
- * @param {boolean} options.skipInvalidRows - Insert all valid rows of a
- *     request, even if invalid rows exist. Default: `false`.
- * @param {string} options.templateSuffix - Treat the destination table as a
+ * @param {boolean} [options.skipInvalidRows=false] Insert all valid rows of a
+ *     request, even if invalid rows exist.
+ * @param {string} [options.templateSuffix] Treat the destination table as a
  *     base template, and insert the rows into an instance table named
  *     "{destination}{templateSuffix}". BigQuery will manage creation of
  *     the instance table, using the schema of the base template table. See
  *     [Automatic table creation using template tables](https://cloud.google.com/bigquery/streaming-data-into-bigquery#template-tables)
  *     for considerations when working with templates tables.
- * @param {function} callback - The callback function.
- * @param {?error} callback.err - An error returned while making this request.
- * @param {object[]} callback.err.errors - If present, these represent partial
+ * @param {function} [callback] The callback function.
+ * @param {?error} callback.err An error returned while making this request.
+ * @param {object[]} callback.err.errors If present, these represent partial
  *     failures. It's possible for part of your request to be completed
  *     successfully, while the other part was not.
- * @param {object} callback.apiResponse - The full API response.
+ * @param {object} callback.apiResponse The full API response.
+ * @returns {Promise}
  *
  * @example
+ * const BigQuery = require('@google-cloud/bigquery');
+ * const bigquery = new BigQuery();
+ * const dataset = bigquery.dataset('my-dataset');
+ * const table = bigquery.table('my-table');
+ *
  * //-
  * // Insert a single row.
  * //-
@@ -1113,7 +1218,10 @@ Table.prototype.insert = function(rows, options, callback) {
 /**
  * Run a query scoped to your dataset.
  *
- * See {module:bigquery#query} for full documentation of this method.
+ * See {@link BigQuery#query} for full documentation of this method.
+ * @param {object} query See {@link BigQuery#query} for full documentation of this method.
+ * @param {function} [callback] See {@link BigQuery#query} for full documentation of this method.
+ * @returns {Promise}
  */
 Table.prototype.query = function(query, callback) {
   this.dataset.query(query, callback);
@@ -1122,25 +1230,31 @@ Table.prototype.query = function(query, callback) {
 /**
  * Set the metadata on the table.
  *
- * @resource [Tables: update API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/tables/update}
+ * @see [Tables: update API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/tables/update}
  *
- * @param {object} metadata - The metadata key/value object to set.
- * @param {string} metadata.description - A user-friendly description of the
+ * @param {object} metadata The metadata key/value object to set.
+ * @param {string} metadata.description A user-friendly description of the
  *     table.
- * @param {string} metadata.name - A descriptive name for the table.
- * @param {string|object} metadata.schema - A comma-separated list of name:type
+ * @param {string} metadata.name A descriptive name for the table.
+ * @param {string|object} metadata.schema A comma-separated list of name:type
  *     pairs. Valid types are "string", "integer", "float", "boolean", "bytes",
  *     "record", and "timestamp". If the type is omitted, it is assumed to be
  *     "string". Example: "name:string, age:integer". Schemas can also be
  *     specified as a JSON array of fields, which allows for nested and repeated
  *     fields. See a [Table resource](http://goo.gl/sl8Dmg) for more detailed
  *     information.
- * @param {function} callback - The callback function.
- * @param {?error} callback.err - An error returned while making this request.
- * @param {object} callback.apiResponse - The full API response.
+ * @param {function} [callback] The callback function.
+ * @param {?error} callback.err An error returned while making this request.
+ * @param {object} callback.apiResponse The full API response.
+ * @returns {Promise}
  *
  * @example
- * var metadata = {
+ * const BigQuery = require('@google-cloud/bigquery');
+ * const bigquery = new BigQuery();
+ * const dataset = bigquery.dataset('my-dataset');
+ * const table = bigquery.table('my-table');
+ *
+ * const metadata = {
  *   name: 'My recipes',
  *   description: 'A table for storing my recipes.',
  *   schema: 'name:string, servings:integer, cookingTime:float, quick:boolean'
@@ -1152,8 +1266,8 @@ Table.prototype.query = function(query, callback) {
  * // If the callback is omitted, we'll return a Promise.
  * //-
  * table.setMetadata(metadata).then(function(data) {
- *   var metadata = data[0];
- *   var apiResponse = data[1];
+ *   const metadata = data[0];
+ *   const apiResponse = data[1];
  * });
  */
 Table.prototype.setMetadata = function(metadata, callback) {
@@ -1165,21 +1279,27 @@ Table.prototype.setMetadata = function(metadata, callback) {
 /**
  * Copy data from one table to another, optionally creating that table.
  *
- * @resource [Jobs: insert API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert}
+ * @see [Jobs: insert API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert}
  *
- * @param {module:bigquery/table} destination - The destination table.
- * @param {object=} metadata - Metadata to set with the copy operation. The
+ * @param {Table} destination The destination table.
+ * @param {object} [metadata] Metadata to set with the copy operation. The
  *     metadata object should be in the format of the
  *     [`configuration.copy`](http://goo.gl/dKWIyS) property of a Jobs resource.
- * @param {function} callback - The callback function.
- * @param {?error} callback.err - An error returned while making this request
- * @param {module:bigquery/job} callback.job - The job used to copy your table.
- * @param {object} callback.apiResponse - The full API response.
+ * @param {function} [callback] The callback function.
+ * @param {?error} callback.err An error returned while making this request
+ * @param {Job} callback.job The job used to copy your table.
+ * @param {object} callback.apiResponse The full API response.
+ * @returns {Promise}
  *
  * @throws {Error} If a destination other than a Table object is provided.
  *
  * @example
- * var yourTable = dataset.table('your-table');
+ * const BigQuery = require('@google-cloud/bigquery');
+ * const bigquery = new BigQuery();
+ * const dataset = bigquery.dataset('my-dataset');
+ * const table = bigquery.table('my-table');
+ *
+ * const yourTable = dataset.table('your-table');
  * table.startCopy(yourTable, function(err, job, apiResponse) {
  *   // `job` is a Job object that can be used to check the status of the
  *   // request.
@@ -1189,7 +1309,7 @@ Table.prototype.setMetadata = function(metadata, callback) {
  * // See the <a href="http://goo.gl/dKWIyS">`configuration.copy`</a> object for
  * // all available options.
  * //-
- * var metadata = {
+ * const metadata = {
  *   createDisposition: 'CREATE_NEVER',
  *   writeDisposition: 'WRITE_TRUNCATE'
  * };
@@ -1200,8 +1320,8 @@ Table.prototype.setMetadata = function(metadata, callback) {
  * // If the callback is omitted, we'll return a Promise.
  * //-
  * table.startCopy(yourTable, metadata).then(function(data) {
- *   var job = data[0];
- *   var apiResponse = data[1];
+ *   const job = data[0];
+ *   const apiResponse = data[1];
  * });
  */
 Table.prototype.startCopy = function(destination, metadata, callback) {
@@ -1242,27 +1362,33 @@ Table.prototype.startCopy = function(destination, metadata, callback) {
 /**
  * Copy data from multiple tables into this table.
  *
- * @resource [Jobs: insert API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert}
+ * @see [Jobs: insert API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert}
  *
- * @param {module:bigquery/table|module:bigquery/table[]} sourceTables - The
+ * @param {Table|Table[]} sourceTables The
  *     source table(s) to copy data from.
- * @param {object=} metadata - Metadata to set with the copy operation. The
+ * @param {object} [metadata] Metadata to set with the copy operation. The
  *     metadata object should be in the format of the
  *     [`configuration.copy`](http://goo.gl/dKWIyS) property of a Jobs resource.
- * @param {function} callback - The callback function.
- * @param {?error} callback.err - An error returned while making this request
- * @param {module:bigquery/job} callback.job - The job used to copy your table.
- * @param {object} callback.apiResponse - The full API response.
+ * @param {function} [callback] The callback function.
+ * @param {?error} callback.err An error returned while making this request
+ * @param {Job} callback.job The job used to copy your table.
+ * @param {object} callback.apiResponse The full API response.
+ * @returns {Promise}
  *
  * @throws {Error} If a source other than a Table object is provided.
  *
  * @example
- * var sourceTables = [
+ * const BigQuery = require('@google-cloud/bigquery');
+ * const bigquery = new BigQuery();
+ * const dataset = bigquery.dataset('my-dataset');
+ * const table = bigquery.table('my-table');
+ *
+ * const sourceTables = [
  *   dataset.table('your-table'),
  *   dataset.table('your-second-table')
  * ];
  *
- * var callback = function(err, job, apiResponse) {
+ * const callback = function(err, job, apiResponse) {
  *   // `job` is a Job object that can be used to check the status of the
  *   // request.
  * };
@@ -1273,7 +1399,7 @@ Table.prototype.startCopy = function(destination, metadata, callback) {
  * // See the <a href="http://goo.gl/dKWIyS">`configuration.copy`</a> object for
  * // all available options.
  * //-
- * var metadata = {
+ * const metadata = {
  *   createDisposition: 'CREATE_NEVER',
  *   writeDisposition: 'WRITE_TRUNCATE'
  * };
@@ -1284,8 +1410,8 @@ Table.prototype.startCopy = function(destination, metadata, callback) {
  * // If the callback is omitted, we'll return a Promise.
  * //-
  * table.startCopyFrom(sourceTables, metadata).then(function(data) {
- *   var job = data[0];
- *   var apiResponse = data[1];
+ *   const job = data[0];
+ *   const apiResponse = data[1];
  * });
  */
 Table.prototype.startCopyFrom = function(sourceTables, metadata, callback) {
@@ -1333,10 +1459,10 @@ Table.prototype.startCopyFrom = function(sourceTables, metadata, callback) {
 /**
  * Export table to Cloud Storage.
  *
- * @resource [Jobs: insert API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert}
+ * @see [Jobs: insert API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert}
  *
- * @param {module:storage/file} destination - Where the file should be exported
- *     to.
+ * @param {string|File} destination Where the file should be exported
+ *     to. A string or a {@link https://cloud.google.com/nodejs/docs/reference/storage/latest/File File} object.
  * @param {object=} options - The configuration object.
  * @param {string} options.format - The format to export the data in. Allowed
  *     options are "CSV", "JSON", or "AVRO". Default: "CSV".
@@ -1344,20 +1470,26 @@ Table.prototype.startCopyFrom = function(sourceTables, metadata, callback) {
  *     with GZIP. Default: false.
  * @param {function} callback - The callback function.
  * @param {?error} callback.err - An error returned while making this request
- * @param {module:bigquery/job} callback.job - The job used to export the table.
+ * @param {Job} callback.job - The job used to export the table.
  * @param {object} callback.apiResponse - The full API response.
  *
  * @throws {Error} If destination isn't a File object.
  * @throws {Error} If destination format isn't recongized.
  *
  * @example
- * var gcs = require('@google-cloud/storage')({
+ * const Storage = require('@google-cloud/storage');
+ * const BigQuery = require('@google-cloud/bigquery');
+ * const bigquery = new BigQuery();
+ * const dataset = bigquery.dataset('my-dataset');
+ * const table = bigquery.table('my-table');
+ *
+ * const storage = new Storage({
  *   projectId: 'grape-spaceship-123'
  * });
- * var exportedFile = gcs.bucket('institutions').file('2014.csv');
+ * const exportedFile = storage.bucket('institutions').file('2014.csv');
  *
  * //-
- * // To use the default options, just pass a {module:storage/file} object.
+ * // To use the default options, just pass a {@link https://cloud.google.com/nodejs/docs/reference/storage/latest/File File} object.
  * //
  * // Note: The exported format type will be inferred by the file's extension.
  * // If you wish to override this, or provide an array of destination files,
@@ -1371,7 +1503,7 @@ Table.prototype.startCopyFrom = function(sourceTables, metadata, callback) {
  * //-
  * // If you need more customization, pass an `options` object.
  * //-
- * var options = {
+ * const options = {
  *   format: 'json',
  *   gzip: true
  * };
@@ -1382,16 +1514,16 @@ Table.prototype.startCopyFrom = function(sourceTables, metadata, callback) {
  * // You can also specify multiple destination files.
  * //-
  * table.startExport([
- *   gcs.bucket('institutions').file('2014.json'),
- *   gcs.bucket('institutions-copy').file('2014.json')
+ *   storage.bucket('institutions').file('2014.json'),
+ *   storage.bucket('institutions-copy').file('2014.json')
  * ], options, function(err, job, apiResponse) {});
  *
  * //-
  * // If the callback is omitted, we'll return a Promise.
  * //-
  * table.startExport(exportedFile, options).then(function(data) {
- *   var job = data[0];
- *   var apiResponse = data[1];
+ *   const job = data[0];
+ *   const apiResponse = data[1];
  * });
  */
 Table.prototype.startExport = function(destination, options, callback) {
@@ -1457,35 +1589,43 @@ Table.prototype.startExport = function(destination, options, callback) {
 };
 
 /**
- * Load data from a local file or Storage file ({module:storage/file}).
+ * Load data from a local file or Storage {@link https://cloud.google.com/nodejs/docs/reference/storage/latest/File File}.
  *
  * By loading data this way, you create a load job that will run your data load
  * asynchronously. If you would like instantaneous access to your data, insert
- * it using {module:bigquery/table#insert}.
+ * it using {@liink Table#insert}.
  *
  * Note: The file type will be inferred by the given file's extension. If you
  * wish to override this, you must provide `metadata.format`.
  *
- * @resource [Jobs: insert API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert}
+ * @see [Jobs: insert API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert}
  *
- * @param {string|module:storage/file} source - The source file to import.
- * @param {object=} metadata - Metadata to set with the load operation. The
+ * @param {string|File} source The source file to import. A string or a
+ *     {@link https://cloud.google.com/nodejs/docs/reference/storage/latest/File File} object.
+ * @param {object} [metadata] Metadata to set with the load operation. The
  *     metadata object should be in the format of the
  *     [`configuration.load`](http://goo.gl/BVcXk4) property of a Jobs resource.
- * @param {string} metadata.format - The format the data being imported is in.
+ * @param {string} [metadata.format] The format the data being imported is in.
  *     Allowed options are "CSV", "JSON", or "AVRO".
- * @param {function} callback - The callback function.
- * @param {?error} callback.err - An error returned while making this request
- * @param {module:bigquery/job} callback.job - The job used to import your data.
- * @param {object} callback.apiResponse - The full API response.
+ * @param {function} [callback] The callback function.
+ * @param {?error} callback.err An error returned while making this request
+ * @param {Job} callback.job The job used to import your data.
+ * @param {object} callback.apiResponse The full API response.
+ * @returns {Promise}
  *
  * @throws {Error} If the source isn't a string file name or a File instance.
  *
  * @example
+ * const Storage = require('@google-cloud/storage');
+ * const BigQuery = require('@google-cloud/bigquery');
+ * const bigquery = new BigQuery();
+ * const dataset = bigquery.dataset('my-dataset');
+ * const table = bigquery.table('my-table');
+ *
  * //-
  * // Load data from a local file.
  * //-
- * var callback = function(err, job, apiResponse) {
+ * const callback = function(err, job, apiResponse) {
  *   // `job` is a Job object that can be used to check the status of the
  *   // request.
  * };
@@ -1496,7 +1636,7 @@ Table.prototype.startExport = function(destination, options, callback) {
  * // You may also pass in metadata in the format of a Jobs resource. See
  * // (http://goo.gl/BVcXk4) for a full list of supported values.
  * //-
- * var metadata = {
+ * const metadata = {
  *   encoding: 'ISO-8859-1',
  *   sourceFormat: 'NEWLINE_DELIMITED_JSON'
  * };
@@ -1506,26 +1646,26 @@ Table.prototype.startExport = function(destination, options, callback) {
  * //-
  * // Load data from a file in your Cloud Storage bucket.
  * //-
- * var gcs = require('@google-cloud/storage')({
+ * const storage = new Storage({
  *   projectId: 'grape-spaceship-123'
  * });
- * var data = gcs.bucket('institutions').file('data.csv');
+ * const data = storage.bucket('institutions').file('data.csv');
  * table.startImport(data, callback);
  *
  * //-
  * // Load data from multiple files in your Cloud Storage bucket(s).
  * //-
  * table.startImport([
- *   gcs.bucket('institutions').file('2011.csv'),
- *   gcs.bucket('institutions').file('2012.csv')
+ *   storage.bucket('institutions').file('2011.csv'),
+ *   storage.bucket('institutions').file('2012.csv')
  * ], callback);
  *
  * //-
  * // If the callback is omitted, we'll return a Promise.
  * //-
  * table.startImport(data).then(function(data) {
- *   var job = data[0];
- *   var apiResponse = data[1];
+ *   const job = data[0];
+ *   const apiResponse = data[1];
  * });
  */
 Table.prototype.startImport = function(source, metadata, callback) {
@@ -1613,7 +1753,7 @@ Table.prototype.startImport = function(source, metadata, callback) {
 /**
  * Start running a query scoped to your dataset.
  *
- * See {module:bigquery#startQuery} for full documentation of this method.
+ * See {@link BigQuery#startQuery} for full documentation of this method.
  */
 Table.prototype.startQuery = function(options, callback) {
   return this.dataset.startQuery(options, callback);
@@ -1632,4 +1772,9 @@ common.paginator.extend(Table, ['getRows']);
  */
 common.util.promisifyAll(Table);
 
+/**
+ * Reference to the {@link Table} class.
+ * @name module:@google-cloud/bigquery.Table
+ * @see Table
+ */
 module.exports = Table;

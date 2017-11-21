@@ -20,20 +20,16 @@ function createTable(datasetId, tableId, schema, projectId) {
   // Imports the Google Cloud client library
   const BigQuery = require('@google-cloud/bigquery');
 
-  // The project ID to use, e.g. "your-project-id"
+  /**
+   * TODO(developer): Uncomment the following lines before running the sample.
+   */
   // const projectId = "your-project-id";
-
-  // The ID of the dataset in which to create the table, e.g. "my_dataset"
   // const datasetId = "my_new_dataset";
-
-  // The ID for the new table, e.g. "my_new_table"
   // const tableId = "my_new_table";
-
-  // The schema of the new table, e.g. "Name:string, Age:integer, Weight:float, IsMagic:boolean"
   // const schema = "Name:string, Age:integer, Weight:float, IsMagic:boolean";
 
-  // Instantiates a client
-  const bigquery = BigQuery({
+  // Creates a client
+  const bigquery = new BigQuery({
     projectId: projectId,
   });
 
@@ -61,17 +57,15 @@ function deleteTable(datasetId, tableId, projectId) {
   // Imports the Google Cloud client library
   const BigQuery = require('@google-cloud/bigquery');
 
-  // The project ID to use, e.g. "your-project-id"
+  /**
+   * TODO(developer): Uncomment the following lines before running the sample.
+   */
   // const projectId = "your-project-id";
-
-  // The ID of the dataset of the table to delete, e.g. "my_dataset"
   // const datasetId = "my_dataset";
-
-  // The ID of the table to delete, e.g. "my_table"
   // const tableId = "my_table";
 
-  // Instantiates a client
-  const bigquery = BigQuery({
+  // Creates a client
+  const bigquery = new BigQuery({
     projectId: projectId,
   });
 
@@ -94,14 +88,14 @@ function listTables(datasetId, projectId) {
   // Imports the Google Cloud client library
   const BigQuery = require('@google-cloud/bigquery');
 
-  // The project ID to use, e.g. "your-project-id"
+  /**
+   * TODO(developer): Uncomment the following lines before running the sample.
+   */
   // const projectId = "your-project-id";
-
-  // The ID of the dataset to list tables in, e.g. "my_dataset"
   // const datasetId = "my_dataset";
 
-  // Instantiates a client
-  const bigquery = BigQuery({
+  // Creates a client
+  const bigquery = new BigQuery({
     projectId: projectId,
   });
 
@@ -125,17 +119,15 @@ function browseRows(datasetId, tableId, projectId) {
   // Imports the Google Cloud client library
   const BigQuery = require('@google-cloud/bigquery');
 
-  // The project ID to use, e.g. "your-project-id"
+  /**
+   * TODO(developer): Uncomment the following lines before running the sample.
+   */
   // const projectId = "your-project-id";
-
-  // The ID of the dataset of the table to browse, e.g. "my_dataset"
   // const datasetId = "my_dataset";
-
-  // The ID of the table to browse, e.g. "my_table"
   // const tableId = "my_table";
 
-  // Instantiates a client
-  const bigquery = BigQuery({
+  // Creates a client
+  const bigquery = new BigQuery({
     projectId: projectId,
   });
 
@@ -166,23 +158,17 @@ function copyTable(
   // Imports the Google Cloud client library
   const BigQuery = require('@google-cloud/bigquery');
 
-  // The project ID to use, e.g. "your-project-id"
+  /**
+   * TODO(developer): Uncomment the following lines before running the sample.
+   */
   // const projectId = "your-project-id";
-
-  // The ID of the dataset of the table to copy, e.g. "my_src_dataset"
   // const srcDatasetId = "my_src_dataset";
-
-  // The ID of the table to copy, e.g. "my_src_table"
   // const srcTableId = "my_src_table";
-
-  // The ID of the destination dataset, e.g. "my_dest_dataset"
   // const destDatasetId = "my_dest_dataset";
-
-  // The ID of the destination table, e.g. "my_dest_table"
   // const destTableId = "my_dest_table";
 
-  // Instantiates a client
-  const bigquery = BigQuery({
+  // Creates a client
+  const bigquery = new BigQuery({
     projectId: projectId,
   });
 
@@ -221,20 +207,16 @@ function importLocalFile(datasetId, tableId, filename, projectId) {
   // Imports the Google Cloud client library
   const BigQuery = require('@google-cloud/bigquery');
 
-  // The project ID to use, e.g. "your-project-id"
+  /**
+   * TODO(developer): Uncomment the following lines before running the sample.
+   */
   // const projectId = "your-project-id";
-
-  // The name of the file from which data should be imported, e.g. "/path/to/file.csv"
   // const filename = "/path/to/file.csv";
-
-  // The ID of the dataset of the table into which data should be imported, e.g. "my_dataset"
   // const datasetId = "my_dataset";
-
-  // The ID of the table into which data should be imported, e.g. "my_table"
   // const tableId = "my_table";
 
-  // Instantiates a client
-  const bigquery = BigQuery({
+  // Creates a client
+  const bigquery = new BigQuery({
     projectId: projectId,
   });
 
@@ -280,23 +262,17 @@ function importFileFromGCS(
   const BigQuery = require('@google-cloud/bigquery');
   const Storage = require('@google-cloud/storage');
 
-  // The project ID to use, e.g. "your-project-id"
+  /**
+   * TODO(developer): Uncomment the following lines before running the sample.
+   */
   // const projectId = "your-project-id";
-
-  // The ID of the dataset of the table into which data should be imported, e.g. "my_dataset"
   // const datasetId = "my_dataset";
-
-  // The ID of the table into which data should be imported, e.g. "my_table"
   // const tableId = "my_table";
-
-  // The name of the Google Cloud Storage bucket where the file is located, e.g. "my-bucket"
   // const bucketName = "my-bucket";
-
-  // The name of the file from which data should be imported, e.g. "file.csv"
   // const filename = "file.csv";
 
   // Instantiates clients
-  const bigquery = BigQuery({
+  const bigquery = new BigQuery({
     projectId: projectId,
   });
 
@@ -340,23 +316,17 @@ function exportTableToGCS(datasetId, tableId, bucketName, filename, projectId) {
   const BigQuery = require('@google-cloud/bigquery');
   const Storage = require('@google-cloud/storage');
 
-  // The project ID to use, e.g. "your-project-id"
+  /**
+   * TODO(developer): Uncomment the following lines before running the sample.
+   */
   // const projectId = "your-project-id";
-
-  // The ID of the dataset of the table into which data should be imported, e.g. "my_dataset"
   // const datasetId = "my_dataset";
-
-  // The ID of the table into which data should be imported, e.g. "my_table"
   // const tableId = "my_table";
-
-  // The name of the Google Cloud Storage bucket where the file is located, e.g. "my-bucket"
   // const bucketName = "my-bucket";
-
-  // The name of the file from which data should be imported, e.g. "file.csv"
   // const filename = "file.csv";
 
   // Instantiates clients
-  const bigquery = BigQuery({
+  const bigquery = new BigQuery({
     projectId: projectId,
   });
 
@@ -399,21 +369,16 @@ function insertRowsAsStream(datasetId, tableId, rows, projectId) {
   // Imports the Google Cloud client library
   const BigQuery = require('@google-cloud/bigquery');
 
-  // The project ID to use, e.g. "your-project-id"
+  /**
+   * TODO(developer): Uncomment the following lines before running the sample.
+   */
   // const projectId = "your-project-id";
-
-  // The ID of the dataset of the table into which data should be inserted, e.g. "my_dataset"
   // const datasetId = "my_dataset";
-
-  // The ID of the table into which data should be inserted, e.g. "my_table"
   // const tableId = "my_table";
-
-  // The rows to insert into the table
-  // Customize this object to match your table's schema
   // const rows = [{name: "Tom", age: 30}, {name: "Jane", age: 32}];
 
-  // Instantiates a client
-  const bigquery = BigQuery({
+  // Creates a client
+  const bigquery = new BigQuery({
     projectId: projectId,
   });
 
@@ -439,34 +404,34 @@ function insertRowsAsStream(datasetId, tableId, rows, projectId) {
 
 const fs = require(`fs`);
 
-const cli = require(`yargs`)
+require(`yargs`)
   .demand(1)
-  .options({
-    projectId: {
-      alias: 'p',
-      default: process.env.GCLOUD_PROJECT || process.env.GOOGLE_CLOUD_PROJECT,
-      description:
-        'The Project ID to use. Defaults to the value of the GCLOUD_PROJECT or GOOGLE_CLOUD_PROJECT environment variables.',
-      requiresArg: true,
-      type: 'string',
-    },
-  })
   .command(
-    `create <datasetId> <tableId> <schema>`,
+    `create <projectId> <datasetId> <tableId> <schema>`,
     `Creates a new table.`,
     {},
     opts => {
       createTable(opts.datasetId, opts.tableId, opts.schema, opts.projectId);
     }
   )
-  .command(`list <datasetId>`, `Lists all tables in a dataset.`, {}, opts => {
-    listTables(opts.datasetId, opts.projectId);
-  })
-  .command(`delete <datasetId> <tableId>`, `Deletes a table.`, {}, opts => {
-    deleteTable(opts.datasetId, opts.tableId, opts.projectId);
-  })
   .command(
-    `copy <srcDatasetId> <srcTableId> <destDatasetId> <destTableId>`,
+    `list <projectId> <datasetId>`,
+    `Lists all tables in a dataset.`,
+    {},
+    opts => {
+      listTables(opts.datasetId, opts.projectId);
+    }
+  )
+  .command(
+    `delete <projectId> <datasetId> <tableId>`,
+    `Deletes a table.`,
+    {},
+    opts => {
+      deleteTable(opts.datasetId, opts.tableId, opts.projectId);
+    }
+  )
+  .command(
+    `copy <projectId> <srcDatasetId> <srcTableId> <destDatasetId> <destTableId>`,
     `Makes a copy of a table.`,
     {},
     opts => {
@@ -480,7 +445,7 @@ const cli = require(`yargs`)
     }
   )
   .command(
-    `browse <datasetId> <tableId>`,
+    `browse <projectId> <datasetId> <tableId>`,
     `Lists rows in a table.`,
     {},
     opts => {
@@ -488,7 +453,7 @@ const cli = require(`yargs`)
     }
   )
   .command(
-    `import <datasetId> <tableId> <fileName>`,
+    `import <projectId> <datasetId> <tableId> <fileName>`,
     `Imports data from a local file into a table.`,
     {},
     opts => {
@@ -501,7 +466,7 @@ const cli = require(`yargs`)
     }
   )
   .command(
-    `import-gcs <datasetId> <tableId> <bucketName> <fileName>`,
+    `import-gcs <projectId> <datasetId> <tableId> <bucketName> <fileName>`,
     `Imports data from a Google Cloud Storage file into a table.`,
     {},
     opts => {
@@ -515,7 +480,7 @@ const cli = require(`yargs`)
     }
   )
   .command(
-    `export <datasetId> <tableId> <bucketName> <fileName>`,
+    `export <projectId> <datasetId> <tableId> <bucketName> <fileName>`,
     `Export a table from BigQuery to Google Cloud Storage.`,
     {},
     opts => {
@@ -529,7 +494,7 @@ const cli = require(`yargs`)
     }
   )
   .command(
-    `insert <datasetId> <tableId> <json_or_file>`,
+    `insert <projectId> <datasetId> <tableId> <json_or_file>`,
     `Insert a JSON array (as a string or newline-delimited file) into a BigQuery table.`,
     {},
     opts => {
@@ -564,52 +529,51 @@ const cli = require(`yargs`)
     }
   )
   .example(
-    `node $0 create my_dataset my_table "Name:string, Age:integer, Weight:float, IsMagic:boolean"`,
+    `node $0 create my-project-id my_dataset my_table "Name:string, Age:integer, Weight:float, IsMagic:boolean"`,
     `Creates a new table named "my_table" in "my_dataset".`
   )
-  .example(`node $0 list my_dataset`, `Lists tables in "my_dataset".`)
   .example(
-    `node $0 browse my_dataset my_table`,
+    `node $0 list my-project-id my_dataset`,
+    `Lists tables in "my_dataset".`
+  )
+  .example(
+    `node $0 browse my-project-id my_dataset my_table`,
     `Displays rows from "my_table" in "my_dataset".`
   )
   .example(
-    `node $0 delete my_dataset my_table`,
+    `node $0 delete my-project-id my_dataset my_table`,
     `Deletes "my_table" from "my_dataset".`
   )
   .example(
-    `node $0 import my_dataset my_table ./data.csv`,
+    `node $0 import my-project-id my_dataset my_table ./data.csv`,
     `Imports a local file into a table.`
   )
   .example(
-    `node $0 import-gcs my_dataset my_table my-bucket data.csv`,
+    `node $0 import-gcs my-project-id my_dataset my_table my-bucket data.csv`,
     `Imports a GCS file into a table.`
   )
   .example(
-    `node $0 export my_dataset my_table my-bucket my-file`,
+    `node $0 export my-project-id my_dataset my_table my-bucket my-file`,
     `Exports my_dataset:my_table to gcs://my-bucket/my-file as raw CSV.`
   )
   .example(
-    `node $0 export my_dataset my_table my-bucket my-file -f JSON --gzip`,
+    `node $0 export my-project-id my_dataset my_table my-bucket my-file -f JSON --gzip`,
     `Exports my_dataset:my_table to gcs://my-bucket/my-file as gzipped JSON.`
   )
   .example(
-    `node $0 insert my_dataset my_table json_string`,
+    `node $0 insert my-project-id my_dataset my_table json_string`,
     `Inserts the JSON array represented by json_string into my_dataset:my_table.`
   )
   .example(
-    `node $0 insert my_dataset my_table json_file`,
+    `node $0 insert my-project-id my_dataset my_table json_file`,
     `Inserts the JSON objects contained in json_file (one per line) into my_dataset:my_table.`
   )
   .example(
-    `node $0 copy src_dataset src_table dest_dataset dest_table`,
+    `node $0 copy my-project-id src_dataset src_table dest_dataset dest_table`,
     `Copies src_dataset:src_table to dest_dataset:dest_table.`
   )
   .wrap(120)
   .recommendCommands()
   .epilogue(`For more information, see https://cloud.google.com/bigquery/docs`)
   .help()
-  .strict();
-
-if (module === require.main) {
-  cli.parse(process.argv.slice(2));
-}
+  .strict().argv;

@@ -14,10 +14,6 @@
  * limitations under the License.
  */
 
-/*!
- * @module bigquery/dataset
- */
-
 'use strict';
 
 var common = require('@google-cloud/common');
@@ -25,33 +21,38 @@ var extend = require('extend');
 var is = require('is');
 var util = require('util');
 
-/**
- * @type {module:bigquery/table}
- * @private
- */
 var Table = require('./table.js');
 
-/*! Developer Documentation
- *
- * @param {module:bigquery} bigQuery - BigQuery instance.
- * @param {string} id - The ID of the Dataset.
- */
 /**
  * Interact with your BigQuery dataset. Create a Dataset instance with
- * {module:bigquery#createDataset} or {module:bigquery#dataset}.
+ * {@link BigQuery#createDataset} or {@link BigQuery#dataset}.
  *
- * @alias module:bigquery/dataset
- * @constructor
+ * @class
+ * @param {BigQuery} bigQuery {@link BigQuery} instance.
+ * @param {string} id The ID of the Dataset.
  *
  * @example
- * var dataset = bigquery.dataset('institutions');
+ * const BigQuery = require('@google-cloud/bigquery');
+ * const bigquery = new BigQuery();
+ * const dataset = bigquery.dataset('institutions');
  */
 function Dataset(bigQuery, id) {
   var methods = {
     /**
      * Create a dataset.
      *
+     * @method Dataset#create
+     * @param {function} [callback] The callback function.
+     * @param {?error} callback.err An error returned while making this
+     *     request.
+     * @param {Dataset} callback.dataset The created dataset.
+     * @param {object} callback.apiResponse The full API response.
+     * @returns {Promise}
+     *
      * @example
+     * const BigQuery = require('@google-cloud/bigquery');
+     * const bigquery = new BigQuery();
+     * const dataset = bigquery.dataset('institutions');
      * dataset.create(function(err, dataset, apiResponse) {
      *   if (!err) {
      *     // The dataset was created successfully.
@@ -62,8 +63,8 @@ function Dataset(bigQuery, id) {
      * // If the callback is omitted, we'll return a Promise.
      * //-
      * dataset.create().then(function(data) {
-     *   var dataset = data[0];
-     *   var apiResponse = data[1];
+     *   const dataset = data[0];
+     *   const apiResponse = data[1];
      * });
      */
     create: true,
@@ -71,19 +72,24 @@ function Dataset(bigQuery, id) {
     /**
      * Check if the dataset exists.
      *
-     * @param {function} callback - The callback function.
-     * @param {?error} callback.err - An error returned while making this
+     * @method Dataset#exists
+     * @param {function} [callback] The callback function.
+     * @param {?error} callback.err An error returned while making this
      *     request.
-     * @param {boolean} callback.exists - Whether the dataset exists or not.
+     * @param {boolean} callback.exists Whether the dataset exists or not.
+     * @returns {Promise}
      *
      * @example
+     * const BigQuery = require('@google-cloud/bigquery');
+     * const bigquery = new BigQuery();
+     * const dataset = bigquery.dataset('institutions');
      * dataset.exists(function(err, exists) {});
      *
      * //-
      * // If the callback is omitted, we'll return a Promise.
      * //-
      * dataset.exists().then(function(data) {
-     *   var exists = data[0];
+     *   const exists = data[0];
      * });
      */
     exists: true,
@@ -96,11 +102,20 @@ function Dataset(bigQuery, id) {
      * normally required for the `create` method must be contained within this
      * object as well.
      *
-     * @param {options=} options - Configuration object.
-     * @param {boolean} options.autoCreate - Automatically create the object if
-     *     it does not exist. Default: `false`
+     * @method Dataset#get
+     * @param {options} [options] Configuration object.
+     * @param {boolean} [options.autoCreate=false] Automatically create the
+     *     object if it does not exist.
+     * @param {function} [callback] The callback function.
+     * @param {?error} callback.err An error returned while making this
+     *     request.
+     * @param {Dataset} callback.dataset The dataset.
+     * @returns {Promise}
      *
      * @example
+     * const BigQuery = require('@google-cloud/bigquery');
+     * const bigquery = new BigQuery();
+     * const dataset = bigquery.dataset('institutions');
      * dataset.get(function(err, dataset, apiResponse) {
      *   if (!err) {
      *     // `dataset.metadata` has been populated.
@@ -111,8 +126,8 @@ function Dataset(bigQuery, id) {
      * // If the callback is omitted, we'll return a Promise.
      * //-
      * dataset.get().then(function(data) {
-     *   var dataset = data[0];
-     *   var apiResponse = data[1];
+     *   const dataset = data[0];
+     *   const apiResponse = data[1];
      * });
      */
     get: true,
@@ -120,23 +135,28 @@ function Dataset(bigQuery, id) {
     /**
      * Get the metadata for the Dataset.
      *
-     * @resource [Datasets: get API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/datasets/get}
+     * @see [Datasets: get API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/datasets/get}
      *
-     * @param {function} callback - The callback function.
-     * @param {?error} callback.err - An error returned while making this
+     * @method Dataset#getMetadata
+     * @param {function} [callback] The callback function.
+     * @param {?error} callback.err An error returned while making this
      *     request.
-     * @param {object} callback.metadata - The dataset's metadata.
-     * @param {object} callback.apiResponse - The full API response.
+     * @param {object} callback.metadata The dataset's metadata.
+     * @param {object} callback.apiResponse The full API response.
+     * @returns {Promise}
      *
      * @example
+     * const BigQuery = require('@google-cloud/bigquery');
+     * const bigquery = new BigQuery();
+     * const dataset = bigquery.dataset('institutions');
      * dataset.getMetadata(function(err, metadata, apiResponse) {});
      *
      * //-
      * // If the callback is omitted, we'll return a Promise.
      * //-
      * dataset.getMetadata().then(function(data) {
-     *   var metadata = data[0];
-     *   var apiResponse = data[1];
+     *   const metadata = data[0];
+     *   const apiResponse = data[1];
      * });
      */
     getMetadata: true,
@@ -144,16 +164,22 @@ function Dataset(bigQuery, id) {
     /**
      * Sets the metadata of the Dataset object.
      *
-     * @resource [Datasets: patch API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/datasets/patch}
+     * @see [Datasets: patch API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/datasets/patch}
      *
-     * @param {object} metadata - Metadata to save on the Dataset.
-     * @param {function} callback - The callback function.
-     * @param {?error} callback.err - An error returned while making this
+     * @method Dataset#setMetadata
+     * @param {object} metadata Metadata to save on the Dataset.
+     * @param {function} [callback] The callback function.
+     * @param {?error} callback.err An error returned while making this
      *     request.
-     * @param {object} callback.apiResponse - The full API response.
+     * @param {object} callback.apiResponse The full API response.
+     * @returns {Promise}
      *
      * @example
-     * var metadata = {
+     * const BigQuery = require('@google-cloud/bigquery');
+     * const bigquery = new BigQuery();
+     * const dataset = bigquery.dataset('institutions');
+     *
+     * const metadata = {
      *   description: 'Info for every institution in the 2013 IPEDS universe'
      * };
      *
@@ -163,7 +189,7 @@ function Dataset(bigQuery, id) {
      * // If the callback is omitted, we'll return a Promise.
      * //-
      * dataset.setMetadata(metadata).then(function(data) {
-     *   var apiResponse = data[0];
+     *   const apiResponse = data[0];
      * });
      */
     setMetadata: true,
@@ -198,8 +224,12 @@ util.inherits(Dataset, common.ServiceObject);
 /**
  * Run a query scoped to your dataset as a readable object stream.
  *
- * See {module:bigquery#createQueryStream} for full documentation of this
+ * See {@link BigQuery#createQueryStream} for full documentation of this
  * method.
+ *
+ * @param {object} options See {@link BigQuery#createQueryStream} for full
+ *     documentation of this method.
+ * @returns {stream}
  */
 Dataset.prototype.createQueryStream = function(options) {
   if (is.string(options)) {
@@ -220,26 +250,31 @@ Dataset.prototype.createQueryStream = function(options) {
 /**
  * Create a table given a tableId or configuration object.
  *
- * @resource [Tables: insert API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/tables/insert}
+ * @see [Tables: insert API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/tables/insert}
  *
- * @param {string} id - Table id.
- * @param {object=} options - See a
+ * @param {string} id Table id.
+ * @param {object} [options] See a
  *     [Table resource](https://cloud.google.com/bigquery/docs/reference/v2/tables#resource).
- * @param {string|object} options.schema - A comma-separated list of name:type
+ * @param {string|object} [options.schema] A comma-separated list of name:type
  *     pairs. Valid types are "string", "integer", "float", "boolean", and
  *     "timestamp". If the type is omitted, it is assumed to be "string".
  *     Example: "name:string, age:integer". Schemas can also be specified as a
  *     JSON array of fields, which allows for nested and repeated fields. See
  *     a [Table resource](http://goo.gl/sl8Dmg) for more detailed information.
- * @param {function} callback - The callback function.
- * @param {?error} callback.err - An error returned while making this request
- * @param {module:bigquery/table} callback.table - The newly created table.
- * @param {object} callback.apiResponse - The full API response.
+ * @param {function} [callback] The callback function.
+ * @param {?error} callback.err An error returned while making this request
+ * @param {Table} callback.table The newly created table.
+ * @param {object} callback.apiResponse The full API response.
+ * @returns {Promise}
  *
  * @example
- * var tableId = 'institution_data';
+ * const BigQuery = require('@google-cloud/bigquery');
+ * const bigquery = new BigQuery();
+ * const dataset = bigquery.dataset('institutions');
  *
- * var options = {
+ * const tableId = 'institution_data';
+ *
+ * const options = {
  *   // From the data.gov CSV dataset (http://goo.gl/kSE7z6):
  *   schema: 'UNITID,INSTNM,ADDR,CITY,STABBR,ZIP,FIPS,OBEREG,CHFNM,...'
  * };
@@ -250,8 +285,8 @@ Dataset.prototype.createQueryStream = function(options) {
  * // If the callback is omitted, we'll return a Promise.
  * //-
  * dataset.createTable(tableId, options).then(function(data) {
- *   var table = data[0];
- *   var apiResponse = data[1];
+ *   const table = data[0];
+ *   const apiResponse = data[1];
  * });
  */
 Dataset.prototype.createTable = function(id, options, callback) {
@@ -293,16 +328,20 @@ Dataset.prototype.createTable = function(id, options, callback) {
 /**
  * Delete the dataset.
  *
- * @resource [Datasets: delete API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/datasets/delete}
+ * @see [Datasets: delete API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/datasets/delete}
  *
- * @param {object=} options - The configuration object.
- * @param {boolean} options.force - Force delete dataset and all tables.
- *     Default: false.
- * @param {function} callback - The callback function.
- * @param {?error} callback.err - An error returned while making this request
- * @param {object} callback.apiResponse - The full API response.
+ * @param {object} [options] The configuration object.
+ * @param {boolean} [options.force=false] Force delete dataset and all tables.
+ * @param {function} [callback] The callback function.
+ * @param {?error} callback.err An error returned while making this request
+ * @param {object} callback.apiResponse The full API response.
+ * @returns {Promise}
  *
  * @example
+ * const BigQuery = require('@google-cloud/bigquery');
+ * const bigquery = new BigQuery();
+ * const dataset = bigquery.dataset('institutions');
+ *
  * //-
  * // Delete the dataset, only if it does not have any tables.
  * //-
@@ -343,21 +382,25 @@ Dataset.prototype.delete = function(options, callback) {
 /**
  * Get a list of tables.
  *
- * @resource [Tables: list API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/tables/list}
+ * @see [Tables: list API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/tables/list}
  *
- * @param {object=} query - Configuration object.
- * @param {boolean} query.autoPaginate - Have pagination handled automatically.
- *     Default: true.
- * @param {number} query.maxApiCalls - Maximum number of API calls to make.
- * @param {number} query.maxResults - Maximum number of results to return.
- * @param {string} query.pageToken - Token returned from a previous call, to
+ * @param {object} [query] Configuration object.
+ * @param {boolean} [query.autoPaginate=true] Have pagination handled automatically.
+ * @param {number} [query.maxApiCalls] Maximum number of API calls to make.
+ * @param {number} [query.maxResults] Maximum number of results to return.
+ * @param {string} [query.pageToken] Token returned from a previous call, to
  *     request the next page of results.
- * @param {function} callback - The callback function.
- * @param {?error} callback.err - An error returned while making this request
- * @param {module:bigquery/table[]} callback.tables - The list of tables from
+ * @param {function} [callback] The callback function.
+ * @param {?error} callback.err An error returned while making this request
+ * @param {Table[]} callback.tables The list of tables from
  *     your Dataset.
+ * @returns {Promise}
  *
  * @example
+ * const BigQuery = require('@google-cloud/bigquery');
+ * const bigquery = new BigQuery();
+ * const dataset = bigquery.dataset('institutions');
+ *
  * dataset.getTables(function(err, tables) {
  *   // tables is an array of `Table` objects.
  * });
@@ -427,11 +470,15 @@ Dataset.prototype.getTables = function(query, callback) {
  * List all or some of the {module:bigquery/table} objects in your project as a
  * readable object stream.
  *
- * @param {object=} query - Configuration object. See
- *     {module:bigquery/dataset#getTables} for a complete list of options.
+ * @param {object} [query] Configuration object. See
+ *     {@link Dataset#getTables} for a complete list of options.
  * @return {stream}
  *
  * @example
+ * const BigQuery = require('@google-cloud/bigquery');
+ * const bigquery = new BigQuery();
+ * const dataset = bigquery.dataset('institutions');
+ *
  * dataset.getTablesStream()
  *   .on('error', console.error)
  *   .on('data', function(table) {})
@@ -453,7 +500,11 @@ Dataset.prototype.getTablesStream = common.paginator.streamify('getTables');
 /**
  * Run a query scoped to your dataset.
  *
- * See {module:bigquery#query} for full documentation of this method.
+ * See {@link BigQuery#query} for full documentation of this method.
+ *
+ * @param {object} options See {@link BigQuery#query} for full documentation of this method.
+ * @param {function} [callback] See {@link BigQuery#query} for full documentation of this method.
+ * @returns {Promise} See {@link BigQuery#query} for full documentation of this method.
  */
 Dataset.prototype.query = function(options, callback) {
   if (is.string(options)) {
@@ -474,7 +525,11 @@ Dataset.prototype.query = function(options, callback) {
 /**
  * Start running a query scoped to your dataset.
  *
- * See {module:bigquery#startQuery} for full documentation of this method.
+ * See {@link BigQuery#startQuery} for full documentation of this method.
+ *
+ * @param {object} options See {@link BigQuery#startQuery} for full documentation of this method.
+ * @param {function} [callback] See {@link BigQuery#startQuery} for full documentation of this method.
+ * @returns {Promise} See {@link BigQuery#startQuery} for full documentation of this method.
  */
 Dataset.prototype.startQuery = function(options, callback) {
   if (is.string(options)) {
@@ -495,11 +550,15 @@ Dataset.prototype.startQuery = function(options, callback) {
 /**
  * Create a Table object.
  *
- * @param {string} id - The ID of the table.
- * @return {module:bigquery/table}
+ * @param {string} id The ID of the table.
+ * @return {Table}
  *
  * @example
- * var institutions = dataset.table('institution_data');
+ * const BigQuery = require('@google-cloud/bigquery');
+ * const bigquery = new BigQuery();
+ * const dataset = bigquery.dataset('institutions');
+ *
+ * const institutions = dataset.table('institution_data');
  */
 Dataset.prototype.table = function(id) {
   return new Table(this, id);
@@ -520,4 +579,9 @@ common.util.promisifyAll(Dataset, {
   exclude: ['table'],
 });
 
+/**
+ * Reference to the {@link Dataset} class.
+ * @name module:@google-cloud/bigquery.Dataset
+ * @see Dataset
+ */
 module.exports = Dataset;

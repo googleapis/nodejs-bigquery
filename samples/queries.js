@@ -37,7 +37,9 @@ function queryShakespeare(projectId) {
   // Imports the Google Cloud client library
   const BigQuery = require('@google-cloud/bigquery');
 
-  // The project ID to use, e.g. "your-project-id"
+  /**
+   * TODO(developer): Uncomment the following lines before running the sample.
+   */
   // const projectId = "your-project-id";
 
   // The SQL query to run
@@ -49,8 +51,8 @@ function queryShakespeare(projectId) {
     ORDER BY
     unique_words DESC LIMIT 10;`;
 
-  // Instantiates a client
-  const bigquery = BigQuery({
+  // Creates a client
+  const bigquery = new BigQuery({
     projectId: projectId,
   });
 
@@ -79,14 +81,14 @@ function syncQuery(sqlQuery, projectId) {
   // Imports the Google Cloud client library
   const BigQuery = require('@google-cloud/bigquery');
 
-  // The project ID to use, e.g. "your-project-id"
+  /**
+   * TODO(developer): Uncomment the following lines before running the sample.
+   */
   // const projectId = "your-project-id";
-
-  // The SQL query to run, e.g. "SELECT * FROM publicdata.samples.natality LIMIT 5;"
   // const sqlQuery = "SELECT * FROM publicdata.samples.natality LIMIT 5;";
 
-  // Instantiates a client
-  const bigquery = BigQuery({
+  // Creates a client
+  const bigquery = new BigQuery({
     projectId: projectId,
   });
 
@@ -117,17 +119,17 @@ function asyncQuery(sqlQuery, projectId) {
   // Imports the Google Cloud client library
   const BigQuery = require('@google-cloud/bigquery');
 
-  // The project ID to use, e.g. "your-project-id"
+  /**
+   * TODO(developer): Uncomment the following lines before running the sample.
+   */
   // const projectId = "your-project-id";
+  // const sqlQuery = "SELECT * FROM publicdata.samples.natality LIMIT 5;";
 
-  // Instantiates a client
-  const bigquery = BigQuery({
+  // Creates a client
+  const bigquery = new BigQuery({
     projectId: projectId,
   });
   // [END bigquery_build_client]
-
-  // The SQL query to run, e.g. "SELECT * FROM publicdata.samples.natality LIMIT 5;"
-  // const sqlQuery = "SELECT * FROM publicdata.samples.natality LIMIT 5;";
 
   // Query options list: https://cloud.google.com/bigquery/docs/reference/v2/jobs/query
   const options = {
@@ -171,48 +173,40 @@ function asyncQuery(sqlQuery, projectId) {
   // [END bigquery_async_query]
 }
 
-const cli = require(`yargs`)
+require(`yargs`)
   .demand(1)
-  .options({
-    projectId: {
-      alias: 'p',
-      default: process.env.GCLOUD_PROJECT || process.env.GOOGLE_CLOUD_PROJECT,
-      description:
-        'The Project ID to use. Defaults to the value of the GCLOUD_PROJECT or GOOGLE_CLOUD_PROJECT environment variables.',
-      requiresArg: true,
-      type: 'string',
-    },
-  })
   .command(
-    `sync <sqlQuery>`,
+    `sync <projectId> <sqlQuery>`,
     `Run the specified synchronous query.`,
     {},
     opts => syncQuery(opts.sqlQuery, opts.projectId)
   )
   .command(
-    `async <sqlQuery>`,
+    `async <projectId> <sqlQuery>`,
     `Start the specified asynchronous query.`,
     {},
     opts => asyncQuery(opts.sqlQuery, opts.projectId)
   )
-  .command(`shakespeare`, `Queries a public Shakespeare dataset.`, {}, opts =>
-    queryShakespeare(opts.projectId)
+  .command(
+    `shakespeare <projectId>`,
+    `Queries a public Shakespeare dataset.`,
+    {},
+    opts => queryShakespeare(opts.projectId)
   )
   .example(
-    `node $0 sync "SELECT * FROM publicdata.samples.natality LIMIT 5;"`,
+    `node $0 sync my-project-id "SELECT * FROM publicdata.samples.natality LIMIT 5;"`,
     `Synchronously queries the natality dataset.`
   )
   .example(
-    `node $0 async "SELECT * FROM publicdata.samples.natality LIMIT 5;"`,
+    `node $0 async my-project-id "SELECT * FROM publicdata.samples.natality LIMIT 5;"`,
     `Queries the natality dataset as a job.`
   )
-  .example(`node $0 shakespeare`, `Queries a public Shakespeare dataset.`)
+  .example(
+    `node $0 shakespeare my-project-id`,
+    `Queries a public Shakespeare dataset.`
+  )
   .wrap(120)
   .recommendCommands()
   .epilogue(`For more information, see https://cloud.google.com/bigquery/docs`)
   .help()
-  .strict();
-
-if (module === require.main) {
-  cli.parse(process.argv.slice(2));
-}
+  .strict().argv;

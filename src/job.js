@@ -25,31 +25,30 @@ var extend = require('extend');
 var is = require('is');
 var util = require('util');
 
-/*! Developer Documentation
- *
- * @param {module:bigquery} bigQuery - BigQuery instance.
- * @param {string} id - The ID of the job.
- */
 /**
  * Job objects are returned from various places in the BigQuery API:
  *
- * - {module:bigquery#getJobs}
- * - {module:bigquery#job}
- * - {module:bigquery#query}
- * - {module:bigquery#startJob}
- * - {module:bigquery/table#copy}
- * - {module:bigquery/table#createWriteStream}
- * - {module:bigquery/table#export}
- * - {module:bigquery/table#import}
+ * - {@link BigQuery#getJobs}
+ * - {@link BigQuery#job}
+ * - {@link BigQuery#query}
+ * - {@link BigQuery#startJob}
+ * - {@link BigQuery/table#copy}
+ * - {@link BigQuery/table#createWriteStream}
+ * - {@link BigQuery/table#export}
+ * - {@link BigQuery/table#import}
  *
  * They can be used to check the status of a running job or fetching the results
  * of a previously-executed one.
  *
- * @alias module:bigquery/job
- * @constructor
+ * @class
+ * @param {BigQuery} bigQuery {@link BigQuery} instance.
+ * @param {string} id The ID of the job.
  *
  * @example
- * var job = bigquery.job('job-id');
+ * const BigQuery = require('@google-cloud/bigquery');
+ * const bigquery = new BigQuery();
+ *
+ * const job = bigquery.job('job-id');
  *
  * //-
  * // All jobs are event emitters. The status of each job is polled
@@ -80,12 +79,19 @@ function Job(bigQuery, id) {
     /**
      * Check if the job exists.
      *
-     * @param {function} callback - The callback function.
-     * @param {?error} callback.err - An error returned while making this
+     * @method Job#exists
+     * @param {function} [callback] The callback function.
+     * @param {?error} callback.err An error returned while making this
      *     request.
-     * @param {boolean} callback.exists - Whether the job exists or not.
+     * @param {boolean} callback.exists Whether the job exists or not.
+     * @returns {Promise}
      *
      * @example
+     * const BigQuery = require('@google-cloud/bigquery');
+     * const bigquery = new BigQuery();
+     *
+     * const job = bigquery.job('job-id');
+     *
      * job.exists(function(err, exists) {});
      *
      * //-
@@ -100,7 +106,19 @@ function Job(bigQuery, id) {
     /**
      * Get a job if it exists.
      *
+     * @method Job#get
+     * @param {function} [callback] The callback function.
+     * @param {?error} callback.err An error returned while making this
+     *     request.
+     * @param {Job} callback.job The job.
+     * @returns {Promise}
+     *
      * @example
+     * const BigQuery = require('@google-cloud/bigquery');
+     * const bigquery = new BigQuery();
+     *
+     * const job = bigquery.job('job-id');
+     *
      * job.get(function(err, job, apiResponse) {
      *   if (!err) {
      *     // `job.metadata` has been populated.
@@ -121,24 +139,29 @@ function Job(bigQuery, id) {
      * Get the metadata of the job. This will mostly be useful for checking the
      * status of a previously-run job.
      *
-     * @resource [Jobs: get API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/get}
+     * @see [Jobs: get API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/get}
      *
-     * @param {function} callback - The callback function.
-     * @param {?error} callback.err - An error returned while making this
+     * @method Job#getMetadata
+     * @param {function} [callback] The callback function.
+     * @param {?error} callback.err An error returned while making this
      *     request.
-     * @param {object} callback.metadata - The metadata of the job.
-     * @param {object} callback.apiResponse - The full API response.
+     * @param {object} callback.metadata The metadata of the job.
+     * @param {object} callback.apiResponse The full API response.
+     * @returns {Promise}
      *
      * @example
-     * var job = bigquery.job('id');
+     * const BigQuery = require('@google-cloud/bigquery');
+     * const bigquery = new BigQuery();
+     *
+     * const job = bigquery.job('id');
      * job.getMetadata(function(err, metadata, apiResponse) {});
      *
      * //-
      * // If the callback is omitted, we'll return a Promise.
      * //-
      * job.getMetadata().then(function(data) {
-     *   var metadata = data[0];
-     *   var apiResponse = data[1];
+     *   const metadata = data[0];
+     *   const apiResponse = data[1];
      * });
      */
     getMetadata: true,
@@ -147,16 +170,21 @@ function Job(bigQuery, id) {
      * Set the metadata for this job. This can be useful for updating job
      * labels.
      *
-     * @resource [Jobs: patch API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/patch}
+     * @see [Jobs: patch API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/patch}
      *
-     * @param {object} metadata - Metadata to save on the Job.
-     * @param {function} callback - The callback function.
-     * @param {?error} callback.err - An error returned while making this
+     * @method Job#setMetadata
+     * @param {object} metadata Metadata to save on the Job.
+     * @param {function} [callback] The callback function.
+     * @param {?error} callback.err An error returned while making this
      *     request.
-     * @param {object} callback.apiResponse - The full API response.
+     * @param {object} callback.apiResponse The full API response.
+     * @returns {Promise}
      *
      * @example
-     * var metadata = {
+     * const BigQuery = require('@google-cloud/bigquery');
+     * const bigquery = new BigQuery();
+     *
+     * const metadata = {
      *   configuration: {
      *     labels: {
      *       foo: 'bar'
@@ -164,13 +192,15 @@ function Job(bigQuery, id) {
      *   }
      * };
      *
+     * const job = bigquery.job('job-id');
+     *
      * job.setMetadata(metadata, function(err, apiResponse) {});
      *
      * //-
      * // If the callback is omitted, we'll return a Promise.
      * //-
      * job.setMetadata(metadata).then(function(data) {
-     *   var apiResponse = data[0];
+     *   const apiResponse = data[0];
      * });
      */
     setMetadata: true,
@@ -201,16 +231,22 @@ function Job(bigQuery, id) {
 util.inherits(Job, common.Operation);
 
 /**
- * Cancel a job. Use {module:bigquery/job#getMetadata} to see if the cancel
+ * Cancel a job. Use {@link Job#getMetadata} to see if the cancel
  * completes successfully. See an example implementation below.
  *
- * @resource [Jobs: get API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/cancel}
+ * @see [Jobs: get API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/cancel}
  *
- * @param {function=} callback - The callback function.
- * @param {?error} callback.err - An error returned while making this request.
- * @param {object} callback.apiResponse - The full API response.
+ * @param {function} [callback] The callback function.
+ * @param {?error} callback.err An error returned while making this request.
+ * @param {object} callback.apiResponse The full API response.
+ * @returns {Promise}
  *
  * @example
+ * const BigQuery = require('@google-cloud/bigquery');
+ * const bigquery = new BigQuery();
+ *
+ * const job = bigquery.job('job-id');
+ *
  * job.cancel(function(err, apiResponse) {
  *   // Check to see if the job completes successfully.
  *   job.on('error', function(err) {});
@@ -241,28 +277,34 @@ Job.prototype.cancel = function(callback) {
 /**
  * Get the results of a job.
  *
- * @resource [Jobs: getQueryResults API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/getQueryResults}
+ * @see [Jobs: getQueryResults API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/getQueryResults}
  *
- * @param {object=} options - Configuration object.
- * @param {boolean} options.autoPaginate - Have pagination handled
- *     automatically. Default: true.
- * @param {number} options.maxApiCalls - Maximum number of API calls to make.
- * @param {number} options.maxResults - Maximum number of results to read.
- * @param {string} options.pageToken - Page token, returned by a previous call,
+ * @param {object} [options] Configuration object.
+ * @param {boolean} [options.autoPaginate=true] Have pagination handled
+ *     automatically.
+ * @param {number} [options.maxApiCalls] Maximum number of API calls to make.
+ * @param {number} [options.maxResults] Maximum number of results to read.
+ * @param {string} [options.pageToken] Page token, returned by a previous call,
  *     to request the next page of results. Note: This is automatically added to
  *     the `nextQuery` argument of your callback.
- * @param {number} options.startIndex - Zero-based index of the starting row.
- * @param {number} options.timeoutMs - How long to wait for the query to
+ * @param {number} [options.startIndex] Zero-based index of the starting row.
+ * @param {number} [options.timeoutMs] How long to wait for the query to
  *     complete, in milliseconds, before returning. Default is to return
  *     immediately. If the timeout passes before the job completes, the request
  *     will fail with a `TIMEOUT` error.
- * @param {function=} callback - The callback function. If you intend to
+ * @param {function} [callback] The callback function. If you intend to
  *     continuously run this query until all results are in as part of a stream,
  *     do not pass a callback.
- * @param {?error} callback.err - An error returned while making this request
- * @param {array} callback.rows - The results of a job.
+ * @param {?error} callback.err An error returned while making this request
+ * @param {array} callback.rows The results of a job.
+ * @returns {Promise}
  *
  * @example
+ * const BigQuery = require('@google-cloud/bigquery');
+ * const bigquery = new BigQuery();
+ *
+ * const job = bigquery.job('job-id');
+ *
  * //-
  * // Get all of the results of a query.
  * //-
@@ -345,13 +387,17 @@ Job.prototype.getQueryResults = function(options, callback) {
 /**
  * Get the results of a job as a readable object stream.
  *
- * @param {object=} options - Configuration object. See
- *     {module:bigquery/job#getQueryResults} for a complete list of options.
+ * @param {object} options Configuration object. See
+ *     {@link Job#getQueryResults} for a complete list of options.
  * @return {stream}
  *
  * @example
- * var through2 = require('through2');
- * var fs = require('fs');
+ * const through2 = require('through2');
+ * const fs = require('fs');
+ * const BigQuery = require('@google-cloud/bigquery');
+ * const bigquery = new BigQuery();
+ *
+ * const job = bigquery.job('job-id');
  *
  * job.getQueryResultsStream()
  *   .pipe(through2.obj(function (row, enc, next) {
@@ -408,4 +454,9 @@ common.paginator.extend(Job, ['getQueryResults']);
  */
 common.util.promisifyAll(Job);
 
+/**
+ * Reference to the {@link Job} class.
+ * @name module:@google-cloud/bigquery.Job
+ * @see Job
+ */
 module.exports = Job;
