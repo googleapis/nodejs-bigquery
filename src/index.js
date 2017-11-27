@@ -645,7 +645,7 @@ BigQuery.prototype.createDataset = function(id, options, callback) {
  * const BigQuery = require('@google-cloud/bigquery');
  * const bigquery = new BigQuery();
  *
- * cpmst query = 'SELECT url FROM [publicdata:samples.github_nested] LIMIT 100';
+ * const query = 'SELECT url FROM `publicdata:samples.github_nested` LIMIT 100';
  *
  * bigquery.createQueryStream(query)
  *   .on('error', console.error)
@@ -699,7 +699,7 @@ BigQuery.prototype.createQueryStream = common.paginator.streamify('query');
  * const options = {
  *   configuration: {
  *     query: {
- *       query: 'SELECT url FROM [publicdata:samples.github_nested] LIMIT 100'
+ *       query: 'SELECT url FROM `publicdata:samples.github_nested` LIMIT 100'
  *     }
  *   }
  * };
@@ -1076,7 +1076,7 @@ BigQuery.prototype.job = function(id) {
  * const BigQuery = require('@google-cloud/bigquery');
  * const bigquery = new BigQuery();
  *
- * const query = 'SELECT url FROM [publicdata:samples.github_nested] LIMIT 100';
+ * const query = 'SELECT url FROM `publicdata:samples.github_nested` LIMIT 100';
  *
  * bigquery.query(query, function(err, rows) {
  *   if (!err) {
@@ -1192,7 +1192,7 @@ BigQuery.prototype.query = function(query, options, callback) {
  * const BigQuery = require('@google-cloud/bigquery');
  * const bigquery = new BigQuery();
  *
- * const query = 'SELECT url FROM [publicdata:samples.github_nested] LIMIT 100';
+ * const query = 'SELECT url FROM `publicdata:samples.github_nested` LIMIT 100';
  *
  * //-
  * // You may pass only a query string, having a new table created to store the

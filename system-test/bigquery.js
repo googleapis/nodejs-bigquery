@@ -362,7 +362,7 @@ describe('BigQuery', function() {
   });
 
   it('should cancel a job', function(done) {
-    var query = 'SELECT url FROM [publicdata:samples.github_nested] LIMIT 10';
+    var query = 'SELECT url FROM `publicdata.samples.github_nested` LIMIT 10';
 
     bigquery.startQuery(query, function(err, job) {
       assert.ifError(err);
