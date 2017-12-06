@@ -1892,6 +1892,23 @@ describe('BigQuery/Table', function() {
       );
     });
 
+    it('should override the destination project if supplied', function(done) {
+      table.bigQuery.createJob = function(reqOpts) {
+          var sourceFormat = reqOpts.configuration.load.sourceFormat;
+          assert.equal(sourceFormat, 'NEWLINE_DELIMITED_JSON');
+          done();
+      };
+      table.startImport(
+          FILE,
+          {
+            destinationTable:{
+                projectId: 'test-override'
+            }
+          },
+          assert.ifError
+        )
+    })
+
     it('should pass the callback to createJob', function(done) {
       table.bigQuery.createJob = function(reqOpts, callback) {
         assert.strictEqual(done, callback);
