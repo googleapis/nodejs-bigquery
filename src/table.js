@@ -1710,7 +1710,7 @@ Table.prototype.startImport = function(source, metadata, callback) {
     configuration: {
       load: {
         destinationTable: {
-          projectId: this.bigQuery.projectId,
+          projectId: (metadata.destinationTable && metadata.destinationTable.projectId) || this.bigQuery.projectId,
           datasetId: this.dataset.id,
           tableId: this.id,
         },
