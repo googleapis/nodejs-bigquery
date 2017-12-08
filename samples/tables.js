@@ -387,17 +387,18 @@ function insertRowsAsStream(datasetId, tableId, rows, projectId) {
     .dataset(datasetId)
     .table(tableId)
     .insert(rows)
-    .then(insertErrors => {
-      console.log('Inserted:');
-      rows.forEach(row => console.log(row));
-
-      if (insertErrors && insertErrors.length > 0) {
-        console.log('Insert errors:');
-        insertErrors.forEach(err => console.error(err));
-      }
+    .then(() => {
+      console.log(`Inserted ${rows.length} rows`);
     })
     .catch(err => {
-      console.error('ERROR:', err);
+      if (err && err.name === 'PartialFailureError') {
+        if (err.errors && err.errors.length > 0) {
+          console.log('Insert errors:');
+          err.errors.forEach(err => console.error(err));
+        }
+      } else {
+        console.error('ERROR:', err);
+      }
     });
   // [END bigquery_insert_stream]
 }
