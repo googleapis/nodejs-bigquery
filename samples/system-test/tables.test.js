@@ -137,7 +137,9 @@ test.serial(`should browse table rows`, async t => {
 test.serial(`should export a table to GCS`, async t => {
   t.plan(2);
   const output = await tools.runAsync(
-    `${cmd} export ${projectId} ${datasetId} ${tableId} ${bucketName} ${exportFileName}`,
+    `${cmd} export ${projectId} ${datasetId} ${tableId} ${bucketName} ${
+      exportFileName
+    }`,
     cwd
   );
   t.true(output.includes(`started.`));
@@ -156,7 +158,9 @@ test.serial(`should export a table to GCS`, async t => {
 test.serial(`should import a GCS file`, async t => {
   t.plan(2);
   const output = await tools.runAsync(
-    `${cmd} import-gcs ${projectId} ${datasetId} ${tableId} ${bucketName} ${importFileName}`,
+    `${cmd} import-gcs ${projectId} ${datasetId} ${tableId} ${bucketName} ${
+      importFileName
+    }`,
     cwd
   );
   t.true(output.includes(`started.`));
@@ -175,7 +179,9 @@ test.serial(`should import a GCS file`, async t => {
 test.serial(`should copy a table`, async t => {
   t.plan(2);
   const output = await tools.runAsync(
-    `${cmd} copy ${projectId} ${srcDatasetId} ${srcTableId} ${destDatasetId} ${destTableId}`,
+    `${cmd} copy ${projectId} ${srcDatasetId} ${srcTableId} ${destDatasetId} ${
+      destTableId
+    }`,
     cwd
   );
   t.true(output.includes(`started.`));
@@ -210,12 +216,7 @@ test.serial(`should insert rows`, async t => {
     )}'`,
     cwd
   );
-  t.is(
-    output.includes(
-      `Inserted:\n{ Name: 'foo', Age: 27, Weight: 80.3, IsMagic: true }\n{ Name: 'bar', Age: 13, Weight: 54.6, IsMagic: false }`
-    ),
-    true
-  );
+  t.is(output.includes(`Inserted 2 rows`), true);
   await tools
     .tryTest(async assert => {
       const [rows] = await bigquery
