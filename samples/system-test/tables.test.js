@@ -210,12 +210,7 @@ test.serial(`should insert rows`, async t => {
     )}'`,
     cwd
   );
-  t.is(
-    output.includes(
-      `Inserted:\n{ Name: 'foo', Age: 27, Weight: 80.3, IsMagic: true }\n{ Name: 'bar', Age: 13, Weight: 54.6, IsMagic: false }`
-    ),
-    true
-  );
+  t.is(output.includes(`Inserted 2 rows`), true);
   await tools
     .tryTest(async assert => {
       const [rows] = await bigquery
