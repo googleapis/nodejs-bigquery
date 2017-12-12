@@ -20,41 +20,42 @@ function printResult(rows) {
   // [START bigquery_simple_app_print]
   console.log('Query Results:');
   rows.forEach(function(row) {
-    let str = '';
-    for (let key in row) {
-      if (str) {
-        str = `${str}\n`;
-      }
-      str = `${str}${key}: ${row[key]}`;
-    }
-    console.log(str);
+    let url = row['url'];
+    let viewCount = row['view_count'];
+    console.log(`url: ${url}, ${viewCount} views`);
   });
   // [END bigquery_simple_app_print]
 }
 
-function queryShakespeare(projectId) {
-  // [START bigquery_simple_app_query]
+function queryStackOverflow(projectId) {
+  // [START bigquery_simple_app_deps]
   // Imports the Google Cloud client library
   const BigQuery = require('@google-cloud/bigquery');
+  // [END bigquery_simple_app_deps]
 
+  // [START bigquery_simple_app_client]
   /**
    * TODO(developer): Uncomment the following lines before running the sample.
    */
   // const projectId = "your-project-id";
 
-  // The SQL query to run
-  const sqlQuery = `SELECT
-    corpus, COUNT(*) as unique_words
-    FROM publicdata.samples.shakespeare
-    GROUP BY
-      corpus
-    ORDER BY
-    unique_words DESC LIMIT 10;`;
-
   // Creates a client
   const bigquery = new BigQuery({
     projectId: projectId,
   });
+  // [END bigquery_simple_app_client]
+
+  // [START bigquery_simple_app_query]
+  // The SQL query to run
+  const sqlQuery = `SELECT
+    CONCAT(
+      'https://stackoverflow.com/questions/',
+      CAST(id as STRING)) as url,
+    view_count
+    FROM ` + '`bigquery-public-data.stackoverflow.posts_questions`' + `
+    WHERE tags like '%google-bigquery%'
+    ORDER BY view_count DESC
+    LIMIT 10`;
 
   // Query options list: https://cloud.google.com/bigquery/docs/reference/v2/jobs/query
   const options = {
@@ -188,10 +189,10 @@ require(`yargs`)
     opts => asyncQuery(opts.sqlQuery, opts.projectId)
   )
   .command(
-    `shakespeare <projectId>`,
-    `Queries a public Shakespeare dataset.`,
+    `stackoverflow <projectId>`,
+    `Queries a public Stack Overflow dataset.`,
     {},
-    opts => queryShakespeare(opts.projectId)
+    opts => queryStackOverflow(opts.projectId)
   )
   .example(
     `node $0 sync my-project-id "SELECT * FROM publicdata.samples.natality LIMIT 5;"`,

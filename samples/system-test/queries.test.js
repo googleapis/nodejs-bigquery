@@ -23,36 +23,15 @@ const cwd = path.join(__dirname, `..`);
 const cmd = `node queries.js`;
 const projectId = process.env.GCLOUD_PROJECT;
 
-const expectedShakespeareResult = `Query Results:
-corpus: hamlet
-unique_words: 5318
-corpus: kinghenryv
-unique_words: 5104
-corpus: cymbeline
-unique_words: 4875
-corpus: troilusandcressida
-unique_words: 4795
-corpus: kinglear
-unique_words: 4784
-corpus: kingrichardiii
-unique_words: 4713
-corpus: 2kinghenryvi
-unique_words: 4683
-corpus: coriolanus
-unique_words: 4653
-corpus: 2kinghenryiv
-unique_words: 4605
-corpus: antonyandcleopatra
-unique_words: 4582`;
-
 const sqlQuery = `SELECT * FROM publicdata.samples.natality LIMIT 5;`;
 const badQuery = `SELECT * FROM INVALID`;
 
 test.before(tools.checkCredentials);
 
-test(`should query shakespeare`, async t => {
-  const output = await tools.runAsync(`${cmd} shakespeare ${projectId}`, cwd);
-  t.is(output, expectedShakespeareResult);
+test(`should query stackoverflow`, async t => {
+  const output = await tools.runAsync(`${cmd} stackoverflow ${projectId}`, cwd);
+  t.true(output.includes(`Query Results:`));
+  t.true(output.includes(`views`));
 });
 
 test(`should run a sync query`, async t => {
