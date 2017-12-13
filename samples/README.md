@@ -125,7 +125,7 @@ queries.js <command>
 Commands:
   queries.js sync <projectId> <sqlQuery>   Run the specified synchronous query.
   queries.js async <projectId> <sqlQuery>  Start the specified asynchronous query.
-  queries.js shakespeare <projectId>       Queries a public Shakespeare dataset.
+  queries.js stackoverflow <projectId>     Queries a public Stack Overflow dataset.
 
 Options:
   --version  Show version number                                                                               [boolean]
@@ -136,7 +136,7 @@ Examples:
   publicdata.samples.natality LIMIT 5;"
   node queries.js async my-project-id "SELECT * FROM            Queries the natality dataset as a job.
   publicdata.samples.natality LIMIT 5;"
-  node queries.js shakespeare my-project-id                     Queries a public Shakespeare dataset.
+  node queries.js stackoverflow my-project-id                   Queries a public Stack Overflow dataset.
 
 For more information, see https://cloud.google.com/bigquery/docs
 ```
