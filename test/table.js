@@ -742,47 +742,47 @@ describe('BigQuery/Table', function() {
     });
   });
 
-  describe('export', function() {
+  describe('extract', function() {
     var fakeJob;
 
     beforeEach(function() {
       fakeJob = new events.EventEmitter();
-      table.startExport = function(destination, metadata, callback) {
+      table.startExtract = function(destination, metadata, callback) {
         callback(null, fakeJob);
       };
     });
 
-    it('should pass the arguments to startExport', function(done) {
+    it('should pass the arguments to startExtract', function(done) {
       var fakeDestination = {};
       var fakeMetadata = {};
 
-      table.startExport = function(destination, metadata) {
+      table.startExtract = function(destination, metadata) {
         assert.strictEqual(destination, fakeDestination);
         assert.strictEqual(metadata, fakeMetadata);
         done();
       };
 
-      table.export(fakeDestination, fakeMetadata, assert.ifError);
+      table.extract(fakeDestination, fakeMetadata, assert.ifError);
     });
 
     it('should optionally accept metadata', function(done) {
-      table.startExport = function(destination, metadata) {
+      table.startExtract = function(destination, metadata) {
         assert.deepEqual(metadata, {});
         done();
       };
 
-      table.export({}, assert.ifError);
+      table.extract({}, assert.ifError);
     });
 
-    it('should return any startExport errors', function(done) {
+    it('should return any startExtract errors', function(done) {
       var error = new Error('err');
       var response = {};
 
-      table.startExport = function(destination, metadata, callback) {
+      table.startExtract = function(destination, metadata, callback) {
         callback(error, null, response);
       };
 
-      table.export({}, function(err, resp) {
+      table.extract({}, function(err, resp) {
         assert.strictEqual(err, error);
         assert.strictEqual(resp, response);
         done();
@@ -792,7 +792,7 @@ describe('BigQuery/Table', function() {
     it('should return any job errors', function(done) {
       var error = new Error('err');
 
-      table.export({}, function(err) {
+      table.extract({}, function(err) {
         assert.strictEqual(err, error);
         done();
       });
@@ -803,7 +803,7 @@ describe('BigQuery/Table', function() {
     it('should return the metadata on complete', function(done) {
       var metadata = {};
 
-      table.export({}, function(err, resp) {
+      table.extract({}, function(err, resp) {
         assert.ifError(err);
         assert.strictEqual(resp, metadata);
         done();
@@ -970,77 +970,6 @@ describe('BigQuery/Table', function() {
         assert.deepEqual(options, {a: 'b', c: 'd'});
         done();
       });
-    });
-  });
-
-  describe('import', function() {
-    var fakeJob;
-
-    beforeEach(function() {
-      fakeJob = new events.EventEmitter();
-      table.startImport = function(source, metadata, callback) {
-        callback(null, fakeJob);
-      };
-    });
-
-    it('should pass the arguments to startImport', function(done) {
-      var fakeSource = {};
-      var fakeMetadata = {};
-
-      table.startImport = function(source, metadata) {
-        assert.strictEqual(source, fakeSource);
-        assert.strictEqual(metadata, fakeMetadata);
-        done();
-      };
-
-      table.import(fakeSource, fakeMetadata, assert.ifError);
-    });
-
-    it('should optionally accept metadata', function(done) {
-      table.startImport = function(source, metadata) {
-        assert.deepEqual(metadata, {});
-        done();
-      };
-
-      table.import({}, assert.ifError);
-    });
-
-    it('should return any startImport errors', function(done) {
-      var error = new Error('err');
-      var response = {};
-
-      table.startImport = function(source, metadata, callback) {
-        callback(error, null, response);
-      };
-
-      table.import({}, function(err, resp) {
-        assert.strictEqual(err, error);
-        assert.strictEqual(resp, response);
-        done();
-      });
-    });
-
-    it('should return any job errors', function(done) {
-      var error = new Error('err');
-
-      table.import({}, function(err) {
-        assert.strictEqual(err, error);
-        done();
-      });
-
-      fakeJob.emit('error', error);
-    });
-
-    it('should return the metadata on complete', function(done) {
-      var metadata = {};
-
-      table.import({}, function(err, resp) {
-        assert.ifError(err);
-        assert.strictEqual(resp, metadata);
-        done();
-      });
-
-      fakeJob.emit('complete', metadata);
     });
   });
 
@@ -1337,6 +1266,77 @@ describe('BigQuery/Table', function() {
     });
   });
 
+  describe('load', function() {
+    var fakeJob;
+
+    beforeEach(function() {
+      fakeJob = new events.EventEmitter();
+      table.startLoad = function(source, metadata, callback) {
+        callback(null, fakeJob);
+      };
+    });
+
+    it('should pass the arguments to startLoad', function(done) {
+      var fakeSource = {};
+      var fakeMetadata = {};
+
+      table.startLoad = function(source, metadata) {
+        assert.strictEqual(source, fakeSource);
+        assert.strictEqual(metadata, fakeMetadata);
+        done();
+      };
+
+      table.load(fakeSource, fakeMetadata, assert.ifError);
+    });
+
+    it('should optionally accept metadata', function(done) {
+      table.startLoad = function(source, metadata) {
+        assert.deepEqual(metadata, {});
+        done();
+      };
+
+      table.load({}, assert.ifError);
+    });
+
+    it('should return any startLoad errors', function(done) {
+      var error = new Error('err');
+      var response = {};
+
+      table.startLoad = function(source, metadata, callback) {
+        callback(error, null, response);
+      };
+
+      table.load({}, function(err, resp) {
+        assert.strictEqual(err, error);
+        assert.strictEqual(resp, response);
+        done();
+      });
+    });
+
+    it('should return any job errors', function(done) {
+      var error = new Error('err');
+
+      table.load({}, function(err) {
+        assert.strictEqual(err, error);
+        done();
+      });
+
+      fakeJob.emit('error', error);
+    });
+
+    it('should return the metadata on complete', function(done) {
+      var metadata = {};
+
+      table.load({}, function(err, resp) {
+        assert.ifError(err);
+        assert.strictEqual(resp, metadata);
+        done();
+      });
+
+      fakeJob.emit('complete', metadata);
+    });
+  });
+
   describe('query', function() {
     it('should pass args through to datasetInstance.query()', function(done) {
       table.dataset.query = function(a, b) {
@@ -1561,7 +1561,7 @@ describe('BigQuery/Table', function() {
     });
   });
 
-  describe('startExport', function() {
+  describe('startExtract', function() {
     var FILE = {
       name: 'file-name.json',
       bucket: {
@@ -1592,7 +1592,7 @@ describe('BigQuery/Table', function() {
         done();
       };
 
-      table.startExport(FILE, assert.ifError);
+      table.startExtract(FILE, assert.ifError);
     });
 
     it('should accept just a destination and a callback', function(done) {
@@ -1600,7 +1600,7 @@ describe('BigQuery/Table', function() {
         callback(null, {jobReference: {jobId: 'job-id'}});
       };
 
-      table.startExport(FILE, done);
+      table.startExtract(FILE, done);
     });
 
     describe('formats', function() {
@@ -1611,7 +1611,7 @@ describe('BigQuery/Table', function() {
           done();
         };
 
-        table.startExport(FILE, {format: 'csv'}, assert.ifError);
+        table.startExtract(FILE, {format: 'csv'}, assert.ifError);
       });
 
       it('should accept json', function(done) {
@@ -1621,7 +1621,7 @@ describe('BigQuery/Table', function() {
           done();
         };
 
-        table.startExport(FILE, {format: 'json'}, assert.ifError);
+        table.startExtract(FILE, {format: 'json'}, assert.ifError);
       });
 
       it('should accept avro', function(done) {
@@ -1631,7 +1631,7 @@ describe('BigQuery/Table', function() {
           done();
         };
 
-        table.startExport(FILE, {format: 'avro'}, assert.ifError);
+        table.startExtract(FILE, {format: 'avro'}, assert.ifError);
       });
     });
 
@@ -1643,7 +1643,7 @@ describe('BigQuery/Table', function() {
         done();
       };
 
-      table.startExport(FILE, assert.ifError);
+      table.startExtract(FILE, assert.ifError);
     });
 
     it('should check if a destination is a File', function(done) {
@@ -1654,7 +1654,7 @@ describe('BigQuery/Table', function() {
         return true;
       };
 
-      table.startExport(FILE, assert.ifError);
+      table.startExtract(FILE, assert.ifError);
     });
 
     it('should throw if a destination is not a File', function() {
@@ -1663,11 +1663,11 @@ describe('BigQuery/Table', function() {
       };
 
       assert.throws(function() {
-        table.startExport({}, util.noop);
+        table.startExtract({}, util.noop);
       }, /Destination must be a File object/);
 
       assert.throws(function() {
-        table.startExport([FILE, {}], util.noop);
+        table.startExtract([FILE, {}], util.noop);
       }, /Destination must be a File object/);
     });
 
@@ -1678,7 +1678,7 @@ describe('BigQuery/Table', function() {
         done();
       };
 
-      table.startExport(FILE, assert.ifError);
+      table.startExtract(FILE, assert.ifError);
     });
 
     it('should assign the provided format if matched', function(done) {
@@ -1689,12 +1689,12 @@ describe('BigQuery/Table', function() {
         done();
       };
 
-      table.startExport(FILE, {format: 'csv'}, assert.ifError);
+      table.startExtract(FILE, {format: 'csv'}, assert.ifError);
     });
 
     it('should throw if a provided format is not recognized', function() {
       assert.throws(function() {
-        table.startExport(FILE, {format: 'zip'}, util.noop);
+        table.startExtract(FILE, {format: 'zip'}, util.noop);
       }, /Destination format not recognized/);
     });
 
@@ -1705,7 +1705,7 @@ describe('BigQuery/Table', function() {
         done();
       };
 
-      table.startExport(FILE, {gzip: true}, util.noop);
+      table.startExtract(FILE, {gzip: true}, util.noop);
     });
 
     it('should accept a job prefix', function(done) {
@@ -1720,7 +1720,7 @@ describe('BigQuery/Table', function() {
         callback(); // the done fn
       };
 
-      table.startExport(FILE, options, done);
+      table.startExtract(FILE, options, done);
     });
 
     it('should pass the callback to createJob', function(done) {
@@ -1729,7 +1729,7 @@ describe('BigQuery/Table', function() {
         callback(); // the done fn
       };
 
-      table.startExport(FILE, {}, done);
+      table.startExtract(FILE, {}, done);
     });
 
     it('should optionally accept options', function(done) {
@@ -1738,11 +1738,11 @@ describe('BigQuery/Table', function() {
         callback(); // the done fn
       };
 
-      table.startExport(FILE, done);
+      table.startExtract(FILE, done);
     });
   });
 
-  describe('startImport', function() {
+  describe('startLoad', function() {
     var FILEPATH = require.resolve('./testdata/testfile.json');
     var FILE = {
       name: 'file-name.json',
@@ -1772,7 +1772,7 @@ describe('BigQuery/Table', function() {
         return ws;
       };
 
-      table.startImport(FILEPATH, function(err, job, resp) {
+      table.startLoad(FILEPATH, function(err, job, resp) {
         assert.strictEqual(err, null);
         assert.strictEqual(job, JOB);
         assert.strictEqual(resp, JOB.metadata);
@@ -1785,7 +1785,7 @@ describe('BigQuery/Table', function() {
         return new stream.Writable();
       };
 
-      assert(table.startImport(FILEPATH) instanceof stream.Stream);
+      assert(table.startLoad(FILEPATH) instanceof stream.Stream);
     });
 
     it('should infer the file format from the given filepath', function(done) {
@@ -1799,7 +1799,7 @@ describe('BigQuery/Table', function() {
         return ws;
       };
 
-      table.startImport(FILEPATH, done);
+      table.startLoad(FILEPATH, done);
     });
 
     it('should execute callback with error from writestream', function(done) {
@@ -1815,7 +1815,7 @@ describe('BigQuery/Table', function() {
         return ws;
       };
 
-      table.startImport(FILEPATH, function(err) {
+      table.startLoad(FILEPATH, function(err) {
         assert.strictEqual(err, error);
         done();
       });
@@ -1832,7 +1832,7 @@ describe('BigQuery/Table', function() {
         return ws;
       };
 
-      table.startImport(FILEPATH, {sourceFormat: 'CSV'}, done);
+      table.startLoad(FILEPATH, {sourceFormat: 'CSV'}, done);
     });
 
     it('should check if a destination is a File', function(done) {
@@ -1843,7 +1843,7 @@ describe('BigQuery/Table', function() {
         return true;
       };
 
-      table.startImport(FILE, assert.ifError);
+      table.startLoad(FILE, assert.ifError);
     });
 
     it('should throw if a File object is not provided', function() {
@@ -1852,7 +1852,7 @@ describe('BigQuery/Table', function() {
       };
 
       assert.throws(function() {
-        table.startImport({});
+        table.startLoad({});
       }, /Source must be a File object/);
     });
 
@@ -1863,7 +1863,7 @@ describe('BigQuery/Table', function() {
         done();
       };
 
-      table.startImport(FILE, assert.ifError);
+      table.startLoad(FILE, assert.ifError);
     });
 
     it('should infer the file format from a File object', function(done) {
@@ -1873,7 +1873,7 @@ describe('BigQuery/Table', function() {
         done();
       };
 
-      table.startImport(FILE, assert.ifError);
+      table.startLoad(FILE, assert.ifError);
     });
 
     it('should not override a provided format with a File', function(done) {
@@ -1883,7 +1883,7 @@ describe('BigQuery/Table', function() {
         done();
       };
 
-      table.startImport(
+      table.startLoad(
         FILE,
         {
           sourceFormat: 'NEWLINE_DELIMITED_JSON',
@@ -1898,7 +1898,7 @@ describe('BigQuery/Table', function() {
         callback(); // the done fn
       };
 
-      table.startImport(FILE, {}, done);
+      table.startLoad(FILE, {}, done);
     });
 
     it('should optionally accept options', function(done) {
@@ -1907,7 +1907,7 @@ describe('BigQuery/Table', function() {
         callback(); // the done fn
       };
 
-      table.startImport(FILE, done);
+      table.startLoad(FILE, done);
     });
 
     it('should set the job prefix', function(done) {
@@ -1919,7 +1919,7 @@ describe('BigQuery/Table', function() {
         done();
       };
 
-      table.startImport(
+      table.startLoad(
         FILE,
         {
           jobPrefix: fakeJobPrefix,
@@ -1936,7 +1936,7 @@ describe('BigQuery/Table', function() {
           done();
         };
 
-        table.startImport(FILE, {format: 'csv'}, assert.ifError);
+        table.startLoad(FILE, {format: 'csv'}, assert.ifError);
       });
 
       it('should accept json', function(done) {
@@ -1946,7 +1946,7 @@ describe('BigQuery/Table', function() {
           done();
         };
 
-        table.startImport(FILE, {format: 'json'}, assert.ifError);
+        table.startLoad(FILE, {format: 'json'}, assert.ifError);
       });
 
       it('should accept avro', function(done) {
@@ -1956,7 +1956,7 @@ describe('BigQuery/Table', function() {
           done();
         };
 
-        table.startImport(FILE, {format: 'avro'}, assert.ifError);
+        table.startLoad(FILE, {format: 'avro'}, assert.ifError);
       });
     });
   });
