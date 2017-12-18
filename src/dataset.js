@@ -384,11 +384,11 @@ Dataset.prototype.delete = function(options, callback) {
  *
  * @see [Tables: list API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/tables/list}
  *
- * @param {object} [query] Configuration object.
- * @param {boolean} [query.autoPaginate=true] Have pagination handled automatically.
- * @param {number} [query.maxApiCalls] Maximum number of API calls to make.
- * @param {number} [query.maxResults] Maximum number of results to return.
- * @param {string} [query.pageToken] Token returned from a previous call, to
+ * @param {object} [options] Configuration object.
+ * @param {boolean} [options.autoPaginate=true] Have pagination handled automatically.
+ * @param {number} [options.maxApiCalls] Maximum number of API calls to make.
+ * @param {number} [options.maxResults] Maximum number of results to return.
+ * @param {string} [options.pageToken] Token returned from a previous call, to
  *     request the next page of results.
  * @param {function} [callback] The callback function.
  * @param {?error} callback.err An error returned while making this request
@@ -427,20 +427,20 @@ Dataset.prototype.delete = function(options, callback) {
  *   var tables = data[0];
  * });
  */
-Dataset.prototype.getTables = function(query, callback) {
+Dataset.prototype.getTables = function(options, callback) {
   var that = this;
 
-  if (is.fn(query)) {
-    callback = query;
-    query = {};
+  if (is.fn(options)) {
+    callback = options;
+    options = {};
   }
 
-  query = query || {};
+  options = options || {};
 
   this.request(
     {
       uri: '/tables',
-      qs: query,
+      qs: options,
     },
     function(err, resp) {
       if (err) {
@@ -450,7 +450,7 @@ Dataset.prototype.getTables = function(query, callback) {
 
       var nextQuery = null;
       if (resp.nextPageToken) {
-        nextQuery = extend({}, query, {
+        nextQuery = extend({}, options, {
           pageToken: resp.nextPageToken,
         });
       }
@@ -470,7 +470,7 @@ Dataset.prototype.getTables = function(query, callback) {
  * List all or some of the {module:bigquery/table} objects in your project as a
  * readable object stream.
  *
- * @param {object} [query] Configuration object. See
+ * @param {object} [options] Configuration object. See
  *     {@link Dataset#getTables} for a complete list of options.
  * @return {stream}
  *

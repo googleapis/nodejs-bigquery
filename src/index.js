@@ -777,13 +777,13 @@ BigQuery.prototype.dataset = function(id) {
  *
  * @see [Datasets: list API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/datasets/list}
  *
- * @param {object} [query] Configuration object.
- * @param {boolean} [query.all] List all datasets, including hidden ones.
- * @param {boolean} [query.autoPaginate] Have pagination handled automatically.
+ * @param {object} [options] Configuration object.
+ * @param {boolean} [options.all] List all datasets, including hidden ones.
+ * @param {boolean} [options.autoPaginate] Have pagination handled automatically.
  *     Default: true.
- * @param {number} [query.maxApiCalls] Maximum number of API calls to make.
- * @param {number} [query.maxResults] Maximum number of results to return.
- * @param {string} [query.pageToken] Token returned from a previous call, to
+ * @param {number} [options.maxApiCalls] Maximum number of API calls to make.
+ * @param {number} [options.maxResults] Maximum number of results to return.
+ * @param {string} [options.pageToken] Token returned from a previous call, to
  *     request the next page of results.
  * @param {function} [callback] The callback function.
  * @param {?error} callback.err An error returned while making this request
@@ -820,20 +820,20 @@ BigQuery.prototype.dataset = function(id) {
  * //-
  * bigquery.getDatasets().then(function(datasets) {});
  */
-BigQuery.prototype.getDatasets = function(query, callback) {
+BigQuery.prototype.getDatasets = function(options, callback) {
   var that = this;
 
-  if (is.fn(query)) {
-    callback = query;
-    query = {};
+  if (is.fn(options)) {
+    callback = options;
+    options = {};
   }
 
-  query = query || {};
+  options = options || {};
 
   this.request(
     {
       uri: '/datasets',
-      qs: query,
+      qs: options,
     },
     function(err, resp) {
       if (err) {
@@ -844,7 +844,7 @@ BigQuery.prototype.getDatasets = function(query, callback) {
       var nextQuery = null;
 
       if (resp.nextPageToken) {
-        nextQuery = extend({}, query, {
+        nextQuery = extend({}, options, {
           pageToken: resp.nextPageToken,
         });
       }
@@ -864,7 +864,7 @@ BigQuery.prototype.getDatasets = function(query, callback) {
  * List all or some of the {@link Dataset} objects in your project as
  * a readable object stream.
  *
- * @param {object} [query] Configuration object. See
+ * @param {object} [options] Configuration object. See
  *     {@link BigQuery#getDatasets} for a complete list of options.
  * @returns {stream}
  *
@@ -997,7 +997,7 @@ BigQuery.prototype.getJobs = function(options, callback) {
  * List all or some of the {@link Job} objects in your project as a
  * readable object stream.
  *
- * @param {object} [query] Configuration object. See
+ * @param {object} [options] Configuration object. See
  *     {@link BigQuery#getJobs} for a complete list of options.
  * @returns {stream}
  *
