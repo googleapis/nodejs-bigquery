@@ -734,7 +734,7 @@ Table.prototype.createWriteStream = function(metadata) {
  * const storage = new Storage({
  *   projectId: 'grape-spaceship-123'
  * });
- * var exportedFile = storage.bucket('institutions').file('2014.csv');
+ * var extractedFile = storage.bucket('institutions').file('2014.csv');
  *
  * //-
  * // To use the default options, just pass a {@link https://cloud.google.com/nodejs/docs/reference/storage/latest/File File} object.
@@ -743,7 +743,7 @@ Table.prototype.createWriteStream = function(metadata) {
  * // If you wish to override this, or provide an array of destination files,
  * // you must provide an `options` object.
  * //-
- * table.export(exportedFile, function(err, apiResponse) {});
+ * table.extract(extractedFile, function(err, apiResponse) {});
  *
  * //-
  * // If you need more customization, pass an `options` object.
@@ -753,12 +753,12 @@ Table.prototype.createWriteStream = function(metadata) {
  *   gzip: true
  * };
  *
- * table.export(exportedFile, options, function(err, apiResponse) {});
+ * table.extract(extractedFile, options, function(err, apiResponse) {});
  *
  * //-
  * // You can also specify multiple destination files.
  * //-
- * table.export([
+ * table.extract([
  *   storage.bucket('institutions').file('2014.json'),
  *   storage.bucket('institutions-copy').file('2014.json')
  * ], options, function(err, apiResponse) {});
@@ -766,17 +766,17 @@ Table.prototype.createWriteStream = function(metadata) {
  * //-
  * // If the callback is omitted, we'll return a Promise.
  * //-
- * table.export(exportedFile, options).then(function(data) {
+ * table.extract(extractedFile, options).then(function(data) {
  *   var apiResponse = data[0];
  * });
  */
-Table.prototype.export = function(destination, options, callback) {
+Table.prototype.extract = function(destination, options, callback) {
   if (is.fn(options)) {
     callback = options;
     options = {};
   }
 
-  this.startExport(destination, options, function(err, job, resp) {
+  this.startExtract(destination, options, function(err, job, resp) {
     if (err) {
       callback(err, resp);
       return;
@@ -892,94 +892,6 @@ Table.prototype.getRows = function(options, callback) {
     rows = self.bigQuery.mergeSchemaWithRows_(self.metadata.schema, rows || []);
     callback(null, rows, nextQuery, resp);
   }
-};
-
-/**
- * Load data from a local file or Storage {@link https://cloud.google.com/nodejs/docs/reference/storage/latest/File File}.
- *
- * By loading data this way, you create a load job that will run your data load
- * asynchronously. If you would like instantaneous access to your data, insert
- * it using {@link Table#insert}.
- *
- * Note: The file type will be inferred by the given file's extension. If you
- * wish to override this, you must provide `metadata.format`.
- *
- * @param {string|File} source The source file to import. A string or a
- *     {@link https://cloud.google.com/nodejs/docs/reference/storage/latest/File File} object.
- * @param {object} [metadata] Metadata to set with the load operation. The
- *     metadata object should be in the format of the
- *     [`configuration.load`](http://goo.gl/BVcXk4) property of a Jobs resource.
- * @param {string} [metadata.format] The format the data being imported is in.
- *     Allowed options are "CSV", "JSON", or "AVRO".
- * @param {function} [callback] The callback function.
- * @param {?error} callback.err An error returned while making this request
- * @param {object} callback.apiResponse The full API response.
- * @returns {Promise}
- *
- * @throws {Error} If the source isn't a string file name or a File instance.
- *
- * @example
- * const BigQuery = require('@google-cloud/bigquery');
- * const bigquery = new BigQuery();
- * const dataset = bigquery.dataset('my-dataset');
- * const table = bigquery.table('my-table');
- *
- * //-
- * // Load data from a local file.
- * //-
- * table.import('./institutions.csv', function(err, apiResponse) {});
- *
- * //-
- * // You may also pass in metadata in the format of a Jobs resource. See
- * // (http://goo.gl/BVcXk4) for a full list of supported values.
- * //-
- * var metadata = {
- *   encoding: 'ISO-8859-1',
- *   sourceFormat: 'NEWLINE_DELIMITED_JSON'
- * };
- *
- * table.import('./my-data.csv', metadata, function(err, apiResponse) {});
- *
- * //-
- * // Load data from a file in your Cloud Storage bucket.
- * //-
- * var gcs = require('@google-cloud/storage')({
- *   projectId: 'grape-spaceship-123'
- * });
- * var data = gcs.bucket('institutions').file('data.csv');
- * table.import(data, function(err, apiResponse) {});
- *
- * //-
- * // Load data from multiple files in your Cloud Storage bucket(s).
- * //-
- * table.import([
- *   gcs.bucket('institutions').file('2011.csv'),
- *   gcs.bucket('institutions').file('2012.csv')
- * ], function(err, apiResponse) {});
- *
- * //-
- * // If the callback is omitted, we'll return a Promise.
- * //-
- * table.import(data).then(function(data) {
- *   var apiResponse = data[0];
- * });
- */
-Table.prototype.import = function(source, metadata, callback) {
-  if (is.fn(metadata)) {
-    callback = metadata;
-    metadata = {};
-  }
-
-  this.startImport(source, metadata, function(err, job, resp) {
-    if (err) {
-      callback(err, resp);
-      return;
-    }
-
-    job.on('error', callback).on('complete', function(metadata) {
-      callback(null, metadata);
-    });
-  });
 };
 
 /**
@@ -1213,6 +1125,94 @@ Table.prototype.insert = function(rows, options, callback) {
       }
     );
   }
+};
+
+/**
+ * Load data from a local file or Storage {@link https://cloud.google.com/nodejs/docs/reference/storage/latest/File File}.
+ *
+ * By loading data this way, you create a load job that will run your data load
+ * asynchronously. If you would like instantaneous access to your data, insert
+ * it using {@link Table#insert}.
+ *
+ * Note: The file type will be inferred by the given file's extension. If you
+ * wish to override this, you must provide `metadata.format`.
+ *
+ * @param {string|File} source The source file to import. A string or a
+ *     {@link https://cloud.google.com/nodejs/docs/reference/storage/latest/File File} object.
+ * @param {object} [metadata] Metadata to set with the load operation. The
+ *     metadata object should be in the format of the
+ *     [`configuration.load`](http://goo.gl/BVcXk4) property of a Jobs resource.
+ * @param {string} [metadata.format] The format the data being imported is in.
+ *     Allowed options are "CSV", "JSON", or "AVRO".
+ * @param {function} [callback] The callback function.
+ * @param {?error} callback.err An error returned while making this request
+ * @param {object} callback.apiResponse The full API response.
+ * @returns {Promise}
+ *
+ * @throws {Error} If the source isn't a string file name or a File instance.
+ *
+ * @example
+ * const BigQuery = require('@google-cloud/bigquery');
+ * const bigquery = new BigQuery();
+ * const dataset = bigquery.dataset('my-dataset');
+ * const table = bigquery.table('my-table');
+ *
+ * //-
+ * // Load data from a local file.
+ * //-
+ * table.load('./institutions.csv', function(err, apiResponse) {});
+ *
+ * //-
+ * // You may also pass in metadata in the format of a Jobs resource. See
+ * // (http://goo.gl/BVcXk4) for a full list of supported values.
+ * //-
+ * var metadata = {
+ *   encoding: 'ISO-8859-1',
+ *   sourceFormat: 'NEWLINE_DELIMITED_JSON'
+ * };
+ *
+ * table.load('./my-data.csv', metadata, function(err, apiResponse) {});
+ *
+ * //-
+ * // Load data from a file in your Cloud Storage bucket.
+ * //-
+ * var gcs = require('@google-cloud/storage')({
+ *   projectId: 'grape-spaceship-123'
+ * });
+ * var data = gcs.bucket('institutions').file('data.csv');
+ * table.load(data, function(err, apiResponse) {});
+ *
+ * //-
+ * // Load data from multiple files in your Cloud Storage bucket(s).
+ * //-
+ * table.load([
+ *   gcs.bucket('institutions').file('2011.csv'),
+ *   gcs.bucket('institutions').file('2012.csv')
+ * ], function(err, apiResponse) {});
+ *
+ * //-
+ * // If the callback is omitted, we'll return a Promise.
+ * //-
+ * table.load(data).then(function(data) {
+ *   var apiResponse = data[0];
+ * });
+ */
+Table.prototype.load = function(source, metadata, callback) {
+  if (is.fn(metadata)) {
+    callback = metadata;
+    metadata = {};
+  }
+
+  this.startLoad(source, metadata, function(err, job, resp) {
+    if (err) {
+      callback(err, resp);
+      return;
+    }
+
+    job.on('error', callback).on('complete', function(metadata) {
+      callback(null, metadata);
+    });
+  });
 };
 
 /**
@@ -1486,7 +1486,12 @@ Table.prototype.startCopyFrom = function(sourceTables, metadata, callback) {
  * const storage = new Storage({
  *   projectId: 'grape-spaceship-123'
  * });
- * const exportedFile = storage.bucket('institutions').file('2014.csv');
+ * const extractedFile = storage.bucket('institutions').file('2014.csv');
+ *
+ * function callback(err, job, apiResponse) {
+ *   // `job` is a Job object that can be used to check the status of the
+ *   // request.
+ * }
  *
  * //-
  * // To use the default options, just pass a {@link https://cloud.google.com/nodejs/docs/reference/storage/latest/File File} object.
@@ -1495,10 +1500,7 @@ Table.prototype.startCopyFrom = function(sourceTables, metadata, callback) {
  * // If you wish to override this, or provide an array of destination files,
  * // you must provide an `options` object.
  * //-
- * table.startExport(exportedFile, function(err, job, apiResponse) {
- *   // `job` is a Job object that can be used to check the status of the
- *   // request.
- * });
+ * table.startExtract(extractedFile, callback);
  *
  * //-
  * // If you need more customization, pass an `options` object.
@@ -1508,25 +1510,25 @@ Table.prototype.startCopyFrom = function(sourceTables, metadata, callback) {
  *   gzip: true
  * };
  *
- * table.startExport(exportedFile, options, function(err, job, apiResponse) {});
+ * table.startExtract(extractedFile, options, callback);
  *
  * //-
  * // You can also specify multiple destination files.
  * //-
- * table.startExport([
+ * table.startExtract([
  *   storage.bucket('institutions').file('2014.json'),
  *   storage.bucket('institutions-copy').file('2014.json')
- * ], options, function(err, job, apiResponse) {});
+ * ], options, callback);
  *
  * //-
  * // If the callback is omitted, we'll return a Promise.
  * //-
- * table.startExport(exportedFile, options).then(function(data) {
+ * table.startExtract(extractedFile, options).then(function(data) {
  *   const job = data[0];
  *   const apiResponse = data[1];
  * });
  */
-Table.prototype.startExport = function(destination, options, callback) {
+Table.prototype.startExtract = function(destination, options, callback) {
   if (is.fn(options)) {
     callback = options;
     options = {};
@@ -1630,7 +1632,7 @@ Table.prototype.startExport = function(destination, options, callback) {
  *   // request.
  * };
  *
- * table.startImport('./institutions.csv', callback);
+ * table.startLoad('./institutions.csv', callback);
  *
  * //-
  * // You may also pass in metadata in the format of a Jobs resource. See
@@ -1641,7 +1643,7 @@ Table.prototype.startExport = function(destination, options, callback) {
  *   sourceFormat: 'NEWLINE_DELIMITED_JSON'
  * };
  *
- * table.startImport('./my-data.csv', metadata, callback);
+ * table.startLoad('./my-data.csv', metadata, callback);
  *
  * //-
  * // Load data from a file in your Cloud Storage bucket.
@@ -1650,12 +1652,12 @@ Table.prototype.startExport = function(destination, options, callback) {
  *   projectId: 'grape-spaceship-123'
  * });
  * const data = storage.bucket('institutions').file('data.csv');
- * table.startImport(data, callback);
+ * table.startLoad(data, callback);
  *
  * //-
  * // Load data from multiple files in your Cloud Storage bucket(s).
  * //-
- * table.startImport([
+ * table.startLoad([
  *   storage.bucket('institutions').file('2011.csv'),
  *   storage.bucket('institutions').file('2012.csv')
  * ], callback);
@@ -1663,12 +1665,12 @@ Table.prototype.startExport = function(destination, options, callback) {
  * //-
  * // If the callback is omitted, we'll return a Promise.
  * //-
- * table.startImport(data).then(function(data) {
+ * table.startLoad(data).then(function(data) {
  *   const job = data[0];
  *   const apiResponse = data[1];
  * });
  */
-Table.prototype.startImport = function(source, metadata, callback) {
+Table.prototype.startLoad = function(source, metadata, callback) {
   if (is.fn(metadata)) {
     callback = metadata;
     metadata = {};

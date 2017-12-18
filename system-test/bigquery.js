@@ -672,7 +672,7 @@ describe('BigQuery', function() {
       });
     });
 
-    describe('importing & exporting', function() {
+    describe('loading & extracting', function() {
       var file = bucket.file('kitten-test-data-backup.json');
 
       before(function(done) {
@@ -687,8 +687,8 @@ describe('BigQuery', function() {
         file.delete(done);
       });
 
-      it('should start to import data from a storage file', function(done) {
-        table.startImport(file, function(err, job) {
+      it('should start to load data from a storage file', function(done) {
+        table.startLoad(file, function(err, job) {
           assert.ifError(err);
 
           job.on('error', done).on('complete', function() {
@@ -697,16 +697,16 @@ describe('BigQuery', function() {
         });
       });
 
-      it('should import data from a storage file', function(done) {
-        table.import(file, function(err, resp) {
+      it('should load data from a storage file', function(done) {
+        table.load(file, function(err, resp) {
           assert.ifError(err);
           assert.strictEqual(resp.status.state, 'DONE');
           done();
         });
       });
 
-      it('should import data from a file via promises', function() {
-        return table.import(file).then(function(results) {
+      it('should load data from a file via promises', function() {
+        return table.load(file).then(function(results) {
           var metadata = results[0];
           assert.strictEqual(metadata.status.state, 'DONE');
         });
@@ -1198,10 +1198,10 @@ describe('BigQuery', function() {
         });
       });
 
-      it('should start export data to a storage file', function(done) {
+      it('should start extracting data to a storage file', function(done) {
         var file = bucket.file('kitten-test-data-backup.json');
 
-        table.startExport(file, function(err, job) {
+        table.startExtract(file, function(err, job) {
           assert.ifError(err);
 
           job.on('error', done).on('complete', function() {
@@ -1210,10 +1210,10 @@ describe('BigQuery', function() {
         });
       });
 
-      it('should export data to a storage file', function(done) {
+      it('should extract data to a storage file', function(done) {
         var file = bucket.file('kitten-test-data-backup.json');
 
-        table.export(file, function(err, resp) {
+        table.extract(file, function(err, resp) {
           assert.ifError(err);
           assert.strictEqual(resp.status.state, 'DONE');
           done();

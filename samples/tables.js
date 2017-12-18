@@ -202,8 +202,8 @@ function copyTable(
   // [END bigquery_copy_table]
 }
 
-function importLocalFile(datasetId, tableId, filename, projectId) {
-  // [START bigquery_import_from_file]
+function loadLocalFile(datasetId, tableId, filename, projectId) {
+  // [START bigquery_load_from_file]
   // Imports the Google Cloud client library
   const BigQuery = require('@google-cloud/bigquery');
 
@@ -222,11 +222,11 @@ function importLocalFile(datasetId, tableId, filename, projectId) {
 
   let job;
 
-  // Imports data from a local file into the table
+  // Loads data from a local file into the table
   bigquery
     .dataset(datasetId)
     .table(tableId)
-    .import(filename)
+    .load(filename)
     .then(results => {
       job = results[0];
       console.log(`Job ${job.id} started.`);
@@ -247,17 +247,11 @@ function importLocalFile(datasetId, tableId, filename, projectId) {
     .catch(err => {
       console.error('ERROR:', err);
     });
-  // [END bigquery_import_from_file]
+  // [END bigquery_load_from_file]
 }
 
-function importFileFromGCS(
-  datasetId,
-  tableId,
-  bucketName,
-  filename,
-  projectId
-) {
-  // [START bigquery_import_from_gcs]
+function loadFileFromGCS(datasetId, tableId, bucketName, filename, projectId) {
+  // [START bigquery_load_from_gcs]
   // Imports the Google Cloud client libraries
   const BigQuery = require('@google-cloud/bigquery');
   const Storage = require('@google-cloud/storage');
@@ -282,11 +276,11 @@ function importFileFromGCS(
 
   let job;
 
-  // Imports data from a Google Cloud Storage file into the table
+  // Loads data from a Google Cloud Storage file into the table
   bigquery
     .dataset(datasetId)
     .table(tableId)
-    .import(storage.bucket(bucketName).file(filename))
+    .load(storage.bucket(bucketName).file(filename))
     .then(results => {
       job = results[0];
       console.log(`Job ${job.id} started.`);
@@ -307,11 +301,17 @@ function importFileFromGCS(
     .catch(err => {
       console.error('ERROR:', err);
     });
-  // [END bigquery_import_from_gcs]
+  // [END bigquery_load_from_gcs]
 }
 
-function exportTableToGCS(datasetId, tableId, bucketName, filename, projectId) {
-  // [START bigquery_export_gcs]
+function extractTableToGCS(
+  datasetId,
+  tableId,
+  bucketName,
+  filename,
+  projectId
+) {
+  // [START bigquery_extract_gcs]
   // Imports the Google Cloud client libraries
   const BigQuery = require('@google-cloud/bigquery');
   const Storage = require('@google-cloud/storage');
@@ -340,7 +340,7 @@ function exportTableToGCS(datasetId, tableId, bucketName, filename, projectId) {
   bigquery
     .dataset(datasetId)
     .table(tableId)
-    .export(storage.bucket(bucketName).file(filename))
+    .extract(storage.bucket(bucketName).file(filename))
     .then(results => {
       job = results[0];
       console.log(`Job ${job.id} started.`);
@@ -361,7 +361,7 @@ function exportTableToGCS(datasetId, tableId, bucketName, filename, projectId) {
     .catch(err => {
       console.error('ERROR:', err);
     });
-  // [END bigquery_export_gcs]
+  // [END bigquery_extract_gcs]
 }
 
 function insertRowsAsStream(datasetId, tableId, rows, projectId) {
@@ -454,11 +454,11 @@ require(`yargs`)
     }
   )
   .command(
-    `import <projectId> <datasetId> <tableId> <fileName>`,
-    `Imports data from a local file into a table.`,
+    `load <projectId> <datasetId> <tableId> <fileName>`,
+    `Loads data from a local file into a table.`,
     {},
     opts => {
-      importLocalFile(
+      loadLocalFile(
         opts.datasetId,
         opts.tableId,
         opts.fileName,
@@ -467,11 +467,11 @@ require(`yargs`)
     }
   )
   .command(
-    `import-gcs <projectId> <datasetId> <tableId> <bucketName> <fileName>`,
-    `Imports data from a Google Cloud Storage file into a table.`,
+    `load-gcs <projectId> <datasetId> <tableId> <bucketName> <fileName>`,
+    `Loads data from a Google Cloud Storage file into a table.`,
     {},
     opts => {
-      importFileFromGCS(
+      loadFileFromGCS(
         opts.datasetId,
         opts.tableId,
         opts.bucketName,
@@ -481,11 +481,11 @@ require(`yargs`)
     }
   )
   .command(
-    `export <projectId> <datasetId> <tableId> <bucketName> <fileName>`,
-    `Export a table from BigQuery to Google Cloud Storage.`,
+    `extract <projectId> <datasetId> <tableId> <bucketName> <fileName>`,
+    `Extract a table from BigQuery to Google Cloud Storage.`,
     {},
     opts => {
-      exportTableToGCS(
+      extractTableToGCS(
         opts.datasetId,
         opts.tableId,
         opts.bucketName,
@@ -546,19 +546,19 @@ require(`yargs`)
     `Deletes "my_table" from "my_dataset".`
   )
   .example(
-    `node $0 import my-project-id my_dataset my_table ./data.csv`,
+    `node $0 load my-project-id my_dataset my_table ./data.csv`,
     `Imports a local file into a table.`
   )
   .example(
-    `node $0 import-gcs my-project-id my_dataset my_table my-bucket data.csv`,
+    `node $0 load-gcs my-project-id my_dataset my_table my-bucket data.csv`,
     `Imports a GCS file into a table.`
   )
   .example(
-    `node $0 export my-project-id my_dataset my_table my-bucket my-file`,
+    `node $0 extract my-project-id my_dataset my_table my-bucket my-file`,
     `Exports my_dataset:my_table to gcs://my-bucket/my-file as raw CSV.`
   )
   .example(
-    `node $0 export my-project-id my_dataset my_table my-bucket my-file -f JSON --gzip`,
+    `node $0 extract my-project-id my_dataset my_table my-bucket my-file -f JSON --gzip`,
     `Exports my_dataset:my_table to gcs://my-bucket/my-file as gzipped JSON.`
   )
   .example(
