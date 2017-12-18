@@ -1042,7 +1042,8 @@ BigQuery.prototype.job = function(id) {
 };
 
 /**
- * Run a query scoped to your project.
+ * Run a query scoped to your project. For manual pagination please refer to
+ * {@link BigQuery#startQuery}.
  *
  * @see [Jobs: query API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/query}
  *
@@ -1059,9 +1060,6 @@ BigQuery.prototype.job = function(id) {
  *     syntax, of the query to execute.
  * @param {boolean} [query.useLegacySql=false] Option to use legacy sql syntax.
  * @param {object} [options] Configuration object for query results.
- * @param {boolean} [options.autoPaginate] Have pagination handled
- *     automatically. Default: true.
- * @param {number} [options.maxApiCalls] Maximum number of API calls to make.
  * @param {number} [options.maxResults] Maximum number of results to read.
  * @param {number} [options.timeoutMs] How long to wait for the query to
  *     complete, in milliseconds, before returning. Default is to return
@@ -1119,21 +1117,6 @@ BigQuery.prototype.job = function(id) {
  * // your query, see {@link BigQuery#date}, {@link BigQuery#datetime},
  * // {@link BigQuery#time}, and {@link BigQuery#timestamp}.
  * //-
- *
- * //-
- * // To control how many API requests are made and page through the results
- * // manually, set `autoPaginate` to `false`.
- * //-
- * function manualPaginationCallback(err, rows, nextQuery, apiResponse) {
- *   if (nextQuery) {
- *     bigquery.query(nextQuery, manualPaginationCallback);
- *   }
- * }
- *
- * bigquery.query({
- *   query: query,
- *   autoPaginate: false
- * }, manualPaginationCallback);
  *
  * //-
  * // If the callback is omitted, we'll return a Promise.
