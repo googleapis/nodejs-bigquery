@@ -222,6 +222,31 @@ function Dataset(bigQuery, id) {
 util.inherits(Dataset, common.ServiceObject);
 
 /**
+ * Start running a query scoped to your dataset.
+ *
+ * See {@link BigQuery#createQueryJob} for full documentation of this method.
+ *
+ * @param {object} options See {@link BigQuery#createQueryJob} for full documentation of this method.
+ * @param {function} [callback] See {@link BigQuery#createQueryJob} for full documentation of this method.
+ * @returns {Promise} See {@link BigQuery#createQueryJob} for full documentation of this method.
+ */
+Dataset.prototype.createQueryJob = function(options, callback) {
+  if (is.string(options)) {
+    options = {
+      query: options,
+    };
+  }
+
+  options = extend(true, {}, options, {
+    defaultDataset: {
+      datasetId: this.id,
+    },
+  });
+
+  return this.bigQuery.createQueryJob(options, callback);
+};
+
+/**
  * Run a query scoped to your dataset as a readable object stream.
  *
  * See {@link BigQuery#createQueryStream} for full documentation of this
@@ -520,31 +545,6 @@ Dataset.prototype.query = function(options, callback) {
   });
 
   return this.bigQuery.query(options, callback);
-};
-
-/**
- * Start running a query scoped to your dataset.
- *
- * See {@link BigQuery#startQuery} for full documentation of this method.
- *
- * @param {object} options See {@link BigQuery#startQuery} for full documentation of this method.
- * @param {function} [callback] See {@link BigQuery#startQuery} for full documentation of this method.
- * @returns {Promise} See {@link BigQuery#startQuery} for full documentation of this method.
- */
-Dataset.prototype.startQuery = function(options, callback) {
-  if (is.string(options)) {
-    options = {
-      query: options,
-    };
-  }
-
-  options = extend(true, {}, options, {
-    defaultDataset: {
-      datasetId: this.id,
-    },
-  });
-
-  return this.bigQuery.startQuery(options, callback);
 };
 
 /**
