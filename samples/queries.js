@@ -142,7 +142,7 @@ function asyncQuery(sqlQuery, projectId) {
 
   // Runs the query as a job
   bigquery
-    .startQuery(options)
+    .createQueryJob(options)
     .then(results => {
       job = results[0];
       console.log(`Job ${job.id} started.`);
