@@ -180,6 +180,40 @@ describe('BigQuery/Dataset', function() {
     });
   });
 
+  describe('createQueryJob', function() {
+    var FAKE_QUERY = 'SELECT * FROM `table`';
+
+    it('should extend the options', function(done) {
+      var fakeOptions = {
+        query: FAKE_QUERY,
+        a: {b: 'c'},
+      };
+
+      var expectedOptions = extend(true, {}, fakeOptions, {
+        defaultDataset: {
+          datasetId: ds.id,
+        },
+      });
+
+      ds.bigQuery.createQueryJob = function(options, callback) {
+        assert.deepEqual(options, expectedOptions);
+        assert.notStrictEqual(fakeOptions, options);
+        callback(); // the done fn
+      };
+
+      ds.createQueryJob(fakeOptions, done);
+    });
+
+    it('should accept a query string', function(done) {
+      ds.bigQuery.createQueryJob = function(options, callback) {
+        assert.strictEqual(options.query, FAKE_QUERY);
+        callback(); // the done fn
+      };
+
+      ds.createQueryJob(FAKE_QUERY, done);
+    });
+  });
+
   describe('createQueryStream', function() {
     var options = {
       a: 'b',
@@ -645,40 +679,6 @@ describe('BigQuery/Dataset', function() {
       };
 
       ds.query(options, callback);
-    });
-  });
-
-  describe('startQuery', function() {
-    var FAKE_QUERY = 'SELECT * FROM `table`';
-
-    it('should extend the options', function(done) {
-      var fakeOptions = {
-        query: FAKE_QUERY,
-        a: {b: 'c'},
-      };
-
-      var expectedOptions = extend(true, {}, fakeOptions, {
-        defaultDataset: {
-          datasetId: ds.id,
-        },
-      });
-
-      ds.bigQuery.startQuery = function(options, callback) {
-        assert.deepEqual(options, expectedOptions);
-        assert.notStrictEqual(fakeOptions, options);
-        callback(); // the done fn
-      };
-
-      ds.startQuery(fakeOptions, done);
-    });
-
-    it('should accept a query string', function(done) {
-      ds.bigQuery.startQuery = function(options, callback) {
-        assert.strictEqual(options.query, FAKE_QUERY);
-        callback(); // the done fn
-      };
-
-      ds.startQuery(FAKE_QUERY, done);
     });
   });
 

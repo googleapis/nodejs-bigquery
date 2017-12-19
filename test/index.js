@@ -893,6 +893,216 @@ describe('BigQuery', function() {
     });
   });
 
+  describe('createQueryJob', function() {
+    var QUERY_STRING = 'SELECT * FROM [dataset.table]';
+
+    it('should throw if a query is not provided', function() {
+      assert.throws(function() {
+        bq.createQueryJob();
+      }, /SQL query string is required/);
+
+      assert.throws(function() {
+        bq.createQueryJob({noQuery: 'here'});
+      }, /SQL query string is required/);
+    });
+
+    describe('with destination', function() {
+      var dataset;
+      var TABLE_ID = 'table-id';
+
+      beforeEach(function() {
+        dataset = {
+          bigQuery: bq,
+          id: 'dataset-id',
+          createTable: util.noop,
+        };
+      });
+
+      it('should throw if a destination is not a table', function() {
+        assert.throws(function() {
+          bq.createQueryJob({
+            query: 'query',
+            destination: 'not a table',
+          });
+        }, /Destination must be a Table/);
+      });
+
+      it('should assign destination table to request body', function(done) {
+        bq.request = function(reqOpts) {
+          assert.deepEqual(reqOpts.json.configuration.query.destinationTable, {
+            datasetId: dataset.id,
+            projectId: dataset.bigQuery.projectId,
+            tableId: TABLE_ID,
+          });
+
+          done();
+        };
+
+        bq.createQueryJob({
+          query: 'query',
+          destination: new FakeTable(dataset, TABLE_ID),
+        });
+      });
+
+      it('should delete `destination` prop from request body', function(done) {
+        bq.request = function(reqOpts) {
+          var body = reqOpts.json;
+          assert.strictEqual(body.configuration.query.destination, undefined);
+          done();
+        };
+
+        bq.createQueryJob({
+          query: 'query',
+          destination: new FakeTable(dataset, TABLE_ID),
+        });
+      });
+    });
+
+    describe('SQL parameters', function() {
+      var NAMED_PARAMS = {
+        key: 'value',
+      };
+
+      var POSITIONAL_PARAMS = ['value'];
+
+      it('should delete the params option', function(done) {
+        bq.createJob = function(reqOpts) {
+          assert.strictEqual(reqOpts.params, undefined);
+          done();
+        };
+
+        bq.createQueryJob(
+          {
+            query: QUERY_STRING,
+            params: NAMED_PARAMS,
+          },
+          assert.ifError
+        );
+      });
+
+      describe('named', function() {
+        it('should set the correct parameter mode', function(done) {
+          bq.createJob = function(reqOpts) {
+            var query = reqOpts.configuration.query;
+            assert.strictEqual(query.parameterMode, 'named');
+            done();
+          };
+
+          bq.createQueryJob(
+            {
+              query: QUERY_STRING,
+              params: NAMED_PARAMS,
+            },
+            assert.ifError
+          );
+        });
+
+        it('should get set the correct query parameters', function(done) {
+          var queryParameter = {};
+
+          BigQuery.valueToQueryParameter_ = function(value) {
+            assert.strictEqual(value, NAMED_PARAMS.key);
+            return queryParameter;
+          };
+
+          bq.createJob = function(reqOpts) {
+            var query = reqOpts.configuration.query;
+            assert.strictEqual(query.queryParameters[0], queryParameter);
+            assert.strictEqual(query.queryParameters[0].name, 'key');
+            done();
+          };
+
+          bq.createQueryJob(
+            {
+              query: QUERY_STRING,
+              params: NAMED_PARAMS,
+            },
+            assert.ifError
+          );
+        });
+      });
+
+      describe('positional', function() {
+        it('should set the correct parameter mode', function(done) {
+          bq.createJob = function(reqOpts) {
+            var query = reqOpts.configuration.query;
+            assert.strictEqual(query.parameterMode, 'positional');
+            done();
+          };
+
+          bq.createQueryJob(
+            {
+              query: QUERY_STRING,
+              params: POSITIONAL_PARAMS,
+            },
+            assert.ifError
+          );
+        });
+
+        it('should get set the correct query parameters', function(done) {
+          var queryParameter = {};
+
+          BigQuery.valueToQueryParameter_ = function(value) {
+            assert.strictEqual(value, POSITIONAL_PARAMS[0]);
+            return queryParameter;
+          };
+
+          bq.createJob = function(reqOpts) {
+            var query = reqOpts.configuration.query;
+            assert.strictEqual(query.queryParameters[0], queryParameter);
+            done();
+          };
+
+          bq.createQueryJob(
+            {
+              query: QUERY_STRING,
+              params: POSITIONAL_PARAMS,
+            },
+            assert.ifError
+          );
+        });
+      });
+    });
+
+    it('should accept the dryRun options', function(done) {
+      var options = {
+        query: QUERY_STRING,
+        dryRun: true,
+      };
+
+      bq.createJob = function(reqOpts) {
+        assert.strictEqual(reqOpts.configuration.query.dryRun, undefined);
+        assert.strictEqual(reqOpts.configuration.dryRun, options.dryRun);
+        done();
+      };
+
+      bq.createQueryJob(options, assert.ifError);
+    });
+
+    it('should accept a job prefix', function(done) {
+      var options = {
+        query: QUERY_STRING,
+        jobPrefix: 'hi',
+      };
+
+      bq.createJob = function(reqOpts) {
+        assert.strictEqual(reqOpts.configuration.query.jobPrefix, undefined);
+        assert.strictEqual(reqOpts.jobPrefix, options.jobPrefix);
+        done();
+      };
+
+      bq.createQueryJob(options, assert.ifError);
+    });
+
+    it('should pass the callback to createJob', function(done) {
+      bq.createJob = function(reqOpts, callback) {
+        callback(); // the done fn
+      };
+
+      bq.createQueryJob(QUERY_STRING, done);
+    });
+  });
+
   describe('dataset', function() {
     var DATASET_ID = 'dataset-id';
 
@@ -1172,10 +1382,10 @@ describe('BigQuery', function() {
     var FAKE_RESPONSE = {};
     var QUERY_STRING = 'SELECT * FROM [dataset.table]';
 
-    it('should return any errors from startQuery', function(done) {
+    it('should return any errors from createQueryJob', function(done) {
       var error = new Error('err');
 
-      bq.startQuery = function(query, callback) {
+      bq.createQueryJob = function(query, callback) {
         callback(error, null, FAKE_RESPONSE);
       };
 
@@ -1195,7 +1405,7 @@ describe('BigQuery', function() {
         },
       };
 
-      bq.startQuery = function(query, callback) {
+      bq.createQueryJob = function(query, callback) {
         callback(null, fakeJob, FAKE_RESPONSE);
       };
 
@@ -1216,221 +1426,11 @@ describe('BigQuery', function() {
         },
       };
 
-      bq.startQuery = function(query, callback) {
+      bq.createQueryJob = function(query, callback) {
         callback(null, fakeJob, FAKE_RESPONSE);
       };
 
       bq.query(QUERY_STRING, fakeOptions, assert.ifError);
-    });
-  });
-
-  describe('startQuery', function() {
-    var QUERY_STRING = 'SELECT * FROM [dataset.table]';
-
-    it('should throw if a query is not provided', function() {
-      assert.throws(function() {
-        bq.startQuery();
-      }, /SQL query string is required/);
-
-      assert.throws(function() {
-        bq.startQuery({noQuery: 'here'});
-      }, /SQL query string is required/);
-    });
-
-    describe('with destination', function() {
-      var dataset;
-      var TABLE_ID = 'table-id';
-
-      beforeEach(function() {
-        dataset = {
-          bigQuery: bq,
-          id: 'dataset-id',
-          createTable: util.noop,
-        };
-      });
-
-      it('should throw if a destination is not a table', function() {
-        assert.throws(function() {
-          bq.startQuery({
-            query: 'query',
-            destination: 'not a table',
-          });
-        }, /Destination must be a Table/);
-      });
-
-      it('should assign destination table to request body', function(done) {
-        bq.request = function(reqOpts) {
-          assert.deepEqual(reqOpts.json.configuration.query.destinationTable, {
-            datasetId: dataset.id,
-            projectId: dataset.bigQuery.projectId,
-            tableId: TABLE_ID,
-          });
-
-          done();
-        };
-
-        bq.startQuery({
-          query: 'query',
-          destination: new FakeTable(dataset, TABLE_ID),
-        });
-      });
-
-      it('should delete `destination` prop from request body', function(done) {
-        bq.request = function(reqOpts) {
-          var body = reqOpts.json;
-          assert.strictEqual(body.configuration.query.destination, undefined);
-          done();
-        };
-
-        bq.startQuery({
-          query: 'query',
-          destination: new FakeTable(dataset, TABLE_ID),
-        });
-      });
-    });
-
-    describe('SQL parameters', function() {
-      var NAMED_PARAMS = {
-        key: 'value',
-      };
-
-      var POSITIONAL_PARAMS = ['value'];
-
-      it('should delete the params option', function(done) {
-        bq.createJob = function(reqOpts) {
-          assert.strictEqual(reqOpts.params, undefined);
-          done();
-        };
-
-        bq.startQuery(
-          {
-            query: QUERY_STRING,
-            params: NAMED_PARAMS,
-          },
-          assert.ifError
-        );
-      });
-
-      describe('named', function() {
-        it('should set the correct parameter mode', function(done) {
-          bq.createJob = function(reqOpts) {
-            var query = reqOpts.configuration.query;
-            assert.strictEqual(query.parameterMode, 'named');
-            done();
-          };
-
-          bq.startQuery(
-            {
-              query: QUERY_STRING,
-              params: NAMED_PARAMS,
-            },
-            assert.ifError
-          );
-        });
-
-        it('should get set the correct query parameters', function(done) {
-          var queryParameter = {};
-
-          BigQuery.valueToQueryParameter_ = function(value) {
-            assert.strictEqual(value, NAMED_PARAMS.key);
-            return queryParameter;
-          };
-
-          bq.createJob = function(reqOpts) {
-            var query = reqOpts.configuration.query;
-            assert.strictEqual(query.queryParameters[0], queryParameter);
-            assert.strictEqual(query.queryParameters[0].name, 'key');
-            done();
-          };
-
-          bq.startQuery(
-            {
-              query: QUERY_STRING,
-              params: NAMED_PARAMS,
-            },
-            assert.ifError
-          );
-        });
-      });
-
-      describe('positional', function() {
-        it('should set the correct parameter mode', function(done) {
-          bq.createJob = function(reqOpts) {
-            var query = reqOpts.configuration.query;
-            assert.strictEqual(query.parameterMode, 'positional');
-            done();
-          };
-
-          bq.startQuery(
-            {
-              query: QUERY_STRING,
-              params: POSITIONAL_PARAMS,
-            },
-            assert.ifError
-          );
-        });
-
-        it('should get set the correct query parameters', function(done) {
-          var queryParameter = {};
-
-          BigQuery.valueToQueryParameter_ = function(value) {
-            assert.strictEqual(value, POSITIONAL_PARAMS[0]);
-            return queryParameter;
-          };
-
-          bq.createJob = function(reqOpts) {
-            var query = reqOpts.configuration.query;
-            assert.strictEqual(query.queryParameters[0], queryParameter);
-            done();
-          };
-
-          bq.startQuery(
-            {
-              query: QUERY_STRING,
-              params: POSITIONAL_PARAMS,
-            },
-            assert.ifError
-          );
-        });
-      });
-    });
-
-    it('should accept the dryRun options', function(done) {
-      var options = {
-        query: QUERY_STRING,
-        dryRun: true,
-      };
-
-      bq.createJob = function(reqOpts) {
-        assert.strictEqual(reqOpts.configuration.query.dryRun, undefined);
-        assert.strictEqual(reqOpts.configuration.dryRun, options.dryRun);
-        done();
-      };
-
-      bq.startQuery(options, assert.ifError);
-    });
-
-    it('should accept a job prefix', function(done) {
-      var options = {
-        query: QUERY_STRING,
-        jobPrefix: 'hi',
-      };
-
-      bq.createJob = function(reqOpts) {
-        assert.strictEqual(reqOpts.configuration.query.jobPrefix, undefined);
-        assert.strictEqual(reqOpts.jobPrefix, options.jobPrefix);
-        done();
-      };
-
-      bq.startQuery(options, assert.ifError);
-    });
-
-    it('should pass the callback to createJob', function(done) {
-      bq.createJob = function(reqOpts, callback) {
-        callback(); // the done fn
-      };
-
-      bq.startQuery(QUERY_STRING, done);
     });
   });
 });

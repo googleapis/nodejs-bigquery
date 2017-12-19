@@ -400,16 +400,16 @@ describe('BigQuery/Table', function() {
 
     beforeEach(function() {
       fakeJob = new events.EventEmitter();
-      table.startCopy = function(destination, metadata, callback) {
+      table.createCopyJob = function(destination, metadata, callback) {
         callback(null, fakeJob);
       };
     });
 
-    it('should pass the arguments to startCopy', function(done) {
+    it('should pass the arguments to createCopyJob', function(done) {
       var fakeDestination = {};
       var fakeMetadata = {};
 
-      table.startCopy = function(destination, metadata) {
+      table.createCopyJob = function(destination, metadata) {
         assert.strictEqual(destination, fakeDestination);
         assert.strictEqual(metadata, fakeMetadata);
         done();
@@ -419,7 +419,7 @@ describe('BigQuery/Table', function() {
     });
 
     it('should optionally accept metadata', function(done) {
-      table.startCopy = function(destination, metadata) {
+      table.createCopyJob = function(destination, metadata) {
         assert.deepEqual(metadata, {});
         done();
       };
@@ -427,11 +427,11 @@ describe('BigQuery/Table', function() {
       table.copy({}, assert.ifError);
     });
 
-    it('should return any startCopy errors', function(done) {
+    it('should return any createCopyJob errors', function(done) {
       var error = new Error('err');
       var response = {};
 
-      table.startCopy = function(destination, metadata, callback) {
+      table.createCopyJob = function(destination, metadata, callback) {
         callback(error, null, response);
       };
 
@@ -471,16 +471,16 @@ describe('BigQuery/Table', function() {
 
     beforeEach(function() {
       fakeJob = new events.EventEmitter();
-      table.startCopyFrom = function(sourceTables, metadata, callback) {
+      table.createCopyFromJob = function(sourceTables, metadata, callback) {
         callback(null, fakeJob);
       };
     });
 
-    it('should pass the arguments to startCopyFrom', function(done) {
+    it('should pass the arguments to createCopyFromJob', function(done) {
       var fakeSourceTables = {};
       var fakeMetadata = {};
 
-      table.startCopyFrom = function(sourceTables, metadata) {
+      table.createCopyFromJob = function(sourceTables, metadata) {
         assert.strictEqual(sourceTables, fakeSourceTables);
         assert.strictEqual(metadata, fakeMetadata);
         done();
@@ -490,7 +490,7 @@ describe('BigQuery/Table', function() {
     });
 
     it('should optionally accept metadata', function(done) {
-      table.startCopyFrom = function(sourceTables, metadata) {
+      table.createCopyFromJob = function(sourceTables, metadata) {
         assert.deepEqual(metadata, {});
         done();
       };
@@ -498,11 +498,11 @@ describe('BigQuery/Table', function() {
       table.copyFrom({}, assert.ifError);
     });
 
-    it('should return any startCopyFrom errors', function(done) {
+    it('should return any createCopyFromJob errors', function(done) {
       var error = new Error('err');
       var response = {};
 
-      table.startCopyFrom = function(sourceTables, metadata, callback) {
+      table.createCopyFromJob = function(sourceTables, metadata, callback) {
         callback(error, null, response);
       };
 
@@ -534,6 +534,613 @@ describe('BigQuery/Table', function() {
       });
 
       fakeJob.emit('complete', metadata);
+    });
+  });
+
+  describe('createCopyJob', function() {
+    var DEST_TABLE;
+
+    before(function() {
+      DEST_TABLE = new Table(DATASET, 'destination-table');
+    });
+
+    it('should throw if a destination is not a Table', function() {
+      assert.throws(function() {
+        table.createCopyJob();
+      }, /Destination must be a Table/);
+
+      assert.throws(function() {
+        table.createCopyJob({});
+      }, /Destination must be a Table/);
+
+      assert.throws(function() {
+        table.createCopyJob(function() {});
+      }, /Destination must be a Table/);
+    });
+
+    it('should send correct request to the API', function(done) {
+      table.bigQuery.createJob = function(reqOpts) {
+        assert.deepEqual(reqOpts, {
+          configuration: {
+            copy: {
+              a: 'b',
+              c: 'd',
+              destinationTable: {
+                datasetId: DEST_TABLE.dataset.id,
+                projectId: DEST_TABLE.bigQuery.projectId,
+                tableId: DEST_TABLE.id,
+              },
+              sourceTable: {
+                datasetId: table.dataset.id,
+                projectId: table.bigQuery.projectId,
+                tableId: table.id,
+              },
+            },
+          },
+        });
+
+        done();
+      };
+
+      table.createCopyJob(DEST_TABLE, {a: 'b', c: 'd'}, assert.ifError);
+    });
+
+    it('should accept a job prefix', function(done) {
+      var fakeJobPrefix = 'abc-';
+      var options = {
+        jobPrefix: fakeJobPrefix,
+      };
+
+      table.bigQuery.createJob = function(reqOpts, callback) {
+        assert.strictEqual(reqOpts.jobPrefix, fakeJobPrefix);
+        assert.strictEqual(reqOpts.configuration.copy.jobPrefix, undefined);
+        callback(); // the done fn
+      };
+
+      table.createCopyJob(DEST_TABLE, options, done);
+    });
+
+    it('should pass the callback to createJob', function(done) {
+      table.bigQuery.createJob = function(reqOpts, callback) {
+        assert.strictEqual(done, callback);
+        callback(); // the done fn
+      };
+
+      table.createCopyJob(DEST_TABLE, {}, done);
+    });
+
+    it('should optionally accept metadata', function(done) {
+      table.bigQuery.createJob = function(reqOpts, callback) {
+        assert.strictEqual(done, callback);
+        callback(); // the done fn
+      };
+
+      table.createCopyJob(DEST_TABLE, done);
+    });
+  });
+
+  describe('createCopyFromJob', function() {
+    var SOURCE_TABLE;
+
+    before(function() {
+      SOURCE_TABLE = new Table(DATASET, 'source-table');
+    });
+
+    it('should throw if a source is not a Table', function() {
+      assert.throws(function() {
+        table.createCopyFromJob(['table']);
+      }, /Source must be a Table/);
+
+      assert.throws(function() {
+        table.createCopyFromJob([SOURCE_TABLE, 'table']);
+      }, /Source must be a Table/);
+
+      assert.throws(function() {
+        table.createCopyFromJob({});
+      }, /Source must be a Table/);
+
+      assert.throws(function() {
+        table.createCopyFromJob(function() {});
+      }, /Source must be a Table/);
+    });
+
+    it('should send correct request to the API', function(done) {
+      table.bigQuery.createJob = function(reqOpts) {
+        assert.deepEqual(reqOpts, {
+          configuration: {
+            copy: {
+              a: 'b',
+              c: 'd',
+              destinationTable: {
+                datasetId: table.dataset.id,
+                projectId: table.bigQuery.projectId,
+                tableId: table.id,
+              },
+              sourceTables: [
+                {
+                  datasetId: SOURCE_TABLE.dataset.id,
+                  projectId: SOURCE_TABLE.bigQuery.projectId,
+                  tableId: SOURCE_TABLE.id,
+                },
+              ],
+            },
+          },
+        });
+
+        done();
+      };
+
+      table.createCopyFromJob(SOURCE_TABLE, {a: 'b', c: 'd'}, assert.ifError);
+    });
+
+    it('should accept multiple source tables', function(done) {
+      table.bigQuery.createJob = function(reqOpts) {
+        assert.deepEqual(reqOpts.configuration.copy.sourceTables, [
+          {
+            datasetId: SOURCE_TABLE.dataset.id,
+            projectId: SOURCE_TABLE.bigQuery.projectId,
+            tableId: SOURCE_TABLE.id,
+          },
+          {
+            datasetId: SOURCE_TABLE.dataset.id,
+            projectId: SOURCE_TABLE.bigQuery.projectId,
+            tableId: SOURCE_TABLE.id,
+          },
+        ]);
+
+        done();
+      };
+
+      table.createCopyFromJob([SOURCE_TABLE, SOURCE_TABLE], assert.ifError);
+    });
+
+    it('should accept a job prefix', function(done) {
+      var fakeJobPrefix = 'abc-';
+      var options = {
+        jobPrefix: fakeJobPrefix,
+      };
+
+      table.bigQuery.createJob = function(reqOpts, callback) {
+        assert.strictEqual(reqOpts.jobPrefix, fakeJobPrefix);
+        assert.strictEqual(reqOpts.configuration.copy.jobPrefix, undefined);
+        callback(); // the done fn
+      };
+
+      table.createCopyFromJob(SOURCE_TABLE, options, done);
+    });
+
+    it('should pass the callback to createJob', function(done) {
+      table.bigQuery.createJob = function(reqOpts, callback) {
+        assert.strictEqual(done, callback);
+        callback(); // the done fn
+      };
+
+      table.createCopyFromJob(SOURCE_TABLE, {}, done);
+    });
+
+    it('should optionally accept options', function(done) {
+      table.bigQuery.createJob = function(reqOpts, callback) {
+        assert.strictEqual(done, callback);
+        callback(); // the done fn
+      };
+
+      table.createCopyFromJob(SOURCE_TABLE, done);
+    });
+  });
+
+  describe('createExtractJob', function() {
+    var FILE = {
+      name: 'file-name.json',
+      bucket: {
+        name: 'bucket-name',
+      },
+    };
+
+    beforeEach(function() {
+      isCustomTypeOverride = function() {
+        return true;
+      };
+
+      table.bigQuery.job = function(id) {
+        return {id: id};
+      };
+
+      table.bigQuery.createJob = function() {};
+    });
+
+    it('should call createJob correctly', function(done) {
+      table.bigQuery.createJob = function(reqOpts) {
+        assert.deepEqual(reqOpts.configuration.extract.sourceTable, {
+          datasetId: table.dataset.id,
+          projectId: table.bigQuery.projectId,
+          tableId: table.id,
+        });
+
+        done();
+      };
+
+      table.createExtractJob(FILE, assert.ifError);
+    });
+
+    it('should accept just a destination and a callback', function(done) {
+      table.bigQuery.createJob = function(reqOpts, callback) {
+        callback(null, {jobReference: {jobId: 'job-id'}});
+      };
+
+      table.createExtractJob(FILE, done);
+    });
+
+    describe('formats', function() {
+      it('should accept csv', function(done) {
+        table.bigQuery.createJob = function(reqOpts) {
+          var extract = reqOpts.configuration.extract;
+          assert.equal(extract.destinationFormat, 'CSV');
+          done();
+        };
+
+        table.createExtractJob(FILE, {format: 'csv'}, assert.ifError);
+      });
+
+      it('should accept json', function(done) {
+        table.bigQuery.createJob = function(reqOpts) {
+          var extract = reqOpts.configuration.extract;
+          assert.equal(extract.destinationFormat, 'NEWLINE_DELIMITED_JSON');
+          done();
+        };
+
+        table.createExtractJob(FILE, {format: 'json'}, assert.ifError);
+      });
+
+      it('should accept avro', function(done) {
+        table.bigQuery.createJob = function(reqOpts) {
+          var extract = reqOpts.configuration.extract;
+          assert.equal(extract.destinationFormat, 'AVRO');
+          done();
+        };
+
+        table.createExtractJob(FILE, {format: 'avro'}, assert.ifError);
+      });
+    });
+
+    it('should parse out full gs:// urls from files', function(done) {
+      table.bigQuery.createJob = function(reqOpts) {
+        assert.deepEqual(reqOpts.configuration.extract.destinationUris, [
+          'gs://' + FILE.bucket.name + '/' + FILE.name,
+        ]);
+        done();
+      };
+
+      table.createExtractJob(FILE, assert.ifError);
+    });
+
+    it('should check if a destination is a File', function(done) {
+      isCustomTypeOverride = function(dest, type) {
+        assert.strictEqual(dest, FILE);
+        assert.strictEqual(type, 'storage/file');
+        setImmediate(done);
+        return true;
+      };
+
+      table.createExtractJob(FILE, assert.ifError);
+    });
+
+    it('should throw if a destination is not a File', function() {
+      isCustomTypeOverride = function() {
+        return false;
+      };
+
+      assert.throws(function() {
+        table.createExtractJob({}, util.noop);
+      }, /Destination must be a File object/);
+
+      assert.throws(function() {
+        table.createExtractJob([FILE, {}], util.noop);
+      }, /Destination must be a File object/);
+    });
+
+    it('should detect file format if a format is not provided', function(done) {
+      table.bigQuery.createJob = function(reqOpts) {
+        var destFormat = reqOpts.configuration.extract.destinationFormat;
+        assert.equal(destFormat, 'NEWLINE_DELIMITED_JSON');
+        done();
+      };
+
+      table.createExtractJob(FILE, assert.ifError);
+    });
+
+    it('should assign the provided format if matched', function(done) {
+      table.bigQuery.createJob = function(reqOpts) {
+        var extract = reqOpts.configuration.extract;
+        assert.equal(extract.destinationFormat, 'CSV');
+        assert.strictEqual(extract.format, undefined);
+        done();
+      };
+
+      table.createExtractJob(FILE, {format: 'csv'}, assert.ifError);
+    });
+
+    it('should throw if a provided format is not recognized', function() {
+      assert.throws(function() {
+        table.createExtractJob(FILE, {format: 'zip'}, util.noop);
+      }, /Destination format not recognized/);
+    });
+
+    it('should assign GZIP compression with gzip: true', function(done) {
+      table.bigQuery.createJob = function(reqOpts) {
+        assert.equal(reqOpts.configuration.extract.compression, 'GZIP');
+        assert.strictEqual(reqOpts.configuration.extract.gzip, undefined);
+        done();
+      };
+
+      table.createExtractJob(FILE, {gzip: true}, util.noop);
+    });
+
+    it('should accept a job prefix', function(done) {
+      var fakeJobPrefix = 'abc-';
+      var options = {
+        jobPrefix: fakeJobPrefix,
+      };
+
+      table.bigQuery.createJob = function(reqOpts, callback) {
+        assert.strictEqual(reqOpts.jobPrefix, fakeJobPrefix);
+        assert.strictEqual(reqOpts.configuration.extract.jobPrefix, undefined);
+        callback(); // the done fn
+      };
+
+      table.createExtractJob(FILE, options, done);
+    });
+
+    it('should pass the callback to createJob', function(done) {
+      table.bigQuery.createJob = function(reqOpts, callback) {
+        assert.strictEqual(done, callback);
+        callback(); // the done fn
+      };
+
+      table.createExtractJob(FILE, {}, done);
+    });
+
+    it('should optionally accept options', function(done) {
+      table.bigQuery.createJob = function(reqOpts, callback) {
+        assert.strictEqual(done, callback);
+        callback(); // the done fn
+      };
+
+      table.createExtractJob(FILE, done);
+    });
+  });
+
+  describe('createLoadJob', function() {
+    var FILEPATH = require.resolve('./testdata/testfile.json');
+    var FILE = {
+      name: 'file-name.json',
+      bucket: {
+        name: 'bucket-name',
+      },
+    };
+
+    var JOB = {
+      id: 'foo',
+      metadata: {},
+    };
+
+    beforeEach(function() {
+      isCustomTypeOverride = function() {
+        return true;
+      };
+    });
+
+    it('should accept just a File and a callback', function(done) {
+      table.createWriteStream = function() {
+        var ws = new stream.Writable();
+        setImmediate(function() {
+          ws.emit('complete', JOB);
+          ws.end();
+        });
+        return ws;
+      };
+
+      table.createLoadJob(FILEPATH, function(err, job, resp) {
+        assert.strictEqual(err, null);
+        assert.strictEqual(job, JOB);
+        assert.strictEqual(resp, JOB.metadata);
+        done();
+      });
+    });
+
+    it('should return a stream when a string is given', function() {
+      table.createWriteStream = function() {
+        return new stream.Writable();
+      };
+
+      assert(table.createLoadJob(FILEPATH) instanceof stream.Stream);
+    });
+
+    it('should infer the file format from the given filepath', function(done) {
+      table.createWriteStream = function(metadata) {
+        assert.equal(metadata.sourceFormat, 'NEWLINE_DELIMITED_JSON');
+        var ws = new stream.Writable();
+        setImmediate(function() {
+          ws.emit('complete', JOB);
+          ws.end();
+        });
+        return ws;
+      };
+
+      table.createLoadJob(FILEPATH, done);
+    });
+
+    it('should execute callback with error from writestream', function(done) {
+      var error = new Error('Error.');
+
+      table.createWriteStream = function(metadata) {
+        assert.equal(metadata.sourceFormat, 'NEWLINE_DELIMITED_JSON');
+        var ws = new stream.Writable();
+        setImmediate(function() {
+          ws.emit('error', error);
+          ws.end();
+        });
+        return ws;
+      };
+
+      table.createLoadJob(FILEPATH, function(err) {
+        assert.strictEqual(err, error);
+        done();
+      });
+    });
+
+    it('should not infer the file format if one is given', function(done) {
+      table.createWriteStream = function(metadata) {
+        assert.equal(metadata.sourceFormat, 'CSV');
+        var ws = new stream.Writable();
+        setImmediate(function() {
+          ws.emit('complete', JOB);
+          ws.end();
+        });
+        return ws;
+      };
+
+      table.createLoadJob(FILEPATH, {sourceFormat: 'CSV'}, done);
+    });
+
+    it('should check if a destination is a File', function(done) {
+      isCustomTypeOverride = function(dest, type) {
+        assert.strictEqual(dest, FILE);
+        assert.strictEqual(type, 'storage/file');
+        setImmediate(done);
+        return true;
+      };
+
+      table.createLoadJob(FILE, assert.ifError);
+    });
+
+    it('should throw if a File object is not provided', function() {
+      isCustomTypeOverride = function() {
+        return false;
+      };
+
+      assert.throws(function() {
+        table.createLoadJob({});
+      }, /Source must be a File object/);
+    });
+
+    it('should convert File objects to gs:// urls', function(done) {
+      table.bigQuery.createJob = function(reqOpts) {
+        var sourceUri = reqOpts.configuration.load.sourceUris[0];
+        assert.equal(sourceUri, 'gs://' + FILE.bucket.name + '/' + FILE.name);
+        done();
+      };
+
+      table.createLoadJob(FILE, assert.ifError);
+    });
+
+    it('should infer the file format from a File object', function(done) {
+      table.bigQuery.createJob = function(reqOpts) {
+        var sourceFormat = reqOpts.configuration.load.sourceFormat;
+        assert.equal(sourceFormat, 'NEWLINE_DELIMITED_JSON');
+        done();
+      };
+
+      table.createLoadJob(FILE, assert.ifError);
+    });
+
+    it('should not override a provided format with a File', function(done) {
+      table.bigQuery.createJob = function(reqOpts) {
+        var sourceFormat = reqOpts.configuration.load.sourceFormat;
+        assert.equal(sourceFormat, 'NEWLINE_DELIMITED_JSON');
+        done();
+      };
+
+      table.createLoadJob(
+        FILE,
+        {
+          sourceFormat: 'NEWLINE_DELIMITED_JSON',
+        },
+        assert.ifError
+      );
+    });
+
+    it('should pass the callback to createJob', function(done) {
+      table.bigQuery.createJob = function(reqOpts, callback) {
+        assert.strictEqual(done, callback);
+        callback(); // the done fn
+      };
+
+      table.createLoadJob(FILE, {}, done);
+    });
+
+    it('should optionally accept options', function(done) {
+      table.bigQuery.createJob = function(reqOpts, callback) {
+        assert.strictEqual(done, callback);
+        callback(); // the done fn
+      };
+
+      table.createLoadJob(FILE, done);
+    });
+
+    it('should set the job prefix', function(done) {
+      var fakeJobPrefix = 'abc';
+
+      table.bigQuery.createJob = function(reqOpts) {
+        assert.strictEqual(reqOpts.jobPrefix, fakeJobPrefix);
+        assert.strictEqual(reqOpts.configuration.load.jobPrefix, undefined);
+        done();
+      };
+
+      table.createLoadJob(
+        FILE,
+        {
+          jobPrefix: fakeJobPrefix,
+        },
+        assert.ifError
+      );
+    });
+
+    describe('formats', function() {
+      it('should accept csv', function(done) {
+        table.bigQuery.createJob = function(reqOpts) {
+          var load = reqOpts.configuration.load;
+          assert.strictEqual(load.sourceFormat, 'CSV');
+          done();
+        };
+
+        table.createLoadJob(FILE, {format: 'csv'}, assert.ifError);
+      });
+
+      it('should accept json', function(done) {
+        table.bigQuery.createJob = function(reqOpts) {
+          var load = reqOpts.configuration.load;
+          assert.strictEqual(load.sourceFormat, 'NEWLINE_DELIMITED_JSON');
+          done();
+        };
+
+        table.createLoadJob(FILE, {format: 'json'}, assert.ifError);
+      });
+
+      it('should accept avro', function(done) {
+        table.bigQuery.createJob = function(reqOpts) {
+          var load = reqOpts.configuration.load;
+          assert.strictEqual(load.sourceFormat, 'AVRO');
+          done();
+        };
+
+        table.createLoadJob(FILE, {format: 'avro'}, assert.ifError);
+      });
+    });
+  });
+
+  describe('createQueryJob', function() {
+    it('should call through to dataset#createQueryJob', function(done) {
+      var fakeOptions = {};
+      var fakeReturnValue = {};
+
+      table.dataset.createQueryJob = function(options, callback) {
+        assert.strictEqual(options, fakeOptions);
+        setImmediate(callback);
+        return fakeReturnValue;
+      };
+
+      var returnVal = table.createQueryJob(fakeOptions, done);
+      assert.strictEqual(returnVal, fakeReturnValue);
     });
   });
 
@@ -747,16 +1354,16 @@ describe('BigQuery/Table', function() {
 
     beforeEach(function() {
       fakeJob = new events.EventEmitter();
-      table.startExtract = function(destination, metadata, callback) {
+      table.createExtractJob = function(destination, metadata, callback) {
         callback(null, fakeJob);
       };
     });
 
-    it('should pass the arguments to startExtract', function(done) {
+    it('should pass the arguments to createExtractJob', function(done) {
       var fakeDestination = {};
       var fakeMetadata = {};
 
-      table.startExtract = function(destination, metadata) {
+      table.createExtractJob = function(destination, metadata) {
         assert.strictEqual(destination, fakeDestination);
         assert.strictEqual(metadata, fakeMetadata);
         done();
@@ -766,7 +1373,7 @@ describe('BigQuery/Table', function() {
     });
 
     it('should optionally accept metadata', function(done) {
-      table.startExtract = function(destination, metadata) {
+      table.createExtractJob = function(destination, metadata) {
         assert.deepEqual(metadata, {});
         done();
       };
@@ -774,11 +1381,11 @@ describe('BigQuery/Table', function() {
       table.extract({}, assert.ifError);
     });
 
-    it('should return any startExtract errors', function(done) {
+    it('should return any createExtractJob errors', function(done) {
       var error = new Error('err');
       var response = {};
 
-      table.startExtract = function(destination, metadata, callback) {
+      table.createExtractJob = function(destination, metadata, callback) {
         callback(error, null, response);
       };
 
@@ -1271,16 +1878,16 @@ describe('BigQuery/Table', function() {
 
     beforeEach(function() {
       fakeJob = new events.EventEmitter();
-      table.startLoad = function(source, metadata, callback) {
+      table.createLoadJob = function(source, metadata, callback) {
         callback(null, fakeJob);
       };
     });
 
-    it('should pass the arguments to startLoad', function(done) {
+    it('should pass the arguments to createLoadJob', function(done) {
       var fakeSource = {};
       var fakeMetadata = {};
 
-      table.startLoad = function(source, metadata) {
+      table.createLoadJob = function(source, metadata) {
         assert.strictEqual(source, fakeSource);
         assert.strictEqual(metadata, fakeMetadata);
         done();
@@ -1290,7 +1897,7 @@ describe('BigQuery/Table', function() {
     });
 
     it('should optionally accept metadata', function(done) {
-      table.startLoad = function(source, metadata) {
+      table.createLoadJob = function(source, metadata) {
         assert.deepEqual(metadata, {});
         done();
       };
@@ -1298,11 +1905,11 @@ describe('BigQuery/Table', function() {
       table.load({}, assert.ifError);
     });
 
-    it('should return any startLoad errors', function(done) {
+    it('should return any createLoadJob errors', function(done) {
       var error = new Error('err');
       var response = {};
 
-      table.startLoad = function(source, metadata, callback) {
+      table.createLoadJob = function(source, metadata, callback) {
         callback(error, null, response);
       };
 
@@ -1367,613 +1974,6 @@ describe('BigQuery/Table', function() {
       };
 
       table.setMetadata(fakeMetadata, done);
-    });
-  });
-
-  describe('startCopy', function() {
-    var DEST_TABLE;
-
-    before(function() {
-      DEST_TABLE = new Table(DATASET, 'destination-table');
-    });
-
-    it('should throw if a destination is not a Table', function() {
-      assert.throws(function() {
-        table.startCopy();
-      }, /Destination must be a Table/);
-
-      assert.throws(function() {
-        table.startCopy({});
-      }, /Destination must be a Table/);
-
-      assert.throws(function() {
-        table.startCopy(function() {});
-      }, /Destination must be a Table/);
-    });
-
-    it('should send correct request to the API', function(done) {
-      table.bigQuery.createJob = function(reqOpts) {
-        assert.deepEqual(reqOpts, {
-          configuration: {
-            copy: {
-              a: 'b',
-              c: 'd',
-              destinationTable: {
-                datasetId: DEST_TABLE.dataset.id,
-                projectId: DEST_TABLE.bigQuery.projectId,
-                tableId: DEST_TABLE.id,
-              },
-              sourceTable: {
-                datasetId: table.dataset.id,
-                projectId: table.bigQuery.projectId,
-                tableId: table.id,
-              },
-            },
-          },
-        });
-
-        done();
-      };
-
-      table.startCopy(DEST_TABLE, {a: 'b', c: 'd'}, assert.ifError);
-    });
-
-    it('should accept a job prefix', function(done) {
-      var fakeJobPrefix = 'abc-';
-      var options = {
-        jobPrefix: fakeJobPrefix,
-      };
-
-      table.bigQuery.createJob = function(reqOpts, callback) {
-        assert.strictEqual(reqOpts.jobPrefix, fakeJobPrefix);
-        assert.strictEqual(reqOpts.configuration.copy.jobPrefix, undefined);
-        callback(); // the done fn
-      };
-
-      table.startCopy(DEST_TABLE, options, done);
-    });
-
-    it('should pass the callback to createJob', function(done) {
-      table.bigQuery.createJob = function(reqOpts, callback) {
-        assert.strictEqual(done, callback);
-        callback(); // the done fn
-      };
-
-      table.startCopy(DEST_TABLE, {}, done);
-    });
-
-    it('should optionally accept metadata', function(done) {
-      table.bigQuery.createJob = function(reqOpts, callback) {
-        assert.strictEqual(done, callback);
-        callback(); // the done fn
-      };
-
-      table.startCopy(DEST_TABLE, done);
-    });
-  });
-
-  describe('startCopyFrom', function() {
-    var SOURCE_TABLE;
-
-    before(function() {
-      SOURCE_TABLE = new Table(DATASET, 'source-table');
-    });
-
-    it('should throw if a source is not a Table', function() {
-      assert.throws(function() {
-        table.startCopyFrom(['table']);
-      }, /Source must be a Table/);
-
-      assert.throws(function() {
-        table.startCopyFrom([SOURCE_TABLE, 'table']);
-      }, /Source must be a Table/);
-
-      assert.throws(function() {
-        table.startCopyFrom({});
-      }, /Source must be a Table/);
-
-      assert.throws(function() {
-        table.startCopyFrom(function() {});
-      }, /Source must be a Table/);
-    });
-
-    it('should send correct request to the API', function(done) {
-      table.bigQuery.createJob = function(reqOpts) {
-        assert.deepEqual(reqOpts, {
-          configuration: {
-            copy: {
-              a: 'b',
-              c: 'd',
-              destinationTable: {
-                datasetId: table.dataset.id,
-                projectId: table.bigQuery.projectId,
-                tableId: table.id,
-              },
-              sourceTables: [
-                {
-                  datasetId: SOURCE_TABLE.dataset.id,
-                  projectId: SOURCE_TABLE.bigQuery.projectId,
-                  tableId: SOURCE_TABLE.id,
-                },
-              ],
-            },
-          },
-        });
-
-        done();
-      };
-
-      table.startCopyFrom(SOURCE_TABLE, {a: 'b', c: 'd'}, assert.ifError);
-    });
-
-    it('should accept multiple source tables', function(done) {
-      table.bigQuery.createJob = function(reqOpts) {
-        assert.deepEqual(reqOpts.configuration.copy.sourceTables, [
-          {
-            datasetId: SOURCE_TABLE.dataset.id,
-            projectId: SOURCE_TABLE.bigQuery.projectId,
-            tableId: SOURCE_TABLE.id,
-          },
-          {
-            datasetId: SOURCE_TABLE.dataset.id,
-            projectId: SOURCE_TABLE.bigQuery.projectId,
-            tableId: SOURCE_TABLE.id,
-          },
-        ]);
-
-        done();
-      };
-
-      table.startCopyFrom([SOURCE_TABLE, SOURCE_TABLE], assert.ifError);
-    });
-
-    it('should accept a job prefix', function(done) {
-      var fakeJobPrefix = 'abc-';
-      var options = {
-        jobPrefix: fakeJobPrefix,
-      };
-
-      table.bigQuery.createJob = function(reqOpts, callback) {
-        assert.strictEqual(reqOpts.jobPrefix, fakeJobPrefix);
-        assert.strictEqual(reqOpts.configuration.copy.jobPrefix, undefined);
-        callback(); // the done fn
-      };
-
-      table.startCopyFrom(SOURCE_TABLE, options, done);
-    });
-
-    it('should pass the callback to createJob', function(done) {
-      table.bigQuery.createJob = function(reqOpts, callback) {
-        assert.strictEqual(done, callback);
-        callback(); // the done fn
-      };
-
-      table.startCopyFrom(SOURCE_TABLE, {}, done);
-    });
-
-    it('should optionally accept options', function(done) {
-      table.bigQuery.createJob = function(reqOpts, callback) {
-        assert.strictEqual(done, callback);
-        callback(); // the done fn
-      };
-
-      table.startCopyFrom(SOURCE_TABLE, done);
-    });
-  });
-
-  describe('startExtract', function() {
-    var FILE = {
-      name: 'file-name.json',
-      bucket: {
-        name: 'bucket-name',
-      },
-    };
-
-    beforeEach(function() {
-      isCustomTypeOverride = function() {
-        return true;
-      };
-
-      table.bigQuery.job = function(id) {
-        return {id: id};
-      };
-
-      table.bigQuery.createJob = function() {};
-    });
-
-    it('should call createJob correctly', function(done) {
-      table.bigQuery.createJob = function(reqOpts) {
-        assert.deepEqual(reqOpts.configuration.extract.sourceTable, {
-          datasetId: table.dataset.id,
-          projectId: table.bigQuery.projectId,
-          tableId: table.id,
-        });
-
-        done();
-      };
-
-      table.startExtract(FILE, assert.ifError);
-    });
-
-    it('should accept just a destination and a callback', function(done) {
-      table.bigQuery.createJob = function(reqOpts, callback) {
-        callback(null, {jobReference: {jobId: 'job-id'}});
-      };
-
-      table.startExtract(FILE, done);
-    });
-
-    describe('formats', function() {
-      it('should accept csv', function(done) {
-        table.bigQuery.createJob = function(reqOpts) {
-          var extract = reqOpts.configuration.extract;
-          assert.equal(extract.destinationFormat, 'CSV');
-          done();
-        };
-
-        table.startExtract(FILE, {format: 'csv'}, assert.ifError);
-      });
-
-      it('should accept json', function(done) {
-        table.bigQuery.createJob = function(reqOpts) {
-          var extract = reqOpts.configuration.extract;
-          assert.equal(extract.destinationFormat, 'NEWLINE_DELIMITED_JSON');
-          done();
-        };
-
-        table.startExtract(FILE, {format: 'json'}, assert.ifError);
-      });
-
-      it('should accept avro', function(done) {
-        table.bigQuery.createJob = function(reqOpts) {
-          var extract = reqOpts.configuration.extract;
-          assert.equal(extract.destinationFormat, 'AVRO');
-          done();
-        };
-
-        table.startExtract(FILE, {format: 'avro'}, assert.ifError);
-      });
-    });
-
-    it('should parse out full gs:// urls from files', function(done) {
-      table.bigQuery.createJob = function(reqOpts) {
-        assert.deepEqual(reqOpts.configuration.extract.destinationUris, [
-          'gs://' + FILE.bucket.name + '/' + FILE.name,
-        ]);
-        done();
-      };
-
-      table.startExtract(FILE, assert.ifError);
-    });
-
-    it('should check if a destination is a File', function(done) {
-      isCustomTypeOverride = function(dest, type) {
-        assert.strictEqual(dest, FILE);
-        assert.strictEqual(type, 'storage/file');
-        setImmediate(done);
-        return true;
-      };
-
-      table.startExtract(FILE, assert.ifError);
-    });
-
-    it('should throw if a destination is not a File', function() {
-      isCustomTypeOverride = function() {
-        return false;
-      };
-
-      assert.throws(function() {
-        table.startExtract({}, util.noop);
-      }, /Destination must be a File object/);
-
-      assert.throws(function() {
-        table.startExtract([FILE, {}], util.noop);
-      }, /Destination must be a File object/);
-    });
-
-    it('should detect file format if a format is not provided', function(done) {
-      table.bigQuery.createJob = function(reqOpts) {
-        var destFormat = reqOpts.configuration.extract.destinationFormat;
-        assert.equal(destFormat, 'NEWLINE_DELIMITED_JSON');
-        done();
-      };
-
-      table.startExtract(FILE, assert.ifError);
-    });
-
-    it('should assign the provided format if matched', function(done) {
-      table.bigQuery.createJob = function(reqOpts) {
-        var extract = reqOpts.configuration.extract;
-        assert.equal(extract.destinationFormat, 'CSV');
-        assert.strictEqual(extract.format, undefined);
-        done();
-      };
-
-      table.startExtract(FILE, {format: 'csv'}, assert.ifError);
-    });
-
-    it('should throw if a provided format is not recognized', function() {
-      assert.throws(function() {
-        table.startExtract(FILE, {format: 'zip'}, util.noop);
-      }, /Destination format not recognized/);
-    });
-
-    it('should assign GZIP compression with gzip: true', function(done) {
-      table.bigQuery.createJob = function(reqOpts) {
-        assert.equal(reqOpts.configuration.extract.compression, 'GZIP');
-        assert.strictEqual(reqOpts.configuration.extract.gzip, undefined);
-        done();
-      };
-
-      table.startExtract(FILE, {gzip: true}, util.noop);
-    });
-
-    it('should accept a job prefix', function(done) {
-      var fakeJobPrefix = 'abc-';
-      var options = {
-        jobPrefix: fakeJobPrefix,
-      };
-
-      table.bigQuery.createJob = function(reqOpts, callback) {
-        assert.strictEqual(reqOpts.jobPrefix, fakeJobPrefix);
-        assert.strictEqual(reqOpts.configuration.extract.jobPrefix, undefined);
-        callback(); // the done fn
-      };
-
-      table.startExtract(FILE, options, done);
-    });
-
-    it('should pass the callback to createJob', function(done) {
-      table.bigQuery.createJob = function(reqOpts, callback) {
-        assert.strictEqual(done, callback);
-        callback(); // the done fn
-      };
-
-      table.startExtract(FILE, {}, done);
-    });
-
-    it('should optionally accept options', function(done) {
-      table.bigQuery.createJob = function(reqOpts, callback) {
-        assert.strictEqual(done, callback);
-        callback(); // the done fn
-      };
-
-      table.startExtract(FILE, done);
-    });
-  });
-
-  describe('startLoad', function() {
-    var FILEPATH = require.resolve('./testdata/testfile.json');
-    var FILE = {
-      name: 'file-name.json',
-      bucket: {
-        name: 'bucket-name',
-      },
-    };
-
-    var JOB = {
-      id: 'foo',
-      metadata: {},
-    };
-
-    beforeEach(function() {
-      isCustomTypeOverride = function() {
-        return true;
-      };
-    });
-
-    it('should accept just a File and a callback', function(done) {
-      table.createWriteStream = function() {
-        var ws = new stream.Writable();
-        setImmediate(function() {
-          ws.emit('complete', JOB);
-          ws.end();
-        });
-        return ws;
-      };
-
-      table.startLoad(FILEPATH, function(err, job, resp) {
-        assert.strictEqual(err, null);
-        assert.strictEqual(job, JOB);
-        assert.strictEqual(resp, JOB.metadata);
-        done();
-      });
-    });
-
-    it('should return a stream when a string is given', function() {
-      table.createWriteStream = function() {
-        return new stream.Writable();
-      };
-
-      assert(table.startLoad(FILEPATH) instanceof stream.Stream);
-    });
-
-    it('should infer the file format from the given filepath', function(done) {
-      table.createWriteStream = function(metadata) {
-        assert.equal(metadata.sourceFormat, 'NEWLINE_DELIMITED_JSON');
-        var ws = new stream.Writable();
-        setImmediate(function() {
-          ws.emit('complete', JOB);
-          ws.end();
-        });
-        return ws;
-      };
-
-      table.startLoad(FILEPATH, done);
-    });
-
-    it('should execute callback with error from writestream', function(done) {
-      var error = new Error('Error.');
-
-      table.createWriteStream = function(metadata) {
-        assert.equal(metadata.sourceFormat, 'NEWLINE_DELIMITED_JSON');
-        var ws = new stream.Writable();
-        setImmediate(function() {
-          ws.emit('error', error);
-          ws.end();
-        });
-        return ws;
-      };
-
-      table.startLoad(FILEPATH, function(err) {
-        assert.strictEqual(err, error);
-        done();
-      });
-    });
-
-    it('should not infer the file format if one is given', function(done) {
-      table.createWriteStream = function(metadata) {
-        assert.equal(metadata.sourceFormat, 'CSV');
-        var ws = new stream.Writable();
-        setImmediate(function() {
-          ws.emit('complete', JOB);
-          ws.end();
-        });
-        return ws;
-      };
-
-      table.startLoad(FILEPATH, {sourceFormat: 'CSV'}, done);
-    });
-
-    it('should check if a destination is a File', function(done) {
-      isCustomTypeOverride = function(dest, type) {
-        assert.strictEqual(dest, FILE);
-        assert.strictEqual(type, 'storage/file');
-        setImmediate(done);
-        return true;
-      };
-
-      table.startLoad(FILE, assert.ifError);
-    });
-
-    it('should throw if a File object is not provided', function() {
-      isCustomTypeOverride = function() {
-        return false;
-      };
-
-      assert.throws(function() {
-        table.startLoad({});
-      }, /Source must be a File object/);
-    });
-
-    it('should convert File objects to gs:// urls', function(done) {
-      table.bigQuery.createJob = function(reqOpts) {
-        var sourceUri = reqOpts.configuration.load.sourceUris[0];
-        assert.equal(sourceUri, 'gs://' + FILE.bucket.name + '/' + FILE.name);
-        done();
-      };
-
-      table.startLoad(FILE, assert.ifError);
-    });
-
-    it('should infer the file format from a File object', function(done) {
-      table.bigQuery.createJob = function(reqOpts) {
-        var sourceFormat = reqOpts.configuration.load.sourceFormat;
-        assert.equal(sourceFormat, 'NEWLINE_DELIMITED_JSON');
-        done();
-      };
-
-      table.startLoad(FILE, assert.ifError);
-    });
-
-    it('should not override a provided format with a File', function(done) {
-      table.bigQuery.createJob = function(reqOpts) {
-        var sourceFormat = reqOpts.configuration.load.sourceFormat;
-        assert.equal(sourceFormat, 'NEWLINE_DELIMITED_JSON');
-        done();
-      };
-
-      table.startLoad(
-        FILE,
-        {
-          sourceFormat: 'NEWLINE_DELIMITED_JSON',
-        },
-        assert.ifError
-      );
-    });
-
-    it('should pass the callback to createJob', function(done) {
-      table.bigQuery.createJob = function(reqOpts, callback) {
-        assert.strictEqual(done, callback);
-        callback(); // the done fn
-      };
-
-      table.startLoad(FILE, {}, done);
-    });
-
-    it('should optionally accept options', function(done) {
-      table.bigQuery.createJob = function(reqOpts, callback) {
-        assert.strictEqual(done, callback);
-        callback(); // the done fn
-      };
-
-      table.startLoad(FILE, done);
-    });
-
-    it('should set the job prefix', function(done) {
-      var fakeJobPrefix = 'abc';
-
-      table.bigQuery.createJob = function(reqOpts) {
-        assert.strictEqual(reqOpts.jobPrefix, fakeJobPrefix);
-        assert.strictEqual(reqOpts.configuration.load.jobPrefix, undefined);
-        done();
-      };
-
-      table.startLoad(
-        FILE,
-        {
-          jobPrefix: fakeJobPrefix,
-        },
-        assert.ifError
-      );
-    });
-
-    describe('formats', function() {
-      it('should accept csv', function(done) {
-        table.bigQuery.createJob = function(reqOpts) {
-          var load = reqOpts.configuration.load;
-          assert.strictEqual(load.sourceFormat, 'CSV');
-          done();
-        };
-
-        table.startLoad(FILE, {format: 'csv'}, assert.ifError);
-      });
-
-      it('should accept json', function(done) {
-        table.bigQuery.createJob = function(reqOpts) {
-          var load = reqOpts.configuration.load;
-          assert.strictEqual(load.sourceFormat, 'NEWLINE_DELIMITED_JSON');
-          done();
-        };
-
-        table.startLoad(FILE, {format: 'json'}, assert.ifError);
-      });
-
-      it('should accept avro', function(done) {
-        table.bigQuery.createJob = function(reqOpts) {
-          var load = reqOpts.configuration.load;
-          assert.strictEqual(load.sourceFormat, 'AVRO');
-          done();
-        };
-
-        table.startLoad(FILE, {format: 'avro'}, assert.ifError);
-      });
-    });
-  });
-
-  describe('startQuery', function() {
-    it('should call through to dataset#startQuery', function(done) {
-      var fakeOptions = {};
-      var fakeReturnValue = {};
-
-      table.dataset.startQuery = function(options, callback) {
-        assert.strictEqual(options, fakeOptions);
-        setImmediate(callback);
-        return fakeReturnValue;
-      };
-
-      var returnVal = table.startQuery(fakeOptions, done);
-      assert.strictEqual(returnVal, fakeReturnValue);
     });
   });
 });
