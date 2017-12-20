@@ -283,8 +283,8 @@ Job.prototype.cancel = function(callback) {
  * @callback ManualQueryResultsCallback
  * @param {?Error} err An error returned while making this request.
  * @param {array} rows The results of the job.
- * @param {object} nextQuery A pre-made configuration object for your next
- *     request.
+ * @param {?object} nextQuery A pre-made configuration object for your next
+ *     request. This will be `null` if no additional results are available.
  * @param {object} apiResponse The full API response.
  */
 /**
