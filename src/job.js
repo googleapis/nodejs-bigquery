@@ -275,6 +275,19 @@ Job.prototype.cancel = function(callback) {
 };
 
 /**
+ * @callback QueryResultsCallback
+ * @param {?Error} err An error returned while making this request.
+ * @param {array} rows The results of the job.
+ */
+/**
+ * @callback ManualQueryResultsCallback
+ * @param {?Error} err An error returned while making this request.
+ * @param {array} rows The results of the job.
+ * @param {object} nextQuery A pre-made configuration object for your next
+ *     request.
+ * @param {object} apiResponse The full API response.
+ */
+/**
  * Get the results of a job.
  *
  * @see [Jobs: getQueryResults API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/getQueryResults}
@@ -292,11 +305,9 @@ Job.prototype.cancel = function(callback) {
  *     complete, in milliseconds, before returning. Default is to return
  *     immediately. If the timeout passes before the job completes, the request
  *     will fail with a `TIMEOUT` error.
- * @param {function} [callback] The callback function. If you intend to
- *     continuously run this query until all results are in as part of a stream,
- *     do not pass a callback.
- * @param {?error} callback.err An error returned while making this request
- * @param {array} callback.rows The results of a job.
+ * @param {QueryResultsCallback|ManualQueryResultsCallback} [callback] The
+ *     callback function. If `autoPaginate` is set to false a
+ *     {@link ManualQueryResultsCallback} should be used.
  * @returns {Promise}
  *
  * @example
