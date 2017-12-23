@@ -285,6 +285,8 @@ Job.prototype.cancel = function(callback) {
  * @param {array} rows The results of the job.
  * @param {?object} nextQuery A pre-made configuration object for your next
  *     request. This will be `null` if no additional results are available.
+ *     If the query is not yet complete, you may get empty `rows` and 
+ *     non-`null` `nextQuery` that you should use for your next request.
  * @param {object} apiResponse The full API response.
  */
 /**
