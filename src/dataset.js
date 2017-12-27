@@ -222,7 +222,10 @@ function Dataset(bigQuery, id) {
 util.inherits(Dataset, common.ServiceObject);
 
 /**
- * Start running a query scoped to your dataset.
+ * Run a query as a job. No results are immediately returned. Instead, your
+ * callback will be executed with a {@link Job} object that you must
+ * ping for the results. See the Job documentation for explanations of how to
+ * check on the status of the job.
  *
  * See {@link BigQuery#createQueryJob} for full documentation of this method.
  *
