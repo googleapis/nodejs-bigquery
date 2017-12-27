@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "license": "Apache-2.0",
-  "author": "Google Inc.",
+  "author": "Google LLC",
   "repository": "googleapis/nodejs-bigquery",
   "engines": {
     "node": ">=4"
@@ -14,7 +14,7 @@
     "cover": "nyc --reporter=lcov --cache ava -T 3m --verbose test/*.test.js system-test/*.test.js && nyc report"
   },
   "dependencies": {
-    "@google-cloud/bigquery": "0.11.1",
+    "@google-cloud/bigquery": "0.12.0",
     "@google-cloud/storage": "1.5.1",
     "yargs": "10.0.3"
   },

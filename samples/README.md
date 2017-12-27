@@ -71,11 +71,10 @@ Commands:
   tables.js copy <projectId> <srcDatasetId> <srcTableId>        Makes a copy of a table.
   <destDatasetId> <destTableId>
   tables.js browse <projectId> <datasetId> <tableId>            Lists rows in a table.
-  tables.js import <projectId> <datasetId> <tableId>            Imports data from a local file into a table.
-  <fileName>
-  tables.js import-gcs <projectId> <datasetId> <tableId>        Imports data from a Google Cloud Storage file into a
+  tables.js load <projectId> <datasetId> <tableId> <fileName>   Loads data from a local file into a table.
+  tables.js load-gcs <projectId> <datasetId> <tableId>          Loads data from a Google Cloud Storage file into a
   <bucketName> <fileName>                                       table.
-  tables.js export <projectId> <datasetId> <tableId>            Export a table from BigQuery to Google Cloud Storage.
+  tables.js extract <projectId> <datasetId> <tableId>           Extract a table from BigQuery to Google Cloud Storage.
   <bucketName> <fileName>
   tables.js insert <projectId> <datasetId> <tableId>            Insert a JSON array (as a string or newline-delimited
   <json_or_file>                                                file) into a BigQuery table.
@@ -90,13 +89,13 @@ Examples:
   node tables.js list my-project-id my_dataset                  Lists tables in "my_dataset".
   node tables.js browse my-project-id my_dataset my_table       Displays rows from "my_table" in "my_dataset".
   node tables.js delete my-project-id my_dataset my_table       Deletes "my_table" from "my_dataset".
-  node tables.js import my-project-id my_dataset my_table       Imports a local file into a table.
+  node tables.js load my-project-id my_dataset my_table         Imports a local file into a table.
   ./data.csv
-  node tables.js import-gcs my-project-id my_dataset my_table   Imports a GCS file into a table.
+  node tables.js load-gcs my-project-id my_dataset my_table     Imports a GCS file into a table.
   my-bucket data.csv
-  node tables.js export my-project-id my_dataset my_table       Exports my_dataset:my_table to gcs://my-bucket/my-file
+  node tables.js extract my-project-id my_dataset my_table      Exports my_dataset:my_table to gcs://my-bucket/my-file
   my-bucket my-file                                             as raw CSV.
-  node tables.js export my-project-id my_dataset my_table       Exports my_dataset:my_table to gcs://my-bucket/my-file
+  node tables.js extract my-project-id my_dataset my_table      Exports my_dataset:my_table to gcs://my-bucket/my-file
   my-bucket my-file -f JSON --gzip                              as gzipped JSON.
   node tables.js insert my-project-id my_dataset my_table       Inserts the JSON array represented by json_string into
   json_string                                                   my_dataset:my_table.
@@ -136,7 +135,7 @@ Examples:
   publicdata.samples.natality LIMIT 5;"
   node queries.js async my-project-id "SELECT * FROM            Queries the natality dataset as a job.
   publicdata.samples.natality LIMIT 5;"
-  node queries.js stackoverflow my-project-id                   Queries a public Stack Overflow dataset.
+  node queries.js shakespeare my-project-id                     Queries a public Shakespeare dataset.
 
 For more information, see https://cloud.google.com/bigquery/docs
 ```
