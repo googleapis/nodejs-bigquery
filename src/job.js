@@ -31,11 +31,11 @@ var util = require('util');
  * - {@link BigQuery#getJobs}
  * - {@link BigQuery#job}
  * - {@link BigQuery#query}
- * - {@link BigQuery#startJob}
+ * - {@link BigQuery#createJob}
  * - {@link BigQuery/table#copy}
  * - {@link BigQuery/table#createWriteStream}
- * - {@link BigQuery/table#export}
- * - {@link BigQuery/table#import}
+ * - {@link BigQuery/table#extract}
+ * - {@link BigQuery/table#load}
  *
  * They can be used to check the status of a running job or fetching the results
  * of a previously-executed one.

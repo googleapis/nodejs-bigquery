@@ -635,6 +635,149 @@ BigQuery.prototype.createDataset = function(id, options, callback) {
 };
 
 /**
+ * Run a query as a job. No results are immediately returned. Instead, your
+ * callback will be executed with a {@link Job} object that you must
+ * ping for the results. See the Job documentation for explanations of how to
+ * check on the status of the job.
+ *
+ * @see [Jobs: insert API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert}
+ *
+ * @param {object|string} options The configuration object. This must be in
+ *     the format of the [`configuration.query`](http://goo.gl/wRpHvR) property
+ *     of a Jobs resource. If a string is provided, this is used as the query
+ *     string, and all other options are defaulted.
+ * @param {Table} [options.destination] The table to save the
+ *     query's results to. If omitted, a new table will be created.
+ * @param {boolean} [options.dryRun] If set, don't actually run this job. A
+ *     valid query will update the job with processing statistics. These can be
+ *     accessed via `job.metadata`.
+ * @param {string} options.query A query string, following the BigQuery query
+ *     syntax, of the query to execute.
+ * @param {boolean} [options.useLegacySql=false] Option to use legacy sql syntax.
+ * @param {function} [callback] The callback function.
+ * @param {?error} callback.err An error returned while making this request.
+ * @param {Job} callback.job The newly created job for your
+       query.
+ * @param {object} callback.apiResponse The full API response.
+ * @returns {Promise}
+ *
+ * @throws {Error} If a query is not specified.
+ * @throws {Error} If a Table is not provided as a destination.
+ *
+ * @example
+ * const BigQuery = require('@google-cloud/bigquery');
+ * const bigquery = new BigQuery();
+ *
+ * const query = 'SELECT url FROM `publicdata:samples.github_nested` LIMIT 100';
+ *
+ * //-
+ * // You may pass only a query string, having a new table created to store the
+ * // results of the query.
+ * //-
+ * bigquery.createQueryJob(query, function(err, job) {});
+ *
+ * //-
+ * // You can also control the destination table by providing a
+ * // {@link Table} object.
+ * //-
+ * bigquery.createQueryJob({
+ *   destination: bigquery.dataset('higher_education').table('institutions'),
+ *   query: query
+ * }, function(err, job) {});
+ *
+ * //-
+ * // After you have run `createQueryJob`, your query will execute in a job. Your
+ * // callback is executed with a {@link Job} object so that you may
+ * // check for the results.
+ * //-
+ * bigquery.createQueryJob(query, function(err, job) {
+ *   if (!err) {
+ *     job.getQueryResults(function(err, rows, apiResponse) {});
+ *   }
+ * });
+ *
+ * //-
+ * // If the callback is omitted, we'll return a Promise.
+ * //-
+ * bigquery.createQueryJob(query).then(function(data) {
+ *   var job = data[0];
+ *   var apiResponse = data[1];
+ *
+ *   return job.getQueryResults();
+ * });
+ */
+BigQuery.prototype.createQueryJob = function(options, callback) {
+  if (is.string(options)) {
+    options = {
+      query: options,
+    };
+  }
+
+  if (!options || !options.query) {
+    throw new Error('A SQL query string is required.');
+  }
+
+  var query = extend(
+    true,
+    {
+      useLegacySql: false,
+    },
+    options
+  );
+
+  if (options.destination) {
+    if (!(options.destination instanceof Table)) {
+      throw new Error('Destination must be a Table object.');
+    }
+
+    query.destinationTable = {
+      datasetId: options.destination.dataset.id,
+      projectId: options.destination.dataset.bigQuery.projectId,
+      tableId: options.destination.id,
+    };
+
+    delete query.destination;
+  }
+
+  if (query.params) {
+    query.parameterMode = is.array(query.params) ? 'positional' : 'named';
+
+    if (query.parameterMode === 'named') {
+      query.queryParameters = [];
+
+      for (var namedParamater in query.params) {
+        var value = query.params[namedParamater];
+        var queryParameter = BigQuery.valueToQueryParameter_(value);
+        queryParameter.name = namedParamater;
+        query.queryParameters.push(queryParameter);
+      }
+    } else {
+      query.queryParameters = query.params.map(BigQuery.valueToQueryParameter_);
+    }
+
+    delete query.params;
+  }
+
+  var reqOpts = {
+    configuration: {
+      query: query,
+    },
+  };
+
+  if (query.dryRun) {
+    reqOpts.configuration.dryRun = query.dryRun;
+    delete query.dryRun;
+  }
+
+  if (query.jobPrefix) {
+    reqOpts.jobPrefix = query.jobPrefix;
+    delete query.jobPrefix;
+  }
+
+  this.createJob(reqOpts, callback);
+};
+
+/**
  * Run a query scoped to your project as a readable object stream.
  *
  * @param {object} query Configuration object. See {@link Query} for a complete
@@ -671,11 +814,11 @@ BigQuery.prototype.createQueryStream = common.paginator.streamify('query');
  * Creates a job. Typically when creating a job you'll have a very specific task
  * in mind. For this we recommend one of the following methods:
  *
- * - {@link BigQuery#startQuery}
- * - {@link BigQuery/table#startCopy}
- * - {@link BigQuery/table#startCopyFrom}
- * - {@link BigQuery/table#startExport}
- * - {@link BigQuery/table#startImport}
+ * - {@link BigQuery#createQueryJob}
+ * - {@link BigQuery/table#createCopyJob}
+ * - {@link BigQuery/table#createCopyFromJob}
+ * - {@link BigQuery/table#createExtractJob}
+ * - {@link BigQuery/table#createLoadJob}
  *
  * However in the event you need a finer level of control over the job creation,
  * you can use this method to pass in a raw [Job resource](https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs)
@@ -1043,7 +1186,7 @@ BigQuery.prototype.job = function(id) {
 
 /**
  * Run a query scoped to your project. For manual pagination please refer to
- * {@link BigQuery#startQuery}.
+ * {@link BigQuery#createQueryJob}.
  *
  * @see [Jobs: query API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/query}
  *
@@ -1131,7 +1274,7 @@ BigQuery.prototype.query = function(query, options, callback) {
     options = {};
   }
 
-  this.startQuery(query, function(err, job, resp) {
+  this.createQueryJob(query, function(err, job, resp) {
     if (err) {
       callback(err, null, resp);
       return;
@@ -1139,149 +1282,6 @@ BigQuery.prototype.query = function(query, options, callback) {
 
     job.getQueryResults(options, callback);
   });
-};
-
-/**
- * Run a query as a job. No results are immediately returned. Instead, your
- * callback will be executed with a {@link Job} object that you must
- * ping for the results. See the Job documentation for explanations of how to
- * check on the status of the job.
- *
- * @see [Jobs: insert API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert}
- *
- * @param {object|string} options The configuration object. This must be in
- *     the format of the [`configuration.query`](http://goo.gl/wRpHvR) property
- *     of a Jobs resource. If a string is provided, this is used as the query
- *     string, and all other options are defaulted.
- * @param {Table} [options.destination] The table to save the
- *     query's results to. If omitted, a new table will be created.
- * @param {boolean} [options.dryRun] If set, don't actually run this job. A
- *     valid query will update the job with processing statistics. These can be
- *     accessed via `job.metadata`.
- * @param {string} options.query A query string, following the BigQuery query
- *     syntax, of the query to execute.
- * @param {boolean} [options.useLegacySql=false] Option to use legacy sql syntax.
- * @param {function} [callback] The callback function.
- * @param {?error} callback.err An error returned while making this request.
- * @param {Job} callback.job The newly created job for your
-       query.
- * @param {object} callback.apiResponse The full API response.
- * @returns {Promise}
- *
- * @throws {Error} If a query is not specified.
- * @throws {Error} If a Table is not provided as a destination.
- *
- * @example
- * const BigQuery = require('@google-cloud/bigquery');
- * const bigquery = new BigQuery();
- *
- * const query = 'SELECT url FROM `publicdata:samples.github_nested` LIMIT 100';
- *
- * //-
- * // You may pass only a query string, having a new table created to store the
- * // results of the query.
- * //-
- * bigquery.startQuery(query, function(err, job) {});
- *
- * //-
- * // You can also control the destination table by providing a
- * // {@link Table} object.
- * //-
- * bigquery.startQuery({
- *   destination: bigquery.dataset('higher_education').table('institutions'),
- *   query: query
- * }, function(err, job) {});
- *
- * //-
- * // After you have run `startQuery`, your query will execute in a job. Your
- * // callback is executed with a {@link Job} object so that you may
- * // check for the results.
- * //-
- * bigquery.startQuery(query, function(err, job) {
- *   if (!err) {
- *     job.getQueryResults(function(err, rows, apiResponse) {});
- *   }
- * });
- *
- * //-
- * // If the callback is omitted, we'll return a Promise.
- * //-
- * bigquery.startQuery(query).then(function(data) {
- *   var job = data[0];
- *   var apiResponse = data[1];
- *
- *   return job.getQueryResults();
- * });
- */
-BigQuery.prototype.startQuery = function(options, callback) {
-  if (is.string(options)) {
-    options = {
-      query: options,
-    };
-  }
-
-  if (!options || !options.query) {
-    throw new Error('A SQL query string is required.');
-  }
-
-  var query = extend(
-    true,
-    {
-      useLegacySql: false,
-    },
-    options
-  );
-
-  if (options.destination) {
-    if (!(options.destination instanceof Table)) {
-      throw new Error('Destination must be a Table object.');
-    }
-
-    query.destinationTable = {
-      datasetId: options.destination.dataset.id,
-      projectId: options.destination.dataset.bigQuery.projectId,
-      tableId: options.destination.id,
-    };
-
-    delete query.destination;
-  }
-
-  if (query.params) {
-    query.parameterMode = is.array(query.params) ? 'positional' : 'named';
-
-    if (query.parameterMode === 'named') {
-      query.queryParameters = [];
-
-      for (var namedParamater in query.params) {
-        var value = query.params[namedParamater];
-        var queryParameter = BigQuery.valueToQueryParameter_(value);
-        queryParameter.name = namedParamater;
-        query.queryParameters.push(queryParameter);
-      }
-    } else {
-      query.queryParameters = query.params.map(BigQuery.valueToQueryParameter_);
-    }
-
-    delete query.params;
-  }
-
-  var reqOpts = {
-    configuration: {
-      query: query,
-    },
-  };
-
-  if (query.dryRun) {
-    reqOpts.configuration.dryRun = query.dryRun;
-    delete query.dryRun;
-  }
-
-  if (query.jobPrefix) {
-    reqOpts.jobPrefix = query.jobPrefix;
-    delete query.jobPrefix;
-  }
-
-  this.createJob(reqOpts, callback);
 };
 
 /*! Developer Documentation

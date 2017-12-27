@@ -215,7 +215,7 @@ describe('BigQuery', function() {
   });
 
   it('should run a query job, then get results', function(done) {
-    bigquery.startQuery(query, function(err, job) {
+    bigquery.createQueryJob(query, function(err, job) {
       assert.ifError(err);
       assert(job instanceof Job);
 
@@ -232,7 +232,7 @@ describe('BigQuery', function() {
     var job;
 
     return bigquery
-      .startQuery(query)
+      .createQueryJob(query)
       .then(function(response) {
         job = response[0];
         return job.promise();
@@ -248,7 +248,7 @@ describe('BigQuery', function() {
   });
 
   it('should get query results as a stream', function(done) {
-    bigquery.startQuery(query, function(err, job) {
+    bigquery.createQueryJob(query, function(err, job) {
       assert.ifError(err);
 
       var rowsEmitted = [];
@@ -273,7 +273,7 @@ describe('BigQuery', function() {
       jobPrefix: 'hi-im-a-prefix',
     };
 
-    bigquery.startQuery(options, function(err, job) {
+    bigquery.createQueryJob(options, function(err, job) {
       assert.ifError(err);
       assert.strictEqual(job.id.indexOf(options.jobPrefix), 0);
 
@@ -292,7 +292,7 @@ describe('BigQuery', function() {
       dryRun: true,
     };
 
-    bigquery.startQuery(options, function(err, job) {
+    bigquery.createQueryJob(options, function(err, job) {
       assert.ifError(err);
       assert(job.metadata.statistics);
       done();
@@ -364,7 +364,7 @@ describe('BigQuery', function() {
   it('should cancel a job', function(done) {
     var query = 'SELECT url FROM `publicdata.samples.github_nested` LIMIT 10';
 
-    bigquery.startQuery(query, function(err, job) {
+    bigquery.createQueryJob(query, function(err, job) {
       assert.ifError(err);
 
       job.cancel(function(err) {
@@ -612,7 +612,7 @@ describe('BigQuery', function() {
         var table2 = TABLES[2];
         var table2Instance = table2.table;
 
-        table1Instance.startCopy(table2Instance, function(err, job) {
+        table1Instance.createCopyJob(table2Instance, function(err, job) {
           assert.ifError(err);
 
           job.on('error', done).on('complete', function() {
@@ -645,7 +645,7 @@ describe('BigQuery', function() {
         var table2 = TABLES[2];
         var table2Instance = table2.table;
 
-        table2Instance.startCopyFrom(table1Instance, function(err, job) {
+        table2Instance.createCopyFromJob(table1Instance, function(err, job) {
           assert.ifError(err);
 
           job.on('error', done).on('complete', function() {
@@ -688,7 +688,7 @@ describe('BigQuery', function() {
       });
 
       it('should start to load data from a storage file', function(done) {
-        table.startLoad(file, function(err, job) {
+        table.createLoadJob(file, function(err, job) {
           assert.ifError(err);
 
           job.on('error', done).on('complete', function() {
@@ -1201,7 +1201,7 @@ describe('BigQuery', function() {
       it('should start extracting data to a storage file', function(done) {
         var file = bucket.file('kitten-test-data-backup.json');
 
-        table.startExtract(file, function(err, job) {
+        table.createExtractJob(file, function(err, job) {
           assert.ifError(err);
 
           job.on('error', done).on('complete', function() {
