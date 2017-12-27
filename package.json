@@ -1,9 +1,9 @@
 {
   "name": "@google-cloud/bigquery",
   "description": "Google BigQuery Client Library for Node.js",
-  "version": "0.11.1",
+  "version": "0.12.0",
   "license": "Apache-2.0",
-  "author": "Google Inc.",
+  "author": "Google LLC",
   "engines": {
     "node": ">=4.0.0"
   },
