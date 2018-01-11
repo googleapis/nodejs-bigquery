@@ -3,7 +3,7 @@
   "requiresProjectId": true,
   "product": "bigquery",
   "client_reference_url": "https://googlecloudplatform.github.io/google-cloud-node/#/docs/bigquery/latest/bigquery",
-  "release_quality": "beta",
+  "release_quality": "ga",
   "samples": [
     {
       "id": "datasets",
