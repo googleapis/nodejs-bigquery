@@ -48,6 +48,7 @@ var fakeUtil = extend({}, util, {
     ]);
   },
 });
+var originalFakeUtil = extend(true, {}, fakeUtil);
 
 function FakeTable(a, b) {
   Table.call(this, a, b);
@@ -108,6 +109,7 @@ describe('BigQuery', function() {
   });
 
   beforeEach(function() {
+    extend(fakeUtil, originalFakeUtil);
     BigQuery = extend(BigQuery, BigQueryCached);
     bq = new BigQuery({projectId: PROJECT_ID});
   });
@@ -127,23 +129,24 @@ describe('BigQuery', function() {
       assert(promisified);
     });
 
-    it('should normalize the arguments', function() {
-      var normalizeArguments = fakeUtil.normalizeArguments;
-      var normalizeArgumentsCalled = false;
-      var fakeOptions = {projectId: PROJECT_ID};
-      var fakeContext = {};
+    it('should work without new', function() {
+      assert.doesNotThrow(function() {
+        BigQuery({projectId: PROJECT_ID});
+      });
+    });
 
-      fakeUtil.normalizeArguments = function(context, options) {
+    it('should normalize the arguments', function() {
+      var normalizeArgumentsCalled = false;
+      var options = {};
+
+      fakeUtil.normalizeArguments = function(context, options_) {
         normalizeArgumentsCalled = true;
-        assert.strictEqual(context, fakeContext);
-        assert.strictEqual(options, fakeOptions);
-        return options;
+        assert.strictEqual(options_, options);
+        return options_;
       };
 
-      BigQuery.call(fakeContext, fakeOptions);
-      assert(normalizeArgumentsCalled);
-
-      fakeUtil.normalizeArguments = normalizeArguments;
+      new BigQuery(options);
+      assert.strictEqual(normalizeArgumentsCalled, true);
     });
 
     it('should inherit from Service', function() {
