@@ -88,9 +88,10 @@ var Table = require('./table.js');
  */
 function BigQuery(options) {
   if (!(this instanceof BigQuery)) {
-    options = common.util.normalizeArguments(this, options);
     return new BigQuery(options);
   }
+
+  options = common.util.normalizeArguments(this, options);
 
   var config = {
     baseUrl: 'https://www.googleapis.com/bigquery/v2',
