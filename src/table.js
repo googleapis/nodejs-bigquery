@@ -490,7 +490,7 @@ Table.prototype.copy = function(destination, metadata, callback) {
  * const BigQuery = require('@google-cloud/bigquery');
  * const bigquery = new BigQuery();
  * const dataset = bigquery.dataset('my-dataset');
- * const table = bigquery.table('my-table');
+ * const table = dataset.table('my-table');
  *
  * const sourceTables = [
  *   dataset.table('your-table'),
@@ -556,7 +556,7 @@ Table.prototype.copyFrom = function(sourceTables, metadata, callback) {
  * const BigQuery = require('@google-cloud/bigquery');
  * const bigquery = new BigQuery();
  * const dataset = bigquery.dataset('my-dataset');
- * const table = bigquery.table('my-table');
+ * const table = dataset.table('my-table');
  *
  * const yourTable = dataset.table('your-table');
  * table.createCopyJob(yourTable, function(err, job, apiResponse) {
@@ -640,7 +640,7 @@ Table.prototype.createCopyJob = function(destination, metadata, callback) {
  * const BigQuery = require('@google-cloud/bigquery');
  * const bigquery = new BigQuery();
  * const dataset = bigquery.dataset('my-dataset');
- * const table = bigquery.table('my-table');
+ * const table = dataset.table('my-table');
  *
  * const sourceTables = [
  *   dataset.table('your-table'),
@@ -740,7 +740,7 @@ Table.prototype.createCopyFromJob = function(sourceTables, metadata, callback) {
  * const BigQuery = require('@google-cloud/bigquery');
  * const bigquery = new BigQuery();
  * const dataset = bigquery.dataset('my-dataset');
- * const table = bigquery.table('my-table');
+ * const table = dataset.table('my-table');
  *
  * const storage = new Storage({
  *   projectId: 'grape-spaceship-123'
@@ -881,7 +881,7 @@ Table.prototype.createExtractJob = function(destination, options, callback) {
  * const BigQuery = require('@google-cloud/bigquery');
  * const bigquery = new BigQuery();
  * const dataset = bigquery.dataset('my-dataset');
- * const table = bigquery.table('my-table');
+ * const table = dataset.table('my-table');
  *
  * //-
  * // Load data from a local file.
@@ -1050,7 +1050,7 @@ Table.prototype.createQueryStream = function(query) {
  * const BigQuery = require('@google-cloud/bigquery');
  * const bigquery = new BigQuery();
  * const dataset = bigquery.dataset('my-dataset');
- * const table = bigquery.table('my-table');
+ * const table = dataset.table('my-table');
  *
  * table.createReadStream(options)
  *   .on('error', console.error)
@@ -1088,7 +1088,7 @@ Table.prototype.createReadStream = common.paginator.streamify('getRows');
  * const BigQuery = require('@google-cloud/bigquery');
  * const bigquery = new BigQuery();
  * const dataset = bigquery.dataset('my-dataset');
- * const table = bigquery.table('my-table');
+ * const table = dataset.table('my-table');
  *
  * //-
  * // Load data from a CSV file.
@@ -1217,7 +1217,7 @@ Table.prototype.createWriteStream = function(metadata) {
  * const BigQuery = require('@google-cloud/bigquery');
  * const bigquery = new BigQuery();
  * const dataset = bigquery.dataset('my-dataset');
- * const table = bigquery.table('my-table');
+ * const table = dataset.table('my-table');
  *
  * const storage = new Storage({
  *   projectId: 'grape-spaceship-123'
@@ -1296,7 +1296,7 @@ Table.prototype.extract = function(destination, options, callback) {
  * const BigQuery = require('@google-cloud/bigquery');
  * const bigquery = new BigQuery();
  * const dataset = bigquery.dataset('my-dataset');
- * const table = bigquery.table('my-table');
+ * const table = dataset.table('my-table');
  *
  * table.getRows(function(err, rows) {
  *   if (!err) {
@@ -1429,7 +1429,7 @@ Table.prototype.getRows = function(options, callback) {
  * const BigQuery = require('@google-cloud/bigquery');
  * const bigquery = new BigQuery();
  * const dataset = bigquery.dataset('my-dataset');
- * const table = bigquery.table('my-table');
+ * const table = dataset.table('my-table');
  *
  * //-
  * // Insert a single row.
@@ -1643,7 +1643,7 @@ Table.prototype.insert = function(rows, options, callback) {
  * const BigQuery = require('@google-cloud/bigquery');
  * const bigquery = new BigQuery();
  * const dataset = bigquery.dataset('my-dataset');
- * const table = bigquery.table('my-table');
+ * const table = dataset.table('my-table');
  *
  * //-
  * // Load data from a local file.
@@ -1740,7 +1740,7 @@ Table.prototype.query = function(query, callback) {
  * const BigQuery = require('@google-cloud/bigquery');
  * const bigquery = new BigQuery();
  * const dataset = bigquery.dataset('my-dataset');
- * const table = bigquery.table('my-table');
+ * const table = dataset.table('my-table');
  *
  * const metadata = {
  *   name: 'My recipes',
