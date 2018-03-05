@@ -159,8 +159,8 @@ test.serial(`should load a GCS file`, async t => {
     `${cmd} load-gcs ${projectId} ${datasetId} ${tableId} ${bucketName} ${importFileName}`,
     cwd
   );
-  t.true(output.includes(`started.`));
-  t.true(output.includes(`completed.`));
+  t.regex(output, /started\./);
+  t.regex(output, /completed\./);
   await tools
     .tryTest(async assert => {
       const [rows] = await bigquery
@@ -168,6 +168,82 @@ test.serial(`should load a GCS file`, async t => {
         .table(tableId)
         .getRows();
       assert.equal(rows.length, 2);
+    })
+    .start();
+});
+
+test.serial(`should load a GCS CSV file with explicit schema`, async t => {
+  t.plan(2);
+  const output = await tools.runAsync(
+    `${cmd} load-gcs-csv ${projectId} ${datasetId} ${tableId}`,
+    cwd
+  );
+  t.regex(output, /started\./);
+  t.regex(output, /completed\./);
+  await tools
+    .tryTest(async assert => {
+      const [rows] = await bigquery
+        .dataset(datasetId)
+        .table(tableId)
+        .getRows();
+      assert(rows.length > 0);
+    })
+    .start();
+});
+
+test.serial(`should load a GCS CSV file with autodetected schema`, async t => {
+  t.plan(2);
+  const output = await tools.runAsync(
+    `${cmd} load-gcs-csv-autodetect ${projectId} ${datasetId} ${tableId}`,
+    cwd
+  );
+  t.regex(output, /started\./);
+  t.regex(output, /completed\./);
+  await tools
+    .tryTest(async assert => {
+      const [rows] = await bigquery
+        .dataset(datasetId)
+        .table(tableId)
+        .getRows();
+      assert(rows.length > 0);
+    })
+    .start();
+});
+
+test.serial(`should load a GCS CSV file append to table`, async t => {
+  t.plan(2);
+  const output = await tools.runAsync(
+    `${cmd} load-gcs-csv-append ${projectId} ${datasetId} ${tableId}`,
+    cwd
+  );
+  t.regex(output, /started\./);
+  t.regex(output, /completed\./);
+  await tools
+    .tryTest(async assert => {
+      const [rows] = await bigquery
+        .dataset(datasetId)
+        .table(tableId)
+        .getRows();
+      assert(rows.length > 0);
+    })
+    .start();
+});
+
+test.serial(`should load a GCS CSV file truncate table`, async t => {
+  t.plan(2);
+  const output = await tools.runAsync(
+    `${cmd} load-gcs-csv-truncate${projectId} ${datasetId} ${tableId}`,
+    cwd
+  );
+  t.regex(output, /started\./);
+  t.regex(output, /completed\./);
+  await tools
+    .tryTest(async assert => {
+      const [rows] = await bigquery
+        .dataset(datasetId)
+        .table(tableId)
+        .getRows();
+      assert(rows.length > 0);
     })
     .start();
 });
