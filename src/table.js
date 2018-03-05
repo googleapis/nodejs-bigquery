@@ -861,16 +861,16 @@ Table.prototype.createExtractJob = function(destination, options, callback) {
  *
  * @see [Jobs: insert API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert}
  *
- * @param {string|File} source The source file to import. A string or a
+ * @param {string|File} source The source file to load. A string or a
  *     {@link https://cloud.google.com/nodejs/docs/reference/storage/latest/File File} object.
  * @param {object} [metadata] Metadata to set with the load operation. The
  *     metadata object should be in the format of the
  *     [`configuration.load`](http://goo.gl/BVcXk4) property of a Jobs resource.
- * @param {string} [metadata.format] The format the data being imported is in.
+ * @param {string} [metadata.format] The format the data being loaded is in.
  *     Allowed options are "CSV", "JSON", or "AVRO".
  * @param {function} [callback] The callback function.
  * @param {?error} callback.err An error returned while making this request
- * @param {Job} callback.job The job used to import your data.
+ * @param {Job} callback.job The job used to load your data.
  * @param {object} callback.apiResponse The full API response.
  * @returns {Promise}
  *
@@ -1387,7 +1387,7 @@ Table.prototype.getRows = function(options, callback) {
  *
  * There are more strict quota limits using this method so it is highly
  * recommended that you load data into BigQuery using
- * {@link Table#import} instead.
+ * {@link Table#load} instead.
  *
  * @see [Tabledata: insertAll API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/tabledata/insertAll}
  * @see [Troubleshooting Errors]{@link https://developers.google.com/bigquery/troubleshooting-errors}
@@ -1625,12 +1625,12 @@ Table.prototype.insert = function(rows, options, callback) {
  * Note: The file type will be inferred by the given file's extension. If you
  * wish to override this, you must provide `metadata.format`.
  *
- * @param {string|File} source The source file to import. A string or a
+ * @param {string|File} source The source file to load. A string or a
  *     {@link https://cloud.google.com/nodejs/docs/reference/storage/latest/File File} object.
  * @param {object} [metadata] Metadata to set with the load operation. The
  *     metadata object should be in the format of the
  *     [`configuration.load`](http://goo.gl/BVcXk4) property of a Jobs resource.
- * @param {string} [metadata.format] The format the data being imported is in.
+ * @param {string} [metadata.format] The format the data being loaded is in.
  *     Allowed options are "CSV", "JSON", or "AVRO".
  * @param {function} [callback] The callback function.
  * @param {?error} callback.err An error returned while making this request
