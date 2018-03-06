@@ -343,9 +343,9 @@ function loadCSVFromGCS(datasetId, tableId, projectId) {
     schema: {
       fields: [
         {name: 'name', type: 'STRING'},
-        {name: 'post_abbr', type: 'STRING'}
-      ]
-    }
+        {name: 'post_abbr', type: 'STRING'},
+      ],
+    },
   };
 
   let job;
@@ -414,7 +414,7 @@ function loadCSVFromGCSAutodetect(datasetId, tableId, projectId) {
   const metadata = {
     sourceFormat: 'CSV',
     skipLeadingRows: 1,
-    autodetect: true
+    autodetect: true,
   };
 
   let job;
@@ -486,11 +486,11 @@ function loadCSVFromGCSAppend(datasetId, tableId, projectId) {
     schema: {
       fields: [
         {name: 'name', type: 'STRING'},
-        {name: 'post_abbr', type: 'STRING'}
-      ]
+        {name: 'post_abbr', type: 'STRING'},
+      ],
     },
     // Set the write disposition to append to an existing table.
-    writeDisposition: 'WRITE_APPEND'
+    writeDisposition: 'WRITE_APPEND',
   };
 
   let job;
@@ -562,11 +562,11 @@ function loadCSVFromGCSTruncate(datasetId, tableId, projectId) {
     schema: {
       fields: [
         {name: 'name', type: 'STRING'},
-        {name: 'post_abbr', type: 'STRING'}
-      ]
+        {name: 'post_abbr', type: 'STRING'},
+      ],
     },
     // Set the write disposition to append to an existing table.
-    writeDisposition: 'WRITE_TRUNCATE'
+    writeDisposition: 'WRITE_TRUNCATE',
   };
 
   let job;
@@ -780,11 +780,7 @@ require(`yargs`)
     `Loads sample CSV data from a Google Cloud Storage file into a table.`,
     {},
     opts => {
-      loadCSVFromGCS(
-        opts.datasetId,
-        opts.tableId,
-        opts.projectId
-      );
+      loadCSVFromGCS(opts.datasetId, opts.tableId, opts.projectId);
     }
   )
   .command(
@@ -792,11 +788,7 @@ require(`yargs`)
     `Loads sample CSV data from a Google Cloud Storage file into a table.`,
     {},
     opts => {
-      loadCSVFromGCSAutodetect(
-        opts.datasetId,
-        opts.tableId,
-        opts.projectId
-      );
+      loadCSVFromGCSAutodetect(opts.datasetId, opts.tableId, opts.projectId);
     }
   )
   .command(
@@ -804,11 +796,7 @@ require(`yargs`)
     `Loads sample CSV data from GCS, adding to an existing table.`,
     {},
     opts => {
-      loadCSVFromGCSAppend(
-        opts.datasetId,
-        opts.tableId,
-        opts.projectId
-      );
+      loadCSVFromGCSAppend(opts.datasetId, opts.tableId, opts.projectId);
     }
   )
   .command(
@@ -816,11 +804,7 @@ require(`yargs`)
     `Loads sample CSV data from GCS, replacing an existing table.`,
     {},
     opts => {
-      loadCSVFromGCSTruncate(
-        opts.datasetId,
-        opts.tableId,
-        opts.projectId
-      );
+      loadCSVFromGCSTruncate(opts.datasetId, opts.tableId, opts.projectId);
     }
   )
   .command(
