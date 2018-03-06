@@ -184,7 +184,7 @@ function copyTable(
       console.log(`Job ${job.id} started.`);
 
       // Wait for the job to finish
-      return job;
+      return job.promise;
     })
     .then(metadata => {
       // Check the job's status for errors
@@ -232,7 +232,7 @@ function loadLocalFile(datasetId, tableId, filename, projectId) {
       console.log(`Job ${job.id} started.`);
 
       // Wait for the job to finish
-      return job;
+      return job.promise;
     })
     .then(metadata => {
       // Check the job's status for errors
@@ -286,7 +286,7 @@ function loadFileFromGCS(datasetId, tableId, bucketName, filename, projectId) {
       console.log(`Job ${job.id} started.`);
 
       // Wait for the job to finish
-      return job;
+      return job.promise;
     })
     .then(metadata => {
       // Check the job's status for errors
@@ -360,7 +360,7 @@ function loadCSVFromGCS(datasetId, tableId, projectId) {
       console.log(`Job ${job.id} started.`);
 
       // Wait for the job to finish
-      return job;
+      return job.promise;
     })
     .then(metadata => {
       // Check the job's status for errors
@@ -429,7 +429,7 @@ function loadCSVFromGCSAutodetect(datasetId, tableId, projectId) {
       console.log(`Job ${job.id} started.`);
 
       // Wait for the job to finish
-      return job;
+      return job.promise;
     })
     .then(metadata => {
       // Check the job's status for errors
@@ -505,7 +505,7 @@ function loadCSVFromGCSAppend(datasetId, tableId, projectId) {
       console.log(`Job ${job.id} started.`);
 
       // Wait for the job to finish
-      return job;
+      return job.promise;
     })
     .then(metadata => {
       // Check the job's status for errors
@@ -581,7 +581,7 @@ function loadCSVFromGCSTruncate(datasetId, tableId, projectId) {
       console.log(`Job ${job.id} started.`);
 
       // Wait for the job to finish
-      return job;
+      return job.promise;
     })
     .then(metadata => {
       // Check the job's status for errors
@@ -641,7 +641,7 @@ function extractTableToGCS(
       console.log(`Job ${job.id} started.`);
 
       // Wait for the job to finish
-      return job;
+      return job.promise;
     })
     .then(metadata => {
       // Check the job's status for errors
