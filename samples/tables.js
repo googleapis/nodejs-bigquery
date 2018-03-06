@@ -323,8 +323,8 @@ function loadCSVFromGCS(datasetId, tableId, projectId) {
    *
    * TODO(developer): Replace the following lines with the path to your file.
    */
-  const bucketName = "cloud-samples-data";
-  const filename = "bigquery/us-states/us-states.csv";
+  const bucketName = 'cloud-samples-data';
+  const filename = 'bigquery/us-states/us-states.csv';
 
   // Instantiates clients
   const bigquery = new BigQuery({
@@ -338,12 +338,12 @@ function loadCSVFromGCS(datasetId, tableId, projectId) {
   // Configure the load job. For full list of options, see:
   // https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs#configuration.load
   const metadata = {
-    'sourceFormat': 'CSV',
-    'skipLeadingRows': 1,
-    'schema': {
-      'fields': [
-        {'name': 'name', 'type': 'STRING'},
-        {'name': 'post_abbr', 'type': 'STRING'}
+    sourceFormat: 'CSV',
+    skipLeadingRows: 1,
+    schema: {
+      fields: [
+        {name: 'name', type: 'STRING'},
+        {name: 'post_abbr', type: 'STRING'}
       ]
     }
   };
@@ -397,8 +397,8 @@ function loadCSVFromGCSAutodetect(datasetId, tableId, projectId) {
    *
    * TODO(developer): Replace the following lines with the path to your file.
    */
-  const bucketName = "cloud-samples-data";
-  const filename = "bigquery/us-states/us-states.csv";
+  const bucketName = 'cloud-samples-data';
+  const filename = 'bigquery/us-states/us-states.csv';
 
   // Instantiates clients
   const bigquery = new BigQuery({
@@ -412,9 +412,9 @@ function loadCSVFromGCSAutodetect(datasetId, tableId, projectId) {
   // Configure the load job. For full list of options, see:
   // https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs#configuration.load
   const metadata = {
-    'sourceFormat': 'CSV',
-    'skipLeadingRows': 1,
-    'autodetect': true
+    sourceFormat: 'CSV',
+    skipLeadingRows: 1,
+    autodetect: true
   };
 
   let job;
@@ -466,8 +466,8 @@ function loadCSVFromGCSAppend(datasetId, tableId, projectId) {
    *
    * TODO(developer): Replace the following lines with the path to your file.
    */
-  const bucketName = "cloud-samples-data";
-  const filename = "bigquery/us-states/us-states.csv";
+  const bucketName = 'cloud-samples-data';
+  const filename = 'bigquery/us-states/us-states.csv';
 
   // Instantiates clients
   const bigquery = new BigQuery({
@@ -481,16 +481,16 @@ function loadCSVFromGCSAppend(datasetId, tableId, projectId) {
   // Configure the load job. For full list of options, see:
   // https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs#configuration.load
   const metadata = {
-    'sourceFormat': 'CSV',
-    'skipLeadingRows': 1,
-    'schema': {
-      'fields': [
-        {'name': 'name', 'type': 'STRING'},
-        {'name': 'post_abbr', 'type': 'STRING'}
+    sourceFormat: 'CSV',
+    skipLeadingRows: 1,
+    schema: {
+      fields: [
+        {name: 'name', type: 'STRING'},
+        {name: 'post_abbr', type: 'STRING'}
       ]
     },
     // Set the write disposition to append to an existing table.
-    'writeDisposition': 'WRITE_APPEND'
+    writeDisposition: 'WRITE_APPEND'
   };
 
   let job;
@@ -542,8 +542,8 @@ function loadCSVFromGCSTruncate(datasetId, tableId, projectId) {
    *
    * TODO(developer): Replace the following lines with the path to your file.
    */
-  const bucketName = "cloud-samples-data";
-  const filename = "bigquery/us-states/us-states.csv";
+  const bucketName = 'cloud-samples-data';
+  const filename = 'bigquery/us-states/us-states.csv';
 
   // Instantiates clients
   const bigquery = new BigQuery({
@@ -557,16 +557,16 @@ function loadCSVFromGCSTruncate(datasetId, tableId, projectId) {
   // Configure the load job. For full list of options, see:
   // https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs#configuration.load
   const metadata = {
-    'sourceFormat': 'CSV',
-    'skipLeadingRows': 1,
-    'schema': {
-      'fields': [
-        {'name': 'name', 'type': 'STRING'},
-        {'name': 'post_abbr', 'type': 'STRING'}
+    sourceFormat: 'CSV',
+    skipLeadingRows: 1,
+    schema: {
+      fields: [
+        {name: 'name', type: 'STRING'},
+        {name: 'post_abbr', type: 'STRING'}
       ]
     },
     // Set the write disposition to append to an existing table.
-    'writeDisposition': 'WRITE_TRUNCATE'
+    writeDisposition: 'WRITE_TRUNCATE'
   };
 
   let job;
