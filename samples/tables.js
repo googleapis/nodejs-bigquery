@@ -270,7 +270,7 @@ function loadFileFromGCS(datasetId, tableId, bucketName, filename, projectId) {
     projectId: projectId,
   });
 
-  const storage = Storage({
+  const storage = new Storage({
     projectId: projectId,
   });
 
@@ -331,7 +331,7 @@ function loadCSVFromGCS(datasetId, tableId, projectId) {
     projectId: projectId,
   });
 
-  const storage = Storage({
+  const storage = new Storage({
     projectId: projectId,
   });
 
@@ -405,7 +405,7 @@ function loadCSVFromGCSAutodetect(datasetId, tableId, projectId) {
     projectId: projectId,
   });
 
-  const storage = Storage({
+  const storage = new Storage({
     projectId: projectId,
   });
 
@@ -474,7 +474,7 @@ function loadCSVFromGCSAppend(datasetId, tableId, projectId) {
     projectId: projectId,
   });
 
-  const storage = Storage({
+  const storage = new Storage({
     projectId: projectId,
   });
 
@@ -550,7 +550,7 @@ function loadCSVFromGCSTruncate(datasetId, tableId, projectId) {
     projectId: projectId,
   });
 
-  const storage = Storage({
+  const storage = new Storage({
     projectId: projectId,
   });
 
@@ -625,7 +625,7 @@ function extractTableToGCS(
     projectId: projectId,
   });
 
-  const storage = Storage({
+  const storage = new Storage({
     projectId: projectId,
   });
 
