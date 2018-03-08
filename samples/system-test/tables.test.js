@@ -37,7 +37,7 @@ const destTableId = generateUuid();
 const schema = `Name:string, Age:integer, Weight:float, IsMagic:boolean`;
 const bucketName = generateUuid();
 const exportFileName = `data.json`;
-const importFileName = `data.csv`;
+const importFileName = `data.avro`;
 const localFilePath = path.join(__dirname, `../resources/${importFileName}`);
 const rows = [
   {Name: `foo`, Age: 27, Weight: 80.3, IsMagic: true},
@@ -105,13 +105,12 @@ test.serial(`should list tables`, async t => {
 });
 
 test.serial(`should load a local file`, async t => {
-  t.plan(2);
+  t.plan(1);
   const output = await tools.runAsync(
     `${cmd} load ${projectId} ${datasetId} ${tableId} ${localFilePath}`,
     cwd
   );
-  t.true(output.includes(`started.`));
-  t.true(output.includes(`completed.`));
+  t.regex(output, /completed\./);
   await tools
     .tryTest(async assert => {
       const [rows] = await bigquery
@@ -135,13 +134,12 @@ test.serial(`should browse table rows`, async t => {
 });
 
 test.serial(`should extract a table to GCS`, async t => {
-  t.plan(2);
+  t.plan(1);
   const output = await tools.runAsync(
     `${cmd} extract ${projectId} ${datasetId} ${tableId} ${bucketName} ${exportFileName}`,
     cwd
   );
-  t.true(output.includes(`started.`));
-  t.true(output.includes(`completed.`));
+  t.regex(output, /completed\./);
   await tools
     .tryTest(async assert => {
       const [exists] = await storage
@@ -154,12 +152,11 @@ test.serial(`should extract a table to GCS`, async t => {
 });
 
 test.serial(`should load a GCS file`, async t => {
-  t.plan(2);
+  t.plan(1);
   const output = await tools.runAsync(
     `${cmd} load-gcs ${projectId} ${datasetId} ${tableId} ${bucketName} ${importFileName}`,
     cwd
   );
-  t.regex(output, /started\./);
   t.regex(output, /completed\./);
   await tools
     .tryTest(async assert => {
@@ -249,13 +246,12 @@ test.serial(`should load a GCS CSV file truncate table`, async t => {
 });
 
 test.serial(`should copy a table`, async t => {
-  t.plan(2);
+  t.plan(1);
   const output = await tools.runAsync(
     `${cmd} copy ${projectId} ${srcDatasetId} ${srcTableId} ${destDatasetId} ${destTableId}`,
     cwd
   );
-  t.true(output.includes(`started.`));
-  t.true(output.includes(`completed.`));
+  t.regex(output, /completed\./);
   await tools
     .tryTest(async assert => {
       const [rows] = await bigquery
