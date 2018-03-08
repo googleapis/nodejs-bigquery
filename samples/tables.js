@@ -180,7 +180,7 @@ function copyTable(
     .table(srcTableId)
     .copy(bigquery.dataset(destDatasetId).table(destTableId))
     .then(results => {
-      var job = results[0];
+      const job = results[0];
 
       // load() waits for the job to finish
       assert.equal(job.status.state, 'DONE');
@@ -222,7 +222,7 @@ function loadLocalFile(datasetId, tableId, filename, projectId) {
     .table(tableId)
     .load(filename)
     .then(results => {
-      var job = results[0];
+      const job = results[0];
 
       // load() waits for the job to finish
       assert.equal(job.status.state, 'DONE');
@@ -270,7 +270,7 @@ function loadFileFromGCS(datasetId, tableId, bucketName, filename, projectId) {
     .table(tableId)
     .load(storage.bucket(bucketName).file(filename))
     .then(results => {
-      var job = results[0];
+      const job = results[0];
 
       // load() waits for the job to finish
       assert.equal(job.status.state, 'DONE');
@@ -324,7 +324,7 @@ function extractTableToGCS(
     .table(tableId)
     .extract(storage.bucket(bucketName).file(filename))
     .then(results => {
-      var job = results[0];
+      const job = results[0];
 
       // load() waits for the job to finish
       assert.equal(job.status.state, 'DONE');
