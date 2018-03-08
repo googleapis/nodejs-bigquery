@@ -15,6 +15,8 @@
 
 'use strict';
 
+const assert = require('assert');
+
 function createTable(datasetId, tableId, schema, projectId) {
   // [START bigquery_create_table]
   // Imports the Google Cloud client library
@@ -172,29 +174,23 @@ function copyTable(
     projectId: projectId,
   });
 
-  let job;
-
   // Copies the table contents into another table
   bigquery
     .dataset(srcDatasetId)
     .table(srcTableId)
     .copy(bigquery.dataset(destDatasetId).table(destTableId))
     .then(results => {
-      job = results[0];
-      console.log(`Job ${job.id} started.`);
+      const job = results[0];
 
-      // Wait for the job to finish
-      return job;
-    })
-    .then(metadata => {
+      // load() waits for the job to finish
+      assert.equal(job.status.state, 'DONE');
+      console.log(`Job ${job.id} completed.`);
+
       // Check the job's status for errors
-      const errors = metadata.status.errors;
+      const errors = job.status.errors;
       if (errors && errors.length > 0) {
         throw errors;
       }
-    })
-    .then(() => {
-      console.log(`Job ${job.id} completed.`);
     })
     .catch(err => {
       console.error('ERROR:', err);
@@ -220,29 +216,23 @@ function loadLocalFile(datasetId, tableId, filename, projectId) {
     projectId: projectId,
   });
 
-  let job;
-
   // Loads data from a local file into the table
   bigquery
     .dataset(datasetId)
     .table(tableId)
     .load(filename)
     .then(results => {
-      job = results[0];
-      console.log(`Job ${job.id} started.`);
+      const job = results[0];
 
-      // Wait for the job to finish
-      return job;
-    })
-    .then(metadata => {
+      // load() waits for the job to finish
+      assert.equal(job.status.state, 'DONE');
+      console.log(`Job ${job.id} completed.`);
+
       // Check the job's status for errors
-      const errors = metadata.status.errors;
+      const errors = job.status.errors;
       if (errors && errors.length > 0) {
         throw errors;
       }
-    })
-    .then(() => {
-      console.log(`Job ${job.id} completed.`);
     })
     .catch(err => {
       console.error('ERROR:', err);
@@ -274,29 +264,23 @@ function loadFileFromGCS(datasetId, tableId, bucketName, filename, projectId) {
     projectId: projectId,
   });
 
-  let job;
-
   // Loads data from a Google Cloud Storage file into the table
   bigquery
     .dataset(datasetId)
     .table(tableId)
     .load(storage.bucket(bucketName).file(filename))
     .then(results => {
-      job = results[0];
-      console.log(`Job ${job.id} started.`);
+      const job = results[0];
 
-      // Wait for the job to finish
-      return job;
-    })
-    .then(metadata => {
+      // load() waits for the job to finish
+      assert.equal(job.status.state, 'DONE');
+      console.log(`Job ${job.id} completed.`);
+
       // Check the job's status for errors
-      const errors = metadata.status.errors;
+      const errors = job.status.errors;
       if (errors && errors.length > 0) {
         throw errors;
       }
-    })
-    .then(() => {
-      console.log(`Job ${job.id} completed.`);
     })
     .catch(err => {
       console.error('ERROR:', err);
@@ -334,29 +318,23 @@ function extractTableToGCS(
     projectId: projectId,
   });
 
-  let job;
-
   // Exports data from the table into a Google Cloud Storage file
   bigquery
     .dataset(datasetId)
     .table(tableId)
     .extract(storage.bucket(bucketName).file(filename))
     .then(results => {
-      job = results[0];
-      console.log(`Job ${job.id} started.`);
+      const job = results[0];
 
-      // Wait for the job to finish
-      return job;
-    })
-    .then(metadata => {
+      // load() waits for the job to finish
+      assert.equal(job.status.state, 'DONE');
+      console.log(`Job ${job.id} completed.`);
+
       // Check the job's status for errors
-      const errors = metadata.status.errors;
+      const errors = job.status.errors;
       if (errors && errors.length > 0) {
         throw errors;
       }
-    })
-    .then(() => {
-      console.log(`Job ${job.id} completed.`);
     })
     .catch(err => {
       console.error('ERROR:', err);
