@@ -332,29 +332,23 @@ function loadCSVFromGCS(datasetId, tableId, projectId) {
     },
   };
 
-  let job;
-
   // Loads data from a Google Cloud Storage file into the table
   bigquery
     .dataset(datasetId)
     .table(tableId)
     .load(storage.bucket(bucketName).file(filename), metadata)
     .then(results => {
-      job = results[0];
-      console.log(`Job ${job.id} started.`);
+      const job = results[0];
 
-      // Wait for the job to finish
-      return job.promise;
-    })
-    .then(metadata => {
+      // load() waits for the job to finish
+      assert.equal(job.status.state, 'DONE');
+      console.log(`Job ${job.id} completed.`);
+
       // Check the job's status for errors
-      const errors = metadata.status.errors;
+      const errors = job.status.errors;
       if (errors && errors.length > 0) {
         throw errors;
       }
-    })
-    .then(() => {
-      console.log(`Job ${job.id} completed.`);
     })
     .catch(err => {
       console.error('ERROR:', err);
@@ -401,29 +395,23 @@ function loadCSVFromGCSAutodetect(datasetId, tableId, projectId) {
     autodetect: true,
   };
 
-  let job;
-
   // Loads data from a Google Cloud Storage file into the table
   bigquery
     .dataset(datasetId)
     .table(tableId)
     .load(storage.bucket(bucketName).file(filename), metadata)
     .then(results => {
-      job = results[0];
-      console.log(`Job ${job.id} started.`);
+      const job = results[0];
 
-      // Wait for the job to finish
-      return job.promise;
-    })
-    .then(metadata => {
+      // load() waits for the job to finish
+      assert.equal(job.status.state, 'DONE');
+      console.log(`Job ${job.id} completed.`);
+
       // Check the job's status for errors
-      const errors = metadata.status.errors;
+      const errors = job.status.errors;
       if (errors && errors.length > 0) {
         throw errors;
       }
-    })
-    .then(() => {
-      console.log(`Job ${job.id} completed.`);
     })
     .catch(err => {
       console.error('ERROR:', err);
@@ -477,29 +465,23 @@ function loadCSVFromGCSAppend(datasetId, tableId, projectId) {
     writeDisposition: 'WRITE_APPEND',
   };
 
-  let job;
-
   // Loads data from a Google Cloud Storage file into the table
   bigquery
     .dataset(datasetId)
     .table(tableId)
     .load(storage.bucket(bucketName).file(filename), metadata)
     .then(results => {
-      job = results[0];
-      console.log(`Job ${job.id} started.`);
+      const job = results[0];
 
-      // Wait for the job to finish
-      return job.promise;
-    })
-    .then(metadata => {
+      // load() waits for the job to finish
+      assert.equal(job.status.state, 'DONE');
+      console.log(`Job ${job.id} completed.`);
+
       // Check the job's status for errors
-      const errors = metadata.status.errors;
+      const errors = job.status.errors;
       if (errors && errors.length > 0) {
         throw errors;
       }
-    })
-    .then(() => {
-      console.log(`Job ${job.id} completed.`);
     })
     .catch(err => {
       console.error('ERROR:', err);
@@ -553,29 +535,23 @@ function loadCSVFromGCSTruncate(datasetId, tableId, projectId) {
     writeDisposition: 'WRITE_TRUNCATE',
   };
 
-  let job;
-
   // Loads data from a Google Cloud Storage file into the table
   bigquery
     .dataset(datasetId)
     .table(tableId)
     .load(storage.bucket(bucketName).file(filename), metadata)
     .then(results => {
-      job = results[0];
-      console.log(`Job ${job.id} started.`);
+      const job = results[0];
 
-      // Wait for the job to finish
-      return job.promise;
-    })
-    .then(metadata => {
+      // load() waits for the job to finish
+      assert.equal(job.status.state, 'DONE');
+      console.log(`Job ${job.id} completed.`);
+
       // Check the job's status for errors
-      const errors = metadata.status.errors;
+      const errors = job.status.errors;
       if (errors && errors.length > 0) {
         throw errors;
       }
-    })
-    .then(() => {
-      console.log(`Job ${job.id} completed.`);
     })
     .catch(err => {
       console.error('ERROR:', err);
