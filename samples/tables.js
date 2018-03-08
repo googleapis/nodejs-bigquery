@@ -15,7 +15,7 @@
 
 'use strict';
 
-var assert = require('assert');
+const assert = require('assert');
 
 function createTable(datasetId, tableId, schema, projectId) {
   // [START bigquery_create_table]
