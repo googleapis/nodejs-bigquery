@@ -260,7 +260,7 @@ function loadFileFromGCS(datasetId, tableId, bucketName, filename, projectId) {
     projectId: projectId,
   });
 
-  const storage = Storage({
+  const storage = new Storage({
     projectId: projectId,
   });
 
@@ -286,6 +286,277 @@ function loadFileFromGCS(datasetId, tableId, bucketName, filename, projectId) {
       console.error('ERROR:', err);
     });
   // [END bigquery_load_from_gcs]
+}
+
+function loadCSVFromGCS(datasetId, tableId, projectId) {
+  // [START bigquery_load_table_gcs_csv]
+  // Imports the Google Cloud client libraries
+  const BigQuery = require('@google-cloud/bigquery');
+  const Storage = require('@google-cloud/storage');
+
+  /**
+   * TODO(developer): Uncomment the following lines before running the sample.
+   */
+  // const projectId = "your-project-id";
+  // const datasetId = "my_dataset";
+  // const tableId = "my_table";
+
+  /**
+   * This sample loads the CSV file at
+   * https://storage.googleapis.com/cloud-samples-data/bigquery/us-states/us-states.json
+   *
+   * TODO(developer): Replace the following lines with the path to your file.
+   */
+  const bucketName = 'cloud-samples-data';
+  const filename = 'bigquery/us-states/us-states.csv';
+
+  // Instantiates clients
+  const bigquery = new BigQuery({
+    projectId: projectId,
+  });
+
+  const storage = new Storage({
+    projectId: projectId,
+  });
+
+  // Configure the load job. For full list of options, see:
+  // https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs#configuration.load
+  const metadata = {
+    sourceFormat: 'CSV',
+    skipLeadingRows: 1,
+    schema: {
+      fields: [
+        {name: 'name', type: 'STRING'},
+        {name: 'post_abbr', type: 'STRING'},
+      ],
+    },
+  };
+
+  // Loads data from a Google Cloud Storage file into the table
+  bigquery
+    .dataset(datasetId)
+    .table(tableId)
+    .load(storage.bucket(bucketName).file(filename), metadata)
+    .then(results => {
+      const job = results[0];
+
+      // load() waits for the job to finish
+      assert.equal(job.status.state, 'DONE');
+      console.log(`Job ${job.id} completed.`);
+
+      // Check the job's status for errors
+      const errors = job.status.errors;
+      if (errors && errors.length > 0) {
+        throw errors;
+      }
+    })
+    .catch(err => {
+      console.error('ERROR:', err);
+    });
+  // [END bigquery_load_table_gcs_csv]
+}
+
+function loadCSVFromGCSAutodetect(datasetId, tableId, projectId) {
+  // [START bigquery_load_table_gcs_csv_autodetect]
+  // Imports the Google Cloud client libraries
+  const BigQuery = require('@google-cloud/bigquery');
+  const Storage = require('@google-cloud/storage');
+
+  /**
+   * TODO(developer): Uncomment the following lines before running the sample.
+   */
+  // const projectId = "your-project-id";
+  // const datasetId = "my_dataset";
+  // const tableId = "my_table";
+
+  /**
+   * This sample loads the CSV file at
+   * https://storage.googleapis.com/cloud-samples-data/bigquery/us-states/us-states.json
+   *
+   * TODO(developer): Replace the following lines with the path to your file.
+   */
+  const bucketName = 'cloud-samples-data';
+  const filename = 'bigquery/us-states/us-states.csv';
+
+  // Instantiates clients
+  const bigquery = new BigQuery({
+    projectId: projectId,
+  });
+
+  const storage = new Storage({
+    projectId: projectId,
+  });
+
+  // Configure the load job. For full list of options, see:
+  // https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs#configuration.load
+  const metadata = {
+    sourceFormat: 'CSV',
+    skipLeadingRows: 1,
+    autodetect: true,
+  };
+
+  // Loads data from a Google Cloud Storage file into the table
+  bigquery
+    .dataset(datasetId)
+    .table(tableId)
+    .load(storage.bucket(bucketName).file(filename), metadata)
+    .then(results => {
+      const job = results[0];
+
+      // load() waits for the job to finish
+      assert.equal(job.status.state, 'DONE');
+      console.log(`Job ${job.id} completed.`);
+
+      // Check the job's status for errors
+      const errors = job.status.errors;
+      if (errors && errors.length > 0) {
+        throw errors;
+      }
+    })
+    .catch(err => {
+      console.error('ERROR:', err);
+    });
+  // [END bigquery_load_table_gcs_csv_autodetect]
+}
+
+function loadCSVFromGCSAppend(datasetId, tableId, projectId) {
+  // [START bigquery_load_table_gcs_csv_append]
+  // Imports the Google Cloud client libraries
+  const BigQuery = require('@google-cloud/bigquery');
+  const Storage = require('@google-cloud/storage');
+
+  /**
+   * TODO(developer): Uncomment the following lines before running the sample.
+   */
+  // const projectId = "your-project-id";
+  // const datasetId = "my_dataset";
+  // const tableId = "my_table";
+
+  /**
+   * This sample loads the CSV file at
+   * https://storage.googleapis.com/cloud-samples-data/bigquery/us-states/us-states.json
+   *
+   * TODO(developer): Replace the following lines with the path to your file.
+   */
+  const bucketName = 'cloud-samples-data';
+  const filename = 'bigquery/us-states/us-states.csv';
+
+  // Instantiates clients
+  const bigquery = new BigQuery({
+    projectId: projectId,
+  });
+
+  const storage = new Storage({
+    projectId: projectId,
+  });
+
+  // Configure the load job. For full list of options, see:
+  // https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs#configuration.load
+  const metadata = {
+    sourceFormat: 'CSV',
+    skipLeadingRows: 1,
+    schema: {
+      fields: [
+        {name: 'name', type: 'STRING'},
+        {name: 'post_abbr', type: 'STRING'},
+      ],
+    },
+    // Set the write disposition to append to an existing table.
+    writeDisposition: 'WRITE_APPEND',
+  };
+
+  // Loads data from a Google Cloud Storage file into the table
+  bigquery
+    .dataset(datasetId)
+    .table(tableId)
+    .load(storage.bucket(bucketName).file(filename), metadata)
+    .then(results => {
+      const job = results[0];
+
+      // load() waits for the job to finish
+      assert.equal(job.status.state, 'DONE');
+      console.log(`Job ${job.id} completed.`);
+
+      // Check the job's status for errors
+      const errors = job.status.errors;
+      if (errors && errors.length > 0) {
+        throw errors;
+      }
+    })
+    .catch(err => {
+      console.error('ERROR:', err);
+    });
+  // [END bigquery_load_table_gcs_csv_append]
+}
+
+function loadCSVFromGCSTruncate(datasetId, tableId, projectId) {
+  // [START bigquery_load_table_gcs_csv_truncate]
+  // Imports the Google Cloud client libraries
+  const BigQuery = require('@google-cloud/bigquery');
+  const Storage = require('@google-cloud/storage');
+
+  /**
+   * TODO(developer): Uncomment the following lines before running the sample.
+   */
+  // const projectId = "your-project-id";
+  // const datasetId = "my_dataset";
+  // const tableId = "my_table";
+
+  /**
+   * This sample loads the CSV file at
+   * https://storage.googleapis.com/cloud-samples-data/bigquery/us-states/us-states.json
+   *
+   * TODO(developer): Replace the following lines with the path to your file.
+   */
+  const bucketName = 'cloud-samples-data';
+  const filename = 'bigquery/us-states/us-states.csv';
+
+  // Instantiates clients
+  const bigquery = new BigQuery({
+    projectId: projectId,
+  });
+
+  const storage = new Storage({
+    projectId: projectId,
+  });
+
+  // Configure the load job. For full list of options, see:
+  // https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs#configuration.load
+  const metadata = {
+    sourceFormat: 'CSV',
+    skipLeadingRows: 1,
+    schema: {
+      fields: [
+        {name: 'name', type: 'STRING'},
+        {name: 'post_abbr', type: 'STRING'},
+      ],
+    },
+    // Set the write disposition to append to an existing table.
+    writeDisposition: 'WRITE_TRUNCATE',
+  };
+
+  // Loads data from a Google Cloud Storage file into the table
+  bigquery
+    .dataset(datasetId)
+    .table(tableId)
+    .load(storage.bucket(bucketName).file(filename), metadata)
+    .then(results => {
+      const job = results[0];
+
+      // load() waits for the job to finish
+      assert.equal(job.status.state, 'DONE');
+      console.log(`Job ${job.id} completed.`);
+
+      // Check the job's status for errors
+      const errors = job.status.errors;
+      if (errors && errors.length > 0) {
+        throw errors;
+      }
+    })
+    .catch(err => {
+      console.error('ERROR:', err);
+    });
+  // [END bigquery_load_table_gcs_csv_truncate]
 }
 
 function extractTableToGCS(
@@ -314,7 +585,7 @@ function extractTableToGCS(
     projectId: projectId,
   });
 
-  const storage = Storage({
+  const storage = new Storage({
     projectId: projectId,
   });
 
@@ -456,6 +727,38 @@ require(`yargs`)
         opts.fileName,
         opts.projectId
       );
+    }
+  )
+  .command(
+    `load-gcs-csv <projectId> <datasetId> <tableId>`,
+    `Loads sample CSV data from a Google Cloud Storage file into a table.`,
+    {},
+    opts => {
+      loadCSVFromGCS(opts.datasetId, opts.tableId, opts.projectId);
+    }
+  )
+  .command(
+    `load-gcs-csv-autodetect <projectId> <datasetId> <tableId>`,
+    `Loads sample CSV data from a Google Cloud Storage file into a table.`,
+    {},
+    opts => {
+      loadCSVFromGCSAutodetect(opts.datasetId, opts.tableId, opts.projectId);
+    }
+  )
+  .command(
+    `load-gcs-csv-append <projectId> <datasetId> <tableId>`,
+    `Loads sample CSV data from GCS, adding to an existing table.`,
+    {},
+    opts => {
+      loadCSVFromGCSAppend(opts.datasetId, opts.tableId, opts.projectId);
+    }
+  )
+  .command(
+    `load-gcs-csv-truncate <projectId> <datasetId> <tableId>`,
+    `Loads sample CSV data from GCS, replacing an existing table.`,
+    {},
+    opts => {
+      loadCSVFromGCSTruncate(opts.datasetId, opts.tableId, opts.projectId);
     }
   )
   .command(
