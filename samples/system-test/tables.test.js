@@ -37,7 +37,7 @@ const destTableId = generateUuid();
 const schema = `Name:string, Age:integer, Weight:float, IsMagic:boolean`;
 const bucketName = generateUuid();
 const exportFileName = `data.json`;
-const importFileName = `data.csv`;
+const importFileName = `data.avro`;
 const localFilePath = path.join(__dirname, `../resources/${importFileName}`);
 const rows = [
   {Name: `foo`, Age: 27, Weight: 80.3, IsMagic: true},
@@ -105,13 +105,12 @@ test.serial(`should list tables`, async t => {
 });
 
 test.serial(`should load a local file`, async t => {
-  t.plan(2);
+  t.plan(1);
   const output = await tools.runAsync(
     `${cmd} load ${projectId} ${datasetId} ${tableId} ${localFilePath}`,
     cwd
   );
-  t.true(output.includes(`started.`));
-  t.true(output.includes(`completed.`));
+  t.regex(output, /completed\./);
   await tools
     .tryTest(async assert => {
       const [rows] = await bigquery
@@ -135,13 +134,12 @@ test.serial(`should browse table rows`, async t => {
 });
 
 test.serial(`should extract a table to GCS`, async t => {
-  t.plan(2);
+  t.plan(1);
   const output = await tools.runAsync(
     `${cmd} extract ${projectId} ${datasetId} ${tableId} ${bucketName} ${exportFileName}`,
     cwd
   );
-  t.true(output.includes(`started.`));
-  t.true(output.includes(`completed.`));
+  t.regex(output, /completed\./);
   await tools
     .tryTest(async assert => {
       const [exists] = await storage
@@ -153,40 +151,120 @@ test.serial(`should extract a table to GCS`, async t => {
     .start();
 });
 
-test.serial(`should load a GCS file`, async t => {
-  t.plan(2);
+test(`should load a GCS file`, async t => {
+  t.plan(1);
+  const tableId = generateUuid();
+
   const output = await tools.runAsync(
     `${cmd} load-gcs ${projectId} ${datasetId} ${tableId} ${bucketName} ${importFileName}`,
     cwd
   );
-  t.true(output.includes(`started.`));
-  t.true(output.includes(`completed.`));
+  t.regex(output, /completed\./);
   await tools
     .tryTest(async assert => {
       const [rows] = await bigquery
         .dataset(datasetId)
         .table(tableId)
         .getRows();
-      assert.equal(rows.length, 2);
+      assert(rows.length > 0);
+    })
+    .start();
+});
+
+test(`should load a GCS CSV file with explicit schema`, async t => {
+  t.plan(1);
+  const tableId = generateUuid();
+
+  const output = await tools.runAsync(
+    `${cmd} load-gcs-csv ${projectId} ${datasetId} ${tableId}`,
+    cwd
+  );
+  t.regex(output, /completed\./);
+  await tools
+    .tryTest(async assert => {
+      const [rows] = await bigquery
+        .dataset(datasetId)
+        .table(tableId)
+        .getRows();
+      assert(rows.length > 0);
+    })
+    .start();
+});
+
+test(`should load a GCS CSV file with autodetected schema`, async t => {
+  t.plan(1);
+  const tableId = generateUuid();
+
+  const output = await tools.runAsync(
+    `${cmd} load-gcs-csv-autodetect ${projectId} ${datasetId} ${tableId}`,
+    cwd
+  );
+  t.regex(output, /completed\./);
+  await tools
+    .tryTest(async assert => {
+      const [rows] = await bigquery
+        .dataset(datasetId)
+        .table(tableId)
+        .getRows();
+      assert(rows.length > 0);
+    })
+    .start();
+});
+
+test(`should load a GCS CSV file append to table`, async t => {
+  t.plan(1);
+  const tableId = generateUuid();
+
+  const output = await tools.runAsync(
+    `${cmd} load-gcs-csv-append ${projectId} ${datasetId} ${tableId}`,
+    cwd
+  );
+  t.regex(output, /completed\./);
+  await tools
+    .tryTest(async assert => {
+      const [rows] = await bigquery
+        .dataset(datasetId)
+        .table(tableId)
+        .getRows();
+      assert(rows.length > 0);
+    })
+    .start();
+});
+
+test(`should load a GCS CSV file truncate table`, async t => {
+  t.plan(1);
+  const tableId = generateUuid();
+
+  const output = await tools.runAsync(
+    `${cmd} load-gcs-csv-truncate ${projectId} ${datasetId} ${tableId}`,
+    cwd
+  );
+  t.regex(output, /completed\./);
+  await tools
+    .tryTest(async assert => {
+      const [rows] = await bigquery
+        .dataset(datasetId)
+        .table(tableId)
+        .getRows();
+      assert(rows.length > 0);
     })
     .start();
 });
 
 test.serial(`should copy a table`, async t => {
-  t.plan(2);
+  t.plan(1);
   const output = await tools.runAsync(
     `${cmd} copy ${projectId} ${srcDatasetId} ${srcTableId} ${destDatasetId} ${destTableId}`,
     cwd
   );
-  t.true(output.includes(`started.`));
-  t.true(output.includes(`completed.`));
+  t.regex(output, /completed\./);
   await tools
     .tryTest(async assert => {
       const [rows] = await bigquery
         .dataset(destDatasetId)
         .table(destTableId)
         .getRows();
-      assert.equal(rows.length, 2);
+      assert(rows.length > 0);
     })
     .start();
 });
@@ -211,15 +289,6 @@ test.serial(`should insert rows`, async t => {
     cwd
   );
   t.is(output.includes(`Inserted 2 rows`), true);
-  await tools
-    .tryTest(async assert => {
-      const [rows] = await bigquery
-        .dataset(datasetId)
-        .table(tableId)
-        .getRows();
-      assert.equal(rows.length, 4);
-    })
-    .start();
 });
 
 test.serial(`should delete a table`, async t => {
