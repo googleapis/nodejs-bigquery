@@ -136,7 +136,9 @@ test.serial(`should browse table rows`, async t => {
 test.serial(`should extract a table to GCS`, async t => {
   t.plan(1);
   const output = await tools.runAsync(
-    `${cmd} extract ${projectId} ${datasetId} ${tableId} ${bucketName} ${exportFileName}`,
+    `${cmd} extract ${projectId} ${datasetId} ${tableId} ${bucketName} ${
+      exportFileName
+    }`,
     cwd
   );
   t.regex(output, /completed\./);
@@ -156,7 +158,9 @@ test(`should load a GCS file`, async t => {
   const tableId = generateUuid();
 
   const output = await tools.runAsync(
-    `${cmd} load-gcs ${projectId} ${datasetId} ${tableId} ${bucketName} ${importFileName}`,
+    `${cmd} load-gcs ${projectId} ${datasetId} ${tableId} ${bucketName} ${
+      importFileName
+    }`,
     cwd
   );
   t.regex(output, /completed\./);
@@ -254,7 +258,9 @@ test(`should load a GCS CSV file truncate table`, async t => {
 test.serial(`should copy a table`, async t => {
   t.plan(1);
   const output = await tools.runAsync(
-    `${cmd} copy ${projectId} ${srcDatasetId} ${srcTableId} ${destDatasetId} ${destTableId}`,
+    `${cmd} copy ${projectId} ${srcDatasetId} ${srcTableId} ${destDatasetId} ${
+      destTableId
+    }`,
     cwd
   );
   t.regex(output, /completed\./);
