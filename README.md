@@ -130,4 +130,4 @@ See [LICENSE](https://github.com/googleapis/nodejs-bigquery/blob/master/LICENSE)
 
 [client-docs]: https://googlecloudplatform.github.io/google-cloud-node/#/docs/bigquery/latest/bigquery
 [product-docs]: https://cloud.google.com/bigquery/docs
-[shell_img]: http://gstatic.com/cloudssh/images/open-btn.png
+[shell_img]: //gstatic.com/cloudssh/images/open-btn.png
