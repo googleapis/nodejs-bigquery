@@ -280,7 +280,7 @@ util.inherits(Table, common.ServiceObject);
     function(acc, pair) {
       acc.fields.push({
         name: pair.split(':')[0],
-        type: (pair.split(':')[1] || 'STRING').toUpperCase(),
+        type: (pair.split(':')[1] || 'STRING').toUpperCase().trim(),
       });
 
       return acc;
