@@ -31,13 +31,16 @@ View the [source code][datasets_0_code].
 __Usage:__ `node datasets.js --help`
 
 ```
+datasets.js <command>
+
 Commands:
-  create <projectId> <datasetId>  Creates a new dataset.
-  delete <projectId> <datasetId>  Deletes a dataset.
-  list <projectId>                Lists datasets.
+  datasets.js create <projectId> <datasetId>  Creates a new dataset.
+  datasets.js delete <projectId> <datasetId>  Deletes a dataset.
+  datasets.js list <projectId>                Lists datasets.
 
 Options:
-  --help  Show help                                                                                            [boolean]
+  --version  Show version number                                                                               [boolean]
+  --help     Show help                                                                                         [boolean]
 
 Examples:
   node datasets.js create my-project-id my_dataset  Creates a new dataset named "my_dataset".
@@ -59,23 +62,34 @@ View the [source code][tables_1_code].
 __Usage:__ `node tables.js --help`
 
 ```
+tables.js <command>
+
 Commands:
-  create <projectId> <datasetId> <tableId> <schema>             Creates a new table.
-  list <projectId> <datasetId>                                  Lists all tables in a dataset.
-  delete <projectId> <datasetId> <tableId>                      Deletes a table.
-  copy <projectId> <srcDatasetId> <srcTableId> <destDatasetId>  Makes a copy of a table.
-  <destTableId>
-  browse <projectId> <datasetId> <tableId>                      Lists rows in a table.
-  load <projectId> <datasetId> <tableId> <fileName>             Loads data from a local file into a table.
-  load-gcs <projectId> <datasetId> <tableId> <bucketName>       Loads data from a Google Cloud Storage file into a
-  <fileName>                                                    table.
-  extract <projectId> <datasetId> <tableId> <bucketName>        Extract a table from BigQuery to Google Cloud Storage.
-  <fileName>
-  insert <projectId> <datasetId> <tableId> <json_or_file>       Insert a JSON array (as a string or newline-delimited
-                                                                file) into a BigQuery table.
+  tables.js create <projectId> <datasetId> <tableId> <schema>   Creates a new table.
+  tables.js list <projectId> <datasetId>                        Lists all tables in a dataset.
+  tables.js delete <projectId> <datasetId> <tableId>            Deletes a table.
+  tables.js copy <projectId> <srcDatasetId> <srcTableId>        Makes a copy of a table.
+  <destDatasetId> <destTableId>
+  tables.js browse <projectId> <datasetId> <tableId>            Lists rows in a table.
+  tables.js load <projectId> <datasetId> <tableId> <fileName>   Loads data from a local file into a table.
+  tables.js load-gcs <projectId> <datasetId> <tableId>          Loads data from a Google Cloud Storage file into a
+  <bucketName> <fileName>                                       table.
+  tables.js load-gcs-csv <projectId> <datasetId> <tableId>      Loads sample CSV data from a Google Cloud Storage file
+                                                                into a table.
+  tables.js load-gcs-csv-autodetect <projectId> <datasetId>     Loads sample CSV data from a Google Cloud Storage file
+  <tableId>                                                     into a table.
+  tables.js load-gcs-csv-append <projectId> <datasetId>         Loads sample CSV data from GCS, adding to an existing
+  <tableId>                                                     table.
+  tables.js load-gcs-csv-truncate <projectId> <datasetId>       Loads sample CSV data from GCS, replacing an existing
+  <tableId>                                                     table.
+  tables.js extract <projectId> <datasetId> <tableId>           Extract a table from BigQuery to Google Cloud Storage.
+  <bucketName> <fileName>
+  tables.js insert <projectId> <datasetId> <tableId>            Insert a JSON array (as a string or newline-delimited
+  <json_or_file>                                                file) into a BigQuery table.
 
 Options:
-  --help  Show help                                                                                            [boolean]
+  --version  Show version number                                                                               [boolean]
+  --help     Show help                                                                                         [boolean]
 
 Examples:
   node tables.js create my-project-id my_dataset my_table       Creates a new table named "my_table" in "my_dataset".
@@ -113,13 +127,16 @@ View the [source code][queries_2_code].
 __Usage:__ `node queries.js --help`
 
 ```
+queries.js <command>
+
 Commands:
-  sync <projectId> <sqlQuery>   Run the specified synchronous query.
-  async <projectId> <sqlQuery>  Start the specified asynchronous query.
-  stackoverflow <projectId>     Queries a public Stack Overflow dataset.
+  queries.js sync <projectId> <sqlQuery>   Run the specified synchronous query.
+  queries.js async <projectId> <sqlQuery>  Start the specified asynchronous query.
+  queries.js stackoverflow <projectId>     Queries a public Stack Overflow dataset.
 
 Options:
-  --help  Show help                                                                                            [boolean]
+  --version  Show version number                                                                               [boolean]
+  --help     Show help                                                                                         [boolean]
 
 Examples:
   node queries.js sync my-project-id "SELECT * FROM             Synchronously queries the natality dataset.
@@ -134,5 +151,5 @@ For more information, see https://cloud.google.com/bigquery/docs
 [queries_2_docs]: https://googlecloudplatform.github.io/google-cloud-node/#/docs/bigquery/latest/bigquery
 [queries_2_code]: queries.js
 
-[shell_img]: http://gstatic.com/cloudssh/images/open-btn.png
+[shell_img]: //gstatic.com/cloudssh/images/open-btn.png
 [shell_link]: https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/README.md
