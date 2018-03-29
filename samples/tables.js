@@ -303,7 +303,7 @@ function loadCSVFromGCS(datasetId, tableId, projectId) {
 
   /**
    * This sample loads the CSV file at
-   * https://storage.googleapis.com/cloud-samples-data/bigquery/us-states/us-states.json
+   * https://storage.googleapis.com/cloud-samples-data/bigquery/us-states/us-states.csv
    *
    * TODO(developer): Replace the following lines with the path to your file.
    */
@@ -371,7 +371,7 @@ function loadCSVFromGCSAutodetect(datasetId, tableId, projectId) {
 
   /**
    * This sample loads the CSV file at
-   * https://storage.googleapis.com/cloud-samples-data/bigquery/us-states/us-states.json
+   * https://storage.googleapis.com/cloud-samples-data/bigquery/us-states/us-states.csv
    *
    * TODO(developer): Replace the following lines with the path to your file.
    */
@@ -434,7 +434,7 @@ function loadCSVFromGCSAppend(datasetId, tableId, projectId) {
 
   /**
    * This sample loads the CSV file at
-   * https://storage.googleapis.com/cloud-samples-data/bigquery/us-states/us-states.json
+   * https://storage.googleapis.com/cloud-samples-data/bigquery/us-states/us-states.csv
    *
    * TODO(developer): Replace the following lines with the path to your file.
    */
@@ -504,7 +504,7 @@ function loadCSVFromGCSTruncate(datasetId, tableId, projectId) {
 
   /**
    * This sample loads the CSV file at
-   * https://storage.googleapis.com/cloud-samples-data/bigquery/us-states/us-states.json
+   * https://storage.googleapis.com/cloud-samples-data/bigquery/us-states/us-states.csv
    *
    * TODO(developer): Replace the following lines with the path to your file.
    */
