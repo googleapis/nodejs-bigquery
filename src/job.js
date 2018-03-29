@@ -136,37 +136,6 @@ function Job(bigQuery, id) {
     get: true,
 
     /**
-     * Get the metadata of the job. This will mostly be useful for checking the
-     * status of a previously-run job.
-     *
-     * @see [Jobs: get API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/get}
-     *
-     * @method Job#getMetadata
-     * @param {function} [callback] The callback function.
-     * @param {?error} callback.err An error returned while making this
-     *     request.
-     * @param {object} callback.metadata The metadata of the job.
-     * @param {object} callback.apiResponse The full API response.
-     * @returns {Promise}
-     *
-     * @example
-     * const BigQuery = require('@google-cloud/bigquery');
-     * const bigquery = new BigQuery();
-     *
-     * const job = bigquery.job('id');
-     * job.getMetadata(function(err, metadata, apiResponse) {});
-     *
-     * //-
-     * // If the callback is omitted, we'll return a Promise.
-     * //-
-     * job.getMetadata().then(function(data) {
-     *   const metadata = data[0];
-     *   const apiResponse = data[1];
-     * });
-     */
-    getMetadata: true,
-
-    /**
      * Set the metadata for this job. This can be useful for updating job
      * labels.
      *
@@ -214,6 +183,18 @@ function Job(bigQuery, id) {
   });
 
   this.bigQuery = bigQuery;
+  this.metadata = {};
+
+  Object.defineProperty(this, 'location', {
+    get: function() {
+      return this.metadata.jobReference && this.metadata.jobReference.location;
+    },
+    set: function(location) {
+      extend(true, this.metadata, {
+        jobReference: {location},
+      });
+    },
+  });
 
   // The API endpoint for cancel is:    .../bigquery/v2/project/projectId/...
   // The rest of the API endpoints are: .../bigquery/v2/projects/projectId/...
@@ -260,17 +241,26 @@ util.inherits(Job, common.Operation);
  *   var apiResponse = data[0];
  * });
  */
-Job.prototype.cancel = function(callback) {
-  callback = callback || common.util.noop;
+Job.prototype.cancel = function(options, callback) {
+  if (is.fn(options)) {
+    callback = options;
+    options = {};
+  }
+
+  var qs = extend(
+    {
+      location: this.location,
+    },
+    options
+  );
 
   this.request(
     {
       method: 'POST',
       uri: '/cancel',
+      qs,
     },
-    function(err, resp) {
-      callback(err, resp);
-    }
+    callback
   );
 };
 
@@ -364,6 +354,13 @@ Job.prototype.getQueryResults = function(options, callback) {
     options = {};
   }
 
+  options = extend(
+    {
+      location: this.location,
+    },
+    options
+  );
+
   this.bigQuery.request(
     {
       uri: '/queries/' + this.id,
@@ -393,6 +390,68 @@ Job.prototype.getQueryResults = function(options, callback) {
       }
 
       callback(null, rows, nextQuery, resp);
+    }
+  );
+};
+
+/**
+ * Get the metadata of the job. This will mostly be useful for checking the
+ * status of a previously-run job.
+ *
+ * @see [Jobs: get API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/get}
+ *
+ * @method Job#getMetadata
+ * @param {function} [callback] The callback function.
+ * @param {?error} callback.err An error returned while making this
+ *     request.
+ * @param {object} callback.metadata The metadata of the job.
+ * @param {object} callback.apiResponse The full API response.
+ * @returns {Promise}
+ *
+ * @example
+ * const BigQuery = require('@google-cloud/bigquery');
+ * const bigquery = new BigQuery();
+ *
+ * const job = bigquery.job('id');
+ * job.getMetadata(function(err, metadata, apiResponse) {});
+ *
+ * //-
+ * // If the callback is omitted, we'll return a Promise.
+ * //-
+ * job.getMetadata().then(function(data) {
+ *   const metadata = data[0];
+ *   const apiResponse = data[1];
+ * });
+ */
+Job.prototype.getMetadata = function(options, callback) {
+  var self = this;
+
+  if (is.fn(options)) {
+    callback = options;
+    options = {};
+  }
+
+  var qs = extend(
+    {
+      location: this.location,
+    },
+    options
+  );
+
+  this.request(
+    {
+      uri: '',
+      qs,
+    },
+    function(err, resp) {
+      if (err) {
+        callback(err, null, resp);
+        return;
+      }
+
+      self.metadata = resp;
+
+      callback(null, self.metadata, resp);
     }
   );
 };

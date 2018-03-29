@@ -505,6 +505,115 @@ describe('BigQuery', function() {
         }
       );
     });
+
+    describe('location', function() {
+      var dataset = bigquery.dataset(generateName('dataset'));
+      var table = dataset.table(generateName('table'));
+      var job;
+
+      var LOCATION = 'asia-northeast1';
+      var QUERY = `SELECT * FROM \`${table.id}\``;
+      var SCHEMA = require('./data/schema.json');
+      var TEST_DATA_FILE = require.resolve('./data/location-test-data.json');
+
+      before(function() {
+        // create a dataset in a certain location will cascade the location
+        // to any jobs created through it
+        return dataset.create({location: LOCATION}).then(function() {
+          return table.create({schema: SCHEMA});
+        });
+      });
+
+      it('should create a load job', function() {
+        return table.createLoadJob(TEST_DATA_FILE).then(function(data) {
+          job = data[0];
+
+          assert.strictEqual(job.location, LOCATION);
+          return job.promise();
+        });
+      });
+
+      it('should fail to reload if the location is not set', function(done) {
+        var badJob = bigquery.job(job.id);
+
+        badJob.getMetadata(function(err, metadata) {
+          assert.strictEqual(err.code, 404);
+          done();
+        });
+      });
+
+      it('should fail to reload if the location is wrong', function(done) {
+        var badJob = bigquery.job(job.id);
+
+        badJob.location = 'US';
+
+        badJob.getMetadata(function(err) {
+          assert.strictEqual(err.code, 404);
+          done();
+        });
+      });
+
+      it('should reload if the location matches', function(done) {
+        var goodJob = bigquery.job(job.id);
+
+        goodJob.location = LOCATION;
+
+        goodJob.getMetadata(function(err) {
+          assert.ifError(err);
+          assert.strictEqual(goodJob.location, LOCATION);
+          done();
+        });
+      });
+
+      it.skip('should cancel a job', function() {
+        return dataset.createQueryJob(QUERY).then(function(data) {
+          var job = data[0];
+
+          return job.cancel();
+        });
+      });
+
+      it('should get query results', function() {
+        var job;
+
+        return dataset
+          .createQueryJob(QUERY)
+          .then(function(data) {
+            job = data[0];
+
+            assert.strictEqual(job.location, LOCATION);
+            return job.promise();
+          })
+          .then(function() {
+            return job.getQueryResults();
+          })
+          .then(function(data) {
+            var rows = data[0];
+
+            assert(rows.length > 0);
+          });
+      });
+
+      it('should copy the table', function() {
+        var otherTable = dataset.table(generateName('table'));
+
+        return table.createCopyJob(otherTable).then(function(data) {
+          var job = data[0];
+
+          assert.strictEqual(job.location, LOCATION);
+        });
+      });
+
+      it('should extract the table', function() {
+        var extractFile = bucket.file('location-extract-data.json');
+
+        return table.createExtractJob(extractFile).then(function(data) {
+          var job = data[0];
+
+          assert.strictEqual(job.location, LOCATION);
+        });
+      });
+    });
   });
 
   describe('BigQuery/Table', function() {

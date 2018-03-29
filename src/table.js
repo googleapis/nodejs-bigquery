@@ -272,6 +272,16 @@ function Table(dataset, id) {
 
   this.bigQuery = dataset.bigQuery;
   this.dataset = dataset;
+  this.metadata = {};
+
+  Object.defineProperty(this, 'location', {
+    get: function() {
+      return this.metadata && this.metadata.location;
+    },
+    set: function(location) {
+      this.metadata.location = location;
+    },
+  });
 
   // Catch all for read-modify-write cycle
   // https://cloud.google.com/bigquery/docs/api-performance#read-patch-write
@@ -615,6 +625,15 @@ Table.prototype.createCopyJob = function(destination, metadata, callback) {
     delete metadata.jobPrefix;
   }
 
+  if (!metadata.location) {
+    metadata.location = this.location;
+  }
+
+  if (metadata.location) {
+    body.location = metadata.location;
+    delete metadata.location;
+  }
+
   this.bigQuery.createJob(body, callback);
 };
 
@@ -846,6 +865,15 @@ Table.prototype.createExtractJob = function(destination, options, callback) {
     delete options.jobPrefix;
   }
 
+  if (!options.location) {
+    options.location = this.location;
+  }
+
+  if (options.location) {
+    body.location = options.location;
+    delete options.location;
+  }
+
   this.bigQuery.createJob(body, callback);
 };
 
@@ -982,6 +1010,15 @@ Table.prototype.createLoadJob = function(source, metadata, callback) {
   if (metadata.jobPrefix) {
     body.jobPrefix = metadata.jobPrefix;
     delete metadata.jobPrefix;
+  }
+
+  if (!metadata.location) {
+    metadata.location = this.location;
+  }
+
+  if (metadata.location) {
+    body.location = metadata.location;
+    delete metadata.location;
   }
 
   extend(true, body.configuration.load, metadata, {
@@ -1173,6 +1210,7 @@ Table.prototype.createWriteStream = function(metadata) {
           jobReference: {
             jobId: jobId,
             projectId: self.bigQuery.projectId,
+            location: self.location,
           },
         },
         request: {

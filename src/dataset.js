@@ -204,6 +204,16 @@ function Dataset(bigQuery, id) {
   });
 
   this.bigQuery = bigQuery;
+  this.metadata = {};
+
+  Object.defineProperty(this, 'location', {
+    get: function() {
+      return this.metadata && this.metadata.location;
+    },
+    set: function(location) {
+      this.metadata.location = location;
+    },
+  });
 
   // Catch all for read-modify-write cycle
   // https://cloud.google.com/bigquery/docs/api-performance#read-patch-write
@@ -240,11 +250,18 @@ Dataset.prototype.createQueryJob = function(options, callback) {
     };
   }
 
-  options = extend(true, {}, options, {
-    defaultDataset: {
-      datasetId: this.id,
+  options = extend(
+    true,
+    {
+      location: this.location,
     },
-  });
+    options,
+    {
+      defaultDataset: {
+        datasetId: this.id,
+      },
+    }
+  );
 
   return this.bigQuery.createQueryJob(options, callback);
 };
@@ -266,11 +283,18 @@ Dataset.prototype.createQueryStream = function(options) {
     };
   }
 
-  options = extend(true, {}, options, {
-    defaultDataset: {
-      datasetId: this.id,
+  options = extend(
+    true,
+    {
+      location: this.location,
     },
-  });
+    options,
+    {
+      defaultDataset: {
+        datasetId: this.id,
+      },
+    }
+  );
 
   return this.bigQuery.createQueryStream(options);
 };
@@ -541,11 +565,18 @@ Dataset.prototype.query = function(options, callback) {
     };
   }
 
-  options = extend(true, {}, options, {
-    defaultDataset: {
-      datasetId: this.id,
+  options = extend(
+    true,
+    {
+      location: this.location,
     },
-  });
+    options,
+    {
+      defaultDataset: {
+        datasetId: this.id,
+      },
+    }
+  );
 
   return this.bigQuery.query(options, callback);
 };
@@ -564,7 +595,13 @@ Dataset.prototype.query = function(options, callback) {
  * const institutions = dataset.table('institution_data');
  */
 Dataset.prototype.table = function(id) {
-  return new Table(this, id);
+  var table = new Table(this, id);
+
+  if (this.location) {
+    table.metadata = {location: this.location};
+  }
+
+  return table;
 };
 
 /*! Developer Documentation

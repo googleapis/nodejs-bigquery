@@ -775,6 +775,11 @@ BigQuery.prototype.createQueryJob = function(options, callback) {
     delete query.jobPrefix;
   }
 
+  if (query.location) {
+    reqOpts.location = query.location;
+    delete query.location;
+  }
+
   this.createJob(reqOpts, callback);
 };
 
@@ -880,6 +885,11 @@ BigQuery.prototype.createJob = function(options, callback) {
     projectId: this.projectId,
     jobId: jobId,
   };
+
+  if (options.location) {
+    reqOpts.jobReference.location = options.location;
+    delete reqOpts.location;
+  }
 
   this.request(
     {
