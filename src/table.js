@@ -48,6 +48,9 @@ var FORMATS = {
  * @class
  * @param {Dataset} dataset {@link Dataset} instance.
  * @param {string} id The ID of the table.
+ * @param {object} [metadata] Table metadata.
+ * @param {string} [metadata.location] The geographic location of the Table.
+ *      Required except for US and EU.
  *
  * @example
  * const BigQuery = require('@google-cloud/bigquery');
@@ -56,7 +59,7 @@ var FORMATS = {
  *
  * const table = dataset.table('my-table');
  */
-function Table(dataset, id) {
+function Table(dataset, id, metadata) {
   var methods = {
     /**
      * Create a table.
@@ -277,7 +280,7 @@ function Table(dataset, id) {
    * @name Table#metadata
    * @type {object}
    */
-  this.metadata = {};
+  this.metadata = metadata || {};
 
   /**
    * @name Table#location

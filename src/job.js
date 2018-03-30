@@ -43,6 +43,9 @@ var util = require('util');
  * @class
  * @param {BigQuery} bigQuery {@link BigQuery} instance.
  * @param {string} id The ID of the job.
+ * @param {object} [options] Configuration object.
+ * @param {string} [options.location] The geographic location of the job.
+ *      Required except for US and EU.
  *
  * @example
  * const BigQuery = require('@google-cloud/bigquery');
@@ -74,7 +77,7 @@ var util = require('util');
  * //-
  * job.removeAllListeners();
  */
-function Job(bigQuery, id) {
+function Job(bigQuery, id, options) {
   var methods = {
     /**
      * Check if the job exists.
@@ -204,6 +207,12 @@ function Job(bigQuery, id) {
       });
     },
   });
+
+  options = options || {};
+
+  if (options.location) {
+    this.location = options.location;
+  }
 }
 
 util.inherits(Job, common.Operation);

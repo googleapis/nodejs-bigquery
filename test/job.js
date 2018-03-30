@@ -132,6 +132,13 @@ describe('BigQuery/Job', function() {
         assert.strictEqual(job.metadata.jobReference.location, LOCATION);
       });
     });
+
+    it('should accept a location option', function() {
+      var options = {location: 'US'};
+      var job = new Job(BIGQUERY, JOB_ID, options);
+
+      assert.strictEqual(job.location, options.location);
+    });
   });
 
   describe('cancel', function() {

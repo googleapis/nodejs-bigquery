@@ -928,6 +928,9 @@ BigQuery.prototype.createJob = function(options, callback) {
  * Create a reference to a dataset.
  *
  * @param {string} id ID of the dataset.
+ * @param {object} [metadata] Dataset metadata.
+ * @param {string} [metadata.location] The geographic location of the dataset.
+ *      Required except for US and EU.
  * @returns {Dataset}
  *
  * @example
@@ -935,8 +938,8 @@ BigQuery.prototype.createJob = function(options, callback) {
  * const bigquery = new BigQuery();
  * const dataset = bigquery.dataset('higher_education');
  */
-BigQuery.prototype.dataset = function(id) {
-  return new Dataset(this, id);
+BigQuery.prototype.dataset = function(id, metadata) {
+  return new Dataset(this, id, metadata);
 };
 
 /**
@@ -1196,6 +1199,9 @@ BigQuery.prototype.getJobsStream = common.paginator.streamify('getJobs');
  * Create a reference to an existing job.
  *
  * @param {string} id ID of the job.
+ * @param {object} [options] Configuration object.
+ * @param {string} [options.location] The geographic location of the job.
+ *      Required except for US and EU.
  * @returns {Job}
  *
  * @example
@@ -1204,8 +1210,8 @@ BigQuery.prototype.getJobsStream = common.paginator.streamify('getJobs');
  *
  * const myExistingJob = bigquery.job('job-id');
  */
-BigQuery.prototype.job = function(id) {
-  return new Job(this, id);
+BigQuery.prototype.job = function(id, options) {
+  return new Job(this, id, options);
 };
 
 /**

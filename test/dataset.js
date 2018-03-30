@@ -128,8 +128,17 @@ describe('BigQuery/Dataset', function() {
       });
     });
 
-    it('should initialize the metadata property', function() {
-      assert.deepEqual(ds.metadata, {});
+    describe('metadata', function() {
+      it('should default the metadata property', function() {
+        assert.deepEqual(ds.metadata, {});
+      });
+
+      it('should capture user provided metadata', function() {
+        var metadata = {location: LOCATION};
+        var ds = new Dataset(BIGQUERY, DATASET_ID, metadata);
+
+        assert.strictEqual(ds.metadata, metadata);
+      });
     });
 
     describe('location', function() {
@@ -738,10 +747,20 @@ describe('BigQuery/Dataset', function() {
       assert.equal(table.id, tableId);
     });
 
-    it('should pass along the location if set', function() {
+    it('should inherit the dataset location', function() {
       ds.location = LOCATION;
       var table = ds.table('tableId');
+
       assert.strictEqual(table.location, LOCATION);
+    });
+
+    it('should pass along the metadata if provided', function() {
+      ds.location = LOCATION;
+
+      var metadata = {location: 'US'};
+      var table = ds.table('tableId', metadata);
+
+      assert.deepEqual(table.metadata, metadata);
     });
   });
 });

@@ -548,9 +548,7 @@ describe('BigQuery', function() {
         });
 
         it('should fail to reload if the location is wrong', function(done) {
-          var badJob = bigquery.job(job.id);
-
-          badJob.location = 'US';
+          var badJob = bigquery.job(job.id, {location: 'US'});
 
           badJob.getMetadata(function(err) {
             assert.strictEqual(err.code, 404);
@@ -559,9 +557,7 @@ describe('BigQuery', function() {
         });
 
         it('should reload if the location matches', function(done) {
-          var goodJob = bigquery.job(job.id);
-
-          goodJob.location = LOCATION;
+          var goodJob = bigquery.job(job.id, {location: LOCATION});
 
           goodJob.getMetadata(function(err) {
             assert.ifError(err);
@@ -581,9 +577,7 @@ describe('BigQuery', function() {
         });
 
         it('should fail if the job location is incorrect', function(done) {
-          var badJob = bigquery.job(job.id);
-
-          badJob.location = 'US';
+          var badJob = bigquery.job(job.id, {location: 'US'});
 
           badJob.cancel(function(err) {
             assert.strictEqual(err.code, 404);

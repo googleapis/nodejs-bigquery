@@ -30,13 +30,16 @@ var Table = require('./table.js');
  * @class
  * @param {BigQuery} bigQuery {@link BigQuery} instance.
  * @param {string} id The ID of the Dataset.
+ * @param {object} [metadata] Dataset metadata.
+ * @param {string} [metadata.location] The geographic location of the dataset.
+ *      Required except for US and EU.
  *
  * @example
  * const BigQuery = require('@google-cloud/bigquery');
  * const bigquery = new BigQuery();
  * const dataset = bigquery.dataset('institutions');
  */
-function Dataset(bigQuery, id) {
+function Dataset(bigQuery, id, metadata) {
   var methods = {
     /**
      * Create a dataset.
@@ -209,7 +212,7 @@ function Dataset(bigQuery, id) {
    * @name Dataset#metadata
    * @type {object}
    */
-  this.metadata = {};
+  this.metadata = metadata || {};
 
   /**
    * @name Dataset#location
@@ -594,6 +597,9 @@ Dataset.prototype.query = function(options, callback) {
  * Create a Table object.
  *
  * @param {string} id The ID of the table.
+ * @param {object} [metadata] Table metadata.
+ * @param {string} [metadata.location] The geographic location of the table.
+ *      Required except for US and EU.
  * @return {Table}
  *
  * @example
@@ -603,14 +609,15 @@ Dataset.prototype.query = function(options, callback) {
  *
  * const institutions = dataset.table('institution_data');
  */
-Dataset.prototype.table = function(id) {
-  var table = new Table(this, id);
+Dataset.prototype.table = function(id, metadata) {
+  metadata = extend(
+    {
+      location: this.location,
+    },
+    metadata
+  );
 
-  if (this.location) {
-    table.location = this.location;
-  }
-
-  return table;
+  return new Table(this, id, metadata);
 };
 
 /*! Developer Documentation

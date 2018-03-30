@@ -59,6 +59,10 @@ function FakeTable(a, b) {
   Table.call(this, a, b);
 }
 
+function FakeJob() {
+  this.calledWith_ = arguments;
+}
+
 var mergeSchemaWithRowsOverride;
 FakeTable.mergeSchemaWithRows_ = function() {
   var args = [].slice.apply(arguments);
@@ -104,6 +108,7 @@ describe('BigQuery', function() {
   before(function() {
     BigQuery = proxyquire('../', {
       uuid: fakeUuid,
+      './job.js': FakeJob,
       './table.js': FakeTable,
       '@google-cloud/common': {
         Service: FakeService,
@@ -1179,6 +1184,13 @@ describe('BigQuery', function() {
       assert.equal(ds.id, DATASET_ID);
       assert.deepEqual(ds.bigQuery, bq);
     });
+
+    it('should accept dataset metadata', function() {
+      var metadata = {location: 'US'};
+      var ds = bq.dataset(DATASET_ID, metadata);
+
+      assert.strictEqual(ds.metadata, metadata);
+    });
   });
 
   describe('getDatasets', function() {
@@ -1359,7 +1371,7 @@ describe('BigQuery', function() {
 
       bq.getJobs(function(err, jobs) {
         assert.ifError(err);
-        assert.strictEqual(jobs[0].constructor.name, 'Job');
+        assert(jobs[0] instanceof FakeJob);
         done();
       });
     });
@@ -1430,13 +1442,22 @@ describe('BigQuery', function() {
   describe('job', function() {
     it('should return a Job instance', function() {
       var job = bq.job(JOB_ID);
-      assert.equal(job.constructor.name, 'Job');
+      assert(job instanceof FakeJob);
     });
 
     it('should scope the correct job', function() {
       var job = bq.job(JOB_ID);
-      assert.equal(job.id, JOB_ID);
-      assert.deepEqual(job.bigQuery, bq);
+      var args = job.calledWith_;
+
+      assert.strictEqual(args[0], bq);
+      assert.strictEqual(args[1], JOB_ID);
+    });
+
+    it('should pass the options object', function() {
+      var options = {a: 'b'};
+      var job = bq.job(JOB_ID, options);
+
+      assert.strictEqual(job.calledWith_[2], options);
     });
   });
 
