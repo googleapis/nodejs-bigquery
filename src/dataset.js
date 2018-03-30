@@ -598,8 +598,12 @@ Dataset.prototype.query = function(options, callback) {
  *
  * @param {string} id The ID of the table.
  * @param {object} [metadata] Table metadata.
- * @param {string} [metadata.location] The geographic location of the table.
- *      Required except for US and EU.
+ * @param {string} [metadata.location] The geographic location of the table, by
+ *      default this value is inherited from the dataset. This can be used to
+ *      configure the location of all jobs created through a table instance. It
+ *      cannot be used to set the actual location of the table. This value will
+ *      be superseded by any API responses containing location data for the
+ *      table.
  * @return {Table}
  *
  * @example
