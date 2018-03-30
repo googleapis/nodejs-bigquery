@@ -30,6 +30,10 @@ var util = require('@google-cloud/common').util;
 
 var fakeUuid = extend(true, {}, fakeUuid);
 
+function FakeApiError() {
+  this.calledWith_ = arguments;
+}
+
 var promisified = false;
 var fakeUtil = extend({}, util, {
   promisifyAll: function(Class, options) {
@@ -47,6 +51,7 @@ var fakeUtil = extend({}, util, {
       'timestamp',
     ]);
   },
+  ApiError: FakeApiError,
 });
 var originalFakeUtil = extend(true, {}, fakeUtil);
 
@@ -90,6 +95,7 @@ nodeutil.inherits(FakeService, Service);
 describe('BigQuery', function() {
   var JOB_ID = 'JOB_ID';
   var PROJECT_ID = 'test-project';
+  var LOCATION = 'asia-northeast1';
 
   var BigQueryCached;
   var BigQuery;
@@ -808,6 +814,12 @@ describe('BigQuery', function() {
   });
 
   describe('createJob', function() {
+    var RESPONSE = {
+      status: {
+        state: 'RUNNING',
+      },
+    };
+
     var fakeJobId;
 
     beforeEach(function() {
@@ -857,6 +869,20 @@ describe('BigQuery', function() {
       bq.createJob(options, assert.ifError);
     });
 
+    it('should accept a location', function(done) {
+      var options = {
+        location: LOCATION,
+      };
+
+      bq.request = function(reqOpts) {
+        assert.strictEqual(reqOpts.json.jobReference.location, LOCATION);
+        assert.strictEqual(reqOpts.json.location, undefined);
+        done();
+      };
+
+      bq.createJob(options, assert.ifError);
+    });
+
     it('should return any request errors', function(done) {
       var response = {};
       var error = new Error('err.');
@@ -873,8 +899,27 @@ describe('BigQuery', function() {
       });
     });
 
+    it('should return any status errors', function(done) {
+      var errors = [{reason: 'notFound'}];
+      var response = extend(true, {}, RESPONSE, {
+        status: {errors},
+      });
+
+      bq.request = function(reqOpts, callback) {
+        callback(null, response);
+      };
+
+      bq.createJob({}, function(err) {
+        assert(err instanceof FakeApiError);
+
+        var errorOpts = err.calledWith_[0];
+        assert.deepEqual(errorOpts.errors, errors);
+        assert.strictEqual(errorOpts.response, response);
+        done();
+      });
+    });
+
     it('should return a job object', function(done) {
-      var response = {};
       var fakeJob = {};
 
       bq.job = function(jobId) {
@@ -883,14 +928,14 @@ describe('BigQuery', function() {
       };
 
       bq.request = function(reqOpts, callback) {
-        callback(null, response);
+        callback(null, RESPONSE);
       };
 
       bq.createJob({}, function(err, job, resp) {
         assert.ifError(err);
         assert.strictEqual(job, fakeJob);
-        assert.strictEqual(job.metadata, response);
-        assert.strictEqual(resp, response);
+        assert.strictEqual(job.metadata, RESPONSE);
+        assert.strictEqual(resp, RESPONSE);
         done();
       });
     });
@@ -1091,6 +1136,21 @@ describe('BigQuery', function() {
       bq.createJob = function(reqOpts) {
         assert.strictEqual(reqOpts.configuration.query.jobPrefix, undefined);
         assert.strictEqual(reqOpts.jobPrefix, options.jobPrefix);
+        done();
+      };
+
+      bq.createQueryJob(options, assert.ifError);
+    });
+
+    it('should accept a location', function(done) {
+      var options = {
+        query: QUERY_STRING,
+        location: LOCATION,
+      };
+
+      bq.createJob = function(reqOpts) {
+        assert.strictEqual(reqOpts.configuration.query.location, undefined);
+        assert.strictEqual(reqOpts.location, LOCATION);
         done();
       };
 

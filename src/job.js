@@ -265,6 +265,70 @@ Job.prototype.cancel = function(options, callback) {
 };
 
 /**
+ * Get the metadata of the job. This will mostly be useful for checking the
+ * status of a previously-run job.
+ *
+ * @see [Jobs: get API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/get}
+ *
+ * @param {object} [options] Configuration object.
+ * @param {string} [options.location] The geographic location of the job
+ *      Required except for US and EU.
+ * @param {function} [callback] The callback function.
+ * @param {?error} callback.err An error returned while making this
+ *     request.
+ * @param {object} callback.metadata The metadata of the job.
+ * @param {object} callback.apiResponse The full API response.
+ * @returns {Promise}
+ *
+ * @example
+ * const BigQuery = require('@google-cloud/bigquery');
+ * const bigquery = new BigQuery();
+ *
+ * const job = bigquery.job('id');
+ * job.getMetadata(function(err, metadata, apiResponse) {});
+ *
+ * //-
+ * // If the callback is omitted, we'll return a Promise.
+ * //-
+ * job.getMetadata().then(function(data) {
+ *   const metadata = data[0];
+ *   const apiResponse = data[1];
+ * });
+ */
+Job.prototype.getMetadata = function(options, callback) {
+  var self = this;
+
+  if (is.fn(options)) {
+    callback = options;
+    options = {};
+  }
+
+  var qs = extend(
+    {
+      location: this.location,
+    },
+    options
+  );
+
+  this.request(
+    {
+      uri: '',
+      qs,
+    },
+    function(err, resp) {
+      if (err) {
+        callback(err, null, resp);
+        return;
+      }
+
+      self.metadata = resp;
+
+      callback(null, self.metadata, resp);
+    }
+  );
+};
+
+/**
  * @callback QueryResultsCallback
  * @param {?Error} err An error returned while making this request.
  * @param {array} rows The results of the job.
@@ -390,70 +454,6 @@ Job.prototype.getQueryResults = function(options, callback) {
       }
 
       callback(null, rows, nextQuery, resp);
-    }
-  );
-};
-
-/**
- * Get the metadata of the job. This will mostly be useful for checking the
- * status of a previously-run job.
- *
- * @see [Jobs: get API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/get}
- *
- * @param {object} [options] Configuration object.
- * @param {string} [options.location] The geographic location of the job
- *      Required except for US and EU.
- * @param {function} [callback] The callback function.
- * @param {?error} callback.err An error returned while making this
- *     request.
- * @param {object} callback.metadata The metadata of the job.
- * @param {object} callback.apiResponse The full API response.
- * @returns {Promise}
- *
- * @example
- * const BigQuery = require('@google-cloud/bigquery');
- * const bigquery = new BigQuery();
- *
- * const job = bigquery.job('id');
- * job.getMetadata(function(err, metadata, apiResponse) {});
- *
- * //-
- * // If the callback is omitted, we'll return a Promise.
- * //-
- * job.getMetadata().then(function(data) {
- *   const metadata = data[0];
- *   const apiResponse = data[1];
- * });
- */
-Job.prototype.getMetadata = function(options, callback) {
-  var self = this;
-
-  if (is.fn(options)) {
-    callback = options;
-    options = {};
-  }
-
-  var qs = extend(
-    {
-      location: this.location,
-    },
-    options
-  );
-
-  this.request(
-    {
-      uri: '',
-      qs,
-    },
-    function(err, resp) {
-      if (err) {
-        callback(err, null, resp);
-        return;
-      }
-
-      self.metadata = resp;
-
-      callback(null, self.metadata, resp);
     }
   );
 };

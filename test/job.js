@@ -18,6 +18,7 @@
 
 var arrify = require('arrify');
 var assert = require('assert');
+var extend = require('extend');
 var is = require('is');
 var proxyquire = require('proxyquire');
 
@@ -68,6 +69,8 @@ describe('BigQuery/Job', function() {
     Promise: Promise,
   };
   var JOB_ID = 'job_XYrk_3z';
+  var LOCATION = 'asia-northeast1';
+
   var Job;
   var job;
 
@@ -110,39 +113,25 @@ describe('BigQuery/Job', function() {
       assert.deepEqual(calledWith.methods, {
         exists: true,
         get: true,
-        getMetadata: true,
         setMetadata: true,
       });
     });
 
-    describe('request interceptor', function() {
-      it('should assign a request interceptor for /cancel', function() {
-        var requestInterceptor = job.interceptors.pop().request;
-        assert(is.fn(requestInterceptor));
+    it('should initialize the metadata', function() {
+      assert.deepEqual(job.metadata, {});
+    });
+
+    describe('location', function() {
+      it('should get the location from the jobReference', function() {
+        assert.strictEqual(job.location, undefined);
+        job.metadata.jobReference = {location: LOCATION};
+        assert.strictEqual(job.location, LOCATION);
       });
 
-      it('should transform `projects` -> `project` for /cancel', function() {
-        var reqOpts = {
-          uri: '/bigquery/v2/projects/projectId/jobs/jobId/cancel',
-        };
-        var expectedReqOpts = {
-          uri: '/bigquery/v2/project/projectId/jobs/jobId/cancel',
-        };
-
-        var requestInterceptor = job.interceptors.pop().request;
-        assert.deepEqual(requestInterceptor(reqOpts), expectedReqOpts);
-      });
-
-      it('should not affect non-cancel requests', function() {
-        var reqOpts = {
-          uri: '/bigquery/v2/projects/projectId/jobs/jobId/getQueryResults',
-        };
-        var expectedReqOpts = {
-          uri: '/bigquery/v2/projects/projectId/jobs/jobId/getQueryResults',
-        };
-
-        var requestInterceptor = job.interceptors.pop().request;
-        assert.deepEqual(requestInterceptor(reqOpts), expectedReqOpts);
+      it('should set the location to the jobReference', function() {
+        assert.strictEqual(job.metadata.jobReference, undefined);
+        job.location = LOCATION;
+        assert.strictEqual(job.metadata.jobReference.location, LOCATION);
       });
     });
   });
@@ -158,30 +147,88 @@ describe('BigQuery/Job', function() {
       job.cancel(assert.ifError);
     });
 
-    it('should not require a callback', function(done) {
-      job.request = function(reqOpts, callback) {
-        assert.doesNotThrow(function() {
-          callback();
-          done();
-        });
+    it('should include the job location', function(done) {
+      job.request = function(reqOpts) {
+        assert.deepEqual(reqOpts.qs, {location: LOCATION});
+        done();
       };
 
-      job.cancel();
+      job.location = LOCATION;
+      job.cancel(assert.ifError);
     });
 
-    it('should execute callback with only error & API resp', function(done) {
-      var arg1 = {};
-      var arg2 = {};
-      var arg3 = {};
+    it('should accept an options object', function(done) {
+      var options = {a: 'b', location: 'US'};
 
-      job.request = function(reqOpts, callback) {
-        callback(arg1, arg2, arg3);
+      job.request = function(reqOpts) {
+        assert.deepEqual(reqOpts.qs, options);
+        done();
       };
 
-      job.cancel(function(arg1_, arg2_) {
-        assert.strictEqual(arguments.length, 2);
-        assert.strictEqual(arg1_, arg1);
-        assert.strictEqual(arg2_, arg2);
+      job.location = LOCATION;
+      job.cancel(options, assert.ifError);
+    });
+  });
+
+  describe('getMetadata', function() {
+    it('should make the correct request', function(done) {
+      job.request = function(config) {
+        assert.strictEqual(config.uri, '');
+        done();
+      };
+
+      job.getMetadata(assert.ifError);
+    });
+
+    it('should send the location', function(done) {
+      job.request = function(config) {
+        assert.deepEqual(config.qs, {location: LOCATION});
+        done();
+      };
+
+      job.location = LOCATION;
+      job.getMetadata(assert.ifError);
+    });
+
+    it('should accept options', function(done) {
+      var options = {a: 'b', location: 'US'};
+
+      job.request = function(config) {
+        assert.deepEqual(config.qs, options);
+        done();
+      };
+
+      job.getMetadata(options, assert.ifError);
+    });
+
+    it('should return any errors to the callback', function(done) {
+      var error = new Error('err');
+      var response = {};
+
+      job.request = function(config, callback) {
+        callback(error, response);
+      };
+
+      job.getMetadata(function(err, metadata, resp) {
+        assert.strictEqual(err, error);
+        assert.strictEqual(metadata, null);
+        assert.strictEqual(resp, response);
+        done();
+      });
+    });
+
+    it('should update the metadata and exec the callback', function(done) {
+      var response = {};
+
+      job.request = function(config, callback) {
+        callback(null, response);
+      };
+
+      job.getMetadata(function(err, metadata, resp) {
+        assert.ifError(err);
+        assert.strictEqual(metadata, response);
+        assert.strictEqual(resp, response);
+        assert.strictEqual(job.metadata, response);
         done();
       });
     });
@@ -192,6 +239,7 @@ describe('BigQuery/Job', function() {
     var options = {
       a: 'a',
       b: 'b',
+      location: 'US',
     };
 
     var RESPONSE = {
@@ -207,14 +255,16 @@ describe('BigQuery/Job', function() {
       BIGQUERY.mergeSchemaWithRows_ = function(schema, rows) {
         return rows;
       };
+
+      job.location = LOCATION;
     });
 
     it('should make the correct request', function(done) {
-      var options = {};
+      var options = {a: 'b', location: 'US'};
 
       BIGQUERY.request = function(reqOpts) {
         assert.strictEqual(reqOpts.uri, '/queries/' + JOB_ID);
-        assert.strictEqual(reqOpts.qs, options);
+        assert.deepEqual(reqOpts.qs, options);
         done();
       };
 
@@ -223,7 +273,7 @@ describe('BigQuery/Job', function() {
 
     it('should optionally accept options', function(done) {
       BIGQUERY.request = function(reqOpts) {
-        assert.deepEqual(reqOpts.qs, {});
+        assert.deepEqual(reqOpts.qs, {location: LOCATION});
         done();
       };
 

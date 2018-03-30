@@ -640,7 +640,7 @@ Table.prototype.createCopyJob = function(destination, metadata, callback) {
     delete metadata.jobPrefix;
   }
 
-  if (!metadata.location) {
+  if (!metadata.location && this.location) {
     metadata.location = this.location;
   }
 
@@ -748,7 +748,7 @@ Table.prototype.createCopyFromJob = function(sourceTables, metadata, callback) {
     delete metadata.jobPrefix;
   }
 
-  if (!metadata.location) {
+  if (!metadata.location && this.location) {
     metadata.location = this.location;
   }
 
@@ -1042,7 +1042,7 @@ Table.prototype.createLoadJob = function(source, metadata, callback) {
     delete metadata.jobPrefix;
   }
 
-  if (!metadata.location) {
+  if (!metadata.location && this.location) {
     metadata.location = this.location;
   }
 

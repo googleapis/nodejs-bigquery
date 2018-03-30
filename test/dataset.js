@@ -67,6 +67,8 @@ describe('BigQuery/Dataset', function() {
     createDataset: util.noop,
   };
   var DATASET_ID = 'kittens';
+  var LOCATION = 'asia-northeast1';
+
   var Dataset;
   var Table;
   var ds;
@@ -123,6 +125,24 @@ describe('BigQuery/Dataset', function() {
         get: true,
         getMetadata: true,
         setMetadata: true,
+      });
+    });
+
+    it('should initialize the metadata property', function() {
+      assert.deepEqual(ds.metadata, {});
+    });
+
+    describe('location', function() {
+      it('should get the location from the metadata', function() {
+        assert.strictEqual(ds.location, undefined);
+        ds.metadata.location = LOCATION;
+        assert.strictEqual(ds.location, LOCATION);
+      });
+
+      it('should set the location in the metadata', function() {
+        assert.strictEqual(ds.metadata.location, undefined);
+        ds.location = LOCATION;
+        assert.strictEqual(ds.metadata.location, LOCATION);
       });
     });
 
@@ -189,11 +209,18 @@ describe('BigQuery/Dataset', function() {
         a: {b: 'c'},
       };
 
-      var expectedOptions = extend(true, {}, fakeOptions, {
-        defaultDataset: {
-          datasetId: ds.id,
+      var expectedOptions = extend(
+        true,
+        {
+          location: LOCATION,
         },
-      });
+        fakeOptions,
+        {
+          defaultDataset: {
+            datasetId: ds.id,
+          },
+        }
+      );
 
       ds.bigQuery.createQueryJob = function(options, callback) {
         assert.deepEqual(options, expectedOptions);
@@ -201,6 +228,7 @@ describe('BigQuery/Dataset', function() {
         callback(); // the done fn
       };
 
+      ds.location = LOCATION;
       ds.createQueryJob(fakeOptions, done);
     });
 
@@ -266,6 +294,16 @@ describe('BigQuery/Dataset', function() {
       };
 
       ds.createQueryStream(options);
+    });
+
+    it('should extend options with the location', function(done) {
+      ds.bigQuery.createQueryStream = function(opts) {
+        assert.strictEqual(opts.location, LOCATION);
+        done();
+      };
+
+      ds.location = LOCATION;
+      ds.createQueryStream();
     });
 
     it('should not modify original options object', function(done) {
@@ -661,6 +699,16 @@ describe('BigQuery/Dataset', function() {
       ds.query(options);
     });
 
+    it('should extend options with the location', function(done) {
+      ds.bigQuery.query = function(opts) {
+        assert.strictEqual(opts.location, LOCATION);
+        done();
+      };
+
+      ds.location = LOCATION;
+      ds.query();
+    });
+
     it('should not modify original options object', function(done) {
       ds.bigQuery.query = function() {
         assert.deepEqual(options, {a: 'b', c: 'd'});
@@ -688,6 +736,12 @@ describe('BigQuery/Dataset', function() {
       var table = ds.table(tableId);
       assert(table instanceof Table);
       assert.equal(table.id, tableId);
+    });
+
+    it('should pass along the location if set', function() {
+      ds.location = LOCATION;
+      var table = ds.table('tableId');
+      assert.strictEqual(table.location, LOCATION);
     });
   });
 });

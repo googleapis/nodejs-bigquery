@@ -103,6 +103,8 @@ describe('BigQuery/Table', function() {
     'hair_count:float',
   ].join(',');
 
+  var LOCATION = 'asia-northeast1';
+
   var Table;
   var TABLE_ID = 'kittens';
   var table;
@@ -187,6 +189,24 @@ describe('BigQuery/Table', function() {
         get: true,
         getMetadata: true,
         setMetadata: true,
+      });
+    });
+
+    it('should initialize metadata', function() {
+      assert.deepEqual(table.metadata, {});
+    });
+
+    describe('location', function() {
+      it('should get the location from the metadata', function() {
+        assert.strictEqual(table.location, undefined);
+        table.metadata.location = LOCATION;
+        assert.strictEqual(table.location, LOCATION);
+      });
+
+      it('should set the location in the metadata', function() {
+        assert.strictEqual(table.metadata.location, undefined);
+        table.location = LOCATION;
+        assert.strictEqual(table.metadata.location, LOCATION);
       });
     });
 
@@ -600,6 +620,31 @@ describe('BigQuery/Table', function() {
       table.createCopyJob(DEST_TABLE, options, done);
     });
 
+    it('should use the default location', function(done) {
+      table.bigQuery.createJob = function(reqOpts, callback) {
+        assert.strictEqual(reqOpts.location, LOCATION);
+        assert.strictEqual(reqOpts.configuration.copy.location, undefined);
+        callback(); // the done fn
+      };
+
+      table.location = LOCATION;
+      table.createCopyJob(DEST_TABLE, done);
+    });
+
+    it('should accept a location override', function(done) {
+      var location = 'US';
+      var options = {location};
+
+      table.bigQuery.createJob = function(reqOpts, callback) {
+        assert.strictEqual(reqOpts.location, location);
+        assert.strictEqual(reqOpts.configuration.copy.location, undefined);
+        callback(); // the done fn
+      };
+
+      table.location = LOCATION;
+      table.createCopyJob(DEST_TABLE, options, done);
+    });
+
     it('should pass the callback to createJob', function(done) {
       table.bigQuery.createJob = function(reqOpts, callback) {
         assert.strictEqual(done, callback);
@@ -706,6 +751,31 @@ describe('BigQuery/Table', function() {
         callback(); // the done fn
       };
 
+      table.createCopyFromJob(SOURCE_TABLE, options, done);
+    });
+
+    it('should use the default location', function(done) {
+      table.bigQuery.createJob = function(reqOpts, callback) {
+        assert.strictEqual(reqOpts.location, LOCATION);
+        assert.strictEqual(reqOpts.configuration.copy.location, undefined);
+        callback(); // the done fn
+      };
+
+      table.location = LOCATION;
+      table.createCopyFromJob(SOURCE_TABLE, done);
+    });
+
+    it('should accept a location override', function(done) {
+      var location = 'US';
+      var options = {location};
+
+      table.bigQuery.createJob = function(reqOpts, callback) {
+        assert.strictEqual(reqOpts.location, location);
+        assert.strictEqual(reqOpts.configuration.copy.location, undefined);
+        callback(); // the done fn
+      };
+
+      table.location = LOCATION;
       table.createCopyFromJob(SOURCE_TABLE, options, done);
     });
 
@@ -887,6 +957,31 @@ describe('BigQuery/Table', function() {
         callback(); // the done fn
       };
 
+      table.createExtractJob(FILE, options, done);
+    });
+
+    it('should use the default location', function(done) {
+      table.bigQuery.createJob = function(reqOpts, callback) {
+        assert.strictEqual(reqOpts.location, LOCATION);
+        assert.strictEqual(reqOpts.configuration.extract.location, undefined);
+        callback(); // the done fn
+      };
+
+      table.location = LOCATION;
+      table.createExtractJob(FILE, done);
+    });
+
+    it('should accept a location override', function(done) {
+      var location = 'US';
+      var options = {location};
+
+      table.bigQuery.createJob = function(reqOpts, callback) {
+        assert.strictEqual(reqOpts.location, location);
+        assert.strictEqual(reqOpts.configuration.extract.location, undefined);
+        callback(); // the done fn
+      };
+
+      table.location = LOCATION;
       table.createExtractJob(FILE, options, done);
     });
 
@@ -1095,6 +1190,31 @@ describe('BigQuery/Table', function() {
       );
     });
 
+    it('should use the default location', function(done) {
+      table.bigQuery.createJob = function(reqOpts, callback) {
+        assert.strictEqual(reqOpts.location, LOCATION);
+        assert.strictEqual(reqOpts.configuration.load.location, undefined);
+        callback(); // the done fn
+      };
+
+      table.location = LOCATION;
+      table.createLoadJob(FILE, done);
+    });
+
+    it('should accept a location override', function(done) {
+      var location = 'US';
+      var options = {location};
+
+      table.bigQuery.createJob = function(reqOpts, callback) {
+        assert.strictEqual(reqOpts.location, location);
+        assert.strictEqual(reqOpts.configuration.load.location, undefined);
+        callback(); // the done fn
+      };
+
+      table.location = LOCATION;
+      table.createLoadJob(FILE, options, done);
+    });
+
     describe('formats', function() {
       it('should accept csv', function(done) {
         table.bigQuery.createJob = function(reqOpts) {
@@ -1287,6 +1407,7 @@ describe('BigQuery/Table', function() {
             jobReference: {
               projectId: table.bigQuery.projectId,
               jobId: fakeJobId,
+              location: undefined,
             },
           });
           done();
@@ -1323,6 +1444,39 @@ describe('BigQuery/Table', function() {
         };
 
         table.createWriteStream({jobPrefix: jobPrefix}).emit('writing');
+      });
+
+      it('should use the default location', function(done) {
+        makeWritableStreamOverride = function(stream, options) {
+          var location = options.metadata.jobReference.location;
+          assert.strictEqual(location, LOCATION);
+
+          var config = options.metadata.configuration.load;
+          assert.strictEqual(config.location, undefined);
+
+          done();
+        };
+
+        table.location = LOCATION;
+        table.createWriteStream().emit('writing');
+      });
+
+      it('should accept a location override', function(done) {
+        var location = 'US';
+        var options = {location};
+
+        makeWritableStreamOverride = function(stream, options) {
+          var locationRef = options.metadata.jobReference.location;
+          assert.strictEqual(locationRef, location);
+
+          var config = options.metadata.configuration.load;
+          assert.strictEqual(config.location, undefined);
+
+          done();
+        };
+
+        table.location = LOCATION;
+        table.createWriteStream(options).emit('writing');
       });
 
       it('should create a job and emit it with complete', function(done) {
