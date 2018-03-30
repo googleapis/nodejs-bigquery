@@ -39,6 +39,8 @@ var Table = require('./table.js');
  *     downloaded from the Google Developers Console. If you provide a path to a
  *     JSON file, the `projectId` option above is not necessary. NOTE: .pem and
  *     .p12 require you to specify the `email` option as well.
+ * @property {string} [token] An OAUTH access token. If provided, we will not
+ *     manage fetching, re-using, and re-minting access tokens.
  * @property {string} [email] Account email address. Required when using a .pem
  *     or .p12 keyFilename.
  * @property {object} [credentials] Credentials object.
