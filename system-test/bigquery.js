@@ -537,7 +537,7 @@ describe('BigQuery', function() {
         it('should fail to reload if the location is not set', function(done) {
           var badJob = bigquery.job(job.id);
 
-          badJob.getMetadata(function(err, metadata) {
+          badJob.getMetadata(function(err) {
             assert.strictEqual(err.code, 404);
             done();
           });
@@ -588,7 +588,7 @@ describe('BigQuery', function() {
         });
 
         it('should cancel a job', function(done) {
-          job.cancel(function(err, resp) {
+          job.cancel(function(err) {
             assert.ifError(err);
             done();
           });
@@ -602,7 +602,7 @@ describe('BigQuery', function() {
               query: QUERY,
               location: 'US',
             },
-            function(err, job, resp) {
+            function(err, job) {
               assert.strictEqual(err.errors[0].reason, 'notFound');
               assert.strictEqual(job.location, 'US');
               done();
