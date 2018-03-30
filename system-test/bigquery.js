@@ -506,7 +506,7 @@ describe('BigQuery', function() {
       );
     });
 
-    describe.only('location', function() {
+    describe('location', function() {
       var dataset = bigquery.dataset(generateName('dataset'));
       var table = dataset.table(generateName('table'));
       var job;
@@ -587,7 +587,7 @@ describe('BigQuery', function() {
           });
         });
 
-        it.skip('should cancel a job', function(done) {
+        it('should cancel a job', function(done) {
           job.cancel(function(err, resp) {
             assert.ifError(err);
             done();
