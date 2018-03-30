@@ -276,7 +276,7 @@ function Table(dataset, id) {
 
   Object.defineProperty(this, 'location', {
     get: function() {
-      return this.metadata && this.metadata.location;
+      return this.metadata.location;
     },
     set: function(location) {
       this.metadata.location = location;

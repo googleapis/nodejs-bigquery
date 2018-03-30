@@ -903,10 +903,17 @@ BigQuery.prototype.createJob = function(options, callback) {
         return;
       }
 
+      if (resp.status.errors) {
+        err = new common.util.ApiError({
+          errors: resp.status.errors,
+          response: resp,
+        });
+      }
+
       var job = self.job(jobId);
       job.metadata = resp;
 
-      callback(null, job, resp);
+      callback(err, job, resp);
     }
   );
 };

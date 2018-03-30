@@ -208,7 +208,7 @@ function Dataset(bigQuery, id) {
 
   Object.defineProperty(this, 'location', {
     get: function() {
-      return this.metadata && this.metadata.location;
+      return this.metadata.location;
     },
     set: function(location) {
       this.metadata.location = location;
@@ -598,7 +598,7 @@ Dataset.prototype.table = function(id) {
   var table = new Table(this, id);
 
   if (this.location) {
-    table.metadata = {location: this.location};
+    table.location = this.location;
   }
 
   return table;
