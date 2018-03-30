@@ -32,7 +32,7 @@ var Table = require('./table.js');
  * @param {string} id The ID of the Dataset.
  * @param {object} [metadata] Dataset metadata.
  * @param {string} [metadata.location] The geographic location of the dataset.
- *      Required except for US and EU.
+ *      Defaults to US.
  *
  * @example
  * const BigQuery = require('@google-cloud/bigquery');
