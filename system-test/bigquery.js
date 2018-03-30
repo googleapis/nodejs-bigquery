@@ -649,12 +649,18 @@ describe('BigQuery', function() {
               var job = data[0];
 
               assert.strictEqual(job.location, LOCATION);
+              return job.promise();
             });
           });
         });
 
         describe('extract', function() {
+          var bucket = storage.bucket(generateName('bucket'));
           var extractFile = bucket.file('location-extract-data.json');
+
+          before(function() {
+            return bucket.create({location: LOCATION});
+          });
 
           it('should fail if the job location is incorrect', function(done) {
             table.createExtractJob(
@@ -674,6 +680,7 @@ describe('BigQuery', function() {
               var job = data[0];
 
               assert.strictEqual(job.location, LOCATION);
+              return job.promise();
             });
           });
         });
