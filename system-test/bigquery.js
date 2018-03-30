@@ -519,18 +519,22 @@ describe('BigQuery', function() {
       before(function() {
         // create a dataset in a certain location will cascade the location
         // to any jobs created through it
-        return dataset.create({location: LOCATION}).then(function() {
-          return table.create({schema: SCHEMA});
-        });
+        return dataset
+          .create({location: LOCATION})
+          .then(function() {
+            return table.create({schema: SCHEMA});
+          })
+          .then(function() {
+            return table.createLoadJob(TEST_DATA_FILE);
+          })
+          .then(function(data) {
+            job = data[0];
+            return job.promise();
+          });
       });
 
-      it('should create a load job', function() {
-        return table.createLoadJob(TEST_DATA_FILE).then(function(data) {
-          job = data[0];
-
-          assert.strictEqual(job.location, LOCATION);
-          return job.promise();
-        });
+      it('should create a load job in the correct location', function() {
+        assert.strictEqual(job.location, LOCATION);
       });
 
       describe('job.get', function() {
@@ -588,10 +592,7 @@ describe('BigQuery', function() {
         });
 
         it('should cancel a job', function(done) {
-          job.cancel(function(err) {
-            assert.ifError(err);
-            done();
-          });
+          job.cancel(done);
         });
       });
 

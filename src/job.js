@@ -215,7 +215,7 @@ util.inherits(Job, common.Operation);
  * @see [Jobs: get API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/cancel}
  *
  * @param {object} [options] Configuration object.
- * @param {string} [options.location] The geographic location of the job
+ * @param {string} [options.location] The geographic location of the job.
  *      Required except for US and EU.
  * @param {function} [callback] The callback function.
  * @param {?error} callback.err An error returned while making this request.
