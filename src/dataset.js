@@ -204,8 +204,17 @@ function Dataset(bigQuery, id) {
   });
 
   this.bigQuery = bigQuery;
+
+  /**
+   * @name Dataset#metadata
+   * @type {object}
+   */
   this.metadata = {};
 
+  /**
+   * @name Dataset#location
+   * @type {string}
+   */
   Object.defineProperty(this, 'location', {
     get: function() {
       return this.metadata.location;

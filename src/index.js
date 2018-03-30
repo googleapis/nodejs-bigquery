@@ -652,6 +652,8 @@ BigQuery.prototype.createDataset = function(id, options, callback) {
  * @param {boolean} [options.dryRun] If set, don't actually run this job. A
  *     valid query will update the job with processing statistics. These can be
  *     accessed via `job.metadata`.
+ * @param {string} [options.location] The geographic location of the job.
+ *     Required except for US and EU.
  * @param {string} options.query A query string, following the BigQuery query
  *     syntax, of the query to execute.
  * @param {boolean} [options.useLegacySql=false] Option to use legacy sql syntax.
@@ -835,6 +837,8 @@ BigQuery.prototype.createQueryStream = common.paginator.streamify('query');
  *
  * @param {object} options Object in the form of a [Job resource](https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs);
  * @param {string} [options.jobPrefix] Prefix to apply to the job id.
+ * @param {string} [options.location] The geographic location of the job.
+ *     Required except for US and EU.
  * @param {function} [callback] The callback function.
  * @param {?error} callback.err An error returned while making this request.
  * @param {Job} callback.job The newly created job.
@@ -1211,6 +1215,8 @@ BigQuery.prototype.job = function(id) {
  * @param {string|object} query A string SQL query or configuration object.
  *     For all available options, see
  *     [Jobs: query request body](https://cloud.google.com/bigquery/docs/reference/v2/jobs/query#request-body).
+ * @param {string} [query.location] The geographic location of the job.
+ *     Required except for US and EU.
  * @param {object|Array<*>} query.params For positional SQL parameters, provide
  *     an array of values. For named SQL parameters, provide an object which
  *     maps each named parameter to its value. The supported types are integers,

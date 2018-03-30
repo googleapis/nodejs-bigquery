@@ -183,8 +183,17 @@ function Job(bigQuery, id) {
   });
 
   this.bigQuery = bigQuery;
+
+  /**
+   * @name Job#metadata
+   * @type {object}
+   */
   this.metadata = {};
 
+  /**
+   * @name Job#location
+   * @type {string}
+   */
   Object.defineProperty(this, 'location', {
     get: function() {
       return this.metadata.jobReference && this.metadata.jobReference.location;
@@ -217,6 +226,9 @@ util.inherits(Job, common.Operation);
  *
  * @see [Jobs: get API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/cancel}
  *
+ * @param {object} [options] Configuration object.
+ * @param {string} [options.location] The geographic location of the job
+ *      Required except for US and EU.
  * @param {function} [callback] The callback function.
  * @param {?error} callback.err An error returned while making this request.
  * @param {object} callback.apiResponse The full API response.
@@ -400,7 +412,9 @@ Job.prototype.getQueryResults = function(options, callback) {
  *
  * @see [Jobs: get API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/get}
  *
- * @method Job#getMetadata
+ * @param {object} [options] Configuration object.
+ * @param {string} [options.location] The geographic location of the job
+ *      Required except for US and EU.
  * @param {function} [callback] The callback function.
  * @param {?error} callback.err An error returned while making this
  *     request.
