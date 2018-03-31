@@ -196,18 +196,10 @@ describe('BigQuery/Table', function() {
       assert.deepEqual(table.metadata, {});
     });
 
-    describe('location', function() {
-      it('should get the location from the metadata', function() {
-        assert.strictEqual(table.location, undefined);
-        table.metadata.location = LOCATION;
-        assert.strictEqual(table.location, LOCATION);
-      });
-
-      it('should set the location in the metadata', function() {
-        assert.strictEqual(table.metadata.location, undefined);
-        table.location = LOCATION;
-        assert.strictEqual(table.metadata.location, LOCATION);
-      });
+    it('should get the location from the metadata', function() {
+      assert.strictEqual(table.location, undefined);
+      table.metadata.location = LOCATION;
+      assert.strictEqual(table.location, LOCATION);
     });
 
     describe('etag interceptor', function() {
@@ -627,7 +619,7 @@ describe('BigQuery/Table', function() {
         callback(); // the done fn
       };
 
-      table.location = LOCATION;
+      table.metadata.location = LOCATION;
       table.createCopyJob(DEST_TABLE, done);
     });
 
@@ -641,7 +633,7 @@ describe('BigQuery/Table', function() {
         callback(); // the done fn
       };
 
-      table.location = LOCATION;
+      table.metadata.location = LOCATION;
       table.createCopyJob(DEST_TABLE, options, done);
     });
 
@@ -761,7 +753,7 @@ describe('BigQuery/Table', function() {
         callback(); // the done fn
       };
 
-      table.location = LOCATION;
+      table.metadata.location = LOCATION;
       table.createCopyFromJob(SOURCE_TABLE, done);
     });
 
@@ -775,7 +767,7 @@ describe('BigQuery/Table', function() {
         callback(); // the done fn
       };
 
-      table.location = LOCATION;
+      table.metadata.location = LOCATION;
       table.createCopyFromJob(SOURCE_TABLE, options, done);
     });
 
@@ -967,7 +959,7 @@ describe('BigQuery/Table', function() {
         callback(); // the done fn
       };
 
-      table.location = LOCATION;
+      table.metadata.location = LOCATION;
       table.createExtractJob(FILE, done);
     });
 
@@ -981,7 +973,7 @@ describe('BigQuery/Table', function() {
         callback(); // the done fn
       };
 
-      table.location = LOCATION;
+      table.metadata.location = LOCATION;
       table.createExtractJob(FILE, options, done);
     });
 
@@ -1197,7 +1189,7 @@ describe('BigQuery/Table', function() {
         callback(); // the done fn
       };
 
-      table.location = LOCATION;
+      table.metadata.location = LOCATION;
       table.createLoadJob(FILE, done);
     });
 
@@ -1211,7 +1203,7 @@ describe('BigQuery/Table', function() {
         callback(); // the done fn
       };
 
-      table.location = LOCATION;
+      table.metadata.location = LOCATION;
       table.createLoadJob(FILE, options, done);
     });
 
@@ -1457,7 +1449,7 @@ describe('BigQuery/Table', function() {
           done();
         };
 
-        table.location = LOCATION;
+        table.metadata.location = LOCATION;
         table.createWriteStream().emit('writing');
       });
 
@@ -1475,7 +1467,7 @@ describe('BigQuery/Table', function() {
           done();
         };
 
-        table.location = LOCATION;
+        table.metadata.location = LOCATION;
         table.createWriteStream(options).emit('writing');
       });
 

@@ -222,9 +222,6 @@ function Dataset(bigQuery, id, metadata) {
     get: function() {
       return this.metadata.location;
     },
-    set: function(location) {
-      this.metadata.location = location;
-    },
   });
 
   // Catch all for read-modify-write cycle

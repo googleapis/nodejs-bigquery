@@ -201,17 +201,14 @@ function Job(bigQuery, id, options) {
     get: function() {
       return this.metadata.jobReference && this.metadata.jobReference.location;
     },
-    set: function(location) {
-      extend(true, this.metadata, {
-        jobReference: {location},
-      });
-    },
   });
 
   options = options || {};
 
   if (options.location) {
-    this.location = options.location;
+    extend(true, this.metadata, {
+      jobReference: {location: options.location},
+    });
   }
 }
 

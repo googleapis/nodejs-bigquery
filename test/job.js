@@ -119,18 +119,10 @@ describe('BigQuery/Job', function() {
       assert.deepEqual(job.metadata, {});
     });
 
-    describe('location', function() {
-      it('should get the location from the jobReference', function() {
-        assert.strictEqual(job.location, undefined);
-        job.metadata.jobReference = {location: LOCATION};
-        assert.strictEqual(job.location, LOCATION);
-      });
-
-      it('should set the location to the jobReference', function() {
-        assert.strictEqual(job.metadata.jobReference, undefined);
-        job.location = LOCATION;
-        assert.strictEqual(job.metadata.jobReference.location, LOCATION);
-      });
+    it('should get the location from the jobReference', function() {
+      assert.strictEqual(job.location, undefined);
+      job.metadata.jobReference = {location: LOCATION};
+      assert.strictEqual(job.location, LOCATION);
     });
 
     it('should accept a location option', function() {
@@ -153,16 +145,18 @@ describe('BigQuery/Job', function() {
     });
 
     it('should include the job location', function(done) {
+      var job = new Job(BIGQUERY, JOB_ID, {location: LOCATION});
+
       job.request = function(reqOpts) {
         assert.deepEqual(reqOpts.qs, {location: LOCATION});
         done();
       };
 
-      job.location = LOCATION;
       job.cancel(assert.ifError);
     });
 
     it('should accept an options object', function(done) {
+      var job = new Job(BIGQUERY, JOB_ID, {location: LOCATION});
       var options = {a: 'b', location: 'US'};
 
       job.request = function(reqOpts) {
@@ -170,7 +164,6 @@ describe('BigQuery/Job', function() {
         done();
       };
 
-      job.location = LOCATION;
       job.cancel(options, assert.ifError);
     });
   });
@@ -186,12 +179,13 @@ describe('BigQuery/Job', function() {
     });
 
     it('should send the location', function(done) {
+      var job = new Job(BIGQUERY, JOB_ID, {location: LOCATION});
+
       job.request = function(config) {
         assert.deepEqual(config.qs, {location: LOCATION});
         done();
       };
 
-      job.location = LOCATION;
       job.getMetadata(assert.ifError);
     });
 
@@ -260,8 +254,6 @@ describe('BigQuery/Job', function() {
       BIGQUERY.mergeSchemaWithRows_ = function(schema, rows) {
         return rows;
       };
-
-      job.location = LOCATION;
     });
 
     it('should make the correct request', function(done) {
@@ -277,6 +269,8 @@ describe('BigQuery/Job', function() {
     });
 
     it('should optionally accept options', function(done) {
+      var job = new Job(BIGQUERY, JOB_ID, {location: LOCATION});
+
       BIGQUERY.request = function(reqOpts) {
         assert.deepEqual(reqOpts.qs, {location: LOCATION});
         done();

@@ -128,6 +128,12 @@ describe('BigQuery/Dataset', function() {
       });
     });
 
+    it('should get the location from the metadata', function() {
+      assert.strictEqual(ds.location, undefined);
+      ds.metadata.location = LOCATION;
+      assert.strictEqual(ds.location, LOCATION);
+    });
+
     describe('metadata', function() {
       it('should default the metadata property', function() {
         assert.deepEqual(ds.metadata, {});
@@ -138,20 +144,6 @@ describe('BigQuery/Dataset', function() {
         var ds = new Dataset(BIGQUERY, DATASET_ID, metadata);
 
         assert.strictEqual(ds.metadata, metadata);
-      });
-    });
-
-    describe('location', function() {
-      it('should get the location from the metadata', function() {
-        assert.strictEqual(ds.location, undefined);
-        ds.metadata.location = LOCATION;
-        assert.strictEqual(ds.location, LOCATION);
-      });
-
-      it('should set the location in the metadata', function() {
-        assert.strictEqual(ds.metadata.location, undefined);
-        ds.location = LOCATION;
-        assert.strictEqual(ds.metadata.location, LOCATION);
       });
     });
 
@@ -237,7 +229,7 @@ describe('BigQuery/Dataset', function() {
         callback(); // the done fn
       };
 
-      ds.location = LOCATION;
+      ds.metadata.location = LOCATION;
       ds.createQueryJob(fakeOptions, done);
     });
 
@@ -311,7 +303,7 @@ describe('BigQuery/Dataset', function() {
         done();
       };
 
-      ds.location = LOCATION;
+      ds.metadata.location = LOCATION;
       ds.createQueryStream();
     });
 
@@ -714,7 +706,7 @@ describe('BigQuery/Dataset', function() {
         done();
       };
 
-      ds.location = LOCATION;
+      ds.metadata.location = LOCATION;
       ds.query();
     });
 
@@ -748,14 +740,14 @@ describe('BigQuery/Dataset', function() {
     });
 
     it('should inherit the dataset location', function() {
-      ds.location = LOCATION;
+      ds.metadata.location = LOCATION;
       var table = ds.table('tableId');
 
       assert.strictEqual(table.location, LOCATION);
     });
 
     it('should pass along the metadata if provided', function() {
-      ds.location = LOCATION;
+      ds.metadata.location = LOCATION;
 
       var metadata = {location: 'US'};
       var table = ds.table('tableId', metadata);
