@@ -193,6 +193,12 @@ function Job(bigQuery, id, options) {
    */
   this.metadata = {};
 
+  /*!
+   * If a location comes back in an apiResponse, we need to capture it and
+   * send it on all subsequent job requests. Failure to do so will result in
+   * an upstream error. It's possible that the user won't provide a location,
+   * hence the need for a getter.
+   */
   /**
    * @name Job#location
    * @type {string}
