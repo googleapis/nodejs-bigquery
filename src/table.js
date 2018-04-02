@@ -48,8 +48,8 @@ var FORMATS = {
  * @class
  * @param {Dataset} dataset {@link Dataset} instance.
  * @param {string} id The ID of the table.
- * @param {object} [metadata] Table metadata.
- * @param {string} [metadata.location] The geographic location of the table, by
+ * @param {object} [options] Table options.
+ * @param {string} [options.location] The geographic location of the table, by
  *      default this value is inherited from the dataset. This can be used to
  *      configure the location of all jobs created through a table instance. It
  *      cannot be used to set the actual location of the table. This value will
@@ -63,7 +63,7 @@ var FORMATS = {
  *
  * const table = dataset.table('my-table');
  */
-function Table(dataset, id, metadata) {
+function Table(dataset, id, options) {
   var methods = {
     /**
      * Create a table.
@@ -284,7 +284,7 @@ function Table(dataset, id, metadata) {
    * @name Table#metadata
    * @type {object}
    */
-  this.metadata = metadata || {};
+  this.metadata = options || {};
 
   /*!
    * If a location comes back in an apiResponse, we need to capture it and

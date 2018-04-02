@@ -928,8 +928,8 @@ BigQuery.prototype.createJob = function(options, callback) {
  * Create a reference to a dataset.
  *
  * @param {string} id ID of the dataset.
- * @param {object} [metadata] Dataset metadata.
- * @param {string} [metadata.location] The geographic location of the dataset.
+ * @param {object} [options] Dataset options.
+ * @param {string} [options.location] The geographic location of the dataset.
  *      Required except for US and EU.
  * @returns {Dataset}
  *
@@ -938,8 +938,8 @@ BigQuery.prototype.createJob = function(options, callback) {
  * const bigquery = new BigQuery();
  * const dataset = bigquery.dataset('higher_education');
  */
-BigQuery.prototype.dataset = function(id, metadata) {
-  return new Dataset(this, id, metadata);
+BigQuery.prototype.dataset = function(id, options) {
+  return new Dataset(this, id, options);
 };
 
 /**

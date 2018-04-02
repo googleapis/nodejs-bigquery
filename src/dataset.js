@@ -30,8 +30,8 @@ var Table = require('./table.js');
  * @class
  * @param {BigQuery} bigQuery {@link BigQuery} instance.
  * @param {string} id The ID of the Dataset.
- * @param {object} [metadata] Dataset metadata.
- * @param {string} [metadata.location] The geographic location of the dataset.
+ * @param {object} [options] Dataset options.
+ * @param {string} [options.location] The geographic location of the dataset.
  *      Defaults to US.
  *
  * @example
@@ -39,7 +39,7 @@ var Table = require('./table.js');
  * const bigquery = new BigQuery();
  * const dataset = bigquery.dataset('institutions');
  */
-function Dataset(bigQuery, id, metadata) {
+function Dataset(bigQuery, id, options) {
   var methods = {
     /**
      * Create a dataset.
@@ -212,7 +212,7 @@ function Dataset(bigQuery, id, metadata) {
    * @name Dataset#metadata
    * @type {object}
    */
-  this.metadata = metadata || {};
+  this.metadata = options || {};
 
   /*!
    * If a location comes back in an apiResponse, we need to capture it and
@@ -600,8 +600,8 @@ Dataset.prototype.query = function(options, callback) {
  * Create a Table object.
  *
  * @param {string} id The ID of the table.
- * @param {object} [metadata] Table metadata.
- * @param {string} [metadata.location] The geographic location of the table, by
+ * @param {object} [options] Table options.
+ * @param {string} [options.location] The geographic location of the table, by
  *      default this value is inherited from the dataset. This can be used to
  *      configure the location of all jobs created through a table instance. It
  *      cannot be used to set the actual location of the table. This value will
@@ -616,15 +616,15 @@ Dataset.prototype.query = function(options, callback) {
  *
  * const institutions = dataset.table('institution_data');
  */
-Dataset.prototype.table = function(id, metadata) {
-  metadata = extend(
+Dataset.prototype.table = function(id, options) {
+  options = extend(
     {
       location: this.location,
     },
-    metadata
+    options
   );
 
-  return new Table(this, id, metadata);
+  return new Table(this, id, options);
 };
 
 /*! Developer Documentation
