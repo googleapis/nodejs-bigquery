@@ -592,10 +592,11 @@ describe('BigQuery', function() {
 
       describe('job.getQueryResults', function() {
         it('should fail if the job location is incorrect', function(done) {
-          dataset.createQueryJob(
+          var badDataset = bigquery.dataset(dataset.id, {location: 'US'});
+
+          badDataset.createQueryJob(
             {
               query: QUERY,
-              location: 'US',
             },
             function(err, job) {
               assert.strictEqual(err.errors[0].reason, 'notFound');
@@ -632,16 +633,12 @@ describe('BigQuery', function() {
           var otherTable = dataset.table(generateName('table'));
 
           it('should fail if the job location is incorrect', function(done) {
-            table.createCopyJob(
-              otherTable,
-              {
-                location: 'US',
-              },
-              function(err) {
-                assert.strictEqual(err.code, 404);
-                done();
-              }
-            );
+            var badTable = dataset.table(table.id, {location: 'US'});
+
+            badTable.createCopyJob(otherTable, function(err) {
+              assert.strictEqual(err.code, 404);
+              done();
+            });
           });
 
           it('should copy the table', function() {
@@ -663,16 +660,12 @@ describe('BigQuery', function() {
           });
 
           it('should fail if the job location is incorrect', function(done) {
-            table.createExtractJob(
-              extractFile,
-              {
-                location: 'US',
-              },
-              function(err) {
-                assert.strictEqual(err.code, 404);
-                done();
-              }
-            );
+            var badTable = dataset.table(table.id, {location: 'US'});
+
+            badTable.createExtractJob(extractFile, function(err) {
+              assert.strictEqual(err.code, 404);
+              done();
+            });
           });
 
           it('should extract the table', function() {
