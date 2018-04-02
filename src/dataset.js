@@ -40,6 +40,8 @@ var Table = require('./table.js');
  * const dataset = bigquery.dataset('institutions');
  */
 function Dataset(bigQuery, id, options) {
+  options = options || {};
+
   var methods = {
     /**
      * Create a dataset.
@@ -212,7 +214,11 @@ function Dataset(bigQuery, id, options) {
    * @name Dataset#metadata
    * @type {object}
    */
-  this.metadata = options || {};
+  this.metadata = {};
+
+  if (options.location) {
+    this.metadata.location = options.location;
+  }
 
   /*!
    * If a location comes back in an apiResponse, we need to capture it and

@@ -139,11 +139,11 @@ describe('BigQuery/Dataset', function() {
         assert.deepEqual(ds.metadata, {});
       });
 
-      it('should capture user provided metadata', function() {
+      it('should capture user provided location', function() {
         var metadata = {location: LOCATION};
         var ds = new Dataset(BIGQUERY, DATASET_ID, metadata);
 
-        assert.strictEqual(ds.metadata, metadata);
+        assert.strictEqual(ds.metadata.location, LOCATION);
       });
     });
 

@@ -53,6 +53,8 @@ var Table = require('./table.js');
  *     attempted before returning the error.
  * @property {Constructor} [promise] Custom promise module to use instead of
  *     native Promises.
+ * @property {string} [location] The geographic location of all datasets and
+ *     jobs referenced and created through the client.
  */
 
 /**
@@ -102,6 +104,12 @@ function BigQuery(options) {
   };
 
   common.Service.call(this, config, options);
+
+  /**
+   * @name Job#location
+   * @type {string}
+   */
+  this.location = options.location;
 }
 
 util.inherits(BigQuery, common.Service);
@@ -617,11 +625,18 @@ BigQuery.prototype.createDataset = function(id, options, callback) {
     {
       method: 'POST',
       uri: '/datasets',
-      json: extend(true, {}, options, {
-        datasetReference: {
-          datasetId: id,
+      json: extend(
+        true,
+        {
+          location: this.location,
         },
-      }),
+        options,
+        {
+          datasetReference: {
+            datasetId: id,
+          },
+        }
+      ),
     },
     function(err, resp) {
       if (err) {
@@ -890,6 +905,7 @@ BigQuery.prototype.createJob = function(options, callback) {
   reqOpts.jobReference = {
     projectId: this.projectId,
     jobId: jobId,
+    location: this.location,
   };
 
   if (options.location) {
@@ -939,6 +955,10 @@ BigQuery.prototype.createJob = function(options, callback) {
  * const dataset = bigquery.dataset('higher_education');
  */
 BigQuery.prototype.dataset = function(id, options) {
+  if (this.location) {
+    options = extend({}, options, {location: this.location});
+  }
+
   return new Dataset(this, id, options);
 };
 

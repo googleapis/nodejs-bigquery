@@ -55,6 +55,10 @@ var fakeUtil = extend({}, util, {
 });
 var originalFakeUtil = extend(true, {}, fakeUtil);
 
+function FakeDataset() {
+  this.calledWith_ = arguments;
+}
+
 function FakeTable(a, b) {
   Table.call(this, a, b);
 }
@@ -108,6 +112,7 @@ describe('BigQuery', function() {
   before(function() {
     BigQuery = proxyquire('../', {
       uuid: fakeUuid,
+      './dataset.js': FakeDataset,
       './job.js': FakeJob,
       './table.js': FakeTable,
       '@google-cloud/common': {
@@ -171,6 +176,15 @@ describe('BigQuery', function() {
         'https://www.googleapis.com/auth/bigquery',
       ]);
       assert.deepEqual(calledWith.packageJson, require('../package.json'));
+    });
+
+    it('should capture any user specified location', function() {
+      var bq = new BigQuery({
+        projectId: PROJECT_ID,
+        location: LOCATION,
+      });
+
+      assert.strictEqual(bq.location, LOCATION);
     });
   });
 
@@ -735,12 +749,24 @@ describe('BigQuery', function() {
       bq.request = function(reqOpts) {
         assert.strictEqual(reqOpts.method, 'POST');
         assert.strictEqual(reqOpts.uri, '/datasets');
-        assert.deepEqual(reqOpts.json, {
-          datasetReference: {
-            datasetId: DATASET_ID,
-          },
+        assert.deepEqual(reqOpts.json.datasetReference, {
+          datasetId: DATASET_ID,
         });
 
+        done();
+      };
+
+      bq.createDataset(DATASET_ID, assert.ifError);
+    });
+
+    it('should send the location if available', function(done) {
+      var bq = new BigQuery({
+        projectId: PROJECT_ID,
+        location: LOCATION,
+      });
+
+      bq.request = function(reqOpts) {
+        assert.strictEqual(reqOpts.json.location, LOCATION);
         done();
       };
 
@@ -784,7 +810,7 @@ describe('BigQuery', function() {
 
       bq.createDataset(DATASET_ID, function(err, dataset) {
         assert.ifError(err);
-        assert.equal(dataset.constructor.name, 'Dataset');
+        assert(dataset instanceof FakeDataset);
         done();
       });
     });
@@ -844,6 +870,7 @@ describe('BigQuery', function() {
         jobReference: {
           projectId: bq.projectId,
           jobId: fakeJobId,
+          location: undefined,
         },
       });
 
@@ -886,6 +913,20 @@ describe('BigQuery', function() {
       };
 
       bq.createJob(options, assert.ifError);
+    });
+
+    it('should use the user defined option if available', function(done) {
+      var bq = new BigQuery({
+        projectId: PROJECT_ID,
+        location: LOCATION,
+      });
+
+      bq.request = function(reqOpts) {
+        assert.strictEqual(reqOpts.json.jobReference.location, LOCATION);
+        done();
+      };
+
+      bq.createJob({}, assert.ifError);
     });
 
     it('should return any request errors', function(done) {
@@ -1176,20 +1217,39 @@ describe('BigQuery', function() {
 
     it('returns a Dataset instance', function() {
       var ds = bq.dataset(DATASET_ID);
-      assert.equal(ds.constructor.name, 'Dataset');
+      assert(ds instanceof FakeDataset);
     });
 
     it('should scope the correct dataset', function() {
       var ds = bq.dataset(DATASET_ID);
-      assert.equal(ds.id, DATASET_ID);
-      assert.deepEqual(ds.bigQuery, bq);
+      var args = ds.calledWith_;
+
+      assert.strictEqual(args[0], bq);
+      assert.strictEqual(args[1], DATASET_ID);
     });
 
     it('should accept dataset metadata', function() {
-      var metadata = {location: 'US'};
-      var ds = bq.dataset(DATASET_ID, metadata);
+      var options = {location: 'US'};
+      var ds = bq.dataset(DATASET_ID, options);
+      var args = ds.calledWith_;
 
-      assert.strictEqual(ds.metadata, metadata);
+      assert.strictEqual(args[2], options);
+    });
+
+    it('should pass the location if available', function() {
+      var bq = new BigQuery({
+        projectId: PROJECT_ID,
+        location: LOCATION,
+      });
+
+      var options = {a: 'b'};
+      var expectedOptions = extend({location: LOCATION}, options);
+
+      var ds = bq.dataset(DATASET_ID, options);
+      var args = ds.calledWith_;
+
+      assert.deepEqual(args[2], expectedOptions);
+      assert.notStrictEqual(args[2], options);
     });
   });
 
@@ -1247,7 +1307,7 @@ describe('BigQuery', function() {
 
       bq.getDatasets(function(err, datasets) {
         assert.ifError(err);
-        assert.strictEqual(datasets[0].constructor.name, 'Dataset');
+        assert(datasets[0] instanceof FakeDataset);
         done();
       });
     });

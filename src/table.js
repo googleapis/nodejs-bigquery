@@ -64,6 +64,8 @@ var FORMATS = {
  * const table = dataset.table('my-table');
  */
 function Table(dataset, id, options) {
+  options = options || {};
+
   var methods = {
     /**
      * Create a table.
@@ -284,7 +286,11 @@ function Table(dataset, id, options) {
    * @name Table#metadata
    * @type {object}
    */
-  this.metadata = options || {};
+  this.metadata = {};
+
+  if (options.location) {
+    this.metadata.location = options.location;
+  }
 
   /*!
    * If a location comes back in an apiResponse, we need to capture it and
@@ -672,8 +678,6 @@ Table.prototype.createCopyJob = function(destination, metadata, callback) {
  * @param {object} [metadata] Metadata to set with the copy operation. The
  *     metadata object should be in the format of the
  *     [`configuration.copy`](http://goo.gl/dKWIyS) property of a Jobs resource.
- * @param {string} [metadata.location] The geographic location of the job.
- *     Required except for US and EU.
  * @param {function} [callback] The callback function.
  * @param {?error} callback.err An error returned while making this request
  * @param {Job} callback.job The job used to copy your table.
@@ -758,13 +762,8 @@ Table.prototype.createCopyFromJob = function(sourceTables, metadata, callback) {
     delete metadata.jobPrefix;
   }
 
-  if (!metadata.location && this.location) {
-    metadata.location = this.location;
-  }
-
-  if (metadata.location) {
-    body.location = metadata.location;
-    delete metadata.location;
+  if (this.location) {
+    body.location = this.location;
   }
 
   this.bigQuery.createJob(body, callback);
