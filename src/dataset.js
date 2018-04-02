@@ -265,18 +265,12 @@ Dataset.prototype.createQueryJob = function(options, callback) {
     };
   }
 
-  options = extend(
-    true,
-    {
-      location: this.location,
+  options = extend(true, {}, options, {
+    defaultDataset: {
+      datasetId: this.id,
     },
-    options,
-    {
-      defaultDataset: {
-        datasetId: this.id,
-      },
-    }
-  );
+    location: this.location,
+  });
 
   return this.bigQuery.createQueryJob(options, callback);
 };
@@ -298,18 +292,12 @@ Dataset.prototype.createQueryStream = function(options) {
     };
   }
 
-  options = extend(
-    true,
-    {
-      location: this.location,
+  options = extend(true, {}, options, {
+    defaultDataset: {
+      datasetId: this.id,
     },
-    options,
-    {
-      defaultDataset: {
-        datasetId: this.id,
-      },
-    }
-  );
+    location: this.location,
+  });
 
   return this.bigQuery.createQueryStream(options);
 };
@@ -580,18 +568,12 @@ Dataset.prototype.query = function(options, callback) {
     };
   }
 
-  options = extend(
-    true,
-    {
-      location: this.location,
+  options = extend(true, {}, options, {
+    defaultDataset: {
+      datasetId: this.id,
     },
-    options,
-    {
-      defaultDataset: {
-        datasetId: this.id,
-      },
-    }
-  );
+    location: this.location,
+  });
 
   return this.bigQuery.query(options, callback);
 };

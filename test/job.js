@@ -154,18 +154,6 @@ describe('BigQuery/Job', function() {
 
       job.cancel(assert.ifError);
     });
-
-    it('should accept an options object', function(done) {
-      var job = new Job(BIGQUERY, JOB_ID, {location: LOCATION});
-      var options = {a: 'b', location: 'US'};
-
-      job.request = function(reqOpts) {
-        assert.deepEqual(reqOpts.qs, options);
-        done();
-      };
-
-      job.cancel(options, assert.ifError);
-    });
   });
 
   describe('getMetadata', function() {
@@ -187,17 +175,6 @@ describe('BigQuery/Job', function() {
       };
 
       job.getMetadata(assert.ifError);
-    });
-
-    it('should accept options', function(done) {
-      var options = {a: 'b', location: 'US'};
-
-      job.request = function(config) {
-        assert.deepEqual(config.qs, options);
-        done();
-      };
-
-      job.getMetadata(options, assert.ifError);
     });
 
     it('should return any errors to the callback', function(done) {

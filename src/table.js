@@ -782,8 +782,6 @@ Table.prototype.createCopyFromJob = function(sourceTables, metadata, callback) {
  *     options are "CSV", "JSON", or "AVRO". Default: "CSV".
  * @param {boolean} options.gzip - Specify if you would like the file compressed
  *     with GZIP. Default: false.
- * @param {string} [options.location] The geographic location of the job.
- *     Required except for US and EU.
  * @param {function} callback - The callback function.
  * @param {?error} callback.err - An error returned while making this request
  * @param {Job} callback.job - The job used to export the table.
@@ -903,13 +901,8 @@ Table.prototype.createExtractJob = function(destination, options, callback) {
     delete options.jobPrefix;
   }
 
-  if (!options.location) {
-    options.location = this.location;
-  }
-
-  if (options.location) {
-    body.location = options.location;
-    delete options.location;
+  if (this.location) {
+    body.location = this.location;
   }
 
   this.bigQuery.createJob(body, callback);
@@ -934,8 +927,6 @@ Table.prototype.createExtractJob = function(destination, options, callback) {
  *     [`configuration.load`](http://goo.gl/BVcXk4) property of a Jobs resource.
  * @param {string} [metadata.format] The format the data being loaded is in.
  *     Allowed options are "CSV", "JSON", or "AVRO".
- * @param {string} [metadata.location] The geographic location of the job.
- *     Required except for US and EU.
  * @param {function} [callback] The callback function.
  * @param {?error} callback.err An error returned while making this request
  * @param {Job} callback.job The job used to load your data.
@@ -1011,6 +1002,10 @@ Table.prototype.createLoadJob = function(source, metadata, callback) {
     delete metadata.format;
   }
 
+  if (this.location) {
+    metadata.location = this.location;
+  }
+
   if (is.string(source)) {
     // A path to a file was given. If a sourceFormat wasn't specified, try to
     // find a match from the file's extension.
@@ -1050,10 +1045,6 @@ Table.prototype.createLoadJob = function(source, metadata, callback) {
   if (metadata.jobPrefix) {
     body.jobPrefix = metadata.jobPrefix;
     delete metadata.jobPrefix;
-  }
-
-  if (!metadata.location && this.location) {
-    metadata.location = this.location;
   }
 
   if (metadata.location) {
@@ -1157,8 +1148,6 @@ Table.prototype.createReadStream = common.paginator.streamify('getRows');
  *     The metadata object should be in the format of the
  *     [`configuration.load`](http://goo.gl/BVcXk4) property of a Jobs resource.
  *     If a string is given, it will be used as the filetype.
- * @param {string} [metadata.location] The geographic location of the underlying
- *      job. Required except for US and EU.
  * @returns {WritableStream}
  *
  * @throws {Error} If source format isn't recognized.
@@ -1231,13 +1220,6 @@ Table.prototype.createWriteStream = function(metadata) {
     delete metadata.jobPrefix;
   }
 
-  var location = this.location;
-
-  if (metadata.location) {
-    location = metadata.location;
-    delete metadata.location;
-  }
-
   if (
     metadata.hasOwnProperty('sourceFormat') &&
     fileTypes.indexOf(metadata.sourceFormat) < 0
@@ -1259,7 +1241,7 @@ Table.prototype.createWriteStream = function(metadata) {
           jobReference: {
             jobId: jobId,
             projectId: self.bigQuery.projectId,
-            location,
+            location: self.location,
           },
         },
         request: {
@@ -1291,8 +1273,6 @@ Table.prototype.createWriteStream = function(metadata) {
  *     options are "CSV", "JSON", or "AVRO". Default: "CSV".
  * @param {boolean} [options.gzip] Specify if you would like the file compressed
  *     with GZIP. Default: false.
- * @param {string} [options.location] The geographic location of the underlying
- *      job. Required except for US and EU.
  * @param {function} [callback] The callback function.
  * @param {?error} callback.err An error returned while making this request
  * @param {object} callback.apiResponse The full API response.
@@ -1721,8 +1701,6 @@ Table.prototype.insert = function(rows, options, callback) {
  *     [`configuration.load`](http://goo.gl/BVcXk4) property of a Jobs resource.
  * @param {string} [metadata.format] The format the data being loaded is in.
  *     Allowed options are "CSV", "JSON", or "AVRO".
- * @param {string} [metadata.location] The geographic location of the underlying
- *      job. Required except for US and EU.
  * @param {function} [callback] The callback function.
  * @param {?error} callback.err An error returned while making this request
  * @param {object} callback.apiResponse The full API response.

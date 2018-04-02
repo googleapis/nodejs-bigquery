@@ -226,9 +226,6 @@ util.inherits(Job, common.Operation);
  *
  * @see [Jobs: get API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/cancel}
  *
- * @param {object} [options] Configuration object.
- * @param {string} [options.location] The geographic location of the job.
- *      Required except for US and EU.
  * @param {function} [callback] The callback function.
  * @param {?error} callback.err An error returned while making this request.
  * @param {object} callback.apiResponse The full API response.
@@ -253,18 +250,12 @@ util.inherits(Job, common.Operation);
  *   var apiResponse = data[0];
  * });
  */
-Job.prototype.cancel = function(options, callback) {
-  if (is.fn(options)) {
-    callback = options;
-    options = {};
-  }
+Job.prototype.cancel = function(callback) {
+  var qs;
 
-  var qs = extend(
-    {
-      location: this.location,
-    },
-    options
-  );
+  if (this.location) {
+    qs = {location: this.location};
+  }
 
   this.request(
     {
@@ -282,9 +273,6 @@ Job.prototype.cancel = function(options, callback) {
  *
  * @see [Jobs: get API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/get}
  *
- * @param {object} [options] Configuration object.
- * @param {string} [options.location] The geographic location of the job
- *      Required except for US and EU.
  * @param {function} [callback] The callback function.
  * @param {?error} callback.err An error returned while making this
  *     request.
@@ -307,20 +295,13 @@ Job.prototype.cancel = function(options, callback) {
  *   const apiResponse = data[1];
  * });
  */
-Job.prototype.getMetadata = function(options, callback) {
+Job.prototype.getMetadata = function(callback) {
   var self = this;
+  var qs;
 
-  if (is.fn(options)) {
-    callback = options;
-    options = {};
+  if (this.location) {
+    qs = {location: this.location};
   }
-
-  var qs = extend(
-    {
-      location: this.location,
-    },
-    options
-  );
 
   this.request(
     {
