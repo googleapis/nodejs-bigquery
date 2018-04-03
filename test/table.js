@@ -623,20 +623,6 @@ describe('BigQuery/Table', function() {
       table.createCopyJob(DEST_TABLE, done);
     });
 
-    it('should accept a location override', function(done) {
-      var location = 'US';
-      var options = {location};
-
-      table.bigQuery.createJob = function(reqOpts, callback) {
-        assert.strictEqual(reqOpts.location, location);
-        assert.strictEqual(reqOpts.configuration.copy.location, undefined);
-        callback(); // the done fn
-      };
-
-      table.metadata.location = LOCATION;
-      table.createCopyJob(DEST_TABLE, options, done);
-    });
-
     it('should pass the callback to createJob', function(done) {
       table.bigQuery.createJob = function(reqOpts, callback) {
         assert.strictEqual(done, callback);
