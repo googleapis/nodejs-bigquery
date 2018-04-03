@@ -106,7 +106,7 @@ function BigQuery(options) {
   common.Service.call(this, config, options);
 
   /**
-   * @name Job#location
+   * @name BigQuery#location
    * @type {string}
    */
   this.location = options.location;
