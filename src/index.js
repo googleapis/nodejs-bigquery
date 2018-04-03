@@ -1231,6 +1231,10 @@ BigQuery.prototype.getJobsStream = common.paginator.streamify('getJobs');
  * const myExistingJob = bigquery.job('job-id');
  */
 BigQuery.prototype.job = function(id, options) {
+  if (this.location) {
+    options = extend({}, options, {location: this.location});
+  }
+
   return new Job(this, id, options);
 };
 

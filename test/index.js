@@ -1519,6 +1519,22 @@ describe('BigQuery', function() {
 
       assert.strictEqual(job.calledWith_[2], options);
     });
+
+    it('should pass in the user specified location', function() {
+      var bq = new BigQuery({
+        projectId: PROJECT_ID,
+        location: LOCATION,
+      });
+
+      var options = {a: 'b'};
+      var expectedOptions = extend({location: LOCATION}, options);
+
+      var job = bq.job(JOB_ID, options);
+      var args = job.calledWith_;
+
+      assert.deepEqual(args[2], expectedOptions);
+      assert.notStrictEqual(args[2], options);
+    });
   });
 
   describe('query', function() {
