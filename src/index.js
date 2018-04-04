@@ -881,6 +881,10 @@ BigQuery.prototype.createJob = function(options, callback) {
   var reqOpts = extend({}, options);
   var jobId = reqOpts.jobId || uuid.v4();
 
+  if (reqOpts.jobId) {
+    delete reqOpts.jobId;
+  }
+
   if (reqOpts.jobPrefix) {
     jobId = reqOpts.jobPrefix + jobId;
     delete reqOpts.jobPrefix;

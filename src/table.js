@@ -870,7 +870,7 @@ Table.prototype.createExtractJob = function(destination, options, callback) {
 
   if (options.jobId) {
     body.jobId = options.jobId;
-    delete options.jobPrefix;
+    delete options.jobId;
   }
 
   this.bigQuery.createJob(body, callback);
