@@ -777,6 +777,11 @@ BigQuery.prototype.createQueryJob = function(options, callback) {
     delete query.jobPrefix;
   }
 
+  if (query.jobId) {
+    reqOpts.jobId = query.jobId;
+    delete query.jobId;
+  }
+
   this.createJob(reqOpts, callback);
 };
 
@@ -831,6 +836,7 @@ BigQuery.prototype.createQueryStream = common.paginator.streamify('query');
  * @see [Jobs: insert API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert}
  *
  * @param {object} options Object in the form of a [Job resource](https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs);
+ * @param {string} [options.jobId] Custom job id.
  * @param {string} [options.jobPrefix] Prefix to apply to the job id.
  * @param {function} [callback] The callback function.
  * @param {?error} callback.err An error returned while making this request.
@@ -871,7 +877,7 @@ BigQuery.prototype.createJob = function(options, callback) {
   var self = this;
 
   var reqOpts = extend({}, options);
-  var jobId = uuid.v4();
+  var jobId = reqOpts.jobId || uuid.v4();
 
   if (reqOpts.jobPrefix) {
     jobId = reqOpts.jobPrefix + jobId;

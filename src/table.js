@@ -615,6 +615,11 @@ Table.prototype.createCopyJob = function(destination, metadata, callback) {
     delete metadata.jobPrefix;
   }
 
+  if (metadata.jobId) {
+    body.jobId = metadata.jobId;
+    delete metadata.jobId;
+  }
+
   this.bigQuery.createJob(body, callback);
 };
 
@@ -710,6 +715,11 @@ Table.prototype.createCopyFromJob = function(sourceTables, metadata, callback) {
   if (metadata.jobPrefix) {
     body.jobPrefix = metadata.jobPrefix;
     delete metadata.jobPrefix;
+  }
+
+  if (metadata.jobId) {
+    body.jobId = metadata.jobId;
+    delete metadata.jobId;
   }
 
   this.bigQuery.createJob(body, callback);
@@ -843,6 +853,11 @@ Table.prototype.createExtractJob = function(destination, options, callback) {
 
   if (options.jobPrefix) {
     body.jobPrefix = options.jobPrefix;
+    delete options.jobPrefix;
+  }
+
+  if (options.jobId) {
+    body.jobId = options.jobId;
     delete options.jobPrefix;
   }
 
@@ -982,6 +997,11 @@ Table.prototype.createLoadJob = function(source, metadata, callback) {
   if (metadata.jobPrefix) {
     body.jobPrefix = metadata.jobPrefix;
     delete metadata.jobPrefix;
+  }
+
+  if (metadata.jobId) {
+    body.jobId = metadata.jobId;
+    delete metadata.jobId;
   }
 
   extend(true, body.configuration.load, metadata, {
@@ -1145,7 +1165,11 @@ Table.prototype.createWriteStream = function(metadata) {
     },
   });
 
-  var jobId = uuid.v4();
+  var jobId = metadata.jobId || uuid.v4();
+
+  if (metadata.jobId) {
+    delete metadata.jobId;
+  }
 
   if (metadata.jobPrefix) {
     jobId = metadata.jobPrefix + jobId;
