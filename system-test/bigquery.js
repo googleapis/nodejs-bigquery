@@ -350,6 +350,21 @@ describe('BigQuery', function() {
     );
   });
 
+  it('should accept the dryRun option', function(done) {
+    bigquery.query(
+      {
+        query,
+        dryRun: true,
+      },
+      function(err, rows, resp) {
+        assert.ifError(err);
+        assert.deepEqual(rows, []);
+        assert(resp.statistics.query);
+        done();
+      }
+    );
+  });
+
   it('should get a list of jobs', function(done) {
     bigquery.getJobs(function(err, jobs) {
       assert.ifError(err);

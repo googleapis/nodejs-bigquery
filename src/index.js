@@ -1297,6 +1297,11 @@ BigQuery.prototype.query = function(query, options, callback) {
       return;
     }
 
+    if (query.dryRun) {
+      callback(null, [], resp);
+      return;
+    }
+
     job.getQueryResults(options, callback);
   });
 };

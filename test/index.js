@@ -1420,9 +1420,28 @@ describe('BigQuery', function() {
         callback(error, null, FAKE_RESPONSE);
       };
 
-      bq.query(QUERY_STRING, function(err, job, resp) {
+      bq.query(QUERY_STRING, function(err, rows, resp) {
         assert.strictEqual(err, error);
-        assert.strictEqual(job, null);
+        assert.strictEqual(rows, null);
+        assert.strictEqual(resp, FAKE_RESPONSE);
+        done();
+      });
+    });
+
+    it('should exit early if dryRun is set', function(done) {
+      var options = {
+        query: QUERY_STRING,
+        dryRun: true,
+      };
+
+      bq.createQueryJob = function(query, callback) {
+        assert.strictEqual(query, options);
+        callback(null, null, FAKE_RESPONSE);
+      };
+
+      bq.query(options, function(err, rows, resp) {
+        assert.ifError(err);
+        assert.deepEqual(rows, []);
         assert.strictEqual(resp, FAKE_RESPONSE);
         done();
       });
