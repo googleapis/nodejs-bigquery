@@ -1113,7 +1113,7 @@ describe('BigQuery', function() {
     it('should accept a job id', function(done) {
       var options = {
         query: QUERY_STRING,
-        jobId: 'jobId'
+        jobId: 'jobId',
       };
 
       bq.createJob = function(reqOpts) {

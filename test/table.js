@@ -1138,7 +1138,7 @@ describe('BigQuery/Table', function() {
       var jobId = 'job-id';
       var options = {jobId};
 
-      table.bigQuery.createJob = function(reqOpts, callback) {
+      table.bigQuery.createJob = function(reqOpts) {
         assert.strictEqual(reqOpts.jobId, jobId);
         assert.strictEqual(reqOpts.configuration.load.jobId, undefined);
         done();
