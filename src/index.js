@@ -654,6 +654,8 @@ BigQuery.prototype.createDataset = function(id, options, callback) {
  * @param {boolean} [options.dryRun] If set, don't actually run this job. A
  *     valid query will update the job with processing statistics. These can be
  *     accessed via `job.metadata`.
+ * @param {string} [options.jobId] Custom job id.
+ * @param {string} [options.jobPrefix] Prefix to apply to the job id.
  * @param {string} options.query A query string, following the BigQuery query
  *     syntax, of the query to execute.
  * @param {boolean} [options.useLegacySql=false] Option to use legacy sql syntax.
@@ -777,6 +779,11 @@ BigQuery.prototype.createQueryJob = function(options, callback) {
     delete query.jobPrefix;
   }
 
+  if (query.jobId) {
+    reqOpts.jobId = query.jobId;
+    delete query.jobId;
+  }
+
   this.createJob(reqOpts, callback);
 };
 
@@ -831,6 +838,7 @@ BigQuery.prototype.createQueryStream = common.paginator.streamify('query');
  * @see [Jobs: insert API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert}
  *
  * @param {object} options Object in the form of a [Job resource](https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs);
+ * @param {string} [options.jobId] Custom job id.
  * @param {string} [options.jobPrefix] Prefix to apply to the job id.
  * @param {function} [callback] The callback function.
  * @param {?error} callback.err An error returned while making this request.
@@ -871,7 +879,11 @@ BigQuery.prototype.createJob = function(options, callback) {
   var self = this;
 
   var reqOpts = extend({}, options);
-  var jobId = uuid.v4();
+  var jobId = reqOpts.jobId || uuid.v4();
+
+  if (reqOpts.jobId) {
+    delete reqOpts.jobId;
+  }
 
   if (reqOpts.jobPrefix) {
     jobId = reqOpts.jobPrefix + jobId;
@@ -1196,6 +1208,8 @@ BigQuery.prototype.job = function(id) {
  * @param {string|object} query A string SQL query or configuration object.
  *     For all available options, see
  *     [Jobs: query request body](https://cloud.google.com/bigquery/docs/reference/v2/jobs/query#request-body).
+ * @param {string} [query.jobId] Custom id for the underlying job.
+ * @param {string} [query.jobPrefix] Prefix to apply to the underlying job id.
  * @param {object|Array<*>} query.params For positional SQL parameters, provide
  *     an array of values. For named SQL parameters, provide an object which
  *     maps each named parameter to its value. The supported types are integers,

@@ -857,6 +857,19 @@ describe('BigQuery', function() {
       bq.createJob(options, assert.ifError);
     });
 
+    it('should accept a job id', function(done) {
+      var jobId = 'job-id';
+      var options = {jobId};
+
+      bq.request = function(reqOpts) {
+        assert.strictEqual(reqOpts.json.jobReference.jobId, jobId);
+        assert.strictEqual(reqOpts.json.jobId, undefined);
+        done();
+      };
+
+      bq.createJob(options, assert.ifError);
+    });
+
     it('should return any request errors', function(done) {
       var response = {};
       var error = new Error('err.');
@@ -1091,6 +1104,21 @@ describe('BigQuery', function() {
       bq.createJob = function(reqOpts) {
         assert.strictEqual(reqOpts.configuration.query.jobPrefix, undefined);
         assert.strictEqual(reqOpts.jobPrefix, options.jobPrefix);
+        done();
+      };
+
+      bq.createQueryJob(options, assert.ifError);
+    });
+
+    it('should accept a job id', function(done) {
+      var options = {
+        query: QUERY_STRING,
+        jobId: 'jobId',
+      };
+
+      bq.createJob = function(reqOpts) {
+        assert.strictEqual(reqOpts.configuration.query.jobId, undefined);
+        assert.strictEqual(reqOpts.jobId, options.jobId);
         done();
       };
 
