@@ -286,6 +286,18 @@ describe('BigQuery', function() {
     });
   });
 
+  it('should honor the job id option', function(done) {
+    var jobId = 'hi-im-a-job-id';
+    var options = {query, jobId};
+
+    bigquery.createQueryJob(options, function(err, job) {
+      assert.ifError(err);
+      assert.strictEqual(job.id, jobId);
+
+      job.getQueryResults(done);
+    });
+  });
+
   it('should honor the dryRun option', function(done) {
     var options = {
       query: query,
@@ -333,6 +345,21 @@ describe('BigQuery', function() {
         assert.ifError(err);
         assert.equal(rows.length, 10);
         assert.equal(typeof nextQuery.pageToken, 'string');
+        done();
+      }
+    );
+  });
+
+  it('should accept the dryRun option', function(done) {
+    bigquery.query(
+      {
+        query,
+        dryRun: true,
+      },
+      function(err, rows, resp) {
+        assert.ifError(err);
+        assert.deepEqual(rows, []);
+        assert(resp.statistics.query);
         done();
       }
     );

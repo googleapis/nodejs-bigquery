@@ -915,6 +915,19 @@ describe('BigQuery', function() {
       bq.createJob(options, assert.ifError);
     });
 
+    it('should accept a job id', function(done) {
+      var jobId = 'job-id';
+      var options = {jobId};
+
+      bq.request = function(reqOpts) {
+        assert.strictEqual(reqOpts.json.jobReference.jobId, jobId);
+        assert.strictEqual(reqOpts.json.jobId, undefined);
+        done();
+      };
+
+      bq.createJob(options, assert.ifError);
+    });
+
     it('should use the user defined option if available', function(done) {
       var bq = new BigQuery({
         projectId: PROJECT_ID,
@@ -1197,6 +1210,21 @@ describe('BigQuery', function() {
       bq.createJob = function(reqOpts) {
         assert.strictEqual(reqOpts.configuration.query.location, undefined);
         assert.strictEqual(reqOpts.location, LOCATION);
+        done();
+      };
+
+      bq.createQueryJob(options, assert.ifError);
+    });
+
+    it('should accept a job id', function(done) {
+      var options = {
+        query: QUERY_STRING,
+        jobId: 'jobId',
+      };
+
+      bq.createJob = function(reqOpts) {
+        assert.strictEqual(reqOpts.configuration.query.jobId, undefined);
+        assert.strictEqual(reqOpts.jobId, options.jobId);
         done();
       };
 
@@ -1549,9 +1577,28 @@ describe('BigQuery', function() {
         callback(error, null, FAKE_RESPONSE);
       };
 
-      bq.query(QUERY_STRING, function(err, job, resp) {
+      bq.query(QUERY_STRING, function(err, rows, resp) {
         assert.strictEqual(err, error);
-        assert.strictEqual(job, null);
+        assert.strictEqual(rows, null);
+        assert.strictEqual(resp, FAKE_RESPONSE);
+        done();
+      });
+    });
+
+    it('should exit early if dryRun is set', function(done) {
+      var options = {
+        query: QUERY_STRING,
+        dryRun: true,
+      };
+
+      bq.createQueryJob = function(query, callback) {
+        assert.strictEqual(query, options);
+        callback(null, null, FAKE_RESPONSE);
+      };
+
+      bq.query(options, function(err, rows, resp) {
+        assert.ifError(err);
+        assert.deepEqual(rows, []);
         assert.strictEqual(resp, FAKE_RESPONSE);
         done();
       });

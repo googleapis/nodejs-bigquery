@@ -453,6 +453,9 @@ Table.formatMetadata_ = function(options) {
  * @param {object} [metadata] Metadata to set with the copy operation. The
  *     metadata object should be in the format of the
  *     [`configuration.copy`](http://goo.gl/dKWIyS) property of a Jobs resource.
+ * @param {string} [metadata.jobId] Custom id for the underlying job.
+ * @param {string} [metadata.jobPrefix] Prefix to apply to the underlying job
+ *     id.
  * @param {function} [callback] The callback function.
  * @param {?error} callback.err An error returned while making this request
  * @param {object} callback.apiResponse The full API response.
@@ -514,6 +517,9 @@ Table.prototype.copy = function(destination, metadata, callback) {
  * @param {object=} metadata Metadata to set with the copy operation. The
  *     metadata object should be in the format of the
  *     [`configuration.copy`](http://goo.gl/dKWIyS) property of a Jobs resource.
+ * @param {string} [metadata.jobId] Custom id for the underlying job.
+ * @param {string} [metadata.jobPrefix] Prefix to apply to the underlying job
+ *     id.
  * @param {function} [callback] The callback function.
  * @param {?error} callback.err An error returned while making this request
  * @param {object} callback.apiResponse The full API response.
@@ -579,6 +585,8 @@ Table.prototype.copyFrom = function(sourceTables, metadata, callback) {
  * @param {object} [metadata] Metadata to set with the copy operation. The
  *     metadata object should be in the format of the
  *     [`configuration.copy`](http://goo.gl/dKWIyS) property of a Jobs resource.
+ * @param {string} [metadata.jobId] Custom job id.
+ * @param {string} [metadata.jobPrefix] Prefix to apply to the job id.
  * @param {function} [callback] The callback function.
  * @param {?error} callback.err An error returned while making this request
  * @param {Job} callback.job The job used to copy your table.
@@ -654,6 +662,11 @@ Table.prototype.createCopyJob = function(destination, metadata, callback) {
     body.location = this.location;
   }
 
+  if (metadata.jobId) {
+    body.jobId = metadata.jobId;
+    delete metadata.jobId;
+  }
+
   this.bigQuery.createJob(body, callback);
 };
 
@@ -667,6 +680,8 @@ Table.prototype.createCopyJob = function(destination, metadata, callback) {
  * @param {object} [metadata] Metadata to set with the copy operation. The
  *     metadata object should be in the format of the
  *     [`configuration.copy`](http://goo.gl/dKWIyS) property of a Jobs resource.
+ * @param {string} [metadata.jobId] Custom job id.
+ * @param {string} [metadata.jobPrefix] Prefix to apply to the job id.
  * @param {function} [callback] The callback function.
  * @param {?error} callback.err An error returned while making this request
  * @param {Job} callback.job The job used to copy your table.
@@ -755,6 +770,11 @@ Table.prototype.createCopyFromJob = function(sourceTables, metadata, callback) {
     body.location = this.location;
   }
 
+  if (metadata.jobId) {
+    body.jobId = metadata.jobId;
+    delete metadata.jobId;
+  }
+
   this.bigQuery.createJob(body, callback);
 };
 
@@ -770,6 +790,8 @@ Table.prototype.createCopyFromJob = function(sourceTables, metadata, callback) {
  *     options are "CSV", "JSON", or "AVRO". Default: "CSV".
  * @param {boolean} options.gzip - Specify if you would like the file compressed
  *     with GZIP. Default: false.
+ * @param {string} [options.jobId] Custom job id.
+ * @param {string} [options.jobPrefix] Prefix to apply to the job id.
  * @param {function} callback - The callback function.
  * @param {?error} callback.err - An error returned while making this request
  * @param {Job} callback.job - The job used to export the table.
@@ -893,6 +915,11 @@ Table.prototype.createExtractJob = function(destination, options, callback) {
     body.location = this.location;
   }
 
+  if (options.jobId) {
+    body.jobId = options.jobId;
+    delete options.jobId;
+  }
+
   this.bigQuery.createJob(body, callback);
 };
 
@@ -915,6 +942,8 @@ Table.prototype.createExtractJob = function(destination, options, callback) {
  *     [`configuration.load`](http://goo.gl/BVcXk4) property of a Jobs resource.
  * @param {string} [metadata.format] The format the data being loaded is in.
  *     Allowed options are "CSV", "JSON", or "AVRO".
+ * @param {string} [metadata.jobId] Custom job id.
+ * @param {string} [metadata.jobPrefix] Prefix to apply to the job id.
  * @param {function} [callback] The callback function.
  * @param {?error} callback.err An error returned while making this request
  * @param {Job} callback.job The job used to load your data.
@@ -1040,6 +1069,11 @@ Table.prototype.createLoadJob = function(source, metadata, callback) {
     delete metadata.location;
   }
 
+  if (metadata.jobId) {
+    body.jobId = metadata.jobId;
+    delete metadata.jobId;
+  }
+
   extend(true, body.configuration.load, metadata, {
     sourceUris: arrify(source).map(function(src) {
       if (!common.util.isCustomType(src, 'storage/file')) {
@@ -1136,6 +1170,8 @@ Table.prototype.createReadStream = common.paginator.streamify('getRows');
  *     The metadata object should be in the format of the
  *     [`configuration.load`](http://goo.gl/BVcXk4) property of a Jobs resource.
  *     If a string is given, it will be used as the filetype.
+ * @param {string} [metadata.jobId] Custom job id.
+ * @param {string} [metadata.jobPrefix] Prefix to apply to the job id.
  * @returns {WritableStream}
  *
  * @throws {Error} If source format isn't recognized.
@@ -1201,7 +1237,11 @@ Table.prototype.createWriteStream = function(metadata) {
     },
   });
 
-  var jobId = uuid.v4();
+  var jobId = metadata.jobId || uuid.v4();
+
+  if (metadata.jobId) {
+    delete metadata.jobId;
+  }
 
   if (metadata.jobPrefix) {
     jobId = metadata.jobPrefix + jobId;
@@ -1261,6 +1301,8 @@ Table.prototype.createWriteStream = function(metadata) {
  *     options are "CSV", "JSON", or "AVRO". Default: "CSV".
  * @param {boolean} [options.gzip] Specify if you would like the file compressed
  *     with GZIP. Default: false.
+ * @param {string} [options.jobId] Custom id for the underlying job.
+ * @param {string} [options.jobPrefix] Prefix to apply to the underlying job id.
  * @param {function} [callback] The callback function.
  * @param {?error} callback.err An error returned while making this request
  * @param {object} callback.apiResponse The full API response.
@@ -1689,6 +1731,9 @@ Table.prototype.insert = function(rows, options, callback) {
  *     [`configuration.load`](http://goo.gl/BVcXk4) property of a Jobs resource.
  * @param {string} [metadata.format] The format the data being loaded is in.
  *     Allowed options are "CSV", "JSON", or "AVRO".
+ * @param {string} [metadata.jobId] Custom id for the underlying job.
+ * @param {string} [metadata.jobPrefix] Prefix to apply to the underlying job
+ *     id.
  * @param {function} [callback] The callback function.
  * @param {?error} callback.err An error returned while making this request
  * @param {object} callback.apiResponse The full API response.

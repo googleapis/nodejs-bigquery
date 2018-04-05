@@ -671,6 +671,8 @@ BigQuery.prototype.createDataset = function(id, options, callback) {
  *     accessed via `job.metadata`.
  * @param {string} [options.location] The geographic location of the job.
  *     Required except for US and EU.
+ * @param {string} [options.jobId] Custom job id.
+ * @param {string} [options.jobPrefix] Prefix to apply to the job id.
  * @param {string} options.query A query string, following the BigQuery query
  *     syntax, of the query to execute.
  * @param {boolean} [options.useLegacySql=false] Option to use legacy sql syntax.
@@ -799,6 +801,11 @@ BigQuery.prototype.createQueryJob = function(options, callback) {
     delete query.location;
   }
 
+  if (query.jobId) {
+    reqOpts.jobId = query.jobId;
+    delete query.jobId;
+  }
+
   this.createJob(reqOpts, callback);
 };
 
@@ -853,6 +860,7 @@ BigQuery.prototype.createQueryStream = common.paginator.streamify('query');
  * @see [Jobs: insert API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert}
  *
  * @param {object} options Object in the form of a [Job resource](https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs);
+ * @param {string} [options.jobId] Custom job id.
  * @param {string} [options.jobPrefix] Prefix to apply to the job id.
  * @param {string} [options.location] The geographic location of the job.
  *     Required except for US and EU.
@@ -895,7 +903,11 @@ BigQuery.prototype.createJob = function(options, callback) {
   var self = this;
 
   var reqOpts = extend({}, options);
-  var jobId = uuid.v4();
+  var jobId = reqOpts.jobId || uuid.v4();
+
+  if (reqOpts.jobId) {
+    delete reqOpts.jobId;
+  }
 
   if (reqOpts.jobPrefix) {
     jobId = reqOpts.jobPrefix + jobId;
@@ -1249,6 +1261,8 @@ BigQuery.prototype.job = function(id, options) {
  *     [Jobs: query request body](https://cloud.google.com/bigquery/docs/reference/v2/jobs/query#request-body).
  * @param {string} [query.location] The geographic location of the job.
  *     Required except for US and EU.
+ * @param {string} [query.jobId] Custom id for the underlying job.
+ * @param {string} [query.jobPrefix] Prefix to apply to the underlying job id.
  * @param {object|Array<*>} query.params For positional SQL parameters, provide
  *     an array of values. For named SQL parameters, provide an object which
  *     maps each named parameter to its value. The supported types are integers,
@@ -1333,6 +1347,11 @@ BigQuery.prototype.query = function(query, options, callback) {
   this.createQueryJob(query, function(err, job, resp) {
     if (err) {
       callback(err, null, resp);
+      return;
+    }
+
+    if (query.dryRun) {
+      callback(null, [], resp);
       return;
     }
 

@@ -623,6 +623,19 @@ describe('BigQuery/Table', function() {
       table.createCopyJob(DEST_TABLE, done);
     });
 
+    it('should accept a job id', function(done) {
+      var jobId = 'job-id';
+      var options = {jobId};
+
+      table.bigQuery.createJob = function(reqOpts, callback) {
+        assert.strictEqual(reqOpts.jobId, jobId);
+        assert.strictEqual(reqOpts.configuration.copy.jobId, undefined);
+        callback(); // the done fn
+      };
+
+      table.createCopyJob(DEST_TABLE, options, done);
+    });
+
     it('should pass the callback to createJob', function(done) {
       table.bigQuery.createJob = function(reqOpts, callback) {
         assert.strictEqual(done, callback);
@@ -741,6 +754,19 @@ describe('BigQuery/Table', function() {
 
       table.metadata.location = LOCATION;
       table.createCopyFromJob(SOURCE_TABLE, done);
+    });
+
+    it('should accept a job id', function(done) {
+      var jobId = 'job-id';
+      var options = {jobId};
+
+      table.bigQuery.createJob = function(reqOpts, callback) {
+        assert.strictEqual(reqOpts.jobId, jobId);
+        assert.strictEqual(reqOpts.configuration.copy.jobId, undefined);
+        callback(); // the done fn
+      };
+
+      table.createCopyFromJob(SOURCE_TABLE, options, done);
     });
 
     it('should pass the callback to createJob', function(done) {
@@ -933,6 +959,19 @@ describe('BigQuery/Table', function() {
       };
 
       table.createExtractJob(FILE, done);
+    });
+
+    it('should accept a job id', function(done) {
+      var jobId = 'job-id';
+      var options = {jobId};
+
+      table.bigQuery.createJob = function(reqOpts, callback) {
+        assert.strictEqual(reqOpts.jobId, jobId);
+        assert.strictEqual(reqOpts.configuration.extract.jobId, undefined);
+        callback(); // the done fn
+      };
+
+      table.createExtractJob(FILE, options, done);
     });
 
     it('should pass the callback to createJob', function(done) {
@@ -1149,6 +1188,19 @@ describe('BigQuery/Table', function() {
       };
 
       table.createLoadJob(FILE, done);
+    });
+
+    it('should accept a job id', function(done) {
+      var jobId = 'job-id';
+      var options = {jobId};
+
+      table.bigQuery.createJob = function(reqOpts) {
+        assert.strictEqual(reqOpts.jobId, jobId);
+        assert.strictEqual(reqOpts.configuration.load.jobId, undefined);
+        done();
+      };
+
+      table.createLoadJob(FILE, options, assert.ifError);
     });
 
     describe('formats', function() {
@@ -1395,7 +1447,24 @@ describe('BigQuery/Table', function() {
           done();
         };
 
-        table.createWriteStream().emit('writing');
+        table.createReadStream().emit('writing');
+      });
+
+      it('should accept a job id', function(done) {
+        var jobId = 'job-id';
+        var options = {jobId};
+
+        makeWritableStreamOverride = function(stream, options) {
+          var jobReference = options.metadata.jobReference;
+          assert.strictEqual(jobReference.jobId, jobId);
+
+          var config = options.metadata.configuration.load;
+          assert.strictEqual(config.jobId, undefined);
+
+          done();
+        };
+
+        table.createWriteStream(options).emit('writing');
       });
 
       it('should create a job and emit it with complete', function(done) {
