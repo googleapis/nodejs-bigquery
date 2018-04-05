@@ -112,17 +112,12 @@ describe('BigQuery/Job', function() {
         exists: true,
         get: true,
         setMetadata: true,
+        getMetadata: {
+          reqOpts: {
+            qs: {location: undefined},
+          },
+        },
       });
-    });
-
-    it('should initialize the metadata', function() {
-      assert.deepEqual(job.metadata, {});
-    });
-
-    it('should get the location from the jobReference', function() {
-      assert.strictEqual(job.location, undefined);
-      job.metadata.jobReference = {location: LOCATION};
-      assert.strictEqual(job.location, LOCATION);
     });
 
     it('should accept a location option', function() {
@@ -153,60 +148,6 @@ describe('BigQuery/Job', function() {
       };
 
       job.cancel(assert.ifError);
-    });
-  });
-
-  describe('getMetadata', function() {
-    it('should make the correct request', function(done) {
-      job.request = function(config) {
-        assert.strictEqual(config.uri, '');
-        done();
-      };
-
-      job.getMetadata(assert.ifError);
-    });
-
-    it('should send the location', function(done) {
-      var job = new Job(BIGQUERY, JOB_ID, {location: LOCATION});
-
-      job.request = function(config) {
-        assert.deepEqual(config.qs, {location: LOCATION});
-        done();
-      };
-
-      job.getMetadata(assert.ifError);
-    });
-
-    it('should return any errors to the callback', function(done) {
-      var error = new Error('err');
-      var response = {};
-
-      job.request = function(config, callback) {
-        callback(error, response);
-      };
-
-      job.getMetadata(function(err, metadata, resp) {
-        assert.strictEqual(err, error);
-        assert.strictEqual(metadata, null);
-        assert.strictEqual(resp, response);
-        done();
-      });
-    });
-
-    it('should update the metadata and exec the callback', function(done) {
-      var response = {};
-
-      job.request = function(config, callback) {
-        callback(null, response);
-      };
-
-      job.getMetadata(function(err, metadata, resp) {
-        assert.ifError(err);
-        assert.strictEqual(metadata, response);
-        assert.strictEqual(resp, response);
-        assert.strictEqual(job.metadata, response);
-        done();
-      });
     });
   });
 

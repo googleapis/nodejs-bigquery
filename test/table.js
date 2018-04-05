@@ -192,13 +192,10 @@ describe('BigQuery/Table', function() {
       });
     });
 
-    it('should initialize metadata', function() {
-      assert.deepEqual(table.metadata, {});
-    });
+    it('should capture the location', function() {
+      var options = {location: LOCATION};
+      var table = new Table(DATASET, TABLE_ID, options);
 
-    it('should get the location from the metadata', function() {
-      assert.strictEqual(table.location, undefined);
-      table.metadata.location = LOCATION;
       assert.strictEqual(table.location, LOCATION);
     });
 
@@ -619,7 +616,7 @@ describe('BigQuery/Table', function() {
         callback(); // the done fn
       };
 
-      table.metadata.location = LOCATION;
+      table.location = LOCATION;
       table.createCopyJob(DEST_TABLE, done);
     });
 
@@ -752,7 +749,7 @@ describe('BigQuery/Table', function() {
         callback(); // the done fn
       };
 
-      table.metadata.location = LOCATION;
+      table.location = LOCATION;
       table.createCopyFromJob(SOURCE_TABLE, done);
     });
 
@@ -1447,7 +1444,7 @@ describe('BigQuery/Table', function() {
           done();
         };
 
-        table.createReadStream().emit('writing');
+        table.createWriteStream().emit('writing');
       });
 
       it('should accept a job id', function(done) {
@@ -1469,9 +1466,14 @@ describe('BigQuery/Table', function() {
 
       it('should create a job and emit it with complete', function(done) {
         var jobId = 'job-id';
-        var metadata = {jobReference: {jobId: jobId}, a: 'b', c: 'd'};
+        var metadata = {
+          jobReference: {jobId, location: LOCATION},
+          a: 'b',
+          c: 'd',
+        };
 
-        table.bigQuery.job = function(id) {
+        table.bigQuery.job = function(id, options) {
+          assert.strictEqual(options.location, LOCATION);
           return {id: id};
         };
 

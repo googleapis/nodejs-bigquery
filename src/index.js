@@ -944,9 +944,11 @@ BigQuery.prototype.createJob = function(options, callback) {
         });
       }
 
-      var job = self.job(jobId);
-      job.metadata = resp;
+      var job = self.job(jobId, {
+        location: resp.jobReference.location,
+      });
 
+      job.metadata = resp;
       callback(err, job, resp);
     }
   );
@@ -968,7 +970,7 @@ BigQuery.prototype.createJob = function(options, callback) {
  */
 BigQuery.prototype.dataset = function(id, options) {
   if (this.location) {
-    options = extend({}, options, {location: this.location});
+    options = extend({location: this.location}, options);
   }
 
   return new Dataset(this, id, options);
@@ -1052,7 +1054,10 @@ BigQuery.prototype.getDatasets = function(options, callback) {
       }
 
       var datasets = (resp.datasets || []).map(function(dataset) {
-        var ds = that.dataset(dataset.datasetReference.datasetId);
+        var ds = that.dataset(dataset.datasetReference.datasetId, {
+          location: dataset.location,
+        });
+
         ds.metadata = dataset;
         return ds;
       });
@@ -1185,7 +1190,10 @@ BigQuery.prototype.getJobs = function(options, callback) {
       }
 
       var jobs = (resp.jobs || []).map(function(jobObject) {
-        var job = that.job(jobObject.jobReference.jobId);
+        var job = that.job(jobObject.jobReference.jobId, {
+          location: jobObject.jobReference.location,
+        });
+
         job.metadata = jobObject;
         return job;
       });
@@ -1244,7 +1252,7 @@ BigQuery.prototype.getJobsStream = common.paginator.streamify('getJobs');
  */
 BigQuery.prototype.job = function(id, options) {
   if (this.location) {
-    options = extend({}, options, {location: this.location});
+    options = extend({location: this.location}, options);
   }
 
   return new Job(this, id, options);

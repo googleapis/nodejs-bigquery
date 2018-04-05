@@ -849,6 +849,9 @@ describe('BigQuery', function() {
       status: {
         state: 'RUNNING',
       },
+      jobReference: {
+        location: LOCATION,
+      },
     };
 
     var fakeJobId;
@@ -928,7 +931,7 @@ describe('BigQuery', function() {
       bq.createJob(options, assert.ifError);
     });
 
-    it('should use the user defined option if available', function(done) {
+    it('should use the user defined location if available', function(done) {
       var bq = new BigQuery({
         projectId: PROJECT_ID,
         location: LOCATION,
@@ -981,8 +984,9 @@ describe('BigQuery', function() {
     it('should return a job object', function(done) {
       var fakeJob = {};
 
-      bq.job = function(jobId) {
+      bq.job = function(jobId, options) {
         assert.strictEqual(jobId, fakeJobId);
+        assert.strictEqual(options.location, LOCATION);
         return fakeJob;
       };
 
@@ -1327,15 +1331,29 @@ describe('BigQuery', function() {
     });
 
     it('should return Dataset objects', function(done) {
+      var datasetId = 'datasetName';
+
       bq.request = function(reqOpts, callback) {
         callback(null, {
-          datasets: [{datasetReference: {datasetId: 'datasetName'}}],
+          datasets: [
+            {
+              datasetReference: {datasetId},
+              location: LOCATION,
+            },
+          ],
         });
       };
 
       bq.getDatasets(function(err, datasets) {
         assert.ifError(err);
-        assert(datasets[0] instanceof FakeDataset);
+
+        var dataset = datasets[0];
+        var args = dataset.calledWith_;
+
+        assert(dataset instanceof FakeDataset);
+        assert.strictEqual(args[0], bq);
+        assert.strictEqual(args[1], datasetId);
+        assert.deepEqual(args[2], {location: LOCATION});
         done();
       });
     });
@@ -1451,6 +1469,7 @@ describe('BigQuery', function() {
               id: JOB_ID,
               jobReference: {
                 jobId: JOB_ID,
+                location: LOCATION,
               },
             },
           ],
@@ -1459,7 +1478,14 @@ describe('BigQuery', function() {
 
       bq.getJobs(function(err, jobs) {
         assert.ifError(err);
-        assert(jobs[0] instanceof FakeJob);
+
+        var job = jobs[0];
+        var args = job.calledWith_;
+
+        assert(job instanceof FakeJob);
+        assert.strictEqual(args[0], bq);
+        assert.strictEqual(args[1], JOB_ID);
+        assert.deepEqual(args[2], {location: LOCATION});
         done();
       });
     });

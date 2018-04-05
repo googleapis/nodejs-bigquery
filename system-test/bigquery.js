@@ -534,11 +534,15 @@ describe('BigQuery', function() {
     });
 
     describe('location', function() {
-      var dataset = bigquery.dataset(generateName('dataset'));
+      var LOCATION = 'asia-northeast1';
+
+      var dataset = bigquery.dataset(generateName('dataset'), {
+        location: LOCATION,
+      });
+
       var table = dataset.table(generateName('table'));
       var job;
 
-      var LOCATION = 'asia-northeast1';
       var QUERY = `SELECT * FROM \`${table.id}\``;
       var SCHEMA = require('./data/schema.json');
       var TEST_DATA_FILE = require.resolve('./data/location-test-data.json');
@@ -547,7 +551,7 @@ describe('BigQuery', function() {
         // create a dataset in a certain location will cascade the location
         // to any jobs created through it
         return dataset
-          .create({location: LOCATION})
+          .create()
           .then(function() {
             return table.create({schema: SCHEMA});
           })

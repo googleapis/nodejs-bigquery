@@ -101,22 +101,12 @@ describe('BigQuery/Dataset', function() {
       assert(promisified);
     });
 
-    it('should inherit from ServiceObject', function(done) {
-      var bigQueryInstance = extend({}, BIGQUERY, {
-        createDataset: {
-          bind: function(context) {
-            assert.strictEqual(context, bigQueryInstance);
-            done();
-          },
-        },
-      });
-
-      var ds = new Dataset(bigQueryInstance, DATASET_ID);
+    it('should inherit from ServiceObject', function() {
       assert(ds instanceof ServiceObject);
 
       var calledWith = ds.calledWith_[0];
 
-      assert.strictEqual(calledWith.parent, bigQueryInstance);
+      assert.strictEqual(calledWith.parent, BIGQUERY);
       assert.strictEqual(calledWith.baseUrl, '/datasets');
       assert.strictEqual(calledWith.id, DATASET_ID);
       assert.deepEqual(calledWith.methods, {
@@ -128,22 +118,52 @@ describe('BigQuery/Dataset', function() {
       });
     });
 
-    it('should get the location from the metadata', function() {
-      assert.strictEqual(ds.location, undefined);
-      ds.metadata.location = LOCATION;
+    it('should capture user provided location', function() {
+      var options = {location: LOCATION};
+      var ds = new Dataset(BIGQUERY, DATASET_ID, options);
+
       assert.strictEqual(ds.location, LOCATION);
     });
 
-    describe('metadata', function() {
-      it('should default the metadata property', function() {
-        assert.deepEqual(ds.metadata, {});
+    describe('createMethod', function() {
+      var bq;
+      var ds;
+      var config;
+
+      beforeEach(function() {
+        bq = extend(true, {}, BIGQUERY);
+        ds = new Dataset(bq, DATASET_ID);
+        config = ds.calledWith_[0];
       });
 
-      it('should capture user provided location', function() {
-        var metadata = {location: LOCATION};
-        var ds = new Dataset(BIGQUERY, DATASET_ID, metadata);
+      it('should call through to BigQuery#createDataset', function(done) {
+        var OPTIONS = {};
 
-        assert.strictEqual(ds.metadata.location, LOCATION);
+        bq.createDataset = function(id, options, callback) {
+          assert.strictEqual(id, DATASET_ID);
+          assert.deepEqual(options, OPTIONS);
+          callback(); // the done fn
+        };
+
+        config.createMethod(DATASET_ID, OPTIONS, done);
+      });
+
+      it('should optionally accept options', function(done) {
+        bq.createDataset = function(id, options, callback) {
+          callback(); // the done fn
+        };
+
+        config.createMethod(DATASET_ID, done);
+      });
+
+      it('should pass the location', function(done) {
+        bq.createDataset = function(id, options, callback) {
+          assert.strictEqual(options.location, LOCATION);
+          callback(); // the done fn
+        };
+
+        ds.location = LOCATION;
+        config.createMethod(DATASET_ID, done);
       });
     });
 
@@ -229,7 +249,7 @@ describe('BigQuery/Dataset', function() {
         callback(); // the done fn
       };
 
-      ds.metadata.location = LOCATION;
+      ds.location = LOCATION;
       ds.createQueryJob(fakeOptions, done);
     });
 
@@ -303,7 +323,7 @@ describe('BigQuery/Dataset', function() {
         done();
       };
 
-      ds.metadata.location = LOCATION;
+      ds.location = LOCATION;
       ds.createQueryStream();
     });
 
@@ -456,6 +476,22 @@ describe('BigQuery/Dataset', function() {
       });
     });
 
+    it('should pass the location to the Table', function(done) {
+      var response = extend({location: LOCATION}, API_RESPONSE);
+
+      ds.request = function(reqOpts, callback) {
+        callback(null, response);
+      };
+
+      ds.table = function(id, options) {
+        assert.strictEqual(options.location, LOCATION);
+        setImmediate(done);
+        return {};
+      };
+
+      ds.createTable(TABLE_ID, {schema: SCHEMA_OBJECT}, assert.ifError);
+    });
+
     it('should return an apiResponse', function(done) {
       var opts = {id: TABLE_ID, schema: SCHEMA_OBJECT};
 
@@ -595,14 +631,14 @@ describe('BigQuery/Dataset', function() {
     });
 
     describe('success', function() {
+      var tableId = 'tableName';
       var apiResponse = {
         tables: [
           {
             a: 'b',
             c: 'd',
-            tableReference: {
-              tableId: 'tableName',
-            },
+            tableReference: {tableId},
+            location: LOCATION,
           },
         ],
       };
@@ -616,8 +652,12 @@ describe('BigQuery/Dataset', function() {
       it('should return Table & apiResponse', function(done) {
         ds.getTables(function(err, tables, nextQuery, apiResponse_) {
           assert.ifError(err);
-          assert(tables[0] instanceof Table);
-          assert(tables[0].id, apiResponse.tables[0].tableReference.tableId);
+
+          var table = tables[0];
+
+          assert(table instanceof Table);
+          assert.strictEqual(table.id, tableId);
+          assert.strictEqual(table.location, LOCATION);
           assert.strictEqual(apiResponse_, apiResponse);
           done();
         });
@@ -706,7 +746,7 @@ describe('BigQuery/Dataset', function() {
         done();
       };
 
-      ds.metadata.location = LOCATION;
+      ds.location = LOCATION;
       ds.query();
     });
 
@@ -740,19 +780,19 @@ describe('BigQuery/Dataset', function() {
     });
 
     it('should inherit the dataset location', function() {
-      ds.metadata.location = LOCATION;
+      ds.location = LOCATION;
       var table = ds.table('tableId');
 
       assert.strictEqual(table.location, LOCATION);
     });
 
-    it('should pass along the metadata if provided', function() {
-      ds.metadata.location = LOCATION;
+    it('should pass along the location if provided', function() {
+      ds.location = LOCATION;
 
-      var metadata = {location: 'US'};
-      var table = ds.table('tableId', metadata);
+      var location = 'US';
+      var table = ds.table('tableId', {location});
 
-      assert.deepEqual(table.metadata, metadata);
+      assert.strictEqual(table.location, location);
     });
   });
 });

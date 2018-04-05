@@ -64,7 +64,9 @@ var FORMATS = {
  * const table = dataset.table('my-table');
  */
 function Table(dataset, id, options) {
-  options = options || {};
+  if (options && options.location) {
+    this.location = options.location;
+  }
 
   var methods = {
     /**
@@ -281,32 +283,6 @@ function Table(dataset, id, options) {
 
   this.bigQuery = dataset.bigQuery;
   this.dataset = dataset;
-
-  /**
-   * @name Table#metadata
-   * @type {object}
-   */
-  this.metadata = {};
-
-  if (options.location) {
-    this.metadata.location = options.location;
-  }
-
-  /*!
-   * If a location comes back in an apiResponse, we need to capture it and
-   * send it on all subsequent job requests. Failure to do so will result in
-   * an upstream error. It's possible that the user won't provide a location,
-   * hence the need for a getter.
-   */
-  /**
-   * @name Table#location
-   * @type {string}
-   */
-  Object.defineProperty(this, 'location', {
-    get: function() {
-      return this.metadata.location;
-    },
-  });
 
   // Catch all for read-modify-write cycle
   // https://cloud.google.com/bigquery/docs/api-performance#read-patch-write
@@ -1280,9 +1256,11 @@ Table.prototype.createWriteStream = function(metadata) {
         },
       },
       function(data) {
-        var job = self.bigQuery.job(data.jobReference.jobId);
-        job.metadata = data;
+        var job = self.bigQuery.job(data.jobReference.jobId, {
+          location: data.jobReference.location,
+        });
 
+        job.metadata = data;
         dup.emit('complete', job);
       }
     );

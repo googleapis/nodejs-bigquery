@@ -40,7 +40,11 @@ var Table = require('./table.js');
  * const dataset = bigquery.dataset('institutions');
  */
 function Dataset(bigQuery, id, options) {
-  options = options || {};
+  var self = this;
+
+  if (options && options.location) {
+    this.location = options.location;
+  }
 
   var methods = {
     /**
@@ -204,37 +208,19 @@ function Dataset(bigQuery, id, options) {
     parent: bigQuery,
     baseUrl: '/datasets',
     id: id,
-    createMethod: bigQuery.createDataset.bind(bigQuery),
     methods: methods,
+    createMethod: function(id, options, callback) {
+      if (is.fn(options)) {
+        callback = options;
+        options = {};
+      }
+
+      options = extend({}, options, {location: self.location});
+      return bigQuery.createDataset(id, options, callback);
+    },
   });
 
   this.bigQuery = bigQuery;
-
-  /**
-   * @name Dataset#metadata
-   * @type {object}
-   */
-  this.metadata = {};
-
-  if (options.location) {
-    this.metadata.location = options.location;
-  }
-
-  /*!
-   * If a location comes back in an apiResponse, we need to capture it and
-   * send it on all subsequent job requests. Failure to do so will result in
-   * an upstream error. It's possible that the user won't provide a location,
-   * hence the need for a getter.
-   */
-  /**
-   * @name Dataset#location
-   * @type {string}
-   */
-  Object.defineProperty(this, 'location', {
-    get: function() {
-      return this.metadata.location;
-    },
-  });
 
   // Catch all for read-modify-write cycle
   // https://cloud.google.com/bigquery/docs/api-performance#read-patch-write
@@ -378,9 +364,11 @@ Dataset.prototype.createTable = function(id, options, callback) {
         return;
       }
 
-      var table = self.table(resp.tableReference.tableId);
-      table.metadata = resp;
+      var table = self.table(resp.tableReference.tableId, {
+        location: resp.location,
+      });
 
+      table.metadata = resp;
       callback(null, table, resp);
     }
   );
@@ -517,7 +505,10 @@ Dataset.prototype.getTables = function(options, callback) {
       }
 
       var tables = (resp.tables || []).map(function(tableObject) {
-        var table = that.table(tableObject.tableReference.tableId);
+        var table = that.table(tableObject.tableReference.tableId, {
+          location: tableObject.location,
+        });
+
         table.metadata = tableObject;
         return table;
       });
