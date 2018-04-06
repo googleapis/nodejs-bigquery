@@ -287,7 +287,7 @@ describe('BigQuery', function() {
   });
 
   it('should honor the job id option', function(done) {
-    var jobId = 'hi-im-a-job-id';
+    var jobId = `hi-im-a-job-id-${uuid.v4()}`;
     var options = {query, jobId};
 
     bigquery.createQueryJob(options, function(err, job) {
