@@ -30,13 +30,22 @@ var Table = require('./table.js');
  * @class
  * @param {BigQuery} bigQuery {@link BigQuery} instance.
  * @param {string} id The ID of the Dataset.
+ * @param {object} [options] Dataset options.
+ * @param {string} [options.location] The geographic location of the dataset.
+ *      Defaults to US.
  *
  * @example
  * const BigQuery = require('@google-cloud/bigquery');
  * const bigquery = new BigQuery();
  * const dataset = bigquery.dataset('institutions');
  */
-function Dataset(bigQuery, id) {
+function Dataset(bigQuery, id, options) {
+  var self = this;
+
+  if (options && options.location) {
+    this.location = options.location;
+  }
+
   var methods = {
     /**
      * Create a dataset.
@@ -199,8 +208,16 @@ function Dataset(bigQuery, id) {
     parent: bigQuery,
     baseUrl: '/datasets',
     id: id,
-    createMethod: bigQuery.createDataset.bind(bigQuery),
     methods: methods,
+    createMethod: function(id, options, callback) {
+      if (is.fn(options)) {
+        callback = options;
+        options = {};
+      }
+
+      options = extend({}, options, {location: self.location});
+      return bigQuery.createDataset(id, options, callback);
+    },
   });
 
   this.bigQuery = bigQuery;
@@ -244,6 +261,7 @@ Dataset.prototype.createQueryJob = function(options, callback) {
     defaultDataset: {
       datasetId: this.id,
     },
+    location: this.location,
   });
 
   return this.bigQuery.createQueryJob(options, callback);
@@ -270,6 +288,7 @@ Dataset.prototype.createQueryStream = function(options) {
     defaultDataset: {
       datasetId: this.id,
     },
+    location: this.location,
   });
 
   return this.bigQuery.createQueryStream(options);
@@ -345,9 +364,11 @@ Dataset.prototype.createTable = function(id, options, callback) {
         return;
       }
 
-      var table = self.table(resp.tableReference.tableId);
-      table.metadata = resp;
+      var table = self.table(resp.tableReference.tableId, {
+        location: resp.location,
+      });
 
+      table.metadata = resp;
       callback(null, table, resp);
     }
   );
@@ -484,7 +505,10 @@ Dataset.prototype.getTables = function(options, callback) {
       }
 
       var tables = (resp.tables || []).map(function(tableObject) {
-        var table = that.table(tableObject.tableReference.tableId);
+        var table = that.table(tableObject.tableReference.tableId, {
+          location: tableObject.location,
+        });
+
         table.metadata = tableObject;
         return table;
       });
@@ -545,6 +569,7 @@ Dataset.prototype.query = function(options, callback) {
     defaultDataset: {
       datasetId: this.id,
     },
+    location: this.location,
   });
 
   return this.bigQuery.query(options, callback);
@@ -554,6 +579,13 @@ Dataset.prototype.query = function(options, callback) {
  * Create a Table object.
  *
  * @param {string} id The ID of the table.
+ * @param {object} [options] Table options.
+ * @param {string} [options.location] The geographic location of the table, by
+ *      default this value is inherited from the dataset. This can be used to
+ *      configure the location of all jobs created through a table instance. It
+ *      cannot be used to set the actual location of the table. This value will
+ *      be superseded by any API responses containing location data for the
+ *      table.
  * @return {Table}
  *
  * @example
@@ -563,8 +595,15 @@ Dataset.prototype.query = function(options, callback) {
  *
  * const institutions = dataset.table('institution_data');
  */
-Dataset.prototype.table = function(id) {
-  return new Table(this, id);
+Dataset.prototype.table = function(id, options) {
+  options = extend(
+    {
+      location: this.location,
+    },
+    options
+  );
+
+  return new Table(this, id, options);
 };
 
 /*! Developer Documentation

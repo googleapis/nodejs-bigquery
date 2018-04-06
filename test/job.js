@@ -18,7 +18,7 @@
 
 var arrify = require('arrify');
 var assert = require('assert');
-var is = require('is');
+var extend = require('extend');
 var proxyquire = require('proxyquire');
 
 var util = require('@google-cloud/common').util;
@@ -68,6 +68,8 @@ describe('BigQuery/Job', function() {
     Promise: Promise,
   };
   var JOB_ID = 'job_XYrk_3z';
+  var LOCATION = 'asia-northeast1';
+
   var Job;
   var job;
 
@@ -110,39 +112,30 @@ describe('BigQuery/Job', function() {
       assert.deepEqual(calledWith.methods, {
         exists: true,
         get: true,
-        getMetadata: true,
         setMetadata: true,
+        getMetadata: {
+          reqOpts: {
+            qs: {location: undefined},
+          },
+        },
       });
     });
 
-    describe('request interceptor', function() {
-      it('should assign a request interceptor for /cancel', function() {
-        var requestInterceptor = job.interceptors.pop().request;
-        assert(is.fn(requestInterceptor));
-      });
+    it('should accept a location option', function() {
+      var options = {location: 'US'};
+      var job = new Job(BIGQUERY, JOB_ID, options);
 
-      it('should transform `projects` -> `project` for /cancel', function() {
-        var reqOpts = {
-          uri: '/bigquery/v2/projects/projectId/jobs/jobId/cancel',
-        };
-        var expectedReqOpts = {
-          uri: '/bigquery/v2/project/projectId/jobs/jobId/cancel',
-        };
+      assert.strictEqual(job.location, options.location);
+    });
 
-        var requestInterceptor = job.interceptors.pop().request;
-        assert.deepEqual(requestInterceptor(reqOpts), expectedReqOpts);
-      });
+    it('should send the location via getMetadata', function() {
+      var job = new Job(BIGQUERY, JOB_ID, {location: LOCATION});
+      var calledWith = job.calledWith_[0];
 
-      it('should not affect non-cancel requests', function() {
-        var reqOpts = {
-          uri: '/bigquery/v2/projects/projectId/jobs/jobId/getQueryResults',
-        };
-        var expectedReqOpts = {
-          uri: '/bigquery/v2/projects/projectId/jobs/jobId/getQueryResults',
-        };
-
-        var requestInterceptor = job.interceptors.pop().request;
-        assert.deepEqual(requestInterceptor(reqOpts), expectedReqOpts);
+      assert.deepEqual(calledWith.methods.getMetadata, {
+        reqOpts: {
+          qs: {location: LOCATION},
+        },
       });
     });
   });
@@ -158,32 +151,15 @@ describe('BigQuery/Job', function() {
       job.cancel(assert.ifError);
     });
 
-    it('should not require a callback', function(done) {
-      job.request = function(reqOpts, callback) {
-        assert.doesNotThrow(function() {
-          callback();
-          done();
-        });
-      };
+    it('should include the job location', function(done) {
+      var job = new Job(BIGQUERY, JOB_ID, {location: LOCATION});
 
-      job.cancel();
-    });
-
-    it('should execute callback with only error & API resp', function(done) {
-      var arg1 = {};
-      var arg2 = {};
-      var arg3 = {};
-
-      job.request = function(reqOpts, callback) {
-        callback(arg1, arg2, arg3);
-      };
-
-      job.cancel(function(arg1_, arg2_) {
-        assert.strictEqual(arguments.length, 2);
-        assert.strictEqual(arg1_, arg1);
-        assert.strictEqual(arg2_, arg2);
+      job.request = function(reqOpts) {
+        assert.deepEqual(reqOpts.qs, {location: LOCATION});
         done();
-      });
+      };
+
+      job.cancel(assert.ifError);
     });
   });
 
@@ -192,6 +168,7 @@ describe('BigQuery/Job', function() {
     var options = {
       a: 'a',
       b: 'b',
+      location: 'US',
     };
 
     var RESPONSE = {
@@ -210,20 +187,31 @@ describe('BigQuery/Job', function() {
     });
 
     it('should make the correct request', function(done) {
-      var options = {};
-
       BIGQUERY.request = function(reqOpts) {
         assert.strictEqual(reqOpts.uri, '/queries/' + JOB_ID);
-        assert.strictEqual(reqOpts.qs, options);
+        done();
+      };
+
+      job.getQueryResults(assert.ifError);
+    });
+
+    it('should optionally accept options', function(done) {
+      var options = {a: 'b'};
+      var expectedOptions = extend({location: undefined}, options);
+
+      BIGQUERY.request = function(reqOpts) {
+        assert.deepEqual(reqOpts.qs, expectedOptions);
         done();
       };
 
       job.getQueryResults(options, assert.ifError);
     });
 
-    it('should optionally accept options', function(done) {
+    it('should inherit the location', function(done) {
+      var job = new Job(BIGQUERY, JOB_ID, {location: LOCATION});
+
       BIGQUERY.request = function(reqOpts) {
-        assert.deepEqual(reqOpts.qs, {});
+        assert.deepEqual(reqOpts.qs, {location: LOCATION});
         done();
       };
 

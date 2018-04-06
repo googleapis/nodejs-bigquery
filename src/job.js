@@ -43,6 +43,9 @@ var util = require('util');
  * @class
  * @param {BigQuery} bigQuery {@link BigQuery} instance.
  * @param {string} id The ID of the job.
+ * @param {object} [options] Configuration object.
+ * @param {string} [options.location] The geographic location of the job.
+ *      Required except for US and EU.
  *
  * @example
  * const BigQuery = require('@google-cloud/bigquery');
@@ -74,7 +77,11 @@ var util = require('util');
  * //-
  * job.removeAllListeners();
  */
-function Job(bigQuery, id) {
+function Job(bigQuery, id, options) {
+  if (options && options.location) {
+    this.location = options.location;
+  }
+
   var methods = {
     /**
      * Check if the job exists.
@@ -141,7 +148,6 @@ function Job(bigQuery, id) {
      *
      * @see [Jobs: get API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/get}
      *
-     * @method Job#getMetadata
      * @param {function} [callback] The callback function.
      * @param {?error} callback.err An error returned while making this
      *     request.
@@ -164,7 +170,11 @@ function Job(bigQuery, id) {
      *   const apiResponse = data[1];
      * });
      */
-    getMetadata: true,
+    getMetadata: {
+      reqOpts: {
+        qs: {location: this.location},
+      },
+    },
 
     /**
      * Set the metadata for this job. This can be useful for updating job
@@ -214,18 +224,6 @@ function Job(bigQuery, id) {
   });
 
   this.bigQuery = bigQuery;
-
-  // The API endpoint for cancel is:    .../bigquery/v2/project/projectId/...
-  // The rest of the API endpoints are: .../bigquery/v2/projects/projectId/...
-  // Reference: https://github.com/GoogleCloudPlatform/google-cloud-node/issues/1027
-  this.interceptors.push({
-    request: function(reqOpts) {
-      if (reqOpts.uri.indexOf('/cancel') > -1) {
-        reqOpts.uri = reqOpts.uri.replace('/projects/', '/project/');
-      }
-      return reqOpts;
-    },
-  });
 }
 
 util.inherits(Job, common.Operation);
@@ -261,16 +259,19 @@ util.inherits(Job, common.Operation);
  * });
  */
 Job.prototype.cancel = function(callback) {
-  callback = callback || common.util.noop;
+  var qs;
+
+  if (this.location) {
+    qs = {location: this.location};
+  }
 
   this.request(
     {
       method: 'POST',
       uri: '/cancel',
+      qs,
     },
-    function(err, resp) {
-      callback(err, resp);
-    }
+    callback
   );
 };
 
@@ -363,6 +364,13 @@ Job.prototype.getQueryResults = function(options, callback) {
     callback = options;
     options = {};
   }
+
+  options = extend(
+    {
+      location: this.location,
+    },
+    options
+  );
 
   this.bigQuery.request(
     {

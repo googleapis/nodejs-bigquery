@@ -53,6 +53,8 @@ var Table = require('./table.js');
  *     attempted before returning the error.
  * @property {Constructor} [promise] Custom promise module to use instead of
  *     native Promises.
+ * @property {string} [location] The geographic location of all datasets and
+ *     jobs referenced and created through the client.
  */
 
 /**
@@ -102,6 +104,12 @@ function BigQuery(options) {
   };
 
   common.Service.call(this, config, options);
+
+  /**
+   * @name BigQuery#location
+   * @type {string}
+   */
+  this.location = options.location;
 }
 
 util.inherits(BigQuery, common.Service);
@@ -617,11 +625,18 @@ BigQuery.prototype.createDataset = function(id, options, callback) {
     {
       method: 'POST',
       uri: '/datasets',
-      json: extend(true, {}, options, {
-        datasetReference: {
-          datasetId: id,
+      json: extend(
+        true,
+        {
+          location: this.location,
         },
-      }),
+        options,
+        {
+          datasetReference: {
+            datasetId: id,
+          },
+        }
+      ),
     },
     function(err, resp) {
       if (err) {
@@ -654,6 +669,8 @@ BigQuery.prototype.createDataset = function(id, options, callback) {
  * @param {boolean} [options.dryRun] If set, don't actually run this job. A
  *     valid query will update the job with processing statistics. These can be
  *     accessed via `job.metadata`.
+ * @param {string} [options.location] The geographic location of the job.
+ *     Required except for US and EU.
  * @param {string} [options.jobId] Custom job id.
  * @param {string} [options.jobPrefix] Prefix to apply to the job id.
  * @param {string} options.query A query string, following the BigQuery query
@@ -779,6 +796,11 @@ BigQuery.prototype.createQueryJob = function(options, callback) {
     delete query.jobPrefix;
   }
 
+  if (query.location) {
+    reqOpts.location = query.location;
+    delete query.location;
+  }
+
   if (query.jobId) {
     reqOpts.jobId = query.jobId;
     delete query.jobId;
@@ -840,6 +862,8 @@ BigQuery.prototype.createQueryStream = common.paginator.streamify('query');
  * @param {object} options Object in the form of a [Job resource](https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs);
  * @param {string} [options.jobId] Custom job id.
  * @param {string} [options.jobPrefix] Prefix to apply to the job id.
+ * @param {string} [options.location] The geographic location of the job.
+ *     Required except for US and EU.
  * @param {function} [callback] The callback function.
  * @param {?error} callback.err An error returned while making this request.
  * @param {Job} callback.job The newly created job.
@@ -893,7 +917,13 @@ BigQuery.prototype.createJob = function(options, callback) {
   reqOpts.jobReference = {
     projectId: this.projectId,
     jobId: jobId,
+    location: this.location,
   };
+
+  if (options.location) {
+    reqOpts.jobReference.location = options.location;
+    delete reqOpts.location;
+  }
 
   this.request(
     {
@@ -907,10 +937,19 @@ BigQuery.prototype.createJob = function(options, callback) {
         return;
       }
 
-      var job = self.job(jobId);
-      job.metadata = resp;
+      if (resp.status.errors) {
+        err = new common.util.ApiError({
+          errors: resp.status.errors,
+          response: resp,
+        });
+      }
 
-      callback(null, job, resp);
+      var job = self.job(jobId, {
+        location: resp.jobReference.location,
+      });
+
+      job.metadata = resp;
+      callback(err, job, resp);
     }
   );
 };
@@ -919,6 +958,9 @@ BigQuery.prototype.createJob = function(options, callback) {
  * Create a reference to a dataset.
  *
  * @param {string} id ID of the dataset.
+ * @param {object} [options] Dataset options.
+ * @param {string} [options.location] The geographic location of the dataset.
+ *      Required except for US and EU.
  * @returns {Dataset}
  *
  * @example
@@ -926,8 +968,12 @@ BigQuery.prototype.createJob = function(options, callback) {
  * const bigquery = new BigQuery();
  * const dataset = bigquery.dataset('higher_education');
  */
-BigQuery.prototype.dataset = function(id) {
-  return new Dataset(this, id);
+BigQuery.prototype.dataset = function(id, options) {
+  if (this.location) {
+    options = extend({location: this.location}, options);
+  }
+
+  return new Dataset(this, id, options);
 };
 
 /**
@@ -1008,7 +1054,10 @@ BigQuery.prototype.getDatasets = function(options, callback) {
       }
 
       var datasets = (resp.datasets || []).map(function(dataset) {
-        var ds = that.dataset(dataset.datasetReference.datasetId);
+        var ds = that.dataset(dataset.datasetReference.datasetId, {
+          location: dataset.location,
+        });
+
         ds.metadata = dataset;
         return ds;
       });
@@ -1141,7 +1190,10 @@ BigQuery.prototype.getJobs = function(options, callback) {
       }
 
       var jobs = (resp.jobs || []).map(function(jobObject) {
-        var job = that.job(jobObject.jobReference.jobId);
+        var job = that.job(jobObject.jobReference.jobId, {
+          location: jobObject.jobReference.location,
+        });
+
         job.metadata = jobObject;
         return job;
       });
@@ -1187,6 +1239,9 @@ BigQuery.prototype.getJobsStream = common.paginator.streamify('getJobs');
  * Create a reference to an existing job.
  *
  * @param {string} id ID of the job.
+ * @param {object} [options] Configuration object.
+ * @param {string} [options.location] The geographic location of the job.
+ *      Required except for US and EU.
  * @returns {Job}
  *
  * @example
@@ -1195,8 +1250,12 @@ BigQuery.prototype.getJobsStream = common.paginator.streamify('getJobs');
  *
  * const myExistingJob = bigquery.job('job-id');
  */
-BigQuery.prototype.job = function(id) {
-  return new Job(this, id);
+BigQuery.prototype.job = function(id, options) {
+  if (this.location) {
+    options = extend({location: this.location}, options);
+  }
+
+  return new Job(this, id, options);
 };
 
 /**
@@ -1208,6 +1267,8 @@ BigQuery.prototype.job = function(id) {
  * @param {string|object} query A string SQL query or configuration object.
  *     For all available options, see
  *     [Jobs: query request body](https://cloud.google.com/bigquery/docs/reference/v2/jobs/query#request-body).
+ * @param {string} [query.location] The geographic location of the job.
+ *     Required except for US and EU.
  * @param {string} [query.jobId] Custom id for the underlying job.
  * @param {string} [query.jobPrefix] Prefix to apply to the underlying job id.
  * @param {object|Array<*>} query.params For positional SQL parameters, provide

@@ -532,6 +532,184 @@ describe('BigQuery', function() {
         }
       );
     });
+
+    describe('location', function() {
+      var LOCATION = 'asia-northeast1';
+
+      var dataset = bigquery.dataset(generateName('dataset'), {
+        location: LOCATION,
+      });
+
+      var table = dataset.table(generateName('table'));
+      var job;
+
+      var QUERY = `SELECT * FROM \`${table.id}\``;
+      var SCHEMA = require('./data/schema.json');
+      var TEST_DATA_FILE = require.resolve('./data/location-test-data.json');
+
+      before(function() {
+        // create a dataset in a certain location will cascade the location
+        // to any jobs created through it
+        return dataset
+          .create()
+          .then(function() {
+            return table.create({schema: SCHEMA});
+          })
+          .then(function() {
+            return table.createLoadJob(TEST_DATA_FILE);
+          })
+          .then(function(data) {
+            job = data[0];
+            return job.promise();
+          });
+      });
+
+      it('should create a load job in the correct location', function() {
+        assert.strictEqual(job.location, LOCATION);
+      });
+
+      describe('job.get', function() {
+        it('should fail to reload if the location is not set', function(done) {
+          var badJob = bigquery.job(job.id);
+
+          badJob.getMetadata(function(err) {
+            assert.strictEqual(err.code, 404);
+            done();
+          });
+        });
+
+        it('should fail to reload if the location is wrong', function(done) {
+          var badJob = bigquery.job(job.id, {location: 'US'});
+
+          badJob.getMetadata(function(err) {
+            assert.strictEqual(err.code, 404);
+            done();
+          });
+        });
+
+        it('should reload if the location matches', function(done) {
+          var goodJob = bigquery.job(job.id, {location: LOCATION});
+
+          goodJob.getMetadata(function(err) {
+            assert.ifError(err);
+            assert.strictEqual(goodJob.location, LOCATION);
+            done();
+          });
+        });
+      });
+
+      describe('job.cancel', function() {
+        var job;
+
+        before(function() {
+          return dataset.createQueryJob(QUERY).then(function(data) {
+            job = data[0];
+          });
+        });
+
+        it('should fail if the job location is incorrect', function(done) {
+          var badJob = bigquery.job(job.id, {location: 'US'});
+
+          badJob.cancel(function(err) {
+            assert.strictEqual(err.code, 404);
+            done();
+          });
+        });
+
+        it('should cancel a job', function(done) {
+          job.cancel(done);
+        });
+      });
+
+      describe('job.getQueryResults', function() {
+        it('should fail if the job location is incorrect', function(done) {
+          var badDataset = bigquery.dataset(dataset.id, {location: 'US'});
+
+          badDataset.createQueryJob(
+            {
+              query: QUERY,
+            },
+            function(err, job) {
+              assert.strictEqual(err.errors[0].reason, 'notFound');
+              assert.strictEqual(job.location, 'US');
+              done();
+            }
+          );
+        });
+
+        it('should get query results', function() {
+          var job;
+
+          return dataset
+            .createQueryJob(QUERY)
+            .then(function(data) {
+              job = data[0];
+
+              assert.strictEqual(job.location, LOCATION);
+              return job.promise();
+            })
+            .then(function() {
+              return job.getQueryResults();
+            })
+            .then(function(data) {
+              var rows = data[0];
+
+              assert(rows.length > 0);
+            });
+        });
+      });
+
+      describe('job.insert', function() {
+        describe('copy', function() {
+          var otherTable = dataset.table(generateName('table'));
+
+          it('should fail if the job location is incorrect', function(done) {
+            var badTable = dataset.table(table.id, {location: 'US'});
+
+            badTable.createCopyJob(otherTable, function(err) {
+              assert.strictEqual(err.code, 404);
+              done();
+            });
+          });
+
+          it('should copy the table', function() {
+            return table.createCopyJob(otherTable).then(function(data) {
+              var job = data[0];
+
+              assert.strictEqual(job.location, LOCATION);
+              return job.promise();
+            });
+          });
+        });
+
+        describe('extract', function() {
+          var bucket = storage.bucket(generateName('bucket'));
+          var extractFile = bucket.file('location-extract-data.json');
+
+          before(function() {
+            return bucket.create({location: LOCATION});
+          });
+
+          it('should fail if the job location is incorrect', function(done) {
+            var badTable = dataset.table(table.id, {location: 'US'});
+
+            badTable.createExtractJob(extractFile, function(err) {
+              assert.strictEqual(err.code, 404);
+              done();
+            });
+          });
+
+          it('should extract the table', function() {
+            return table.createExtractJob(extractFile).then(function(data) {
+              var job = data[0];
+
+              assert.strictEqual(job.location, LOCATION);
+              return job.promise();
+            });
+          });
+        });
+      });
+    });
   });
 
   describe('BigQuery/Table', function() {

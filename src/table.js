@@ -48,6 +48,13 @@ var FORMATS = {
  * @class
  * @param {Dataset} dataset {@link Dataset} instance.
  * @param {string} id The ID of the table.
+ * @param {object} [options] Table options.
+ * @param {string} [options.location] The geographic location of the table, by
+ *      default this value is inherited from the dataset. This can be used to
+ *      configure the location of all jobs created through a table instance. It
+ *      cannot be used to set the actual location of the table. This value will
+ *      be superseded by any API responses containing location data for the
+ *      table.
  *
  * @example
  * const BigQuery = require('@google-cloud/bigquery');
@@ -56,7 +63,11 @@ var FORMATS = {
  *
  * const table = dataset.table('my-table');
  */
-function Table(dataset, id) {
+function Table(dataset, id, options) {
+  if (options && options.location) {
+    this.location = options.location;
+  }
+
   var methods = {
     /**
      * Create a table.
@@ -623,6 +634,10 @@ Table.prototype.createCopyJob = function(destination, metadata, callback) {
     delete metadata.jobPrefix;
   }
 
+  if (this.location) {
+    body.location = this.location;
+  }
+
   if (metadata.jobId) {
     body.jobId = metadata.jobId;
     delete metadata.jobId;
@@ -725,6 +740,10 @@ Table.prototype.createCopyFromJob = function(sourceTables, metadata, callback) {
   if (metadata.jobPrefix) {
     body.jobPrefix = metadata.jobPrefix;
     delete metadata.jobPrefix;
+  }
+
+  if (this.location) {
+    body.location = this.location;
   }
 
   if (metadata.jobId) {
@@ -868,6 +887,10 @@ Table.prototype.createExtractJob = function(destination, options, callback) {
     delete options.jobPrefix;
   }
 
+  if (this.location) {
+    body.location = this.location;
+  }
+
   if (options.jobId) {
     body.jobId = options.jobId;
     delete options.jobId;
@@ -972,6 +995,10 @@ Table.prototype.createLoadJob = function(source, metadata, callback) {
     delete metadata.format;
   }
 
+  if (this.location) {
+    metadata.location = this.location;
+  }
+
   if (is.string(source)) {
     // A path to a file was given. If a sourceFormat wasn't specified, try to
     // find a match from the file's extension.
@@ -1011,6 +1038,11 @@ Table.prototype.createLoadJob = function(source, metadata, callback) {
   if (metadata.jobPrefix) {
     body.jobPrefix = metadata.jobPrefix;
     delete metadata.jobPrefix;
+  }
+
+  if (metadata.location) {
+    body.location = metadata.location;
+    delete metadata.location;
   }
 
   if (metadata.jobId) {
@@ -1213,6 +1245,7 @@ Table.prototype.createWriteStream = function(metadata) {
           jobReference: {
             jobId: jobId,
             projectId: self.bigQuery.projectId,
+            location: self.location,
           },
         },
         request: {
@@ -1223,9 +1256,11 @@ Table.prototype.createWriteStream = function(metadata) {
         },
       },
       function(data) {
-        var job = self.bigQuery.job(data.jobReference.jobId);
-        job.metadata = data;
+        var job = self.bigQuery.job(data.jobReference.jobId, {
+          location: data.jobReference.location,
+        });
 
+        job.metadata = data;
         dup.emit('complete', job);
       }
     );

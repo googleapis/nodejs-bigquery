@@ -103,6 +103,8 @@ describe('BigQuery/Table', function() {
     'hair_count:float',
   ].join(',');
 
+  var LOCATION = 'asia-northeast1';
+
   var Table;
   var TABLE_ID = 'kittens';
   var table;
@@ -188,6 +190,13 @@ describe('BigQuery/Table', function() {
         getMetadata: true,
         setMetadata: true,
       });
+    });
+
+    it('should capture the location', function() {
+      var options = {location: LOCATION};
+      var table = new Table(DATASET, TABLE_ID, options);
+
+      assert.strictEqual(table.location, LOCATION);
     });
 
     describe('etag interceptor', function() {
@@ -600,6 +609,16 @@ describe('BigQuery/Table', function() {
       table.createCopyJob(DEST_TABLE, options, done);
     });
 
+    it('should use the default location', function(done) {
+      table.bigQuery.createJob = function(reqOpts, callback) {
+        assert.strictEqual(reqOpts.location, LOCATION);
+        callback(); // the done fn
+      };
+
+      table.location = LOCATION;
+      table.createCopyJob(DEST_TABLE, done);
+    });
+
     it('should accept a job id', function(done) {
       var jobId = 'job-id';
       var options = {jobId};
@@ -720,6 +739,16 @@ describe('BigQuery/Table', function() {
       };
 
       table.createCopyFromJob(SOURCE_TABLE, options, done);
+    });
+
+    it('should use the default location', function(done) {
+      table.bigQuery.createJob = function(reqOpts, callback) {
+        assert.strictEqual(reqOpts.location, LOCATION);
+        callback(); // the done fn
+      };
+
+      table.location = LOCATION;
+      table.createCopyFromJob(SOURCE_TABLE, done);
     });
 
     it('should accept a job id', function(done) {
@@ -914,6 +943,17 @@ describe('BigQuery/Table', function() {
       };
 
       table.createExtractJob(FILE, options, done);
+    });
+
+    it('should use the default location', function(done) {
+      var table = new Table(DATASET, TABLE_ID, {location: LOCATION});
+
+      table.bigQuery.createJob = function(reqOpts, callback) {
+        assert.strictEqual(reqOpts.location, LOCATION);
+        callback(); // the done fn
+      };
+
+      table.createExtractJob(FILE, done);
     });
 
     it('should accept a job id', function(done) {
@@ -1134,6 +1174,17 @@ describe('BigQuery/Table', function() {
       );
     });
 
+    it('should use the default location', function(done) {
+      var table = new Table(DATASET, TABLE_ID, {location: LOCATION});
+
+      table.bigQuery.createJob = function(reqOpts, callback) {
+        assert.strictEqual(reqOpts.location, LOCATION);
+        callback(); // the done fn
+      };
+
+      table.createLoadJob(FILE, done);
+    });
+
     it('should accept a job id', function(done) {
       var jobId = 'job-id';
       var options = {jobId};
@@ -1339,6 +1390,7 @@ describe('BigQuery/Table', function() {
             jobReference: {
               projectId: table.bigQuery.projectId,
               jobId: fakeJobId,
+              location: undefined,
             },
           });
           done();
@@ -1377,6 +1429,19 @@ describe('BigQuery/Table', function() {
         table.createWriteStream({jobPrefix: jobPrefix}).emit('writing');
       });
 
+      it('should use the default location', function(done) {
+        var table = new Table(DATASET, TABLE_ID, {location: LOCATION});
+
+        makeWritableStreamOverride = function(stream, options) {
+          var location = options.metadata.jobReference.location;
+          assert.strictEqual(location, LOCATION);
+
+          done();
+        };
+
+        table.createWriteStream().emit('writing');
+      });
+
       it('should accept a job id', function(done) {
         var jobId = 'job-id';
         var options = {jobId};
@@ -1396,9 +1461,14 @@ describe('BigQuery/Table', function() {
 
       it('should create a job and emit it with complete', function(done) {
         var jobId = 'job-id';
-        var metadata = {jobReference: {jobId: jobId}, a: 'b', c: 'd'};
+        var metadata = {
+          jobReference: {jobId, location: LOCATION},
+          a: 'b',
+          c: 'd',
+        };
 
-        table.bigQuery.job = function(id) {
+        table.bigQuery.job = function(id, options) {
+          assert.strictEqual(options.location, LOCATION);
           return {id: id};
         };
 
