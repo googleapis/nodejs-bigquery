@@ -612,7 +612,6 @@ describe('BigQuery/Table', function() {
     it('should use the default location', function(done) {
       table.bigQuery.createJob = function(reqOpts, callback) {
         assert.strictEqual(reqOpts.location, LOCATION);
-        assert.strictEqual(reqOpts.configuration.copy.location, undefined);
         callback(); // the done fn
       };
 
@@ -745,7 +744,6 @@ describe('BigQuery/Table', function() {
     it('should use the default location', function(done) {
       table.bigQuery.createJob = function(reqOpts, callback) {
         assert.strictEqual(reqOpts.location, LOCATION);
-        assert.strictEqual(reqOpts.configuration.copy.location, undefined);
         callback(); // the done fn
       };
 
@@ -1437,9 +1435,6 @@ describe('BigQuery/Table', function() {
         makeWritableStreamOverride = function(stream, options) {
           var location = options.metadata.jobReference.location;
           assert.strictEqual(location, LOCATION);
-
-          var config = options.metadata.configuration.load;
-          assert.strictEqual(config.location, undefined);
 
           done();
         };

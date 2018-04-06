@@ -18,6 +18,7 @@
 
 var arrify = require('arrify');
 var assert = require('assert');
+var extend = require('extend');
 var proxyquire = require('proxyquire');
 
 var util = require('@google-cloud/common').util;
@@ -126,6 +127,17 @@ describe('BigQuery/Job', function() {
 
       assert.strictEqual(job.location, options.location);
     });
+
+    it('should send the location via getMetadata', function() {
+      var job = new Job(BIGQUERY, JOB_ID, {location: LOCATION});
+      var calledWith = job.calledWith_[0];
+
+      assert.deepEqual(calledWith.methods.getMetadata, {
+        reqOpts: {
+          qs: {location: LOCATION},
+        },
+      });
+    });
   });
 
   describe('cancel', function() {
@@ -175,18 +187,27 @@ describe('BigQuery/Job', function() {
     });
 
     it('should make the correct request', function(done) {
-      var options = {a: 'b', location: 'US'};
-
       BIGQUERY.request = function(reqOpts) {
         assert.strictEqual(reqOpts.uri, '/queries/' + JOB_ID);
-        assert.deepEqual(reqOpts.qs, options);
+        done();
+      };
+
+      job.getQueryResults(assert.ifError);
+    });
+
+    it('should optionally accept options', function(done) {
+      var options = {a: 'b'};
+      var expectedOptions = extend({location: undefined}, options);
+
+      BIGQUERY.request = function(reqOpts) {
+        assert.deepEqual(reqOpts.qs, expectedOptions);
         done();
       };
 
       job.getQueryResults(options, assert.ifError);
     });
 
-    it('should optionally accept options', function(done) {
+    it('should inherit the location', function(done) {
       var job = new Job(BIGQUERY, JOB_ID, {location: LOCATION});
 
       BIGQUERY.request = function(reqOpts) {
