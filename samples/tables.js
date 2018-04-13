@@ -518,7 +518,7 @@ function extractTableToGCS(
   filename,
   projectId
 ) {
-  // [START bigquery_extract_gcs]
+  // [START bigquery_extract_table]
   // Imports the Google Cloud client libraries
   const BigQuery = require('@google-cloud/bigquery');
   const Storage = require('@google-cloud/storage');
@@ -562,7 +562,7 @@ function extractTableToGCS(
     .catch(err => {
       console.error('ERROR:', err);
     });
-  // [END bigquery_extract_gcs]
+  // [END bigquery_extract_table]
 }
 
 function insertRowsAsStream(datasetId, tableId, rows, projectId) {
