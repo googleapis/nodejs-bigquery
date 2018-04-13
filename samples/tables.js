@@ -566,7 +566,7 @@ function extractTableToGCS(
 }
 
 function insertRowsAsStream(datasetId, tableId, rows, projectId) {
-  // [START bigquery_insert_stream]
+  // [START bigquery_table_insert_rows]
   // Imports the Google Cloud client library
   const BigQuery = require('@google-cloud/bigquery');
 
@@ -601,7 +601,7 @@ function insertRowsAsStream(datasetId, tableId, rows, projectId) {
         console.error('ERROR:', err);
       }
     });
-  // [END bigquery_insert_stream]
+  // [END bigquery_table_insert_rows]
 }
 
 const fs = require(`fs`);
