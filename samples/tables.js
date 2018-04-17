@@ -240,54 +240,6 @@ function loadLocalFile(datasetId, tableId, filename, projectId) {
   // [END bigquery_load_from_file]
 }
 
-function loadFileFromGCS(datasetId, tableId, bucketName, filename, projectId) {
-  // [START bigquery_load_from_gcs]
-  // Imports the Google Cloud client libraries
-  const BigQuery = require('@google-cloud/bigquery');
-  const Storage = require('@google-cloud/storage');
-
-  /**
-   * TODO(developer): Uncomment the following lines before running the sample.
-   */
-  // const projectId = "your-project-id";
-  // const datasetId = "my_dataset";
-  // const tableId = "my_table";
-  // const bucketName = "my-bucket";
-  // const filename = "file.csv";
-
-  // Instantiates clients
-  const bigquery = new BigQuery({
-    projectId: projectId,
-  });
-
-  const storage = new Storage({
-    projectId: projectId,
-  });
-
-  // Loads data from a Google Cloud Storage file into the table
-  bigquery
-    .dataset(datasetId)
-    .table(tableId)
-    .load(storage.bucket(bucketName).file(filename))
-    .then(results => {
-      const job = results[0];
-
-      // load() waits for the job to finish
-      assert.equal(job.status.state, 'DONE');
-      console.log(`Job ${job.id} completed.`);
-
-      // Check the job's status for errors
-      const errors = job.status.errors;
-      if (errors && errors.length > 0) {
-        throw errors;
-      }
-    })
-    .catch(err => {
-      console.error('ERROR:', err);
-    });
-  // [END bigquery_load_from_gcs]
-}
-
 function loadCSVFromGCS(datasetId, tableId, projectId) {
   // [START bigquery_load_table_gcs_csv]
   // Imports the Google Cloud client libraries
@@ -566,7 +518,7 @@ function extractTableToGCS(
   filename,
   projectId
 ) {
-  // [START bigquery_extract_gcs]
+  // [START bigquery_extract_table]
   // Imports the Google Cloud client libraries
   const BigQuery = require('@google-cloud/bigquery');
   const Storage = require('@google-cloud/storage');
@@ -610,11 +562,11 @@ function extractTableToGCS(
     .catch(err => {
       console.error('ERROR:', err);
     });
-  // [END bigquery_extract_gcs]
+  // [END bigquery_extract_table]
 }
 
 function insertRowsAsStream(datasetId, tableId, rows, projectId) {
-  // [START bigquery_insert_stream]
+  // [START bigquery_table_insert_rows]
   // Imports the Google Cloud client library
   const BigQuery = require('@google-cloud/bigquery');
 
@@ -649,7 +601,7 @@ function insertRowsAsStream(datasetId, tableId, rows, projectId) {
         console.error('ERROR:', err);
       }
     });
-  // [END bigquery_insert_stream]
+  // [END bigquery_table_insert_rows]
 }
 
 const fs = require(`fs`);
@@ -710,20 +662,6 @@ require(`yargs`)
       loadLocalFile(
         opts.datasetId,
         opts.tableId,
-        opts.fileName,
-        opts.projectId
-      );
-    }
-  )
-  .command(
-    `load-gcs <projectId> <datasetId> <tableId> <bucketName> <fileName>`,
-    `Loads data from a Google Cloud Storage file into a table.`,
-    {},
-    opts => {
-      loadFileFromGCS(
-        opts.datasetId,
-        opts.tableId,
-        opts.bucketName,
         opts.fileName,
         opts.projectId
       );
