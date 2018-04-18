@@ -1,3 +1,5 @@
+[//]: # "This README.md file is auto-generated, all changes to this file will be lost."
+[//]: # "To regenerate it, use `npm run generate-scaffolding`."
 <img src="https://avatars2.githubusercontent.com/u/2810941?v=3&s=96" alt="Google Cloud Platform logo" title="Google Cloud Platform" align="right" height="96" width="96"/>
 
 # [Google BigQuery: Node.js Client](https://github.com/googleapis/nodejs-bigquery)
@@ -130,4 +132,4 @@ See [LICENSE](https://github.com/googleapis/nodejs-bigquery/blob/master/LICENSE)
 
 [client-docs]: https://googlecloudplatform.github.io/google-cloud-node/#/docs/bigquery/latest/bigquery
 [product-docs]: https://cloud.google.com/bigquery/docs
-[shell_img]: //gstatic.com/cloudssh/images/open-btn.png
+[shell_img]: https://gstatic.com/cloudssh/images/open-btn.png
