@@ -186,6 +186,21 @@ describe('BigQuery', function() {
 
       assert.strictEqual(bq.location, LOCATION);
     });
+
+    it('should pass scopes from options', function() {
+      var bq = new BigQuery({
+        scopes: ['https://www.googleapis.com/auth/drive.readonly'],
+      });
+
+      var calledWith = bq.calledWith_[0];
+      assert.equal(calledWith.scopes.length, 2); // default + extended
+      assert.ok(
+        calledWith.scopes.includes('https://www.googleapis.com/auth/bigquery')
+      );
+      assert.ok(
+        calledWith.scopes.includes('https://www.googleapis.com/auth/drive.readonly')
+      );
+    });
   });
 
   describe('mergeSchemaWithRows_', function() {
