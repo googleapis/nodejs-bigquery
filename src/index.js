@@ -55,9 +55,9 @@ var Table = require('./table.js');
  *     native Promises.
  * @property {string} [location] The geographic location of all datasets and
  *     jobs referenced and created through the client.
- * @property {array} [scopes] Additional OAuth scopes to use in requests.
- *     Ex: for federated spreadsheets table you may need
- *     https://www.googleapis.com/auth/drive.readonly scope.
+ * @property {string[]} [scopes] Additional OAuth scopes to use in requests. For
+ *     example, to access an external data source, you may need the
+ *     `https://www.googleapis.com/auth/drive.readonly` scope.
  */
 
 /**
@@ -106,10 +106,8 @@ function BigQuery(options) {
     packageJson: require('../package.json'),
   };
 
-  if (Array.isArray(options.scopes)) {
-    for (var scope of options.scopes) {
-      config.scopes.push(scope);
-    }
+  if (options.scopes) {
+    config.scopes = config.scopes.concat(options.scopes);
   }
 
   common.Service.call(this, config, options);

@@ -192,18 +192,13 @@ describe('BigQuery', function() {
         scopes: ['https://www.googleapis.com/auth/drive.readonly'],
       });
 
+      var expectedScopes = [
+        'https://www.googleapis.com/auth/bigquery',
+        'https://www.googleapis.com/auth/drive.readonly',
+      ];
+
       var calledWith = bq.calledWith_[0];
-      assert.equal(calledWith.scopes.length, 2); // default + extended
-      assert.ok(
-        calledWith.scopes.indexOf(
-          'https://www.googleapis.com/auth/bigquery'
-        ) !== -1
-      );
-      assert.ok(
-        calledWith.scopes.indexOf(
-          'https://www.googleapis.com/auth/drive.readonly'
-        ) !== -1
-      );
+      assert.deepStrictEqual(calledWith.scopes, expectedScopes);
     });
   });
 
