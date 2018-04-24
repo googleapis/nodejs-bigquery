@@ -38,6 +38,7 @@ var FORMATS = {
   avro: 'AVRO',
   csv: 'CSV',
   json: 'NEWLINE_DELIMITED_JSON',
+  parquet: 'PARQUET',
 };
 
 /**
@@ -763,7 +764,7 @@ Table.prototype.createCopyFromJob = function(sourceTables, metadata, callback) {
  *     to. A string or a {@link https://cloud.google.com/nodejs/docs/reference/storage/latest/File File} object.
  * @param {object=} options - The configuration object.
  * @param {string} options.format - The format to export the data in. Allowed
- *     options are "CSV", "JSON", or "AVRO". Default: "CSV".
+ *     options are "CSV", "JSON", "AVRO", or "PARQUET". Default: "CSV".
  * @param {boolean} options.gzip - Specify if you would like the file compressed
  *     with GZIP. Default: false.
  * @param {string} [options.jobId] Custom job id.
