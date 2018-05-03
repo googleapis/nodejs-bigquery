@@ -275,7 +275,6 @@ function loadParquetFromGCS(datasetId, tableId, projectId) {
   // https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs#configuration.load
   const metadata = {
     sourceFormat: 'PARQUET',
-    skipLeadingRows: 1,
     schema: {
       fields: [
         {name: 'name', type: 'STRING'},
