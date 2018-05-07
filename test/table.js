@@ -854,6 +854,16 @@ describe('BigQuery/Table', function() {
 
         table.createExtractJob(FILE, {format: 'avro'}, assert.ifError);
       });
+
+      it('should accept parquet', function(done) {
+        table.bigQuery.createJob = function(reqOpts) {
+          var extract = reqOpts.configuration.extract;
+          assert.equal(extract.destinationFormat, 'PARQUET');
+          done();
+        };
+
+        table.createExtractJob(FILE, {format: 'parquet'}, assert.ifError);
+      });
     });
 
     it('should parse out full gs:// urls from files', function(done) {
