@@ -188,7 +188,6 @@ describe('BigQuery/Table', function() {
         exists: true,
         get: true,
         getMetadata: true,
-        setMetadata: true,
       });
     });
 

@@ -234,44 +234,6 @@ function Table(dataset, id, options) {
      * });
      */
     getMetadata: true,
-
-    /**
-     * Set the metadata for this Table. This can be useful for updating table
-     * labels.
-     *
-     * @see [Tables: patch API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/tables/patch}
-     *
-     * @method Table#setMetadata
-     * @param {object} metadata Metadata to save on the Table.
-     * @param {function} [callback] The callback function.
-     * @param {?error} callback.err An error returned while making this
-     *     request.
-     * @param {object} callback.apiResponse The full API response.
-     * @returns {Promise}
-     *
-     * @example
-     * const BigQuery = require('@google-cloud/bigquery');
-     * const bigquery = new BigQuery();
-     * const dataset = bigquery.dataset('my-dataset');
-     *
-     * const table = dataset.table('my-table');
-     *
-     * const metadata = {
-     *   labels: {
-     *     foo: 'bar'
-     *   }
-     * };
-     *
-     * table.setMetadata(metadata, function(err, apiResponse) {});
-     *
-     * //-
-     * // If the callback is omitted, we'll return a Promise.
-     * //-
-     * table.setMetadata(metadata).then(function(data) {
-     *   const apiResponse = data[0];
-     * });
-     */
-    setMetadata: true,
   };
 
   common.ServiceObject.call(this, {
@@ -1799,7 +1761,7 @@ Table.prototype.query = function(query, callback) {
 /**
  * Set the metadata on the table.
  *
- * @see [Tables: update API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/tables/update}
+ * @see [Tables: patch API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/tables/patch}
  *
  * @param {object} metadata The metadata key/value object to set.
  * @param {string} metadata.description A user-friendly description of the
