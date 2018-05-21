@@ -64,7 +64,7 @@
     "system-test": "repo-tools test run --cmd mocha -- system-test/*.js --timeout 600000"
   },
   "dependencies": {
-    "@google-cloud/common": "^0.17.0",
+    "@google-cloud/common": "^0.18.8",
     "arrify": "^1.0.0",
     "duplexify": "^3.5.0",
     "extend": "^3.0.1",
