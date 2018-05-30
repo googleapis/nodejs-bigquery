@@ -4,25 +4,17 @@ workflows:
   tests:
     jobs: &workflow_jobs
       - node4:
-          filters:
+          filters: &all_commits
             tags:
               only: /.*/
       - node6:
-          filters:
-            tags:
-              only: /.*/
+          filters: *all_commits
       - node8:
-          filters:
-            tags:
-              only: /.*/
+          filters: *all_commits
       - node9:
-          filters:
-            tags:
-              only: /.*/
+          filters: *all_commits
       - node10:
-          filters:
-            tags:
-              only: /.*/
+          filters: *all_commits
       - lint:
           requires:
             - node4
@@ -30,9 +22,7 @@ workflows:
             - node8
             - node9
             - node10
-          filters:
-            tags:
-              only: /.*/
+          filters: *all_commits
       - docs:
           requires:
             - node4
@@ -40,27 +30,21 @@ workflows:
             - node8
             - node9
             - node10
-          filters:
-            tags:
-              only: /.*/
+          filters: *all_commits
       - system_tests:
           requires:
             - lint
             - docs
-          filters:
+          filters: &master_and_releases
             branches:
               only: master
-            tags:
+            tags: &releases
               only: '/^v[\d.]+$/'
       - sample_tests:
           requires:
             - lint
             - docs
-          filters:
-            branches:
-              only: master
-            tags:
-              only: '/^v[\d.]+$/'
+          filters: *master_and_releases
       - publish_npm:
           requires:
             - system_tests
@@ -68,8 +52,7 @@ workflows:
           filters:
             branches:
               ignore: /.*/
-            tags:
-              only: '/^v[\d.]+$/'
+            tags: *releases
   nightly:
     triggers:
       - schedule:
@@ -82,6 +65,7 @@ jobs:
   node4:
     docker:
       - image: 'node:4'
+        user: node
     steps: &unit_tests_steps
       - checkout
       - run: &remove_package_lock
@@ -96,14 +80,14 @@ jobs:
               echo "Not a nightly build, skipping this step."
             fi
       - run: &npm_install_and_link
-          name: Install and link the module.
-          command: |
+          name: Install and link the module
+          command: |-
+            mkdir -p /home/node/.npm-global
             npm install
-            repo_tools="node_modules/@google-cloud/nodejs-repo-tools/bin/tools"
-            if ! test -x "$repo_tools"; then
-              chmod +x "$repo_tools"
-            fi
             npm link
+            chmod +x node_modules/@google-cloud/nodejs-repo-tools/bin/tools
+          environment:
+            NPM_CONFIG_PREFIX: /home/node/.npm-global
       - run:
           name: Run unit tests.
           command: npm test
@@ -114,22 +98,27 @@ jobs:
   node6:
     docker:
       - image: 'node:6'
+        user: node
     steps: *unit_tests_steps
   node8:
     docker:
       - image: 'node:8'
+        user: node
     steps: *unit_tests_steps
   node9:
     docker:
       - image: 'node:9'
+        user: node
     steps: *unit_tests_steps
   node10:
     docker:
       - image: 'node:10'
+        user: node
     steps: *unit_tests_steps
   lint:
     docker:
       - image: 'node:8'
+        user: node
     steps:
       - checkout
       - run: *remove_package_lock
@@ -141,12 +130,15 @@ jobs:
             npm link @google-cloud/bigquery
             npm install
             cd ..
+          environment:
+            NPM_CONFIG_PREFIX: /home/node/.npm-global
       - run:
           name: Run linting.
           command: npm run lint
   docs:
     docker:
       - image: 'node:8'
+        user: node
     steps:
       - checkout
       - run: *remove_package_lock
@@ -157,6 +149,7 @@ jobs:
   sample_tests:
     docker:
       - image: 'node:8'
+        user: node
     steps:
       - checkout
       - run: *remove_package_lock
@@ -173,15 +166,16 @@ jobs:
           command: npm run samples-test
           environment:
             GCLOUD_PROJECT: long-door-651
-            GOOGLE_APPLICATION_CREDENTIALS: /var/bigquery/.circleci/key.json
+            GOOGLE_APPLICATION_CREDENTIALS: /home/node/bigquery-samples/.circleci/key.json
       - run:
           name: Remove unencrypted key.
           command: rm .circleci/key.json
           when: always
-    working_directory: /var/bigquery/
+    working_directory: /home/node/bigquery-samples/
   system_tests:
     docker:
       - image: 'node:8'
+        user: node
     steps:
       - checkout
       - run: *remove_package_lock
@@ -205,6 +199,7 @@ jobs:
   publish_npm:
     docker:
       - image: 'node:8'
+        user: node
     steps:
       - checkout
       - run:
