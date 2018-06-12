@@ -17,6 +17,7 @@
 'use strict';
 
 var arrify = require('arrify');
+var Big = require('big.js');
 var common = require('@google-cloud/common');
 var extend = require('extend');
 var format = require('string-format-obj');
@@ -163,6 +164,10 @@ BigQuery.mergeSchemaWithRows_ = BigQuery.prototype.mergeSchemaWithRows_ = functi
       case 'INTEGER':
       case 'INT64': {
         value = parseInt(value, 10);
+        break;
+      }
+      case 'NUMERIC': {
+        value = new Big(value);
         break;
       }
       case 'RECORD': {

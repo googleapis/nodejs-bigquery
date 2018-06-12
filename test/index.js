@@ -18,6 +18,7 @@
 
 var arrify = require('arrify');
 var assert = require('assert');
+var Big = require('big.js');
 var extend = require('extend');
 var nodeutil = require('util');
 var prop = require('propprop');
@@ -173,6 +174,7 @@ describe('BigQuery', function() {
         {name: 'has_fangs', type: 'BOOL'},
         {name: 'hair_count', type: 'FLOAT'},
         {name: 'teeth_count', type: 'FLOAT64'},
+        {name: 'numeric_col', type: 'NUMERIC'},
       ],
     };
 
@@ -221,6 +223,7 @@ describe('BigQuery', function() {
               {v: 'true'},
               {v: '5.222330009847'},
               {v: '30.2232138'},
+              {v: '3.14'},
               {
                 v: [
                   {
@@ -272,6 +275,7 @@ describe('BigQuery', function() {
             has_fangs: true,
             hair_count: 5.222330009847,
             teeth_count: 30.2232138,
+            numeric_col: new Big(3.14),
             arr: [10],
             arr2: [2],
             nullable: null,

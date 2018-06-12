@@ -18,6 +18,7 @@
 
 var arrify = require('arrify');
 var assert = require('assert');
+var Big = require('big.js');
 var events = require('events');
 var extend = require('extend');
 var nodeutil = require('util');
@@ -92,6 +93,7 @@ describe('BigQuery/Table', function() {
       {name: 'dob', type: 'TIMESTAMP'},
       {name: 'has_claws', type: 'BOOLEAN'},
       {name: 'hair_count', type: 'FLOAT'},
+      {name: 'numeric_col', type: 'NUMERIC'},
     ],
   };
 
@@ -101,6 +103,7 @@ describe('BigQuery/Table', function() {
     'dob:timestamp',
     'has_claws:boolean',
     'hair_count:float',
+    'numeric_col:numeric',
   ].join(',');
 
   var Table;
@@ -319,6 +322,17 @@ describe('BigQuery/Table', function() {
           array: [buffer.toString('base64'), date.toJSON()],
         },
       });
+    });
+
+    it('should properly encode numerics', function() {
+      assert.strictEqual(Table.encodeValue_(new Big('123.456')), '123.456');
+      assert.strictEqual(Table.encodeValue_(new Big('-123.456')), '-123.456');
+      assert.strictEqual(Table.encodeValue_(
+          new Big('99999999999999999999999999999.999999999')),
+          '99999999999999999999999999999.999999999');
+      assert.strictEqual(Table.encodeValue_(
+          new Big('-99999999999999999999999999999.999999999')),
+          '-99999999999999999999999999999.999999999');
     });
   });
 

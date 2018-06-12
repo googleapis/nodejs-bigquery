@@ -65,6 +65,7 @@
   "dependencies": {
     "@google-cloud/common": "^0.16.0",
     "arrify": "^1.0.0",
+    "big.js": "^5.1.2",
     "duplexify": "^3.5.0",
     "extend": "^3.0.1",
     "is": "^3.0.1",
