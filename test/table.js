@@ -327,12 +327,14 @@ describe('BigQuery/Table', function() {
     it('should properly encode numerics', function() {
       assert.strictEqual(Table.encodeValue_(new Big('123.456')), '123.456');
       assert.strictEqual(Table.encodeValue_(new Big('-123.456')), '-123.456');
-      assert.strictEqual(Table.encodeValue_(
-          new Big('99999999999999999999999999999.999999999')),
-          '99999999999999999999999999999.999999999');
-      assert.strictEqual(Table.encodeValue_(
-          new Big('-99999999999999999999999999999.999999999')),
-          '-99999999999999999999999999999.999999999');
+      assert.strictEqual(
+        Table.encodeValue_(new Big('99999999999999999999999999999.999999999')),
+        '99999999999999999999999999999.999999999'
+      );
+      assert.strictEqual(
+        Table.encodeValue_(new Big('-99999999999999999999999999999.999999999')),
+        '-99999999999999999999999999999.999999999'
+      );
     });
   });
 
