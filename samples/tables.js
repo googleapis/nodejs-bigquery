@@ -240,8 +240,8 @@ function loadLocalFile(datasetId, tableId, filename, projectId) {
   // [END bigquery_load_from_file]
 }
 
-function loadFileFromGCS(datasetId, tableId, bucketName, filename, projectId) {
-  // [START bigquery_load_from_gcs]
+function loadParquetFromGCS(datasetId, tableId, projectId) {
+  // [START bigquery_load_table_gcs_parquet]
   // Imports the Google Cloud client libraries
   const BigQuery = require('@google-cloud/bigquery');
   const Storage = require('@google-cloud/storage');
@@ -252,8 +252,15 @@ function loadFileFromGCS(datasetId, tableId, bucketName, filename, projectId) {
   // const projectId = "your-project-id";
   // const datasetId = "my_dataset";
   // const tableId = "my_table";
-  // const bucketName = "my-bucket";
-  // const filename = "file.csv";
+
+  /**
+   * This sample loads the Parquet file at
+   * https://storage.googleapis.com/cloud-samples-data/bigquery/us-states/us-states.parquet
+   *
+   * TODO(developer): Replace the following lines with the path to your file.
+   */
+  const bucketName = 'cloud-samples-data';
+  const filename = 'bigquery/us-states/us-states.parquet';
 
   // Instantiates clients
   const bigquery = new BigQuery({
@@ -264,11 +271,23 @@ function loadFileFromGCS(datasetId, tableId, bucketName, filename, projectId) {
     projectId: projectId,
   });
 
+  // Configure the load job. For full list of options, see:
+  // https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs#configuration.load
+  const metadata = {
+    sourceFormat: 'PARQUET',
+    schema: {
+      fields: [
+        {name: 'name', type: 'STRING'},
+        {name: 'post_abbr', type: 'STRING'},
+      ],
+    },
+  };
+
   // Loads data from a Google Cloud Storage file into the table
   bigquery
     .dataset(datasetId)
     .table(tableId)
-    .load(storage.bucket(bucketName).file(filename))
+    .load(storage.bucket(bucketName).file(filename), metadata)
     .then(results => {
       const job = results[0];
 
@@ -285,7 +304,7 @@ function loadFileFromGCS(datasetId, tableId, bucketName, filename, projectId) {
     .catch(err => {
       console.error('ERROR:', err);
     });
-  // [END bigquery_load_from_gcs]
+  // [END bigquery_load_table_gcs_parquet]
 }
 
 function loadCSVFromGCS(datasetId, tableId, projectId) {
@@ -303,7 +322,7 @@ function loadCSVFromGCS(datasetId, tableId, projectId) {
 
   /**
    * This sample loads the CSV file at
-   * https://storage.googleapis.com/cloud-samples-data/bigquery/us-states/us-states.json
+   * https://storage.googleapis.com/cloud-samples-data/bigquery/us-states/us-states.csv
    *
    * TODO(developer): Replace the following lines with the path to your file.
    */
@@ -371,7 +390,7 @@ function loadCSVFromGCSAutodetect(datasetId, tableId, projectId) {
 
   /**
    * This sample loads the CSV file at
-   * https://storage.googleapis.com/cloud-samples-data/bigquery/us-states/us-states.json
+   * https://storage.googleapis.com/cloud-samples-data/bigquery/us-states/us-states.csv
    *
    * TODO(developer): Replace the following lines with the path to your file.
    */
@@ -434,7 +453,7 @@ function loadCSVFromGCSAppend(datasetId, tableId, projectId) {
 
   /**
    * This sample loads the CSV file at
-   * https://storage.googleapis.com/cloud-samples-data/bigquery/us-states/us-states.json
+   * https://storage.googleapis.com/cloud-samples-data/bigquery/us-states/us-states.csv
    *
    * TODO(developer): Replace the following lines with the path to your file.
    */
@@ -504,7 +523,7 @@ function loadCSVFromGCSTruncate(datasetId, tableId, projectId) {
 
   /**
    * This sample loads the CSV file at
-   * https://storage.googleapis.com/cloud-samples-data/bigquery/us-states/us-states.json
+   * https://storage.googleapis.com/cloud-samples-data/bigquery/us-states/us-states.csv
    *
    * TODO(developer): Replace the following lines with the path to your file.
    */
@@ -566,7 +585,7 @@ function extractTableToGCS(
   filename,
   projectId
 ) {
-  // [START bigquery_extract_gcs]
+  // [START bigquery_extract_table]
   // Imports the Google Cloud client libraries
   const BigQuery = require('@google-cloud/bigquery');
   const Storage = require('@google-cloud/storage');
@@ -610,11 +629,11 @@ function extractTableToGCS(
     .catch(err => {
       console.error('ERROR:', err);
     });
-  // [END bigquery_extract_gcs]
+  // [END bigquery_extract_table]
 }
 
 function insertRowsAsStream(datasetId, tableId, rows, projectId) {
-  // [START bigquery_insert_stream]
+  // [START bigquery_table_insert_rows]
   // Imports the Google Cloud client library
   const BigQuery = require('@google-cloud/bigquery');
 
@@ -649,7 +668,7 @@ function insertRowsAsStream(datasetId, tableId, rows, projectId) {
         console.error('ERROR:', err);
       }
     });
-  // [END bigquery_insert_stream]
+  // [END bigquery_table_insert_rows]
 }
 
 const fs = require(`fs`);
@@ -716,17 +735,11 @@ require(`yargs`)
     }
   )
   .command(
-    `load-gcs <projectId> <datasetId> <tableId> <bucketName> <fileName>`,
-    `Loads data from a Google Cloud Storage file into a table.`,
+    `load-gcs-parquet <projectId> <datasetId> <tableId>`,
+    `Loads sample Parquet data from a Google Cloud Storage file into a table.`,
     {},
     opts => {
-      loadFileFromGCS(
-        opts.datasetId,
-        opts.tableId,
-        opts.bucketName,
-        opts.fileName,
-        opts.projectId
-      );
+      loadParquetFromGCS(opts.datasetId, opts.tableId, opts.projectId);
     }
   )
   .command(

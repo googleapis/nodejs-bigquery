@@ -39,6 +39,7 @@ var FORMATS = {
   avro: 'AVRO',
   csv: 'CSV',
   json: 'NEWLINE_DELIMITED_JSON',
+  parquet: 'PARQUET',
 };
 
 /**
@@ -49,6 +50,13 @@ var FORMATS = {
  * @class
  * @param {Dataset} dataset {@link Dataset} instance.
  * @param {string} id The ID of the table.
+ * @param {object} [options] Table options.
+ * @param {string} [options.location] The geographic location of the table, by
+ *      default this value is inherited from the dataset. This can be used to
+ *      configure the location of all jobs created through a table instance. It
+ *      cannot be used to set the actual location of the table. This value will
+ *      be superseded by any API responses containing location data for the
+ *      table.
  *
  * @example
  * const BigQuery = require('@google-cloud/bigquery');
@@ -57,7 +65,11 @@ var FORMATS = {
  *
  * const table = dataset.table('my-table');
  */
-function Table(dataset, id) {
+function Table(dataset, id, options) {
+  if (options && options.location) {
+    this.location = options.location;
+  }
+
   var methods = {
     /**
      * Create a table.
@@ -223,44 +235,6 @@ function Table(dataset, id) {
      * });
      */
     getMetadata: true,
-
-    /**
-     * Set the metadata for this Table. This can be useful for updating table
-     * labels.
-     *
-     * @see [Tables: patch API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/tables/patch}
-     *
-     * @method Table#setMetadata
-     * @param {object} metadata Metadata to save on the Table.
-     * @param {function} [callback] The callback function.
-     * @param {?error} callback.err An error returned while making this
-     *     request.
-     * @param {object} callback.apiResponse The full API response.
-     * @returns {Promise}
-     *
-     * @example
-     * const BigQuery = require('@google-cloud/bigquery');
-     * const bigquery = new BigQuery();
-     * const dataset = bigquery.dataset('my-dataset');
-     *
-     * const table = dataset.table('my-table');
-     *
-     * const metadata = {
-     *   labels: {
-     *     foo: 'bar'
-     *   }
-     * };
-     *
-     * table.setMetadata(metadata, function(err, apiResponse) {});
-     *
-     * //-
-     * // If the callback is omitted, we'll return a Promise.
-     * //-
-     * table.setMetadata(metadata).then(function(data) {
-     *   const apiResponse = data[0];
-     * });
-     */
-    setMetadata: true,
   };
 
   common.ServiceObject.call(this, {
@@ -423,6 +397,9 @@ Table.formatMetadata_ = function(options) {
  * @param {object} [metadata] Metadata to set with the copy operation. The
  *     metadata object should be in the format of the
  *     [`configuration.copy`](http://goo.gl/dKWIyS) property of a Jobs resource.
+ * @param {string} [metadata.jobId] Custom id for the underlying job.
+ * @param {string} [metadata.jobPrefix] Prefix to apply to the underlying job
+ *     id.
  * @param {function} [callback] The callback function.
  * @param {?error} callback.err An error returned while making this request
  * @param {object} callback.apiResponse The full API response.
@@ -484,6 +461,9 @@ Table.prototype.copy = function(destination, metadata, callback) {
  * @param {object=} metadata Metadata to set with the copy operation. The
  *     metadata object should be in the format of the
  *     [`configuration.copy`](http://goo.gl/dKWIyS) property of a Jobs resource.
+ * @param {string} [metadata.jobId] Custom id for the underlying job.
+ * @param {string} [metadata.jobPrefix] Prefix to apply to the underlying job
+ *     id.
  * @param {function} [callback] The callback function.
  * @param {?error} callback.err An error returned while making this request
  * @param {object} callback.apiResponse The full API response.
@@ -549,6 +529,8 @@ Table.prototype.copyFrom = function(sourceTables, metadata, callback) {
  * @param {object} [metadata] Metadata to set with the copy operation. The
  *     metadata object should be in the format of the
  *     [`configuration.copy`](http://goo.gl/dKWIyS) property of a Jobs resource.
+ * @param {string} [metadata.jobId] Custom job id.
+ * @param {string} [metadata.jobPrefix] Prefix to apply to the job id.
  * @param {function} [callback] The callback function.
  * @param {?error} callback.err An error returned while making this request
  * @param {Job} callback.job The job used to copy your table.
@@ -620,6 +602,15 @@ Table.prototype.createCopyJob = function(destination, metadata, callback) {
     delete metadata.jobPrefix;
   }
 
+  if (this.location) {
+    body.location = this.location;
+  }
+
+  if (metadata.jobId) {
+    body.jobId = metadata.jobId;
+    delete metadata.jobId;
+  }
+
   this.bigQuery.createJob(body, callback);
 };
 
@@ -633,6 +624,8 @@ Table.prototype.createCopyJob = function(destination, metadata, callback) {
  * @param {object} [metadata] Metadata to set with the copy operation. The
  *     metadata object should be in the format of the
  *     [`configuration.copy`](http://goo.gl/dKWIyS) property of a Jobs resource.
+ * @param {string} [metadata.jobId] Custom job id.
+ * @param {string} [metadata.jobPrefix] Prefix to apply to the job id.
  * @param {function} [callback] The callback function.
  * @param {?error} callback.err An error returned while making this request
  * @param {Job} callback.job The job used to copy your table.
@@ -717,6 +710,15 @@ Table.prototype.createCopyFromJob = function(sourceTables, metadata, callback) {
     delete metadata.jobPrefix;
   }
 
+  if (this.location) {
+    body.location = this.location;
+  }
+
+  if (metadata.jobId) {
+    body.jobId = metadata.jobId;
+    delete metadata.jobId;
+  }
+
   this.bigQuery.createJob(body, callback);
 };
 
@@ -729,9 +731,11 @@ Table.prototype.createCopyFromJob = function(sourceTables, metadata, callback) {
  *     to. A string or a {@link https://cloud.google.com/nodejs/docs/reference/storage/latest/File File} object.
  * @param {object=} options - The configuration object.
  * @param {string} options.format - The format to export the data in. Allowed
- *     options are "CSV", "JSON", or "AVRO". Default: "CSV".
+ *     options are "CSV", "JSON", "AVRO", or "PARQUET". Default: "CSV".
  * @param {boolean} options.gzip - Specify if you would like the file compressed
  *     with GZIP. Default: false.
+ * @param {string} [options.jobId] Custom job id.
+ * @param {string} [options.jobPrefix] Prefix to apply to the job id.
  * @param {function} callback - The callback function.
  * @param {?error} callback.err - An error returned while making this request
  * @param {Job} callback.job - The job used to export the table.
@@ -851,6 +855,15 @@ Table.prototype.createExtractJob = function(destination, options, callback) {
     delete options.jobPrefix;
   }
 
+  if (this.location) {
+    body.location = this.location;
+  }
+
+  if (options.jobId) {
+    body.jobId = options.jobId;
+    delete options.jobId;
+  }
+
   this.bigQuery.createJob(body, callback);
 };
 
@@ -873,6 +886,8 @@ Table.prototype.createExtractJob = function(destination, options, callback) {
  *     [`configuration.load`](http://goo.gl/BVcXk4) property of a Jobs resource.
  * @param {string} [metadata.format] The format the data being loaded is in.
  *     Allowed options are "CSV", "JSON", or "AVRO".
+ * @param {string} [metadata.jobId] Custom job id.
+ * @param {string} [metadata.jobPrefix] Prefix to apply to the job id.
  * @param {function} [callback] The callback function.
  * @param {?error} callback.err An error returned while making this request
  * @param {Job} callback.job The job used to load your data.
@@ -948,6 +963,10 @@ Table.prototype.createLoadJob = function(source, metadata, callback) {
     delete metadata.format;
   }
 
+  if (this.location) {
+    metadata.location = this.location;
+  }
+
   if (is.string(source)) {
     // A path to a file was given. If a sourceFormat wasn't specified, try to
     // find a match from the file's extension.
@@ -987,6 +1006,16 @@ Table.prototype.createLoadJob = function(source, metadata, callback) {
   if (metadata.jobPrefix) {
     body.jobPrefix = metadata.jobPrefix;
     delete metadata.jobPrefix;
+  }
+
+  if (metadata.location) {
+    body.location = metadata.location;
+    delete metadata.location;
+  }
+
+  if (metadata.jobId) {
+    body.jobId = metadata.jobId;
+    delete metadata.jobId;
   }
 
   extend(true, body.configuration.load, metadata, {
@@ -1085,6 +1114,8 @@ Table.prototype.createReadStream = common.paginator.streamify('getRows');
  *     The metadata object should be in the format of the
  *     [`configuration.load`](http://goo.gl/BVcXk4) property of a Jobs resource.
  *     If a string is given, it will be used as the filetype.
+ * @param {string} [metadata.jobId] Custom job id.
+ * @param {string} [metadata.jobPrefix] Prefix to apply to the job id.
  * @returns {WritableStream}
  *
  * @throws {Error} If source format isn't recognized.
@@ -1150,7 +1181,11 @@ Table.prototype.createWriteStream = function(metadata) {
     },
   });
 
-  var jobId = uuid.v4();
+  var jobId = metadata.jobId || uuid.v4();
+
+  if (metadata.jobId) {
+    delete metadata.jobId;
+  }
 
   if (metadata.jobPrefix) {
     jobId = metadata.jobPrefix + jobId;
@@ -1178,6 +1213,7 @@ Table.prototype.createWriteStream = function(metadata) {
           jobReference: {
             jobId: jobId,
             projectId: self.bigQuery.projectId,
+            location: self.location,
           },
         },
         request: {
@@ -1188,9 +1224,11 @@ Table.prototype.createWriteStream = function(metadata) {
         },
       },
       function(data) {
-        var job = self.bigQuery.job(data.jobReference.jobId);
-        job.metadata = data;
+        var job = self.bigQuery.job(data.jobReference.jobId, {
+          location: data.jobReference.location,
+        });
 
+        job.metadata = data;
         dup.emit('complete', job);
       }
     );
@@ -1209,6 +1247,8 @@ Table.prototype.createWriteStream = function(metadata) {
  *     options are "CSV", "JSON", or "AVRO". Default: "CSV".
  * @param {boolean} [options.gzip] Specify if you would like the file compressed
  *     with GZIP. Default: false.
+ * @param {string} [options.jobId] Custom id for the underlying job.
+ * @param {string} [options.jobPrefix] Prefix to apply to the underlying job id.
  * @param {function} [callback] The callback function.
  * @param {?error} callback.err An error returned while making this request
  * @param {object} callback.apiResponse The full API response.
@@ -1637,6 +1677,9 @@ Table.prototype.insert = function(rows, options, callback) {
  *     [`configuration.load`](http://goo.gl/BVcXk4) property of a Jobs resource.
  * @param {string} [metadata.format] The format the data being loaded is in.
  *     Allowed options are "CSV", "JSON", or "AVRO".
+ * @param {string} [metadata.jobId] Custom id for the underlying job.
+ * @param {string} [metadata.jobPrefix] Prefix to apply to the underlying job
+ *     id.
  * @param {function} [callback] The callback function.
  * @param {?error} callback.err An error returned while making this request
  * @param {object} callback.apiResponse The full API response.
@@ -1723,7 +1766,7 @@ Table.prototype.query = function(query, callback) {
 /**
  * Set the metadata on the table.
  *
- * @see [Tables: update API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/tables/update}
+ * @see [Tables: patch API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/tables/patch}
  *
  * @param {object} metadata The metadata key/value object to set.
  * @param {string} metadata.description A user-friendly description of the

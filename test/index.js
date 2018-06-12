@@ -31,6 +31,10 @@ var util = require('@google-cloud/common').util;
 
 var fakeUuid = extend(true, {}, fakeUuid);
 
+function FakeApiError() {
+  this.calledWith_ = arguments;
+}
+
 var promisified = false;
 var fakeUtil = extend({}, util, {
   promisifyAll: function(Class, options) {
@@ -48,11 +52,20 @@ var fakeUtil = extend({}, util, {
       'timestamp',
     ]);
   },
+  ApiError: FakeApiError,
 });
 var originalFakeUtil = extend(true, {}, fakeUtil);
 
+function FakeDataset() {
+  this.calledWith_ = arguments;
+}
+
 function FakeTable(a, b) {
   Table.call(this, a, b);
+}
+
+function FakeJob() {
+  this.calledWith_ = arguments;
 }
 
 var mergeSchemaWithRowsOverride;
@@ -91,6 +104,7 @@ nodeutil.inherits(FakeService, Service);
 describe('BigQuery', function() {
   var JOB_ID = 'JOB_ID';
   var PROJECT_ID = 'test-project';
+  var LOCATION = 'asia-northeast1';
 
   var BigQueryCached;
   var BigQuery;
@@ -99,6 +113,8 @@ describe('BigQuery', function() {
   before(function() {
     BigQuery = proxyquire('../', {
       uuid: fakeUuid,
+      './dataset.js': FakeDataset,
+      './job.js': FakeJob,
       './table.js': FakeTable,
       '@google-cloud/common': {
         Service: FakeService,
@@ -161,6 +177,29 @@ describe('BigQuery', function() {
         'https://www.googleapis.com/auth/bigquery',
       ]);
       assert.deepEqual(calledWith.packageJson, require('../package.json'));
+    });
+
+    it('should capture any user specified location', function() {
+      var bq = new BigQuery({
+        projectId: PROJECT_ID,
+        location: LOCATION,
+      });
+
+      assert.strictEqual(bq.location, LOCATION);
+    });
+
+    it('should pass scopes from options', function() {
+      var bq = new BigQuery({
+        scopes: ['https://www.googleapis.com/auth/drive.readonly'],
+      });
+
+      var expectedScopes = [
+        'https://www.googleapis.com/auth/bigquery',
+        'https://www.googleapis.com/auth/drive.readonly',
+      ];
+
+      var calledWith = bq.calledWith_[0];
+      assert.deepStrictEqual(calledWith.scopes, expectedScopes);
     });
   });
 
@@ -728,12 +767,24 @@ describe('BigQuery', function() {
       bq.request = function(reqOpts) {
         assert.strictEqual(reqOpts.method, 'POST');
         assert.strictEqual(reqOpts.uri, '/datasets');
-        assert.deepEqual(reqOpts.json, {
-          datasetReference: {
-            datasetId: DATASET_ID,
-          },
+        assert.deepEqual(reqOpts.json.datasetReference, {
+          datasetId: DATASET_ID,
         });
 
+        done();
+      };
+
+      bq.createDataset(DATASET_ID, assert.ifError);
+    });
+
+    it('should send the location if available', function(done) {
+      var bq = new BigQuery({
+        projectId: PROJECT_ID,
+        location: LOCATION,
+      });
+
+      bq.request = function(reqOpts) {
+        assert.strictEqual(reqOpts.json.location, LOCATION);
         done();
       };
 
@@ -777,7 +828,7 @@ describe('BigQuery', function() {
 
       bq.createDataset(DATASET_ID, function(err, dataset) {
         assert.ifError(err);
-        assert.equal(dataset.constructor.name, 'Dataset');
+        assert(dataset instanceof FakeDataset);
         done();
       });
     });
@@ -812,6 +863,15 @@ describe('BigQuery', function() {
   });
 
   describe('createJob', function() {
+    var RESPONSE = {
+      status: {
+        state: 'RUNNING',
+      },
+      jobReference: {
+        location: LOCATION,
+      },
+    };
+
     var fakeJobId;
 
     beforeEach(function() {
@@ -831,6 +891,7 @@ describe('BigQuery', function() {
         jobReference: {
           projectId: bq.projectId,
           jobId: fakeJobId,
+          location: undefined,
         },
       });
 
@@ -861,6 +922,47 @@ describe('BigQuery', function() {
       bq.createJob(options, assert.ifError);
     });
 
+    it('should accept a location', function(done) {
+      var options = {
+        location: LOCATION,
+      };
+
+      bq.request = function(reqOpts) {
+        assert.strictEqual(reqOpts.json.jobReference.location, LOCATION);
+        assert.strictEqual(reqOpts.json.location, undefined);
+        done();
+      };
+
+      bq.createJob(options, assert.ifError);
+    });
+
+    it('should accept a job id', function(done) {
+      var jobId = 'job-id';
+      var options = {jobId};
+
+      bq.request = function(reqOpts) {
+        assert.strictEqual(reqOpts.json.jobReference.jobId, jobId);
+        assert.strictEqual(reqOpts.json.jobId, undefined);
+        done();
+      };
+
+      bq.createJob(options, assert.ifError);
+    });
+
+    it('should use the user defined location if available', function(done) {
+      var bq = new BigQuery({
+        projectId: PROJECT_ID,
+        location: LOCATION,
+      });
+
+      bq.request = function(reqOpts) {
+        assert.strictEqual(reqOpts.json.jobReference.location, LOCATION);
+        done();
+      };
+
+      bq.createJob({}, assert.ifError);
+    });
+
     it('should return any request errors', function(done) {
       var response = {};
       var error = new Error('err.');
@@ -877,24 +979,44 @@ describe('BigQuery', function() {
       });
     });
 
-    it('should return a job object', function(done) {
-      var response = {};
-      var fakeJob = {};
-
-      bq.job = function(jobId) {
-        assert.strictEqual(jobId, fakeJobId);
-        return fakeJob;
-      };
+    it('should return any status errors', function(done) {
+      var errors = [{reason: 'notFound'}];
+      var response = extend(true, {}, RESPONSE, {
+        status: {errors},
+      });
 
       bq.request = function(reqOpts, callback) {
         callback(null, response);
       };
 
+      bq.createJob({}, function(err) {
+        assert(err instanceof FakeApiError);
+
+        var errorOpts = err.calledWith_[0];
+        assert.deepEqual(errorOpts.errors, errors);
+        assert.strictEqual(errorOpts.response, response);
+        done();
+      });
+    });
+
+    it('should return a job object', function(done) {
+      var fakeJob = {};
+
+      bq.job = function(jobId, options) {
+        assert.strictEqual(jobId, fakeJobId);
+        assert.strictEqual(options.location, LOCATION);
+        return fakeJob;
+      };
+
+      bq.request = function(reqOpts, callback) {
+        callback(null, RESPONSE);
+      };
+
       bq.createJob({}, function(err, job, resp) {
         assert.ifError(err);
         assert.strictEqual(job, fakeJob);
-        assert.strictEqual(job.metadata, response);
-        assert.strictEqual(resp, response);
+        assert.strictEqual(job.metadata, RESPONSE);
+        assert.strictEqual(resp, RESPONSE);
         done();
       });
     });
@@ -1101,6 +1223,36 @@ describe('BigQuery', function() {
       bq.createQueryJob(options, assert.ifError);
     });
 
+    it('should accept a location', function(done) {
+      var options = {
+        query: QUERY_STRING,
+        location: LOCATION,
+      };
+
+      bq.createJob = function(reqOpts) {
+        assert.strictEqual(reqOpts.configuration.query.location, undefined);
+        assert.strictEqual(reqOpts.location, LOCATION);
+        done();
+      };
+
+      bq.createQueryJob(options, assert.ifError);
+    });
+
+    it('should accept a job id', function(done) {
+      var options = {
+        query: QUERY_STRING,
+        jobId: 'jobId',
+      };
+
+      bq.createJob = function(reqOpts) {
+        assert.strictEqual(reqOpts.configuration.query.jobId, undefined);
+        assert.strictEqual(reqOpts.jobId, options.jobId);
+        done();
+      };
+
+      bq.createQueryJob(options, assert.ifError);
+    });
+
     it('should pass the callback to createJob', function(done) {
       bq.createJob = function(reqOpts, callback) {
         callback(); // the done fn
@@ -1115,13 +1267,39 @@ describe('BigQuery', function() {
 
     it('returns a Dataset instance', function() {
       var ds = bq.dataset(DATASET_ID);
-      assert.equal(ds.constructor.name, 'Dataset');
+      assert(ds instanceof FakeDataset);
     });
 
     it('should scope the correct dataset', function() {
       var ds = bq.dataset(DATASET_ID);
-      assert.equal(ds.id, DATASET_ID);
-      assert.deepEqual(ds.bigQuery, bq);
+      var args = ds.calledWith_;
+
+      assert.strictEqual(args[0], bq);
+      assert.strictEqual(args[1], DATASET_ID);
+    });
+
+    it('should accept dataset metadata', function() {
+      var options = {location: 'US'};
+      var ds = bq.dataset(DATASET_ID, options);
+      var args = ds.calledWith_;
+
+      assert.strictEqual(args[2], options);
+    });
+
+    it('should pass the location if available', function() {
+      var bq = new BigQuery({
+        projectId: PROJECT_ID,
+        location: LOCATION,
+      });
+
+      var options = {a: 'b'};
+      var expectedOptions = extend({location: LOCATION}, options);
+
+      var ds = bq.dataset(DATASET_ID, options);
+      var args = ds.calledWith_;
+
+      assert.deepEqual(args[2], expectedOptions);
+      assert.notStrictEqual(args[2], options);
     });
   });
 
@@ -1171,15 +1349,29 @@ describe('BigQuery', function() {
     });
 
     it('should return Dataset objects', function(done) {
+      var datasetId = 'datasetName';
+
       bq.request = function(reqOpts, callback) {
         callback(null, {
-          datasets: [{datasetReference: {datasetId: 'datasetName'}}],
+          datasets: [
+            {
+              datasetReference: {datasetId},
+              location: LOCATION,
+            },
+          ],
         });
       };
 
       bq.getDatasets(function(err, datasets) {
         assert.ifError(err);
-        assert.strictEqual(datasets[0].constructor.name, 'Dataset');
+
+        var dataset = datasets[0];
+        var args = dataset.calledWith_;
+
+        assert(dataset instanceof FakeDataset);
+        assert.strictEqual(args[0], bq);
+        assert.strictEqual(args[1], datasetId);
+        assert.deepEqual(args[2], {location: LOCATION});
         done();
       });
     });
@@ -1295,6 +1487,7 @@ describe('BigQuery', function() {
               id: JOB_ID,
               jobReference: {
                 jobId: JOB_ID,
+                location: LOCATION,
               },
             },
           ],
@@ -1303,7 +1496,14 @@ describe('BigQuery', function() {
 
       bq.getJobs(function(err, jobs) {
         assert.ifError(err);
-        assert.strictEqual(jobs[0].constructor.name, 'Job');
+
+        var job = jobs[0];
+        var args = job.calledWith_;
+
+        assert(job instanceof FakeJob);
+        assert.strictEqual(args[0], bq);
+        assert.strictEqual(args[1], JOB_ID);
+        assert.deepEqual(args[2], {location: LOCATION});
         done();
       });
     });
@@ -1374,13 +1574,38 @@ describe('BigQuery', function() {
   describe('job', function() {
     it('should return a Job instance', function() {
       var job = bq.job(JOB_ID);
-      assert.equal(job.constructor.name, 'Job');
+      assert(job instanceof FakeJob);
     });
 
     it('should scope the correct job', function() {
       var job = bq.job(JOB_ID);
-      assert.equal(job.id, JOB_ID);
-      assert.deepEqual(job.bigQuery, bq);
+      var args = job.calledWith_;
+
+      assert.strictEqual(args[0], bq);
+      assert.strictEqual(args[1], JOB_ID);
+    });
+
+    it('should pass the options object', function() {
+      var options = {a: 'b'};
+      var job = bq.job(JOB_ID, options);
+
+      assert.strictEqual(job.calledWith_[2], options);
+    });
+
+    it('should pass in the user specified location', function() {
+      var bq = new BigQuery({
+        projectId: PROJECT_ID,
+        location: LOCATION,
+      });
+
+      var options = {a: 'b'};
+      var expectedOptions = extend({location: LOCATION}, options);
+
+      var job = bq.job(JOB_ID, options);
+      var args = job.calledWith_;
+
+      assert.deepEqual(args[2], expectedOptions);
+      assert.notStrictEqual(args[2], options);
     });
   });
 
@@ -1396,9 +1621,28 @@ describe('BigQuery', function() {
         callback(error, null, FAKE_RESPONSE);
       };
 
-      bq.query(QUERY_STRING, function(err, job, resp) {
+      bq.query(QUERY_STRING, function(err, rows, resp) {
         assert.strictEqual(err, error);
-        assert.strictEqual(job, null);
+        assert.strictEqual(rows, null);
+        assert.strictEqual(resp, FAKE_RESPONSE);
+        done();
+      });
+    });
+
+    it('should exit early if dryRun is set', function(done) {
+      var options = {
+        query: QUERY_STRING,
+        dryRun: true,
+      };
+
+      bq.createQueryJob = function(query, callback) {
+        assert.strictEqual(query, options);
+        callback(null, null, FAKE_RESPONSE);
+      };
+
+      bq.query(options, function(err, rows, resp) {
+        assert.ifError(err);
+        assert.deepEqual(rows, []);
         assert.strictEqual(resp, FAKE_RESPONSE);
         done();
       });

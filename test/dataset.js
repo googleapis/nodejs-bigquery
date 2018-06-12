@@ -67,6 +67,8 @@ describe('BigQuery/Dataset', function() {
     createDataset: util.noop,
   };
   var DATASET_ID = 'kittens';
+  var LOCATION = 'asia-northeast1';
+
   var Dataset;
   var Table;
   var ds;
@@ -99,22 +101,12 @@ describe('BigQuery/Dataset', function() {
       assert(promisified);
     });
 
-    it('should inherit from ServiceObject', function(done) {
-      var bigQueryInstance = extend({}, BIGQUERY, {
-        createDataset: {
-          bind: function(context) {
-            assert.strictEqual(context, bigQueryInstance);
-            done();
-          },
-        },
-      });
-
-      var ds = new Dataset(bigQueryInstance, DATASET_ID);
+    it('should inherit from ServiceObject', function() {
       assert(ds instanceof ServiceObject);
 
       var calledWith = ds.calledWith_[0];
 
-      assert.strictEqual(calledWith.parent, bigQueryInstance);
+      assert.strictEqual(calledWith.parent, BIGQUERY);
       assert.strictEqual(calledWith.baseUrl, '/datasets');
       assert.strictEqual(calledWith.id, DATASET_ID);
       assert.deepEqual(calledWith.methods, {
@@ -123,6 +115,55 @@ describe('BigQuery/Dataset', function() {
         get: true,
         getMetadata: true,
         setMetadata: true,
+      });
+    });
+
+    it('should capture user provided location', function() {
+      var options = {location: LOCATION};
+      var ds = new Dataset(BIGQUERY, DATASET_ID, options);
+
+      assert.strictEqual(ds.location, LOCATION);
+    });
+
+    describe('createMethod', function() {
+      var bq;
+      var ds;
+      var config;
+
+      beforeEach(function() {
+        bq = extend(true, {}, BIGQUERY);
+        ds = new Dataset(bq, DATASET_ID);
+        config = ds.calledWith_[0];
+      });
+
+      it('should call through to BigQuery#createDataset', function(done) {
+        var OPTIONS = {};
+
+        bq.createDataset = function(id, options, callback) {
+          assert.strictEqual(id, DATASET_ID);
+          assert.deepEqual(options, OPTIONS);
+          callback(); // the done fn
+        };
+
+        config.createMethod(DATASET_ID, OPTIONS, done);
+      });
+
+      it('should optionally accept options', function(done) {
+        bq.createDataset = function(id, options, callback) {
+          callback(); // the done fn
+        };
+
+        config.createMethod(DATASET_ID, done);
+      });
+
+      it('should pass the location', function(done) {
+        bq.createDataset = function(id, options, callback) {
+          assert.strictEqual(options.location, LOCATION);
+          callback(); // the done fn
+        };
+
+        ds.location = LOCATION;
+        config.createMethod(DATASET_ID, done);
       });
     });
 
@@ -189,11 +230,18 @@ describe('BigQuery/Dataset', function() {
         a: {b: 'c'},
       };
 
-      var expectedOptions = extend(true, {}, fakeOptions, {
-        defaultDataset: {
-          datasetId: ds.id,
+      var expectedOptions = extend(
+        true,
+        {
+          location: LOCATION,
         },
-      });
+        fakeOptions,
+        {
+          defaultDataset: {
+            datasetId: ds.id,
+          },
+        }
+      );
 
       ds.bigQuery.createQueryJob = function(options, callback) {
         assert.deepEqual(options, expectedOptions);
@@ -201,6 +249,7 @@ describe('BigQuery/Dataset', function() {
         callback(); // the done fn
       };
 
+      ds.location = LOCATION;
       ds.createQueryJob(fakeOptions, done);
     });
 
@@ -266,6 +315,16 @@ describe('BigQuery/Dataset', function() {
       };
 
       ds.createQueryStream(options);
+    });
+
+    it('should extend options with the location', function(done) {
+      ds.bigQuery.createQueryStream = function(opts) {
+        assert.strictEqual(opts.location, LOCATION);
+        done();
+      };
+
+      ds.location = LOCATION;
+      ds.createQueryStream();
     });
 
     it('should not modify original options object', function(done) {
@@ -417,6 +476,22 @@ describe('BigQuery/Dataset', function() {
       });
     });
 
+    it('should pass the location to the Table', function(done) {
+      var response = extend({location: LOCATION}, API_RESPONSE);
+
+      ds.request = function(reqOpts, callback) {
+        callback(null, response);
+      };
+
+      ds.table = function(id, options) {
+        assert.strictEqual(options.location, LOCATION);
+        setImmediate(done);
+        return {};
+      };
+
+      ds.createTable(TABLE_ID, {schema: SCHEMA_OBJECT}, assert.ifError);
+    });
+
     it('should return an apiResponse', function(done) {
       var opts = {id: TABLE_ID, schema: SCHEMA_OBJECT};
 
@@ -556,14 +631,14 @@ describe('BigQuery/Dataset', function() {
     });
 
     describe('success', function() {
+      var tableId = 'tableName';
       var apiResponse = {
         tables: [
           {
             a: 'b',
             c: 'd',
-            tableReference: {
-              tableId: 'tableName',
-            },
+            tableReference: {tableId},
+            location: LOCATION,
           },
         ],
       };
@@ -577,8 +652,12 @@ describe('BigQuery/Dataset', function() {
       it('should return Table & apiResponse', function(done) {
         ds.getTables(function(err, tables, nextQuery, apiResponse_) {
           assert.ifError(err);
-          assert(tables[0] instanceof Table);
-          assert(tables[0].id, apiResponse.tables[0].tableReference.tableId);
+
+          var table = tables[0];
+
+          assert(table instanceof Table);
+          assert.strictEqual(table.id, tableId);
+          assert.strictEqual(table.location, LOCATION);
           assert.strictEqual(apiResponse_, apiResponse);
           done();
         });
@@ -661,6 +740,16 @@ describe('BigQuery/Dataset', function() {
       ds.query(options);
     });
 
+    it('should extend options with the location', function(done) {
+      ds.bigQuery.query = function(opts) {
+        assert.strictEqual(opts.location, LOCATION);
+        done();
+      };
+
+      ds.location = LOCATION;
+      ds.query();
+    });
+
     it('should not modify original options object', function(done) {
       ds.bigQuery.query = function() {
         assert.deepEqual(options, {a: 'b', c: 'd'});
@@ -688,6 +777,22 @@ describe('BigQuery/Dataset', function() {
       var table = ds.table(tableId);
       assert(table instanceof Table);
       assert.equal(table.id, tableId);
+    });
+
+    it('should inherit the dataset location', function() {
+      ds.location = LOCATION;
+      var table = ds.table('tableId');
+
+      assert.strictEqual(table.location, LOCATION);
+    });
+
+    it('should pass along the location if provided', function() {
+      ds.location = LOCATION;
+
+      var location = 'US';
+      var table = ds.table('tableId', {location});
+
+      assert.strictEqual(table.location, location);
     });
   });
 });

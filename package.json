@@ -1,7 +1,7 @@
 {
   "name": "@google-cloud/bigquery",
   "description": "Google BigQuery Client Library for Node.js",
-  "version": "1.0.0",
+  "version": "1.3.0",
   "license": "Apache-2.0",
   "author": "Google LLC",
   "engines": {
@@ -31,6 +31,7 @@
     "Ace Nassri <anassri@google.com>",
     "Alexander Fenster <fenster@google.com>",
     "Alexander Fenster <github@fenster.name>",
+    "Alix Hamilton <ajhamilton@google.com>",
     "Ashley Schuett <ashleyns1992@gmail.com>",
     "Cristian Cavalli <cristiancavall@google.com>",
     "Dave Gramlich <callmehiphop@gmail.com>",
@@ -60,10 +61,10 @@
     "samples-test": "cd samples/ && npm link ../ && npm test && cd ../",
     "test-no-cover": "repo-tools test run --cmd mocha -- test/*.js --no-timeouts",
     "test": "repo-tools test run --cmd npm -- run cover",
-    "system-test": "repo-tools test run --cmd mocha -- system-test/*.js --no-timeouts"
+    "system-test": "repo-tools test run --cmd mocha -- system-test/*.js --timeout 600000"
   },
   "dependencies": {
-    "@google-cloud/common": "^0.16.0",
+    "@google-cloud/common": "^0.17.0",
     "arrify": "^1.0.0",
     "big.js": "^5.1.2",
     "duplexify": "^3.5.0",
@@ -87,9 +88,9 @@
     "jsdoc": "^3.5.5",
     "methmeth": "^1.1.0",
     "mocha": "^5.0.0",
-    "nyc": "^11.3.0",
+    "nyc": "^12.0.2",
     "power-assert": "^1.4.4",
-    "prettier": "^1.8.2",
+    "prettier": "^1.13.2",
     "propprop": "^0.3.0",
     "proxyquire": "^2.0.0"
   }

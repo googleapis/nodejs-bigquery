@@ -151,12 +151,12 @@ test.serial(`should extract a table to GCS`, async t => {
     .start();
 });
 
-test(`should load a GCS file`, async t => {
+test(`should load a GCS Parquet file with explicit schema`, async t => {
   t.plan(1);
   const tableId = generateUuid();
 
   const output = await tools.runAsync(
-    `${cmd} load-gcs ${projectId} ${datasetId} ${tableId} ${bucketName} ${importFileName}`,
+    `${cmd} load-gcs-parquet ${projectId} ${datasetId} ${tableId}`,
     cwd
   );
   t.regex(output, /completed\./);

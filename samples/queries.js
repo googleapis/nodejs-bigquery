@@ -78,7 +78,6 @@ function queryStackOverflow(projectId) {
 // [END bigquery_simple_app_all]
 
 function syncQuery(sqlQuery, projectId) {
-  // [START bigquery_sync_query]
   // Imports the Google Cloud client library
   const BigQuery = require('@google-cloud/bigquery');
 
@@ -111,12 +110,10 @@ function syncQuery(sqlQuery, projectId) {
     .catch(err => {
       console.error('ERROR:', err);
     });
-  // [END bigquery_sync_query]
 }
 
 function asyncQuery(sqlQuery, projectId) {
-  // [START bigquery_async_query]
-  // [START bigquery_build_client]
+  // [START bigquery_query]
   // Imports the Google Cloud client library
   const BigQuery = require('@google-cloud/bigquery');
 
@@ -130,7 +127,6 @@ function asyncQuery(sqlQuery, projectId) {
   const bigquery = new BigQuery({
     projectId: projectId,
   });
-  // [END bigquery_build_client]
 
   // Query options list: https://cloud.google.com/bigquery/docs/reference/v2/jobs/query
   const options = {
@@ -171,7 +167,7 @@ function asyncQuery(sqlQuery, projectId) {
     .catch(err => {
       console.error('ERROR:', err);
     });
-  // [END bigquery_async_query]
+  // [END bigquery_query]
 }
 
 require(`yargs`)
