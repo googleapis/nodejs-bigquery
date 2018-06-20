@@ -428,8 +428,19 @@ Job.prototype.getQueryResults = function(options, callback) {
  *   .pipe(fs.createWriteStream('./test/testdata/testfile.json'));
  */
 Job.prototype.getQueryResultsStream = common.paginator.streamify(
-  'getQueryResults'
+  'getQueryResultsAsStream_'
 );
+
+/**
+ * This method will be called by `getQueryResultsStream()`. It is required to
+ * properly set the `autoPaginate` option value.
+ *
+ * @private
+ */
+Job.prototype.getQueryResultsAsStream_ = function(options, callback) {
+  options = extend({autoPaginate: false}, options);
+  this.getQueryResults(options, callback);
+};
 
 /**
  * Poll for a status update. Execute the callback:

@@ -847,7 +847,9 @@ BigQuery.prototype.createQueryJob = function(options, callback) {
  *     this.end();
  *   });
  */
-BigQuery.prototype.createQueryStream = common.paginator.streamify('query');
+BigQuery.prototype.createQueryStream = common.paginator.streamify(
+  'queryAsStream_'
+);
 
 /**
  * Creates a job. Typically when creating a job you'll have a very specific task
@@ -1372,6 +1374,16 @@ BigQuery.prototype.query = function(query, options, callback) {
 
     job.getQueryResults(options, callback);
   });
+};
+
+/**
+ * This method will be called by `createQueryStream()`. It is required to
+ * properly set the `autoPaginate` option value.
+ *
+ * @private
+ */
+BigQuery.prototype.queryAsStream_ = function(query, callback) {
+  this.query(query, {autoPaginate: false}, callback);
 };
 
 /*! Developer Documentation

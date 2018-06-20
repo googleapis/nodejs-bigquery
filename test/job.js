@@ -295,7 +295,24 @@ describe('BigQuery/Job', function() {
 
   describe('getQueryResultsStream', function() {
     it('should have streamified getQueryResults', function() {
-      assert.strictEqual(job.getQueryResultsStream, 'getQueryResults');
+      assert.strictEqual(job.getQueryResultsStream, 'getQueryResultsAsStream_');
+    });
+  });
+
+  describe('getQueryResultsAsStream_', function() {
+    it('should call getQueryResults correctly', function(done) {
+      var options = {a: 'b', c: 'd'};
+
+      job.getQueryResults = function(options_, callback) {
+        assert.deepStrictEqual(options_, {
+          a: 'b',
+          c: 'd',
+          autoPaginate: false,
+        });
+        callback(); // done()
+      };
+
+      job.getQueryResultsAsStream_(options, done);
     });
   });
 
