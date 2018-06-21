@@ -512,6 +512,8 @@ BigQuery.getType_ = function(value) {
     typeName = 'TIMESTAMP';
   } else if (value instanceof Buffer) {
     typeName = 'BYTES';
+  } else if (value instanceof Big) {
+    typeName = 'NUMERIC';
   } else if (is.array(value)) {
     return {
       type: 'ARRAY',

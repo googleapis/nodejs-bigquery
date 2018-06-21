@@ -7,7 +7,8 @@
     "NextVacation": "2017-09-22",
     "Spells": [],
     "TeaTime": "10:00:00",
-    "Weight": 67.2
+    "Weight": 67.2,
+    "FavoriteNumeric": "123.45"
   },
   {
     "Age": "1000",
@@ -38,7 +39,8 @@
       }
     ],
     "TeaTime": "15:00:00",
-    "Weight": 198.6
+    "Weight": 198.6,
+    "FavoriteNumeric": "-111.222"
   },
   {
     "Age": "17",
@@ -61,6 +63,7 @@
       }
     ],
     "TeaTime": "12:00:00",
-    "Weight": 128.3
+    "Weight": 128.3,
+    "FavoriteNumeric": "-3.14"
   }
 ]

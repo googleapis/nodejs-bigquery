@@ -586,6 +586,7 @@ describe('BigQuery', function() {
       assert.strictEqual(BigQuery.getType_(8).type, 'INT64');
       assert.strictEqual(BigQuery.getType_(8.1).type, 'FLOAT64');
       assert.strictEqual(BigQuery.getType_('hi').type, 'STRING');
+      assert.strictEqual(BigQuery.getType_(new Big('1.1')).type, 'NUMERIC');
     });
 
     it('should return correct type for an array', function() {
