@@ -737,8 +737,7 @@ describe('BigQuery', function() {
     });
 
     it('should insert rows via stream', function(done) {
-      fs
-        .createReadStream(TEST_DATA_JSON_PATH)
+      fs.createReadStream(TEST_DATA_JSON_PATH)
         .pipe(table.createWriteStream('json'))
         .on('error', done)
         .on('complete', function() {
@@ -882,8 +881,7 @@ describe('BigQuery', function() {
       var file = bucket.file('kitten-test-data-backup.json');
 
       before(function(done) {
-        fs
-          .createReadStream(TEST_DATA_JSON_PATH)
+        fs.createReadStream(TEST_DATA_JSON_PATH)
           .pipe(file.createWriteStream())
           .on('error', done)
           .on('finish', done);
