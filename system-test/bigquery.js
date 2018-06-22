@@ -18,6 +18,7 @@
 
 var assert = require('assert');
 var async = require('async');
+var Big = require('big.js');
 var exec = require('methmeth');
 var fs = require('fs');
 var uuid = require('uuid');
@@ -1042,6 +1043,24 @@ describe('BigQuery', function() {
             );
           });
 
+          it('should work with numerics', function(done) {
+            bigquery.query(
+              {
+                query: [
+                  'SELECT x',
+                  'FROM UNNEST([NUMERIC "1", NUMERIC "2", NUMERIC "3"]) x',
+                  'WHERE x = ?',
+                ].join(' '),
+                params: [new Big('2')],
+              },
+              function(err, rows) {
+                assert.ifError(err);
+                assert.equal(rows.length, 1);
+                done();
+              }
+            );
+          });
+
           it('should work with booleans', function(done) {
             bigquery.query(
               {
@@ -1244,6 +1263,26 @@ describe('BigQuery', function() {
             );
           });
 
+          it('should work with numerics', function(done) {
+            bigquery.query(
+              {
+                query: [
+                  'SELECT x',
+                  'FROM UNNEST([NUMERIC "1", NUMERIC "2", NUMERIC "3"]) x',
+                  'WHERE x = @num',
+                ].join(' '),
+                params: {
+                  num: new Big('2'),
+                },
+              },
+              function(err, rows) {
+                assert.ifError(err);
+                assert.equal(rows.length, 1);
+                done();
+              }
+            );
+          });
+
           it('should work with booleans', function(done) {
             bigquery.query(
               {
@@ -1432,11 +1471,18 @@ describe('BigQuery', function() {
     var DATETIME = bigquery.datetime('2017-01-01 13:00:00');
     var TIME = bigquery.time('14:00:00');
     var TIMESTAMP = bigquery.timestamp(new Date());
+    var NUMERIC = new Big('123.456');
 
     before(function() {
       table = dataset.table(generateName('table'));
       return table.create({
-        schema: 'date:DATE, datetime:DATETIME, time:TIME, timestamp:TIMESTAMP',
+        schema: [
+          'date:DATE',
+          'datetime:DATETIME',
+          'time:TIME',
+          'timestamp:TIMESTAMP',
+          'numeric:NUMERIC',
+        ].join(', '),
       });
     });
 
@@ -1446,6 +1492,7 @@ describe('BigQuery', function() {
         datetime: DATETIME,
         time: TIME,
         timestamp: TIMESTAMP,
+        numeric: NUMERIC,
       });
     });
   });
@@ -1465,6 +1512,7 @@ describe('BigQuery', function() {
         TeaTime: bigquery.time('10:00:00'),
         NextVacation: bigquery.date('2017-09-22'),
         FavoriteTime: bigquery.datetime('2031-04-01T05:09:27'),
+        FavoriteNumeric: new Big('123.45'),
       },
 
       Gandalf: {
@@ -1497,6 +1545,7 @@ describe('BigQuery', function() {
         TeaTime: bigquery.time('15:00:00'),
         NextVacation: bigquery.date('2666-06-06'),
         FavoriteTime: bigquery.datetime('2001-12-19T23:59:59'),
+        FavoriteNumeric: new Big('-111.222'),
       },
 
       Sabrina: {
@@ -1521,6 +1570,7 @@ describe('BigQuery', function() {
         TeaTime: bigquery.time('12:00:00'),
         NextVacation: bigquery.date('2017-03-14'),
         FavoriteTime: bigquery.datetime('2000-10-31T23:27:46'),
+        FavoriteNumeric: new Big('-3.14'),
       },
     };
 

@@ -5,7 +5,7 @@
   "license": "Apache-2.0",
   "author": "Google LLC",
   "engines": {
-    "node": ">=4.0.0"
+    "node": ">=6.0.0"
   },
   "repository": "googleapis/nodejs-bigquery",
   "main": "./src/index.js",
@@ -66,6 +66,7 @@
   "dependencies": {
     "@google-cloud/common": "^0.17.0",
     "arrify": "^1.0.0",
+    "big.js": "^5.1.2",
     "duplexify": "^3.5.0",
     "extend": "^3.0.1",
     "is": "^3.0.1",
