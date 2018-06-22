@@ -77,5 +77,10 @@
     "mode": "NULLABLE",
     "name": "FavoriteTime",
     "type": "DATETIME"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "FavoriteNumeric",
+    "type": "NUMERIC"
   }
 ]

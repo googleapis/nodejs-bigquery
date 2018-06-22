@@ -17,6 +17,7 @@
 'use strict';
 
 var arrify = require('arrify');
+var Big = require('big.js');
 var common = require('@google-cloud/common');
 var duplexify = require('duplexify');
 var extend = require('extend');
@@ -305,6 +306,10 @@ Table.encodeValue_ = function(value) {
 
   if (value instanceof Buffer) {
     return value.toString('base64');
+  }
+
+  if (value instanceof Big) {
+    return value.toFixed();
   }
 
   var customTypeConstructorNames = [
