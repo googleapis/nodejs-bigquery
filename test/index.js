@@ -139,7 +139,7 @@ describe('BigQuery', function() {
     it('should streamify the correct methods', function() {
       assert.strictEqual(bq.getDatasetsStream, 'getDatasets');
       assert.strictEqual(bq.getJobsStream, 'getJobs');
-      assert.strictEqual(bq.createQueryStream, 'query');
+      assert.strictEqual(bq.createQueryStream, 'queryAsStream_');
     });
 
     it('should promisify all the things', function() {
@@ -1683,6 +1683,20 @@ describe('BigQuery', function() {
       };
 
       bq.query(QUERY_STRING, fakeOptions, assert.ifError);
+    });
+  });
+
+  describe('queryAsStream_', function() {
+    it('should call query correctly', function(done) {
+      var query = 'SELECT';
+
+      bq.query = function(query_, options, callback) {
+        assert.strictEqual(query_, query);
+        assert.deepStrictEqual(options, {autoPaginate: false});
+        callback(); // done()
+      };
+
+      bq.queryAsStream_(query, done);
     });
   });
 });
