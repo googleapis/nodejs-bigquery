@@ -6,7 +6,7 @@
   "author": "Google LLC",
   "repository": "googleapis/nodejs-bigquery",
   "engines": {
-    "node": ">=4"
+    "node": ">=6"
   },
   "scripts": {
     "test": "npm run cover",
@@ -14,16 +14,16 @@
     "cover": "nyc --reporter=lcov --cache ava -T 3m --verbose test/*.test.js system-test/*.test.js && nyc report"
   },
   "dependencies": {
-    "@google-cloud/bigquery": "1.3.0",
-    "@google-cloud/storage": "1.5.1",
-    "yargs": "10.0.3"
+    "@google-cloud/bigquery": "^1.3.0",
+    "@google-cloud/storage": "^1.5.1",
+    "yargs": "^10.0.3"
   },
   "devDependencies": {
-    "@google-cloud/nodejs-repo-tools": "2.3.0",
-    "ava": "0.25.0",
-    "nyc": "11.3.0",
-    "proxyquire": "1.8.0",
-    "sinon": "4.5.0",
-    "uuid": "3.3.0"
+    "@google-cloud/nodejs-repo-tools": "^2.3.0",
+    "ava": "^0.25.0",
+    "nyc": "^11.3.0",
+    "proxyquire": "^1.8.0",
+    "sinon": "^4.5.0",
+    "uuid": "^3.3.0"
   }
 }
