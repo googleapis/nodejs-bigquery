@@ -1231,7 +1231,10 @@ Table.prototype.createWriteStream = function(metadata) {
         });
 
         job.metadata = data;
-        dup.emit('complete', job);
+
+        job
+          .on('error', err => dup.destroy(err))
+          .on('complete', () => dup.emit('complete', job));
       }
     );
   });
