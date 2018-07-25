@@ -43,7 +43,7 @@ var fakeUtil = extend({}, util, {
     }
 
     promisified = true;
-    assert.deepEqual(options.exclude, [
+    assert.deepStrictEqual(options.exclude, [
       'dataset',
       'date',
       'datetime',
@@ -85,8 +85,8 @@ var fakePaginator = {
     }
 
     methods = arrify(methods);
-    assert.equal(Class.name, 'BigQuery');
-    assert.deepEqual(methods, ['getDatasets', 'getJobs']);
+    assert.strictEqual(Class.name, 'BigQuery');
+    assert.deepStrictEqual(methods, ['getDatasets', 'getJobs']);
     extended = true;
   },
   streamify: function(methodName) {
@@ -173,10 +173,13 @@ describe('BigQuery', function() {
 
       var baseUrl = 'https://www.googleapis.com/bigquery/v2';
       assert.strictEqual(calledWith.baseUrl, baseUrl);
-      assert.deepEqual(calledWith.scopes, [
+      assert.deepStrictEqual(calledWith.scopes, [
         'https://www.googleapis.com/auth/bigquery',
       ]);
-      assert.deepEqual(calledWith.packageJson, require('../package.json'));
+      assert.deepStrictEqual(
+        calledWith.packageJson,
+        require('../package.json')
+      );
     });
 
     it('should capture any user specified location', function() {
@@ -404,7 +407,7 @@ describe('BigQuery', function() {
       var mergedRows = BigQuery.mergeSchemaWithRows_(schemaObject, rawRows);
 
       mergedRows.forEach(function(mergedRow, index) {
-        assert.deepEqual(mergedRow, rows[index].expected);
+        assert.deepStrictEqual(mergedRow, rows[index].expected);
       });
     });
   });
@@ -592,7 +595,7 @@ describe('BigQuery', function() {
     it('should return correct type for an array', function() {
       var type = BigQuery.getType_([1]);
 
-      assert.deepEqual(type, {
+      assert.deepStrictEqual(type, {
         type: 'ARRAY',
         arrayType: {
           type: 'INT64',
@@ -603,7 +606,7 @@ describe('BigQuery', function() {
     it('should return correct type for a struct', function() {
       var type = BigQuery.getType_({prop: 1});
 
-      assert.deepEqual(type, {
+      assert.deepStrictEqual(type, {
         type: 'STRUCT',
         structTypes: [
           {
@@ -708,7 +711,7 @@ describe('BigQuery', function() {
       var queryParameter = BigQuery.valueToQueryParameter_(array);
       var arrayValues = queryParameter.parameterValue.arrayValues;
 
-      assert.deepEqual(arrayValues, [
+      assert.deepStrictEqual(arrayValues, [
         {
           value: array[0],
         },
@@ -750,7 +753,7 @@ describe('BigQuery', function() {
         };
       };
 
-      assert.deepEqual(BigQuery.valueToQueryParameter_(8), {
+      assert.deepStrictEqual(BigQuery.valueToQueryParameter_(8), {
         parameterType: {
           type: typeName,
         },
@@ -768,7 +771,7 @@ describe('BigQuery', function() {
       bq.request = function(reqOpts) {
         assert.strictEqual(reqOpts.method, 'POST');
         assert.strictEqual(reqOpts.uri, '/datasets');
-        assert.deepEqual(reqOpts.json.datasetReference, {
+        assert.deepStrictEqual(reqOpts.json.datasetReference, {
           datasetId: DATASET_ID,
         });
 
@@ -802,7 +805,7 @@ describe('BigQuery', function() {
 
       bq.request = function(reqOpts) {
         assert.notStrictEqual(reqOpts.json, options);
-        assert.deepEqual(options, originalOptions);
+        assert.deepStrictEqual(options, originalOptions);
         done();
       };
 
@@ -817,7 +820,7 @@ describe('BigQuery', function() {
       };
 
       bq.createDataset(DATASET_ID, function(err) {
-        assert.equal(err, error);
+        assert.strictEqual(err, error);
         done();
       });
     });
@@ -843,7 +846,7 @@ describe('BigQuery', function() {
 
       bq.createDataset(DATASET_ID, function(err, dataset, apiResponse) {
         assert.ifError(err);
-        assert.deepEqual(apiResponse, resp);
+        assert.deepStrictEqual(apiResponse, resp);
         done();
       });
     });
@@ -857,7 +860,7 @@ describe('BigQuery', function() {
 
       bq.createDataset(DATASET_ID, function(err, dataset) {
         assert.ifError(err);
-        assert.deepEqual(dataset.metadata, metadata);
+        assert.deepStrictEqual(dataset.metadata, metadata);
         done();
       });
     });
@@ -899,7 +902,7 @@ describe('BigQuery', function() {
       bq.request = function(reqOpts) {
         assert.strictEqual(reqOpts.method, 'POST');
         assert.strictEqual(reqOpts.uri, '/jobs');
-        assert.deepEqual(reqOpts.json, expectedOptions);
+        assert.deepStrictEqual(reqOpts.json, expectedOptions);
         assert.notStrictEqual(reqOpts.json, fakeOptions);
         done();
       };
@@ -994,7 +997,7 @@ describe('BigQuery', function() {
         assert(err instanceof FakeApiError);
 
         var errorOpts = err.calledWith_[0];
-        assert.deepEqual(errorOpts.errors, errors);
+        assert.deepStrictEqual(errorOpts.errors, errors);
         assert.strictEqual(errorOpts.response, response);
         done();
       });
@@ -1059,11 +1062,14 @@ describe('BigQuery', function() {
 
       it('should assign destination table to request body', function(done) {
         bq.request = function(reqOpts) {
-          assert.deepEqual(reqOpts.json.configuration.query.destinationTable, {
-            datasetId: dataset.id,
-            projectId: dataset.bigQuery.projectId,
-            tableId: TABLE_ID,
-          });
+          assert.deepStrictEqual(
+            reqOpts.json.configuration.query.destinationTable,
+            {
+              datasetId: dataset.id,
+              projectId: dataset.bigQuery.projectId,
+              tableId: TABLE_ID,
+            }
+          );
 
           done();
         };
@@ -1299,7 +1305,7 @@ describe('BigQuery', function() {
       var ds = bq.dataset(DATASET_ID, options);
       var args = ds.calledWith_;
 
-      assert.deepEqual(args[2], expectedOptions);
+      assert.deepStrictEqual(args[2], expectedOptions);
       assert.notStrictEqual(args[2], options);
     });
   });
@@ -1308,7 +1314,7 @@ describe('BigQuery', function() {
     it('should get datasets from the api', function(done) {
       bq.request = function(reqOpts) {
         assert.strictEqual(reqOpts.uri, '/datasets');
-        assert.deepEqual(reqOpts.qs, {});
+        assert.deepStrictEqual(reqOpts.qs, {});
 
         done();
       };
@@ -1329,7 +1335,7 @@ describe('BigQuery', function() {
 
     it('should default the query to an empty object', function(done) {
       bq.request = function(reqOpts) {
-        assert.deepEqual(reqOpts.qs, {});
+        assert.deepStrictEqual(reqOpts.qs, {});
         done();
       };
 
@@ -1372,7 +1378,7 @@ describe('BigQuery', function() {
         assert(dataset instanceof FakeDataset);
         assert.strictEqual(args[0], bq);
         assert.strictEqual(args[1], datasetId);
-        assert.deepEqual(args[2], {location: LOCATION});
+        assert.deepStrictEqual(args[2], {location: LOCATION});
         done();
       });
     });
@@ -1421,7 +1427,7 @@ describe('BigQuery', function() {
       };
 
       bq.getDatasets(function(err, datasets, nextQuery) {
-        assert.deepEqual(nextQuery, {
+        assert.deepStrictEqual(nextQuery, {
           pageToken: token,
         });
         done();
@@ -1451,7 +1457,7 @@ describe('BigQuery', function() {
       };
 
       bq.request = function(reqOpts) {
-        assert.deepEqual(reqOpts.qs, queryObject);
+        assert.deepStrictEqual(reqOpts.qs, queryObject);
         done();
       };
 
@@ -1460,7 +1466,7 @@ describe('BigQuery', function() {
 
     it('should default the query to an object', function(done) {
       bq.request = function(reqOpts) {
-        assert.deepEqual(reqOpts.qs, {});
+        assert.deepStrictEqual(reqOpts.qs, {});
         done();
       };
 
@@ -1504,7 +1510,7 @@ describe('BigQuery', function() {
         assert(job instanceof FakeJob);
         assert.strictEqual(args[0], bq);
         assert.strictEqual(args[1], JOB_ID);
-        assert.deepEqual(args[2], {location: LOCATION});
+        assert.deepStrictEqual(args[2], {location: LOCATION});
         done();
       });
     });
@@ -1564,7 +1570,7 @@ describe('BigQuery', function() {
 
       bq.getJobs(function(err, jobs, nextQuery) {
         assert.ifError(err);
-        assert.deepEqual(nextQuery, {
+        assert.deepStrictEqual(nextQuery, {
           pageToken: token,
         });
         done();
@@ -1605,7 +1611,7 @@ describe('BigQuery', function() {
       var job = bq.job(JOB_ID, options);
       var args = job.calledWith_;
 
-      assert.deepEqual(args[2], expectedOptions);
+      assert.deepStrictEqual(args[2], expectedOptions);
       assert.notStrictEqual(args[2], options);
     });
   });
@@ -1643,7 +1649,7 @@ describe('BigQuery', function() {
 
       bq.query(options, function(err, rows, resp) {
         assert.ifError(err);
-        assert.deepEqual(rows, []);
+        assert.deepStrictEqual(rows, []);
         assert.strictEqual(resp, FAKE_RESPONSE);
         done();
       });
@@ -1652,7 +1658,7 @@ describe('BigQuery', function() {
     it('should call job#getQueryResults', function(done) {
       var fakeJob = {
         getQueryResults: function(options, callback) {
-          assert.deepEqual(options, {});
+          assert.deepStrictEqual(options, {});
           callback(null, FAKE_ROWS, FAKE_RESPONSE);
         },
       };
