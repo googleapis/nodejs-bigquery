@@ -65,6 +65,7 @@
   },
   "dependencies": {
     "@google-cloud/common": "^0.17.0",
+    "@google-cloud/promisify": "^0.3.0",
     "arrify": "^1.0.0",
     "big.js": "^5.1.2",
     "duplexify": "^3.5.0",
@@ -92,6 +93,7 @@
     "power-assert": "^1.4.4",
     "prettier": "^1.13.2",
     "propprop": "^0.3.0",
-    "proxyquire": "^2.0.0"
+    "proxyquire": "^2.0.0",
+    "sinon": "^6.1.4"
   }
 }

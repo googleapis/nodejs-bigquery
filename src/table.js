@@ -19,6 +19,7 @@
 var arrify = require('arrify');
 var Big = require('big.js');
 var common = require('@google-cloud/common');
+var {promisifyAll} = require('@google-cloud/promisify');
 var duplexify = require('duplexify');
 var extend = require('extend');
 var format = require('string-format-obj');
@@ -1823,7 +1824,7 @@ common.paginator.extend(Table, ['getRows']);
  * All async methods (except for streams) will return a Promise in the event
  * that a callback is omitted.
  */
-common.util.promisifyAll(Table);
+promisifyAll(Table);
 
 /**
  * Reference to the {@link Table} class.

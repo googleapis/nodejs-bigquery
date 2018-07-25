@@ -24,6 +24,7 @@ var nodeutil = require('util');
 var prop = require('propprop');
 var proxyquire = require('proxyquire');
 var uuid = require('uuid');
+var pfy = require('@google-cloud/promisify');
 
 var Service = require('@google-cloud/common').Service;
 var Table = require('../src/table.js');
@@ -36,7 +37,7 @@ function FakeApiError() {
 }
 
 var promisified = false;
-var fakeUtil = extend({}, util, {
+var fakePfy = extend({}, pfy, {
   promisifyAll: function(Class, options) {
     if (Class.name !== 'BigQuery') {
       return;
@@ -52,6 +53,8 @@ var fakeUtil = extend({}, util, {
       'timestamp',
     ]);
   },
+});
+var fakeUtil = extend({}, util, {
   ApiError: FakeApiError,
 });
 var originalFakeUtil = extend(true, {}, fakeUtil);
@@ -121,6 +124,7 @@ describe('BigQuery', function() {
         paginator: fakePaginator,
         util: fakeUtil,
       },
+      '@google-cloud/promisify': fakePfy,
     });
     BigQueryCached = extend({}, BigQuery);
   });
