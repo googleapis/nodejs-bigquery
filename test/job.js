@@ -46,7 +46,7 @@ var fakePaginator = {
     }
 
     methods = arrify(methods);
-    assert.deepEqual(methods, ['getQueryResults']);
+    assert.deepStrictEqual(methods, ['getQueryResults']);
     extended = true;
   },
   streamify: function(methodName) {
@@ -98,7 +98,7 @@ describe('BigQuery/Job', function() {
     });
 
     it('should assign this.bigQuery', function() {
-      assert.deepEqual(job.bigQuery, BIGQUERY);
+      assert.deepStrictEqual(job.bigQuery, BIGQUERY);
     });
 
     it('should inherit from Operation', function() {
@@ -109,7 +109,7 @@ describe('BigQuery/Job', function() {
       assert.strictEqual(calledWith.parent, BIGQUERY);
       assert.strictEqual(calledWith.baseUrl, '/jobs');
       assert.strictEqual(calledWith.id, JOB_ID);
-      assert.deepEqual(calledWith.methods, {
+      assert.deepStrictEqual(calledWith.methods, {
         exists: true,
         get: true,
         setMetadata: true,
@@ -132,7 +132,7 @@ describe('BigQuery/Job', function() {
       var job = new Job(BIGQUERY, JOB_ID, {location: LOCATION});
       var calledWith = job.calledWith_[0];
 
-      assert.deepEqual(calledWith.methods.getMetadata, {
+      assert.deepStrictEqual(calledWith.methods.getMetadata, {
         reqOpts: {
           qs: {location: LOCATION},
         },
@@ -155,7 +155,7 @@ describe('BigQuery/Job', function() {
       var job = new Job(BIGQUERY, JOB_ID, {location: LOCATION});
 
       job.request = function(reqOpts) {
-        assert.deepEqual(reqOpts.qs, {location: LOCATION});
+        assert.deepStrictEqual(reqOpts.qs, {location: LOCATION});
         done();
       };
 
@@ -200,7 +200,7 @@ describe('BigQuery/Job', function() {
       var expectedOptions = extend({location: undefined}, options);
 
       BIGQUERY.request = function(reqOpts) {
-        assert.deepEqual(reqOpts.qs, expectedOptions);
+        assert.deepStrictEqual(reqOpts.qs, expectedOptions);
         done();
       };
 
@@ -211,7 +211,7 @@ describe('BigQuery/Job', function() {
       var job = new Job(BIGQUERY, JOB_ID, {location: LOCATION});
 
       BIGQUERY.request = function(reqOpts) {
-        assert.deepEqual(reqOpts.qs, {location: LOCATION});
+        assert.deepStrictEqual(reqOpts.qs, {location: LOCATION});
         done();
       };
 
@@ -238,7 +238,7 @@ describe('BigQuery/Job', function() {
     it('should return the rows and response to the callback', function(done) {
       job.getQueryResults(function(err, rows, nextQuery, resp) {
         assert.ifError(err);
-        assert.deepEqual(rows, []);
+        assert.deepStrictEqual(rows, []);
         assert.strictEqual(resp, RESPONSE);
         done();
       });
@@ -278,7 +278,7 @@ describe('BigQuery/Job', function() {
 
       job.getQueryResults(options, function(err, rows, nextQuery) {
         assert.ifError(err);
-        assert.deepEqual(nextQuery, options);
+        assert.deepStrictEqual(nextQuery, options);
         assert.notStrictEqual(nextQuery, options);
         done();
       });
@@ -287,7 +287,7 @@ describe('BigQuery/Job', function() {
     it('should populate nextQuery when more results exist', function(done) {
       job.getQueryResults(options, function(err, rows, nextQuery) {
         assert.ifError(err);
-        assert.equal(nextQuery.pageToken, pageToken);
+        assert.strictEqual(nextQuery.pageToken, pageToken);
         done();
       });
     });

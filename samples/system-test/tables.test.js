@@ -117,7 +117,7 @@ test.serial(`should load a local file`, async t => {
         .dataset(datasetId)
         .table(tableId)
         .getRows();
-      assert.equal(rows.length, 1);
+      assert.strictEqual(rows.length, 1);
     })
     .start();
 });
