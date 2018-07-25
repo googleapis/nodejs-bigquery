@@ -279,7 +279,7 @@ util.inherits(Table, common.ServiceObject);
   return str.split(/\s*,\s*/).reduce(
     function(acc, pair) {
       acc.fields.push({
-        name: pair.split(':')[0],
+        name: pair.split(':')[0].trim(),
         type: (pair.split(':')[1] || 'STRING').toUpperCase().trim(),
       });
 
