@@ -20,8 +20,9 @@ var arrify = require('arrify');
 var assert = require('assert');
 var extend = require('extend');
 var proxyquire = require('proxyquire');
-
+var pfy = require('@google-cloud/promisify');
 var util = require('@google-cloud/common').util;
+var sinon = require('sinon');
 
 function FakeOperation() {
   this.calledWith_ = arguments;
@@ -30,13 +31,13 @@ function FakeOperation() {
 }
 
 var promisified = false;
-var utilOverrides = {
+var fakePfy = extend({}, pfy, {
   promisifyAll: function(Class) {
     if (Class.name === 'Job') {
       promisified = true;
     }
   },
-};
+});
 
 var extended = false;
 var fakePaginator = {
@@ -54,14 +55,6 @@ var fakePaginator = {
   },
 };
 
-var fakeUtil = Object.keys(util).reduce(function(fakeUtil, methodName) {
-  fakeUtil[methodName] = function() {
-    var method = utilOverrides[methodName] || util[methodName];
-    return method.apply(this, arguments);
-  };
-  return fakeUtil;
-}, {});
-
 describe('BigQuery/Job', function() {
   var BIGQUERY = {
     projectId: 'my-project',
@@ -78,13 +71,12 @@ describe('BigQuery/Job', function() {
       '@google-cloud/common': {
         Operation: FakeOperation,
         paginator: fakePaginator,
-        util: fakeUtil,
       },
+      '@google-cloud/promisify': fakePfy,
     });
   });
 
   beforeEach(function() {
-    utilOverrides = {};
     job = new Job(BIGQUERY, JOB_ID);
   });
 
@@ -350,23 +342,29 @@ describe('BigQuery/Job', function() {
         },
       };
 
+      let sandbox;
+
       beforeEach(function() {
+        sandbox = sinon.createSandbox();
         job.getMetadata = function(callback) {
           callback(null, apiResponse, apiResponse);
         };
       });
 
       it('should detect and return an error from the response', function(done) {
-        utilOverrides.ApiError = function(body) {
+        sandbox.stub(util, 'ApiError').callsFake(body => {
           assert.strictEqual(body, apiResponse.status);
-
           return error;
-        };
+        });
 
         job.poll_(function(err) {
           assert.strictEqual(err, error);
           done();
         });
+      });
+
+      afterEach(() => {
+        sandbox.restore();
       });
     });
 

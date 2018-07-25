@@ -21,12 +21,13 @@ var assert = require('assert');
 var extend = require('extend');
 var nodeutil = require('util');
 var proxyquire = require('proxyquire');
+var pfy = require('@google-cloud/promisify');
 
 var ServiceObject = require('@google-cloud/common').ServiceObject;
 var util = require('@google-cloud/common').util;
 
 var promisified = false;
-var fakeUtil = extend({}, util, {
+var fakePfy = extend({}, pfy, {
   promisifyAll: function(Class, options) {
     if (Class.name !== 'Dataset') {
       return;
@@ -78,8 +79,8 @@ describe('BigQuery/Dataset', function() {
       '@google-cloud/common': {
         paginator: fakePaginator,
         ServiceObject: FakeServiceObject,
-        util: fakeUtil,
       },
+      '@google-cloud/promisify': fakePfy,
     });
     Table = require('../src/table.js');
   });

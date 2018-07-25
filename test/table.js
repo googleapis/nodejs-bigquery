@@ -25,6 +25,7 @@ var nodeutil = require('util');
 var proxyquire = require('proxyquire');
 var stream = require('stream');
 var uuid = require('uuid');
+var pfy = require('@google-cloud/promisify');
 
 var ServiceObject = require('@google-cloud/common').ServiceObject;
 var util = require('@google-cloud/common').util;
@@ -40,6 +41,8 @@ var fakeUtil = extend({}, util, {
     var args = arguments;
     (makeWritableStreamOverride || util.makeWritableStream).apply(null, args);
   },
+});
+var fakePfy = extend({}, pfy, {
   promisifyAll: function(Class) {
     if (Class.name === 'Table') {
       promisified = true;
@@ -121,6 +124,7 @@ describe('BigQuery/Table', function() {
         paginator: fakePaginator,
         util: fakeUtil,
       },
+      '@google-cloud/promisify': fakePfy,
     });
 
     var tableCached = extend(true, {}, Table);

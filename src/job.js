@@ -21,6 +21,7 @@
 'use strict';
 
 var common = require('@google-cloud/common');
+var {promisifyAll} = require('@google-cloud/promisify');
 var extend = require('extend');
 var is = require('is');
 var util = require('util');
@@ -484,7 +485,7 @@ common.paginator.extend(Job, ['getQueryResults']);
  * All async methods (except for streams) will return a Promise in the event
  * that a callback is omitted.
  */
-common.util.promisifyAll(Job);
+promisifyAll(Job);
 
 /**
  * Reference to the {@link Job} class.

@@ -17,6 +17,7 @@
 'use strict';
 
 var common = require('@google-cloud/common');
+var {promisifyAll} = require('@google-cloud/promisify');
 var extend = require('extend');
 var is = require('is');
 var util = require('util');
@@ -617,7 +618,7 @@ common.paginator.extend(Dataset, ['getTables']);
  * All async methods (except for streams) will return a Promise in the event
  * that a callback is omitted.
  */
-common.util.promisifyAll(Dataset, {
+promisifyAll(Dataset, {
   exclude: ['table'],
 });
 
