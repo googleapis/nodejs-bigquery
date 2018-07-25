@@ -58,8 +58,8 @@ var fakePaginator = {
     }
 
     methods = arrify(methods);
-    assert.equal(Class.name, 'Table');
-    assert.deepEqual(methods, ['getRows']);
+    assert.strictEqual(Class.name, 'Table');
+    assert.deepStrictEqual(methods, ['getRows']);
     extended = true;
   },
   streamify: function(methodName) {
@@ -189,7 +189,7 @@ describe('BigQuery/Table', function() {
       assert.strictEqual(calledWith.parent, datasetInstance);
       assert.strictEqual(calledWith.baseUrl, '/tables');
       assert.strictEqual(calledWith.id, TABLE_ID);
-      assert.deepEqual(calledWith.methods, {
+      assert.deepStrictEqual(calledWith.methods, {
         create: true,
         delete: true,
         exists: true,
@@ -219,7 +219,7 @@ describe('BigQuery/Table', function() {
         };
 
         var reqOpts = interceptor.request(fakeReqOpts);
-        assert.deepEqual(reqOpts.headers, {'If-Match': FAKE_ETAG});
+        assert.deepStrictEqual(reqOpts.headers, {'If-Match': FAKE_ETAG});
       });
 
       it('should respect already existing headers', function() {
@@ -240,7 +240,7 @@ describe('BigQuery/Table', function() {
         });
 
         var reqOpts = interceptor.request(fakeReqOpts);
-        assert.deepEqual(reqOpts.headers, expectedHeaders);
+        assert.deepStrictEqual(reqOpts.headers, expectedHeaders);
       });
 
       it('should not apply the header if method is not patch', function() {
@@ -254,14 +254,14 @@ describe('BigQuery/Table', function() {
         };
 
         var reqOpts = interceptor.request(fakeReqOpts);
-        assert.deepEqual(reqOpts.headers, undefined);
+        assert.deepStrictEqual(reqOpts.headers, undefined);
       });
     });
   });
 
   describe('createSchemaFromString_', function() {
     it('should create a schema object from a string', function() {
-      assert.deepEqual(
+      assert.deepStrictEqual(
         Table.createSchemaFromString_(SCHEMA_STRING),
         SCHEMA_OBJECT
       );
@@ -313,7 +313,7 @@ describe('BigQuery/Table', function() {
 
       var array = [buffer, date];
 
-      assert.deepEqual(Table.encodeValue_(array), [
+      assert.deepStrictEqual(Table.encodeValue_(array), [
         buffer.toString('base64'),
         date.toJSON(),
       ]);
@@ -329,7 +329,7 @@ describe('BigQuery/Table', function() {
         },
       };
 
-      assert.deepEqual(Table.encodeValue_(object), {
+      assert.deepStrictEqual(Table.encodeValue_(object), {
         nested: {
           array: [buffer.toString('base64'), date.toJSON()],
         },
@@ -360,7 +360,7 @@ describe('BigQuery/Table', function() {
 
       var formatted = Table.formatMetadata_(metadata);
 
-      assert.deepEqual(metadata, formatted);
+      assert.deepStrictEqual(metadata, formatted);
       assert.notStrictEqual(metadata, formatted);
     });
 
@@ -391,7 +391,7 @@ describe('BigQuery/Table', function() {
 
       var formatted = Table.formatMetadata_({schema: fields});
 
-      assert.deepEqual(formatted.schema.fields, fields);
+      assert.deepStrictEqual(formatted.schema.fields, fields);
     });
 
     it('should format the schema fields option', function() {
@@ -404,7 +404,7 @@ describe('BigQuery/Table', function() {
       var expectedFields = ['a', {fields: [], type: 'RECORD'}, 'b'];
       var formatted = Table.formatMetadata_(metadata);
 
-      assert.deepEqual(formatted.schema.fields, expectedFields);
+      assert.deepStrictEqual(formatted.schema.fields, expectedFields);
     });
 
     it('should format the time partitioning option', function() {
@@ -448,7 +448,7 @@ describe('BigQuery/Table', function() {
 
     it('should optionally accept metadata', function(done) {
       table.createCopyJob = function(destination, metadata) {
-        assert.deepEqual(metadata, {});
+        assert.deepStrictEqual(metadata, {});
         done();
       };
 
@@ -519,7 +519,7 @@ describe('BigQuery/Table', function() {
 
     it('should optionally accept metadata', function(done) {
       table.createCopyFromJob = function(sourceTables, metadata) {
-        assert.deepEqual(metadata, {});
+        assert.deepStrictEqual(metadata, {});
         done();
       };
 
@@ -588,7 +588,7 @@ describe('BigQuery/Table', function() {
 
     it('should send correct request to the API', function(done) {
       table.bigQuery.createJob = function(reqOpts) {
-        assert.deepEqual(reqOpts, {
+        assert.deepStrictEqual(reqOpts, {
           configuration: {
             copy: {
               a: 'b',
@@ -697,7 +697,7 @@ describe('BigQuery/Table', function() {
 
     it('should send correct request to the API', function(done) {
       table.bigQuery.createJob = function(reqOpts) {
-        assert.deepEqual(reqOpts, {
+        assert.deepStrictEqual(reqOpts, {
           configuration: {
             copy: {
               a: 'b',
@@ -726,7 +726,7 @@ describe('BigQuery/Table', function() {
 
     it('should accept multiple source tables', function(done) {
       table.bigQuery.createJob = function(reqOpts) {
-        assert.deepEqual(reqOpts.configuration.copy.sourceTables, [
+        assert.deepStrictEqual(reqOpts.configuration.copy.sourceTables, [
           {
             datasetId: SOURCE_TABLE.dataset.id,
             projectId: SOURCE_TABLE.bigQuery.projectId,
@@ -824,7 +824,7 @@ describe('BigQuery/Table', function() {
 
     it('should call createJob correctly', function(done) {
       table.bigQuery.createJob = function(reqOpts) {
-        assert.deepEqual(reqOpts.configuration.extract.sourceTable, {
+        assert.deepStrictEqual(reqOpts.configuration.extract.sourceTable, {
           datasetId: table.dataset.id,
           projectId: table.bigQuery.projectId,
           tableId: table.id,
@@ -848,7 +848,7 @@ describe('BigQuery/Table', function() {
       it('should accept csv', function(done) {
         table.bigQuery.createJob = function(reqOpts) {
           var extract = reqOpts.configuration.extract;
-          assert.equal(extract.destinationFormat, 'CSV');
+          assert.strictEqual(extract.destinationFormat, 'CSV');
           done();
         };
 
@@ -858,7 +858,10 @@ describe('BigQuery/Table', function() {
       it('should accept json', function(done) {
         table.bigQuery.createJob = function(reqOpts) {
           var extract = reqOpts.configuration.extract;
-          assert.equal(extract.destinationFormat, 'NEWLINE_DELIMITED_JSON');
+          assert.strictEqual(
+            extract.destinationFormat,
+            'NEWLINE_DELIMITED_JSON'
+          );
           done();
         };
 
@@ -868,7 +871,7 @@ describe('BigQuery/Table', function() {
       it('should accept avro', function(done) {
         table.bigQuery.createJob = function(reqOpts) {
           var extract = reqOpts.configuration.extract;
-          assert.equal(extract.destinationFormat, 'AVRO');
+          assert.strictEqual(extract.destinationFormat, 'AVRO');
           done();
         };
 
@@ -878,7 +881,7 @@ describe('BigQuery/Table', function() {
       it('should accept parquet', function(done) {
         table.bigQuery.createJob = function(reqOpts) {
           var extract = reqOpts.configuration.extract;
-          assert.equal(extract.destinationFormat, 'PARQUET');
+          assert.strictEqual(extract.destinationFormat, 'PARQUET');
           done();
         };
 
@@ -888,7 +891,7 @@ describe('BigQuery/Table', function() {
 
     it('should parse out full gs:// urls from files', function(done) {
       table.bigQuery.createJob = function(reqOpts) {
-        assert.deepEqual(reqOpts.configuration.extract.destinationUris, [
+        assert.deepStrictEqual(reqOpts.configuration.extract.destinationUris, [
           'gs://' + FILE.bucket.name + '/' + FILE.name,
         ]);
         done();
@@ -925,7 +928,7 @@ describe('BigQuery/Table', function() {
     it('should detect file format if a format is not provided', function(done) {
       table.bigQuery.createJob = function(reqOpts) {
         var destFormat = reqOpts.configuration.extract.destinationFormat;
-        assert.equal(destFormat, 'NEWLINE_DELIMITED_JSON');
+        assert.strictEqual(destFormat, 'NEWLINE_DELIMITED_JSON');
         done();
       };
 
@@ -935,7 +938,7 @@ describe('BigQuery/Table', function() {
     it('should assign the provided format if matched', function(done) {
       table.bigQuery.createJob = function(reqOpts) {
         var extract = reqOpts.configuration.extract;
-        assert.equal(extract.destinationFormat, 'CSV');
+        assert.strictEqual(extract.destinationFormat, 'CSV');
         assert.strictEqual(extract.format, undefined);
         done();
       };
@@ -951,7 +954,7 @@ describe('BigQuery/Table', function() {
 
     it('should assign GZIP compression with gzip: true', function(done) {
       table.bigQuery.createJob = function(reqOpts) {
-        assert.equal(reqOpts.configuration.extract.compression, 'GZIP');
+        assert.strictEqual(reqOpts.configuration.extract.compression, 'GZIP');
         assert.strictEqual(reqOpts.configuration.extract.gzip, undefined);
         done();
       };
@@ -1065,7 +1068,7 @@ describe('BigQuery/Table', function() {
 
     it('should infer the file format from the given filepath', function(done) {
       table.createWriteStream = function(metadata) {
-        assert.equal(metadata.sourceFormat, 'NEWLINE_DELIMITED_JSON');
+        assert.strictEqual(metadata.sourceFormat, 'NEWLINE_DELIMITED_JSON');
         var ws = new stream.Writable();
         setImmediate(function() {
           ws.emit('complete', JOB);
@@ -1081,7 +1084,7 @@ describe('BigQuery/Table', function() {
       var error = new Error('Error.');
 
       table.createWriteStream = function(metadata) {
-        assert.equal(metadata.sourceFormat, 'NEWLINE_DELIMITED_JSON');
+        assert.strictEqual(metadata.sourceFormat, 'NEWLINE_DELIMITED_JSON');
         var ws = new stream.Writable();
         setImmediate(function() {
           ws.emit('error', error);
@@ -1098,7 +1101,7 @@ describe('BigQuery/Table', function() {
 
     it('should not infer the file format if one is given', function(done) {
       table.createWriteStream = function(metadata) {
-        assert.equal(metadata.sourceFormat, 'CSV');
+        assert.strictEqual(metadata.sourceFormat, 'CSV');
         var ws = new stream.Writable();
         setImmediate(function() {
           ws.emit('complete', JOB);
@@ -1134,7 +1137,10 @@ describe('BigQuery/Table', function() {
     it('should convert File objects to gs:// urls', function(done) {
       table.bigQuery.createJob = function(reqOpts) {
         var sourceUri = reqOpts.configuration.load.sourceUris[0];
-        assert.equal(sourceUri, 'gs://' + FILE.bucket.name + '/' + FILE.name);
+        assert.strictEqual(
+          sourceUri,
+          'gs://' + FILE.bucket.name + '/' + FILE.name
+        );
         done();
       };
 
@@ -1144,7 +1150,7 @@ describe('BigQuery/Table', function() {
     it('should infer the file format from a File object', function(done) {
       table.bigQuery.createJob = function(reqOpts) {
         var sourceFormat = reqOpts.configuration.load.sourceFormat;
-        assert.equal(sourceFormat, 'NEWLINE_DELIMITED_JSON');
+        assert.strictEqual(sourceFormat, 'NEWLINE_DELIMITED_JSON');
         done();
       };
 
@@ -1154,7 +1160,7 @@ describe('BigQuery/Table', function() {
     it('should not override a provided format with a File', function(done) {
       table.bigQuery.createJob = function(reqOpts) {
         var sourceFormat = reqOpts.configuration.load.sourceFormat;
-        assert.equal(sourceFormat, 'NEWLINE_DELIMITED_JSON');
+        assert.strictEqual(sourceFormat, 'NEWLINE_DELIMITED_JSON');
         done();
       };
 
@@ -1279,7 +1285,7 @@ describe('BigQuery/Table', function() {
   describe('createQueryStream', function() {
     it('should call datasetInstance.createQueryStream()', function(done) {
       table.dataset.createQueryStream = function(a) {
-        assert.equal(a, 'a');
+        assert.strictEqual(a, 'a');
         done();
       };
 
@@ -1304,7 +1310,7 @@ describe('BigQuery/Table', function() {
       it('should accept csv', function(done) {
         makeWritableStreamOverride = function(stream, options) {
           var load = options.metadata.configuration.load;
-          assert.equal(load.sourceFormat, 'CSV');
+          assert.strictEqual(load.sourceFormat, 'CSV');
           done();
         };
 
@@ -1314,7 +1320,7 @@ describe('BigQuery/Table', function() {
       it('should accept json', function(done) {
         makeWritableStreamOverride = function(stream, options) {
           var load = options.metadata.configuration.load;
-          assert.equal(load.sourceFormat, 'NEWLINE_DELIMITED_JSON');
+          assert.strictEqual(load.sourceFormat, 'NEWLINE_DELIMITED_JSON');
           done();
         };
 
@@ -1324,7 +1330,7 @@ describe('BigQuery/Table', function() {
       it('should accept avro', function(done) {
         makeWritableStreamOverride = function(stream, options) {
           var load = options.metadata.configuration.load;
-          assert.equal(load.sourceFormat, 'AVRO');
+          assert.strictEqual(load.sourceFormat, 'AVRO');
           done();
         };
 
@@ -1342,7 +1348,7 @@ describe('BigQuery/Table', function() {
 
       makeWritableStreamOverride = function(stream, options) {
         var load = options.metadata.configuration.load;
-        assert.deepEqual(load.schema, expectedSchema);
+        assert.deepStrictEqual(load.schema, expectedSchema);
         done();
       };
 
@@ -1385,7 +1391,7 @@ describe('BigQuery/Table', function() {
         var stream;
 
         makeWritableStreamOverride = function(s) {
-          assert.equal(s, stream);
+          assert.strictEqual(s, stream);
           done();
         };
 
@@ -1395,7 +1401,7 @@ describe('BigQuery/Table', function() {
 
       it('should pass the connection', function(done) {
         makeWritableStreamOverride = function(stream, options) {
-          assert.deepEqual(options.connection, table.connection);
+          assert.deepStrictEqual(options.connection, table.connection);
           done();
         };
 
@@ -1404,7 +1410,7 @@ describe('BigQuery/Table', function() {
 
       it('should pass extended metadata', function(done) {
         makeWritableStreamOverride = function(stream, options) {
-          assert.deepEqual(options.metadata, {
+          assert.deepStrictEqual(options.metadata, {
             configuration: {
               load: {
                 a: 'b',
@@ -1434,7 +1440,7 @@ describe('BigQuery/Table', function() {
             'https://www.googleapis.com/upload/bigquery/v2/projects/' +
             table.bigQuery.projectId +
             '/jobs';
-          assert.equal(options.request.uri, uri);
+          assert.strictEqual(options.request.uri, uri);
           done();
         };
 
@@ -1508,8 +1514,8 @@ describe('BigQuery/Table', function() {
         table
           .createWriteStream()
           .on('complete', function(job) {
-            assert.equal(job.id, jobId);
-            assert.deepEqual(job.metadata, metadata);
+            assert.strictEqual(job.id, jobId);
+            assert.deepStrictEqual(job.metadata, metadata);
             done();
           })
           .emit('writing');
@@ -1542,7 +1548,7 @@ describe('BigQuery/Table', function() {
 
     it('should optionally accept metadata', function(done) {
       table.createExtractJob = function(destination, metadata) {
-        assert.deepEqual(metadata, {});
+        assert.deepStrictEqual(metadata, {});
         done();
       };
 
@@ -1722,7 +1728,7 @@ describe('BigQuery/Table', function() {
 
       table.getRows(function(err, rows, nextQuery, apiResponse) {
         assert.ifError(err);
-        assert.deepEqual(apiResponse, {rows: [{f: [{v: 'stephen'}]}]});
+        assert.deepStrictEqual(apiResponse, {rows: [{f: [{v: 'stephen'}]}]});
         done();
       });
     });
@@ -1740,9 +1746,13 @@ describe('BigQuery/Table', function() {
 
       table.getRows(options, function(err, rows, nextQuery) {
         assert.ifError(err);
-        assert.deepEqual(nextQuery, {a: 'b', c: 'd', pageToken: pageToken});
+        assert.deepStrictEqual(nextQuery, {
+          a: 'b',
+          c: 'd',
+          pageToken: pageToken,
+        });
         // Original object isn't affected.
-        assert.deepEqual(options, {a: 'b', c: 'd'});
+        assert.deepStrictEqual(options, {a: 'b', c: 'd'});
         done();
       });
     });
@@ -1790,9 +1800,9 @@ describe('BigQuery/Table', function() {
 
     it('should save data', function(done) {
       table.request = function(reqOpts) {
-        assert.equal(reqOpts.method, 'POST');
-        assert.equal(reqOpts.uri, '/insertAll');
-        assert.deepEqual(reqOpts.json, dataApiFormat);
+        assert.strictEqual(reqOpts.method, 'POST');
+        assert.strictEqual(reqOpts.uri, '/insertAll');
+        assert.deepStrictEqual(reqOpts.json, dataApiFormat);
         done();
       };
 
@@ -1853,7 +1863,7 @@ describe('BigQuery/Table', function() {
       table.insert(data, function(err) {
         assert.strictEqual(err.name, 'PartialFailureError');
 
-        assert.deepEqual(err.errors, [
+        assert.deepStrictEqual(err.errors, [
           {
             row: dataApiFormat.rows[0].json,
             errors: [row0Error],
@@ -1870,9 +1880,9 @@ describe('BigQuery/Table', function() {
 
     it('should insert raw data', function(done) {
       table.request = function(reqOpts) {
-        assert.equal(reqOpts.method, 'POST');
-        assert.equal(reqOpts.uri, '/insertAll');
-        assert.deepEqual(reqOpts.json, {rows: rawData});
+        assert.strictEqual(reqOpts.method, 'POST');
+        assert.strictEqual(reqOpts.uri, '/insertAll');
+        assert.deepStrictEqual(reqOpts.json, {rows: rawData});
         assert.strictEqual(reqOpts.json.raw, undefined);
         done();
       };
@@ -1889,8 +1899,8 @@ describe('BigQuery/Table', function() {
       };
 
       table.request = function(reqOpts) {
-        assert.equal(reqOpts.method, 'POST');
-        assert.equal(reqOpts.uri, '/insertAll');
+        assert.strictEqual(reqOpts.method, 'POST');
+        assert.strictEqual(reqOpts.uri, '/insertAll');
 
         assert.strictEqual(
           reqOpts.json.ignoreUnknownValues,
@@ -1899,7 +1909,7 @@ describe('BigQuery/Table', function() {
         assert.strictEqual(reqOpts.json.skipInvalidRows, opts.skipInvalidRows);
         assert.strictEqual(reqOpts.json.templateSuffix, opts.templateSuffix);
 
-        assert.deepEqual(reqOpts.json.rows, dataApiFormat.rows);
+        assert.deepStrictEqual(reqOpts.json.rows, dataApiFormat.rows);
         done();
       };
 
@@ -2020,9 +2030,9 @@ describe('BigQuery/Table', function() {
         var attempts = 0;
 
         table.request = function(reqOpts, callback) {
-          assert.equal(reqOpts.method, 'POST');
-          assert.equal(reqOpts.uri, '/insertAll');
-          assert.deepEqual(reqOpts.json, dataApiFormat);
+          assert.strictEqual(reqOpts.method, 'POST');
+          assert.strictEqual(reqOpts.uri, '/insertAll');
+          assert.deepStrictEqual(reqOpts.json, dataApiFormat);
 
           if (++attempts === 2) {
             callback(null, response);
@@ -2066,7 +2076,7 @@ describe('BigQuery/Table', function() {
 
     it('should optionally accept metadata', function(done) {
       table.createLoadJob = function(source, metadata) {
-        assert.deepEqual(metadata, {});
+        assert.deepStrictEqual(metadata, {});
         done();
       };
 
@@ -2115,8 +2125,8 @@ describe('BigQuery/Table', function() {
   describe('query', function() {
     it('should pass args through to datasetInstance.query()', function(done) {
       table.dataset.query = function(a, b) {
-        assert.equal(a, 'a');
-        assert.equal(b, 'b');
+        assert.strictEqual(a, 'a');
+        assert.strictEqual(b, 'b');
         done();
       };
 

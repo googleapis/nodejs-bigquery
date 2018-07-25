@@ -34,7 +34,7 @@ var fakePfy = extend({}, pfy, {
     }
 
     promisified = true;
-    assert.deepEqual(options.exclude, ['table']);
+    assert.deepStrictEqual(options.exclude, ['table']);
   },
 });
 
@@ -46,8 +46,8 @@ var fakePaginator = {
     }
 
     methods = arrify(methods);
-    assert.equal(Class.name, 'Dataset');
-    assert.deepEqual(methods, ['getTables']);
+    assert.strictEqual(Class.name, 'Dataset');
+    assert.deepStrictEqual(methods, ['getTables']);
     extended = true;
   },
   streamify: function(methodName) {
@@ -110,7 +110,7 @@ describe('BigQuery/Dataset', function() {
       assert.strictEqual(calledWith.parent, BIGQUERY);
       assert.strictEqual(calledWith.baseUrl, '/datasets');
       assert.strictEqual(calledWith.id, DATASET_ID);
-      assert.deepEqual(calledWith.methods, {
+      assert.deepStrictEqual(calledWith.methods, {
         create: true,
         exists: true,
         get: true,
@@ -142,7 +142,7 @@ describe('BigQuery/Dataset', function() {
 
         bq.createDataset = function(id, options, callback) {
           assert.strictEqual(id, DATASET_ID);
-          assert.deepEqual(options, OPTIONS);
+          assert.deepStrictEqual(options, OPTIONS);
           callback(); // the done fn
         };
 
@@ -182,7 +182,7 @@ describe('BigQuery/Dataset', function() {
         };
 
         var reqOpts = interceptor.request(fakeReqOpts);
-        assert.deepEqual(reqOpts.headers, {'If-Match': FAKE_ETAG});
+        assert.deepStrictEqual(reqOpts.headers, {'If-Match': FAKE_ETAG});
       });
 
       it('should respect already existing headers', function() {
@@ -203,7 +203,7 @@ describe('BigQuery/Dataset', function() {
         });
 
         var reqOpts = interceptor.request(fakeReqOpts);
-        assert.deepEqual(reqOpts.headers, expectedHeaders);
+        assert.deepStrictEqual(reqOpts.headers, expectedHeaders);
       });
 
       it('should not apply the header if method is not patch', function() {
@@ -217,7 +217,7 @@ describe('BigQuery/Dataset', function() {
         };
 
         var reqOpts = interceptor.request(fakeReqOpts);
-        assert.deepEqual(reqOpts.headers, undefined);
+        assert.deepStrictEqual(reqOpts.headers, undefined);
       });
     });
   });
@@ -245,7 +245,7 @@ describe('BigQuery/Dataset', function() {
       );
 
       ds.bigQuery.createQueryJob = function(options, callback) {
-        assert.deepEqual(options, expectedOptions);
+        assert.deepStrictEqual(options, expectedOptions);
         assert.notStrictEqual(fakeOptions, options);
         callback(); // the done fn
       };
@@ -292,7 +292,7 @@ describe('BigQuery/Dataset', function() {
       var query = 'SELECT * FROM allthedata';
 
       ds.bigQuery.createQueryStream = function(opts) {
-        assert.equal(opts.query, query);
+        assert.strictEqual(opts.query, query);
         done();
       };
 
@@ -301,8 +301,8 @@ describe('BigQuery/Dataset', function() {
 
     it('should pass along options', function(done) {
       ds.bigQuery.createQueryStream = function(opts) {
-        assert.equal(opts.a, options.a);
-        assert.equal(opts.c, options.c);
+        assert.strictEqual(opts.a, options.a);
+        assert.strictEqual(opts.c, options.c);
         done();
       };
 
@@ -311,7 +311,7 @@ describe('BigQuery/Dataset', function() {
 
     it('should extend options with defaultDataset', function(done) {
       ds.bigQuery.createQueryStream = function(opts) {
-        assert.deepEqual(opts.defaultDataset, {datasetId: ds.id});
+        assert.deepStrictEqual(opts.defaultDataset, {datasetId: ds.id});
         done();
       };
 
@@ -330,7 +330,7 @@ describe('BigQuery/Dataset', function() {
 
     it('should not modify original options object', function(done) {
       ds.bigQuery.createQueryStream = function() {
-        assert.deepEqual(options, {a: 'b', c: 'd'});
+        assert.deepStrictEqual(options, {a: 'b', c: 'd'});
         done();
       };
 
@@ -367,10 +367,13 @@ describe('BigQuery/Dataset', function() {
         assert.strictEqual(reqOpts.uri, '/tables');
 
         var body = reqOpts.json;
-        assert.deepEqual(body.schema, SCHEMA_OBJECT);
-        assert.equal(body.tableReference.datasetId, DATASET_ID);
-        assert.equal(body.tableReference.projectId, ds.bigQuery.projectId);
-        assert.equal(body.tableReference.tableId, TABLE_ID);
+        assert.deepStrictEqual(body.schema, SCHEMA_OBJECT);
+        assert.strictEqual(body.tableReference.datasetId, DATASET_ID);
+        assert.strictEqual(
+          body.tableReference.projectId,
+          ds.bigQuery.projectId
+        );
+        assert.strictEqual(body.tableReference.tableId, TABLE_ID);
 
         done();
       };
@@ -408,7 +411,7 @@ describe('BigQuery/Dataset', function() {
 
     it('should create a schema object from a string', function(done) {
       ds.request = function(reqOpts) {
-        assert.deepEqual(reqOpts.json.schema, SCHEMA_OBJECT);
+        assert.deepStrictEqual(reqOpts.json.schema, SCHEMA_OBJECT);
         done();
       };
 
@@ -417,7 +420,10 @@ describe('BigQuery/Dataset', function() {
 
     it('should wrap an array schema', function(done) {
       ds.request = function(reqOpts) {
-        assert.deepEqual(reqOpts.json.schema.fields, SCHEMA_OBJECT.fields);
+        assert.deepStrictEqual(
+          reqOpts.json.schema.fields,
+          SCHEMA_OBJECT.fields
+        );
         done();
       };
 
@@ -531,9 +537,9 @@ describe('BigQuery/Dataset', function() {
   describe('delete', function() {
     it('should delete the dataset via the api', function(done) {
       ds.request = function(reqOpts) {
-        assert.equal(reqOpts.method, 'DELETE');
-        assert.equal(reqOpts.uri, '');
-        assert.deepEqual(reqOpts.qs, {deleteContents: false});
+        assert.strictEqual(reqOpts.method, 'DELETE');
+        assert.strictEqual(reqOpts.uri, '');
+        assert.deepStrictEqual(reqOpts.qs, {deleteContents: false});
         done();
       };
 
@@ -542,7 +548,7 @@ describe('BigQuery/Dataset', function() {
 
     it('should allow a force delete', function(done) {
       ds.request = function(reqOpts) {
-        assert.deepEqual(reqOpts.qs, {deleteContents: true});
+        assert.deepStrictEqual(reqOpts.qs, {deleteContents: true});
         done();
       };
 
@@ -587,8 +593,8 @@ describe('BigQuery/Dataset', function() {
   describe('getTables', function() {
     it('should get tables from the api', function(done) {
       ds.request = function(reqOpts) {
-        assert.equal(reqOpts.uri, '/tables');
-        assert.deepEqual(reqOpts.qs, {});
+        assert.strictEqual(reqOpts.uri, '/tables');
+        assert.deepStrictEqual(reqOpts.qs, {});
         done();
       };
 
@@ -611,7 +617,7 @@ describe('BigQuery/Dataset', function() {
 
     it('should default the query value to an empty object', function(done) {
       ds.request = function(reqOpts) {
-        assert.deepEqual(reqOpts.qs, {});
+        assert.deepStrictEqual(reqOpts.qs, {});
         done();
       };
 
@@ -690,7 +696,7 @@ describe('BigQuery/Dataset', function() {
 
         ds.getTables(query, function(err, tables, nextQuery) {
           assert.ifError(err);
-          assert.deepEqual(nextQuery, expectedNextQuery);
+          assert.deepStrictEqual(nextQuery, expectedNextQuery);
           done();
         });
       });
@@ -715,7 +721,7 @@ describe('BigQuery/Dataset', function() {
       var query = 'SELECT * FROM allthedata';
 
       ds.bigQuery.query = function(opts) {
-        assert.equal(opts.query, query);
+        assert.strictEqual(opts.query, query);
         done();
       };
 
@@ -724,8 +730,8 @@ describe('BigQuery/Dataset', function() {
 
     it('should pass along options', function(done) {
       ds.bigQuery.query = function(opts) {
-        assert.equal(opts.a, options.a);
-        assert.equal(opts.c, options.c);
+        assert.strictEqual(opts.a, options.a);
+        assert.strictEqual(opts.c, options.c);
         done();
       };
 
@@ -734,7 +740,7 @@ describe('BigQuery/Dataset', function() {
 
     it('should extend options with defaultDataset', function(done) {
       ds.bigQuery.query = function(opts) {
-        assert.deepEqual(opts.defaultDataset, {datasetId: ds.id});
+        assert.deepStrictEqual(opts.defaultDataset, {datasetId: ds.id});
         done();
       };
 
@@ -753,7 +759,7 @@ describe('BigQuery/Dataset', function() {
 
     it('should not modify original options object', function(done) {
       ds.bigQuery.query = function() {
-        assert.deepEqual(options, {a: 'b', c: 'd'});
+        assert.deepStrictEqual(options, {a: 'b', c: 'd'});
         done();
       };
 
@@ -764,7 +770,7 @@ describe('BigQuery/Dataset', function() {
       var callback = util.noop;
 
       ds.bigQuery.query = function(opts, cb) {
-        assert.equal(cb, callback);
+        assert.strictEqual(cb, callback);
         done();
       };
 
@@ -777,7 +783,7 @@ describe('BigQuery/Dataset', function() {
       var tableId = 'tableId';
       var table = ds.table(tableId);
       assert(table instanceof Table);
-      assert.equal(table.id, tableId);
+      assert.strictEqual(table.id, tableId);
     });
 
     it('should inherit the dataset location', function() {
