@@ -65,7 +65,6 @@
   },
   "dependencies": {
     "@google-cloud/common": "^0.20.3",
-    "@google-cloud/paginator": "^0.1.0",
     "@google-cloud/promisify": "^0.3.0",
     "arrify": "^1.0.0",
     "big.js": "^5.1.2",
