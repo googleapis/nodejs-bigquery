@@ -16,15 +16,15 @@
 
 'use strict';
 
-var arrify = require('arrify');
-var Big = require('big.js');
-var common = require('@google-cloud/common');
-var {promisifyAll} = require('@google-cloud/promisify');
-var extend = require('extend');
+import * as arrify from 'arrify';
+import * as Big from 'big.js';
+import * as common from '@google-cloud/common';
+import {promisifyAll} from '@google-cloud/promisify';
+import * as extend from 'extend';
 var format = require('string-format-obj');
-var is = require('is');
-var util = require('util');
-var uuid = require('uuid');
+import * as is from 'is';
+import * as util from 'util';
+import * as uuid from 'uuid';
 
 var Dataset = require('./dataset.js');
 var Job = require('./job.js');
@@ -96,16 +96,11 @@ var Table = require('./table.js');
  * Full quickstart example:
  */
 function BigQuery(options) {
-  if (!(this instanceof BigQuery)) {
-    return new BigQuery(options);
-  }
-
-  options = common.util.normalizeArguments(this, options);
-
+  options = options || {};
   var config = {
     baseUrl: 'https://www.googleapis.com/bigquery/v2',
     scopes: ['https://www.googleapis.com/auth/bigquery'],
-    packageJson: require('../package.json'),
+    packageJson: require('../../package.json'),
   };
 
   if (options.scopes) {
@@ -132,7 +127,7 @@ util.inherits(BigQuery, common.Service);
  * @param {array} rows
  * @returns {array} Fields using their matching names from the table's schema.
  */
-BigQuery.mergeSchemaWithRows_ = BigQuery.prototype.mergeSchemaWithRows_ = function(
+(BigQuery as any).mergeSchemaWithRows_ = BigQuery.prototype.mergeSchemaWithRows_ = function(
   schema,
   rows
 ) {
@@ -189,23 +184,23 @@ BigQuery.mergeSchemaWithRows_ = BigQuery.prototype.mergeSchemaWithRows_ = functi
         break;
       }
       case 'RECORD': {
-        value = BigQuery.mergeSchemaWithRows_(schemaField, value).pop();
+        value = (BigQuery as any).mergeSchemaWithRows_(schemaField, value).pop();
         break;
       }
       case 'DATE': {
-        value = BigQuery.date(value);
+        value = (BigQuery as any).date(value);
         break;
       }
       case 'DATETIME': {
-        value = BigQuery.datetime(value);
+        value = (BigQuery as any).datetime(value);
         break;
       }
       case 'TIME': {
-        value = BigQuery.time(value);
+        value = (BigQuery as any).time(value);
         break;
       }
       case 'TIMESTAMP': {
-        value = BigQuery.timestamp(new Date(value * 1000));
+        value = (BigQuery as any).timestamp(new Date(value * 1000));
         break;
       }
     }
@@ -274,13 +269,13 @@ BigQuery.mergeSchemaWithRows_ = BigQuery.prototype.mergeSchemaWithRows_ = functi
  *   day: 1
  * });
  */
-BigQuery.date = BigQuery.prototype.date = function BigQueryDate(value) {
-  if (!(this instanceof BigQuery.date)) {
-    return new BigQuery.date(value);
+(BigQuery as any).date = BigQuery.prototype.date = function BigQueryDate(value) {
+  if (!(this instanceof (BigQuery as any).date)) {
+    return new (BigQuery as any).date(value);
   }
 
   if (is.object(value)) {
-    value = BigQuery.datetime(value).value;
+    value = (BigQuery as any).datetime(value).value;
   }
 
   this.value = value;
@@ -356,18 +351,18 @@ BigQuery.date = BigQuery.prototype.date = function BigQueryDate(value) {
  *   seconds: 0
  * });
  */
-BigQuery.datetime = BigQuery.prototype.datetime = function BigQueryDatetime(
+(BigQuery as any).datetime = BigQuery.prototype.datetime = function BigQueryDatetime(
   value
 ) {
-  if (!(this instanceof BigQuery.datetime)) {
-    return new BigQuery.datetime(value);
+  if (!(this instanceof (BigQuery as any).datetime)) {
+    return new (BigQuery as any).datetime(value);
   }
 
   if (is.object(value)) {
     var time;
 
     if (value.hours) {
-      time = BigQuery.time(value).value;
+      time = (BigQuery as any).time(value).value;
     }
 
     value = format('{y}-{m}-{d}{time}', {
@@ -437,9 +432,9 @@ BigQuery.datetime = BigQuery.prototype.datetime = function BigQueryDatetime(
  *   seconds: 0
  * });
  */
-BigQuery.time = BigQuery.prototype.time = function BigQueryTime(value) {
-  if (!(this instanceof BigQuery.time)) {
-    return new BigQuery.time(value);
+(BigQuery as any).time = BigQuery.prototype.time = function BigQueryTime(value) {
+  if (!(this instanceof (BigQuery as any).time)) {
+    return new (BigQuery as any).time(value);
   }
 
   if (is.object(value)) {
@@ -478,11 +473,11 @@ BigQuery.time = BigQuery.prototype.time = function BigQueryTime(value) {
  * const bigquery = new BigQuery();
  * const timestamp = bigquery.timestamp(new Date());
  */
-BigQuery.timestamp = BigQuery.prototype.timestamp = function BigQueryTimestamp(
+(BigQuery as any).timestamp = BigQuery.prototype.timestamp = function BigQueryTimestamp(
   value
 ) {
-  if (!(this instanceof BigQuery.timestamp)) {
-    return new BigQuery.timestamp(value);
+  if (!(this instanceof (BigQuery as any).timestamp)) {
+    return new (BigQuery as any).timestamp(value);
   }
 
   this.value = new Date(value).toJSON();
@@ -500,16 +495,16 @@ BigQuery.timestamp = BigQuery.prototype.timestamp = function BigQueryTimestamp(
  * @param {*} value The value.
  * @returns {string} The type detected from the value.
  */
-BigQuery.getType_ = function(value) {
+(BigQuery as any).getType_ = function(value) {
   var typeName;
 
-  if (value instanceof BigQuery.date) {
+  if (value instanceof (BigQuery as any).date) {
     typeName = 'DATE';
-  } else if (value instanceof BigQuery.datetime) {
+  } else if (value instanceof (BigQuery as any).datetime) {
     typeName = 'DATETIME';
-  } else if (value instanceof BigQuery.time) {
+  } else if (value instanceof (BigQuery as any).time) {
     typeName = 'TIME';
-  } else if (value instanceof BigQuery.timestamp) {
+  } else if (value instanceof (BigQuery as any).timestamp) {
     typeName = 'TIMESTAMP';
   } else if (value instanceof Buffer) {
     typeName = 'BYTES';
@@ -518,7 +513,7 @@ BigQuery.getType_ = function(value) {
   } else if (is.array(value)) {
     return {
       type: 'ARRAY',
-      arrayType: BigQuery.getType_(value[0]),
+      arrayType: (BigQuery as any).getType_(value[0]),
     };
   } else if (is.bool(value)) {
     typeName = 'BOOL';
@@ -530,7 +525,7 @@ BigQuery.getType_ = function(value) {
       structTypes: Object.keys(value).map(function(prop) {
         return {
           name: prop,
-          type: BigQuery.getType_(value[prop]),
+          type: (BigQuery as any).getType_(value[prop]),
         };
       }),
     };
@@ -562,14 +557,14 @@ BigQuery.getType_ = function(value) {
  * @param {*} value The value.
  * @returns {object} A properly-formed `queryParameter` object.
  */
-BigQuery.valueToQueryParameter_ = function(value) {
+(BigQuery as any).valueToQueryParameter_ = function(value) {
   if (is.date(value)) {
-    value = BigQuery.timestamp(value);
+    value = (BigQuery as any).timestamp(value);
   }
 
   var queryParameter = {
-    parameterType: BigQuery.getType_(value),
-    parameterValue: {},
+    parameterType: (BigQuery as any).getType_(value),
+    parameterValue: {} as any,
   };
 
   var typeName = queryParameter.parameterType.type;
@@ -587,7 +582,7 @@ BigQuery.valueToQueryParameter_ = function(value) {
   } else if (typeName === 'STRUCT') {
     queryParameter.parameterValue.structValues = Object.keys(value).reduce(
       function(structValues, prop) {
-        var nestedQueryParameter = BigQuery.valueToQueryParameter_(value[prop]);
+        var nestedQueryParameter = (BigQuery as any).valueToQueryParameter_(value[prop]);
         structValues[prop] = nestedQueryParameter.parameterValue;
         return structValues;
       },
@@ -784,12 +779,12 @@ BigQuery.prototype.createQueryJob = function(options, callback) {
 
       for (var namedParamater in query.params) {
         var value = query.params[namedParamater];
-        var queryParameter = BigQuery.valueToQueryParameter_(value);
+        var queryParameter = (BigQuery as any).valueToQueryParameter_(value);
         queryParameter.name = namedParamater;
         query.queryParameters.push(queryParameter);
       }
     } else {
-      query.queryParameters = query.params.map(BigQuery.valueToQueryParameter_);
+      query.queryParameters = query.params.map((BigQuery as any).valueToQueryParameter_);
     }
 
     delete query.params;
@@ -798,8 +793,8 @@ BigQuery.prototype.createQueryJob = function(options, callback) {
   var reqOpts = {
     configuration: {
       query: query,
-    },
-  };
+    } as any,
+  } as any;
 
   if (query.dryRun) {
     reqOpts.configuration.dryRun = query.dryRun;
@@ -958,7 +953,7 @@ BigQuery.prototype.createJob = function(options, callback) {
         err = new common.util.ApiError({
           errors: resp.status.errors,
           response: resp,
-        });
+        } as any);
       }
 
       var job = self.job(jobId, {
@@ -1416,7 +1411,7 @@ promisifyAll(BigQuery, {
  * @see Dataset
  * @type {constructor}
  */
-BigQuery.Dataset = Dataset;
+(BigQuery as any).Dataset = Dataset;
 
 /**
  * {@link Job} class.
@@ -1425,7 +1420,7 @@ BigQuery.Dataset = Dataset;
  * @see Job
  * @type {constructor}
  */
-BigQuery.Job = Job;
+(BigQuery as any).Job = Job;
 
 /**
  * {@link Table} class.
@@ -1434,7 +1429,7 @@ BigQuery.Job = Job;
  * @see Table
  * @type {constructor}
  */
-BigQuery.Table = Table;
+(BigQuery as any).Table = Table;
 
 /**
  * The default export of the `@google-cloud/bigquery` package is the {@link BigQuery}

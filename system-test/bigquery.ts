@@ -16,18 +16,19 @@
 
 'use strict';
 
-var assert = require('assert');
-var async = require('async');
-var Big = require('big.js');
-var exec = require('methmeth');
-var fs = require('fs');
-var uuid = require('uuid');
+import * as assert from 'assert';
+import * as async from 'async';
+import * as Big from 'big.js';
+import * as fs from 'fs';
+import * as uuid from 'uuid';
+import * as exec from 'methmeth';
 
-var Dataset = require('../src/dataset.js');
-var Job = require('../src/job.js');
-var Table = require('../src/table.js');
+var Dataset = require('../src/dataset');
+var Job = require('../src/job');
+var Table = require('../src/table');
 
-var bigquery = require('../')();
+var BigQuery = require('../src');
+var bigquery = new BigQuery();
 var storage = require('@google-cloud/storage')();
 
 describe('BigQuery', function() {
@@ -137,7 +138,8 @@ describe('BigQuery', function() {
     var maxApiCalls = 1;
     var numRequestsMade = 0;
 
-    var bigquery = require('../')();
+    var BigQuery = require('../src');
+    var bigquery = new BigQuery();
 
     bigquery.interceptors.push({
       request: function(reqOpts) {
@@ -166,7 +168,8 @@ describe('BigQuery', function() {
     var maxApiCalls = 1;
     var numRequestsMade = 0;
 
-    var bigquery = require('../')();
+    var BigQuery = require('../src');
+    var bigquery = new BigQuery();
 
     bigquery.interceptors.push({
       request: function(reqOpts) {
@@ -252,7 +255,7 @@ describe('BigQuery', function() {
     bigquery.createQueryJob(query, function(err, job) {
       assert.ifError(err);
 
-      var rowsEmitted = [];
+      var rowsEmitted: any[] = [];
 
       job
         .getQueryResultsStream()
@@ -545,21 +548,21 @@ describe('BigQuery', function() {
       var job;
 
       var QUERY = `SELECT * FROM \`${table.id}\``;
-      var SCHEMA = require('./data/schema.json');
-      var TEST_DATA_FILE = require.resolve('./data/location-test-data.json');
+      var SCHEMA = require('../../system-test/data/schema.json');
+      var TEST_DATA_FILE = require.resolve('../../system-test/data/location-test-data.json');
 
       before(function() {
         // create a dataset in a certain location will cascade the location
         // to any jobs created through it
         return dataset
           .create()
-          .then(function() {
+          .then(() => {
             return table.create({schema: SCHEMA});
           })
-          .then(function() {
+          .then(() => {
             return table.createLoadJob(TEST_DATA_FILE);
           })
-          .then(function(data) {
+          .then(data => {
             job = data[0];
             return job.promise();
           });
@@ -714,7 +717,7 @@ describe('BigQuery', function() {
   });
 
   describe('BigQuery/Table', function() {
-    var TEST_DATA_JSON_PATH = require.resolve('./data/kitten-test-data.json');
+    var TEST_DATA_JSON_PATH = require.resolve('../../system-test/data/kitten-test-data.json');
 
     it('should have created the correct schema', function() {
       assert.deepStrictEqual(table.metadata.schema.fields, SCHEMA);
@@ -770,7 +773,7 @@ describe('BigQuery', function() {
     });
 
     describe('copying', function() {
-      var TABLES = {
+      var TABLES: any = {
         1: {
           data: {
             tableId: 1,
@@ -1499,8 +1502,8 @@ describe('BigQuery', function() {
 
   describe('Provided Tests', function() {
     var table = dataset.table(generateName('table'));
-    var schema = require('./data/schema.json');
-    var testData = require('./data/schema-test-data.json');
+    var schema = require('../../system-test/data/schema.json');
+    var testData = require('../../system-test/data/schema-test-data.json');
 
     var EXPECTED_ROWS = {
       Bilbo: {

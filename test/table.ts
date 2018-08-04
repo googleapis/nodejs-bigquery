@@ -16,19 +16,17 @@
 
 'use strict';
 
-var arrify = require('arrify');
-var assert = require('assert');
-var Big = require('big.js');
+import * as arrify from 'arrify';
+import * as assert from 'assert';
+import * as Big from 'big.js';
 var events = require('events');
-var extend = require('extend');
-var nodeutil = require('util');
-var proxyquire = require('proxyquire');
+import * as extend from 'extend';
+import * as nodeutil from 'util';
+import * as proxyquire from 'proxyquire';
 var stream = require('stream');
-var uuid = require('uuid');
-var pfy = require('@google-cloud/promisify');
-
-var ServiceObject = require('@google-cloud/common').ServiceObject;
-var util = require('@google-cloud/common').util;
+import * as uuid from 'uuid';
+import * as pfy from '@google-cloud/promisify';
+import {ServiceObject, util} from '@google-cloud/common';
 
 var promisified = false;
 var makeWritableStreamOverride;
@@ -114,7 +112,7 @@ describe('BigQuery/Table', function() {
   var Table;
   var TABLE_ID = 'kittens';
   var table;
-  var tableOverrides = {};
+  var tableOverrides: any = {};
 
   before(function() {
     Table = proxyquire('../src/table.js', {
@@ -1021,7 +1019,7 @@ describe('BigQuery/Table', function() {
   });
 
   describe('createLoadJob', function() {
-    var FILEPATH = require.resolve('./testdata/testfile.json');
+    var FILEPATH = require.resolve('../../test/testdata/testfile.json');
     var FILE = {
       name: 'file-name.json',
       bucket: {
@@ -1931,7 +1929,7 @@ describe('BigQuery/Table', function() {
       });
 
       beforeEach(function() {
-        global.setTimeout = function(callback) {
+        (global as any).setTimeout = function(callback) {
           callback();
         };
 
@@ -1978,7 +1976,7 @@ describe('BigQuery/Table', function() {
           return fakeRandomValue;
         };
 
-        global.setTimeout = function(callback, delay) {
+        (global as any).setTimeout = function(callback, delay) {
           assert.strictEqual(delay, fakeRandomValue * 60000);
           callback();
         };
@@ -2012,7 +2010,7 @@ describe('BigQuery/Table', function() {
         };
 
         var timeouts = 0;
-        global.setTimeout = function(callback, delay) {
+        (global as any).setTimeout = function(callback, delay) {
           if (++timeouts === 2) {
             assert.strictEqual(delay, 60000);
             done();

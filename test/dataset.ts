@@ -16,15 +16,13 @@
 
 'use strict';
 
-var arrify = require('arrify');
-var assert = require('assert');
-var extend = require('extend');
-var nodeutil = require('util');
-var proxyquire = require('proxyquire');
-var pfy = require('@google-cloud/promisify');
-
-var ServiceObject = require('@google-cloud/common').ServiceObject;
-var util = require('@google-cloud/common').util;
+import * as arrify from 'arrify';
+import * as assert from 'assert';
+import * as extend from 'extend';
+import * as nodeutil from 'util';
+import * as proxyquire from 'proxyquire';
+import * as pfy from '@google-cloud/promisify';
+import {ServiceObject, util} from '@google-cloud/common';
 
 var promisified = false;
 var fakePfy = extend({}, pfy, {
@@ -44,7 +42,6 @@ var fakePaginator = {
     if (Class.name !== 'Dataset') {
       return;
     }
-
     methods = arrify(methods);
     assert.strictEqual(Class.name, 'Dataset');
     assert.deepStrictEqual(methods, ['getTables']);
@@ -75,14 +72,14 @@ describe('BigQuery/Dataset', function() {
   var ds;
 
   before(function() {
-    Dataset = proxyquire('../src/dataset.js', {
+    Dataset = proxyquire('../src/dataset', {
       '@google-cloud/common': {
         paginator: fakePaginator,
         ServiceObject: FakeServiceObject,
       },
       '@google-cloud/promisify': fakePfy,
     });
-    Table = require('../src/table.js');
+    Table = require('../src/table');
   });
 
   beforeEach(function() {
