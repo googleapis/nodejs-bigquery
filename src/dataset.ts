@@ -16,7 +16,8 @@
 
 'use strict';
 
-import * as common from '@google-cloud/common';
+import {ServiceObject} from '@google-cloud/common';
+import {paginator} from '@google-cloud/paginator';
 import {promisifyAll} from '@google-cloud/promisify';
 import * as extend from 'extend';
 import * as is from 'is';
@@ -205,7 +206,7 @@ function Dataset(bigQuery, id, options) {
     setMetadata: true,
   };
 
-  common.ServiceObject.call(this, {
+  ServiceObject.call(this, {
     parent: bigQuery,
     baseUrl: '/datasets',
     id: id,
@@ -237,7 +238,7 @@ function Dataset(bigQuery, id, options) {
   });
 }
 
-util.inherits(Dataset, common.ServiceObject);
+util.inherits(Dataset, ServiceObject);
 
 /**
  * Run a query as a job. No results are immediately returned. Instead, your
@@ -548,7 +549,7 @@ Dataset.prototype.getTables = function(options, callback) {
  *     this.end();
  *   });
  */
-Dataset.prototype.getTablesStream = common.paginator.streamify('getTables');
+Dataset.prototype.getTablesStream = paginator.streamify('getTables');
 
 /**
  * Run a query scoped to your dataset.
@@ -611,7 +612,7 @@ Dataset.prototype.table = function(id, options) {
  *
  * These methods can be auto-paginated.
  */
-common.paginator.extend(Dataset, ['getTables']);
+paginator.extend(Dataset, ['getTables']);
 
 /*! Developer Documentation
  *

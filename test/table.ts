@@ -50,19 +50,21 @@ var fakePfy = extend({}, pfy, {
 
 var extended = false;
 var fakePaginator = {
-  extend: function(Class, methods) {
-    if (Class.name !== 'Table') {
-      return;
-    }
+  paginator: {
+    extend: function(Class, methods) {
+      if (Class.name !== 'Table') {
+        return;
+      }
 
-    methods = arrify(methods);
-    assert.strictEqual(Class.name, 'Table');
-    assert.deepStrictEqual(methods, ['getRows']);
-    extended = true;
-  },
-  streamify: function(methodName) {
-    return methodName;
-  },
+      methods = arrify(methods);
+      assert.strictEqual(Class.name, 'Table');
+      assert.deepStrictEqual(methods, ['getRows']);
+      extended = true;
+    },
+    streamify: function(methodName) {
+      return methodName;
+    },
+  }
 };
 
 var fakeUuid = extend(true, {}, uuid);
@@ -119,9 +121,9 @@ describe('BigQuery/Table', function() {
       uuid: fakeUuid,
       '@google-cloud/common': {
         ServiceObject: FakeServiceObject,
-        paginator: fakePaginator,
         util: fakeUtil,
       },
+      '@google-cloud/paginator': fakePaginator,
       '@google-cloud/promisify': fakePfy,
     });
 

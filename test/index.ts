@@ -80,19 +80,21 @@ var mergeSchemaWithRowsOverride;
 
 var extended = false;
 var fakePaginator = {
-  extend: function(Class, methods) {
-    if (Class.name !== 'BigQuery') {
-      return;
-    }
+  paginator: {
+    extend: function(Class, methods) {
+      if (Class.name !== 'BigQuery') {
+        return;
+      }
 
-    methods = arrify(methods);
-    assert.strictEqual(Class.name, 'BigQuery');
-    assert.deepStrictEqual(methods, ['getDatasets', 'getJobs']);
-    extended = true;
-  },
-  streamify: function(methodName) {
-    return methodName;
-  },
+      methods = arrify(methods);
+      assert.strictEqual(Class.name, 'BigQuery');
+      assert.deepStrictEqual(methods, ['getDatasets', 'getJobs']);
+      extended = true;
+    },
+    streamify: function(methodName) {
+      return methodName;
+    },
+  }
 };
 
 function FakeService() {
@@ -119,9 +121,9 @@ describe('BigQuery', function() {
       './table': FakeTable,
       '@google-cloud/common': {
         Service: FakeService,
-        paginator: fakePaginator,
         util: fakeUtil,
       },
+      '@google-cloud/paginator': fakePaginator,
       '@google-cloud/promisify': fakePfy,
     });
     BigQueryCached = extend({}, BigQuery);
