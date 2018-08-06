@@ -16,13 +16,13 @@
 
 'use strict';
 
-var arrify = require('arrify');
-var assert = require('assert');
-var extend = require('extend');
-var proxyquire = require('proxyquire');
-var pfy = require('@google-cloud/promisify');
-var util = require('@google-cloud/common').util;
-var sinon = require('sinon');
+import * as arrify from 'arrify';
+import * as assert from 'assert';
+import * as extend from 'extend';
+import * as proxyquire from 'proxyquire';
+import * as pfy from '@google-cloud/promisify';
+import {util} from '@google-cloud/common';
+import * as sinon from 'sinon';
 
 function FakeOperation() {
   this.calledWith_ = arguments;
@@ -56,7 +56,7 @@ var fakePaginator = {
 };
 
 describe('BigQuery/Job', function() {
-  var BIGQUERY = {
+  var BIGQUERY: any = {
     projectId: 'my-project',
     Promise: Promise,
   };

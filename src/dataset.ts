@@ -16,11 +16,11 @@
 
 'use strict';
 
-var common = require('@google-cloud/common');
-var {promisifyAll} = require('@google-cloud/promisify');
-var extend = require('extend');
-var is = require('is');
-var util = require('util');
+import * as common from '@google-cloud/common';
+import {promisifyAll} from '@google-cloud/promisify';
+import * as extend from 'extend';
+import * as is from 'is';
+import * as util from 'util';
 
 var Table = require('./table.js');
 

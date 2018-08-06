@@ -16,19 +16,19 @@
 
 'use strict';
 
-var arrify = require('arrify');
-var Big = require('big.js');
-var common = require('@google-cloud/common');
-var {promisifyAll} = require('@google-cloud/promisify');
+import * as arrify from 'arrify';
+import * as Big from 'big.js';
+import * as common from '@google-cloud/common';
+import {promisifyAll} from '@google-cloud/promisify';
 var duplexify = require('duplexify');
-var extend = require('extend');
+import * as extend from 'extend';
 var format = require('string-format-obj');
-var fs = require('fs');
-var is = require('is');
-var path = require('path');
+import * as fs from 'fs';
+import * as is from 'is';
+import * as path from 'path';
 var streamEvents = require('stream-events');
-var util = require('util');
-var uuid = require('uuid');
+import * as util from 'util';
+import * as uuid from 'uuid';
 
 /**
  * The file formats accepted by BigQuery.
@@ -274,7 +274,7 @@ util.inherits(Table, common.ServiceObject);
  * @param {string} str Comma-separated schema string.
  * @returns {object} Table schema in the format the API expects.
  */
-Table.createSchemaFromString_ = function(str) {
+(Table as any).createSchemaFromString_ = function(str) {
   return str.split(/\s*,\s*/).reduce(
     function(acc, pair) {
       acc.fields.push({
@@ -300,7 +300,7 @@ Table.createSchemaFromString_ = function(str) {
  * @param {*} value The value to be converted.
  * @returns {*} The converted value.
  */
-Table.encodeValue_ = function(value) {
+(Table as any).encodeValue_ = function(value) {
   if (is.undefined(value) || is.null(value)) {
     return null;
   }
@@ -331,12 +331,12 @@ Table.encodeValue_ = function(value) {
   }
 
   if (is.array(value)) {
-    return value.map(Table.encodeValue_);
+    return value.map((Table as any).encodeValue_);
   }
 
   if (is.object(value)) {
     return Object.keys(value).reduce(function(acc, key) {
-      acc[key] = Table.encodeValue_(value[key]);
+      acc[key] = (Table as any).encodeValue_(value[key]);
       return acc;
     }, {});
   }
@@ -347,7 +347,7 @@ Table.encodeValue_ = function(value) {
 /**
  * @private
  */
-Table.formatMetadata_ = function(options) {
+(Table as any).formatMetadata_ = function(options) {
   var body = extend(true, {}, options);
 
   if (options.name) {
@@ -356,7 +356,7 @@ Table.formatMetadata_ = function(options) {
   }
 
   if (is.string(options.schema)) {
-    body.schema = Table.createSchemaFromString_(options.schema);
+    body.schema = (Table as any).createSchemaFromString_(options.schema);
   }
 
   if (is.array(options.schema)) {
@@ -581,7 +581,7 @@ Table.prototype.createCopyJob = function(destination, metadata, callback) {
     metadata = {};
   }
 
-  var body = {
+  var body: any = {
     configuration: {
       copy: extend(true, metadata, {
         destinationTable: {
@@ -686,7 +686,7 @@ Table.prototype.createCopyFromJob = function(sourceTables, metadata, callback) {
     metadata = {};
   }
 
-  var body = {
+  var body: any = {
     configuration: {
       copy: extend(true, metadata, {
         destinationTable: {
@@ -839,7 +839,7 @@ Table.prototype.createExtractJob = function(destination, options, callback) {
     delete options.gzip;
   }
 
-  var body = {
+  var body: any = {
     configuration: {
       extract: extend(true, options, {
         sourceTable: {
@@ -992,7 +992,7 @@ Table.prototype.createLoadJob = function(source, metadata, callback) {
       });
   }
 
-  var body = {
+  var body: any = {
     configuration: {
       load: {
         destinationTable: {
@@ -1171,7 +1171,7 @@ Table.prototype.createWriteStream = function(metadata) {
   }
 
   if (is.string(metadata.schema)) {
-    metadata.schema = Table.createSchemaFromString_(metadata.schema);
+    metadata.schema = (Table as any).createSchemaFromString_(metadata.schema);
   }
 
   extend(true, metadata, {
@@ -1223,7 +1223,7 @@ Table.prototype.createWriteStream = function(metadata) {
             projectId: self.bigQuery.projectId,
           }),
         },
-      },
+      } as any,
       function(data) {
         var job = self.bigQuery.job(data.jobReference.jobId, {
           location: data.jobReference.location,
@@ -1580,7 +1580,7 @@ Table.prototype.insert = function(rows, options, callback) {
     json.rows = arrify(rows).map(function(row) {
       return {
         insertId: uuid.v4(),
-        json: Table.encodeValue_(row),
+        json: (Table as any).encodeValue_(row),
       };
     });
   }
@@ -1635,7 +1635,7 @@ Table.prototype.insert = function(rows, options, callback) {
         err = new common.util.PartialFailureError({
           errors: partialFailures,
           response: resp,
-        });
+        } as any);
       }
 
       callback(err, resp);
@@ -1808,7 +1808,7 @@ Table.prototype.query = function(query, callback) {
  * });
  */
 Table.prototype.setMetadata = function(metadata, callback) {
-  var body = Table.formatMetadata_(metadata);
+  var body = (Table as any).formatMetadata_(metadata);
 
   common.ServiceObject.prototype.setMetadata.call(this, body, callback);
 };

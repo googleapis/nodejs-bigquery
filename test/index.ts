@@ -16,19 +16,17 @@
 
 'use strict';
 
-var arrify = require('arrify');
-var assert = require('assert');
-var Big = require('big.js');
-var extend = require('extend');
-var nodeutil = require('util');
-var prop = require('propprop');
-var proxyquire = require('proxyquire');
-var uuid = require('uuid');
-var pfy = require('@google-cloud/promisify');
+import * as arrify from 'arrify';
+import * as assert from 'assert';
+import * as Big from 'big.js';
+import * as extend from 'extend';
+import * as nodeutil from 'util';
+import * as proxyquire from 'proxyquire';
+import * as uuid from 'uuid';
+import * as pfy from '@google-cloud/promisify';
+import {Service, util} from '@google-cloud/common';
 
-var Service = require('@google-cloud/common').Service;
-var Table = require('../src/table.js');
-var util = require('@google-cloud/common').util;
+var Table = require('../src/table');
 
 var fakeUuid = extend(true, {}, fakeUuid);
 
@@ -72,7 +70,7 @@ function FakeJob() {
 }
 
 var mergeSchemaWithRowsOverride;
-FakeTable.mergeSchemaWithRows_ = function() {
+(FakeTable as any).mergeSchemaWithRows_ = function() {
   var args = [].slice.apply(arguments);
   return (mergeSchemaWithRowsOverride || Table.mergeSchemaWithRows_).apply(
     null,
@@ -114,11 +112,11 @@ describe('BigQuery', function() {
   var bq;
 
   before(function() {
-    BigQuery = proxyquire('../', {
+    BigQuery = proxyquire('../src', {
       uuid: fakeUuid,
-      './dataset.js': FakeDataset,
-      './job.js': FakeJob,
-      './table.js': FakeTable,
+      './dataset': FakeDataset,
+      './job': FakeJob,
+      './table': FakeTable,
       '@google-cloud/common': {
         Service: FakeService,
         paginator: fakePaginator,
@@ -150,26 +148,6 @@ describe('BigQuery', function() {
       assert(promisified);
     });
 
-    it('should work without new', function() {
-      assert.doesNotThrow(function() {
-        BigQuery({projectId: PROJECT_ID});
-      });
-    });
-
-    it('should normalize the arguments', function() {
-      var normalizeArgumentsCalled = false;
-      var options = {};
-
-      fakeUtil.normalizeArguments = function(context, options_) {
-        normalizeArgumentsCalled = true;
-        assert.strictEqual(options_, options);
-        return options_;
-      };
-
-      new BigQuery(options);
-      assert.strictEqual(normalizeArgumentsCalled, true);
-    });
-
     it('should inherit from Service', function() {
       assert(bq instanceof Service);
 
@@ -182,7 +160,7 @@ describe('BigQuery', function() {
       ]);
       assert.deepStrictEqual(
         calledWith.packageJson,
-        require('../package.json')
+        require('../../package.json')
       );
     });
 
@@ -407,7 +385,7 @@ describe('BigQuery', function() {
         type: 'TIME',
       });
 
-      var rawRows = rows.map(prop('raw'));
+      var rawRows = rows.map(x => x.raw);
       var mergedRows = BigQuery.mergeSchemaWithRows_(schemaObject, rawRows);
 
       mergedRows.forEach(function(mergedRow, index) {
