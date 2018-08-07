@@ -22,14 +22,14 @@ import * as common from '@google-cloud/common';
 import {promisifyAll} from '@google-cloud/promisify';
 import {paginator} from '@google-cloud/paginator';
 import * as extend from 'extend';
-var format = require('string-format-obj');
+const format = require('string-format-obj');
 import * as is from 'is';
 import * as util from 'util';
 import * as uuid from 'uuid';
 
-var Dataset = require('./dataset.js');
-var Job = require('./job.js');
-var Table = require('./table.js');
+const Dataset = require('./dataset.js');
+const Job = require('./job.js');
+const Table = require('./table.js');
 
 /**
  * @typedef {object} ClientConfig
@@ -98,7 +98,7 @@ var Table = require('./table.js');
  */
 function BigQuery(options) {
   options = options || {};
-  var config = {
+  const config = {
     baseUrl: 'https://www.googleapis.com/bigquery/v2',
     scopes: ['https://www.googleapis.com/auth/bigquery'],
     packageJson: require('../../package.json'),
@@ -138,8 +138,8 @@ util.inherits(BigQuery, common.Service);
 
   function mergeSchema(row) {
     return row.f.map(function(field, index) {
-      var schemaField = schema.fields[index];
-      var value = field.v;
+      const schemaField = schema.fields[index];
+      let value = field.v;
 
       if (schemaField.mode === 'REPEATED') {
         value = value.map(function(val) {
@@ -149,7 +149,7 @@ util.inherits(BigQuery, common.Service);
         value = convert(schemaField, value);
       }
 
-      var fieldObject = {};
+      const fieldObject = {};
       fieldObject[schemaField.name] = value;
       return fieldObject;
     });
@@ -211,7 +211,7 @@ util.inherits(BigQuery, common.Service);
 
   function flattenRows(rows) {
     return rows.reduce(function(acc, row) {
-      var key = Object.keys(row)[0];
+      const key = Object.keys(row)[0];
       acc[key] = row[key];
       return acc;
     }, {});
@@ -360,7 +360,7 @@ util.inherits(BigQuery, common.Service);
   }
 
   if (is.object(value)) {
-    var time;
+    let time;
 
     if (value.hours) {
       time = (BigQuery as any).time(value).value;
@@ -497,7 +497,7 @@ util.inherits(BigQuery, common.Service);
  * @returns {string} The type detected from the value.
  */
 (BigQuery as any).getType_ = function(value) {
-  var typeName;
+  let typeName;
 
   if (value instanceof (BigQuery as any).date) {
     typeName = 'DATE';
@@ -563,12 +563,12 @@ util.inherits(BigQuery, common.Service);
     value = (BigQuery as any).timestamp(value);
   }
 
-  var queryParameter = {
+  const queryParameter = {
     parameterType: (BigQuery as any).getType_(value),
     parameterValue: {} as any,
   };
 
-  var typeName = queryParameter.parameterType.type;
+  const typeName = queryParameter.parameterType.type;
 
   if (typeName.indexOf('TIME') > -1 || typeName.indexOf('DATE') > -1) {
     value = value.value;
@@ -583,7 +583,7 @@ util.inherits(BigQuery, common.Service);
   } else if (typeName === 'STRUCT') {
     queryParameter.parameterValue.structValues = Object.keys(value).reduce(
       function(structValues, prop) {
-        var nestedQueryParameter = (BigQuery as any).valueToQueryParameter_(value[prop]);
+        const nestedQueryParameter = (BigQuery as any).valueToQueryParameter_(value[prop]);
         structValues[prop] = nestedQueryParameter.parameterValue;
         return structValues;
       },
@@ -625,7 +625,7 @@ util.inherits(BigQuery, common.Service);
  * });
  */
 BigQuery.prototype.createDataset = function(id, options, callback) {
-  var that = this;
+  const that = this;
 
   if (is.fn(options)) {
     callback = options;
@@ -655,7 +655,7 @@ BigQuery.prototype.createDataset = function(id, options, callback) {
         return;
       }
 
-      var dataset = that.dataset(id);
+      const dataset = that.dataset(id);
       dataset.metadata = resp;
 
       callback(null, dataset, resp);
@@ -733,8 +733,8 @@ BigQuery.prototype.createDataset = function(id, options, callback) {
  * // If the callback is omitted, we'll return a Promise.
  * //-
  * bigquery.createQueryJob(query).then(function(data) {
- *   var job = data[0];
- *   var apiResponse = data[1];
+ *   const job = data[0];
+ *   const apiResponse = data[1];
  *
  *   return job.getQueryResults();
  * });
@@ -750,7 +750,7 @@ BigQuery.prototype.createQueryJob = function(options, callback) {
     throw new Error('A SQL query string is required.');
   }
 
-  var query = extend(
+  const query = extend(
     true,
     {
       useLegacySql: false,
@@ -778,9 +778,9 @@ BigQuery.prototype.createQueryJob = function(options, callback) {
     if (query.parameterMode === 'named') {
       query.queryParameters = [];
 
-      for (var namedParamater in query.params) {
-        var value = query.params[namedParamater];
-        var queryParameter = (BigQuery as any).valueToQueryParameter_(value);
+      for (const namedParamater in query.params) {
+        const value = query.params[namedParamater];
+        const queryParameter = (BigQuery as any).valueToQueryParameter_(value);
         queryParameter.name = namedParamater;
         query.queryParameters.push(queryParameter);
       }
@@ -791,7 +791,7 @@ BigQuery.prototype.createQueryJob = function(options, callback) {
     delete query.params;
   }
 
-  var reqOpts = {
+  const reqOpts = {
     configuration: {
       query: query,
     } as any,
@@ -913,10 +913,10 @@ BigQuery.prototype.createQueryStream = paginator.streamify(
  * });
  */
 BigQuery.prototype.createJob = function(options, callback) {
-  var self = this;
+  const self = this;
 
-  var reqOpts = extend({}, options);
-  var jobId = reqOpts.jobId || uuid.v4();
+  const reqOpts = extend({}, options);
+  let jobId = reqOpts.jobId || uuid.v4();
 
   if (reqOpts.jobId) {
     delete reqOpts.jobId;
@@ -957,7 +957,7 @@ BigQuery.prototype.createJob = function(options, callback) {
         } as any);
       }
 
-      var job = self.job(jobId, {
+      const job = self.job(jobId, {
         location: resp.jobReference.location,
       });
 
@@ -1038,7 +1038,7 @@ BigQuery.prototype.dataset = function(id, options) {
  * bigquery.getDatasets().then(function(datasets) {});
  */
 BigQuery.prototype.getDatasets = function(options, callback) {
-  var that = this;
+  const that = this;
 
   if (is.fn(options)) {
     callback = options;
@@ -1058,7 +1058,7 @@ BigQuery.prototype.getDatasets = function(options, callback) {
         return;
       }
 
-      var nextQuery = null;
+      let nextQuery = null;
 
       if (resp.nextPageToken) {
         nextQuery = extend({}, options, {
@@ -1066,8 +1066,8 @@ BigQuery.prototype.getDatasets = function(options, callback) {
         });
       }
 
-      var datasets = (resp.datasets || []).map(function(dataset) {
-        var ds = that.dataset(dataset.datasetReference.datasetId, {
+      const datasets = (resp.datasets || []).map(function(dataset) {
+        const ds = that.dataset(dataset.datasetReference.datasetId, {
           location: dataset.location,
         });
 
@@ -1173,7 +1173,7 @@ BigQuery.prototype.getDatasetsStream = paginator.streamify(
  * });
  */
 BigQuery.prototype.getJobs = function(options, callback) {
-  var that = this;
+  const that = this;
 
   if (is.fn(options)) {
     callback = options;
@@ -1194,7 +1194,7 @@ BigQuery.prototype.getJobs = function(options, callback) {
         return;
       }
 
-      var nextQuery = null;
+      let nextQuery = null;
 
       if (resp.nextPageToken) {
         nextQuery = extend({}, options, {
@@ -1202,8 +1202,8 @@ BigQuery.prototype.getJobs = function(options, callback) {
         });
       }
 
-      var jobs = (resp.jobs || []).map(function(jobObject) {
-        var job = that.job(jobObject.jobReference.jobId, {
+      const jobs = (resp.jobs || []).map(function(jobObject) {
+        const job = that.job(jobObject.jobReference.jobId, {
           location: jobObject.jobReference.location,
         });
 
@@ -1356,7 +1356,7 @@ BigQuery.prototype.job = function(id, options) {
  * // If the callback is omitted, we'll return a Promise.
  * //-
  * bigquery.query(query).then(function(data) {
- *   var rows = data[0];
+ *   const rows = data[0];
  * });
  */
 BigQuery.prototype.query = function(query, options, callback) {

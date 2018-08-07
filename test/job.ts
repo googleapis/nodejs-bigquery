@@ -30,8 +30,8 @@ function FakeOperation() {
   this.id = this.calledWith_[0].id;
 }
 
-var promisified = false;
-var fakePfy = extend({}, pfy, {
+let promisified = false;
+const fakePfy = extend({}, pfy, {
   promisifyAll: function(Class) {
     if (Class.name === 'Job') {
       promisified = true;
@@ -39,8 +39,8 @@ var fakePfy = extend({}, pfy, {
   },
 });
 
-var extended = false;
-var fakePaginator = {
+let extended = false;
+const fakePaginator = {
   paginator: {
     extend: function(Class, methods) {
       if (Class.name !== 'Job') {
@@ -58,15 +58,15 @@ var fakePaginator = {
 };
 
 describe('BigQuery/Job', function() {
-  var BIGQUERY: any = {
+  const BIGQUERY: any = {
     projectId: 'my-project',
     Promise: Promise,
   };
-  var JOB_ID = 'job_XYrk_3z';
-  var LOCATION = 'asia-northeast1';
+  const JOB_ID = 'job_XYrk_3z';
+  const LOCATION = 'asia-northeast1';
 
-  var Job;
-  var job;
+  let Job;
+  let job;
 
   before(function() {
     Job = proxyquire('../src/job.js', {
@@ -98,7 +98,7 @@ describe('BigQuery/Job', function() {
     it('should inherit from Operation', function() {
       assert(job instanceof FakeOperation);
 
-      var calledWith = job.calledWith_[0];
+      const calledWith = job.calledWith_[0];
 
       assert.strictEqual(calledWith.parent, BIGQUERY);
       assert.strictEqual(calledWith.baseUrl, '/jobs');
@@ -116,15 +116,15 @@ describe('BigQuery/Job', function() {
     });
 
     it('should accept a location option', function() {
-      var options = {location: 'US'};
-      var job = new Job(BIGQUERY, JOB_ID, options);
+      const options = {location: 'US'};
+      const job = new Job(BIGQUERY, JOB_ID, options);
 
       assert.strictEqual(job.location, options.location);
     });
 
     it('should send the location via getMetadata', function() {
-      var job = new Job(BIGQUERY, JOB_ID, {location: LOCATION});
-      var calledWith = job.calledWith_[0];
+      const job = new Job(BIGQUERY, JOB_ID, {location: LOCATION});
+      const calledWith = job.calledWith_[0];
 
       assert.deepStrictEqual(calledWith.methods.getMetadata, {
         reqOpts: {
@@ -146,7 +146,7 @@ describe('BigQuery/Job', function() {
     });
 
     it('should include the job location', function(done) {
-      var job = new Job(BIGQUERY, JOB_ID, {location: LOCATION});
+      const job = new Job(BIGQUERY, JOB_ID, {location: LOCATION});
 
       job.request = function(reqOpts) {
         assert.deepStrictEqual(reqOpts.qs, {location: LOCATION});
@@ -158,14 +158,14 @@ describe('BigQuery/Job', function() {
   });
 
   describe('getQueryResults', function() {
-    var pageToken = 'token';
-    var options = {
+    const pageToken = 'token';
+    const options = {
       a: 'a',
       b: 'b',
       location: 'US',
     };
 
-    var RESPONSE = {
+    const RESPONSE = {
       pageToken: pageToken,
       jobReference: {jobId: JOB_ID},
     };
@@ -190,8 +190,8 @@ describe('BigQuery/Job', function() {
     });
 
     it('should optionally accept options', function(done) {
-      var options = {a: 'b'};
-      var expectedOptions = extend({location: undefined}, options);
+      const options = {a: 'b'};
+      const expectedOptions = extend({location: undefined}, options);
 
       BIGQUERY.request = function(reqOpts) {
         assert.deepStrictEqual(reqOpts.qs, expectedOptions);
@@ -202,7 +202,7 @@ describe('BigQuery/Job', function() {
     });
 
     it('should inherit the location', function(done) {
-      var job = new Job(BIGQUERY, JOB_ID, {location: LOCATION});
+      const job = new Job(BIGQUERY, JOB_ID, {location: LOCATION});
 
       BIGQUERY.request = function(reqOpts) {
         assert.deepStrictEqual(reqOpts.qs, {location: LOCATION});
@@ -213,8 +213,8 @@ describe('BigQuery/Job', function() {
     });
 
     it('should return any errors to the callback', function(done) {
-      var error = new Error('err');
-      var response = {};
+      const error = new Error('err');
+      const response = {};
 
       BIGQUERY.request = function(reqOpts, callback) {
         callback(error, response);
@@ -239,12 +239,12 @@ describe('BigQuery/Job', function() {
     });
 
     it('should merge the rows with the schema', function(done) {
-      var response = {
+      const response = {
         schema: {},
         rows: [],
       };
 
-      var mergedRows = [];
+      const mergedRows = [];
 
       BIGQUERY.request = function(reqOpts, callback) {
         callback(null, response);
@@ -295,7 +295,7 @@ describe('BigQuery/Job', function() {
 
   describe('getQueryResultsAsStream_', function() {
     it('should call getQueryResults correctly', function(done) {
-      var options = {a: 'b', c: 'd'};
+      const options = {a: 'b', c: 'd'};
 
       job.getQueryResults = function(options_, callback) {
         assert.deepStrictEqual(options_, {
@@ -320,7 +320,7 @@ describe('BigQuery/Job', function() {
     });
 
     describe('API error', function() {
-      var error = new Error('Error.');
+      const error = new Error('Error.');
 
       beforeEach(function() {
         job.getMetadata = function(callback) {
@@ -337,8 +337,8 @@ describe('BigQuery/Job', function() {
     });
 
     describe('job failure', function() {
-      var error = new Error('Error.');
-      var apiResponse = {
+      const error = new Error('Error.');
+      const apiResponse = {
         status: {
           errors: error,
         },
@@ -371,7 +371,7 @@ describe('BigQuery/Job', function() {
     });
 
     describe('job pending', function() {
-      var apiResponse = {
+      const apiResponse = {
         status: {
           state: 'PENDING',
         },
@@ -393,7 +393,7 @@ describe('BigQuery/Job', function() {
     });
 
     describe('job complete', function() {
-      var apiResponse = {
+      const apiResponse = {
         status: {
           state: 'DONE',
         },

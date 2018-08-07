@@ -23,24 +23,24 @@ import * as fs from 'fs';
 import * as uuid from 'uuid';
 import * as exec from 'methmeth';
 
-var Dataset = require('../src/dataset');
-var Job = require('../src/job');
-var Table = require('../src/table');
+const Dataset = require('../src/dataset');
+const Job = require('../src/job');
+const Table = require('../src/table');
 
-var BigQuery = require('../src');
-var bigquery = new BigQuery();
-var storage = require('@google-cloud/storage')();
+const BigQuery = require('../src');
+const bigquery = new BigQuery();
+const storage = require('@google-cloud/storage')();
 
 describe('BigQuery', function() {
-  var GCLOUD_TESTS_PREFIX = 'gcloud_test_';
+  const GCLOUD_TESTS_PREFIX = 'gcloud_test_';
 
-  var dataset = bigquery.dataset(generateName('dataset'));
-  var table = dataset.table(generateName('table'));
-  var bucket = storage.bucket(generateName('bucket'));
+  const dataset = bigquery.dataset(generateName('dataset'));
+  const table = dataset.table(generateName('table'));
+  const bucket = storage.bucket(generateName('bucket'));
 
-  var query = 'SELECT url FROM `publicdata.samples.github_nested` LIMIT 100';
+  const query = 'SELECT url FROM `publicdata.samples.github_nested` LIMIT 100';
 
-  var SCHEMA = [
+  const SCHEMA = [
     {
       name: 'id',
       type: 'INTEGER',
@@ -135,11 +135,11 @@ describe('BigQuery', function() {
   });
 
   it('should allow limiting API calls', function(done) {
-    var maxApiCalls = 1;
-    var numRequestsMade = 0;
+    const maxApiCalls = 1;
+    let numRequestsMade = 0;
 
-    var BigQuery = require('../src');
-    var bigquery = new BigQuery();
+    const BigQuery = require('../src');
+    const bigquery = new BigQuery();
 
     bigquery.interceptors.push({
       request: function(reqOpts) {
@@ -157,7 +157,7 @@ describe('BigQuery', function() {
 
   it('should return a promise', function() {
     return bigquery.getDatasets().then(function(data) {
-      var datasets = data[0];
+      const datasets = data[0];
 
       assert(datasets.length > 0);
       assert(datasets[0] instanceof Dataset);
@@ -165,11 +165,11 @@ describe('BigQuery', function() {
   });
 
   it('should allow limiting API calls via promises', function() {
-    var maxApiCalls = 1;
-    var numRequestsMade = 0;
+    const maxApiCalls = 1;
+    let numRequestsMade = 0;
 
-    var BigQuery = require('../src');
-    var bigquery = new BigQuery();
+    const BigQuery = require('../src');
+    const bigquery = new BigQuery();
 
     bigquery.interceptors.push({
       request: function(reqOpts) {
@@ -193,9 +193,9 @@ describe('BigQuery', function() {
         autoPaginate: false,
       })
       .then(function(data) {
-        var datasets = data[0];
-        var nextQuery = data[1];
-        var apiResponse = data[2];
+        const datasets = data[0];
+        const nextQuery = data[1];
+        const apiResponse = data[2];
 
         assert(datasets[0] instanceof Dataset);
         assert.strictEqual(nextQuery, null);
@@ -204,7 +204,7 @@ describe('BigQuery', function() {
   });
 
   it('should list datasets as a stream', function(done) {
-    var datasetEmitted = false;
+    let datasetEmitted = false;
 
     bigquery
       .getDatasetsStream()
@@ -233,7 +233,7 @@ describe('BigQuery', function() {
   });
 
   it('should run a query job as a promise', function() {
-    var job;
+    let job;
 
     return bigquery
       .createQueryJob(query)
@@ -245,7 +245,7 @@ describe('BigQuery', function() {
         return job.getQueryResults();
       })
       .then(function(response) {
-        var rows = response[0];
+        const rows = response[0];
         assert.strictEqual(rows.length, 100);
         assert.strictEqual(typeof rows[0].url, 'string');
       });
@@ -255,7 +255,7 @@ describe('BigQuery', function() {
     bigquery.createQueryJob(query, function(err, job) {
       assert.ifError(err);
 
-      var rowsEmitted: any[] = [];
+      const rowsEmitted: any[] = [];
 
       job
         .getQueryResultsStream()
@@ -272,7 +272,7 @@ describe('BigQuery', function() {
   });
 
   it('should honor the job prefix option', function(done) {
-    var options = {
+    const options = {
       query: query,
       jobPrefix: 'hi-im-a-prefix',
     };
@@ -291,8 +291,8 @@ describe('BigQuery', function() {
   });
 
   it('should honor the job id option', function(done) {
-    var jobId = `hi-im-a-job-id-${uuid.v4()}`;
-    var options = {query, jobId};
+    const jobId = `hi-im-a-job-id-${uuid.v4()}`;
+    const options = {query, jobId};
 
     bigquery.createQueryJob(options, function(err, job) {
       assert.ifError(err);
@@ -303,7 +303,7 @@ describe('BigQuery', function() {
   });
 
   it('should honor the dryRun option', function(done) {
-    var options = {
+    const options = {
       query: query,
       dryRun: true,
     };
@@ -316,7 +316,7 @@ describe('BigQuery', function() {
   });
 
   it('should query as a stream', function(done) {
-    var rowsEmitted = 0;
+    let rowsEmitted = 0;
 
     bigquery
       .createQueryStream(query)
@@ -378,7 +378,7 @@ describe('BigQuery', function() {
   });
 
   it('should list jobs as a stream', function(done) {
-    var jobEmitted = false;
+    let jobEmitted = false;
 
     bigquery
       .getJobsStream()
@@ -393,7 +393,7 @@ describe('BigQuery', function() {
   });
 
   it('should cancel a job', function(done) {
-    var query = 'SELECT url FROM `publicdata.samples.github_nested` LIMIT 10';
+    const query = 'SELECT url FROM `publicdata.samples.github_nested` LIMIT 10';
 
     bigquery.createQueryJob(query, function(err, job) {
       assert.ifError(err);
@@ -430,7 +430,7 @@ describe('BigQuery', function() {
       dataset.getMetadata(function(err) {
         assert.ifError(err);
 
-        var etag = dataset.metadata.etag;
+        const etag = dataset.metadata.etag;
 
         dataset.setMetadata(
           {
@@ -469,7 +469,7 @@ describe('BigQuery', function() {
     });
 
     it('should get tables as a stream', function(done) {
-      var tableEmitted = false;
+      let tableEmitted = false;
 
       dataset
         .getTablesStream()
@@ -484,7 +484,7 @@ describe('BigQuery', function() {
     });
 
     it('should create a Table with a nested schema', function(done) {
-      var table = dataset.table(generateName('table'));
+      const table = dataset.table(generateName('table'));
 
       table.create(
         {
@@ -538,18 +538,18 @@ describe('BigQuery', function() {
     });
 
     describe('location', function() {
-      var LOCATION = 'asia-northeast1';
+      const LOCATION = 'asia-northeast1';
 
-      var dataset = bigquery.dataset(generateName('dataset'), {
+      const dataset = bigquery.dataset(generateName('dataset'), {
         location: LOCATION,
       });
 
-      var table = dataset.table(generateName('table'));
-      var job;
+      const table = dataset.table(generateName('table'));
+      let job;
 
-      var QUERY = `SELECT * FROM \`${table.id}\``;
-      var SCHEMA = require('../../system-test/data/schema.json');
-      var TEST_DATA_FILE = require.resolve('../../system-test/data/location-test-data.json');
+      const QUERY = `SELECT * FROM \`${table.id}\``;
+      const SCHEMA = require('../../system-test/data/schema.json');
+      const TEST_DATA_FILE = require.resolve('../../system-test/data/location-test-data.json');
 
       before(function() {
         // create a dataset in a certain location will cascade the location
@@ -574,7 +574,7 @@ describe('BigQuery', function() {
 
       describe('job.get', function() {
         it('should fail to reload if the location is not set', function(done) {
-          var badJob = bigquery.job(job.id);
+          const badJob = bigquery.job(job.id);
 
           badJob.getMetadata(function(err) {
             assert.strictEqual(err.code, 404);
@@ -583,7 +583,7 @@ describe('BigQuery', function() {
         });
 
         it('should fail to reload if the location is wrong', function(done) {
-          var badJob = bigquery.job(job.id, {location: 'US'});
+          const badJob = bigquery.job(job.id, {location: 'US'});
 
           badJob.getMetadata(function(err) {
             assert.strictEqual(err.code, 404);
@@ -592,7 +592,7 @@ describe('BigQuery', function() {
         });
 
         it('should reload if the location matches', function(done) {
-          var goodJob = bigquery.job(job.id, {location: LOCATION});
+          const goodJob = bigquery.job(job.id, {location: LOCATION});
 
           goodJob.getMetadata(function(err) {
             assert.ifError(err);
@@ -603,7 +603,7 @@ describe('BigQuery', function() {
       });
 
       describe('job.cancel', function() {
-        var job;
+        let job;
 
         before(function() {
           return dataset.createQueryJob(QUERY).then(function(data) {
@@ -612,7 +612,7 @@ describe('BigQuery', function() {
         });
 
         it('should fail if the job location is incorrect', function(done) {
-          var badJob = bigquery.job(job.id, {location: 'US'});
+          const badJob = bigquery.job(job.id, {location: 'US'});
 
           badJob.cancel(function(err) {
             assert.strictEqual(err.code, 404);
@@ -627,7 +627,7 @@ describe('BigQuery', function() {
 
       describe('job.getQueryResults', function() {
         it('should fail if the job location is incorrect', function(done) {
-          var badDataset = bigquery.dataset(dataset.id, {location: 'US'});
+          const badDataset = bigquery.dataset(dataset.id, {location: 'US'});
 
           badDataset.createQueryJob(
             {
@@ -642,7 +642,7 @@ describe('BigQuery', function() {
         });
 
         it('should get query results', function() {
-          var job;
+          let job;
 
           return dataset
             .createQueryJob(QUERY)
@@ -656,7 +656,7 @@ describe('BigQuery', function() {
               return job.getQueryResults();
             })
             .then(function(data) {
-              var rows = data[0];
+              const rows = data[0];
 
               assert(rows.length > 0);
             });
@@ -665,10 +665,10 @@ describe('BigQuery', function() {
 
       describe('job.insert', function() {
         describe('copy', function() {
-          var otherTable = dataset.table(generateName('table'));
+          const otherTable = dataset.table(generateName('table'));
 
           it('should fail if the job location is incorrect', function(done) {
-            var badTable = dataset.table(table.id, {location: 'US'});
+            const badTable = dataset.table(table.id, {location: 'US'});
 
             badTable.createCopyJob(otherTable, function(err) {
               assert.strictEqual(err.code, 404);
@@ -678,7 +678,7 @@ describe('BigQuery', function() {
 
           it('should copy the table', function() {
             return table.createCopyJob(otherTable).then(function(data) {
-              var job = data[0];
+              const job = data[0];
 
               assert.strictEqual(job.location, LOCATION);
               return job.promise();
@@ -687,15 +687,15 @@ describe('BigQuery', function() {
         });
 
         describe('extract', function() {
-          var bucket = storage.bucket(generateName('bucket'));
-          var extractFile = bucket.file('location-extract-data.json');
+          const bucket = storage.bucket(generateName('bucket'));
+          const extractFile = bucket.file('location-extract-data.json');
 
           before(function() {
             return bucket.create({location: LOCATION});
           });
 
           it('should fail if the job location is incorrect', function(done) {
-            var badTable = dataset.table(table.id, {location: 'US'});
+            const badTable = dataset.table(table.id, {location: 'US'});
 
             badTable.createExtractJob(extractFile, function(err) {
               assert.strictEqual(err.code, 404);
@@ -705,7 +705,7 @@ describe('BigQuery', function() {
 
           it('should extract the table', function() {
             return table.createExtractJob(extractFile).then(function(data) {
-              var job = data[0];
+              const job = data[0];
 
               assert.strictEqual(job.location, LOCATION);
               return job.promise();
@@ -717,7 +717,7 @@ describe('BigQuery', function() {
   });
 
   describe('BigQuery/Table', function() {
-    var TEST_DATA_JSON_PATH = require.resolve('../../system-test/data/kitten-test-data.json');
+    const TEST_DATA_JSON_PATH = require.resolve('../../system-test/data/kitten-test-data.json');
 
     it('should have created the correct schema', function() {
       assert.deepStrictEqual(table.metadata.schema.fields, SCHEMA);
@@ -773,7 +773,7 @@ describe('BigQuery', function() {
     });
 
     describe('copying', function() {
-      var TABLES: any = {
+      const TABLES: any = {
         1: {
           data: {
             tableId: 1,
@@ -783,7 +783,7 @@ describe('BigQuery', function() {
         2: {},
       };
 
-      var SCHEMA = 'tableId:integer';
+      const SCHEMA = 'tableId:integer';
 
       before(function(done) {
         TABLES[1].table = dataset.table(generateName('table'));
@@ -792,7 +792,7 @@ describe('BigQuery', function() {
         async.each(
           TABLES,
           function(tableObject, next) {
-            var tableInstance = tableObject.table;
+            const tableInstance = tableObject.table;
 
             tableInstance.create(
               {
@@ -807,18 +807,18 @@ describe('BigQuery', function() {
               return;
             }
 
-            var table1Instance = TABLES[1].table;
+            const table1Instance = TABLES[1].table;
             table1Instance.insert(TABLES[1].data, done);
           }
         );
       });
 
       it('should start copying data from current table', function(done) {
-        var table1 = TABLES[1];
-        var table1Instance = table1.table;
+        const table1 = TABLES[1];
+        const table1Instance = table1.table;
 
-        var table2 = TABLES[2];
-        var table2Instance = table2.table;
+        const table2 = TABLES[2];
+        const table2Instance = table2.table;
 
         table1Instance.createCopyJob(table2Instance, function(err, job) {
           assert.ifError(err);
@@ -833,11 +833,11 @@ describe('BigQuery', function() {
       });
 
       it('should copy data from current table', function(done) {
-        var table1 = TABLES[1];
-        var table1Instance = table1.table;
+        const table1 = TABLES[1];
+        const table1Instance = table1.table;
 
-        var table2 = TABLES[2];
-        var table2Instance = table2.table;
+        const table2 = TABLES[2];
+        const table2Instance = table2.table;
 
         table1Instance.copy(table2Instance, function(err, resp) {
           assert.ifError(err);
@@ -847,11 +847,11 @@ describe('BigQuery', function() {
       });
 
       it('should start copying data from another table', function(done) {
-        var table1 = TABLES[1];
-        var table1Instance = table1.table;
+        const table1 = TABLES[1];
+        const table1Instance = table1.table;
 
-        var table2 = TABLES[2];
-        var table2Instance = table2.table;
+        const table2 = TABLES[2];
+        const table2Instance = table2.table;
 
         table2Instance.createCopyFromJob(table1Instance, function(err, job) {
           assert.ifError(err);
@@ -866,11 +866,11 @@ describe('BigQuery', function() {
       });
 
       it('should copy data from another table', function(done) {
-        var table1 = TABLES[1];
-        var table1Instance = table1.table;
+        const table1 = TABLES[1];
+        const table1Instance = table1.table;
 
-        var table2 = TABLES[2];
-        var table2Instance = table2.table;
+        const table2 = TABLES[2];
+        const table2Instance = table2.table;
 
         table2Instance.copyFrom(table1Instance, function(err, resp) {
           assert.ifError(err);
@@ -881,7 +881,7 @@ describe('BigQuery', function() {
     });
 
     describe('loading & extracting', function() {
-      var file = bucket.file('kitten-test-data-backup.json');
+      const file = bucket.file('kitten-test-data-backup.json');
 
       before(function(done) {
         fs.createReadStream(TEST_DATA_JSON_PATH)
@@ -914,17 +914,17 @@ describe('BigQuery', function() {
 
       it('should load data from a file via promises', function() {
         return table.load(file).then(function(results) {
-          var metadata = results[0];
+          const metadata = results[0];
           assert.strictEqual(metadata.status.state, 'DONE');
         });
       });
 
       it('should return partial errors', function(done) {
-        var data = {
+        const data = {
           name: 'dave',
         };
 
-        var improperData = {
+        const improperData = {
           name: true,
         };
 
@@ -956,13 +956,13 @@ describe('BigQuery', function() {
       });
 
       it('should create tables upon insert', function() {
-        var table = dataset.table(generateName('does-not-exist'));
+        const table = dataset.table(generateName('does-not-exist'));
 
-        var row = {
+        const row = {
           name: 'stephen',
         };
 
-        var options = {
+        const options = {
           autoCreate: true,
           schema: SCHEMA,
         };
@@ -980,7 +980,7 @@ describe('BigQuery', function() {
             return table.getRows();
           })
           .then(function(data) {
-            var rows = data[0];
+            const rows = data[0];
 
             assert.strictEqual(rows.length, 1);
             assert.strictEqual(rows[0].name, row.name);
@@ -1444,7 +1444,7 @@ describe('BigQuery', function() {
       });
 
       it('should start extracting data to a storage file', function(done) {
-        var file = bucket.file('kitten-test-data-backup.json');
+        const file = bucket.file('kitten-test-data-backup.json');
 
         table.createExtractJob(file, function(err, job) {
           assert.ifError(err);
@@ -1456,7 +1456,7 @@ describe('BigQuery', function() {
       });
 
       it('should extract data to a storage file', function(done) {
-        var file = bucket.file('kitten-test-data-backup.json');
+        const file = bucket.file('kitten-test-data-backup.json');
 
         table.extract(file, function(err, resp) {
           assert.ifError(err);
@@ -1468,13 +1468,13 @@ describe('BigQuery', function() {
   });
 
   describe('Custom Types', function() {
-    var table;
+    let table;
 
-    var DATE = bigquery.date('2017-01-01');
-    var DATETIME = bigquery.datetime('2017-01-01 13:00:00');
-    var TIME = bigquery.time('14:00:00');
-    var TIMESTAMP = bigquery.timestamp(new Date());
-    var NUMERIC = new Big('123.456');
+    const DATE = bigquery.date('2017-01-01');
+    const DATETIME = bigquery.datetime('2017-01-01 13:00:00');
+    const TIME = bigquery.time('14:00:00');
+    const TIMESTAMP = bigquery.timestamp(new Date());
+    const NUMERIC = new Big('123.456');
 
     before(function() {
       table = dataset.table(generateName('table'));
@@ -1501,11 +1501,11 @@ describe('BigQuery', function() {
   });
 
   describe('Provided Tests', function() {
-    var table = dataset.table(generateName('table'));
-    var schema = require('../../system-test/data/schema.json');
-    var testData = require('../../system-test/data/schema-test-data.json');
+    const table = dataset.table(generateName('table'));
+    const schema = require('../../system-test/data/schema.json');
+    const testData = require('../../system-test/data/schema-test-data.json');
 
-    var EXPECTED_ROWS = {
+    const EXPECTED_ROWS = {
       Bilbo: {
         Name: 'Bilbo',
         Age: 111,
@@ -1615,7 +1615,7 @@ describe('BigQuery', function() {
         }
 
         rows.forEach(function(row) {
-          var expectedRow = EXPECTED_ROWS[row.Name];
+          const expectedRow = EXPECTED_ROWS[row.Name];
           assert.deepStrictEqual(row, expectedRow);
         });
 

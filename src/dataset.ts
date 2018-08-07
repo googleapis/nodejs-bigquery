@@ -23,7 +23,7 @@ import * as extend from 'extend';
 import * as is from 'is';
 import * as util from 'util';
 
-var Table = require('./table.js');
+const Table = require('./table.js');
 
 /**
  * Interact with your BigQuery dataset. Create a Dataset instance with
@@ -42,13 +42,13 @@ var Table = require('./table.js');
  * const dataset = bigquery.dataset('institutions');
  */
 function Dataset(bigQuery, id, options) {
-  var self = this;
+  const self = this;
 
   if (options && options.location) {
     this.location = options.location;
   }
 
-  var methods = {
+  const methods = {
     /**
      * Create a dataset.
      *
@@ -339,14 +339,14 @@ Dataset.prototype.createQueryStream = function(options) {
  * });
  */
 Dataset.prototype.createTable = function(id, options, callback) {
-  var self = this;
+  const self = this;
 
   if (is.fn(options)) {
     callback = options;
     options = {};
   }
 
-  var body = Table.formatMetadata_(options);
+  const body = Table.formatMetadata_(options);
 
   body.tableReference = {
     datasetId: this.id,
@@ -366,7 +366,7 @@ Dataset.prototype.createTable = function(id, options, callback) {
         return;
       }
 
-      var table = self.table(resp.tableReference.tableId, {
+      const table = self.table(resp.tableReference.tableId, {
         location: resp.location,
       });
 
@@ -407,7 +407,7 @@ Dataset.prototype.createTable = function(id, options, callback) {
  * // If the callback is omitted, we'll return a Promise.
  * //-
  * dataset.delete().then(function(data) {
- *   var apiResponse = data[0];
+ *   const apiResponse = data[0];
  * });
  */
 Dataset.prototype.delete = function(options, callback) {
@@ -416,7 +416,7 @@ Dataset.prototype.delete = function(options, callback) {
     options = {};
   }
 
-  var query = {
+  const query = {
     deleteContents: !!options.force,
   };
 
@@ -475,11 +475,11 @@ Dataset.prototype.delete = function(options, callback) {
  * // If the callback is omitted, we'll return a Promise.
  * //-
  * dataset.getTables().then(function(data) {
- *   var tables = data[0];
+ *   const tables = data[0];
  * });
  */
 Dataset.prototype.getTables = function(options, callback) {
-  var that = this;
+  const that = this;
 
   if (is.fn(options)) {
     callback = options;
@@ -499,15 +499,15 @@ Dataset.prototype.getTables = function(options, callback) {
         return;
       }
 
-      var nextQuery = null;
+      let nextQuery = null;
       if (resp.nextPageToken) {
         nextQuery = extend({}, options, {
           pageToken: resp.nextPageToken,
         });
       }
 
-      var tables = (resp.tables || []).map(function(tableObject) {
-        var table = that.table(tableObject.tableReference.tableId, {
+      const tables = (resp.tables || []).map(function(tableObject) {
+        const table = that.table(tableObject.tableReference.tableId, {
           location: tableObject.location,
         });
 
