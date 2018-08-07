@@ -41,18 +41,20 @@ var fakePfy = extend({}, pfy, {
 
 var extended = false;
 var fakePaginator = {
-  extend: function(Class, methods) {
-    if (Class.name !== 'Job') {
-      return;
-    }
+  paginator: {
+    extend: function(Class, methods) {
+      if (Class.name !== 'Job') {
+        return;
+      }
 
-    methods = arrify(methods);
-    assert.deepStrictEqual(methods, ['getQueryResults']);
-    extended = true;
-  },
-  streamify: function(methodName) {
-    return methodName;
-  },
+      methods = arrify(methods);
+      assert.deepStrictEqual(methods, ['getQueryResults']);
+      extended = true;
+    },
+    streamify: function(methodName) {
+      return methodName;
+    },
+  }
 };
 
 describe('BigQuery/Job', function() {
@@ -69,9 +71,9 @@ describe('BigQuery/Job', function() {
   before(function() {
     Job = proxyquire('../src/job.js', {
       '@google-cloud/common': {
-        Operation: FakeOperation,
-        paginator: fakePaginator,
+        Operation: FakeOperation
       },
+      '@google-cloud/paginator': fakePaginator,
       '@google-cloud/promisify': fakePfy,
     });
   });

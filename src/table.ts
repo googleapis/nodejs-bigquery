@@ -19,6 +19,7 @@
 import * as arrify from 'arrify';
 import * as Big from 'big.js';
 import * as common from '@google-cloud/common';
+import {paginator} from '@google-cloud/paginator';
 import {promisifyAll} from '@google-cloud/promisify';
 var duplexify = require('duplexify');
 import * as extend from 'extend';
@@ -1103,7 +1104,7 @@ Table.prototype.createQueryStream = function(query) {
  *     this.end();
  *   });
  */
-Table.prototype.createReadStream = common.paginator.streamify('getRows');
+Table.prototype.createReadStream = paginator.streamify('getRows');
 
 /**
  * Load data into your table from a readable stream of JSON, CSV, or
@@ -1817,7 +1818,7 @@ Table.prototype.setMetadata = function(metadata, callback) {
  *
  * These methods can be auto-paginated.
  */
-common.paginator.extend(Table, ['getRows']);
+paginator.extend(Table, ['getRows']);
 
 /*! Developer Documentation
  *

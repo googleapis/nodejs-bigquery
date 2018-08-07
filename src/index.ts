@@ -20,6 +20,7 @@ import * as arrify from 'arrify';
 import * as Big from 'big.js';
 import * as common from '@google-cloud/common';
 import {promisifyAll} from '@google-cloud/promisify';
+import {paginator} from '@google-cloud/paginator';
 import * as extend from 'extend';
 var format = require('string-format-obj');
 import * as is from 'is';
@@ -850,7 +851,7 @@ BigQuery.prototype.createQueryJob = function(options, callback) {
  *     this.end();
  *   });
  */
-BigQuery.prototype.createQueryStream = common.paginator.streamify(
+BigQuery.prototype.createQueryStream = paginator.streamify(
   'queryAsStream_'
 );
 
@@ -1109,7 +1110,7 @@ BigQuery.prototype.getDatasets = function(options, callback) {
  *     this.end();
  *   });
  */
-BigQuery.prototype.getDatasetsStream = common.paginator.streamify(
+BigQuery.prototype.getDatasetsStream = paginator.streamify(
   'getDatasets'
 );
 
@@ -1245,7 +1246,7 @@ BigQuery.prototype.getJobs = function(options, callback) {
  *     this.end();
  *   });
  */
-BigQuery.prototype.getJobsStream = common.paginator.streamify('getJobs');
+BigQuery.prototype.getJobsStream = paginator.streamify('getJobs');
 
 /**
  * Create a reference to an existing job.
@@ -1393,7 +1394,7 @@ BigQuery.prototype.queryAsStream_ = function(query, callback) {
  *
  * These methods can be auto-paginated.
  */
-common.paginator.extend(BigQuery, ['getDatasets', 'getJobs']);
+paginator.extend(BigQuery, ['getDatasets', 'getJobs']);
 
 /*! Developer Documentation
  *

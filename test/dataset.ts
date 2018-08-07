@@ -38,18 +38,20 @@ var fakePfy = extend({}, pfy, {
 
 var extended = false;
 var fakePaginator = {
-  extend: function(Class, methods) {
-    if (Class.name !== 'Dataset') {
-      return;
-    }
-    methods = arrify(methods);
-    assert.strictEqual(Class.name, 'Dataset');
-    assert.deepStrictEqual(methods, ['getTables']);
-    extended = true;
-  },
-  streamify: function(methodName) {
-    return methodName;
-  },
+  paginator: {
+    extend: function(Class, methods) {
+      if (Class.name !== 'Dataset') {
+        return;
+      }
+      methods = arrify(methods);
+      assert.strictEqual(Class.name, 'Dataset');
+      assert.deepStrictEqual(methods, ['getTables']);
+      extended = true;
+    },
+    streamify: function(methodName) {
+      return methodName;
+    },
+  }
 };
 
 function FakeServiceObject() {
@@ -74,9 +76,9 @@ describe('BigQuery/Dataset', function() {
   before(function() {
     Dataset = proxyquire('../src/dataset', {
       '@google-cloud/common': {
-        paginator: fakePaginator,
         ServiceObject: FakeServiceObject,
       },
+      '@google-cloud/paginator': fakePaginator,
       '@google-cloud/promisify': fakePfy,
     });
     Table = require('../src/table');

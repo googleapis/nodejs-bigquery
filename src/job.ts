@@ -22,6 +22,7 @@
 
 import * as common from '@google-cloud/common';
 import {promisifyAll} from '@google-cloud/promisify';
+import {paginator} from '@google-cloud/paginator';
 import * as extend from 'extend';
 import * as is from 'is';
 import * as util from 'util';
@@ -428,7 +429,7 @@ Job.prototype.getQueryResults = function(options, callback) {
  *   }))
  *   .pipe(fs.createWriteStream('./test/testdata/testfile.json'));
  */
-Job.prototype.getQueryResultsStream = common.paginator.streamify(
+Job.prototype.getQueryResultsStream = paginator.streamify(
   'getQueryResultsAsStream_'
 );
 
@@ -478,7 +479,7 @@ Job.prototype.poll_ = function(callback) {
  *
  * These methods can be auto-paginated.
  */
-common.paginator.extend(Job, ['getQueryResults']);
+paginator.extend(Job, ['getQueryResults']);
 
 /*! Developer Documentation
  *
