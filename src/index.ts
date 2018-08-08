@@ -860,10 +860,10 @@ BigQuery.prototype.createQueryStream = paginator.streamify(
  * in mind. For this we recommend one of the following methods:
  *
  * - {@link BigQuery#createQueryJob}
- * - {@link BigQuery/table#createCopyJob}
- * - {@link BigQuery/table#createCopyFromJob}
- * - {@link BigQuery/table#createExtractJob}
- * - {@link BigQuery/table#createLoadJob}
+ * - {@link Table#createCopyJob}
+ * - {@link Table#createCopyFromJob}
+ * - {@link Table#createExtractJob}
+ * - {@link Table#createLoadJob}
  *
  * However in the event you need a finer level of control over the job creation,
  * you can use this method to pass in a raw [Job resource](https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs)
