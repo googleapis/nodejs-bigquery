@@ -15,7 +15,7 @@
 
 'use strict';
 
-const bigquery = require(`@google-cloud/bigquery`)();
+const BigQuery = require(`@google-cloud/bigquery`);
 const path = require(`path`);
 const test = require(`ava`);
 const tools = require(`@google-cloud/nodejs-repo-tools`);
@@ -25,6 +25,7 @@ const cwd = path.join(__dirname, `..`);
 const cmd = `node datasets.js`;
 const datasetId = `nodejs-docs-samples-test-${uuid.v4()}`.replace(/-/gi, '_');
 const projectId = process.env.GCLOUD_PROJECT;
+const bigquery = new BigQuery();
 
 test.before(tools.checkCredentials);
 test.beforeEach(tools.stubConsole);

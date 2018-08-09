@@ -15,7 +15,7 @@
 
 'use strict';
 
-const bigquery = require(`@google-cloud/bigquery`)();
+const BigQuery = require(`@google-cloud/bigquery`);
 const path = require(`path`);
 const storage = require(`@google-cloud/storage`)();
 const test = require(`ava`);
@@ -43,6 +43,8 @@ const rows = [
   {Name: `foo`, Age: 27, Weight: 80.3, IsMagic: true},
   {Name: `bar`, Age: 13, Weight: 54.6, IsMagic: false},
 ];
+
+const bigquery = new BigQuery();
 
 test.before(tools.checkCredentials);
 test.before(async () => {
