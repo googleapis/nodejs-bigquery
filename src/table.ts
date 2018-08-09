@@ -21,13 +21,13 @@ import * as Big from 'big.js';
 import * as common from '@google-cloud/common';
 import {paginator} from '@google-cloud/paginator';
 import {promisifyAll} from '@google-cloud/promisify';
-var duplexify = require('duplexify');
+const duplexify = require('duplexify');
 import * as extend from 'extend';
-var format = require('string-format-obj');
+const format = require('string-format-obj');
 import * as fs from 'fs';
 import * as is from 'is';
 import * as path from 'path';
-var streamEvents = require('stream-events');
+const streamEvents = require('stream-events');
 import * as util from 'util';
 import * as uuid from 'uuid';
 
@@ -37,7 +37,7 @@ import * as uuid from 'uuid';
  * @type {object}
  * @private
  */
-var FORMATS = {
+const FORMATS = {
   avro: 'AVRO',
   csv: 'CSV',
   json: 'NEWLINE_DELIMITED_JSON',
@@ -72,7 +72,7 @@ function Table(dataset, id, options) {
     this.location = options.location;
   }
 
-  var methods = {
+  const methods = {
     /**
      * Create a table.
      *
@@ -314,14 +314,14 @@ util.inherits(Table, common.ServiceObject);
     return value.toFixed();
   }
 
-  var customTypeConstructorNames = [
+  const customTypeConstructorNames = [
     'BigQueryDate',
     'BigQueryDatetime',
     'BigQueryTime',
     'BigQueryTimestamp',
   ];
-  var constructorName = value.constructor.name;
-  var isCustomType = customTypeConstructorNames.indexOf(constructorName) > -1;
+  const constructorName = value.constructor.name;
+  const isCustomType = customTypeConstructorNames.indexOf(constructorName) > -1;
 
   if (isCustomType) {
     return value.value;
@@ -349,7 +349,7 @@ util.inherits(Table, common.ServiceObject);
  * @private
  */
 (Table as any).formatMetadata_ = function(options) {
-  var body = extend(true, {}, options);
+  const body = extend(true, {}, options);
 
   if (options.name) {
     body.friendlyName = options.name;
@@ -582,7 +582,7 @@ Table.prototype.createCopyJob = function(destination, metadata, callback) {
     metadata = {};
   }
 
-  var body: any = {
+  const body: any = {
     configuration: {
       copy: extend(true, metadata, {
         destinationTable: {
@@ -687,7 +687,7 @@ Table.prototype.createCopyFromJob = function(sourceTables, metadata, callback) {
     metadata = {};
   }
 
-  var body: any = {
+  const body: any = {
     configuration: {
       copy: extend(true, metadata, {
         destinationTable: {
@@ -812,7 +812,7 @@ Table.prototype.createExtractJob = function(destination, options, callback) {
 
       // If no explicit format was provided, attempt to find a match from the
       // file's extension. If no match, don't set, and default upstream to CSV.
-      var format = path
+      const format = path
         .extname(dest.name)
         .substr(1)
         .toLowerCase();
@@ -840,7 +840,7 @@ Table.prototype.createExtractJob = function(destination, options, callback) {
     delete options.gzip;
   }
 
-  var body: any = {
+  const body: any = {
     configuration: {
       extract: extend(true, options, {
         sourceTable: {
@@ -972,7 +972,7 @@ Table.prototype.createLoadJob = function(source, metadata, callback) {
   if (is.string(source)) {
     // A path to a file was given. If a sourceFormat wasn't specified, try to
     // find a match from the file's extension.
-    var detectedFormat =
+    const detectedFormat =
       FORMATS[
         path
           .extname(source)
@@ -993,7 +993,7 @@ Table.prototype.createLoadJob = function(source, metadata, callback) {
       });
   }
 
-  var body: any = {
+  const body: any = {
     configuration: {
       load: {
         destinationTable: {
@@ -1029,7 +1029,7 @@ Table.prototype.createLoadJob = function(source, metadata, callback) {
       // If no explicit format was provided, attempt to find a match from
       // the file's extension. If no match, don't set, and default upstream
       // to CSV.
-      var format =
+      const format =
         FORMATS[
           path
             .extname(src.name)
@@ -1157,11 +1157,11 @@ Table.prototype.createReadStream = paginator.streamify('getRows');
  *   .on('complete', function(job) {});
  */
 Table.prototype.createWriteStream = function(metadata) {
-  var self = this;
+  const self = this;
 
   metadata = metadata || {};
 
-  var fileTypes = Object.keys(FORMATS).map(function(key) {
+  const fileTypes = Object.keys(FORMATS).map(function(key) {
     return FORMATS[key];
   });
 
@@ -1183,7 +1183,7 @@ Table.prototype.createWriteStream = function(metadata) {
     },
   });
 
-  var jobId = metadata.jobId || uuid.v4();
+  let jobId = metadata.jobId || uuid.v4();
 
   if (metadata.jobId) {
     delete metadata.jobId;
@@ -1201,7 +1201,7 @@ Table.prototype.createWriteStream = function(metadata) {
     throw new Error('Source format not recognized: ' + metadata.sourceFormat);
   }
 
-  var dup = streamEvents(duplexify());
+  const dup = streamEvents(duplexify());
 
   dup.once('writing', function() {
     common.util.makeWritableStream(
@@ -1226,7 +1226,7 @@ Table.prototype.createWriteStream = function(metadata) {
         },
       } as any,
       function(data) {
-        var job = self.bigQuery.job(data.jobReference.jobId, {
+        const job = self.bigQuery.job(data.jobReference.jobId, {
           location: data.jobReference.location,
         });
 
@@ -1269,7 +1269,7 @@ Table.prototype.createWriteStream = function(metadata) {
  * const storage = new Storage({
  *   projectId: 'grape-spaceship-123'
  * });
- * var extractedFile = storage.bucket('institutions').file('2014.csv');
+ * const extractedFile = storage.bucket('institutions').file('2014.csv');
  *
  * //-
  * // To use the default options, just pass a {@link https://cloud.google.com/nodejs/docs/reference/storage/latest/File File} object.
@@ -1283,7 +1283,7 @@ Table.prototype.createWriteStream = function(metadata) {
  * //-
  * // If you need more customization, pass an `options` object.
  * //-
- * var options = {
+ * const options = {
  *   format: 'json',
  *   gzip: true
  * };
@@ -1302,7 +1302,7 @@ Table.prototype.createWriteStream = function(metadata) {
  * // If the callback is omitted, we'll return a Promise.
  * //-
  * table.extract(extractedFile, options).then(function(data) {
- *   var apiResponse = data[0];
+ *   const apiResponse = data[0];
  * });
  */
 Table.prototype.extract = function(destination, options, callback) {
@@ -1374,7 +1374,7 @@ Table.prototype.extract = function(destination, options, callback) {
 });
  */
 Table.prototype.getRows = function(options, callback) {
-  var self = this;
+  const self = this;
 
   if (is.fn(options)) {
     callback = options;
@@ -1392,7 +1392,7 @@ Table.prototype.getRows = function(options, callback) {
         return;
       }
 
-      var nextQuery = null;
+      let nextQuery = null;
 
       if (resp.pageToken) {
         nextQuery = extend({}, options, {
@@ -1490,7 +1490,7 @@ Table.prototype.getRows = function(options, callback) {
  * //-
  * // Insert multiple rows at a time.
  * //-
- * var rows = [
+ * const rows = [
  *   {
  *     INSTNM: 'Motion Picture Institute of Michigan',
  *     CITY: 'Troy',
@@ -1505,7 +1505,7 @@ Table.prototype.getRows = function(options, callback) {
  * // Insert a row as according to the <a href="https://cloud.google.com/bigquery/docs/reference/v2/tabledata/insertAll">
  * // specification</a>.
  * //-
- * var row = {
+ * const row = {
  *   insertId: '1',
  *   json: {
  *     INSTNM: 'Motion Picture Institute of Michigan',
@@ -1514,7 +1514,7 @@ Table.prototype.getRows = function(options, callback) {
  *   }
  * };
  *
- * var options = {
+ * const options = {
  *   raw: true
  * };
  *
@@ -1544,7 +1544,7 @@ Table.prototype.getRows = function(options, callback) {
  * //-
  * table.insert(rows)
  *   .then(function(data) {
- *     var apiResponse = data[0];
+ *     const apiResponse = data[0];
  *   })
  *   .catch(function(err) {
  *     // An API error or partial failure occurred.
@@ -1560,7 +1560,7 @@ Table.prototype.getRows = function(options, callback) {
  *   });
  */
 Table.prototype.insert = function(rows, options, callback) {
-  var self = this;
+  const self = this;
 
   if (is.fn(options)) {
     callback = options;
@@ -1573,7 +1573,7 @@ Table.prototype.insert = function(rows, options, callback) {
     throw new Error('You must provide at least 1 row to be inserted.');
   }
 
-  var json = extend(true, {}, options, {
+  const json = extend(true, {}, options, {
     rows: rows,
   });
 
@@ -1588,8 +1588,8 @@ Table.prototype.insert = function(rows, options, callback) {
 
   delete json.raw;
 
-  var autoCreate = !!options.autoCreate;
-  var schema;
+  const autoCreate = !!options.autoCreate;
+  let schema;
 
   delete json.autoCreate;
 
@@ -1618,7 +1618,7 @@ Table.prototype.insert = function(rows, options, callback) {
         return;
       }
 
-      var partialFailures = (resp.insertErrors || []).map(function(
+      const partialFailures = (resp.insertErrors || []).map(function(
         insertError
       ) {
         return {
@@ -1704,7 +1704,7 @@ Table.prototype.insert = function(rows, options, callback) {
  * // You may also pass in metadata in the format of a Jobs resource. See
  * // (http://goo.gl/BVcXk4) for a full list of supported values.
  * //-
- * var metadata = {
+ * const metadata = {
  *   encoding: 'ISO-8859-1',
  *   sourceFormat: 'NEWLINE_DELIMITED_JSON'
  * };
@@ -1714,10 +1714,10 @@ Table.prototype.insert = function(rows, options, callback) {
  * //-
  * // Load data from a file in your Cloud Storage bucket.
  * //-
- * var gcs = require('@google-cloud/storage')({
+ * const gcs = require('@google-cloud/storage')({
  *   projectId: 'grape-spaceship-123'
  * });
- * var data = gcs.bucket('institutions').file('data.csv');
+ * const data = gcs.bucket('institutions').file('data.csv');
  * table.load(data, function(err, apiResponse) {});
  *
  * //-
@@ -1732,7 +1732,7 @@ Table.prototype.insert = function(rows, options, callback) {
  * // If the callback is omitted, we'll return a Promise.
  * //-
  * table.load(data).then(function(data) {
- *   var apiResponse = data[0];
+ *   const apiResponse = data[0];
  * });
  */
 Table.prototype.load = function(source, metadata, callback) {
@@ -1809,7 +1809,7 @@ Table.prototype.query = function(query, callback) {
  * });
  */
 Table.prototype.setMetadata = function(metadata, callback) {
-  var body = (Table as any).formatMetadata_(metadata);
+  const body = (Table as any).formatMetadata_(metadata);
 
   common.ServiceObject.prototype.setMetadata.call(this, body, callback);
 };

@@ -26,17 +26,17 @@ if (process.argv.length < 3) {
     `usage: '${process.argv[0]} ${process.argv[1]} <queries.json>'`);
 }
 
-var queryJson = fs.readFileSync(process.argv[2]);
-var queries = JSON.parse(queryJson);
-var client = new BigQuery(env);
+const queryJson = fs.readFileSync(process.argv[2]);
+const queries = JSON.parse(queryJson);
+const client = new BigQuery(env);
 
-var doQuery = function(queryTxt, callback) {
-  var startMilli = new Date().getTime();
-  var numRows = 0;
-  var numCols;
-  var timeFirstByteMilli;
+const doQuery = function(queryTxt, callback) {
+  const startMilli = new Date().getTime();
+  let numRows = 0;
+  let numCols;
+  let timeFirstByteMilli;
 
-  var query = {
+  const query = {
     query: queryTxt,
     useLegacySql: false
   };
@@ -51,8 +51,8 @@ var doQuery = function(queryTxt, callback) {
       } else if (numCols !== Object.keys(row).length) {
         this.end();
 
-        var receivedCols = Object.keys(row).length;
-        var error = new Error(
+        const receivedCols = Object.keys(row).length;
+        const error = new Error(
           `query "${queryTxt}": ` +
             `wrong number of columns, want ${numCols} got ${receivedCols}`
         );
@@ -62,7 +62,7 @@ var doQuery = function(queryTxt, callback) {
       numRows++;
     })
     .on('end', function() {
-      var timeTotalMilli = new Date().getTime() - startMilli;
+      const timeTotalMilli = new Date().getTime() - startMilli;
 
       console.log(
         `query ${queryTxt}:`,
