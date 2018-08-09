@@ -1387,7 +1387,7 @@ Table.prototype.getRows = function(options, callback) {
  *
  * There are more strict quota limits using this method so it is highly
  * recommended that you load data into BigQuery using
- * {@link Table#import} instead.
+ * {@link Table#load} instead.
  *
  * @see [Tabledata: insertAll API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/tabledata/insertAll}
  * @see [Troubleshooting Errors]{@link https://developers.google.com/bigquery/troubleshooting-errors}
