@@ -24,20 +24,19 @@ import * as proxyquire from 'proxyquire';
 import * as pfy from '@google-cloud/promisify';
 import {ServiceObject, util} from '@google-cloud/common';
 
-var promisified = false;
-var fakePfy = extend({}, pfy, {
+let promisified = false;
+const fakePfy = extend({}, pfy, {
   promisifyAll: function(Class, options) {
     if (Class.name !== 'Dataset') {
       return;
     }
-
     promisified = true;
     assert.deepStrictEqual(options.exclude, ['table']);
   },
 });
 
-var extended = false;
-var fakePaginator = {
+let extended = false;
+const fakePaginator = {
   paginator: {
     extend: function(Class, methods) {
       if (Class.name !== 'Dataset') {
@@ -62,16 +61,16 @@ function FakeServiceObject() {
 nodeutil.inherits(FakeServiceObject, ServiceObject);
 
 describe('BigQuery/Dataset', function() {
-  var BIGQUERY = {
+  const BIGQUERY = {
     projectId: 'my-project',
     createDataset: util.noop,
   };
-  var DATASET_ID = 'kittens';
-  var LOCATION = 'asia-northeast1';
+  const DATASET_ID = 'kittens';
+  const LOCATION = 'asia-northeast1';
 
-  var Dataset;
-  var Table;
-  var ds;
+  let Dataset;
+  let Table;
+  let ds;
 
   before(function() {
     Dataset = proxyquire('../src/dataset', {
@@ -104,7 +103,7 @@ describe('BigQuery/Dataset', function() {
     it('should inherit from ServiceObject', function() {
       assert(ds instanceof ServiceObject);
 
-      var calledWith = ds.calledWith_[0];
+      const calledWith = ds.calledWith_[0];
 
       assert.strictEqual(calledWith.parent, BIGQUERY);
       assert.strictEqual(calledWith.baseUrl, '/datasets');
@@ -119,16 +118,16 @@ describe('BigQuery/Dataset', function() {
     });
 
     it('should capture user provided location', function() {
-      var options = {location: LOCATION};
-      var ds = new Dataset(BIGQUERY, DATASET_ID, options);
+      const options = {location: LOCATION};
+      const ds = new Dataset(BIGQUERY, DATASET_ID, options);
 
       assert.strictEqual(ds.location, LOCATION);
     });
 
     describe('createMethod', function() {
-      var bq;
-      var ds;
-      var config;
+      let bq;
+      let ds;
+      let config;
 
       beforeEach(function() {
         bq = extend(true, {}, BIGQUERY);
@@ -137,7 +136,7 @@ describe('BigQuery/Dataset', function() {
       });
 
       it('should call through to BigQuery#createDataset', function(done) {
-        var OPTIONS = {};
+        const OPTIONS = {};
 
         bq.createDataset = function(id, options, callback) {
           assert.strictEqual(id, DATASET_ID);
@@ -168,26 +167,26 @@ describe('BigQuery/Dataset', function() {
     });
 
     describe('etag interceptor', function() {
-      var FAKE_ETAG = 'abc';
+      const FAKE_ETAG = 'abc';
 
       it('should apply the If-Match header', function() {
-        var interceptor = ds.interceptors.pop();
+        const interceptor = ds.interceptors.pop();
 
-        var fakeReqOpts = {
+        const fakeReqOpts = {
           method: 'PATCH',
           json: {
             etag: FAKE_ETAG,
           },
         };
 
-        var reqOpts = interceptor.request(fakeReqOpts);
+        const reqOpts = interceptor.request(fakeReqOpts);
         assert.deepStrictEqual(reqOpts.headers, {'If-Match': FAKE_ETAG});
       });
 
       it('should respect already existing headers', function() {
-        var interceptor = ds.interceptors.pop();
+        const interceptor = ds.interceptors.pop();
 
-        var fakeReqOpts = {
+        const fakeReqOpts = {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
@@ -197,40 +196,40 @@ describe('BigQuery/Dataset', function() {
           },
         };
 
-        var expectedHeaders = extend({}, fakeReqOpts.headers, {
+        const expectedHeaders = extend({}, fakeReqOpts.headers, {
           'If-Match': FAKE_ETAG,
         });
 
-        var reqOpts = interceptor.request(fakeReqOpts);
+        const reqOpts = interceptor.request(fakeReqOpts);
         assert.deepStrictEqual(reqOpts.headers, expectedHeaders);
       });
 
       it('should not apply the header if method is not patch', function() {
-        var interceptor = ds.interceptors.pop();
+        const interceptor = ds.interceptors.pop();
 
-        var fakeReqOpts = {
+        const fakeReqOpts = {
           method: 'POST',
           json: {
             etag: FAKE_ETAG,
           },
         };
 
-        var reqOpts = interceptor.request(fakeReqOpts);
+        const reqOpts = interceptor.request(fakeReqOpts);
         assert.deepStrictEqual(reqOpts.headers, undefined);
       });
     });
   });
 
   describe('createQueryJob', function() {
-    var FAKE_QUERY = 'SELECT * FROM `table`';
+    const FAKE_QUERY = 'SELECT * FROM `table`';
 
     it('should extend the options', function(done) {
-      var fakeOptions = {
+      const fakeOptions = {
         query: FAKE_QUERY,
         a: {b: 'c'},
       };
 
-      var expectedOptions = extend(
+      const expectedOptions = extend(
         true,
         {
           location: LOCATION,
@@ -264,7 +263,7 @@ describe('BigQuery/Dataset', function() {
   });
 
   describe('createQueryStream', function() {
-    var options = {
+    const options = {
       a: 'b',
       c: 'd',
     };
@@ -288,7 +287,7 @@ describe('BigQuery/Dataset', function() {
     });
 
     it('should accept a string', function(done) {
-      var query = 'SELECT * FROM allthedata';
+      const query = 'SELECT * FROM allthedata';
 
       ds.bigQuery.createQueryStream = function(opts) {
         assert.strictEqual(opts.query, query);
@@ -338,7 +337,7 @@ describe('BigQuery/Dataset', function() {
   });
 
   describe('createTable', function() {
-    var SCHEMA_OBJECT = {
+    const SCHEMA_OBJECT = {
       fields: [
         {name: 'id', type: 'INTEGER'},
         {name: 'breed', type: 'STRING'},
@@ -347,17 +346,17 @@ describe('BigQuery/Dataset', function() {
         {name: 'around', type: 'BOOLEAN'},
       ],
     };
-    var SCHEMA_STRING = 'id:integer,breed,name,dob:timestamp,around:boolean';
-    var TABLE_ID = 'kittens';
+    const SCHEMA_STRING = 'id:integer,breed,name,dob:timestamp,around:boolean';
+    const TABLE_ID = 'kittens';
 
-    var API_RESPONSE = {
+    const API_RESPONSE = {
       tableReference: {
         tableId: TABLE_ID,
       },
     };
 
     it('should create a table', function(done) {
-      var options = {
+      const options = {
         schema: SCHEMA_OBJECT,
       };
 
@@ -365,7 +364,7 @@ describe('BigQuery/Dataset', function() {
         assert.strictEqual(reqOpts.method, 'POST');
         assert.strictEqual(reqOpts.uri, '/tables');
 
-        var body = reqOpts.json;
+        const body = reqOpts.json;
         assert.deepStrictEqual(body.schema, SCHEMA_OBJECT);
         assert.strictEqual(body.tableReference.datasetId, DATASET_ID);
         assert.strictEqual(
@@ -389,9 +388,9 @@ describe('BigQuery/Dataset', function() {
     });
 
     it('should format the metadata', function(done) {
-      var formatMetadata_ = Table.formatMetadata_;
-      var formatted = {};
-      var fakeOptions = {};
+      const formatMetadata_ = Table.formatMetadata_;
+      const formatted = {};
+      const fakeOptions = {};
 
       Table.formatMetadata_ = function(options) {
         assert.strictEqual(options, fakeOptions);
@@ -436,7 +435,7 @@ describe('BigQuery/Dataset', function() {
     });
 
     it('should assign record type to nested schemas', function(done) {
-      var nestedField = {
+      const nestedField = {
         id: 'nested',
         fields: [{id: 'nested_name', type: 'STRING'}],
       };
@@ -458,7 +457,7 @@ describe('BigQuery/Dataset', function() {
     });
 
     it('should return an error to the callback', function(done) {
-      var error = new Error('Error.');
+      const error = new Error('Error.');
 
       ds.request = function(reqOpts, callback) {
         callback(error);
@@ -483,7 +482,7 @@ describe('BigQuery/Dataset', function() {
     });
 
     it('should pass the location to the Table', function(done) {
-      var response = extend({location: LOCATION}, API_RESPONSE);
+      const response = extend({location: LOCATION}, API_RESPONSE);
 
       ds.request = function(reqOpts, callback) {
         callback(null, response);
@@ -499,7 +498,7 @@ describe('BigQuery/Dataset', function() {
     });
 
     it('should return an apiResponse', function(done) {
-      var opts = {id: TABLE_ID, schema: SCHEMA_OBJECT};
+      const opts = {id: TABLE_ID, schema: SCHEMA_OBJECT};
 
       ds.request = function(reqOpts, callback) {
         callback(null, API_RESPONSE);
@@ -513,7 +512,7 @@ describe('BigQuery/Dataset', function() {
     });
 
     it('should assign metadata to the Table object', function(done) {
-      var apiResponse = extend(
+      const apiResponse = extend(
         {
           a: 'b',
           c: 'd',
@@ -563,7 +562,7 @@ describe('BigQuery/Dataset', function() {
     });
 
     it('should pass error to callback', function(done) {
-      var error = new Error('Error.');
+      const error = new Error('Error.');
 
       ds.request = function(reqOpts, callback) {
         callback(error);
@@ -576,7 +575,7 @@ describe('BigQuery/Dataset', function() {
     });
 
     it('should pass apiResponse to callback', function(done) {
-      var apiResponse = {};
+      const apiResponse = {};
 
       ds.request = function(reqOpts, callback) {
         callback(null, apiResponse);
@@ -601,7 +600,7 @@ describe('BigQuery/Dataset', function() {
     });
 
     it('should accept a query', function(done) {
-      var query = {
+      const query = {
         maxResults: 8,
         pageToken: 'token',
       };
@@ -624,7 +623,7 @@ describe('BigQuery/Dataset', function() {
     });
 
     it('should return error to callback', function(done) {
-      var error = new Error('Error.');
+      const error = new Error('Error.');
 
       ds.request = function(reqOpts, callback) {
         callback(error);
@@ -637,8 +636,8 @@ describe('BigQuery/Dataset', function() {
     });
 
     describe('success', function() {
-      var tableId = 'tableName';
-      var apiResponse = {
+      const tableId = 'tableName';
+      const apiResponse = {
         tables: [
           {
             a: 'b',
@@ -659,7 +658,7 @@ describe('BigQuery/Dataset', function() {
         ds.getTables(function(err, tables, nextQuery, apiResponse_) {
           assert.ifError(err);
 
-          var table = tables[0];
+          const table = tables[0];
 
           assert(table instanceof Table);
           assert.strictEqual(table.id, tableId);
@@ -678,13 +677,13 @@ describe('BigQuery/Dataset', function() {
       });
 
       it('should return token if more results exist', function(done) {
-        var pageToken = 'token';
+        const pageToken = 'token';
 
-        var query = {
+        const query = {
           maxResults: 5,
         };
 
-        var expectedNextQuery = {
+        const expectedNextQuery = {
           maxResults: 5,
           pageToken: pageToken,
         };
@@ -703,7 +702,7 @@ describe('BigQuery/Dataset', function() {
   });
 
   describe('query', function() {
-    var options = {
+    const options = {
       a: 'b',
       c: 'd',
     };
@@ -717,7 +716,7 @@ describe('BigQuery/Dataset', function() {
     });
 
     it('should accept a string', function(done) {
-      var query = 'SELECT * FROM allthedata';
+      const query = 'SELECT * FROM allthedata';
 
       ds.bigQuery.query = function(opts) {
         assert.strictEqual(opts.query, query);
@@ -766,7 +765,7 @@ describe('BigQuery/Dataset', function() {
     });
 
     it('should pass callback', function(done) {
-      var callback = util.noop;
+      const callback = util.noop;
 
       ds.bigQuery.query = function(opts, cb) {
         assert.strictEqual(cb, callback);
@@ -779,15 +778,15 @@ describe('BigQuery/Dataset', function() {
 
   describe('table', function() {
     it('should return a Table object', function() {
-      var tableId = 'tableId';
-      var table = ds.table(tableId);
+      const tableId = 'tableId';
+      const table = ds.table(tableId);
       assert(table instanceof Table);
       assert.strictEqual(table.id, tableId);
     });
 
     it('should inherit the dataset location', function() {
       ds.location = LOCATION;
-      var table = ds.table('tableId');
+      const table = ds.table('tableId');
 
       assert.strictEqual(table.location, LOCATION);
     });
@@ -795,8 +794,8 @@ describe('BigQuery/Dataset', function() {
     it('should pass along the location if provided', function() {
       ds.location = LOCATION;
 
-      var location = 'US';
-      var table = ds.table('tableId', {location});
+      const location = 'US';
+      const table = ds.table('tableId', {location});
 
       assert.strictEqual(table.location, location);
     });

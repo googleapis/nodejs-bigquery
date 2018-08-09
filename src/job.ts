@@ -84,7 +84,7 @@ function Job(bigQuery, id, options) {
     this.location = options.location;
   }
 
-  var methods = {
+  const methods = {
     /**
      * Check if the job exists.
      *
@@ -107,7 +107,7 @@ function Job(bigQuery, id, options) {
      * // If the callback is omitted, we'll return a Promise.
      * //-
      * job.exists().then(function(data) {
-     *   var exists = data[0];
+     *   const exists = data[0];
      * });
      */
     exists: true,
@@ -138,8 +138,8 @@ function Job(bigQuery, id, options) {
      * // If the callback is omitted, we'll return a Promise.
      * //-
      * job.get().then(function(data) {
-     *   var job = data[0];
-     *   var apiResponse = data[1];
+     *   const job = data[0];
+     *   const apiResponse = data[1];
      * });
      */
     get: true,
@@ -257,11 +257,11 @@ util.inherits(Job, common.Operation);
  * // If the callback is omitted, we'll return a Promise.
  * //-
  * job.cancel().then(function(data) {
- *   var apiResponse = data[0];
+ *   const apiResponse = data[0];
  * });
  */
 Job.prototype.cancel = function(callback) {
-  var qs;
+  let qs;
 
   if (this.location) {
     qs = {location: this.location};
@@ -356,11 +356,11 @@ Job.prototype.cancel = function(callback) {
  * // If the callback is omitted, we'll return a Promise.
  * //-
  * job.getQueryResults().then(function(data) {
- *   var rows = data[0];
+ *   const rows = data[0];
  * });
  */
 Job.prototype.getQueryResults = function(options, callback) {
-  var self = this;
+  const self = this;
 
   if (is.fn(options)) {
     callback = options;
@@ -385,13 +385,13 @@ Job.prototype.getQueryResults = function(options, callback) {
         return;
       }
 
-      var rows = [];
+      let rows = [];
 
       if (resp.schema && resp.rows) {
         rows = self.bigQuery.mergeSchemaWithRows_(resp.schema, resp.rows);
       }
 
-      var nextQuery = null;
+      let nextQuery = null;
       if (resp.jobComplete === false) {
         // Query is still running.
         nextQuery = extend({}, options);
