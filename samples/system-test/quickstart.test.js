@@ -21,7 +21,8 @@ const test = require(`ava`);
 const tools = require(`@google-cloud/nodejs-repo-tools`);
 const uuid = require(`uuid`);
 
-const bigquery = proxyquire(`@google-cloud/bigquery`, {})();
+const BigQuery = proxyquire(`@google-cloud/bigquery`, {});
+const bigquery = new BigQuery();
 
 const expectedDatasetId = `my_new_dataset`;
 let datasetId = `nodejs-docs-samples-test-${uuid.v4()}`;
