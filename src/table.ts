@@ -1212,6 +1212,11 @@ Table.prototype.createWriteStream = function(metadata) {
 
   const dup = streamEvents(duplexify());
 
+  // This will allow the natural `finish` event to fire.
+  dup.on('prefinish', () => {
+    dup.cork();
+  });
+
   dup.once('writing', function() {
     common.util.makeWritableStream(
       dup,
@@ -1245,7 +1250,10 @@ Table.prototype.createWriteStream = function(metadata) {
 
         job
           .on('error', err => dup.destroy(err))
-          .on('complete', () => dup.emit('complete', job));
+          .on('complete', () => {
+            dup.emit('complete', job);
+            dup.uncork();
+          });
       }
     );
   });

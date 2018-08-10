@@ -1561,7 +1561,7 @@ describe('BigQuery/Table', function() {
           .emit('writing');
       });
 
-      it('should emit complete when job is complete', function(done) {
+      it('should emit finish when the job is complete', function(done) {
         const metadata = {
           jobReference: {
             jobId: 'job-id',
@@ -1571,21 +1571,27 @@ describe('BigQuery/Table', function() {
           c: 'd',
         };
 
-        makeWritableStreamOverride = function(stream, options, callback) {
+        makeWritableStreamOverride = function(dup, options, callback) {
+          dup.setWritable(new stream.PassThrough());
           callback(metadata);
           setImmediate(function() {
             fakeJob.emit('complete');
           });
         };
 
+        let completeWasEmitted = false;
+
         table
           .createWriteStream()
           .on('complete', function(job) {
             assert.strictEqual(job, fakeJob);
-            assert.deepStrictEqual(job.metadata, metadata);
+            completeWasEmitted = true;
+          })
+          .on('finish', function() {
+            assert.strictEqual(completeWasEmitted, true);
             done();
           })
-          .emit('writing');
+          .end('data');
       });
     });
   });
