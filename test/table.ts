@@ -266,6 +266,16 @@ describe('BigQuery/Table', function() {
         SCHEMA_OBJECT
       );
     });
+
+    it('should trim names', function() {
+      var schema = Table.createSchemaFromString_(' name :type');
+      assert.strictEqual(schema.fields[0].name, 'name');
+    });
+
+    it('should trim types', function() {
+      var schema = Table.createSchemaFromString_('name: type ');
+      assert.strictEqual(schema.fields[0].type, 'TYPE');
+    });
   });
 
   describe('encodeValue_', function() {
