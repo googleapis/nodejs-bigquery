@@ -740,10 +740,16 @@ describe('BigQuery', function() {
     });
 
     it('should insert rows via stream', function(done) {
+      let job;
+
       fs.createReadStream(TEST_DATA_JSON_PATH)
         .pipe(table.createWriteStream('json'))
         .on('error', done)
-        .on('complete', function() {
+        .on('complete', function(_job) {
+          job = _job;
+        })
+        .on('finish', function() {
+          assert.strictEqual(job.metadata.status.state, 'DONE');
           done();
         });
     });

@@ -1142,9 +1142,12 @@ Table.prototype.createReadStream = paginator.streamify('getRows');
  *
  * request.get(csvUrl)
  *   .pipe(table.createWriteStream(metadata))
- *   .on('complete', function(job) {
+ *   .on('job', function(job) {
  *     // `job` is a Job object that can be used to check the status of the
  *     // request.
+ *   })
+ *   .on('complete', function(job) {
+ *     // The job has completed successfully.
  *   });
  *
  * //-
@@ -1154,7 +1157,13 @@ Table.prototype.createReadStream = paginator.streamify('getRows');
  *
  * fs.createReadStream('./test/testdata/testfile.json')
  *   .pipe(table.createWriteStream('json'))
- *   .on('complete', function(job) {});
+ *   .on('job', function(job) {
+ *     // `job` is a Job object that can be used to check the status of the
+ *     // request.
+ *   })
+ *   .on('complete', function(job) {
+ *     // The job has completed successfully.
+ *   });
  */
 Table.prototype.createWriteStream = function(metadata) {
   const self = this;
@@ -1203,6 +1212,11 @@ Table.prototype.createWriteStream = function(metadata) {
 
   const dup = streamEvents(duplexify());
 
+  // This will allow the natural `finish` event to fire.
+  dup.on('prefinish', () => {
+    dup.cork();
+  });
+
   dup.once('writing', function() {
     common.util.makeWritableStream(
       dup,
@@ -1231,7 +1245,15 @@ Table.prototype.createWriteStream = function(metadata) {
         });
 
         job.metadata = data;
-        dup.emit('complete', job);
+
+        dup.emit('job', job);
+
+        job
+          .on('error', err => dup.destroy(err))
+          .on('complete', () => {
+            dup.emit('complete', job);
+            dup.uncork();
+          });
       }
     );
   });

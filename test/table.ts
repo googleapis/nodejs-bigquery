@@ -1387,10 +1387,16 @@ describe('BigQuery/Table', function() {
     });
 
     describe('writable stream', function() {
+      let fakeJob;
       let fakeJobId;
 
       beforeEach(function() {
+        fakeJob = new events.EventEmitter();
         fakeJobId = uuid.v4();
+
+        table.bigQuery.job = function(id, options) {
+          return fakeJob;
+        };
 
         fakeUuid.v4 = function() {
           return fakeJobId;
@@ -1407,15 +1413,6 @@ describe('BigQuery/Table', function() {
 
         stream = table.createWriteStream();
         stream.emit('writing');
-      });
-
-      it('should pass the connection', function(done) {
-        makeWritableStreamOverride = function(stream, options) {
-          assert.deepStrictEqual(options.connection, table.connection);
-          done();
-        };
-
-        table.createWriteStream().emit('writing');
       });
 
       it('should pass extended metadata', function(done) {
@@ -1504,17 +1501,22 @@ describe('BigQuery/Table', function() {
         table.createWriteStream(options).emit('writing');
       });
 
-      it('should create a job and emit it with complete', function(done) {
-        const jobId = 'job-id';
+      it('should create a job and emit it with job', function(done) {
         const metadata = {
-          jobReference: {jobId, location: LOCATION},
+          jobReference: {
+            jobId: 'job-id',
+            location: 'location',
+          },
           a: 'b',
           c: 'd',
         };
 
         table.bigQuery.job = function(id, options) {
-          assert.strictEqual(options.location, LOCATION);
-          return {id: id};
+          assert.strictEqual(id, metadata.jobReference.jobId);
+          assert.deepStrictEqual(options, {
+            location: metadata.jobReference.location,
+          });
+          return fakeJob;
         };
 
         makeWritableStreamOverride = function(stream, options, callback) {
@@ -1523,12 +1525,73 @@ describe('BigQuery/Table', function() {
 
         table
           .createWriteStream()
-          .on('complete', function(job) {
-            assert.strictEqual(job.id, jobId);
+          .on('job', function(job) {
+            assert.strictEqual(job, fakeJob);
             assert.deepStrictEqual(job.metadata, metadata);
             done();
           })
           .emit('writing');
+      });
+
+      it('should return an error if the job fails', function(done) {
+        const error = new Error('Error.');
+
+        const metadata = {
+          jobReference: {
+            jobId: 'job-id',
+            location: 'location',
+          },
+          a: 'b',
+          c: 'd',
+        };
+
+        makeWritableStreamOverride = function(stream, options, callback) {
+          callback(metadata);
+          setImmediate(function() {
+            fakeJob.emit('error', error);
+          });
+        };
+
+        table
+          .createWriteStream()
+          .on('error', function(err) {
+            assert.strictEqual(err, error);
+            done();
+          })
+          .emit('writing');
+      });
+
+      it('should emit finish when the job is complete', function(done) {
+        const metadata = {
+          jobReference: {
+            jobId: 'job-id',
+            location: 'location',
+          },
+          a: 'b',
+          c: 'd',
+        };
+
+        makeWritableStreamOverride = function(dup, options, callback) {
+          dup.setWritable(new stream.PassThrough());
+          callback(metadata);
+          setImmediate(function() {
+            fakeJob.emit('complete');
+          });
+        };
+
+        let completeWasEmitted = false;
+
+        table
+          .createWriteStream()
+          .on('complete', function(job) {
+            assert.strictEqual(job, fakeJob);
+            completeWasEmitted = true;
+          })
+          .on('finish', function() {
+            assert.strictEqual(completeWasEmitted, true);
+            done();
+          })
+          .end('data');
       });
     });
   });
