@@ -61,8 +61,10 @@ function FakeDataset() {
   this.calledWith_ = arguments;
 }
 
-function FakeTable(a, b) {
-  Table.call(this, a, b);
+class FakeTable extends Table {
+  constructor(a, b) {
+    super(a, b);
+  }
 }
 
 function FakeJob() {

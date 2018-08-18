@@ -19,7 +19,6 @@
 import * as arrify from 'arrify';
 import * as assert from 'assert';
 import * as extend from 'extend';
-import * as nodeutil from 'util';
 import * as proxyquire from 'proxyquire';
 import * as pfy from '@google-cloud/promisify';
 import {ServiceObject, util} from '@google-cloud/common';
@@ -53,12 +52,13 @@ const fakePaginator = {
   }
 };
 
-function FakeServiceObject() {
-  this.calledWith_ = arguments;
-  ServiceObject.apply(this, arguments);
+class FakeServiceObject extends ServiceObject {
+  calledWith_;
+  constructor(config) {
+    super(config)
+    this.calledWith_ = arguments;
+  }
 }
-
-nodeutil.inherits(FakeServiceObject, ServiceObject);
 
 describe('BigQuery/Dataset', function() {
   const BIGQUERY = {
