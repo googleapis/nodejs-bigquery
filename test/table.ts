@@ -19,11 +19,11 @@
 import * as arrify from 'arrify';
 import * as assert from 'assert';
 import * as Big from 'big.js';
-const events = require('events');
+import {EventEmitter} from 'events';
 import * as extend from 'extend';
 import * as nodeutil from 'util';
 import * as proxyquire from 'proxyquire';
-const stream = require('stream');
+import * as stream from 'stream';
 import * as uuid from 'uuid';
 import * as pfy from '@google-cloud/promisify';
 import {ServiceObject, util} from '@google-cloud/common';
@@ -69,12 +69,13 @@ const fakePaginator = {
 
 let fakeUuid = extend(true, {}, uuid);
 
-function FakeServiceObject() {
-  this.calledWith_ = arguments;
-  ServiceObject.apply(this, arguments);
+class FakeServiceObject extends ServiceObject {
+  calledWith_;
+  constructor(config) {
+    super(config);
+    this.calledWith_ = arguments;
+  }
 }
-
-nodeutil.inherits(FakeServiceObject, ServiceObject);
 
 describe('BigQuery/Table', function() {
   const DATASET = {
@@ -437,7 +438,7 @@ describe('BigQuery/Table', function() {
     let fakeJob;
 
     beforeEach(function() {
-      fakeJob = new events.EventEmitter();
+      fakeJob = new EventEmitter();
       table.createCopyJob = function(destination, metadata, callback) {
         callback(null, fakeJob);
       };
@@ -508,7 +509,7 @@ describe('BigQuery/Table', function() {
     let fakeJob;
 
     beforeEach(function() {
-      fakeJob = new events.EventEmitter();
+      fakeJob = new EventEmitter();
       table.createCopyFromJob = function(sourceTables, metadata, callback) {
         callback(null, fakeJob);
       };
@@ -1391,7 +1392,7 @@ describe('BigQuery/Table', function() {
       let fakeJobId;
 
       beforeEach(function() {
-        fakeJob = new events.EventEmitter();
+        fakeJob = new EventEmitter();
         fakeJobId = uuid.v4();
 
         table.bigQuery.job = function(id, options) {
@@ -1600,7 +1601,7 @@ describe('BigQuery/Table', function() {
     let fakeJob;
 
     beforeEach(function() {
-      fakeJob = new events.EventEmitter();
+      fakeJob = new EventEmitter();
       table.createExtractJob = function(destination, metadata, callback) {
         callback(null, fakeJob);
       };
@@ -2128,7 +2129,7 @@ describe('BigQuery/Table', function() {
     let fakeJob;
 
     beforeEach(function() {
-      fakeJob = new events.EventEmitter();
+      fakeJob = new EventEmitter();
       table.createLoadJob = function(source, metadata, callback) {
         callback(null, fakeJob);
       };
@@ -2221,7 +2222,7 @@ describe('BigQuery/Table', function() {
         assert.strictEqual(this, table);
         assert.strictEqual(metadata, formattedMetadata);
         assert.strictEqual(callback, done);
-        callback(); // the done fn
+        callback!(null); // the done fn
       };
 
       table.setMetadata(fakeMetadata, done);
