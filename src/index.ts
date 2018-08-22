@@ -27,9 +27,9 @@ import * as is from 'is';
 import * as util from 'util';
 import * as uuid from 'uuid';
 
-const Dataset = require('./dataset.js');
-const Job = require('./job.js');
-const Table = require('./table.js');
+import {Dataset} from './dataset';
+import {Job} from './job';
+import {Table} from './table';
 
 /**
  * @typedef {object} ClientConfig

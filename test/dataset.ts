@@ -79,8 +79,8 @@ describe('BigQuery/Dataset', function() {
       },
       '@google-cloud/paginator': fakePaginator,
       '@google-cloud/promisify': fakePfy,
-    });
-    Table = require('../src/table');
+    }).Dataset;
+    Table = require('../src/table').Table;
   });
 
   beforeEach(function() {

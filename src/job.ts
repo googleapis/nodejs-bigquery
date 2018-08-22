@@ -58,7 +58,7 @@ import * as is from 'is';
  * // All jobs are event emitters. The status of each job is polled
  * // continuously, starting only after you register a "complete" listener.
  * //-
- * job.on('complete', function(metadata) {
+ * job.on('complete', (metadata) => {
  *   // The job is complete.
  * });
  *
@@ -66,7 +66,7 @@ import * as is from 'is';
  * // Be sure to register an error handler as well to catch any issues which
  * // impeded the job.
  * //-
- * job.on('error', function(err) {
+ * job.on('error', (err) => {
  *   // An error occurred during the job.
  * });
  *
@@ -102,12 +102,12 @@ class Job extends Operation {
        *
        * const job = bigquery.job('job-id');
        *
-       * job.exists(function(err, exists) {});
+       * job.exists((err, exists) => {});
        *
        * //-
        * // If the callback is omitted, we'll return a Promise.
        * //-
-       * job.exists().then(function(data) {
+       * job.exists().then((data) => {
        *   const exists = data[0];
        * });
        */
@@ -129,7 +129,7 @@ class Job extends Operation {
        *
        * const job = bigquery.job('job-id');
        *
-       * job.get(function(err, job, apiResponse) {
+       * job.get((err, job, apiResponse) => {
        *   if (!err) {
        *     // `job.metadata` has been populated.
        *   }
@@ -138,7 +138,7 @@ class Job extends Operation {
        * //-
        * // If the callback is omitted, we'll return a Promise.
        * //-
-       * job.get().then(function(data) {
+       * job.get().then((data) => {
        *   const job = data[0];
        *   const apiResponse = data[1];
        * });
@@ -163,12 +163,12 @@ class Job extends Operation {
        * const bigquery = new BigQuery();
        *
        * const job = bigquery.job('id');
-       * job.getMetadata(function(err, metadata, apiResponse) {});
+       * job.getMetadata((err, metadata, apiResponse) => {});
        *
        * //-
        * // If the callback is omitted, we'll return a Promise.
        * //-
-       * job.getMetadata().then(function(data) {
+       * job.getMetadata().then((data) => {
        *   const metadata = data[0];
        *   const apiResponse = data[1];
        * });
@@ -207,12 +207,12 @@ class Job extends Operation {
        *
        * const job = bigquery.job('job-id');
        *
-       * job.setMetadata(metadata, function(err, apiResponse) {});
+       * job.setMetadata(metadata, (err, apiResponse) => {});
        *
        * //-
        * // If the callback is omitted, we'll return a Promise.
        * //-
-       * job.setMetadata(metadata).then(function(data) {
+       * job.setMetadata(metadata).then((data) => {
        *   const apiResponse = data[0];
        * });
        */
@@ -276,16 +276,16 @@ class Job extends Operation {
    *
    * const job = bigquery.job('job-id');
    *
-   * job.cancel(function(err, apiResponse) {
+   * job.cancel((err, apiResponse) =>{
    *   // Check to see if the job completes successfully.
-   *   job.on('error', function(err) {});
-   *   job.on('complete', function(metadata) {});
+   *   job.on('error', (err) => {});
+   *   job.on('complete', (metadata) => {});
    * });
    *
    * //-
    * // If the callback is omitted, we'll return a Promise.
    * //-
-   * job.cancel().then(function(data) {
+   * job.cancel().then((data) => {
    *   const apiResponse = data[0];
    * });
    */
@@ -353,7 +353,7 @@ class Job extends Operation {
    * //-
    * // Get all of the results of a query.
    * //-
-   * job.getQueryResults(function(err, rows) {
+   * job.getQueryResults((err, rows) => {
    *   if (!err) {
    *     // rows is an array of results.
    *   }
@@ -364,7 +364,7 @@ class Job extends Operation {
    * //-
    * job.getQueryResults({
    *   maxResults: 100
-   * }, function(err, rows) {});
+   * }, (err, rows) => {});
    *
    * //-
    * // To control how many API requests are made and page through the results
@@ -384,13 +384,11 @@ class Job extends Operation {
    * //-
    * // If the callback is omitted, we'll return a Promise.
    * //-
-   * job.getQueryResults().then(function(data) {
+   * job.getQueryResults().then((data) => {
    *   const rows = data[0];
    * });
    */
   getQueryResults(options, callback) {
-    const self = this;
-
     if (is.fn(options)) {
       callback = options;
       options = {};
@@ -408,7 +406,7 @@ class Job extends Operation {
         uri: '/queries/' + this.id,
         qs: options,
       },
-      function(err, resp) {
+      (err, resp) => {
         if (err) {
           callback(err, null, null, resp);
           return;
@@ -417,7 +415,7 @@ class Job extends Operation {
         let rows = [];
 
         if (resp.schema && resp.rows) {
-          rows = self.bigQuery.mergeSchemaWithRows_(resp.schema, resp.rows);
+          rows = this.bigQuery.mergeSchemaWithRows_(resp.schema, resp.rows);
         }
 
         let nextQuery = null;
@@ -497,4 +495,4 @@ promisifyAll(Job);
  * @name module:@google-cloud/bigquery.Job
  * @see Job
  */
-module.exports = Job;
+export {Job};

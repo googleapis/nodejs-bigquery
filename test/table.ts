@@ -126,7 +126,7 @@ describe('BigQuery/Table', function() {
       },
       '@google-cloud/paginator': fakePaginator,
       '@google-cloud/promisify': fakePfy,
-    });
+    }).Table;
 
     const tableCached = extend(true, {}, Table);
 
