@@ -75,7 +75,7 @@ describe('BigQuery/Job', function() {
       },
       '@google-cloud/paginator': fakePaginator,
       '@google-cloud/promisify': fakePfy,
-    });
+    }).Job;
   });
 
   beforeEach(function() {

@@ -23,9 +23,9 @@ import * as fs from 'fs';
 import * as uuid from 'uuid';
 import * as exec from 'methmeth';
 
-const Dataset = require('../src/dataset');
-const Job = require('../src/job');
-const Table = require('../src/table');
+import {Dataset} from '../src/dataset';
+import {Job} from '../src/job';
+import {Table} from '../src/table';
 
 const BigQuery = require('../src');
 const bigquery = new BigQuery();

@@ -67,7 +67,7 @@ const FORMATS = {
  * const table = dataset.table('my-table');
  */
 class Table extends ServiceObject {
-  constructor(dataset, id, options) {
+  constructor(dataset, id, options?) {
 
     const methods = {
       /**
@@ -89,7 +89,7 @@ class Table extends ServiceObject {
        *
        * const table = dataset.table('my-table');
        *
-       * table.create(function(err, table, apiResponse) {
+       * table.create((err, table, apiResponse) => {
        *   if (!err) {
        *     // The table was created successfully.
        *   }
@@ -98,7 +98,7 @@ class Table extends ServiceObject {
        * //-
        * // If the callback is omitted, we'll return a Promise.
        * //-
-       * table.create().then(function(data) {
+       * table.create().then((data) => {
        *   const table = data[0];
        *   const apiResponse = data[1];
        * });
@@ -124,12 +124,12 @@ class Table extends ServiceObject {
        *
        * const table = dataset.table('my-table');
        *
-       * table.delete(function(err, apiResponse) {});
+       * table.delete((err, apiResponse) => {});
        *
        * //-
        * // If the callback is omitted, we'll return a Promise.
        * //-
-       * table.delete().then(function(data) {
+       * table.delete().then((data) => {
        *   const apiResponse = data[0];
        * });
        */
@@ -152,12 +152,12 @@ class Table extends ServiceObject {
        *
        * const table = dataset.table('my-table');
        *
-       * table.exists(function(err, exists) {});
+       * table.exists((err, exists) => {});
        *
        * //-
        * // If the callback is omitted, we'll return a Promise.
        * //-
-       * table.exists().then(function(data) {
+       * table.exists().then((data) => {
        *   const exists = data[0];
        * });
        */
@@ -189,14 +189,14 @@ class Table extends ServiceObject {
        *
        * const table = dataset.table('my-table');
        *
-       * table.get(function(err, table, apiResponse) {
+       * table.get((err, table, apiResponse) => {
        *   // `table.metadata` has been populated.
        * });
        *
        * //-
        * // If the callback is omitted, we'll return a Promise.
        * //-
-       * table.get().then(function(data) {
+       * table.get().then((data) => {
        *   const table = data[0];
        *   const apiResponse = data[1];
        * });
@@ -223,12 +223,12 @@ class Table extends ServiceObject {
        *
        * const table = dataset.table('my-table');
        *
-       * table.getMetadata(function(err, metadata, apiResponse) {});
+       * table.getMetadata((err, metadata, apiResponse) => {});
        *
        * //-
        * // If the callback is omitted, we'll return a Promise.
        * //-
-       * table.getMetadata().then(function(data) {
+       * table.getMetadata().then((data) => {
        *   const metadata = data[0];
        *   const apiResponse = data[1];
        * });
@@ -366,12 +366,11 @@ class Table extends ServiceObject {
     }
 
     if (is.object(value)) {
-      return Object.keys(value).reduce(function(acc, key) {
+      return Object.keys(value).reduce((acc, key) => {
         acc[key] = (Table as any).encodeValue_(value[key]);
         return acc;
       }, {});
     }
-
     return value;
   };
 
@@ -397,11 +396,10 @@ class Table extends ServiceObject {
     }
 
     if (body.schema && body.schema.fields) {
-      body.schema.fields = body.schema.fields.map(function(field) {
+      body.schema.fields = body.schema.fields.map((field) => {
         if (field.fields) {
           field.type = 'RECORD';
         }
-
         return field;
       });
     }
@@ -447,7 +445,7 @@ class Table extends ServiceObject {
    * const table = dataset.table('my-table');
    * const yourTable = dataset.table('your-table');
    *
-   * table.copy(yourTable, function(err, apiResponse) {});
+   * table.copy(yourTable, (err, apiResponse) => {});
    *
    * //-
    * // See the <a href="http://goo.gl/dKWIyS">`configuration.copy`</a> object for
@@ -458,12 +456,12 @@ class Table extends ServiceObject {
    *   writeDisposition: 'WRITE_TRUNCATE'
    * };
    *
-   * table.copy(yourTable, metadata, function(err, apiResponse) {});
+   * table.copy(yourTable, metadata, (err, apiResponse) => {});
    *
    * //-
    * // If the callback is omitted, we'll return a Promise.
    * //-
-   * table.copy(yourTable, metadata).then(function(data) {
+   * table.copy(yourTable, metadata).then((data) => {
    *   const apiResponse = data[0];
    * });
    */
@@ -473,13 +471,13 @@ class Table extends ServiceObject {
       metadata = {};
     }
 
-    this.createCopyJob(destination, metadata, function(err, job, resp) {
+    this.createCopyJob(destination, metadata, (err, job, resp) => {
       if (err) {
         callback(err, resp);
         return;
       }
 
-      job.on('error', callback).on('complete', function(metadata) {
+      job.on('error', callback).on('complete', (metadata) => {
         callback(null, metadata);
       });
     });
@@ -514,7 +512,7 @@ class Table extends ServiceObject {
    *   dataset.table('your-second-table')
    * ];
    *
-   * table.copyFrom(sourceTables, function(err, apiResponse) {});
+   * table.copyFrom(sourceTables, (err, apiResponse) => {});
    *
    * //-
    * // See the <a href="http://goo.gl/dKWIyS">`configuration.copy`</a> object for
@@ -525,12 +523,12 @@ class Table extends ServiceObject {
    *   writeDisposition: 'WRITE_TRUNCATE'
    * };
    *
-   * table.copyFrom(sourceTables, metadata, function(err, apiResponse) {});
+   * table.copyFrom(sourceTables, metadata, (err, apiResponse) => {});
    *
    * //-
    * // If the callback is omitted, we'll return a Promise.
    * //-
-   * table.copyFrom(sourceTables, metadata).then(function(data) {
+   * table.copyFrom(sourceTables, metadata).then((data) => {
    *   const apiResponse = data[0];
    * });
    */
@@ -540,13 +538,13 @@ class Table extends ServiceObject {
       metadata = {};
     }
 
-    this.createCopyFromJob(sourceTables, metadata, function(err, job, resp) {
+    this.createCopyFromJob(sourceTables, metadata, (err, job, resp) => {
       if (err) {
         callback(err, resp);
         return;
       }
 
-      job.on('error', callback).on('complete', function(metadata) {
+      job.on('error', callback).on('complete', (metadata) => {
         callback(null, metadata);
       });
     });
@@ -578,7 +576,7 @@ class Table extends ServiceObject {
    * const table = dataset.table('my-table');
    *
    * const yourTable = dataset.table('your-table');
-   * table.createCopyJob(yourTable, function(err, job, apiResponse) {
+   * table.createCopyJob(yourTable, (err, job, apiResponse) => {
    *   // `job` is a Job object that can be used to check the status of the
    *   // request.
    * });
@@ -592,12 +590,12 @@ class Table extends ServiceObject {
    *   writeDisposition: 'WRITE_TRUNCATE'
    * };
    *
-   * table.createCopyJob(yourTable, metadata, function(err, job, apiResponse) {});
+   * table.createCopyJob(yourTable, metadata, (err, job, apiResponse) => {});
    *
    * //-
    * // If the callback is omitted, we'll return a Promise.
    * //-
-   * table.createCopyJob(yourTable, metadata).then(function(data) {
+   * table.createCopyJob(yourTable, metadata).then((data) => {
    *   const job = data[0];
    *   const apiResponse = data[1];
    * });
@@ -677,7 +675,7 @@ class Table extends ServiceObject {
    *   dataset.table('your-second-table')
    * ];
    *
-   * const callback = function(err, job, apiResponse) {
+   * const callback = (err, job, apiResponse) => {
    *   // `job` is a Job object that can be used to check the status of the
    *   // request.
    * };
@@ -698,7 +696,7 @@ class Table extends ServiceObject {
    * //-
    * // If the callback is omitted, we'll return a Promise.
    * //-
-   * table.createCopyFromJob(sourceTables, metadata).then(function(data) {
+   * table.createCopyFromJob(sourceTables, metadata).then((data) => {
    *   const job = data[0];
    *   const apiResponse = data[1];
    * });
@@ -706,7 +704,7 @@ class Table extends ServiceObject {
   createCopyFromJob(sourceTables, metadata, callback) {
     sourceTables = arrify(sourceTables);
 
-    sourceTables.forEach(function(sourceTable) {
+    sourceTables.forEach((sourceTable) => {
       if (!(sourceTable instanceof Table)) {
         throw new Error('Source must be a Table object.');
       }
@@ -726,7 +724,7 @@ class Table extends ServiceObject {
             tableId: this.id,
           },
 
-          sourceTables: sourceTables.map(function(sourceTable) {
+          sourceTables: sourceTables.map((sourceTable) => {
             return {
               datasetId: sourceTable.dataset.id,
               projectId: sourceTable.bigQuery.projectId,
@@ -823,7 +821,7 @@ class Table extends ServiceObject {
    * //-
    * // If the callback is omitted, we'll return a Promise.
    * //-
-   * table.createExtractJob(extractedFile, options).then(function(data) {
+   * table.createExtractJob(extractedFile, options).then((data) => {
    *   const job = data[0];
    *   const apiResponse = data[1];
    * });
@@ -835,7 +833,7 @@ class Table extends ServiceObject {
     }
 
     options = extend(true, options, {
-      destinationUris: arrify(destination).map(function(dest) {
+      destinationUris: arrify(destination).map((dest) => {
         if (!util.isCustomType(dest, 'storage/file')) {
           throw new Error('Destination must be a File object.');
         }
@@ -938,7 +936,7 @@ class Table extends ServiceObject {
    * //-
    * // Load data from a local file.
    * //-
-   * const callback = function(err, job, apiResponse) {
+   * const callback = (err, job, apiResponse) => {
    *   // `job` is a Job object that can be used to check the status of the
    *   // request.
    * };
@@ -976,7 +974,7 @@ class Table extends ServiceObject {
    * //-
    * // If the callback is omitted, we'll return a Promise.
    * //-
-   * table.createLoadJob(data).then(function(data) {
+   * table.createLoadJob(data).then((data) => {
    *   const job = data[0];
    *   const apiResponse = data[1];
    * });
@@ -1018,7 +1016,7 @@ class Table extends ServiceObject {
         .createReadStream(source)
         .pipe(this.createWriteStream(metadata))
         .on('error', callback)
-        .on('complete', function(job) {
+        .on('complete', (job) => {
           callback(null, job, job.metadata);
         });
     }
@@ -1051,7 +1049,7 @@ class Table extends ServiceObject {
     }
 
     extend(true, body.configuration.load, metadata, {
-      sourceUris: arrify(source).map(function(src) {
+      sourceUris: arrify(source).map((src) => {
         if (!util.isCustomType(src, 'storage/file')) {
           throw new Error('Source must be a File object.');
         }
@@ -1069,7 +1067,6 @@ class Table extends ServiceObject {
         if (!metadata.sourceFormat && format) {
           body.configuration.load.sourceFormat = format;
         }
-
         return 'gs://' + src.bucket.name + '/' + src.name;
       }),
     });
@@ -1140,11 +1137,11 @@ class Table extends ServiceObject {
    *
    * request.get(csvUrl)
    *   .pipe(table.createWriteStream(metadata))
-   *   .on('job', function(job) {
+   *   .on('job', (job) => {
    *     // `job` is a Job object that can be used to check the status of the
    *     // request.
    *   })
-   *   .on('complete', function(job) {
+   *   .on('complete', (job) => {
    *     // The job has completed successfully.
    *   });
    *
@@ -1155,20 +1152,17 @@ class Table extends ServiceObject {
    *
    * fs.createReadStream('./test/testdata/testfile.json')
    *   .pipe(table.createWriteStream('json'))
-   *   .on('job', function(job) {
+   *   .on('job', (job) => {
    *     // `job` is a Job object that can be used to check the status of the
    *     // request.
    *   })
-   *   .on('complete', function(job) {
+   *   .on('complete', (job) => {
    *     // The job has completed successfully.
    *   });
    */
   createWriteStream(metadata) {
-    const self = this;
-
     metadata = metadata || {};
-
-    const fileTypes = Object.keys(FORMATS).map(function(key) {
+    const fileTypes = Object.keys(FORMATS).map((key) => {
       return FORMATS[key];
     });
 
@@ -1184,9 +1178,9 @@ class Table extends ServiceObject {
 
     extend(true, metadata, {
       destinationTable: {
-        projectId: self.bigQuery.projectId,
-        datasetId: self.dataset.id,
-        tableId: self.id,
+        projectId: this.bigQuery.projectId,
+        datasetId: this.dataset.id,
+        tableId: this.id,
       },
     });
 
@@ -1205,7 +1199,7 @@ class Table extends ServiceObject {
       metadata.hasOwnProperty('sourceFormat') &&
       fileTypes.indexOf(metadata.sourceFormat) < 0
     ) {
-      throw new Error('Source format not recognized: ' + metadata.sourceFormat);
+      throw new Error(`Source format not recognized: ${metadata.sourceFormat}`);
     }
 
     const dup = streamEvents(duplexify());
@@ -1215,37 +1209,34 @@ class Table extends ServiceObject {
       dup.cork();
     });
 
-    dup.once('writing', function() {
+    dup.once('writing', () => {
       util.makeWritableStream(
         dup,
         {
-          makeAuthenticatedRequest: self.bigQuery.makeAuthenticatedRequest,
+          makeAuthenticatedRequest: this.bigQuery.makeAuthenticatedRequest,
           metadata: {
             configuration: {
               load: metadata,
             },
             jobReference: {
               jobId: jobId,
-              projectId: self.bigQuery.projectId,
-              location: self.location,
+              projectId: this.bigQuery.projectId,
+              location: this.location,
             },
           },
           request: {
             uri: format('{base}/{projectId}/jobs', {
               base: 'https://www.googleapis.com/upload/bigquery/v2/projects',
-              projectId: self.bigQuery.projectId,
+              projectId: this.bigQuery.projectId,
             }),
           },
         } as any,
-        function(data) {
-          const job = self.bigQuery.job(data.jobReference.jobId, {
+        (data) => {
+          const job = this.bigQuery.job(data.jobReference.jobId, {
             location: data.jobReference.location,
           });
-
           job.metadata = data;
-
           dup.emit('job', job);
-
           job
             .on('error', err => dup.destroy(err))
             .on('complete', () => {
@@ -1255,7 +1246,6 @@ class Table extends ServiceObject {
         }
       );
     });
-
     return dup;
   };
 
@@ -1298,7 +1288,7 @@ class Table extends ServiceObject {
    * // If you wish to override this, or provide an array of destination files,
    * // you must provide an `options` object.
    * //-
-   * table.extract(extractedFile, function(err, apiResponse) {});
+   * table.extract(extractedFile, (err, apiResponse) => {});
    *
    * //-
    * // If you need more customization, pass an `options` object.
@@ -1308,7 +1298,7 @@ class Table extends ServiceObject {
    *   gzip: true
    * };
    *
-   * table.extract(extractedFile, options, function(err, apiResponse) {});
+   * table.extract(extractedFile, options, (err, apiResponse) => {});
    *
    * //-
    * // You can also specify multiple destination files.
@@ -1316,12 +1306,12 @@ class Table extends ServiceObject {
    * table.extract([
    *   storage.bucket('institutions').file('2014.json'),
    *   storage.bucket('institutions-copy').file('2014.json')
-   * ], options, function(err, apiResponse) {});
+   * ], options, (err, apiResponse) => {});
    *
    * //-
    * // If the callback is omitted, we'll return a Promise.
    * //-
-   * table.extract(extractedFile, options).then(function(data) {
+   * table.extract(extractedFile, options).then((data) => {
    *   const apiResponse = data[0];
    * });
    */
@@ -1331,13 +1321,12 @@ class Table extends ServiceObject {
       options = {};
     }
 
-    this.createExtractJob(destination, options, function(err, job, resp) {
+    this.createExtractJob(destination, options, (err, job, resp) => {
       if (err) {
         callback(err, resp);
         return;
       }
-
-      job.on('error', callback).on('complete', function(metadata) {
+      job.on('error', callback).on('complete', (metadata) => {
         callback(null, metadata);
       });
     });
@@ -1365,7 +1354,7 @@ class Table extends ServiceObject {
    * const dataset = bigquery.dataset('my-dataset');
    * const table = dataset.table('my-table');
    *
-   * table.getRows(function(err, rows) {
+   * table.getRows((err, rows) => {
    *   if (!err) {
    *     // rows is an array of results.
    *   }
@@ -1389,16 +1378,23 @@ class Table extends ServiceObject {
    * //-
    * // If the callback is omitted, we'll return a Promise.
    * //-
-   * table.getRows().then(function(data) {
+   * table.getRows().then((data) => {
    *   const rows = data[0];
   });
   */
   getRows(options, callback) {
-    const self = this;
-
     if (is.fn(options)) {
       callback = options;
       options = {};
+    }
+
+    const onComplete = (err, rows, nextQuery, resp) => {
+      if (err) {
+        callback(err, null, null, resp);
+        return;
+      }
+      rows = this.bigQuery.mergeSchemaWithRows_(this.metadata.schema, rows || []);
+      callback(null, rows, nextQuery, resp);
     }
 
     this.request(
@@ -1406,47 +1402,33 @@ class Table extends ServiceObject {
         uri: '/data',
         qs: options,
       },
-      function(err, resp) {
+      (err, resp) => {
         if (err) {
           onComplete(err, null, null, resp);
           return;
         }
-
         let nextQuery = null;
-
         if (resp.pageToken) {
           nextQuery = extend({}, options, {
             pageToken: resp.pageToken,
           });
         }
 
-        if (resp.rows && resp.rows.length > 0 && !self.metadata.schema) {
+        if (resp.rows && resp.rows.length > 0 && !this.metadata.schema) {
           // We don't know the schema for this table yet. Do a quick stat.
-          self.getMetadata(function(err, metadata, apiResponse) {
+          this.getMetadata((err, metadata, apiResponse) => {
             if (err) {
               onComplete(err, null, null, apiResponse);
               return;
             }
-
             onComplete(null, resp.rows, nextQuery, resp);
           });
-
           return;
         }
 
         onComplete(null, resp.rows, nextQuery, resp);
       }
     );
-
-    function onComplete(err, rows, nextQuery, resp) {
-      if (err) {
-        callback(err, null, null, resp);
-        return;
-      }
-
-      rows = self.bigQuery.mergeSchemaWithRows_(self.metadata.schema, rows || []);
-      callback(null, rows, nextQuery, resp);
-    }
   };
 
   /**
@@ -1563,10 +1545,10 @@ class Table extends ServiceObject {
    * // If the callback is omitted, we'll return a Promise.
    * //-
    * table.insert(rows)
-   *   .then(function(data) {
+   *   .then((data) => {
    *     const apiResponse = data[0];
    *   })
-   *   .catch(function(err) {
+   *   .catch((err) => {
    *     // An API error or partial failure occurred.
    *
    *     if (err.name === 'PartialFailureError') {
@@ -1580,8 +1562,6 @@ class Table extends ServiceObject {
    *   });
    */
   insert(rows, options, callback) {
-    const self = this;
-
     if (is.fn(options)) {
       callback = options;
       options = {};
@@ -1598,10 +1578,10 @@ class Table extends ServiceObject {
     });
 
     if (!options.raw) {
-      json.rows = arrify(rows).map(function(row) {
+      json.rows = arrify(rows).map((row) => {
         return {
           insertId: uuid.v4(),
-          json: (Table as any).encodeValue_(row),
+          json: Table.encodeValue_(row),
         };
       });
     }
@@ -1622,13 +1602,31 @@ class Table extends ServiceObject {
       delete json.schema;
     }
 
+    const createTableAndRetry = () => {
+      this.create(
+        {
+          schema: schema,
+        },
+        (err, table, resp) => {
+          if (err && err.code !== 409) {
+            callback(err, resp);
+            return;
+          }
+
+          setTimeout(() => {
+            this.insert(rows, options, callback);
+          }, 60000);
+        }
+      );
+    }
+
     this.request(
       {
         method: 'POST',
         uri: '/insertAll',
         json: json,
       },
-      function(err, resp) {
+      (err, resp) => {
         if (err) {
           if ((err as any).code === 404 && autoCreate) {
             setTimeout(createTableAndRetry, Math.random() * 60000);
@@ -1638,11 +1636,11 @@ class Table extends ServiceObject {
           return;
         }
 
-        const partialFailures = (resp.insertErrors || []).map(function(
+        const partialFailures = (resp.insertErrors || []).map((
           insertError
-        ) {
+        ) => {
           return {
-            errors: insertError.errors.map(function(error) {
+            errors: insertError.errors.map((error) => {
               return {
                 message: error.message,
                 reason: error.reason,
@@ -1662,24 +1660,6 @@ class Table extends ServiceObject {
         callback(err, resp);
       }
     );
-
-    function createTableAndRetry() {
-      self.create(
-        {
-          schema: schema,
-        },
-        function(err, table, resp) {
-          if (err && err.code !== 409) {
-            callback(err, resp);
-            return;
-          }
-
-          setTimeout(function() {
-            self.insert(rows, options, callback);
-          }, 60000);
-        }
-      );
-    }
   };
 
   /**
@@ -1718,7 +1698,7 @@ class Table extends ServiceObject {
    * //-
    * // Load data from a local file.
    * //-
-   * table.load('./institutions.csv', function(err, apiResponse) {});
+   * table.load('./institutions.csv', (err, apiResponse) => {});
    *
    * //-
    * // You may also pass in metadata in the format of a Jobs resource. See
@@ -1729,7 +1709,7 @@ class Table extends ServiceObject {
    *   sourceFormat: 'NEWLINE_DELIMITED_JSON'
    * };
    *
-   * table.load('./my-data.csv', metadata, function(err, apiResponse) {});
+   * table.load('./my-data.csv', metadata, (err, apiResponse) => {});
    *
    * //-
    * // Load data from a file in your Cloud Storage bucket.
@@ -1738,7 +1718,7 @@ class Table extends ServiceObject {
    *   projectId: 'grape-spaceship-123'
    * });
    * const data = gcs.bucket('institutions').file('data.csv');
-   * table.load(data, function(err, apiResponse) {});
+   * table.load(data, (err, apiResponse) => {});
    *
    * //-
    * // Load data from multiple files in your Cloud Storage bucket(s).
@@ -1761,13 +1741,13 @@ class Table extends ServiceObject {
       metadata = {};
     }
 
-    this.createLoadJob(source, metadata, function(err, job, resp) {
+    this.createLoadJob(source, metadata, (err, job, resp) => {
       if (err) {
         callback(err, resp);
         return;
       }
 
-      job.on('error', callback).on('complete', function(metadata) {
+      job.on('error', callback).on('complete', (metadata) => {
         callback(null, metadata);
       });
     });
@@ -1818,19 +1798,19 @@ class Table extends ServiceObject {
    *   schema: 'name:string, servings:integer, cookingTime:float, quick:boolean'
    * };
    *
-   * table.setMetadata(metadata, function(err, metadata, apiResponse) {});
+   * table.setMetadata(metadata, (err, metadata, apiResponse) => {});
    *
    * //-
    * // If the callback is omitted, we'll return a Promise.
    * //-
-   * table.setMetadata(metadata).then(function(data) {
+   * table.setMetadata(metadata).then((data) => {
    *   const metadata = data[0];
    *   const apiResponse = data[1];
    * });
    */
   setMetadata(metadata, callback) {
-    const body = (Table as any).formatMetadata_(metadata);
-    ServiceObject.prototype.setMetadata.call(this, body, callback);
+    const body = Table.formatMetadata_(metadata);
+    super.setMetadata(body, callback);
   };
 }
 
@@ -1852,4 +1832,4 @@ promisifyAll(Table);
  * @name module:@google-cloud/bigquery.Table
  * @see Table
  */
-module.exports = Table;
+export {Table};

@@ -21,8 +21,7 @@ import {paginator} from '@google-cloud/paginator';
 import {promisifyAll} from '@google-cloud/promisify';
 import * as extend from 'extend';
 import * as is from 'is';
-
-const Table = require('./table');
+import {Table} from './table';
 
 /**
  * Interact with your BigQuery dataset. Create a Dataset instance with
@@ -59,7 +58,7 @@ class Dataset extends ServiceObject {
        * const BigQuery = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        * const dataset = bigquery.dataset('institutions');
-       * dataset.create(function(err, dataset, apiResponse) {
+       * dataset.create((err, dataset, apiResponse) => {
        *   if (!err) {
        *     // The dataset was created successfully.
        *   }
@@ -68,7 +67,7 @@ class Dataset extends ServiceObject {
        * //-
        * // If the callback is omitted, we'll return a Promise.
        * //-
-       * dataset.create().then(function(data) {
+       * dataset.create().then((data) => {
        *   const dataset = data[0];
        *   const apiResponse = data[1];
        * });
@@ -89,12 +88,12 @@ class Dataset extends ServiceObject {
        * const BigQuery = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        * const dataset = bigquery.dataset('institutions');
-       * dataset.exists(function(err, exists) {});
+       * dataset.exists((err, exists) => {});
        *
        * //-
        * // If the callback is omitted, we'll return a Promise.
        * //-
-       * dataset.exists().then(function(data) {
+       * dataset.exists().then((data) => {
        *   const exists = data[0];
        * });
        */
@@ -122,7 +121,7 @@ class Dataset extends ServiceObject {
        * const BigQuery = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        * const dataset = bigquery.dataset('institutions');
-       * dataset.get(function(err, dataset, apiResponse) {
+       * dataset.get((err, dataset, apiResponse) => {
        *   if (!err) {
        *     // `dataset.metadata` has been populated.
        *   }
@@ -131,7 +130,7 @@ class Dataset extends ServiceObject {
        * //-
        * // If the callback is omitted, we'll return a Promise.
        * //-
-       * dataset.get().then(function(data) {
+       * dataset.get().then((data) => {
        *   const dataset = data[0];
        *   const apiResponse = data[1];
        * });
@@ -155,12 +154,12 @@ class Dataset extends ServiceObject {
        * const BigQuery = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        * const dataset = bigquery.dataset('institutions');
-       * dataset.getMetadata(function(err, metadata, apiResponse) {});
+       * dataset.getMetadata((err, metadata, apiResponse) => {});
        *
        * //-
        * // If the callback is omitted, we'll return a Promise.
        * //-
-       * dataset.getMetadata().then(function(data) {
+       * dataset.getMetadata().then((data) => {
        *   const metadata = data[0];
        *   const apiResponse = data[1];
        * });
@@ -189,12 +188,12 @@ class Dataset extends ServiceObject {
        *   description: 'Info for every institution in the 2013 IPEDS universe'
        * };
        *
-       * dataset.setMetadata(metadata, function(err, apiResponse) {});
+       * dataset.setMetadata(metadata, (err, apiResponse) => {});
        *
        * //-
        * // If the callback is omitted, we'll return a Promise.
        * //-
-       * dataset.setMetadata(metadata).then(function(data) {
+       * dataset.setMetadata(metadata).then((data) => {
        *   const apiResponse = data[0];
        * });
        */
@@ -250,8 +249,8 @@ class Dataset extends ServiceObject {
      *
      * dataset.getTablesStream()
      *   .on('error', console.error)
-     *   .on('data', function(table) {})
-     *   .on('end', function() {
+     *   .on('data', (table) => {})
+     *   .on('end', () => {
      *     // All tables have been retrieved
      *   });
      *
@@ -265,7 +264,6 @@ class Dataset extends ServiceObject {
      *   });
      */
     this.getTablesStream = paginator.streamify('getTables');
-
   }
 
   /**
@@ -356,19 +354,17 @@ class Dataset extends ServiceObject {
    *   schema: 'UNITID,INSTNM,ADDR,CITY,STABBR,ZIP,FIPS,OBEREG,CHFNM,...'
    * };
    *
-   * dataset.createTable(tableId, options, function(err, table, apiResponse) {});
+   * dataset.createTable(tableId, options, (err, table, apiResponse) => {});
    *
    * //-
    * // If the callback is omitted, we'll return a Promise.
    * //-
-   * dataset.createTable(tableId, options).then(function(data) {
+   * dataset.createTable(tableId, options).then((data) => {
    *   const table = data[0];
    *   const apiResponse = data[1];
    * });
    */
   createTable(id, options, callback) {
-    const self = this;
-
     if (is.fn(options)) {
       callback = options;
       options = {};
@@ -388,13 +384,13 @@ class Dataset extends ServiceObject {
         uri: '/tables',
         json: body,
       },
-      function(err, resp) {
+      (err, resp) => {
         if (err) {
           callback(err, null, resp);
           return;
         }
 
-        const table = self.table(resp.tableReference.tableId, {
+        const table = this.table(resp.tableReference.tableId, {
           location: resp.location,
         });
 
@@ -424,17 +420,17 @@ class Dataset extends ServiceObject {
    * //-
    * // Delete the dataset, only if it does not have any tables.
    * //-
-   * dataset.delete(function(err, apiResponse) {});
+   * dataset.delete((err, apiResponse) => {});
    *
    * //-
    * // Delete the dataset and any tables it contains.
    * //-
-   * dataset.delete({ force: true }, function(err, apiResponse) {});
+   * dataset.delete({ force: true }, (err, apiResponse) => {});
    *
    * //-
    * // If the callback is omitted, we'll return a Promise.
    * //-
-   * dataset.delete().then(function(data) {
+   * dataset.delete().then((data) => {
    *   const apiResponse = data[0];
    * });
    */
@@ -480,7 +476,7 @@ class Dataset extends ServiceObject {
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('institutions');
    *
-   * dataset.getTables(function(err, tables) {
+   * dataset.getTables((err, tables) => {
    *   // tables is an array of `Table` objects.
    * });
    *
@@ -502,13 +498,11 @@ class Dataset extends ServiceObject {
    * //-
    * // If the callback is omitted, we'll return a Promise.
    * //-
-   * dataset.getTables().then(function(data) {
+   * dataset.getTables().then((data) => {
    *   const tables = data[0];
    * });
    */
   getTables(options, callback) {
-    const that = this;
-
     if (is.fn(options)) {
       callback = options;
       options = {};
@@ -521,7 +515,7 @@ class Dataset extends ServiceObject {
         uri: '/tables',
         qs: options,
       },
-      function(err, resp) {
+      (err, resp) => {
         if (err) {
           callback(err, null, null, resp);
           return;
@@ -534,15 +528,13 @@ class Dataset extends ServiceObject {
           });
         }
 
-        const tables = (resp.tables || []).map(function(tableObject) {
-          const table = that.table(tableObject.tableReference.tableId, {
+        const tables = (resp.tables || []).map(tableObject => {
+          const table = this.table(tableObject.tableReference.tableId, {
             location: tableObject.location,
           });
-
           table.metadata = tableObject;
           return table;
         });
-
         callback(null, tables, nextQuery, resp);
       }
     );
@@ -626,4 +618,4 @@ promisifyAll(Dataset, {
  * @name module:@google-cloud/bigquery.Dataset
  * @see Dataset
  */
-module.exports = Dataset;
+export {Dataset};

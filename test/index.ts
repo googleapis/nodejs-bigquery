@@ -25,8 +25,7 @@ import * as proxyquire from 'proxyquire';
 import * as uuid from 'uuid';
 import * as pfy from '@google-cloud/promisify';
 import {Service, util} from '@google-cloud/common';
-
-const Table = require('../src/table');
+import {Table} from '../src/table';
 
 const fakeUuid = extend(true, {}, uuid);
 
@@ -74,7 +73,7 @@ function FakeJob() {
 let mergeSchemaWithRowsOverride;
 (FakeTable as any).mergeSchemaWithRows_ = function() {
   const args = [].slice.apply(arguments);
-  return (mergeSchemaWithRowsOverride || Table.mergeSchemaWithRows_).apply(
+  return (mergeSchemaWithRowsOverride || (Table as any).mergeSchemaWithRows_).apply(
     null,
     args
   );
@@ -118,9 +117,15 @@ describe('BigQuery', function() {
   before(function() {
     BigQuery = proxyquire('../src', {
       uuid: fakeUuid,
-      './dataset': FakeDataset,
-      './job': FakeJob,
-      './table': FakeTable,
+      './dataset': {
+        Dataset: FakeDataset,
+      },
+      './job': {
+        Job: FakeJob,
+      },
+      './table': {
+        Table: FakeTable,
+      },
       '@google-cloud/common': {
         Service: FakeService,
         util: fakeUtil,
