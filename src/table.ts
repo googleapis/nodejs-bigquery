@@ -1016,9 +1016,9 @@ class Table extends ServiceObject {
       // Read the file into a new write stream.
       return fs
         .createReadStream(source)
-        .pipe(this.createWriteStream(metadata))
+        .pipe(this.createWriteStream_(metadata))
         .on('error', callback)
-        .on('complete', (job) => {
+        .on('job', (job) => {
           callback(null, job, job.metadata);
         });
     }
@@ -1104,6 +1104,99 @@ class Table extends ServiceObject {
   };
 
   /**
+   * Creates a write stream. Unlike the public version, this will not
+   * automatically poll the underlying job.
+   *
+   * @private
+   *
+   * @param {string|object} [metadata] Metadata to set with the load operation.
+   *     The metadata object should be in the format of the
+   *     [`configuration.load`](http://goo.gl/BVcXk4) property of a Jobs resource.
+   *     If a string is given, it will be used as the filetype.
+   * @param {string} [metadata.jobId] Custom job id.
+   * @param {string} [metadata.jobPrefix] Prefix to apply to the job id.
+   * @returns {WritableStream}
+   */
+  createWriteStream_(metadata) {
+    metadata = metadata || {};
+    const fileTypes = Object.keys(FORMATS).map((key) => {
+      return FORMATS[key];
+    });
+
+    if (is.string(metadata)) {
+      metadata = {
+        sourceFormat: FORMATS[metadata.toLowerCase()],
+      };
+    }
+
+    if (is.string(metadata.schema)) {
+      metadata.schema = (Table as any).createSchemaFromString_(metadata.schema);
+    }
+
+    extend(true, metadata, {
+      destinationTable: {
+        projectId: this.bigQuery.projectId,
+        datasetId: this.dataset.id,
+        tableId: this.id,
+      },
+    });
+
+    let jobId = metadata.jobId || uuid.v4();
+
+    if (metadata.jobId) {
+      delete metadata.jobId;
+    }
+
+    if (metadata.jobPrefix) {
+      jobId = metadata.jobPrefix + jobId;
+      delete metadata.jobPrefix;
+    }
+
+    if (
+      metadata.hasOwnProperty('sourceFormat') &&
+      fileTypes.indexOf(metadata.sourceFormat) < 0
+    ) {
+      throw new Error(`Source format not recognized: ${metadata.sourceFormat}`);
+    }
+
+    const dup = streamEvents(duplexify());
+
+    dup.once('writing', () => {
+      util.makeWritableStream(
+        dup,
+        {
+          makeAuthenticatedRequest: this.bigQuery.makeAuthenticatedRequest,
+          requestModule: request,
+          metadata: {
+            configuration: {
+              load: metadata,
+            },
+            jobReference: {
+              jobId: jobId,
+              projectId: this.bigQuery.projectId,
+              location: this.location,
+            },
+          },
+          request: {
+            uri: format('{base}/{projectId}/jobs', {
+              base: 'https://www.googleapis.com/upload/bigquery/v2/projects',
+              projectId: this.bigQuery.projectId,
+            }),
+          },
+        } as any,
+        (data) => {
+          const job = this.bigQuery.job(data.jobReference.jobId, {
+            location: data.jobReference.location,
+          });
+          job.metadata = data;
+          dup.emit('job', job);
+        }
+      );
+    });
+    return dup;
+  };
+
+  /**
    * Load data into your table from a readable stream of JSON, CSV, or
    * AVRO data.
    *
@@ -1163,93 +1256,22 @@ class Table extends ServiceObject {
    *   });
    */
   createWriteStream(metadata) {
-    metadata = metadata || {};
-    const fileTypes = Object.keys(FORMATS).map((key) => {
-      return FORMATS[key];
+    const stream = this.createWriteStream_(metadata);
+
+    stream.on('prefinish', () => {
+      stream.cork();
     });
 
-    if (is.string(metadata)) {
-      metadata = {
-        sourceFormat: FORMATS[metadata.toLowerCase()],
-      };
-    }
-
-    if (is.string(metadata.schema)) {
-      metadata.schema = (Table as any).createSchemaFromString_(metadata.schema);
-    }
-
-    extend(true, metadata, {
-      destinationTable: {
-        projectId: this.bigQuery.projectId,
-        datasetId: this.dataset.id,
-        tableId: this.id,
-      },
+    stream.on('job', (job) => {
+      job
+        .on('error', err => stream.destroy(err))
+        .on('complete', () => {
+          stream.emit('complete', job);
+          stream.uncork();
+        });
     });
 
-    let jobId = metadata.jobId || uuid.v4();
-
-    if (metadata.jobId) {
-      delete metadata.jobId;
-    }
-
-    if (metadata.jobPrefix) {
-      jobId = metadata.jobPrefix + jobId;
-      delete metadata.jobPrefix;
-    }
-
-    if (
-      metadata.hasOwnProperty('sourceFormat') &&
-      fileTypes.indexOf(metadata.sourceFormat) < 0
-    ) {
-      throw new Error(`Source format not recognized: ${metadata.sourceFormat}`);
-    }
-
-    const dup = streamEvents(duplexify());
-
-    // This will allow the natural `finish` event to fire.
-    dup.on('prefinish', () => {
-      dup.cork();
-    });
-
-    dup.once('writing', () => {
-      util.makeWritableStream(
-        dup,
-        {
-          makeAuthenticatedRequest: this.bigQuery.makeAuthenticatedRequest,
-          requestModule: request,
-          metadata: {
-            configuration: {
-              load: metadata,
-            },
-            jobReference: {
-              jobId: jobId,
-              projectId: this.bigQuery.projectId,
-              location: this.location,
-            },
-          },
-          request: {
-            uri: format('{base}/{projectId}/jobs', {
-              base: 'https://www.googleapis.com/upload/bigquery/v2/projects',
-              projectId: this.bigQuery.projectId,
-            }),
-          },
-        } as any,
-        (data) => {
-          const job = this.bigQuery.job(data.jobReference.jobId, {
-            location: data.jobReference.location,
-          });
-          job.metadata = data;
-          dup.emit('job', job);
-          job
-            .on('error', err => dup.destroy(err))
-            .on('complete', () => {
-              dup.emit('complete', job);
-              dup.uncork();
-            });
-        }
-      );
-    });
-    return dup;
+    return stream;
   };
 
   /**
