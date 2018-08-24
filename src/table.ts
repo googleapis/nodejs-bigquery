@@ -27,6 +27,7 @@ const format = require('string-format-obj');
 import * as fs from 'fs';
 import * as is from 'is';
 import * as path from 'path';
+import * as request from 'request';
 const streamEvents = require('stream-events');
 import * as uuid from 'uuid';
 
@@ -242,6 +243,7 @@ class Table extends ServiceObject {
       id: id,
       createMethod: dataset.createTable.bind(dataset),
       methods: methods,
+      requestModule: request,
     });
 
     if (options && options.location) {
@@ -1214,6 +1216,7 @@ class Table extends ServiceObject {
         dup,
         {
           makeAuthenticatedRequest: this.bigQuery.makeAuthenticatedRequest,
+          requestModule: request,
           metadata: {
             configuration: {
               load: metadata,

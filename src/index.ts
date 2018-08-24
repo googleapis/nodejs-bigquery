@@ -24,6 +24,7 @@ import {paginator} from '@google-cloud/paginator';
 import * as extend from 'extend';
 const format = require('string-format-obj');
 import * as is from 'is';
+import * as request from 'request';
 import * as util from 'util';
 import * as uuid from 'uuid';
 
@@ -102,6 +103,7 @@ function BigQuery(options) {
     baseUrl: 'https://www.googleapis.com/bigquery/v2',
     scopes: ['https://www.googleapis.com/auth/bigquery'],
     packageJson: require('../../package.json'),
+    requestModule: request,
   };
 
   if (options.scopes) {
