@@ -1052,10 +1052,10 @@ describe('BigQuery/Table', function() {
     });
 
     it('should accept just a File and a callback', function(done) {
-      table.createWriteStream = function() {
+      table.createWriteStream_ = function() {
         const ws = new stream.Writable();
         setImmediate(function() {
-          ws.emit('complete', JOB);
+          ws.emit('job', JOB);
           ws.end();
         });
         return ws;
@@ -1070,7 +1070,7 @@ describe('BigQuery/Table', function() {
     });
 
     it('should return a stream when a string is given', function() {
-      table.createWriteStream = function() {
+      table.createWriteStream_ = function() {
         return new stream.Writable();
       };
 
@@ -1078,11 +1078,11 @@ describe('BigQuery/Table', function() {
     });
 
     it('should infer the file format from the given filepath', function(done) {
-      table.createWriteStream = function(metadata) {
+      table.createWriteStream_ = function(metadata) {
         assert.strictEqual(metadata.sourceFormat, 'NEWLINE_DELIMITED_JSON');
         const ws = new stream.Writable();
         setImmediate(function() {
-          ws.emit('complete', JOB);
+          ws.emit('job', JOB);
           ws.end();
         });
         return ws;
@@ -1094,7 +1094,7 @@ describe('BigQuery/Table', function() {
     it('should execute callback with error from writestream', function(done) {
       const error = new Error('Error.');
 
-      table.createWriteStream = function(metadata) {
+      table.createWriteStream_ = function(metadata) {
         assert.strictEqual(metadata.sourceFormat, 'NEWLINE_DELIMITED_JSON');
         const ws = new stream.Writable();
         setImmediate(function() {
@@ -1111,11 +1111,11 @@ describe('BigQuery/Table', function() {
     });
 
     it('should not infer the file format if one is given', function(done) {
-      table.createWriteStream = function(metadata) {
+      table.createWriteStream_ = function(metadata) {
         assert.strictEqual(metadata.sourceFormat, 'CSV');
         const ws = new stream.Writable();
         setImmediate(function() {
-          ws.emit('complete', JOB);
+          ws.emit('job', JOB);
           ws.end();
         });
         return ws;
@@ -1316,7 +1316,7 @@ describe('BigQuery/Table', function() {
     });
   });
 
-  describe('createWriteStream', function() {
+  describe('createWriteStream_', function() {
     describe('formats', function() {
       it('should accept csv', function(done) {
         makeWritableStreamOverride = function(stream, options) {
@@ -1325,7 +1325,7 @@ describe('BigQuery/Table', function() {
           done();
         };
 
-        table.createWriteStream('csv').emit('writing');
+        table.createWriteStream_('csv').emit('writing');
       });
 
       it('should accept json', function(done) {
@@ -1335,7 +1335,7 @@ describe('BigQuery/Table', function() {
           done();
         };
 
-        table.createWriteStream('json').emit('writing');
+        table.createWriteStream_('json').emit('writing');
       });
 
       it('should accept avro', function(done) {
@@ -1345,7 +1345,7 @@ describe('BigQuery/Table', function() {
           done();
         };
 
-        table.createWriteStream('avro').emit('writing');
+        table.createWriteStream_('avro').emit('writing');
       });
     });
 
@@ -1363,28 +1363,28 @@ describe('BigQuery/Table', function() {
         done();
       };
 
-      table.createWriteStream({schema: SCHEMA_STRING}).emit('writing');
+      table.createWriteStream_({schema: SCHEMA_STRING}).emit('writing');
     });
 
     it('should throw if a given source format is not recognized', function() {
       assert.throws(function() {
-        table.createWriteStream('zip');
+        table.createWriteStream_('zip');
       }, /Source format not recognized/);
 
       assert.throws(function() {
-        table.createWriteStream({
+        table.createWriteStream_({
           sourceFormat: 'zip',
         });
       }, /Source format not recognized/);
 
       assert.doesNotThrow(function() {
-        table.createWriteStream();
-        table.createWriteStream({});
+        table.createWriteStream_();
+        table.createWriteStream_({});
       });
     });
 
     it('should return a stream', function() {
-      assert(table.createWriteStream() instanceof stream.Stream);
+      assert(table.createWriteStream_() instanceof stream.Stream);
     });
 
     describe('writable stream', function() {
@@ -1394,10 +1394,6 @@ describe('BigQuery/Table', function() {
       beforeEach(function() {
         fakeJob = new EventEmitter();
         fakeJobId = uuid.v4();
-
-        table.bigQuery.job = function(id, options) {
-          return fakeJob;
-        };
 
         fakeUuid.v4 = function() {
           return fakeJobId;
@@ -1412,7 +1408,7 @@ describe('BigQuery/Table', function() {
           done();
         };
 
-        stream = table.createWriteStream();
+        stream = table.createWriteStream_();
         stream.emit('writing');
       });
 
@@ -1439,7 +1435,7 @@ describe('BigQuery/Table', function() {
           done();
         };
 
-        table.createWriteStream({a: 'b', c: 'd'}).emit('writing');
+        table.createWriteStream_({a: 'b', c: 'd'}).emit('writing');
       });
 
       it('should pass the correct request uri', function(done) {
@@ -1452,7 +1448,7 @@ describe('BigQuery/Table', function() {
           done();
         };
 
-        table.createWriteStream().emit('writing');
+        table.createWriteStream_().emit('writing');
       });
 
       it('should respect the jobPrefix option', function(done) {
@@ -1469,7 +1465,7 @@ describe('BigQuery/Table', function() {
           done();
         };
 
-        table.createWriteStream({jobPrefix: jobPrefix}).emit('writing');
+        table.createWriteStream_({jobPrefix: jobPrefix}).emit('writing');
       });
 
       it('should use the default location', function(done) {
@@ -1482,7 +1478,7 @@ describe('BigQuery/Table', function() {
           done();
         };
 
-        table.createWriteStream().emit('writing');
+        table.createWriteStream_().emit('writing');
       });
 
       it('should accept a job id', function(done) {
@@ -1499,7 +1495,7 @@ describe('BigQuery/Table', function() {
           done();
         };
 
-        table.createWriteStream(options).emit('writing');
+        table.createWriteStream_(options).emit('writing');
       });
 
       it('should create a job and emit it with job', function(done) {
@@ -1525,7 +1521,7 @@ describe('BigQuery/Table', function() {
         };
 
         table
-          .createWriteStream()
+          .createWriteStream_()
           .on('job', function(job) {
             assert.strictEqual(job, fakeJob);
             assert.deepStrictEqual(job.metadata, metadata);
@@ -1533,67 +1529,75 @@ describe('BigQuery/Table', function() {
           })
           .emit('writing');
       });
+    });
+  });
 
-      it('should return an error if the job fails', function(done) {
-        const error = new Error('Error.');
+  describe('createWriteStream', function() {
+    let fakeJob;
+    let fakeStream;
 
-        const metadata = {
-          jobReference: {
-            jobId: 'job-id',
-            location: 'location',
-          },
-          a: 'b',
-          c: 'd',
-        };
+    beforeEach(function() {
+      fakeJob = new EventEmitter();
+      fakeStream = new EventEmitter();
+      table.createWriteStream_ = () => fakeStream;
+    });
 
-        makeWritableStreamOverride = function(stream, options, callback) {
-          callback(metadata);
-          setImmediate(function() {
-            fakeJob.emit('error', error);
-          });
-        };
+    it('should pass the metadata to the private method', function(done) {
+      const fakeMetadata = {};
 
-        table
-          .createWriteStream()
-          .on('error', function(err) {
-            assert.strictEqual(err, error);
-            done();
-          })
-          .emit('writing');
+      table.createWriteStream_ = function(metadata) {
+        assert.strictEqual(metadata, fakeMetadata);
+        setImmediate(done);
+        return new EventEmitter();
+      };
+
+      table.createWriteStream(fakeMetadata);
+    });
+
+    it('should cork the stream on prefinish', function() {
+      let corked = false;
+
+      fakeStream.cork = function() {
+        corked = true;
+      };
+
+      table.createWriteStream().emit('prefinish');
+
+      assert.strictEqual(corked, true);
+    });
+
+    it('should destroy the stream on job error', function(done) {
+      const error = new Error('error');
+
+      fakeStream.destroy = function(err) {
+        assert.strictEqual(err, error);
+        done();
+      };
+
+      table.createWriteStream().emit('job', fakeJob);
+      fakeJob.emit('error', error);
+    });
+
+    it('should signal complete upon job complete', function(done) {
+      const stream = table.createWriteStream();
+
+      let uncorked = false;
+
+      stream.uncork = function() {
+        uncorked = true;
+      };
+
+      stream.on('complete', job => {
+        assert.strictEqual(job, fakeJob);
+
+        setImmediate(() => {
+          assert.strictEqual(uncorked, true);
+          done();
+        });
       });
 
-      it('should emit finish when the job is complete', function(done) {
-        const metadata = {
-          jobReference: {
-            jobId: 'job-id',
-            location: 'location',
-          },
-          a: 'b',
-          c: 'd',
-        };
-
-        makeWritableStreamOverride = function(dup, options, callback) {
-          dup.setWritable(new stream.PassThrough());
-          callback(metadata);
-          setImmediate(function() {
-            fakeJob.emit('complete');
-          });
-        };
-
-        let completeWasEmitted = false;
-
-        table
-          .createWriteStream()
-          .on('complete', function(job) {
-            assert.strictEqual(job, fakeJob);
-            completeWasEmitted = true;
-          })
-          .on('finish', function() {
-            assert.strictEqual(completeWasEmitted, true);
-            done();
-          })
-          .end('data');
-      });
+      stream.emit('job', fakeJob);
+      fakeJob.emit('complete');
     });
   });
 

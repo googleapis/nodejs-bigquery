@@ -25,6 +25,7 @@ import {promisifyAll} from '@google-cloud/promisify';
 import {paginator} from '@google-cloud/paginator';
 import * as extend from 'extend';
 import * as is from 'is';
+import * as request from 'request';
 
 /**
  * Job objects are returned from various places in the BigQuery API:
@@ -224,6 +225,7 @@ class Job extends Operation {
       baseUrl: '/jobs',
       id: id,
       methods: methods,
+      requestModule: request,
     } as any);
 
     this.bigQuery = bigQuery;

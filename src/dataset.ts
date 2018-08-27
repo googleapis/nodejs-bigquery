@@ -22,6 +22,7 @@ import {promisifyAll} from '@google-cloud/promisify';
 import * as extend from 'extend';
 import * as is from 'is';
 import {Table} from './table';
+import * as request from 'request';
 
 /**
  * Interact with your BigQuery dataset. Create a Dataset instance with
@@ -205,6 +206,7 @@ class Dataset extends ServiceObject {
       baseUrl: '/datasets',
       id: id,
       methods: methods,
+      requestModule: request,
       createMethod: (id, options, callback) => {
         if (is.fn(options)) {
           callback = options;
