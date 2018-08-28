@@ -32,7 +32,7 @@ const bigquery = new BigQuery();
 const storage = require('@google-cloud/storage')();
 
 describe('BigQuery', function() {
-  const GCLOUD_TESTS_PREFIX = 'gcloud_test_';
+  const GCLOUD_TESTS_PREFIX = 'nodejs_bq_test';
 
   const dataset = bigquery.dataset(generateName('dataset'));
   const table = dataset.table(generateName('table'));
@@ -98,8 +98,10 @@ describe('BigQuery', function() {
         // Remove datasets created for the tests.
         deleteDatasets,
 
-        // Create the test dataset.
-        dataset.create.bind(dataset),
+        // Create the test dataset with a label tagging this as a test run.
+        dataset.create.bind(dataset, {
+          labels: [{[GCLOUD_TESTS_PREFIX]: ''}]
+        }),
 
         // Create the test table.
         table.create.bind(table, {
@@ -1631,7 +1633,7 @@ describe('BigQuery', function() {
   });
 
   function generateName(resourceType) {
-    return (GCLOUD_TESTS_PREFIX + resourceType + '_' + uuid.v1()).replace(
+    return `${GCLOUD_TESTS_PREFIX}_${resourceType}_${uuid.v1()}`.replace(
       /-/g,
       '_'
     );
@@ -1674,7 +1676,7 @@ describe('BigQuery', function() {
   function deleteDatasets(callback) {
     bigquery.getDatasets(
       {
-        prefix: GCLOUD_TESTS_PREFIX,
+        filter: `labels.${GCLOUD_TESTS_PREFIX}`,
       },
       function(err, datasets) {
         if (err) {
