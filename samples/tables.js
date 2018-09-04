@@ -15,8 +15,6 @@
 
 'use strict';
 
-const assert = require('assert');
-
 function createTable(datasetId, tableId, schema, projectId) {
   // [START bigquery_create_table]
   // Imports the Google Cloud client library
@@ -183,7 +181,6 @@ function copyTable(
       const job = results[0];
 
       // load() waits for the job to finish
-      assert.strictEqual(job.status.state, 'DONE');
       console.log(`Job ${job.id} completed.`);
 
       // Check the job's status for errors
@@ -225,7 +222,6 @@ function loadLocalFile(datasetId, tableId, filename, projectId) {
       const job = results[0];
 
       // load() waits for the job to finish
-      assert.strictEqual(job.status.state, 'DONE');
       console.log(`Job ${job.id} completed.`);
 
       // Check the job's status for errors
@@ -292,7 +288,6 @@ function loadParquetFromGCS(datasetId, tableId, projectId) {
       const job = results[0];
 
       // load() waits for the job to finish
-      assert.strictEqual(job.status.state, 'DONE');
       console.log(`Job ${job.id} completed.`);
 
       // Check the job's status for errors
@@ -360,7 +355,6 @@ function loadCSVFromGCS(datasetId, tableId, projectId) {
       const job = results[0];
 
       // load() waits for the job to finish
-      assert.strictEqual(job.status.state, 'DONE');
       console.log(`Job ${job.id} completed.`);
 
       // Check the job's status for errors
@@ -423,7 +417,6 @@ function loadCSVFromGCSAutodetect(datasetId, tableId, projectId) {
       const job = results[0];
 
       // load() waits for the job to finish
-      assert.strictEqual(job.status.state, 'DONE');
       console.log(`Job ${job.id} completed.`);
 
       // Check the job's status for errors
@@ -493,7 +486,6 @@ function loadCSVFromGCSAppend(datasetId, tableId, projectId) {
       const job = results[0];
 
       // load() waits for the job to finish
-      assert.strictEqual(job.status.state, 'DONE');
       console.log(`Job ${job.id} completed.`);
 
       // Check the job's status for errors
@@ -563,7 +555,6 @@ function loadCSVFromGCSTruncate(datasetId, tableId, projectId) {
       const job = results[0];
 
       // load() waits for the job to finish
-      assert.strictEqual(job.status.state, 'DONE');
       console.log(`Job ${job.id} completed.`);
 
       // Check the job's status for errors
@@ -617,7 +608,6 @@ function extractTableToGCS(
       const job = results[0];
 
       // load() waits for the job to finish
-      assert.strictEqual(job.status.state, 'DONE');
       console.log(`Job ${job.id} completed.`);
 
       // Check the job's status for errors
