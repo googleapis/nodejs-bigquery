@@ -23,13 +23,16 @@ import * as fs from 'fs';
 import * as uuid from 'uuid';
 import * as exec from 'methmeth';
 
+
 import {Dataset} from '../src/dataset';
 import {Job} from '../src/job';
 import {Table} from '../src/table';
 
 const BigQuery = require('../src');
 const bigquery = new BigQuery();
-const storage = require('@google-cloud/storage')();
+import {Storage} from '@google-cloud/storage';
+
+const storage = new Storage();
 
 describe('BigQuery', function() {
   const GCLOUD_TESTS_PREFIX = 'nodejs_bq_test';
