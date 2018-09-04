@@ -15,12 +15,16 @@
 
 'use strict';
 
-const BigQuery = require(`@google-cloud/bigquery`);
-const path = require(`path`);
-const storage = require(`@google-cloud/storage`)();
 const test = require(`ava`);
-const tools = require(`@google-cloud/nodejs-repo-tools`);
+const path = require(`path`);
 const uuid = require(`uuid`);
+
+const tools = require(`@google-cloud/nodejs-repo-tools`);
+const {Storage} = require(`@google-cloud/storage`);
+
+const BigQuery = require(`@google-cloud/bigquery`);
+
+const storage = new Storage();
 
 const cwd = path.join(__dirname, `..`);
 const cmd = `node tables.js`;
