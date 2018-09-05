@@ -777,7 +777,7 @@ class Table extends ServiceObject {
    * @throws {Error} If destination format isn't recongized.
    *
    * @example
-   * const Storage = require('@google-cloud/storage');
+   * const {Storage} = require('@google-cloud/storage');
    * const BigQuery = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('my-dataset');
@@ -929,7 +929,7 @@ class Table extends ServiceObject {
    * @throws {Error} If the source isn't a string file name or a File instance.
    *
    * @example
-   * const Storage = require('@google-cloud/storage');
+   * const {Storage} = require('@google-cloud/storage');
    * const BigQuery = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('my-dataset');

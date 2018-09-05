@@ -240,7 +240,7 @@ function loadParquetFromGCS(datasetId, tableId, projectId) {
   // [START bigquery_load_table_gcs_parquet]
   // Imports the Google Cloud client libraries
   const BigQuery = require('@google-cloud/bigquery');
-  const Storage = require('@google-cloud/storage');
+  const {Storage} = require('@google-cloud/storage');
 
   /**
    * TODO(developer): Uncomment the following lines before running the sample.
@@ -306,7 +306,7 @@ function loadCSVFromGCS(datasetId, tableId, projectId) {
   // [START bigquery_load_table_gcs_csv]
   // Imports the Google Cloud client libraries
   const BigQuery = require('@google-cloud/bigquery');
-  const Storage = require('@google-cloud/storage');
+  const {Storage} = require('@google-cloud/storage');
 
   /**
    * TODO(developer): Uncomment the following lines before running the sample.
@@ -373,7 +373,7 @@ function loadCSVFromGCSAutodetect(datasetId, tableId, projectId) {
   // [START bigquery_load_table_gcs_csv_autodetect]
   // Imports the Google Cloud client libraries
   const BigQuery = require('@google-cloud/bigquery');
-  const Storage = require('@google-cloud/storage');
+  const {Storage} = require('@google-cloud/storage');
 
   /**
    * TODO(developer): Uncomment the following lines before running the sample.
@@ -435,7 +435,7 @@ function loadCSVFromGCSAppend(datasetId, tableId, projectId) {
   // [START bigquery_load_table_gcs_csv_append]
   // Imports the Google Cloud client libraries
   const BigQuery = require('@google-cloud/bigquery');
-  const Storage = require('@google-cloud/storage');
+  const {Storage} = require('@google-cloud/storage');
 
   /**
    * TODO(developer): Uncomment the following lines before running the sample.
@@ -504,7 +504,7 @@ function loadCSVFromGCSTruncate(datasetId, tableId, projectId) {
   // [START bigquery_load_table_gcs_csv_truncate]
   // Imports the Google Cloud client libraries
   const BigQuery = require('@google-cloud/bigquery');
-  const Storage = require('@google-cloud/storage');
+  const {Storage} = require('@google-cloud/storage');
 
   /**
    * TODO(developer): Uncomment the following lines before running the sample.
@@ -579,7 +579,7 @@ function extractTableToGCS(
   // [START bigquery_extract_table]
   // Imports the Google Cloud client libraries
   const BigQuery = require('@google-cloud/bigquery');
-  const Storage = require('@google-cloud/storage');
+  const {Storage} = require('@google-cloud/storage');
 
   /**
    * TODO(developer): Uncomment the following lines before running the sample.
