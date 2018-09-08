@@ -256,7 +256,7 @@ class Table extends ServiceObject {
     // Catch all for read-modify-write cycle
     // https://cloud.google.com/bigquery/docs/api-performance#read-patch-write
     this.interceptors.push({
-      request: function(reqOpts) {
+      request: reqOpts => {
         if (reqOpts.method === 'PATCH' && reqOpts.json.etag) {
           reqOpts.headers = reqOpts.headers || {};
           reqOpts.headers['If-Match'] = reqOpts.json.etag;
@@ -281,7 +281,7 @@ class Table extends ServiceObject {
      *
      * table.createReadStream(options)
      *   .on('error', console.error)
-     *   .on('data', function(row) {})
+     *   .on('data', row => {})
      *   .on('end', function() {
      *     // All rows have been retrieved.
      *   });
@@ -309,7 +309,7 @@ class Table extends ServiceObject {
    */
   static createSchemaFromString_(str) {
     return str.split(/\s*,\s*/).reduce(
-      function(acc, pair) {
+      (acc, pair) => {
         acc.fields.push({
           name: pair.split(':')[0].trim(),
           type: (pair.split(':')[1] || 'STRING').toUpperCase().trim(),

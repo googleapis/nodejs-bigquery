@@ -226,12 +226,11 @@ class Dataset extends ServiceObject {
     // Catch all for read-modify-write cycle
     // https://cloud.google.com/bigquery/docs/api-performance#read-patch-write
     this.interceptors.push({
-      request: function(reqOpts) {
+      request: reqOpts => {
         if (reqOpts.method === 'PATCH' && reqOpts.json.etag) {
           reqOpts.headers = reqOpts.headers || {};
           reqOpts.headers['If-Match'] = reqOpts.json.etag;
         }
-
         return reqOpts;
       },
     });

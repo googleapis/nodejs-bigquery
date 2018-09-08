@@ -32,7 +32,7 @@ function FakeOperation() {
 
 let promisified = false;
 const fakePfy = extend({}, pfy, {
-  promisifyAll: function(Class) {
+  promisifyAll: Class => {
     if (Class.name === 'Job') {
       promisified = true;
     }
@@ -42,7 +42,7 @@ const fakePfy = extend({}, pfy, {
 let extended = false;
 const fakePaginator = {
   paginator: {
-    extend: function(Class, methods) {
+    extend: (Class, methods) => {
       if (Class.name !== 'Job') {
         return;
       }
@@ -51,13 +51,13 @@ const fakePaginator = {
       assert.deepStrictEqual(methods, ['getQueryResults']);
       extended = true;
     },
-    streamify: function(methodName) {
+    streamify: methodName => {
       return methodName;
     },
   }
 };
 
-describe('BigQuery/Job', function() {
+describe('BigQuery/Job', () => {
   const BIGQUERY: any = {
     projectId: 'my-project',
     Promise: Promise,
@@ -68,7 +68,7 @@ describe('BigQuery/Job', function() {
   let Job;
   let job;
 
-  before(function() {
+  before(() => {
     Job = proxyquire('../src/job.js', {
       '@google-cloud/common': {
         Operation: FakeOperation
@@ -78,24 +78,24 @@ describe('BigQuery/Job', function() {
     }).Job;
   });
 
-  beforeEach(function() {
+  beforeEach(() => {
     job = new Job(BIGQUERY, JOB_ID);
   });
 
-  describe('initialization', function() {
-    it('should paginate all the things', function() {
+  describe('initialization', () => {
+    it('should paginate all the things', () => {
       assert(extended);
     });
 
-    it('should promisify all the things', function() {
+    it('should promisify all the things', () => {
       assert(promisified);
     });
 
-    it('should assign this.bigQuery', function() {
+    it('should assign this.bigQuery', () => {
       assert.deepStrictEqual(job.bigQuery, BIGQUERY);
     });
 
-    it('should inherit from Operation', function() {
+    it('should inherit from Operation', () => {
       assert(job instanceof FakeOperation);
 
       const calledWith = job.calledWith_[0];
@@ -115,14 +115,14 @@ describe('BigQuery/Job', function() {
       });
     });
 
-    it('should accept a location option', function() {
+    it('should accept a location option', () => {
       const options = {location: 'US'};
       const job = new Job(BIGQUERY, JOB_ID, options);
 
       assert.strictEqual(job.location, options.location);
     });
 
-    it('should send the location via getMetadata', function() {
+    it('should send the location via getMetadata', () => {
       const job = new Job(BIGQUERY, JOB_ID, {location: LOCATION});
       const calledWith = job.calledWith_[0];
 
@@ -134,9 +134,9 @@ describe('BigQuery/Job', function() {
     });
   });
 
-  describe('cancel', function() {
-    it('should make the correct API request', function(done) {
-      job.request = function(reqOpts) {
+  describe('cancel', () => {
+    it('should make the correct API request', done => {
+      job.request = reqOpts => {
         assert.strictEqual(reqOpts.method, 'POST');
         assert.strictEqual(reqOpts.uri, '/cancel');
         done();
@@ -145,10 +145,10 @@ describe('BigQuery/Job', function() {
       job.cancel(assert.ifError);
     });
 
-    it('should include the job location', function(done) {
+    it('should include the job location', done => {
       const job = new Job(BIGQUERY, JOB_ID, {location: LOCATION});
 
-      job.request = function(reqOpts) {
+      job.request = reqOpts => {
         assert.deepStrictEqual(reqOpts.qs, {location: LOCATION});
         done();
       };
@@ -157,7 +157,7 @@ describe('BigQuery/Job', function() {
     });
   });
 
-  describe('getQueryResults', function() {
+  describe('getQueryResults', () => {
     const pageToken = 'token';
     const options = {
       a: 'a',
@@ -170,18 +170,18 @@ describe('BigQuery/Job', function() {
       jobReference: {jobId: JOB_ID},
     };
 
-    beforeEach(function() {
-      BIGQUERY.request = function(reqOpts, callback) {
+    beforeEach(() => {
+      BIGQUERY.request = (reqOpts, callback) => {
         callback(null, RESPONSE);
       };
 
-      BIGQUERY.mergeSchemaWithRows_ = function(schema, rows) {
+      BIGQUERY.mergeSchemaWithRows_ = (schema, rows) => {
         return rows;
       };
     });
 
-    it('should make the correct request', function(done) {
-      BIGQUERY.request = function(reqOpts) {
+    it('should make the correct request', done => {
+      BIGQUERY.request = reqOpts => {
         assert.strictEqual(reqOpts.uri, '/queries/' + JOB_ID);
         done();
       };
@@ -189,11 +189,11 @@ describe('BigQuery/Job', function() {
       job.getQueryResults(assert.ifError);
     });
 
-    it('should optionally accept options', function(done) {
+    it('should optionally accept options', done => {
       const options = {a: 'b'};
       const expectedOptions = extend({location: undefined}, options);
 
-      BIGQUERY.request = function(reqOpts) {
+      BIGQUERY.request = reqOpts => {
         assert.deepStrictEqual(reqOpts.qs, expectedOptions);
         done();
       };
@@ -201,10 +201,10 @@ describe('BigQuery/Job', function() {
       job.getQueryResults(options, assert.ifError);
     });
 
-    it('should inherit the location', function(done) {
+    it('should inherit the location', done => {
       const job = new Job(BIGQUERY, JOB_ID, {location: LOCATION});
 
-      BIGQUERY.request = function(reqOpts) {
+      BIGQUERY.request = reqOpts => {
         assert.deepStrictEqual(reqOpts.qs, {location: LOCATION});
         done();
       };
@@ -212,15 +212,15 @@ describe('BigQuery/Job', function() {
       job.getQueryResults(assert.ifError);
     });
 
-    it('should return any errors to the callback', function(done) {
+    it('should return any errors to the callback', done => {
       const error = new Error('err');
       const response = {};
 
-      BIGQUERY.request = function(reqOpts, callback) {
+      BIGQUERY.request = (reqOpts, callback) => {
         callback(error, response);
       };
 
-      job.getQueryResults(function(err, rows, nextQuery, resp) {
+      job.getQueryResults((err, rows, nextQuery, resp) => {
         assert.strictEqual(err, error);
         assert.strictEqual(rows, null);
         assert.strictEqual(nextQuery, null);
@@ -229,8 +229,8 @@ describe('BigQuery/Job', function() {
       });
     });
 
-    it('should return the rows and response to the callback', function(done) {
-      job.getQueryResults(function(err, rows, nextQuery, resp) {
+    it('should return the rows and response to the callback', done => {
+      job.getQueryResults((err, rows, nextQuery, resp) => {
         assert.ifError(err);
         assert.deepStrictEqual(rows, []);
         assert.strictEqual(resp, RESPONSE);
@@ -238,7 +238,7 @@ describe('BigQuery/Job', function() {
       });
     });
 
-    it('should merge the rows with the schema', function(done) {
+    it('should merge the rows with the schema', done => {
       const response = {
         schema: {},
         rows: [],
@@ -246,31 +246,31 @@ describe('BigQuery/Job', function() {
 
       const mergedRows = [];
 
-      BIGQUERY.request = function(reqOpts, callback) {
+      BIGQUERY.request = (reqOpts, callback) => {
         callback(null, response);
       };
 
-      BIGQUERY.mergeSchemaWithRows_ = function(schema, rows) {
+      BIGQUERY.mergeSchemaWithRows_ = (schema, rows) => {
         assert.strictEqual(schema, response.schema);
         assert.strictEqual(rows, response.rows);
         return mergedRows;
       };
 
-      job.getQueryResults(function(err, rows) {
+      job.getQueryResults((err, rows) => {
         assert.ifError(err);
         assert.strictEqual(rows, mergedRows);
         done();
       });
     });
 
-    it('should return the query when the job is not complete', function(done) {
-      BIGQUERY.request = function(reqOpts, callback) {
+    it('should return the query when the job is not complete', done => {
+      BIGQUERY.request = (reqOpts, callback) => {
         callback(null, {
           jobComplete: false,
         });
       };
 
-      job.getQueryResults(options, function(err, rows, nextQuery) {
+      job.getQueryResults(options, (err, rows, nextQuery) => {
         assert.ifError(err);
         assert.deepStrictEqual(nextQuery, options);
         assert.notStrictEqual(nextQuery, options);
@@ -278,8 +278,8 @@ describe('BigQuery/Job', function() {
       });
     });
 
-    it('should populate nextQuery when more results exist', function(done) {
-      job.getQueryResults(options, function(err, rows, nextQuery) {
+    it('should populate nextQuery when more results exist', done => {
+      job.getQueryResults(options, (err, rows, nextQuery) => {
         assert.ifError(err);
         assert.strictEqual(nextQuery.pageToken, pageToken);
         done();
@@ -287,17 +287,17 @@ describe('BigQuery/Job', function() {
     });
   });
 
-  describe('getQueryResultsStream', function() {
-    it('should have streamified getQueryResults', function() {
+  describe('getQueryResultsStream', () => {
+    it('should have streamified getQueryResults', () => {
       assert.strictEqual(job.getQueryResultsStream, 'getQueryResultsAsStream_');
     });
   });
 
-  describe('getQueryResultsAsStream_', function() {
-    it('should call getQueryResults correctly', function(done) {
+  describe('getQueryResultsAsStream_', () => {
+    it('should call getQueryResults correctly', done => {
       const options = {a: 'b', c: 'd'};
 
-      job.getQueryResults = function(options_, callback) {
+      job.getQueryResults = (options_, callback) => {
         assert.deepStrictEqual(options_, {
           a: 'b',
           c: 'd',
@@ -310,33 +310,33 @@ describe('BigQuery/Job', function() {
     });
   });
 
-  describe('poll_', function() {
-    it('should call getMetadata', function(done) {
-      job.getMetadata = function() {
+  describe('poll_', () => {
+    it('should call getMetadata', done => {
+      job.getMetadata = () => {
         done();
       };
 
       job.poll_(assert.ifError);
     });
 
-    describe('API error', function() {
+    describe('API error', () => {
       const error = new Error('Error.');
 
-      beforeEach(function() {
-        job.getMetadata = function(callback) {
+      beforeEach(() => {
+        job.getMetadata = callback => {
           callback(error);
         };
       });
 
-      it('should return an error', function(done) {
-        job.poll_(function(err) {
+      it('should return an error', done => {
+        job.poll_(err => {
           assert.strictEqual(err, error);
           done();
         });
       });
     });
 
-    describe('job failure', function() {
+    describe('job failure', () => {
       const error = new Error('Error.');
       const apiResponse = {
         status: {
@@ -346,20 +346,20 @@ describe('BigQuery/Job', function() {
 
       let sandbox;
 
-      beforeEach(function() {
+      beforeEach(() => {
         sandbox = sinon.createSandbox();
-        job.getMetadata = function(callback) {
+        job.getMetadata = callback => {
           callback(null, apiResponse, apiResponse);
         };
       });
 
-      it('should detect and return an error from the response', function(done) {
+      it('should detect and return an error from the response', done => {
         sandbox.stub(util, 'ApiError').callsFake(body => {
           assert.strictEqual(body, apiResponse.status);
           return error;
         });
 
-        job.poll_(function(err) {
+        job.poll_(err => {
           assert.strictEqual(err, error);
           done();
         });
@@ -370,21 +370,21 @@ describe('BigQuery/Job', function() {
       });
     });
 
-    describe('job pending', function() {
+    describe('job pending', () => {
       const apiResponse = {
         status: {
           state: 'PENDING',
         },
       };
 
-      beforeEach(function() {
-        job.getMetadata = function(callback) {
+      beforeEach(() => {
+        job.getMetadata = callback => {
           callback(null, apiResponse, apiResponse);
         };
       });
 
-      it('should execute callback', function(done) {
-        job.poll_(function(err, metadata) {
+      it('should execute callback', done => {
+        job.poll_((err, metadata) => {
           assert.ifError(err);
           assert.strictEqual(metadata, undefined);
           done();
@@ -392,21 +392,21 @@ describe('BigQuery/Job', function() {
       });
     });
 
-    describe('job complete', function() {
+    describe('job complete', () => {
       const apiResponse = {
         status: {
           state: 'DONE',
         },
       };
 
-      beforeEach(function() {
-        job.getMetadata = function(callback) {
+      beforeEach(() => {
+        job.getMetadata = callback => {
           callback(null, apiResponse, apiResponse);
         };
       });
 
-      it('should emit complete with metadata', function(done) {
-        job.poll_(function(err, metadata) {
+      it('should emit complete with metadata', done => {
+        job.poll_((err, metadata) => {
           assert.ifError(err);
           assert.strictEqual(metadata, apiResponse);
           done();

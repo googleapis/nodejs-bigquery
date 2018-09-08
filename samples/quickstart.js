@@ -35,7 +35,6 @@ bigquery
   .createDataset(datasetName)
   .then(results => {
     const dataset = results[0];
-
     console.log(`Dataset ${dataset.id} created.`);
   })
   .catch(err => {

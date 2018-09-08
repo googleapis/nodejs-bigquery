@@ -21,7 +21,6 @@ import * as assert from 'assert';
 import * as Big from 'big.js';
 import {EventEmitter} from 'events';
 import * as extend from 'extend';
-import * as nodeutil from 'util';
 import * as proxyquire from 'proxyquire';
 import * as stream from 'stream';
 import * as uuid from 'uuid';
@@ -32,16 +31,15 @@ let promisified = false;
 let makeWritableStreamOverride;
 let isCustomTypeOverride;
 const fakeUtil = extend({}, util, {
-  isCustomType: function() {
-    return (isCustomTypeOverride || util.isCustomType).apply(null, arguments);
+  isCustomType: (...args) => {
+    return (isCustomTypeOverride || util.isCustomType).apply(null, args);
   },
-  makeWritableStream: function() {
-    const args = arguments;
+  makeWritableStream: (...args) => {
     (makeWritableStreamOverride || util.makeWritableStream).apply(null, args);
   },
 });
 const fakePfy = extend({}, pfy, {
-  promisifyAll: function(Class) {
+  promisifyAll: Class => {
     if (Class.name === 'Table') {
       promisified = true;
     }
@@ -51,7 +49,7 @@ const fakePfy = extend({}, pfy, {
 let extended = false;
 const fakePaginator = {
   paginator: {
-    extend: function(Class, methods) {
+    extend: (Class, methods) => {
       if (Class.name !== 'Table') {
         return;
       }
@@ -61,7 +59,7 @@ const fakePaginator = {
       assert.deepStrictEqual(methods, ['getRows']);
       extended = true;
     },
-    streamify: function(methodName) {
+    streamify: methodName => {
       return methodName;
     },
   }
@@ -77,13 +75,13 @@ class FakeServiceObject extends ServiceObject {
   }
 }
 
-describe('BigQuery/Table', function() {
+describe('BigQuery/Table', () => {
   const DATASET = {
     id: 'dataset-id',
     createTable: util.noop,
     bigQuery: {
       projectId: 'project-id',
-      job: function(id) {
+      job: id => {
         return {id: id};
       },
       request: util.noop,
@@ -117,7 +115,7 @@ describe('BigQuery/Table', function() {
   let table;
   let tableOverrides: any = {};
 
-  before(function() {
+  before(() => {
     Table = proxyquire('../src/table.js', {
       uuid: fakeUuid,
       '@google-cloud/common': {
@@ -132,12 +130,12 @@ describe('BigQuery/Table', function() {
 
     // Override all util methods, allowing them to be mocked. Overrides are
     // removed before each test.
-    Object.keys(Table).forEach(function(tableMethod) {
+    Object.keys(Table).forEach(tableMethod => {
       if (typeof Table[tableMethod] !== 'function') {
         return;
       }
 
-      Table[tableMethod] = function() {
+      Table[tableMethod] = () => {
         return (tableOverrides[tableMethod] || tableCached[tableMethod]).apply(
           this,
           arguments
@@ -146,7 +144,7 @@ describe('BigQuery/Table', function() {
     });
   });
 
-  beforeEach(function() {
+  beforeEach(() => {
     fakeUuid = extend(fakeUuid, uuid);
     isCustomTypeOverride = null;
     makeWritableStreamOverride = null;
@@ -154,28 +152,28 @@ describe('BigQuery/Table', function() {
     table = new Table(DATASET, TABLE_ID);
     table.bigQuery.request = util.noop;
     table.bigQuery.createJob = util.noop;
-    table.bigQuery.mergeSchemaWithRows_ = function(schema, rows) {
+    table.bigQuery.mergeSchemaWithRows_ = (schema, rows) => {
       return rows;
     };
   });
 
-  describe('instantiation', function() {
-    it('should extend the correct methods', function() {
+  describe('instantiation', () => {
+    it('should extend the correct methods', () => {
       assert(extended); // See `fakePaginator.extend`
     });
 
-    it('should streamify the correct methods', function() {
+    it('should streamify the correct methods', () => {
       assert.strictEqual(table.createReadStream, 'getRows');
     });
 
-    it('should promisify all the things', function() {
+    it('should promisify all the things', () => {
       assert(promisified);
     });
 
-    it('should inherit from ServiceObject', function(done) {
+    it('should inherit from ServiceObject', done => {
       const datasetInstance = extend({}, DATASET, {
         createTable: {
-          bind: function(context) {
+          bind: context => {
             assert.strictEqual(context, datasetInstance);
             done();
           },
@@ -199,17 +197,17 @@ describe('BigQuery/Table', function() {
       });
     });
 
-    it('should capture the location', function() {
+    it('should capture the location', () => {
       const options = {location: LOCATION};
       const table = new Table(DATASET, TABLE_ID, options);
 
       assert.strictEqual(table.location, LOCATION);
     });
 
-    describe('etag interceptor', function() {
+    describe('etag interceptor', () => {
       const FAKE_ETAG = 'abc';
 
-      it('should apply the If-Match header', function() {
+      it('should apply the If-Match header', () => {
         const interceptor = table.interceptors.pop();
 
         const fakeReqOpts = {
@@ -223,7 +221,7 @@ describe('BigQuery/Table', function() {
         assert.deepStrictEqual(reqOpts.headers, {'If-Match': FAKE_ETAG});
       });
 
-      it('should respect already existing headers', function() {
+      it('should respect already existing headers', () => {
         const interceptor = table.interceptors.pop();
 
         const fakeReqOpts = {
@@ -244,7 +242,7 @@ describe('BigQuery/Table', function() {
         assert.deepStrictEqual(reqOpts.headers, expectedHeaders);
       });
 
-      it('should not apply the header if method is not patch', function() {
+      it('should not apply the header if method is not patch', () => {
         const interceptor = table.interceptors.pop();
 
         const fakeReqOpts = {
@@ -260,32 +258,32 @@ describe('BigQuery/Table', function() {
     });
   });
 
-  describe('createSchemaFromString_', function() {
-    it('should create a schema object from a string', function() {
+  describe('createSchemaFromString_', () => {
+    it('should create a schema object from a string', () => {
       assert.deepStrictEqual(
         Table.createSchemaFromString_(SCHEMA_STRING),
         SCHEMA_OBJECT
       );
     });
 
-    it('should trim names', function() {
+    it('should trim names', () => {
       var schema = Table.createSchemaFromString_(' name :type');
       assert.strictEqual(schema.fields[0].name, 'name');
     });
 
-    it('should trim types', function() {
+    it('should trim types', () => {
       var schema = Table.createSchemaFromString_('name: type ');
       assert.strictEqual(schema.fields[0].type, 'TYPE');
     });
   });
 
-  describe('encodeValue_', function() {
-    it('should return null if null or undefined', function() {
+  describe('encodeValue_', () => {
+    it('should return null if null or undefined', () => {
       assert.strictEqual(Table.encodeValue_(null), null);
       assert.strictEqual(Table.encodeValue_(undefined), null);
     });
 
-    it('should properly encode values', function() {
+    it('should properly encode values', () => {
       const buffer = Buffer.from('test');
       assert.strictEqual(Table.encodeValue_(buffer), buffer.toString('base64'));
 
@@ -293,7 +291,7 @@ describe('BigQuery/Table', function() {
       assert.strictEqual(Table.encodeValue_(date), date.toJSON());
     });
 
-    it('should properly encode custom types', function() {
+    it('should properly encode custom types', () => {
       function BigQueryDate(value) {
         this.value = value;
       }
@@ -318,7 +316,7 @@ describe('BigQuery/Table', function() {
       assert.strictEqual(Table.encodeValue_(timestamp), 'timestamp');
     });
 
-    it('should properly encode arrays', function() {
+    it('should properly encode arrays', () => {
       const buffer = Buffer.from('test');
       const date = new Date();
 
@@ -330,7 +328,7 @@ describe('BigQuery/Table', function() {
       ]);
     });
 
-    it('should properly encode objects', function() {
+    it('should properly encode objects', () => {
       const buffer = Buffer.from('test');
       const date = new Date();
 
@@ -347,7 +345,7 @@ describe('BigQuery/Table', function() {
       });
     });
 
-    it('should properly encode numerics', function() {
+    it('should properly encode numerics', () => {
       assert.strictEqual(Table.encodeValue_(new Big('123.456')), '123.456');
       assert.strictEqual(Table.encodeValue_(new Big('-123.456')), '-123.456');
       assert.strictEqual(
@@ -361,8 +359,8 @@ describe('BigQuery/Table', function() {
     });
   });
 
-  describe('formatMetadata_', function() {
-    it('should return a deep copy', function() {
+  describe('formatMetadata_', () => {
+    it('should return a deep copy', () => {
       const metadata = {
         a: {
           b: 'c',
@@ -375,7 +373,7 @@ describe('BigQuery/Table', function() {
       assert.notStrictEqual(metadata, formatted);
     });
 
-    it('should format the name option', function() {
+    it('should format the name option', () => {
       const NAME = 'name';
 
       const formatted = Table.formatMetadata_({name: NAME});
@@ -384,10 +382,10 @@ describe('BigQuery/Table', function() {
       assert.strictEqual(formatted.friendlyName, NAME);
     });
 
-    it('should format the schema string option', function() {
+    it('should format the schema string option', () => {
       const fakeSchema = {};
 
-      Table.createSchemaFromString_ = function(schema) {
+      Table.createSchemaFromString_ = schema => {
         assert.strictEqual(schema, SCHEMA_STRING);
         return fakeSchema;
       };
@@ -397,7 +395,7 @@ describe('BigQuery/Table', function() {
       assert.strictEqual(formatted.schema, fakeSchema);
     });
 
-    it('should accept an array of schema fields', function() {
+    it('should accept an array of schema fields', () => {
       const fields = ['a', 'b', 'c'];
 
       const formatted = Table.formatMetadata_({schema: fields});
@@ -405,7 +403,7 @@ describe('BigQuery/Table', function() {
       assert.deepStrictEqual(formatted.schema.fields, fields);
     });
 
-    it('should format the schema fields option', function() {
+    it('should format the schema fields option', () => {
       const metadata = {
         schema: {
           fields: ['a', {fields: []}, 'b'],
@@ -418,13 +416,13 @@ describe('BigQuery/Table', function() {
       assert.deepStrictEqual(formatted.schema.fields, expectedFields);
     });
 
-    it('should format the time partitioning option', function() {
+    it('should format the time partitioning option', () => {
       const formatted = Table.formatMetadata_({partitioning: 'abc'});
 
       assert.strictEqual(formatted.timePartitioning.type, 'ABC');
     });
 
-    it('should format the table view option', function() {
+    it('should format the table view option', () => {
       const VIEW = 'abc';
 
       const formatted = Table.formatMetadata_({view: VIEW});
@@ -434,21 +432,21 @@ describe('BigQuery/Table', function() {
     });
   });
 
-  describe('copy', function() {
+  describe('copy', () => {
     let fakeJob;
 
-    beforeEach(function() {
+    beforeEach(() => {
       fakeJob = new EventEmitter();
-      table.createCopyJob = function(destination, metadata, callback) {
+      table.createCopyJob = (destination, metadata, callback) => {
         callback(null, fakeJob);
       };
     });
 
-    it('should pass the arguments to createCopyJob', function(done) {
+    it('should pass the arguments to createCopyJob', done => {
       const fakeDestination = {};
       const fakeMetadata = {};
 
-      table.createCopyJob = function(destination, metadata) {
+      table.createCopyJob = (destination, metadata) => {
         assert.strictEqual(destination, fakeDestination);
         assert.strictEqual(metadata, fakeMetadata);
         done();
@@ -457,8 +455,8 @@ describe('BigQuery/Table', function() {
       table.copy(fakeDestination, fakeMetadata, assert.ifError);
     });
 
-    it('should optionally accept metadata', function(done) {
-      table.createCopyJob = function(destination, metadata) {
+    it('should optionally accept metadata', done => {
+      table.createCopyJob = (destination, metadata) => {
         assert.deepStrictEqual(metadata, {});
         done();
       };
@@ -466,25 +464,25 @@ describe('BigQuery/Table', function() {
       table.copy({}, assert.ifError);
     });
 
-    it('should return any createCopyJob errors', function(done) {
+    it('should return any createCopyJob errors', done => {
       const error = new Error('err');
       const response = {};
 
-      table.createCopyJob = function(destination, metadata, callback) {
+      table.createCopyJob = (destination, metadata, callback) => {
         callback(error, null, response);
       };
 
-      table.copy({}, function(err, resp) {
+      table.copy({}, (err, resp) => {
         assert.strictEqual(err, error);
         assert.strictEqual(resp, response);
         done();
       });
     });
 
-    it('should return any job errors', function(done) {
+    it('should return any job errors', done => {
       const error = new Error('err');
 
-      table.copy({}, function(err) {
+      table.copy({}, err => {
         assert.strictEqual(err, error);
         done();
       });
@@ -492,10 +490,10 @@ describe('BigQuery/Table', function() {
       fakeJob.emit('error', error);
     });
 
-    it('should return the metadata on complete', function(done) {
+    it('should return the metadata on complete', done => {
       const metadata = {};
 
-      table.copy({}, function(err, resp) {
+      table.copy({}, (err, resp) => {
         assert.ifError(err);
         assert.strictEqual(resp, metadata);
         done();
@@ -505,21 +503,21 @@ describe('BigQuery/Table', function() {
     });
   });
 
-  describe('copyFrom', function() {
+  describe('copyFrom', () => {
     let fakeJob;
 
-    beforeEach(function() {
+    beforeEach(() => {
       fakeJob = new EventEmitter();
-      table.createCopyFromJob = function(sourceTables, metadata, callback) {
+      table.createCopyFromJob = (sourceTables, metadata, callback) => {
         callback(null, fakeJob);
       };
     });
 
-    it('should pass the arguments to createCopyFromJob', function(done) {
+    it('should pass the arguments to createCopyFromJob', done => {
       const fakeSourceTables = {};
       const fakeMetadata = {};
 
-      table.createCopyFromJob = function(sourceTables, metadata) {
+      table.createCopyFromJob = (sourceTables, metadata) => {
         assert.strictEqual(sourceTables, fakeSourceTables);
         assert.strictEqual(metadata, fakeMetadata);
         done();
@@ -528,8 +526,8 @@ describe('BigQuery/Table', function() {
       table.copyFrom(fakeSourceTables, fakeMetadata, assert.ifError);
     });
 
-    it('should optionally accept metadata', function(done) {
-      table.createCopyFromJob = function(sourceTables, metadata) {
+    it('should optionally accept metadata', done => {
+      table.createCopyFromJob = (sourceTables, metadata) => {
         assert.deepStrictEqual(metadata, {});
         done();
       };
@@ -537,25 +535,25 @@ describe('BigQuery/Table', function() {
       table.copyFrom({}, assert.ifError);
     });
 
-    it('should return any createCopyFromJob errors', function(done) {
+    it('should return any createCopyFromJob errors', done => {
       const error = new Error('err');
       const response = {};
 
-      table.createCopyFromJob = function(sourceTables, metadata, callback) {
+      table.createCopyFromJob = (sourceTables, metadata, callback) => {
         callback(error, null, response);
       };
 
-      table.copyFrom({}, function(err, resp) {
+      table.copyFrom({}, (err, resp) => {
         assert.strictEqual(err, error);
         assert.strictEqual(resp, response);
         done();
       });
     });
 
-    it('should return any job errors', function(done) {
+    it('should return any job errors', done => {
       const error = new Error('err');
 
-      table.copyFrom({}, function(err) {
+      table.copyFrom({}, err => {
         assert.strictEqual(err, error);
         done();
       });
@@ -563,10 +561,10 @@ describe('BigQuery/Table', function() {
       fakeJob.emit('error', error);
     });
 
-    it('should return the metadata on complete', function(done) {
+    it('should return the metadata on complete', done => {
       const metadata = {};
 
-      table.copyFrom({}, function(err, resp) {
+      table.copyFrom({}, (err, resp) => {
         assert.ifError(err);
         assert.strictEqual(resp, metadata);
         done();
@@ -576,29 +574,29 @@ describe('BigQuery/Table', function() {
     });
   });
 
-  describe('createCopyJob', function() {
+  describe('createCopyJob', () => {
     let DEST_TABLE;
 
-    before(function() {
+    before(() => {
       DEST_TABLE = new Table(DATASET, 'destination-table');
     });
 
-    it('should throw if a destination is not a Table', function() {
-      assert.throws(function() {
+    it('should throw if a destination is not a Table', () => {
+      assert.throws(() => {
         table.createCopyJob();
       }, /Destination must be a Table/);
 
-      assert.throws(function() {
+      assert.throws(() => {
         table.createCopyJob({});
       }, /Destination must be a Table/);
 
-      assert.throws(function() {
-        table.createCopyJob(function() {});
+      assert.throws(() => {
+        table.createCopyJob(() => {});
       }, /Destination must be a Table/);
     });
 
-    it('should send correct request to the API', function(done) {
-      table.bigQuery.createJob = function(reqOpts) {
+    it('should send correct request to the API', done => {
+      table.bigQuery.createJob = reqOpts => {
         assert.deepStrictEqual(reqOpts, {
           configuration: {
             copy: {
@@ -624,13 +622,13 @@ describe('BigQuery/Table', function() {
       table.createCopyJob(DEST_TABLE, {a: 'b', c: 'd'}, assert.ifError);
     });
 
-    it('should accept a job prefix', function(done) {
+    it('should accept a job prefix', done => {
       const fakeJobPrefix = 'abc-';
       const options = {
         jobPrefix: fakeJobPrefix,
       };
 
-      table.bigQuery.createJob = function(reqOpts, callback) {
+      table.bigQuery.createJob = (reqOpts, callback) => {
         assert.strictEqual(reqOpts.jobPrefix, fakeJobPrefix);
         assert.strictEqual(reqOpts.configuration.copy.jobPrefix, undefined);
         callback(); // the done fn
@@ -639,8 +637,8 @@ describe('BigQuery/Table', function() {
       table.createCopyJob(DEST_TABLE, options, done);
     });
 
-    it('should use the default location', function(done) {
-      table.bigQuery.createJob = function(reqOpts, callback) {
+    it('should use the default location', done => {
+      table.bigQuery.createJob = (reqOpts, callback) => {
         assert.strictEqual(reqOpts.location, LOCATION);
         callback(); // the done fn
       };
@@ -649,11 +647,11 @@ describe('BigQuery/Table', function() {
       table.createCopyJob(DEST_TABLE, done);
     });
 
-    it('should accept a job id', function(done) {
+    it('should accept a job id', done => {
       const jobId = 'job-id';
       const options = {jobId};
 
-      table.bigQuery.createJob = function(reqOpts, callback) {
+      table.bigQuery.createJob = (reqOpts, callback) => {
         assert.strictEqual(reqOpts.jobId, jobId);
         assert.strictEqual(reqOpts.configuration.copy.jobId, undefined);
         callback(); // the done fn
@@ -662,8 +660,8 @@ describe('BigQuery/Table', function() {
       table.createCopyJob(DEST_TABLE, options, done);
     });
 
-    it('should pass the callback to createJob', function(done) {
-      table.bigQuery.createJob = function(reqOpts, callback) {
+    it('should pass the callback to createJob', done => {
+      table.bigQuery.createJob = (reqOpts, callback) => {
         assert.strictEqual(done, callback);
         callback(); // the done fn
       };
@@ -671,8 +669,8 @@ describe('BigQuery/Table', function() {
       table.createCopyJob(DEST_TABLE, {}, done);
     });
 
-    it('should optionally accept metadata', function(done) {
-      table.bigQuery.createJob = function(reqOpts, callback) {
+    it('should optionally accept metadata', done => {
+      table.bigQuery.createJob = (reqOpts, callback) => {
         assert.strictEqual(done, callback);
         callback(); // the done fn
       };
@@ -681,33 +679,33 @@ describe('BigQuery/Table', function() {
     });
   });
 
-  describe('createCopyFromJob', function() {
+  describe('createCopyFromJob', () => {
     let SOURCE_TABLE;
 
-    before(function() {
+    before(() => {
       SOURCE_TABLE = new Table(DATASET, 'source-table');
     });
 
-    it('should throw if a source is not a Table', function() {
-      assert.throws(function() {
+    it('should throw if a source is not a Table', () => {
+      assert.throws(() => {
         table.createCopyFromJob(['table']);
       }, /Source must be a Table/);
 
-      assert.throws(function() {
+      assert.throws(() => {
         table.createCopyFromJob([SOURCE_TABLE, 'table']);
       }, /Source must be a Table/);
 
-      assert.throws(function() {
+      assert.throws(() => {
         table.createCopyFromJob({});
       }, /Source must be a Table/);
 
-      assert.throws(function() {
-        table.createCopyFromJob(function() {});
+      assert.throws(() => {
+        table.createCopyFromJob(() => {});
       }, /Source must be a Table/);
     });
 
-    it('should send correct request to the API', function(done) {
-      table.bigQuery.createJob = function(reqOpts) {
+    it('should send correct request to the API', done => {
+      table.bigQuery.createJob = reqOpts => {
         assert.deepStrictEqual(reqOpts, {
           configuration: {
             copy: {
@@ -735,8 +733,8 @@ describe('BigQuery/Table', function() {
       table.createCopyFromJob(SOURCE_TABLE, {a: 'b', c: 'd'}, assert.ifError);
     });
 
-    it('should accept multiple source tables', function(done) {
-      table.bigQuery.createJob = function(reqOpts) {
+    it('should accept multiple source tables', done => {
+      table.bigQuery.createJob = reqOpts => {
         assert.deepStrictEqual(reqOpts.configuration.copy.sourceTables, [
           {
             datasetId: SOURCE_TABLE.dataset.id,
@@ -756,13 +754,13 @@ describe('BigQuery/Table', function() {
       table.createCopyFromJob([SOURCE_TABLE, SOURCE_TABLE], assert.ifError);
     });
 
-    it('should accept a job prefix', function(done) {
+    it('should accept a job prefix', done => {
       const fakeJobPrefix = 'abc-';
       const options = {
         jobPrefix: fakeJobPrefix,
       };
 
-      table.bigQuery.createJob = function(reqOpts, callback) {
+      table.bigQuery.createJob = (reqOpts, callback) => {
         assert.strictEqual(reqOpts.jobPrefix, fakeJobPrefix);
         assert.strictEqual(reqOpts.configuration.copy.jobPrefix, undefined);
         callback(); // the done fn
@@ -771,8 +769,8 @@ describe('BigQuery/Table', function() {
       table.createCopyFromJob(SOURCE_TABLE, options, done);
     });
 
-    it('should use the default location', function(done) {
-      table.bigQuery.createJob = function(reqOpts, callback) {
+    it('should use the default location', done => {
+      table.bigQuery.createJob = (reqOpts, callback) => {
         assert.strictEqual(reqOpts.location, LOCATION);
         callback(); // the done fn
       };
@@ -781,11 +779,11 @@ describe('BigQuery/Table', function() {
       table.createCopyFromJob(SOURCE_TABLE, done);
     });
 
-    it('should accept a job id', function(done) {
+    it('should accept a job id', done => {
       const jobId = 'job-id';
       const options = {jobId};
 
-      table.bigQuery.createJob = function(reqOpts, callback) {
+      table.bigQuery.createJob = (reqOpts, callback) => {
         assert.strictEqual(reqOpts.jobId, jobId);
         assert.strictEqual(reqOpts.configuration.copy.jobId, undefined);
         callback(); // the done fn
@@ -794,8 +792,8 @@ describe('BigQuery/Table', function() {
       table.createCopyFromJob(SOURCE_TABLE, options, done);
     });
 
-    it('should pass the callback to createJob', function(done) {
-      table.bigQuery.createJob = function(reqOpts, callback) {
+    it('should pass the callback to createJob', done => {
+      table.bigQuery.createJob = (reqOpts, callback) => {
         assert.strictEqual(done, callback);
         callback(); // the done fn
       };
@@ -803,8 +801,8 @@ describe('BigQuery/Table', function() {
       table.createCopyFromJob(SOURCE_TABLE, {}, done);
     });
 
-    it('should optionally accept options', function(done) {
-      table.bigQuery.createJob = function(reqOpts, callback) {
+    it('should optionally accept options', done => {
+      table.bigQuery.createJob = (reqOpts, callback) => {
         assert.strictEqual(done, callback);
         callback(); // the done fn
       };
@@ -813,7 +811,7 @@ describe('BigQuery/Table', function() {
     });
   });
 
-  describe('createExtractJob', function() {
+  describe('createExtractJob', () => {
     const FILE = {
       name: 'file-name.json',
       bucket: {
@@ -821,20 +819,20 @@ describe('BigQuery/Table', function() {
       },
     };
 
-    beforeEach(function() {
-      isCustomTypeOverride = function() {
+    beforeEach(() => {
+      isCustomTypeOverride = () => {
         return true;
       };
 
-      table.bigQuery.job = function(id) {
+      table.bigQuery.job = id => {
         return {id: id};
       };
 
-      table.bigQuery.createJob = function() {};
+      table.bigQuery.createJob = () => {};
     });
 
-    it('should call createJob correctly', function(done) {
-      table.bigQuery.createJob = function(reqOpts) {
+    it('should call createJob correctly', done => {
+      table.bigQuery.createJob = reqOpts => {
         assert.deepStrictEqual(reqOpts.configuration.extract.sourceTable, {
           datasetId: table.dataset.id,
           projectId: table.bigQuery.projectId,
@@ -847,17 +845,17 @@ describe('BigQuery/Table', function() {
       table.createExtractJob(FILE, assert.ifError);
     });
 
-    it('should accept just a destination and a callback', function(done) {
-      table.bigQuery.createJob = function(reqOpts, callback) {
+    it('should accept just a destination and a callback', done => {
+      table.bigQuery.createJob = (reqOpts, callback) => {
         callback(null, {jobReference: {jobId: 'job-id'}});
       };
 
       table.createExtractJob(FILE, done);
     });
 
-    describe('formats', function() {
-      it('should accept csv', function(done) {
-        table.bigQuery.createJob = function(reqOpts) {
+    describe('formats', () => {
+      it('should accept csv', done => {
+        table.bigQuery.createJob = reqOpts => {
           const extract = reqOpts.configuration.extract;
           assert.strictEqual(extract.destinationFormat, 'CSV');
           done();
@@ -866,8 +864,8 @@ describe('BigQuery/Table', function() {
         table.createExtractJob(FILE, {format: 'csv'}, assert.ifError);
       });
 
-      it('should accept json', function(done) {
-        table.bigQuery.createJob = function(reqOpts) {
+      it('should accept json', done => {
+        table.bigQuery.createJob = reqOpts => {
           const extract = reqOpts.configuration.extract;
           assert.strictEqual(
             extract.destinationFormat,
@@ -879,8 +877,8 @@ describe('BigQuery/Table', function() {
         table.createExtractJob(FILE, {format: 'json'}, assert.ifError);
       });
 
-      it('should accept avro', function(done) {
-        table.bigQuery.createJob = function(reqOpts) {
+      it('should accept avro', done => {
+        table.bigQuery.createJob = reqOpts => {
           const extract = reqOpts.configuration.extract;
           assert.strictEqual(extract.destinationFormat, 'AVRO');
           done();
@@ -889,8 +887,8 @@ describe('BigQuery/Table', function() {
         table.createExtractJob(FILE, {format: 'avro'}, assert.ifError);
       });
 
-      it('should accept parquet', function(done) {
-        table.bigQuery.createJob = function(reqOpts) {
+      it('should accept parquet', done => {
+        table.bigQuery.createJob = reqOpts => {
           const extract = reqOpts.configuration.extract;
           assert.strictEqual(extract.destinationFormat, 'PARQUET');
           done();
@@ -900,8 +898,8 @@ describe('BigQuery/Table', function() {
       });
     });
 
-    it('should parse out full gs:// urls from files', function(done) {
-      table.bigQuery.createJob = function(reqOpts) {
+    it('should parse out full gs:// urls from files', done => {
+      table.bigQuery.createJob = reqOpts => {
         assert.deepStrictEqual(reqOpts.configuration.extract.destinationUris, [
           'gs://' + FILE.bucket.name + '/' + FILE.name,
         ]);
@@ -911,8 +909,8 @@ describe('BigQuery/Table', function() {
       table.createExtractJob(FILE, assert.ifError);
     });
 
-    it('should check if a destination is a File', function(done) {
-      isCustomTypeOverride = function(dest, type) {
+    it('should check if a destination is a File', done => {
+      isCustomTypeOverride = (dest, type) => {
         assert.strictEqual(dest, FILE);
         assert.strictEqual(type, 'storage/file');
         setImmediate(done);
@@ -922,22 +920,22 @@ describe('BigQuery/Table', function() {
       table.createExtractJob(FILE, assert.ifError);
     });
 
-    it('should throw if a destination is not a File', function() {
-      isCustomTypeOverride = function() {
+    it('should throw if a destination is not a File', () => {
+      isCustomTypeOverride = () => {
         return false;
       };
 
-      assert.throws(function() {
+      assert.throws(() => {
         table.createExtractJob({}, util.noop);
       }, /Destination must be a File object/);
 
-      assert.throws(function() {
+      assert.throws(() => {
         table.createExtractJob([FILE, {}], util.noop);
       }, /Destination must be a File object/);
     });
 
-    it('should detect file format if a format is not provided', function(done) {
-      table.bigQuery.createJob = function(reqOpts) {
+    it('should detect file format if a format is not provided', done => {
+      table.bigQuery.createJob = reqOpts => {
         const destFormat = reqOpts.configuration.extract.destinationFormat;
         assert.strictEqual(destFormat, 'NEWLINE_DELIMITED_JSON');
         done();
@@ -946,8 +944,8 @@ describe('BigQuery/Table', function() {
       table.createExtractJob(FILE, assert.ifError);
     });
 
-    it('should assign the provided format if matched', function(done) {
-      table.bigQuery.createJob = function(reqOpts) {
+    it('should assign the provided format if matched', done => {
+      table.bigQuery.createJob = reqOpts => {
         const extract = reqOpts.configuration.extract;
         assert.strictEqual(extract.destinationFormat, 'CSV');
         assert.strictEqual(extract.format, undefined);
@@ -957,14 +955,14 @@ describe('BigQuery/Table', function() {
       table.createExtractJob(FILE, {format: 'csv'}, assert.ifError);
     });
 
-    it('should throw if a provided format is not recognized', function() {
-      assert.throws(function() {
+    it('should throw if a provided format is not recognized', () => {
+      assert.throws(() => {
         table.createExtractJob(FILE, {format: 'zip'}, util.noop);
       }, /Destination format not recognized/);
     });
 
-    it('should assign GZIP compression with gzip: true', function(done) {
-      table.bigQuery.createJob = function(reqOpts) {
+    it('should assign GZIP compression with gzip: true', done => {
+      table.bigQuery.createJob = reqOpts => {
         assert.strictEqual(reqOpts.configuration.extract.compression, 'GZIP');
         assert.strictEqual(reqOpts.configuration.extract.gzip, undefined);
         done();
@@ -973,13 +971,13 @@ describe('BigQuery/Table', function() {
       table.createExtractJob(FILE, {gzip: true}, util.noop);
     });
 
-    it('should accept a job prefix', function(done) {
+    it('should accept a job prefix', done => {
       const fakeJobPrefix = 'abc-';
       const options = {
         jobPrefix: fakeJobPrefix,
       };
 
-      table.bigQuery.createJob = function(reqOpts, callback) {
+      table.bigQuery.createJob = (reqOpts, callback) => {
         assert.strictEqual(reqOpts.jobPrefix, fakeJobPrefix);
         assert.strictEqual(reqOpts.configuration.extract.jobPrefix, undefined);
         callback(); // the done fn
@@ -988,10 +986,10 @@ describe('BigQuery/Table', function() {
       table.createExtractJob(FILE, options, done);
     });
 
-    it('should use the default location', function(done) {
+    it('should use the default location', done => {
       const table = new Table(DATASET, TABLE_ID, {location: LOCATION});
 
-      table.bigQuery.createJob = function(reqOpts, callback) {
+      table.bigQuery.createJob = (reqOpts, callback) => {
         assert.strictEqual(reqOpts.location, LOCATION);
         callback(); // the done fn
       };
@@ -999,11 +997,11 @@ describe('BigQuery/Table', function() {
       table.createExtractJob(FILE, done);
     });
 
-    it('should accept a job id', function(done) {
+    it('should accept a job id', done => {
       const jobId = 'job-id';
       const options = {jobId};
 
-      table.bigQuery.createJob = function(reqOpts, callback) {
+      table.bigQuery.createJob = (reqOpts, callback) => {
         assert.strictEqual(reqOpts.jobId, jobId);
         assert.strictEqual(reqOpts.configuration.extract.jobId, undefined);
         callback(); // the done fn
@@ -1012,8 +1010,8 @@ describe('BigQuery/Table', function() {
       table.createExtractJob(FILE, options, done);
     });
 
-    it('should pass the callback to createJob', function(done) {
-      table.bigQuery.createJob = function(reqOpts, callback) {
+    it('should pass the callback to createJob', done => {
+      table.bigQuery.createJob = (reqOpts, callback) => {
         assert.strictEqual(done, callback);
         callback(); // the done fn
       };
@@ -1021,8 +1019,8 @@ describe('BigQuery/Table', function() {
       table.createExtractJob(FILE, {}, done);
     });
 
-    it('should optionally accept options', function(done) {
-      table.bigQuery.createJob = function(reqOpts, callback) {
+    it('should optionally accept options', done => {
+      table.bigQuery.createJob = (reqOpts, callback) => {
         assert.strictEqual(done, callback);
         callback(); // the done fn
       };
@@ -1031,7 +1029,7 @@ describe('BigQuery/Table', function() {
     });
   });
 
-  describe('createLoadJob', function() {
+  describe('createLoadJob', () => {
     const FILEPATH = require.resolve('../../test/testdata/testfile.json');
     const FILE = {
       name: 'file-name.json',
@@ -1045,23 +1043,23 @@ describe('BigQuery/Table', function() {
       metadata: {},
     };
 
-    beforeEach(function() {
-      isCustomTypeOverride = function() {
+    beforeEach(() => {
+      isCustomTypeOverride = () => {
         return true;
       };
     });
 
-    it('should accept just a File and a callback', function(done) {
-      table.createWriteStream_ = function() {
+    it('should accept just a File and a callback', done => {
+      table.createWriteStream_ = () => {
         const ws = new stream.Writable();
-        setImmediate(function() {
+        setImmediate(() => {
           ws.emit('job', JOB);
           ws.end();
         });
         return ws;
       };
 
-      table.createLoadJob(FILEPATH, function(err, job, resp) {
+      table.createLoadJob(FILEPATH, (err, job, resp) => {
         assert.strictEqual(err, null);
         assert.strictEqual(job, JOB);
         assert.strictEqual(resp, JOB.metadata);
@@ -1069,19 +1067,19 @@ describe('BigQuery/Table', function() {
       });
     });
 
-    it('should return a stream when a string is given', function() {
-      table.createWriteStream_ = function() {
+    it('should return a stream when a string is given', () => {
+      table.createWriteStream_ = () => {
         return new stream.Writable();
       };
 
       assert(table.createLoadJob(FILEPATH) instanceof stream.Stream);
     });
 
-    it('should infer the file format from the given filepath', function(done) {
-      table.createWriteStream_ = function(metadata) {
+    it('should infer the file format from the given filepath', done => {
+      table.createWriteStream_ = metadata => {
         assert.strictEqual(metadata.sourceFormat, 'NEWLINE_DELIMITED_JSON');
         const ws = new stream.Writable();
-        setImmediate(function() {
+        setImmediate(() => {
           ws.emit('job', JOB);
           ws.end();
         });
@@ -1091,30 +1089,30 @@ describe('BigQuery/Table', function() {
       table.createLoadJob(FILEPATH, done);
     });
 
-    it('should execute callback with error from writestream', function(done) {
+    it('should execute callback with error from writestream', done => {
       const error = new Error('Error.');
 
-      table.createWriteStream_ = function(metadata) {
+      table.createWriteStream_ = metadata => {
         assert.strictEqual(metadata.sourceFormat, 'NEWLINE_DELIMITED_JSON');
         const ws = new stream.Writable();
-        setImmediate(function() {
+        setImmediate(() => {
           ws.emit('error', error);
           ws.end();
         });
         return ws;
       };
 
-      table.createLoadJob(FILEPATH, function(err) {
+      table.createLoadJob(FILEPATH, err => {
         assert.strictEqual(err, error);
         done();
       });
     });
 
-    it('should not infer the file format if one is given', function(done) {
-      table.createWriteStream_ = function(metadata) {
+    it('should not infer the file format if one is given', done => {
+      table.createWriteStream_ = metadata => {
         assert.strictEqual(metadata.sourceFormat, 'CSV');
         const ws = new stream.Writable();
-        setImmediate(function() {
+        setImmediate(() => {
           ws.emit('job', JOB);
           ws.end();
         });
@@ -1124,8 +1122,8 @@ describe('BigQuery/Table', function() {
       table.createLoadJob(FILEPATH, {sourceFormat: 'CSV'}, done);
     });
 
-    it('should check if a destination is a File', function(done) {
-      isCustomTypeOverride = function(dest, type) {
+    it('should check if a destination is a File', done => {
+      isCustomTypeOverride = (dest, type) => {
         assert.strictEqual(dest, FILE);
         assert.strictEqual(type, 'storage/file');
         setImmediate(done);
@@ -1135,18 +1133,18 @@ describe('BigQuery/Table', function() {
       table.createLoadJob(FILE, assert.ifError);
     });
 
-    it('should throw if a File object is not provided', function() {
-      isCustomTypeOverride = function() {
+    it('should throw if a File object is not provided', () => {
+      isCustomTypeOverride = () => {
         return false;
       };
 
-      assert.throws(function() {
+      assert.throws(() => {
         table.createLoadJob({});
       }, /Source must be a File object/);
     });
 
-    it('should convert File objects to gs:// urls', function(done) {
-      table.bigQuery.createJob = function(reqOpts) {
+    it('should convert File objects to gs:// urls', done => {
+      table.bigQuery.createJob = reqOpts => {
         const sourceUri = reqOpts.configuration.load.sourceUris[0];
         assert.strictEqual(
           sourceUri,
@@ -1158,8 +1156,8 @@ describe('BigQuery/Table', function() {
       table.createLoadJob(FILE, assert.ifError);
     });
 
-    it('should infer the file format from a File object', function(done) {
-      table.bigQuery.createJob = function(reqOpts) {
+    it('should infer the file format from a File object', done => {
+      table.bigQuery.createJob = reqOpts => {
         const sourceFormat = reqOpts.configuration.load.sourceFormat;
         assert.strictEqual(sourceFormat, 'NEWLINE_DELIMITED_JSON');
         done();
@@ -1168,8 +1166,8 @@ describe('BigQuery/Table', function() {
       table.createLoadJob(FILE, assert.ifError);
     });
 
-    it('should not override a provided format with a File', function(done) {
-      table.bigQuery.createJob = function(reqOpts) {
+    it('should not override a provided format with a File', done => {
+      table.bigQuery.createJob = reqOpts => {
         const sourceFormat = reqOpts.configuration.load.sourceFormat;
         assert.strictEqual(sourceFormat, 'NEWLINE_DELIMITED_JSON');
         done();
@@ -1184,8 +1182,8 @@ describe('BigQuery/Table', function() {
       );
     });
 
-    it('should pass the callback to createJob', function(done) {
-      table.bigQuery.createJob = function(reqOpts, callback) {
+    it('should pass the callback to createJob', done => {
+      table.bigQuery.createJob = (reqOpts, callback) => {
         assert.strictEqual(done, callback);
         callback(); // the done fn
       };
@@ -1193,8 +1191,8 @@ describe('BigQuery/Table', function() {
       table.createLoadJob(FILE, {}, done);
     });
 
-    it('should optionally accept options', function(done) {
-      table.bigQuery.createJob = function(reqOpts, callback) {
+    it('should optionally accept options', done => {
+      table.bigQuery.createJob = (reqOpts, callback) => {
         assert.strictEqual(done, callback);
         callback(); // the done fn
       };
@@ -1202,10 +1200,10 @@ describe('BigQuery/Table', function() {
       table.createLoadJob(FILE, done);
     });
 
-    it('should set the job prefix', function(done) {
+    it('should set the job prefix', done => {
       const fakeJobPrefix = 'abc';
 
-      table.bigQuery.createJob = function(reqOpts) {
+      table.bigQuery.createJob = reqOpts => {
         assert.strictEqual(reqOpts.jobPrefix, fakeJobPrefix);
         assert.strictEqual(reqOpts.configuration.load.jobPrefix, undefined);
         done();
@@ -1220,10 +1218,10 @@ describe('BigQuery/Table', function() {
       );
     });
 
-    it('should use the default location', function(done) {
+    it('should use the default location', done => {
       const table = new Table(DATASET, TABLE_ID, {location: LOCATION});
 
-      table.bigQuery.createJob = function(reqOpts, callback) {
+      table.bigQuery.createJob = (reqOpts, callback) => {
         assert.strictEqual(reqOpts.location, LOCATION);
         callback(); // the done fn
       };
@@ -1231,11 +1229,11 @@ describe('BigQuery/Table', function() {
       table.createLoadJob(FILE, done);
     });
 
-    it('should accept a job id', function(done) {
+    it('should accept a job id', done => {
       const jobId = 'job-id';
       const options = {jobId};
 
-      table.bigQuery.createJob = function(reqOpts) {
+      table.bigQuery.createJob = reqOpts => {
         assert.strictEqual(reqOpts.jobId, jobId);
         assert.strictEqual(reqOpts.configuration.load.jobId, undefined);
         done();
@@ -1244,9 +1242,9 @@ describe('BigQuery/Table', function() {
       table.createLoadJob(FILE, options, assert.ifError);
     });
 
-    describe('formats', function() {
-      it('should accept csv', function(done) {
-        table.bigQuery.createJob = function(reqOpts) {
+    describe('formats', () => {
+      it('should accept csv', done => {
+        table.bigQuery.createJob = reqOpts => {
           const load = reqOpts.configuration.load;
           assert.strictEqual(load.sourceFormat, 'CSV');
           done();
@@ -1255,8 +1253,8 @@ describe('BigQuery/Table', function() {
         table.createLoadJob(FILE, {format: 'csv'}, assert.ifError);
       });
 
-      it('should accept json', function(done) {
-        table.bigQuery.createJob = function(reqOpts) {
+      it('should accept json', done => {
+        table.bigQuery.createJob = reqOpts => {
           const load = reqOpts.configuration.load;
           assert.strictEqual(load.sourceFormat, 'NEWLINE_DELIMITED_JSON');
           done();
@@ -1265,8 +1263,8 @@ describe('BigQuery/Table', function() {
         table.createLoadJob(FILE, {format: 'json'}, assert.ifError);
       });
 
-      it('should accept avro', function(done) {
-        table.bigQuery.createJob = function(reqOpts) {
+      it('should accept avro', done => {
+        table.bigQuery.createJob = reqOpts => {
           const load = reqOpts.configuration.load;
           assert.strictEqual(load.sourceFormat, 'AVRO');
           done();
@@ -1277,12 +1275,12 @@ describe('BigQuery/Table', function() {
     });
   });
 
-  describe('createQueryJob', function() {
-    it('should call through to dataset#createQueryJob', function(done) {
+  describe('createQueryJob', () => {
+    it('should call through to dataset#createQueryJob', done => {
       const fakeOptions = {};
       const fakeReturnValue = {};
 
-      table.dataset.createQueryJob = function(options, callback) {
+      table.dataset.createQueryJob = (options, callback) => {
         assert.strictEqual(options, fakeOptions);
         setImmediate(callback);
         return fakeReturnValue;
@@ -1293,9 +1291,9 @@ describe('BigQuery/Table', function() {
     });
   });
 
-  describe('createQueryStream', function() {
-    it('should call datasetInstance.createQueryStream()', function(done) {
-      table.dataset.createQueryStream = function(a) {
+  describe('createQueryStream', () => {
+    it('should call datasetInstance.createQueryStream()', done => {
+      table.dataset.createQueryStream = a => {
         assert.strictEqual(a, 'a');
         done();
       };
@@ -1303,10 +1301,10 @@ describe('BigQuery/Table', function() {
       table.createQueryStream('a');
     });
 
-    it('should return whatever dataset.createQueryStream returns', function() {
+    it('should return whatever dataset.createQueryStream returns', () => {
       const fakeValue = 123;
 
-      table.dataset.createQueryStream = function() {
+      table.dataset.createQueryStream = () => {
         return fakeValue;
       };
 
@@ -1316,10 +1314,10 @@ describe('BigQuery/Table', function() {
     });
   });
 
-  describe('createWriteStream_', function() {
-    describe('formats', function() {
-      it('should accept csv', function(done) {
-        makeWritableStreamOverride = function(stream, options) {
+  describe('createWriteStream_', () => {
+    describe('formats', () => {
+      it('should accept csv', done => {
+        makeWritableStreamOverride = (stream, options) => {
           const load = options.metadata.configuration.load;
           assert.strictEqual(load.sourceFormat, 'CSV');
           done();
@@ -1328,8 +1326,8 @@ describe('BigQuery/Table', function() {
         table.createWriteStream_('csv').emit('writing');
       });
 
-      it('should accept json', function(done) {
-        makeWritableStreamOverride = function(stream, options) {
+      it('should accept json', done => {
+        makeWritableStreamOverride = (stream, options) => {
           const load = options.metadata.configuration.load;
           assert.strictEqual(load.sourceFormat, 'NEWLINE_DELIMITED_JSON');
           done();
@@ -1338,8 +1336,8 @@ describe('BigQuery/Table', function() {
         table.createWriteStream_('json').emit('writing');
       });
 
-      it('should accept avro', function(done) {
-        makeWritableStreamOverride = function(stream, options) {
+      it('should accept avro', done => {
+        makeWritableStreamOverride = (stream, options) => {
           const load = options.metadata.configuration.load;
           assert.strictEqual(load.sourceFormat, 'AVRO');
           done();
@@ -1349,15 +1347,15 @@ describe('BigQuery/Table', function() {
       });
     });
 
-    it('should format a schema', function(done) {
+    it('should format a schema', done => {
       const expectedSchema = {};
 
-      tableOverrides.createSchemaFromString_ = function(string) {
+      tableOverrides.createSchemaFromString_ = string => {
         assert.strictEqual(string, SCHEMA_STRING);
         return expectedSchema;
       };
 
-      makeWritableStreamOverride = function(stream, options) {
+      makeWritableStreamOverride = (stream, options) => {
         const load = options.metadata.configuration.load;
         assert.deepStrictEqual(load.schema, expectedSchema);
         done();
@@ -1366,44 +1364,44 @@ describe('BigQuery/Table', function() {
       table.createWriteStream_({schema: SCHEMA_STRING}).emit('writing');
     });
 
-    it('should throw if a given source format is not recognized', function() {
-      assert.throws(function() {
+    it('should throw if a given source format is not recognized', () => {
+      assert.throws(() => {
         table.createWriteStream_('zip');
       }, /Source format not recognized/);
 
-      assert.throws(function() {
+      assert.throws(() => {
         table.createWriteStream_({
           sourceFormat: 'zip',
         });
       }, /Source format not recognized/);
 
-      assert.doesNotThrow(function() {
+      assert.doesNotThrow(() => {
         table.createWriteStream_();
         table.createWriteStream_({});
       });
     });
 
-    it('should return a stream', function() {
+    it('should return a stream', () => {
       assert(table.createWriteStream_() instanceof stream.Stream);
     });
 
-    describe('writable stream', function() {
+    describe('writable stream', () => {
       let fakeJob;
       let fakeJobId;
 
-      beforeEach(function() {
+      beforeEach(() => {
         fakeJob = new EventEmitter();
         fakeJobId = uuid.v4();
 
-        fakeUuid.v4 = function() {
+        fakeUuid.v4 = () => {
           return fakeJobId;
         };
       });
 
-      it('should make a writable stream when written to', function(done) {
+      it('should make a writable stream when written to', done => {
         let stream;
 
-        makeWritableStreamOverride = function(s) {
+        makeWritableStreamOverride = s => {
           assert.strictEqual(s, stream);
           done();
         };
@@ -1412,8 +1410,8 @@ describe('BigQuery/Table', function() {
         stream.emit('writing');
       });
 
-      it('should pass extended metadata', function(done) {
-        makeWritableStreamOverride = function(stream, options) {
+      it('should pass extended metadata', done => {
+        makeWritableStreamOverride = (stream, options) => {
           assert.deepStrictEqual(options.metadata, {
             configuration: {
               load: {
@@ -1438,8 +1436,8 @@ describe('BigQuery/Table', function() {
         table.createWriteStream_({a: 'b', c: 'd'}).emit('writing');
       });
 
-      it('should pass the correct request uri', function(done) {
-        makeWritableStreamOverride = function(stream, options) {
+      it('should pass the correct request uri', done => {
+        makeWritableStreamOverride = (stream, options) => {
           const uri =
             'https://www.googleapis.com/upload/bigquery/v2/projects/' +
             table.bigQuery.projectId +
@@ -1451,11 +1449,11 @@ describe('BigQuery/Table', function() {
         table.createWriteStream_().emit('writing');
       });
 
-      it('should respect the jobPrefix option', function(done) {
+      it('should respect the jobPrefix option', done => {
         const jobPrefix = 'abc-';
         const expectedJobId = jobPrefix + fakeJobId;
 
-        makeWritableStreamOverride = function(stream, options) {
+        makeWritableStreamOverride = (stream, options) => {
           const jobId = options.metadata.jobReference.jobId;
           assert.strictEqual(jobId, expectedJobId);
 
@@ -1468,10 +1466,10 @@ describe('BigQuery/Table', function() {
         table.createWriteStream_({jobPrefix: jobPrefix}).emit('writing');
       });
 
-      it('should use the default location', function(done) {
+      it('should use the default location', done => {
         const table = new Table(DATASET, TABLE_ID, {location: LOCATION});
 
-        makeWritableStreamOverride = function(stream, options) {
+        makeWritableStreamOverride = (stream, options) => {
           const location = options.metadata.jobReference.location;
           assert.strictEqual(location, LOCATION);
 
@@ -1481,11 +1479,11 @@ describe('BigQuery/Table', function() {
         table.createWriteStream_().emit('writing');
       });
 
-      it('should accept a job id', function(done) {
+      it('should accept a job id', done => {
         const jobId = 'job-id';
         const options = {jobId};
 
-        makeWritableStreamOverride = function(stream, options) {
+        makeWritableStreamOverride = (stream, options) => {
           const jobReference = options.metadata.jobReference;
           assert.strictEqual(jobReference.jobId, jobId);
 
@@ -1498,7 +1496,7 @@ describe('BigQuery/Table', function() {
         table.createWriteStream_(options).emit('writing');
       });
 
-      it('should create a job and emit it with job', function(done) {
+      it('should create a job and emit it with job', done => {
         const metadata = {
           jobReference: {
             jobId: 'job-id',
@@ -1508,7 +1506,7 @@ describe('BigQuery/Table', function() {
           c: 'd',
         };
 
-        table.bigQuery.job = function(id, options) {
+        table.bigQuery.job = (id, options) => {
           assert.strictEqual(id, metadata.jobReference.jobId);
           assert.deepStrictEqual(options, {
             location: metadata.jobReference.location,
@@ -1516,13 +1514,13 @@ describe('BigQuery/Table', function() {
           return fakeJob;
         };
 
-        makeWritableStreamOverride = function(stream, options, callback) {
+        makeWritableStreamOverride = (stream, options, callback) => {
           callback(metadata);
         };
 
         table
           .createWriteStream_()
-          .on('job', function(job) {
+          .on('job', job => {
             assert.strictEqual(job, fakeJob);
             assert.deepStrictEqual(job.metadata, metadata);
             done();
@@ -1532,20 +1530,20 @@ describe('BigQuery/Table', function() {
     });
   });
 
-  describe('createWriteStream', function() {
+  describe('createWriteStream', () => {
     let fakeJob;
     let fakeStream;
 
-    beforeEach(function() {
+    beforeEach(() => {
       fakeJob = new EventEmitter();
       fakeStream = new EventEmitter();
       table.createWriteStream_ = () => fakeStream;
     });
 
-    it('should pass the metadata to the private method', function(done) {
+    it('should pass the metadata to the private method', done => {
       const fakeMetadata = {};
 
-      table.createWriteStream_ = function(metadata) {
+      table.createWriteStream_ = metadata => {
         assert.strictEqual(metadata, fakeMetadata);
         setImmediate(done);
         return new EventEmitter();
@@ -1554,10 +1552,10 @@ describe('BigQuery/Table', function() {
       table.createWriteStream(fakeMetadata);
     });
 
-    it('should cork the stream on prefinish', function() {
+    it('should cork the stream on prefinish', () => {
       let corked = false;
 
-      fakeStream.cork = function() {
+      fakeStream.cork = () => {
         corked = true;
       };
 
@@ -1566,10 +1564,10 @@ describe('BigQuery/Table', function() {
       assert.strictEqual(corked, true);
     });
 
-    it('should destroy the stream on job error', function(done) {
+    it('should destroy the stream on job error', done => {
       const error = new Error('error');
 
-      fakeStream.destroy = function(err) {
+      fakeStream.destroy = err => {
         assert.strictEqual(err, error);
         done();
       };
@@ -1578,12 +1576,12 @@ describe('BigQuery/Table', function() {
       fakeJob.emit('error', error);
     });
 
-    it('should signal complete upon job complete', function(done) {
+    it('should signal complete upon job complete', done => {
       const stream = table.createWriteStream();
 
       let uncorked = false;
 
-      stream.uncork = function() {
+      stream.uncork = () => {
         uncorked = true;
       };
 
@@ -1601,21 +1599,21 @@ describe('BigQuery/Table', function() {
     });
   });
 
-  describe('extract', function() {
+  describe('extract', () => {
     let fakeJob;
 
-    beforeEach(function() {
+    beforeEach(() => {
       fakeJob = new EventEmitter();
-      table.createExtractJob = function(destination, metadata, callback) {
+      table.createExtractJob = (destination, metadata, callback) => {
         callback(null, fakeJob);
       };
     });
 
-    it('should pass the arguments to createExtractJob', function(done) {
+    it('should pass the arguments to createExtractJob', done => {
       const fakeDestination = {};
       const fakeMetadata = {};
 
-      table.createExtractJob = function(destination, metadata) {
+      table.createExtractJob = (destination, metadata) => {
         assert.strictEqual(destination, fakeDestination);
         assert.strictEqual(metadata, fakeMetadata);
         done();
@@ -1624,8 +1622,8 @@ describe('BigQuery/Table', function() {
       table.extract(fakeDestination, fakeMetadata, assert.ifError);
     });
 
-    it('should optionally accept metadata', function(done) {
-      table.createExtractJob = function(destination, metadata) {
+    it('should optionally accept metadata', done => {
+      table.createExtractJob = (destination, metadata) => {
         assert.deepStrictEqual(metadata, {});
         done();
       };
@@ -1633,25 +1631,25 @@ describe('BigQuery/Table', function() {
       table.extract({}, assert.ifError);
     });
 
-    it('should return any createExtractJob errors', function(done) {
+    it('should return any createExtractJob errors', done => {
       const error = new Error('err');
       const response = {};
 
-      table.createExtractJob = function(destination, metadata, callback) {
+      table.createExtractJob = (destination, metadata, callback) => {
         callback(error, null, response);
       };
 
-      table.extract({}, function(err, resp) {
+      table.extract({}, (err, resp) => {
         assert.strictEqual(err, error);
         assert.strictEqual(resp, response);
         done();
       });
     });
 
-    it('should return any job errors', function(done) {
+    it('should return any job errors', done => {
       const error = new Error('err');
 
-      table.extract({}, function(err) {
+      table.extract({}, err => {
         assert.strictEqual(err, error);
         done();
       });
@@ -1659,10 +1657,10 @@ describe('BigQuery/Table', function() {
       fakeJob.emit('error', error);
     });
 
-    it('should return the metadata on complete', function(done) {
+    it('should return the metadata on complete', done => {
       const metadata = {};
 
-      table.extract({}, function(err, resp) {
+      table.extract({}, (err, resp) => {
         assert.ifError(err);
         assert.strictEqual(resp, metadata);
         done();
@@ -1672,18 +1670,18 @@ describe('BigQuery/Table', function() {
     });
   });
 
-  describe('getRows', function() {
-    it('should accept just a callback', function(done) {
-      table.request = function(reqOpts, callback) {
+  describe('getRows', () => {
+    it('should accept just a callback', done => {
+      table.request = (reqOpts, callback) => {
         callback(null, {});
       };
       table.getRows(done);
     });
 
-    it('should make correct API request', function(done) {
+    it('should make correct API request', done => {
       const options = {a: 'b', c: 'd'};
 
-      table.request = function(reqOpts, callback) {
+      table.request = (reqOpts, callback) => {
         assert.strictEqual(reqOpts.uri, '/data');
         assert.strictEqual(reqOpts.qs, options);
         callback(null, {});
@@ -1692,15 +1690,15 @@ describe('BigQuery/Table', function() {
       table.getRows(options, done);
     });
 
-    it('should execute callback with error & API response', function(done) {
+    it('should execute callback with error & API response', done => {
       const apiResponse = {};
       const error = new Error('Error.');
 
-      table.request = function(reqOpts, callback) {
+      table.request = (reqOpts, callback) => {
         callback(error, apiResponse);
       };
 
-      table.getRows(function(err, rows, nextQuery, apiResponse_) {
+      table.getRows((err, rows, nextQuery, apiResponse_) => {
         assert.strictEqual(err, error);
         assert.strictEqual(rows, null);
         assert.strictEqual(nextQuery, null);
@@ -1710,32 +1708,32 @@ describe('BigQuery/Table', function() {
       });
     });
 
-    describe('refreshing metadata', function() {
+    describe('refreshing metadata', () => {
       // Using "Stephen" so you know who to blame for these tests.
       const rows = [{f: [{v: 'stephen'}]}];
       const schema = {fields: [{name: 'name', type: 'string'}]};
       const mergedRows = [{name: 'stephen'}];
 
-      beforeEach(function() {
-        table.request = function(reqOpts, callback) {
+      beforeEach(() => {
+        table.request = (reqOpts, callback) => {
           // Respond with a row, so it grabs the schema.
           // Use setImmediate to let our getMetadata overwrite process.
           setImmediate(callback, null, {rows: rows});
         };
 
-        table.bigQuery.mergeSchemaWithRows_ = function(schema_, rows_) {
+        table.bigQuery.mergeSchemaWithRows_ = (schema_, rows_) => {
           assert.strictEqual(schema_, schema);
           assert.strictEqual(rows_, rows);
           return mergedRows;
         };
       });
 
-      it('should refresh', function(done) {
+      it('should refresh', done => {
         // Step 1: makes the request.
         table.getRows(responseHandler);
 
         // Step 2: refreshes the metadata to pull down the schema.
-        table.getMetadata = function(callback) {
+        table.getMetadata = callback => {
           table.metadata = {schema: schema};
           callback();
         };
@@ -1748,7 +1746,7 @@ describe('BigQuery/Table', function() {
         }
       });
 
-      it('should execute callback from refreshing metadata', function(done) {
+      it('should execute callback from refreshing metadata', done => {
         const apiResponse = {};
         const error = new Error('Error.');
 
@@ -1756,7 +1754,7 @@ describe('BigQuery/Table', function() {
         table.getRows(responseHandler);
 
         // Step 2: refreshes the metadata to pull down the schema.
-        table.getMetadata = function(callback) {
+        table.getMetadata = callback => {
           callback(error, {}, apiResponse);
         };
 
@@ -1771,58 +1769,58 @@ describe('BigQuery/Table', function() {
       });
     });
 
-    it('should return schema-merged rows', function(done) {
+    it('should return schema-merged rows', done => {
       const rows = [{f: [{v: 'stephen'}]}];
       const schema = {fields: [{name: 'name', type: 'string'}]};
       const merged = [{name: 'stephen'}];
 
       table.metadata = {schema: schema};
 
-      table.request = function(reqOpts, callback) {
+      table.request = (reqOpts, callback) => {
         callback(null, {rows: rows});
       };
 
-      table.bigQuery.mergeSchemaWithRows_ = function(schema_, rows_) {
+      table.bigQuery.mergeSchemaWithRows_ = (schema_, rows_) => {
         assert.strictEqual(schema_, schema);
         assert.strictEqual(rows_, rows);
         return merged;
       };
 
-      table.getRows(function(err, rows) {
+      table.getRows((err, rows) => {
         assert.ifError(err);
         assert.strictEqual(rows, merged);
         done();
       });
     });
 
-    it('should return apiResponse in callback', function(done) {
+    it('should return apiResponse in callback', done => {
       const rows = [{f: [{v: 'stephen'}]}];
       const schema = {fields: [{name: 'name', type: 'string'}]};
       table.metadata = {schema: schema};
 
-      table.request = function(reqOpts, callback) {
+      table.request = (reqOpts, callback) => {
         callback(null, {rows: rows});
       };
 
-      table.getRows(function(err, rows, nextQuery, apiResponse) {
+      table.getRows((err, rows, nextQuery, apiResponse) => {
         assert.ifError(err);
         assert.deepStrictEqual(apiResponse, {rows: [{f: [{v: 'stephen'}]}]});
         done();
       });
     });
 
-    it('should pass nextQuery if pageToken is returned', function(done) {
+    it('should pass nextQuery if pageToken is returned', done => {
       const options = {a: 'b', c: 'd'};
       const pageToken = 'token';
 
       // Set a schema so it doesn't try to refresh the metadata.
       table.metadata = {schema: {}};
 
-      table.request = function(reqOpts, callback) {
+      table.request = (reqOpts, callback) => {
         callback(null, {pageToken: pageToken});
       };
 
-      table.getRows(options, function(err, rows, nextQuery) {
+      table.getRows(options, (err, rows, nextQuery) => {
         assert.ifError(err);
         assert.deepStrictEqual(nextQuery, {
           a: 'b',
@@ -1836,7 +1834,7 @@ describe('BigQuery/Table', function() {
     });
   });
 
-  describe('insert', function() {
+  describe('insert', () => {
     const fakeInsertId = 'fake-insert-id';
 
     const data = [
@@ -1856,7 +1854,7 @@ describe('BigQuery/Table', function() {
     ];
 
     const dataApiFormat = {
-      rows: data.map(function(row) {
+      rows: data.map(row => {
         return {
           insertId: fakeInsertId,
           json: row,
@@ -1864,20 +1862,20 @@ describe('BigQuery/Table', function() {
       }),
     };
 
-    beforeEach(function() {
-      fakeUuid.v4 = function() {
+    beforeEach(() => {
+      fakeUuid.v4 = () => {
         return fakeInsertId;
       };
     });
 
-    it('should throw an error if rows is empty', function() {
-      assert.throws(function() {
+    it('should throw an error if rows is empty', () => {
+      assert.throws(() => {
         table.insert([]);
       }, /You must provide at least 1 row to be inserted\./);
     });
 
-    it('should save data', function(done) {
-      table.request = function(reqOpts) {
+    it('should save data', done => {
+      table.request = reqOpts => {
         assert.strictEqual(reqOpts.method, 'POST');
         assert.strictEqual(reqOpts.uri, '/insertAll');
         assert.deepStrictEqual(reqOpts.json, dataApiFormat);
@@ -1887,8 +1885,8 @@ describe('BigQuery/Table', function() {
       table.insert(data, done);
     });
 
-    it('should generate insertId', function(done) {
-      table.request = function(reqOpts) {
+    it('should generate insertId', done => {
+      table.request = reqOpts => {
         assert.strictEqual(reqOpts.json.rows[0].insertId, fakeInsertId);
         done();
       };
@@ -1896,40 +1894,40 @@ describe('BigQuery/Table', function() {
       table.insert([data[0]], done);
     });
 
-    it('should execute callback with API response', function(done) {
+    it('should execute callback with API response', done => {
       const apiResponse = {insertErrors: []};
 
-      table.request = function(reqOpts, callback) {
+      table.request = (reqOpts, callback) => {
         callback(null, apiResponse);
       };
 
-      table.insert(data, function(err, apiResponse_) {
+      table.insert(data, (err, apiResponse_) => {
         assert.ifError(err);
         assert.strictEqual(apiResponse_, apiResponse);
         done();
       });
     });
 
-    it('should execute callback with error & API response', function(done) {
+    it('should execute callback with error & API response', done => {
       const error = new Error('Error.');
       const apiResponse = {};
 
-      table.request = function(reqOpts, callback) {
+      table.request = (reqOpts, callback) => {
         callback(error, apiResponse);
       };
 
-      table.insert(data, function(err, apiResponse_) {
+      table.insert(data, (err, apiResponse_) => {
         assert.strictEqual(err, error);
         assert.strictEqual(apiResponse_, apiResponse);
         done();
       });
     });
 
-    it('should return partial failures', function(done) {
+    it('should return partial failures', done => {
       const row0Error = {message: 'Error.', reason: 'notFound'};
       const row1Error = {message: 'Error.', reason: 'notFound'};
 
-      table.request = function(reqOpts, callback) {
+      table.request = (reqOpts, callback) => {
         callback(null, {
           insertErrors: [
             {index: 0, errors: [row0Error]},
@@ -1938,7 +1936,7 @@ describe('BigQuery/Table', function() {
         });
       };
 
-      table.insert(data, function(err) {
+      table.insert(data, err => {
         assert.strictEqual(err.name, 'PartialFailureError');
 
         assert.deepStrictEqual(err.errors, [
@@ -1956,8 +1954,8 @@ describe('BigQuery/Table', function() {
       });
     });
 
-    it('should insert raw data', function(done) {
-      table.request = function(reqOpts) {
+    it('should insert raw data', done => {
+      table.request = reqOpts => {
         assert.strictEqual(reqOpts.method, 'POST');
         assert.strictEqual(reqOpts.uri, '/insertAll');
         assert.deepStrictEqual(reqOpts.json, {rows: rawData});
@@ -1969,14 +1967,14 @@ describe('BigQuery/Table', function() {
       table.insert(rawData, opts, done);
     });
 
-    it('should accept options', function(done) {
+    it('should accept options', done => {
       const opts = {
         ignoreUnknownValues: true,
         skipInvalidRows: true,
         templateSuffix: 'test',
       };
 
-      table.request = function(reqOpts) {
+      table.request = reqOpts => {
         assert.strictEqual(reqOpts.method, 'POST');
         assert.strictEqual(reqOpts.uri, '/insertAll');
 
@@ -1994,7 +1992,7 @@ describe('BigQuery/Table', function() {
       table.insert(data, opts, done);
     });
 
-    describe('create table and retry', function() {
+    describe('create table and retry', () => {
       const OPTIONS = {
         autoCreate: true,
         schema: SCHEMA_STRING,
@@ -2003,44 +2001,44 @@ describe('BigQuery/Table', function() {
       let _setTimeout;
       let _random;
 
-      before(function() {
+      before(() => {
         _setTimeout = global.setTimeout;
         _random = Math.random;
       });
 
-      beforeEach(function() {
-        (global as any).setTimeout = function(callback) {
+      beforeEach(() => {
+        (global as any).setTimeout = callback => {
           callback();
         };
 
         Math.random = _random;
 
-        table.request = function(reqOpts, callback) {
+        table.request = (reqOpts, callback) => {
           callback({code: 404});
         };
 
-        table.create = function(reqOpts, callback) {
+        table.create = (reqOpts, callback) => {
           callback(null);
         };
       });
 
-      after(function() {
+      after(() => {
         global.setTimeout = _setTimeout;
         Math.random = _random;
       });
 
-      it('should throw if autoCreate is set with no schema', function() {
+      it('should throw if autoCreate is set with no schema', () => {
         const options = {
           autoCreate: true,
         };
 
-        assert.throws(function() {
+        assert.throws(() => {
           table.insert(data, options);
         }, /Schema must be provided in order to auto-create Table\./);
       });
 
-      it('should not include the schema in the insert request', function(done) {
-        table.request = function(reqOpts) {
+      it('should not include the schema in the insert request', done => {
+        table.request = reqOpts => {
           assert.strictEqual(reqOpts.json.schema, undefined);
           assert.strictEqual(reqOpts.json.autoCreate, undefined);
           done();
@@ -2049,19 +2047,19 @@ describe('BigQuery/Table', function() {
         table.insert(data, OPTIONS, assert.ifError);
       });
 
-      it('should set a timeout to create the table', function(done) {
+      it('should set a timeout to create the table', done => {
         const fakeRandomValue = Math.random();
 
-        Math.random = function() {
+        Math.random = () => {
           return fakeRandomValue;
         };
 
-        (global as any).setTimeout = function(callback, delay) {
+        (global as any).setTimeout = (callback, delay) => {
           assert.strictEqual(delay, fakeRandomValue * 60000);
           callback();
         };
 
-        table.create = function(reqOpts) {
+        table.create = reqOpts => {
           assert.strictEqual(reqOpts.schema, SCHEMA_STRING);
           done();
         };
@@ -2069,28 +2067,28 @@ describe('BigQuery/Table', function() {
         table.insert(data, OPTIONS, assert.ifError);
       });
 
-      it('should return table creation errors', function(done) {
+      it('should return table creation errors', done => {
         const error = new Error('err.');
         const response = {};
 
-        table.create = function(reqOpts, callback) {
+        table.create = (reqOpts, callback) => {
           callback(error, null, response);
         };
 
-        table.insert(data, OPTIONS, function(err, resp) {
+        table.insert(data, OPTIONS, (err, resp) => {
           assert.strictEqual(err, error);
           assert.strictEqual(resp, response);
           done();
         });
       });
 
-      it('should ignore 409 errors', function(done) {
-        table.create = function(reqOpts, callback) {
+      it('should ignore 409 errors', done => {
+        table.create = (reqOpts, callback) => {
           callback({code: 409});
         };
 
         let timeouts = 0;
-        (global as any).setTimeout = function(callback, delay) {
+        (global as any).setTimeout = (callback, delay) => {
           if (++timeouts === 2) {
             assert.strictEqual(delay, 60000);
             done();
@@ -2103,11 +2101,11 @@ describe('BigQuery/Table', function() {
         table.insert(data, OPTIONS, assert.ifError);
       });
 
-      it('should retry the insert', function(done) {
+      it('should retry the insert', done => {
         const response = {};
         let attempts = 0;
 
-        table.request = function(reqOpts, callback) {
+        table.request = (reqOpts, callback) => {
           assert.strictEqual(reqOpts.method, 'POST');
           assert.strictEqual(reqOpts.uri, '/insertAll');
           assert.deepStrictEqual(reqOpts.json, dataApiFormat);
@@ -2120,7 +2118,7 @@ describe('BigQuery/Table', function() {
           callback({code: 404});
         };
 
-        table.insert(data, OPTIONS, function(err, resp) {
+        table.insert(data, OPTIONS, (err, resp) => {
           assert.ifError(err);
           assert.strictEqual(resp, response);
           done();
@@ -2129,21 +2127,21 @@ describe('BigQuery/Table', function() {
     });
   });
 
-  describe('load', function() {
+  describe('load', () => {
     let fakeJob;
 
-    beforeEach(function() {
+    beforeEach(() => {
       fakeJob = new EventEmitter();
-      table.createLoadJob = function(source, metadata, callback) {
+      table.createLoadJob = (source, metadata, callback) => {
         callback(null, fakeJob);
       };
     });
 
-    it('should pass the arguments to createLoadJob', function(done) {
+    it('should pass the arguments to createLoadJob', done => {
       const fakeSource = {};
       const fakeMetadata = {};
 
-      table.createLoadJob = function(source, metadata) {
+      table.createLoadJob = (source, metadata) => {
         assert.strictEqual(source, fakeSource);
         assert.strictEqual(metadata, fakeMetadata);
         done();
@@ -2152,8 +2150,8 @@ describe('BigQuery/Table', function() {
       table.load(fakeSource, fakeMetadata, assert.ifError);
     });
 
-    it('should optionally accept metadata', function(done) {
-      table.createLoadJob = function(source, metadata) {
+    it('should optionally accept metadata', done => {
+      table.createLoadJob = (source, metadata) => {
         assert.deepStrictEqual(metadata, {});
         done();
       };
@@ -2161,25 +2159,25 @@ describe('BigQuery/Table', function() {
       table.load({}, assert.ifError);
     });
 
-    it('should return any createLoadJob errors', function(done) {
+    it('should return any createLoadJob errors', done => {
       const error = new Error('err');
       const response = {};
 
-      table.createLoadJob = function(source, metadata, callback) {
+      table.createLoadJob = (source, metadata, callback) => {
         callback(error, null, response);
       };
 
-      table.load({}, function(err, resp) {
+      table.load({}, (err, resp) => {
         assert.strictEqual(err, error);
         assert.strictEqual(resp, response);
         done();
       });
     });
 
-    it('should return any job errors', function(done) {
+    it('should return any job errors', done => {
       const error = new Error('err');
 
-      table.load({}, function(err) {
+      table.load({}, err => {
         assert.strictEqual(err, error);
         done();
       });
@@ -2187,10 +2185,10 @@ describe('BigQuery/Table', function() {
       fakeJob.emit('error', error);
     });
 
-    it('should return the metadata on complete', function(done) {
+    it('should return the metadata on complete', done => {
       const metadata = {};
 
-      table.load({}, function(err, resp) {
+      table.load({}, (err, resp) => {
         assert.ifError(err);
         assert.strictEqual(resp, metadata);
         done();
@@ -2200,9 +2198,9 @@ describe('BigQuery/Table', function() {
     });
   });
 
-  describe('query', function() {
-    it('should pass args through to datasetInstance.query()', function(done) {
-      table.dataset.query = function(a, b) {
+  describe('query', () => {
+    it('should pass args through to datasetInstance.query()', done => {
+      table.dataset.query = (a, b) => {
         assert.strictEqual(a, 'a');
         assert.strictEqual(b, 'b');
         done();
@@ -2212,12 +2210,12 @@ describe('BigQuery/Table', function() {
     });
   });
 
-  describe('setMetadata', function() {
-    it('should call ServiceObject#setMetadata', function(done) {
+  describe('setMetadata', () => {
+    it('should call ServiceObject#setMetadata', done => {
       const fakeMetadata = {};
       const formattedMetadata = {};
 
-      Table.formatMetadata_ = function(data) {
+      Table.formatMetadata_ = data => {
         assert.strictEqual(data, fakeMetadata);
         return formattedMetadata;
       };
