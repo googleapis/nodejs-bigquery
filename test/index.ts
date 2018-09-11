@@ -35,7 +35,7 @@ function FakeApiError() {
 
 let promisified = false;
 const fakePfy = extend({}, pfy, {
-  promisifyAll: function(Class, options) {
+  promisifyAll: (Class, options) => {
     if (Class.name !== 'BigQuery') {
       return;
     }
@@ -71,8 +71,7 @@ function FakeJob() {
 }
 
 let mergeSchemaWithRowsOverride;
-(FakeTable as any).mergeSchemaWithRows_ = function() {
-  const args = [].slice.apply(arguments);
+(FakeTable as any).mergeSchemaWithRows_ = (...args) => {
   return (mergeSchemaWithRowsOverride || (Table as any).mergeSchemaWithRows_).apply(
     null,
     args
@@ -82,7 +81,7 @@ let mergeSchemaWithRowsOverride;
 let extended = false;
 const fakePaginator = {
   paginator: {
-    extend: function(Class, methods) {
+    extend: (Class, methods) => {
       if (Class.name !== 'BigQuery') {
         return;
       }
@@ -92,7 +91,7 @@ const fakePaginator = {
       assert.deepStrictEqual(methods, ['getDatasets', 'getJobs']);
       extended = true;
     },
-    streamify: function(methodName) {
+    streamify: methodName => {
       return methodName;
     },
   }
@@ -105,7 +104,7 @@ function FakeService() {
 
 nodeutil.inherits(FakeService, Service);
 
-describe('BigQuery', function() {
+describe('BigQuery', () => {
   const JOB_ID = 'JOB_ID';
   const PROJECT_ID = 'test-project';
   const LOCATION = 'asia-northeast1';
@@ -114,7 +113,7 @@ describe('BigQuery', function() {
   let BigQuery;
   let bq;
 
-  before(function() {
+  before(() => {
     BigQuery = proxyquire('../src', {
       uuid: fakeUuid,
       './dataset': {
@@ -136,28 +135,28 @@ describe('BigQuery', function() {
     BigQueryCached = extend({}, BigQuery);
   });
 
-  beforeEach(function() {
+  beforeEach(() => {
     extend(fakeUtil, originalFakeUtil);
     BigQuery = extend(BigQuery, BigQueryCached);
     bq = new BigQuery({projectId: PROJECT_ID});
   });
 
-  describe('instantiation', function() {
-    it('should extend the correct methods', function() {
+  describe('instantiation', () => {
+    it('should extend the correct methods', () => {
       assert(extended); // See `fakePaginator.extend`
     });
 
-    it('should streamify the correct methods', function() {
+    it('should streamify the correct methods', () => {
       assert.strictEqual(bq.getDatasetsStream, 'getDatasets');
       assert.strictEqual(bq.getJobsStream, 'getJobs');
       assert.strictEqual(bq.createQueryStream, 'queryAsStream_');
     });
 
-    it('should promisify all the things', function() {
+    it('should promisify all the things', () => {
       assert(promisified);
     });
 
-    it('should inherit from Service', function() {
+    it('should inherit from Service', () => {
       assert(bq instanceof Service);
 
       const calledWith = bq.calledWith_[0];
@@ -173,7 +172,7 @@ describe('BigQuery', function() {
       );
     });
 
-    it('should capture any user specified location', function() {
+    it('should capture any user specified location', () => {
       const bq = new BigQuery({
         projectId: PROJECT_ID,
         location: LOCATION,
@@ -182,7 +181,7 @@ describe('BigQuery', function() {
       assert.strictEqual(bq.location, LOCATION);
     });
 
-    it('should pass scopes from options', function() {
+    it('should pass scopes from options', () => {
       const bq = new BigQuery({
         scopes: ['https://www.googleapis.com/auth/drive.readonly'],
       });
@@ -197,7 +196,7 @@ describe('BigQuery', function() {
     });
   });
 
-  describe('mergeSchemaWithRows_', function() {
+  describe('mergeSchemaWithRows_', () => {
     const SCHEMA_OBJECT = {
       fields: [
         {name: 'id', type: 'INTEGER'},
@@ -211,37 +210,37 @@ describe('BigQuery', function() {
       ],
     };
 
-    beforeEach(function() {
+    beforeEach(() => {
       BigQuery.date = function(input) {
         return {
           type: 'fakeDate',
-          input: input,
+          input,
         };
       };
 
       BigQuery.datetime = function(input) {
         return {
           type: 'fakeDatetime',
-          input: input,
+          input,
         };
       };
 
       BigQuery.time = function(input) {
         return {
           type: 'fakeTime',
-          input: input,
+          input,
         };
       };
 
       BigQuery.timestamp = function(input) {
         return {
           type: 'fakeTimestamp',
-          input: input,
+          input,
         };
       };
     });
 
-    it('should merge the schema and flatten the rows', function() {
+    it('should merge the schema and flatten the rows', () => {
       const now = new Date();
       const buffer = Buffer.from('test');
 
@@ -312,7 +311,7 @@ describe('BigQuery', function() {
             arr: [10],
             arr2: [2],
             nullable: null,
-            buffer: buffer,
+            buffer,
             objects: [
               {
                 nested_object: {
@@ -397,13 +396,13 @@ describe('BigQuery', function() {
       const rawRows = rows.map(x => x.raw);
       const mergedRows = BigQuery.mergeSchemaWithRows_(schemaObject, rawRows);
 
-      mergedRows.forEach(function(mergedRow, index) {
+      mergedRows.forEach((mergedRow, index) => {
         assert.deepStrictEqual(mergedRow, rows[index].expected);
       });
     });
   });
 
-  describe('date', function() {
+  describe('date', () => {
     const INPUT_STRING = '2017-1-1';
     const INPUT_OBJ = {
       year: 2017,
@@ -411,7 +410,7 @@ describe('BigQuery', function() {
       day: 1,
     };
 
-    it('should expose static and instance constructors', function() {
+    it('should expose static and instance constructors', () => {
       const staticD = BigQuery.date();
       assert(staticD instanceof BigQuery.date);
       assert(staticD instanceof bq.date);
@@ -421,23 +420,23 @@ describe('BigQuery', function() {
       assert(instanceD instanceof bq.date);
     });
 
-    it('should have the correct constructor name', function() {
+    it('should have the correct constructor name', () => {
       const date = bq.date(INPUT_STRING);
       assert.strictEqual(date.constructor.name, 'BigQueryDate');
     });
 
-    it('should accept a string', function() {
+    it('should accept a string', () => {
       const date = bq.date(INPUT_STRING);
       assert.strictEqual(date.value, INPUT_STRING);
     });
 
-    it('should accept an object', function() {
+    it('should accept an object', () => {
       const date = bq.date(INPUT_OBJ);
       assert.strictEqual(date.value, INPUT_STRING);
     });
   });
 
-  describe('datetime', function() {
+  describe('datetime', () => {
     const INPUT_STRING = '2017-1-1T14:2:38.883388Z';
 
     const INPUT_OBJ = {
@@ -452,7 +451,7 @@ describe('BigQuery', function() {
 
     const EXPECTED_VALUE = '2017-1-1 14:2:38.883388';
 
-    it('should expose static and instance constructors', function() {
+    it('should expose static and instance constructors', () => {
       const staticDt = BigQuery.datetime(INPUT_OBJ);
       assert(staticDt instanceof BigQuery.datetime);
       assert(staticDt instanceof bq.datetime);
@@ -462,17 +461,17 @@ describe('BigQuery', function() {
       assert(instanceDt instanceof bq.datetime);
     });
 
-    it('should have the correct constructor name', function() {
+    it('should have the correct constructor name', () => {
       const datetime = bq.datetime(INPUT_STRING);
       assert.strictEqual(datetime.constructor.name, 'BigQueryDatetime');
     });
 
-    it('should accept an object', function() {
+    it('should accept an object', () => {
       const datetime = bq.datetime(INPUT_OBJ);
       assert.strictEqual(datetime.value, EXPECTED_VALUE);
     });
 
-    it('should not include time if hours not provided', function() {
+    it('should not include time if hours not provided', () => {
       const datetime = bq.datetime({
         year: 2016,
         month: 1,
@@ -482,13 +481,13 @@ describe('BigQuery', function() {
       assert.strictEqual(datetime.value, '2016-1-1');
     });
 
-    it('should accept a string', function() {
+    it('should accept a string', () => {
       const datetime = bq.datetime(INPUT_STRING);
       assert.strictEqual(datetime.value, EXPECTED_VALUE);
     });
   });
 
-  describe('time', function() {
+  describe('time', () => {
     const INPUT_STRING = '14:2:38.883388';
     const INPUT_OBJ = {
       hours: 14,
@@ -497,7 +496,7 @@ describe('BigQuery', function() {
       fractional: 883388,
     };
 
-    it('should expose static and instance constructors', function() {
+    it('should expose static and instance constructors', () => {
       const staticT = BigQuery.time();
       assert(staticT instanceof BigQuery.time);
       assert(staticT instanceof bq.time);
@@ -507,29 +506,29 @@ describe('BigQuery', function() {
       assert(instanceT instanceof bq.time);
     });
 
-    it('should have the correct constructor name', function() {
+    it('should have the correct constructor name', () => {
       const time = bq.time(INPUT_STRING);
       assert.strictEqual(time.constructor.name, 'BigQueryTime');
     });
 
-    it('should accept a string', function() {
+    it('should accept a string', () => {
       const time = bq.time(INPUT_STRING);
       assert.strictEqual(time.value, INPUT_STRING);
     });
 
-    it('should accept an object', function() {
+    it('should accept an object', () => {
       const time = bq.time(INPUT_OBJ);
       assert.strictEqual(time.value, INPUT_STRING);
     });
 
-    it('should default minutes and seconds to 0', function() {
+    it('should default minutes and seconds to 0', () => {
       const time = bq.time({
         hours: 14,
       });
       assert.strictEqual(time.value, '14:0:0');
     });
 
-    it('should not include fractional digits if not provided', function() {
+    it('should not include fractional digits if not provided', () => {
       const input = extend({}, INPUT_OBJ);
       delete input.fractional;
 
@@ -538,12 +537,12 @@ describe('BigQuery', function() {
     });
   });
 
-  describe('timestamp', function() {
+  describe('timestamp', () => {
     const INPUT_STRING = '2016-12-06T12:00:00.000Z';
     const INPUT_DATE = new Date(INPUT_STRING);
     const EXPECTED_VALUE = INPUT_DATE.toJSON();
 
-    it('should expose static and instance constructors', function() {
+    it('should expose static and instance constructors', () => {
       const staticT = BigQuery.timestamp(INPUT_DATE);
       assert(staticT instanceof BigQuery.timestamp);
       assert(staticT instanceof bq.timestamp);
@@ -553,24 +552,24 @@ describe('BigQuery', function() {
       assert(instanceT instanceof bq.timestamp);
     });
 
-    it('should have the correct constructor name', function() {
+    it('should have the correct constructor name', () => {
       const timestamp = bq.timestamp(INPUT_STRING);
       assert.strictEqual(timestamp.constructor.name, 'BigQueryTimestamp');
     });
 
-    it('should accept a string', function() {
+    it('should accept a string', () => {
       const timestamp = bq.timestamp(INPUT_STRING);
       assert.strictEqual(timestamp.value, EXPECTED_VALUE);
     });
 
-    it('should accept a Date object', function() {
+    it('should accept a Date object', () => {
       const timestamp = bq.timestamp(INPUT_DATE);
       assert.strictEqual(timestamp.value, EXPECTED_VALUE);
     });
   });
 
-  describe('getType_', function() {
-    it('should return correct types', function() {
+  describe('getType_', () => {
+    it('should return correct types', () => {
       assert.strictEqual(BigQuery.getType_(bq.date()).type, 'DATE');
       assert.strictEqual(BigQuery.getType_(bq.datetime('')).type, 'DATETIME');
       assert.strictEqual(BigQuery.getType_(bq.time()).type, 'TIME');
@@ -583,7 +582,7 @@ describe('BigQuery', function() {
       assert.strictEqual(BigQuery.getType_(new Big('1.1')).type, 'NUMERIC');
     });
 
-    it('should return correct type for an array', function() {
+    it('should return correct type for an array', () => {
       const type = BigQuery.getType_([1]);
 
       assert.deepStrictEqual(type, {
@@ -594,7 +593,7 @@ describe('BigQuery', function() {
       });
     });
 
-    it('should return correct type for a struct', function() {
+    it('should return correct type for a struct', () => {
       const type = BigQuery.getType_({prop: 1});
 
       assert.deepStrictEqual(type, {
@@ -610,7 +609,7 @@ describe('BigQuery', function() {
       });
     });
 
-    it('should throw if a type cannot be detected', function() {
+    it('should throw if a type cannot be detected', () => {
       const expectedError = new RegExp(
         [
           'This value could not be translated to a BigQuery data type.',
@@ -618,17 +617,17 @@ describe('BigQuery', function() {
         ].join('\n')
       );
 
-      assert.throws(function() {
+      assert.throws(() => {
         BigQuery.getType_(undefined);
       }, expectedError);
     });
   });
 
-  describe('valueToQueryParameter_', function() {
-    it('should get the type', function(done) {
+  describe('valueToQueryParameter_', () => {
+    it('should get the type', done => {
       const value = {};
 
-      BigQuery.getType_ = function(value_) {
+      BigQuery.getType_ = value_ => {
         assert.strictEqual(value_, value);
         setImmediate(done);
         return {
@@ -639,18 +638,18 @@ describe('BigQuery', function() {
       BigQuery.valueToQueryParameter_(value);
     });
 
-    it('should format a Date', function() {
+    it('should format a Date', () => {
       const date = new Date();
       const expectedValue = date.toJSON().replace(/(.*)T(.*)Z$/, '$1 $2');
 
-      BigQuery.timestamp = function(value) {
+      BigQuery.timestamp = value => {
         assert.strictEqual(value, date);
         return {
           value: expectedValue,
         };
       };
 
-      BigQuery.getType_ = function() {
+      BigQuery.getType_ = () => {
         return {
           type: 'TIMESTAMP',
         };
@@ -660,12 +659,12 @@ describe('BigQuery', function() {
       assert.strictEqual(queryParameter.parameterValue.value, expectedValue);
     });
 
-    it('should locate the value on DATETIME objects', function() {
+    it('should locate the value on DATETIME objects', () => {
       const datetime = {
         value: 'value',
       };
 
-      BigQuery.getType_ = function() {
+      BigQuery.getType_ = () => {
         return {
           type: 'DATETIME',
         };
@@ -675,12 +674,12 @@ describe('BigQuery', function() {
       assert.strictEqual(queryParameter.parameterValue.value, datetime.value);
     });
 
-    it('should locate the value on TIME objects', function() {
+    it('should locate the value on TIME objects', () => {
       const time = {
         value: 'value',
       };
 
-      BigQuery.getType_ = function() {
+      BigQuery.getType_ = () => {
         return {
           type: 'TIME',
         };
@@ -690,10 +689,10 @@ describe('BigQuery', function() {
       assert.strictEqual(queryParameter.parameterValue.value, time.value);
     });
 
-    it('should format an array', function() {
+    it('should format an array', () => {
       const array = [1];
 
-      BigQuery.getType_ = function() {
+      BigQuery.getType_ = () => {
         return {
           type: 'ARRAY',
         };
@@ -709,15 +708,15 @@ describe('BigQuery', function() {
       ]);
     });
 
-    it('should format a struct', function() {
+    it('should format a struct', () => {
       const struct = {
         key: 'value',
       };
 
       const expectedParameterValue = {};
 
-      BigQuery.getType_ = function() {
-        BigQuery.valueToQueryParameter_ = function(value) {
+      BigQuery.getType_ = () => {
+        BigQuery.valueToQueryParameter_ = value => {
           assert.strictEqual(value, struct.key);
           return {
             parameterValue: expectedParameterValue,
@@ -735,10 +734,10 @@ describe('BigQuery', function() {
       assert.strictEqual(structValues.key, expectedParameterValue);
     });
 
-    it('should format all other types', function() {
+    it('should format all other types', () => {
       const typeName = 'ANY-TYPE';
 
-      BigQuery.getType_ = function() {
+      BigQuery.getType_ = () => {
         return {
           type: typeName,
         };
@@ -755,11 +754,11 @@ describe('BigQuery', function() {
     });
   });
 
-  describe('createDataset', function() {
+  describe('createDataset', () => {
     const DATASET_ID = 'kittens';
 
-    it('should create a dataset', function(done) {
-      bq.request = function(reqOpts) {
+    it('should create a dataset', done => {
+      bq.request = reqOpts => {
         assert.strictEqual(reqOpts.method, 'POST');
         assert.strictEqual(reqOpts.uri, '/datasets');
         assert.deepStrictEqual(reqOpts.json.datasetReference, {
@@ -772,13 +771,13 @@ describe('BigQuery', function() {
       bq.createDataset(DATASET_ID, assert.ifError);
     });
 
-    it('should send the location if available', function(done) {
+    it('should send the location if available', done => {
       const bq = new BigQuery({
         projectId: PROJECT_ID,
         location: LOCATION,
       });
 
-      bq.request = function(reqOpts) {
+      bq.request = reqOpts => {
         assert.strictEqual(reqOpts.json.location, LOCATION);
         done();
       };
@@ -786,7 +785,7 @@ describe('BigQuery', function() {
       bq.createDataset(DATASET_ID, assert.ifError);
     });
 
-    it('should not modify the original options object', function(done) {
+    it('should not modify the original options object', done => {
       const options = {
         a: 'b',
         c: 'd',
@@ -794,7 +793,7 @@ describe('BigQuery', function() {
 
       const originalOptions = extend({}, options);
 
-      bq.request = function(reqOpts) {
+      bq.request = reqOpts => {
         assert.notStrictEqual(reqOpts.json, options);
         assert.deepStrictEqual(options, originalOptions);
         done();
@@ -803,53 +802,53 @@ describe('BigQuery', function() {
       bq.createDataset(DATASET_ID, options, assert.ifError);
     });
 
-    it('should return an error to the callback', function(done) {
+    it('should return an error to the callback', done => {
       const error = new Error('Error.');
 
-      bq.request = function(reqOpts, callback) {
+      bq.request = (reqOpts, callback) => {
         callback(error);
       };
 
-      bq.createDataset(DATASET_ID, function(err) {
+      bq.createDataset(DATASET_ID, err => {
         assert.strictEqual(err, error);
         done();
       });
     });
 
-    it('should return a Dataset object', function(done) {
-      bq.request = function(reqOpts, callback) {
+    it('should return a Dataset object', done => {
+      bq.request = (reqOpts, callback) => {
         callback(null, {});
       };
 
-      bq.createDataset(DATASET_ID, function(err, dataset) {
+      bq.createDataset(DATASET_ID, (err, dataset) => {
         assert.ifError(err);
         assert(dataset instanceof FakeDataset);
         done();
       });
     });
 
-    it('should return an apiResponse', function(done) {
+    it('should return an apiResponse', done => {
       const resp = {success: true};
 
-      bq.request = function(reqOpts, callback) {
+      bq.request = (reqOpts, callback) => {
         callback(null, resp);
       };
 
-      bq.createDataset(DATASET_ID, function(err, dataset, apiResponse) {
+      bq.createDataset(DATASET_ID, (err, dataset, apiResponse) => {
         assert.ifError(err);
         assert.deepStrictEqual(apiResponse, resp);
         done();
       });
     });
 
-    it('should assign metadata to the Dataset object', function(done) {
+    it('should assign metadata to the Dataset object', done => {
       const metadata = {a: 'b', c: 'd'};
 
-      bq.request = function(reqOpts, callback) {
+      bq.request = (reqOpts, callback) => {
         callback(null, metadata);
       };
 
-      bq.createDataset(DATASET_ID, function(err, dataset) {
+      bq.createDataset(DATASET_ID, (err, dataset) => {
         assert.ifError(err);
         assert.deepStrictEqual(dataset.metadata, metadata);
         done();
@@ -857,7 +856,7 @@ describe('BigQuery', function() {
     });
   });
 
-  describe('createJob', function() {
+  describe('createJob', () => {
     const RESPONSE = {
       status: {
         state: 'RUNNING',
@@ -869,15 +868,15 @@ describe('BigQuery', function() {
 
     let fakeJobId;
 
-    beforeEach(function() {
+    beforeEach(() => {
       fakeJobId = uuid.v4();
 
-      fakeUuid.v4 = function() {
+      fakeUuid.v4 = () => {
         return fakeJobId;
       };
     });
 
-    it('should make the correct request', function(done) {
+    it('should make the correct request', done => {
       const fakeOptions = {
         a: 'b',
       };
@@ -890,7 +889,7 @@ describe('BigQuery', function() {
         },
       });
 
-      bq.request = function(reqOpts) {
+      bq.request = reqOpts => {
         assert.strictEqual(reqOpts.method, 'POST');
         assert.strictEqual(reqOpts.uri, '/jobs');
         assert.deepStrictEqual(reqOpts.json, expectedOptions);
@@ -901,14 +900,14 @@ describe('BigQuery', function() {
       bq.createJob(fakeOptions, assert.ifError);
     });
 
-    it('should accept a job prefix', function(done) {
+    it('should accept a job prefix', done => {
       const jobPrefix = 'abc-';
       const expectedJobId = jobPrefix + fakeJobId;
       const options = {
-        jobPrefix: jobPrefix,
+        jobPrefix,
       };
 
-      bq.request = function(reqOpts) {
+      bq.request = reqOpts => {
         assert.strictEqual(reqOpts.json.jobReference.jobId, expectedJobId);
         assert.strictEqual(reqOpts.json.jobPrefix, undefined);
         done();
@@ -917,12 +916,12 @@ describe('BigQuery', function() {
       bq.createJob(options, assert.ifError);
     });
 
-    it('should accept a location', function(done) {
+    it('should accept a location', done => {
       const options = {
         location: LOCATION,
       };
 
-      bq.request = function(reqOpts) {
+      bq.request = reqOpts => {
         assert.strictEqual(reqOpts.json.jobReference.location, LOCATION);
         assert.strictEqual(reqOpts.json.location, undefined);
         done();
@@ -931,11 +930,11 @@ describe('BigQuery', function() {
       bq.createJob(options, assert.ifError);
     });
 
-    it('should accept a job id', function(done) {
+    it('should accept a job id', done => {
       const jobId = 'job-id';
       const options = {jobId};
 
-      bq.request = function(reqOpts) {
+      bq.request = reqOpts => {
         assert.strictEqual(reqOpts.json.jobReference.jobId, jobId);
         assert.strictEqual(reqOpts.json.jobId, undefined);
         done();
@@ -944,13 +943,13 @@ describe('BigQuery', function() {
       bq.createJob(options, assert.ifError);
     });
 
-    it('should use the user defined location if available', function(done) {
+    it('should use the user defined location if available', done => {
       const bq = new BigQuery({
         projectId: PROJECT_ID,
         location: LOCATION,
       });
 
-      bq.request = function(reqOpts) {
+      bq.request = reqOpts => {
         assert.strictEqual(reqOpts.json.jobReference.location, LOCATION);
         done();
       };
@@ -958,15 +957,15 @@ describe('BigQuery', function() {
       bq.createJob({}, assert.ifError);
     });
 
-    it('should return any request errors', function(done) {
+    it('should return any request errors', done => {
       const response = {};
       const error = new Error('err.');
 
-      bq.request = function(reqOpts, callback) {
+      bq.request = (reqOpts, callback) => {
         callback(error, response);
       };
 
-      bq.createJob({}, function(err, job, resp) {
+      bq.createJob({}, (err, job, resp) => {
         assert.strictEqual(err, error);
         assert.strictEqual(job, null);
         assert.strictEqual(resp, response);
@@ -974,17 +973,17 @@ describe('BigQuery', function() {
       });
     });
 
-    it('should return any status errors', function(done) {
+    it('should return any status errors', done => {
       const errors = [{reason: 'notFound'}];
       const response = extend(true, {}, RESPONSE, {
         status: {errors},
       });
 
-      bq.request = function(reqOpts, callback) {
+      bq.request = (reqOpts, callback) => {
         callback(null, response);
       };
 
-      bq.createJob({}, function(err) {
+      bq.createJob({}, err => {
         assert(err instanceof FakeApiError);
 
         const errorOpts = err.calledWith_[0];
@@ -994,20 +993,20 @@ describe('BigQuery', function() {
       });
     });
 
-    it('should return a job object', function(done) {
+    it('should return a job object', done => {
       const fakeJob = {};
 
-      bq.job = function(jobId, options) {
+      bq.job = (jobId, options) => {
         assert.strictEqual(jobId, fakeJobId);
         assert.strictEqual(options.location, LOCATION);
         return fakeJob;
       };
 
-      bq.request = function(reqOpts, callback) {
+      bq.request = (reqOpts, callback) => {
         callback(null, RESPONSE);
       };
 
-      bq.createJob({}, function(err, job, resp) {
+      bq.createJob({}, (err, job, resp) => {
         assert.ifError(err);
         assert.strictEqual(job, fakeJob);
         assert.strictEqual(job.metadata, RESPONSE);
@@ -1017,24 +1016,24 @@ describe('BigQuery', function() {
     });
   });
 
-  describe('createQueryJob', function() {
+  describe('createQueryJob', () => {
     const QUERY_STRING = 'SELECT * FROM [dataset.table]';
 
-    it('should throw if a query is not provided', function() {
-      assert.throws(function() {
+    it('should throw if a query is not provided', () => {
+      assert.throws(() => {
         bq.createQueryJob();
       }, /SQL query string is required/);
 
-      assert.throws(function() {
+      assert.throws(() => {
         bq.createQueryJob({noQuery: 'here'});
       }, /SQL query string is required/);
     });
 
-    describe('with destination', function() {
+    describe('with destination', () => {
       let dataset;
       const TABLE_ID = 'table-id';
 
-      beforeEach(function() {
+      beforeEach(() => {
         dataset = {
           bigQuery: bq,
           id: 'dataset-id',
@@ -1042,8 +1041,8 @@ describe('BigQuery', function() {
         };
       });
 
-      it('should throw if a destination is not a table', function() {
-        assert.throws(function() {
+      it('should throw if a destination is not a table', () => {
+        assert.throws(() => {
           bq.createQueryJob({
             query: 'query',
             destination: 'not a table',
@@ -1051,8 +1050,8 @@ describe('BigQuery', function() {
         }, /Destination must be a Table/);
       });
 
-      it('should assign destination table to request body', function(done) {
-        bq.request = function(reqOpts) {
+      it('should assign destination table to request body', done => {
+        bq.request = reqOpts => {
           assert.deepStrictEqual(
             reqOpts.json.configuration.query.destinationTable,
             {
@@ -1071,8 +1070,8 @@ describe('BigQuery', function() {
         });
       });
 
-      it('should delete `destination` prop from request body', function(done) {
-        bq.request = function(reqOpts) {
+      it('should delete `destination` prop from request body', done => {
+        bq.request = reqOpts => {
           const body = reqOpts.json;
           assert.strictEqual(body.configuration.query.destination, undefined);
           done();
@@ -1085,15 +1084,15 @@ describe('BigQuery', function() {
       });
     });
 
-    describe('SQL parameters', function() {
+    describe('SQL parameters', () => {
       const NAMED_PARAMS = {
         key: 'value',
       };
 
       const POSITIONAL_PARAMS = ['value'];
 
-      it('should delete the params option', function(done) {
-        bq.createJob = function(reqOpts) {
+      it('should delete the params option', done => {
+        bq.createJob = reqOpts => {
           assert.strictEqual(reqOpts.params, undefined);
           done();
         };
@@ -1107,9 +1106,9 @@ describe('BigQuery', function() {
         );
       });
 
-      describe('named', function() {
-        it('should set the correct parameter mode', function(done) {
-          bq.createJob = function(reqOpts) {
+      describe('named', () => {
+        it('should set the correct parameter mode', done => {
+          bq.createJob = reqOpts => {
             const query = reqOpts.configuration.query;
             assert.strictEqual(query.parameterMode, 'named');
             done();
@@ -1124,15 +1123,15 @@ describe('BigQuery', function() {
           );
         });
 
-        it('should get set the correct query parameters', function(done) {
+        it('should get set the correct query parameters', done => {
           const queryParameter = {};
 
-          BigQuery.valueToQueryParameter_ = function(value) {
+          BigQuery.valueToQueryParameter_ = value => {
             assert.strictEqual(value, NAMED_PARAMS.key);
             return queryParameter;
           };
 
-          bq.createJob = function(reqOpts) {
+          bq.createJob = reqOpts => {
             const query = reqOpts.configuration.query;
             assert.strictEqual(query.queryParameters[0], queryParameter);
             assert.strictEqual(query.queryParameters[0].name, 'key');
@@ -1149,9 +1148,9 @@ describe('BigQuery', function() {
         });
       });
 
-      describe('positional', function() {
-        it('should set the correct parameter mode', function(done) {
-          bq.createJob = function(reqOpts) {
+      describe('positional', () => {
+        it('should set the correct parameter mode', done => {
+          bq.createJob = reqOpts => {
             const query = reqOpts.configuration.query;
             assert.strictEqual(query.parameterMode, 'positional');
             done();
@@ -1166,15 +1165,15 @@ describe('BigQuery', function() {
           );
         });
 
-        it('should get set the correct query parameters', function(done) {
+        it('should get set the correct query parameters', done => {
           const queryParameter = {};
 
-          BigQuery.valueToQueryParameter_ = function(value) {
+          BigQuery.valueToQueryParameter_ = value => {
             assert.strictEqual(value, POSITIONAL_PARAMS[0]);
             return queryParameter;
           };
 
-          bq.createJob = function(reqOpts) {
+          bq.createJob = reqOpts => {
             const query = reqOpts.configuration.query;
             assert.strictEqual(query.queryParameters[0], queryParameter);
             done();
@@ -1191,13 +1190,13 @@ describe('BigQuery', function() {
       });
     });
 
-    it('should accept the dryRun options', function(done) {
+    it('should accept the dryRun options', done => {
       const options = {
         query: QUERY_STRING,
         dryRun: true,
       };
 
-      bq.createJob = function(reqOpts) {
+      bq.createJob = reqOpts => {
         assert.strictEqual(reqOpts.configuration.query.dryRun, undefined);
         assert.strictEqual(reqOpts.configuration.dryRun, options.dryRun);
         done();
@@ -1206,13 +1205,13 @@ describe('BigQuery', function() {
       bq.createQueryJob(options, assert.ifError);
     });
 
-    it('should accept a job prefix', function(done) {
+    it('should accept a job prefix', done => {
       const options = {
         query: QUERY_STRING,
         jobPrefix: 'hi',
       };
 
-      bq.createJob = function(reqOpts) {
+      bq.createJob = reqOpts => {
         assert.strictEqual(reqOpts.configuration.query.jobPrefix, undefined);
         assert.strictEqual(reqOpts.jobPrefix, options.jobPrefix);
         done();
@@ -1221,13 +1220,13 @@ describe('BigQuery', function() {
       bq.createQueryJob(options, assert.ifError);
     });
 
-    it('should accept a location', function(done) {
+    it('should accept a location', done => {
       const options = {
         query: QUERY_STRING,
         location: LOCATION,
       };
 
-      bq.createJob = function(reqOpts) {
+      bq.createJob = reqOpts => {
         assert.strictEqual(reqOpts.configuration.query.location, undefined);
         assert.strictEqual(reqOpts.location, LOCATION);
         done();
@@ -1236,13 +1235,13 @@ describe('BigQuery', function() {
       bq.createQueryJob(options, assert.ifError);
     });
 
-    it('should accept a job id', function(done) {
+    it('should accept a job id', done => {
       const options = {
         query: QUERY_STRING,
         jobId: 'jobId',
       };
 
-      bq.createJob = function(reqOpts) {
+      bq.createJob = reqOpts => {
         assert.strictEqual(reqOpts.configuration.query.jobId, undefined);
         assert.strictEqual(reqOpts.jobId, options.jobId);
         done();
@@ -1251,8 +1250,8 @@ describe('BigQuery', function() {
       bq.createQueryJob(options, assert.ifError);
     });
 
-    it('should pass the callback to createJob', function(done) {
-      bq.createJob = function(reqOpts, callback) {
+    it('should pass the callback to createJob', done => {
+      bq.createJob = (reqOpts, callback) => {
         callback(); // the done fn
       };
 
@@ -1260,15 +1259,15 @@ describe('BigQuery', function() {
     });
   });
 
-  describe('dataset', function() {
+  describe('dataset', () => {
     const DATASET_ID = 'dataset-id';
 
-    it('returns a Dataset instance', function() {
+    it('returns a Dataset instance', () => {
       const ds = bq.dataset(DATASET_ID);
       assert(ds instanceof FakeDataset);
     });
 
-    it('should scope the correct dataset', function() {
+    it('should scope the correct dataset', () => {
       const ds = bq.dataset(DATASET_ID);
       const args = ds.calledWith_;
 
@@ -1276,7 +1275,7 @@ describe('BigQuery', function() {
       assert.strictEqual(args[1], DATASET_ID);
     });
 
-    it('should accept dataset metadata', function() {
+    it('should accept dataset metadata', () => {
       const options = {location: 'US'};
       const ds = bq.dataset(DATASET_ID, options);
       const args = ds.calledWith_;
@@ -1284,7 +1283,7 @@ describe('BigQuery', function() {
       assert.strictEqual(args[2], options);
     });
 
-    it('should pass the location if available', function() {
+    it('should pass the location if available', () => {
       const bq = new BigQuery({
         projectId: PROJECT_ID,
         location: LOCATION,
@@ -1301,9 +1300,9 @@ describe('BigQuery', function() {
     });
   });
 
-  describe('getDatasets', function() {
-    it('should get datasets from the api', function(done) {
-      bq.request = function(reqOpts) {
+  describe('getDatasets', () => {
+    it('should get datasets from the api', done => {
+      bq.request = reqOpts => {
         assert.strictEqual(reqOpts.uri, '/datasets');
         assert.deepStrictEqual(reqOpts.qs, {});
 
@@ -1313,10 +1312,10 @@ describe('BigQuery', function() {
       bq.getDatasets(assert.ifError);
     });
 
-    it('should accept query', function(done) {
+    it('should accept query', done => {
       const queryObject = {all: true, maxResults: 8, pageToken: 'token'};
 
-      bq.request = function(reqOpts) {
+      bq.request = reqOpts => {
         assert.strictEqual(reqOpts.qs, queryObject);
         done();
       };
@@ -1324,8 +1323,8 @@ describe('BigQuery', function() {
       bq.getDatasets(queryObject, assert.ifError);
     });
 
-    it('should default the query to an empty object', function(done) {
-      bq.request = function(reqOpts) {
+    it('should default the query to an empty object', done => {
+      bq.request = reqOpts => {
         assert.deepStrictEqual(reqOpts.qs, {});
         done();
       };
@@ -1333,23 +1332,23 @@ describe('BigQuery', function() {
       bq.getDatasets(null, assert.ifError);
     });
 
-    it('should return error to callback', function(done) {
+    it('should return error to callback', done => {
       const error = new Error('Error.');
 
-      bq.request = function(reqOpts, callback) {
+      bq.request = (reqOpts, callback) => {
         callback(error);
       };
 
-      bq.getDatasets(function(err) {
+      bq.getDatasets(err => {
         assert.strictEqual(err, error);
         done();
       });
     });
 
-    it('should return Dataset objects', function(done) {
+    it('should return Dataset objects', done => {
       const datasetId = 'datasetName';
 
-      bq.request = function(reqOpts, callback) {
+      bq.request = (reqOpts, callback) => {
         callback(null, {
           datasets: [
             {
@@ -1360,7 +1359,7 @@ describe('BigQuery', function() {
         });
       };
 
-      bq.getDatasets(function(err, datasets) {
+      bq.getDatasets((err, datasets) => {
         assert.ifError(err);
 
         const dataset = datasets[0];
@@ -1374,21 +1373,21 @@ describe('BigQuery', function() {
       });
     });
 
-    it('should return Dataset objects', function(done) {
+    it('should return Dataset objects', done => {
       const resp = {success: true};
 
-      bq.request = function(reqOpts, callback) {
+      bq.request = (reqOpts, callback) => {
         callback(null, resp);
       };
 
-      bq.getDatasets(function(err, datasets, nextQuery, apiResponse) {
+      bq.getDatasets((err, datasets, nextQuery, apiResponse) => {
         assert.ifError(err);
         assert.strictEqual(apiResponse, resp);
         done();
       });
     });
 
-    it('should assign metadata to the Dataset objects', function(done) {
+    it('should assign metadata to the Dataset objects', done => {
       const datasetObjects = [
         {
           a: 'b',
@@ -1399,25 +1398,25 @@ describe('BigQuery', function() {
         },
       ];
 
-      bq.request = function(reqOpts, callback) {
+      bq.request = (reqOpts, callback) => {
         callback(null, {datasets: datasetObjects});
       };
 
-      bq.getDatasets(function(err, datasets) {
+      bq.getDatasets((err, datasets) => {
         assert.ifError(err);
         assert.strictEqual(datasets[0].metadata, datasetObjects[0]);
         done();
       });
     });
 
-    it('should return token if more results exist', function(done) {
+    it('should return token if more results exist', done => {
       const token = 'token';
 
-      bq.request = function(reqOpts, callback) {
+      bq.request = (reqOpts, callback) => {
         callback(null, {nextPageToken: token});
       };
 
-      bq.getDatasets(function(err, datasets, nextQuery) {
+      bq.getDatasets((err, datasets, nextQuery) => {
         assert.deepStrictEqual(nextQuery, {
           pageToken: token,
         });
@@ -1426,9 +1425,9 @@ describe('BigQuery', function() {
     });
   });
 
-  describe('getJobs', function() {
-    it('should get jobs from the api', function(done) {
-      bq.request = function(reqOpts) {
+  describe('getJobs', () => {
+    it('should get jobs from the api', done => {
+      bq.request = reqOpts => {
         assert.strictEqual(reqOpts.uri, '/jobs');
         assert.deepStrictEqual(reqOpts.qs, {});
         assert.deepStrictEqual(reqOpts.useQuerystring, true);
@@ -1438,7 +1437,7 @@ describe('BigQuery', function() {
       bq.getJobs(assert.ifError);
     });
 
-    it('should accept query', function(done) {
+    it('should accept query', done => {
       const queryObject = {
         allUsers: true,
         maxResults: 8,
@@ -1447,7 +1446,7 @@ describe('BigQuery', function() {
         stateFilter: 'done',
       };
 
-      bq.request = function(reqOpts) {
+      bq.request = reqOpts => {
         assert.deepStrictEqual(reqOpts.qs, queryObject);
         done();
       };
@@ -1455,8 +1454,8 @@ describe('BigQuery', function() {
       bq.getJobs(queryObject, assert.ifError);
     });
 
-    it('should default the query to an object', function(done) {
-      bq.request = function(reqOpts) {
+    it('should default the query to an object', done => {
+      bq.request = reqOpts => {
         assert.deepStrictEqual(reqOpts.qs, {});
         done();
       };
@@ -1464,21 +1463,21 @@ describe('BigQuery', function() {
       bq.getJobs(null, assert.ifError);
     });
 
-    it('should return error to callback', function(done) {
+    it('should return error to callback', done => {
       const error = new Error('Error.');
 
-      bq.request = function(reqOpts, callback) {
+      bq.request = (reqOpts, callback) => {
         callback(error);
       };
 
-      bq.getJobs(function(err) {
+      bq.getJobs(err => {
         assert.strictEqual(err, error);
         done();
       });
     });
 
-    it('should return Job objects', function(done) {
-      bq.request = function(reqOpts, callback) {
+    it('should return Job objects', done => {
+      bq.request = (reqOpts, callback) => {
         callback(null, {
           jobs: [
             {
@@ -1492,7 +1491,7 @@ describe('BigQuery', function() {
         });
       };
 
-      bq.getJobs(function(err, jobs) {
+      bq.getJobs((err, jobs) => {
         assert.ifError(err);
 
         const job = jobs[0];
@@ -1506,7 +1505,7 @@ describe('BigQuery', function() {
       });
     });
 
-    it('should return apiResponse', function(done) {
+    it('should return apiResponse', done => {
       const resp = {
         jobs: [
           {
@@ -1518,18 +1517,18 @@ describe('BigQuery', function() {
         ],
       };
 
-      bq.request = function(reqOpts, callback) {
+      bq.request = (reqOpts, callback) => {
         callback(null, resp);
       };
 
-      bq.getJobs(function(err, jobs, nextQuery, apiResponse) {
+      bq.getJobs((err, jobs, nextQuery, apiResponse) => {
         assert.ifError(err);
         assert.strictEqual(resp, apiResponse);
         done();
       });
     });
 
-    it('should assign metadata to the Job objects', function(done) {
+    it('should assign metadata to the Job objects', done => {
       const jobObjects = [
         {
           a: 'b',
@@ -1541,25 +1540,25 @@ describe('BigQuery', function() {
         },
       ];
 
-      bq.request = function(reqOpts, callback) {
+      bq.request = (reqOpts, callback) => {
         callback(null, {jobs: jobObjects});
       };
 
-      bq.getJobs(function(err, jobs) {
+      bq.getJobs((err, jobs) => {
         assert.ifError(err);
         assert.strictEqual(jobs[0].metadata, jobObjects[0]);
         done();
       });
     });
 
-    it('should return token if more results exist', function(done) {
+    it('should return token if more results exist', done => {
       const token = 'token';
 
-      bq.request = function(reqOpts, callback) {
+      bq.request = (reqOpts, callback) => {
         callback(null, {nextPageToken: token});
       };
 
-      bq.getJobs(function(err, jobs, nextQuery) {
+      bq.getJobs((err, jobs, nextQuery) => {
         assert.ifError(err);
         assert.deepStrictEqual(nextQuery, {
           pageToken: token,
@@ -1569,13 +1568,13 @@ describe('BigQuery', function() {
     });
   });
 
-  describe('job', function() {
-    it('should return a Job instance', function() {
+  describe('job', () => {
+    it('should return a Job instance', () => {
       const job = bq.job(JOB_ID);
       assert(job instanceof FakeJob);
     });
 
-    it('should scope the correct job', function() {
+    it('should scope the correct job', () => {
       const job = bq.job(JOB_ID);
       const args = job.calledWith_;
 
@@ -1583,14 +1582,14 @@ describe('BigQuery', function() {
       assert.strictEqual(args[1], JOB_ID);
     });
 
-    it('should pass the options object', function() {
+    it('should pass the options object', () => {
       const options = {a: 'b'};
       const job = bq.job(JOB_ID, options);
 
       assert.strictEqual(job.calledWith_[2], options);
     });
 
-    it('should pass in the user specified location', function() {
+    it('should pass in the user specified location', () => {
       const bq = new BigQuery({
         projectId: PROJECT_ID,
         location: LOCATION,
@@ -1607,19 +1606,19 @@ describe('BigQuery', function() {
     });
   });
 
-  describe('query', function() {
+  describe('query', () => {
     const FAKE_ROWS = [{}, {}, {}];
     const FAKE_RESPONSE = {};
     const QUERY_STRING = 'SELECT * FROM [dataset.table]';
 
-    it('should return any errors from createQueryJob', function(done) {
+    it('should return any errors from createQueryJob', done => {
       const error = new Error('err');
 
-      bq.createQueryJob = function(query, callback) {
+      bq.createQueryJob = (query, callback) => {
         callback(error, null, FAKE_RESPONSE);
       };
 
-      bq.query(QUERY_STRING, function(err, rows, resp) {
+      bq.query(QUERY_STRING, (err, rows, resp) => {
         assert.strictEqual(err, error);
         assert.strictEqual(rows, null);
         assert.strictEqual(resp, FAKE_RESPONSE);
@@ -1627,18 +1626,18 @@ describe('BigQuery', function() {
       });
     });
 
-    it('should exit early if dryRun is set', function(done) {
+    it('should exit early if dryRun is set', done => {
       const options = {
         query: QUERY_STRING,
         dryRun: true,
       };
 
-      bq.createQueryJob = function(query, callback) {
+      bq.createQueryJob = (query, callback) => {
         assert.strictEqual(query, options);
         callback(null, null, FAKE_RESPONSE);
       };
 
-      bq.query(options, function(err, rows, resp) {
+      bq.query(options, (err, rows, resp) => {
         assert.ifError(err);
         assert.deepStrictEqual(rows, []);
         assert.strictEqual(resp, FAKE_RESPONSE);
@@ -1646,19 +1645,19 @@ describe('BigQuery', function() {
       });
     });
 
-    it('should call job#getQueryResults', function(done) {
+    it('should call job#getQueryResults', done => {
       const fakeJob = {
-        getQueryResults: function(options, callback) {
+        getQueryResults: (options, callback) => {
           assert.deepStrictEqual(options, {});
           callback(null, FAKE_ROWS, FAKE_RESPONSE);
         },
       };
 
-      bq.createQueryJob = function(query, callback) {
+      bq.createQueryJob = (query, callback) => {
         callback(null, fakeJob, FAKE_RESPONSE);
       };
 
-      bq.query(QUERY_STRING, function(err, rows, resp) {
+      bq.query(QUERY_STRING, (err, rows, resp) => {
         assert.ifError(err);
         assert.strictEqual(rows, FAKE_ROWS);
         assert.strictEqual(resp, FAKE_RESPONSE);
@@ -1666,16 +1665,16 @@ describe('BigQuery', function() {
       });
     });
 
-    it('should optionally accept options', function(done) {
+    it('should optionally accept options', done => {
       const fakeOptions = {};
       const fakeJob = {
-        getQueryResults: function(options) {
+        getQueryResults: options => {
           assert.strictEqual(options, fakeOptions);
           done();
         },
       };
 
-      bq.createQueryJob = function(query, callback) {
+      bq.createQueryJob = (query, callback) => {
         callback(null, fakeJob, FAKE_RESPONSE);
       };
 
@@ -1683,11 +1682,11 @@ describe('BigQuery', function() {
     });
   });
 
-  describe('queryAsStream_', function() {
-    it('should call query correctly', function(done) {
+  describe('queryAsStream_', () => {
+    it('should call query correctly', done => {
       const query = 'SELECT';
 
-      bq.query = function(query_, options, callback) {
+      bq.query = (query_, options, callback) => {
         assert.strictEqual(query_, query);
         assert.deepStrictEqual(options, {autoPaginate: false});
         callback(); // done()

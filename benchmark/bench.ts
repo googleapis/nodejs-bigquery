@@ -30,7 +30,7 @@ const queryJson = fs.readFileSync(process.argv[2]);
 const queries = JSON.parse(queryJson);
 const client = new BigQuery(env);
 
-const doQuery = function(queryTxt, callback) {
+const doQuery = (queryTxt, callback) =>{
   const startMilli = new Date().getTime();
   let numRows = 0;
   let numCols;
@@ -61,9 +61,8 @@ const doQuery = function(queryTxt, callback) {
       }
       numRows++;
     })
-    .on('end', function() {
+    .on('end', () => {
       const timeTotalMilli = new Date().getTime() - startMilli;
-
       console.log(
         `query ${queryTxt}:`,
           `got ${numRows} rows,`,

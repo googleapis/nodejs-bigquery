@@ -204,8 +204,8 @@ class Dataset extends ServiceObject {
     super({
       parent: bigQuery,
       baseUrl: '/datasets',
-      id: id,
-      methods: methods,
+      id,
+      methods,
       requestModule: request,
       createMethod: (id, options, callback) => {
         if (is.fn(options)) {
@@ -226,12 +226,11 @@ class Dataset extends ServiceObject {
     // Catch all for read-modify-write cycle
     // https://cloud.google.com/bigquery/docs/api-performance#read-patch-write
     this.interceptors.push({
-      request: function(reqOpts) {
+      request: reqOpts => {
         if (reqOpts.method === 'PATCH' && reqOpts.json.etag) {
           reqOpts.headers = reqOpts.headers || {};
           reqOpts.headers['If-Match'] = reqOpts.json.etag;
         }
-
         return reqOpts;
       },
     });
@@ -295,7 +294,7 @@ class Dataset extends ServiceObject {
     });
 
     return this.bigQuery.createQueryJob(options, callback);
-  };
+  }
 
   /**
    * Run a query scoped to your dataset as a readable object stream.
@@ -322,7 +321,7 @@ class Dataset extends ServiceObject {
     });
 
     return this.bigQuery.createQueryStream(options);
-  };
+  }
 
   /**
    * Create a table given a tableId or configuration object.
@@ -400,7 +399,7 @@ class Dataset extends ServiceObject {
         callback(null, table, resp);
       }
     );
-  };
+  }
 
   /**
    * Delete the dataset.
@@ -454,7 +453,7 @@ class Dataset extends ServiceObject {
       },
       callback
     );
-  };
+  }
 
   /**
    * Get a list of tables.
@@ -540,7 +539,7 @@ class Dataset extends ServiceObject {
         callback(null, tables, nextQuery, resp);
       }
     );
-  };
+  }
 
   /**
    * Run a query scoped to your dataset.
@@ -566,7 +565,7 @@ class Dataset extends ServiceObject {
     });
 
     return this.bigQuery.query(options, callback);
-  };
+  }
 
   /**
    * Create a Table object.
@@ -597,7 +596,7 @@ class Dataset extends ServiceObject {
     );
 
     return new Table(this, id, options);
-  };
+  }
 }
 
 /*! Developer Documentation
