@@ -55,7 +55,7 @@ const fakePaginator = {
 class FakeServiceObject extends ServiceObject {
   calledWith_;
   constructor(config) {
-    super(config)
+    super(config);
     this.calledWith_ = arguments;
   }
 }
@@ -279,7 +279,7 @@ describe('BigQuery/Dataset', () => {
     it('should return the result of the call to bq.query', done => {
       ds.bigQuery.createQueryStream = () => {
         return {
-          done: done,
+          done,
         };
       };
 
@@ -685,7 +685,7 @@ describe('BigQuery/Dataset', () => {
 
         const expectedNextQuery = {
           maxResults: 5,
-          pageToken: pageToken,
+          pageToken,
         };
 
         ds.request = (reqOpts, callback) => {

@@ -60,7 +60,7 @@ const fakePaginator = {
 describe('BigQuery/Job', () => {
   const BIGQUERY: any = {
     projectId: 'my-project',
-    Promise: Promise,
+    Promise,
   };
   const JOB_ID = 'job_XYrk_3z';
   const LOCATION = 'asia-northeast1';
@@ -166,7 +166,7 @@ describe('BigQuery/Job', () => {
     };
 
     const RESPONSE = {
-      pageToken: pageToken,
+      pageToken,
       jobReference: {jobId: JOB_ID},
     };
 

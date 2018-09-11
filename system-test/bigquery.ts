@@ -152,7 +152,7 @@ describe('BigQuery', () => {
       },
     });
 
-    bigquery.getDatasets({maxApiCalls: maxApiCalls}, err => {
+    bigquery.getDatasets({maxApiCalls}, err => {
       assert.ifError(err);
       assert.strictEqual(numRequestsMade, 1);
       done();
@@ -184,7 +184,7 @@ describe('BigQuery', () => {
 
     return bigquery
       .getDatasets({
-        maxApiCalls: maxApiCalls,
+        maxApiCalls,
       })
       .then(() => {
         assert.strictEqual(numRequestsMade, maxApiCalls);
@@ -277,7 +277,7 @@ describe('BigQuery', () => {
 
   it('should honor the job prefix option', done => {
     const options = {
-      query: query,
+      query,
       jobPrefix: 'hi-im-a-prefix',
     };
 
@@ -308,7 +308,7 @@ describe('BigQuery', () => {
 
   it('should honor the dryRun option', done => {
     const options = {
-      query: query,
+      query,
       dryRun: true,
     };
 
@@ -438,7 +438,7 @@ describe('BigQuery', () => {
 
         dataset.setMetadata(
           {
-            etag: etag,
+            etag,
             description: 'another description',
           },
           err => {
@@ -1593,7 +1593,7 @@ describe('BigQuery', () => {
           next => {
             table.create(
               {
-                schema: schema,
+                schema,
               },
               next
             );

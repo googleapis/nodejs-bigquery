@@ -223,8 +223,8 @@ class Job extends Operation {
     super({
       parent: bigQuery,
       baseUrl: '/jobs',
-      id: id,
-      methods: methods,
+      id,
+      methods,
       requestModule: request,
     } as any);
 
@@ -306,7 +306,7 @@ class Job extends Operation {
       },
       callback
     );
-  };
+  }
 
   /**
    * @callback QueryResultsCallback
@@ -434,7 +434,7 @@ class Job extends Operation {
         callback(null, rows, nextQuery, resp);
       }
     );
-  };
+  }
 
   /**
    * This method will be called by `getQueryResultsStream()`. It is required to
@@ -445,7 +445,7 @@ class Job extends Operation {
   getQueryResultsAsStream_(options, callback) {
     options = extend({autoPaginate: false}, options);
     this.getQueryResults(options, callback);
-  };
+  }
 
   /**
    * Poll for a status update. Execute the callback:
@@ -476,7 +476,7 @@ class Job extends Operation {
 
       callback(null, metadata);
     });
-  };
+  }
 }
 
 /*! Developer Documentation

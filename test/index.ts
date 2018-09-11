@@ -214,28 +214,28 @@ describe('BigQuery', () => {
       BigQuery.date = function(input) {
         return {
           type: 'fakeDate',
-          input: input,
+          input,
         };
       };
 
       BigQuery.datetime = function(input) {
         return {
           type: 'fakeDatetime',
-          input: input,
+          input,
         };
       };
 
       BigQuery.time = function(input) {
         return {
           type: 'fakeTime',
-          input: input,
+          input,
         };
       };
 
       BigQuery.timestamp = function(input) {
         return {
           type: 'fakeTimestamp',
-          input: input,
+          input,
         };
       };
     });
@@ -311,7 +311,7 @@ describe('BigQuery', () => {
             arr: [10],
             arr2: [2],
             nullable: null,
-            buffer: buffer,
+            buffer,
             objects: [
               {
                 nested_object: {
@@ -904,7 +904,7 @@ describe('BigQuery', () => {
       const jobPrefix = 'abc-';
       const expectedJobId = jobPrefix + fakeJobId;
       const options = {
-        jobPrefix: jobPrefix,
+        jobPrefix,
       };
 
       bq.request = reqOpts => {

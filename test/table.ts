@@ -82,7 +82,7 @@ describe('BigQuery/Table', () => {
     bigQuery: {
       projectId: 'project-id',
       job: id => {
-        return {id: id};
+        return {id};
       },
       request: util.noop,
     },
@@ -267,12 +267,12 @@ describe('BigQuery/Table', () => {
     });
 
     it('should trim names', () => {
-      var schema = Table.createSchemaFromString_(' name :type');
+      let schema = Table.createSchemaFromString_(' name :type');
       assert.strictEqual(schema.fields[0].name, 'name');
     });
 
     it('should trim types', () => {
-      var schema = Table.createSchemaFromString_('name: type ');
+      let schema = Table.createSchemaFromString_('name: type ');
       assert.strictEqual(schema.fields[0].type, 'TYPE');
     });
   });
@@ -825,7 +825,7 @@ describe('BigQuery/Table', () => {
       };
 
       table.bigQuery.job = id => {
-        return {id: id};
+        return {id};
       };
 
       table.bigQuery.createJob = () => {};
@@ -1463,7 +1463,7 @@ describe('BigQuery/Table', () => {
           done();
         };
 
-        table.createWriteStream_({jobPrefix: jobPrefix}).emit('writing');
+        table.createWriteStream_({jobPrefix}).emit('writing');
       });
 
       it('should use the default location', done => {
@@ -1718,7 +1718,7 @@ describe('BigQuery/Table', () => {
         table.request = (reqOpts, callback) => {
           // Respond with a row, so it grabs the schema.
           // Use setImmediate to let our getMetadata overwrite process.
-          setImmediate(callback, null, {rows: rows});
+          setImmediate(callback, null, {rows});
         };
 
         table.bigQuery.mergeSchemaWithRows_ = (schema_, rows_) => {
@@ -1734,7 +1734,7 @@ describe('BigQuery/Table', () => {
 
         // Step 2: refreshes the metadata to pull down the schema.
         table.getMetadata = callback => {
-          table.metadata = {schema: schema};
+          table.metadata = {schema};
           callback();
         };
 
@@ -1774,10 +1774,10 @@ describe('BigQuery/Table', () => {
       const schema = {fields: [{name: 'name', type: 'string'}]};
       const merged = [{name: 'stephen'}];
 
-      table.metadata = {schema: schema};
+      table.metadata = {schema};
 
       table.request = (reqOpts, callback) => {
-        callback(null, {rows: rows});
+        callback(null, {rows});
       };
 
       table.bigQuery.mergeSchemaWithRows_ = (schema_, rows_) => {
@@ -1796,10 +1796,10 @@ describe('BigQuery/Table', () => {
     it('should return apiResponse in callback', done => {
       const rows = [{f: [{v: 'stephen'}]}];
       const schema = {fields: [{name: 'name', type: 'string'}]};
-      table.metadata = {schema: schema};
+      table.metadata = {schema};
 
       table.request = (reqOpts, callback) => {
-        callback(null, {rows: rows});
+        callback(null, {rows});
       };
 
       table.getRows((err, rows, nextQuery, apiResponse) => {
@@ -1817,7 +1817,7 @@ describe('BigQuery/Table', () => {
       table.metadata = {schema: {}};
 
       table.request = (reqOpts, callback) => {
-        callback(null, {pageToken: pageToken});
+        callback(null, {pageToken});
       };
 
       table.getRows(options, (err, rows, nextQuery) => {
@@ -1825,7 +1825,7 @@ describe('BigQuery/Table', () => {
         assert.deepStrictEqual(nextQuery, {
           a: 'b',
           c: 'd',
-          pageToken: pageToken,
+          pageToken,
         });
         // Original object isn't affected.
         assert.deepStrictEqual(options, {a: 'b', c: 'd'});

@@ -240,9 +240,9 @@ class Table extends ServiceObject {
     super({
       parent: dataset,
       baseUrl: '/tables',
-      id: id,
+      id,
       createMethod: dataset.createTable.bind(dataset),
-      methods: methods,
+      methods,
       requestModule: request,
     });
 
@@ -321,7 +321,7 @@ class Table extends ServiceObject {
         fields: [],
       }
     );
-  };
+  }
 
   /**
    * Convert a row entry from native types to their encoded types that the API
@@ -374,7 +374,7 @@ class Table extends ServiceObject {
       }, {});
     }
     return value;
-  };
+  }
 
   /**
    * @private
@@ -420,7 +420,7 @@ class Table extends ServiceObject {
     }
 
     return body;
-  };
+  }
 
   /**
    * Copy data from one table to another, optionally creating that table.
@@ -483,7 +483,7 @@ class Table extends ServiceObject {
         callback(null, metadata);
       });
     });
-  };
+  }
 
   /**
    * Copy data from multiple tables into this table.
@@ -550,7 +550,7 @@ class Table extends ServiceObject {
         callback(null, metadata);
       });
     });
-  };
+  }
 
   /**
    * Copy data from one table to another, optionally creating that table.
@@ -644,7 +644,7 @@ class Table extends ServiceObject {
     }
 
     this.bigQuery.createJob(body, callback);
-  };
+  }
 
   /**
    * Copy data from multiple tables into this table.
@@ -752,7 +752,7 @@ class Table extends ServiceObject {
     }
 
     this.bigQuery.createJob(body, callback);
-  };
+  }
 
   /**
    * Export table to Cloud Storage.
@@ -897,7 +897,7 @@ class Table extends ServiceObject {
     }
 
     this.bigQuery.createJob(body, callback);
-  };
+  }
 
   /**
    * Load data from a local file or Storage {@link https://cloud.google.com/nodejs/docs/reference/storage/latest/File File}.
@@ -1074,7 +1074,7 @@ class Table extends ServiceObject {
     });
 
     this.bigQuery.createJob(body, callback);
-  };
+  }
 
   /**
    * Run a query as a job. No results are immediately returned. Instead, your
@@ -1086,7 +1086,7 @@ class Table extends ServiceObject {
    */
   createQueryJob(options, callback) {
     return this.dataset.createQueryJob(options, callback);
-  };
+  }
 
   /**
    * Run a query scoped to your dataset as a readable object stream.
@@ -1101,7 +1101,7 @@ class Table extends ServiceObject {
    */
   createQueryStream(query) {
     return this.dataset.createQueryStream(query);
-  };
+  }
 
   /**
    * Creates a write stream. Unlike the public version, this will not
@@ -1172,7 +1172,7 @@ class Table extends ServiceObject {
               load: metadata,
             },
             jobReference: {
-              jobId: jobId,
+              jobId,
               projectId: this.bigQuery.projectId,
               location: this.location,
             },
@@ -1194,7 +1194,7 @@ class Table extends ServiceObject {
       );
     });
     return dup;
-  };
+  }
 
   /**
    * Load data into your table from a readable stream of JSON, CSV, or
@@ -1272,7 +1272,7 @@ class Table extends ServiceObject {
     });
 
     return stream;
-  };
+  }
 
   /**
    * Export table to Cloud Storage.
@@ -1355,7 +1355,7 @@ class Table extends ServiceObject {
         callback(null, metadata);
       });
     });
-  };
+  }
 
   /**
    * Retrieves table data from a specified set of rows. The rows are returned to
@@ -1420,7 +1420,7 @@ class Table extends ServiceObject {
       }
       rows = this.bigQuery.mergeSchemaWithRows_(this.metadata.schema, rows || []);
       callback(null, rows, nextQuery, resp);
-    }
+    };
 
     this.request(
       {
@@ -1454,7 +1454,7 @@ class Table extends ServiceObject {
         onComplete(null, resp.rows, nextQuery, resp);
       }
     );
-  };
+  }
 
   /**
    * Stream data into BigQuery one record at a time without running a load job.
@@ -1599,7 +1599,7 @@ class Table extends ServiceObject {
     }
 
     const json = extend(true, {}, options, {
-      rows: rows,
+      rows,
     });
 
     if (!options.raw) {
@@ -1630,7 +1630,7 @@ class Table extends ServiceObject {
     const createTableAndRetry = () => {
       this.create(
         {
-          schema: schema,
+          schema,
         },
         (err, table, resp) => {
           if (err && err.code !== 409) {
@@ -1643,13 +1643,13 @@ class Table extends ServiceObject {
           }, 60000);
         }
       );
-    }
+    };
 
     this.request(
       {
         method: 'POST',
         uri: '/insertAll',
-        json: json,
+        json,
       },
       (err, resp) => {
         if (err) {
@@ -1685,7 +1685,7 @@ class Table extends ServiceObject {
         callback(err, resp);
       }
     );
-  };
+  }
 
   /**
    * Load data from a local file or Storage {@link https://cloud.google.com/nodejs/docs/reference/storage/latest/File File}.
@@ -1776,7 +1776,7 @@ class Table extends ServiceObject {
         callback(null, metadata);
       });
     });
-  };
+  }
 
   /**
    * Run a query scoped to your dataset.
@@ -1788,7 +1788,7 @@ class Table extends ServiceObject {
    */
   query(query, callback) {
     this.dataset.query(query, callback);
-  };
+  }
 
   /**
    * Set the metadata on the table.
@@ -1836,7 +1836,7 @@ class Table extends ServiceObject {
   setMetadata(metadata, callback) {
     const body = Table.formatMetadata_(metadata);
     super.setMetadata(body, callback);
-  };
+  }
 }
 
 /*! Developer Documentation

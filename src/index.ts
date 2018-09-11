@@ -579,7 +579,7 @@ util.inherits(BigQuery, common.Service);
   if (typeName === 'ARRAY') {
     queryParameter.parameterValue.arrayValues = value.map(function(value) {
       return {
-        value: value,
+        value,
       };
     });
   } else if (typeName === 'STRUCT') {
@@ -795,7 +795,7 @@ BigQuery.prototype.createQueryJob = function(options, callback) {
 
   const reqOpts = {
     configuration: {
-      query: query,
+      query,
     } as any,
   } as any;
 
@@ -931,7 +931,7 @@ BigQuery.prototype.createJob = function(options, callback) {
 
   reqOpts.jobReference = {
     projectId: this.projectId,
-    jobId: jobId,
+    jobId,
     location: this.location,
   };
 
