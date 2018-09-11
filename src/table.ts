@@ -41,6 +41,7 @@ const FORMATS = {
   avro: 'AVRO',
   csv: 'CSV',
   json: 'NEWLINE_DELIMITED_JSON',
+  orc: 'ORC',
   parquet: 'PARQUET',
 };
 
@@ -917,7 +918,7 @@ class Table extends ServiceObject {
    *     metadata object should be in the format of the
    *     [`configuration.load`](http://goo.gl/BVcXk4) property of a Jobs resource.
    * @param {string} [metadata.format] The format the data being loaded is in.
-   *     Allowed options are "CSV", "JSON", or "AVRO".
+   *     Allowed options are "AVRO", "CSV", "JSON", "ORC", or "PARQUET".
    * @param {string} [metadata.jobId] Custom job id.
    * @param {string} [metadata.jobPrefix] Prefix to apply to the job id.
    * @param {function} [callback] The callback function.
@@ -1197,8 +1198,8 @@ class Table extends ServiceObject {
   }
 
   /**
-   * Load data into your table from a readable stream of JSON, CSV, or
-   * AVRO data.
+   * Load data into your table from a readable stream of AVRO, CSV, JSON, ORC,
+   * or PARQUET data.
    *
    * @see [Jobs: insert API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert}
    *
@@ -1280,8 +1281,8 @@ class Table extends ServiceObject {
    * @param {string|File} destination Where the file should be exported
    *     to. A string or a {@link https://cloud.google.com/nodejs/docs/reference/storage/latest/File File}.
    * @param {object} [options] The configuration object.
-   * @param {string} [options.format] The format to export the data in. Allowed
-   *     options are "CSV", "JSON", or "AVRO". Default: "CSV".
+   * @param {string} [options.format="CSV"] The format to export the data in.
+   *     Allowed options are "AVRO", "CSV", "JSON", "ORC" or "PARQUET".
    * @param {boolean} [options.gzip] Specify if you would like the file compressed
    *     with GZIP. Default: false.
    * @param {string} [options.jobId] Custom id for the underlying job.

@@ -157,6 +157,26 @@ test.serial(`should extract a table to GCS`, async t => {
     .start();
 });
 
+test(`should load a GCS ORC file with explicit schema`, async t => {
+  t.plan(1);
+  const tableId = generateUuid();
+
+  const output = await tools.runAsync(
+    `${cmd} load-gcs-orc ${projectId} ${datasetId} ${tableId}`,
+    cwd
+  );
+  t.regex(output, /completed\./);
+  await tools
+    .tryTest(async assert => {
+      const [rows] = await bigquery
+        .dataset(datasetId)
+        .table(tableId)
+        .getRows();
+      assert(rows.length > 0);
+    })
+    .start();
+});
+
 test(`should load a GCS Parquet file with explicit schema`, async t => {
   t.plan(1);
   const tableId = generateUuid();
