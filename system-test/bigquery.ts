@@ -895,7 +895,7 @@ describe('BigQuery', () => {
 
       before(done => {
         fs.createReadStream(TEST_DATA_JSON_PATH)
-          .pipe(file.createWriteStream())
+          .pipe(file.createWriteStream({}))
           .on('error', done)
           .on('finish', done);
       });
