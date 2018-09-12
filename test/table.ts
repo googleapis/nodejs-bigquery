@@ -887,6 +887,16 @@ describe('BigQuery/Table', () => {
         table.createExtractJob(FILE, {format: 'avro'}, assert.ifError);
       });
 
+      it('should accept orc', done => {
+        table.bigQuery.createJob = reqOpts => {
+          const extract = reqOpts.configuration.extract;
+          assert.strictEqual(extract.destinationFormat, 'ORC');
+          done();
+        };
+
+        table.createExtractJob(FILE, {format: 'orc'}, assert.ifError);
+      });
+
       it('should accept parquet', done => {
         table.bigQuery.createJob = reqOpts => {
           const extract = reqOpts.configuration.extract;
