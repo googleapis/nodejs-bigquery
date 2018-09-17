@@ -217,12 +217,52 @@ test(`should load a GCS CSV file with explicit schema`, async t => {
     .start();
 });
 
+test(`should load a GCS JSON file with explicit schema`, async t => {
+  t.plan(1);
+  const tableId = generateUuid();
+
+  const output = await tools.runAsync(
+    `${cmd} load-gcs-json ${projectId} ${datasetId} ${tableId}`,
+    cwd
+  );
+  t.regex(output, /completed\./);
+  await tools
+    .tryTest(async assert => {
+      const [rows] = await bigquery
+        .dataset(datasetId)
+        .table(tableId)
+        .getRows();
+      assert(rows.length > 0);
+    })
+    .start();
+});
+
 test(`should load a GCS CSV file with autodetected schema`, async t => {
   t.plan(1);
   const tableId = generateUuid();
 
   const output = await tools.runAsync(
     `${cmd} load-gcs-csv-autodetect ${projectId} ${datasetId} ${tableId}`,
+    cwd
+  );
+  t.regex(output, /completed\./);
+  await tools
+    .tryTest(async assert => {
+      const [rows] = await bigquery
+        .dataset(datasetId)
+        .table(tableId)
+        .getRows();
+      assert(rows.length > 0);
+    })
+    .start();
+});
+
+test(`should load a GCS JSON file with autodetected schema`, async t => {
+  t.plan(1);
+  const tableId = generateUuid();
+
+  const output = await tools.runAsync(
+    `${cmd} load-gcs-json-autodetect ${projectId} ${datasetId} ${tableId}`,
     cwd
   );
   t.regex(output, /completed\./);
@@ -263,6 +303,26 @@ test(`should load a GCS CSV file truncate table`, async t => {
 
   const output = await tools.runAsync(
     `${cmd} load-gcs-csv-truncate ${projectId} ${datasetId} ${tableId}`,
+    cwd
+  );
+  t.regex(output, /completed\./);
+  await tools
+    .tryTest(async assert => {
+      const [rows] = await bigquery
+        .dataset(datasetId)
+        .table(tableId)
+        .getRows();
+      assert(rows.length > 0);
+    })
+    .start();
+});
+
+test(`should load a GCS JSON file truncate table`, async t => {
+  t.plan(1);
+  const tableId = generateUuid();
+
+  const output = await tools.runAsync(
+    `${cmd} load-gcs-json-truncate ${projectId} ${datasetId} ${tableId}`,
     cwd
   );
   t.regex(output, /completed\./);
