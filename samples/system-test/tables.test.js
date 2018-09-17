@@ -110,10 +110,10 @@ test.serial(`should list tables`, async t => {
     .start();
 });
 
-test.serial(`should load a local file`, async t => {
+test.serial(`should load a local CSV file`, async t => {
   t.plan(1);
   const output = await tools.runAsync(
-    `${cmd} load ${projectId} ${datasetId} ${tableId} ${localFilePath}`,
+    `${cmd} load-local-csv ${projectId} ${datasetId} ${tableId} ${localFilePath}`,
     cwd
   );
   t.regex(output, /completed\./);
@@ -157,7 +157,7 @@ test.serial(`should extract a table to GCS`, async t => {
     .start();
 });
 
-test(`should load a GCS ORC file with explicit schema`, async t => {
+test(`should load a GCS ORC file`, async t => {
   t.plan(1);
   const tableId = generateUuid();
 
@@ -177,7 +177,7 @@ test(`should load a GCS ORC file with explicit schema`, async t => {
     .start();
 });
 
-test(`should load a GCS Parquet file with explicit schema`, async t => {
+test(`should load a GCS Parquet file`, async t => {
   t.plan(1);
   const tableId = generateUuid();
 
@@ -217,12 +217,52 @@ test(`should load a GCS CSV file with explicit schema`, async t => {
     .start();
 });
 
+test(`should load a GCS JSON file with explicit schema`, async t => {
+  t.plan(1);
+  const tableId = generateUuid();
+
+  const output = await tools.runAsync(
+    `${cmd} load-gcs-json ${projectId} ${datasetId} ${tableId}`,
+    cwd
+  );
+  t.regex(output, /completed\./);
+  await tools
+    .tryTest(async assert => {
+      const [rows] = await bigquery
+        .dataset(datasetId)
+        .table(tableId)
+        .getRows();
+      assert(rows.length > 0);
+    })
+    .start();
+});
+
 test(`should load a GCS CSV file with autodetected schema`, async t => {
   t.plan(1);
   const tableId = generateUuid();
 
   const output = await tools.runAsync(
     `${cmd} load-gcs-csv-autodetect ${projectId} ${datasetId} ${tableId}`,
+    cwd
+  );
+  t.regex(output, /completed\./);
+  await tools
+    .tryTest(async assert => {
+      const [rows] = await bigquery
+        .dataset(datasetId)
+        .table(tableId)
+        .getRows();
+      assert(rows.length > 0);
+    })
+    .start();
+});
+
+test(`should load a GCS JSON file with autodetected schema`, async t => {
+  t.plan(1);
+  const tableId = generateUuid();
+
+  const output = await tools.runAsync(
+    `${cmd} load-gcs-json-autodetect ${projectId} ${datasetId} ${tableId}`,
     cwd
   );
   t.regex(output, /completed\./);
@@ -263,6 +303,66 @@ test(`should load a GCS CSV file truncate table`, async t => {
 
   const output = await tools.runAsync(
     `${cmd} load-gcs-csv-truncate ${projectId} ${datasetId} ${tableId}`,
+    cwd
+  );
+  t.regex(output, /completed\./);
+  await tools
+    .tryTest(async assert => {
+      const [rows] = await bigquery
+        .dataset(datasetId)
+        .table(tableId)
+        .getRows();
+      assert(rows.length > 0);
+    })
+    .start();
+});
+
+test(`should load a GCS JSON file truncate table`, async t => {
+  t.plan(1);
+  const tableId = generateUuid();
+
+  const output = await tools.runAsync(
+    `${cmd} load-gcs-json-truncate ${projectId} ${datasetId} ${tableId}`,
+    cwd
+  );
+  t.regex(output, /completed\./);
+  await tools
+    .tryTest(async assert => {
+      const [rows] = await bigquery
+        .dataset(datasetId)
+        .table(tableId)
+        .getRows();
+      assert(rows.length > 0);
+    })
+    .start();
+});
+
+test(`should load a GCS parquet file truncate table`, async t => {
+  t.plan(1);
+  const tableId = generateUuid();
+
+  const output = await tools.runAsync(
+    `${cmd} load-gcs-parquet-truncate ${projectId} ${datasetId} ${tableId}`,
+    cwd
+  );
+  t.regex(output, /completed\./);
+  await tools
+    .tryTest(async assert => {
+      const [rows] = await bigquery
+        .dataset(datasetId)
+        .table(tableId)
+        .getRows();
+      assert(rows.length > 0);
+    })
+    .start();
+});
+
+test(`should load a GCS ORC file truncate table`, async t => {
+  t.plan(1);
+  const tableId = generateUuid();
+
+  const output = await tools.runAsync(
+    `${cmd} load-gcs-orc-truncate ${projectId} ${datasetId} ${tableId}`,
     cwd
   );
   t.regex(output, /completed\./);
