@@ -270,13 +270,7 @@ function loadORCFromGCS(datasetId, tableId, projectId) {
   // Configure the load job. For full list of options, see:
   // https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs#configuration.load
   const metadata = {
-    sourceFormat: 'ORC',
-    schema: {
-      fields: [
-        {name: 'name', type: 'STRING'},
-        {name: 'post_abbr', type: 'STRING'},
-      ],
-    },
+    sourceFormat: 'ORC'
   };
 
   // Loads data from a Google Cloud Storage file into the table

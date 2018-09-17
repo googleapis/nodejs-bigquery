@@ -157,7 +157,7 @@ test.serial(`should extract a table to GCS`, async t => {
     .start();
 });
 
-test(`should load a GCS ORC file with explicit schema`, async t => {
+test(`should load a GCS ORC file`, async t => {
   t.plan(1);
   const tableId = generateUuid();
 
