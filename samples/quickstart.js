@@ -23,21 +23,16 @@ const BigQuery = require('@google-cloud/bigquery');
 const projectId = 'YOUR_PROJECT_ID';
 
 // Creates a client
-const bigquery = new BigQuery({
-  projectId: projectId,
-});
+const bigquery = new BigQuery({projectId});
 
 // The name for the new dataset
 const datasetName = 'my_new_dataset';
 
 // Creates the new dataset
-bigquery
-  .createDataset(datasetName)
-  .then(results => {
-    const dataset = results[0];
-    console.log(`Dataset ${dataset.id} created.`);
-  })
-  .catch(err => {
-    console.error('ERROR:', err);
-  });
+async function createDataset() {
+  const [dataset] = await bigquery.createDataset(datasetName);
+  console.log(`Dataset ${dataset.id} created.`);
+}
 // [END bigquery_quickstart]
+
+createDataset().catch(console.error);

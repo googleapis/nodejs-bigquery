@@ -19,7 +19,7 @@
 function printResult(rows) {
   // [START bigquery_simple_app_print]
   console.log('Query Results:');
-  rows.forEach(function(row) {
+  rows.forEach(row => {
     const url = row['url'];
     const viewCount = row['view_count'];
     console.log(`url: ${url}, ${viewCount} views`);
@@ -27,7 +27,7 @@ function printResult(rows) {
   // [END bigquery_simple_app_print]
 }
 
-function queryStackOverflow(projectId) {
+async function queryStackOverflow(projectId) {
   // [START bigquery_simple_app_deps]
   // Imports the Google Cloud client library
   const BigQuery = require('@google-cloud/bigquery');
@@ -40,9 +40,7 @@ function queryStackOverflow(projectId) {
   // const projectId = "your-project-id";
 
   // Creates a client
-  const bigquery = new BigQuery({
-    projectId: projectId,
-  });
+  const bigquery = new BigQuery({projectId});
   // [END bigquery_simple_app_client]
 
   // [START bigquery_simple_app_query]
@@ -64,20 +62,13 @@ function queryStackOverflow(projectId) {
   };
 
   // Runs the query
-  bigquery
-    .query(options)
-    .then(results => {
-      const rows = results[0];
-      printResult(rows);
-    })
-    .catch(err => {
-      console.error('ERROR:', err);
-    });
+  const [rows] = await bigquery.query(options);
+  printResult(rows);
   // [END bigquery_simple_app_query]
 }
 // [END bigquery_simple_app_all]
 
-function syncQuery(sqlQuery, projectId) {
+async function syncQuery(sqlQuery, projectId) {
   // Imports the Google Cloud client library
   const BigQuery = require('@google-cloud/bigquery');
 
@@ -88,9 +79,7 @@ function syncQuery(sqlQuery, projectId) {
   // const sqlQuery = "SELECT * FROM publicdata.samples.natality LIMIT 5;";
 
   // Creates a client
-  const bigquery = new BigQuery({
-    projectId: projectId,
-  });
+  const bigquery = new BigQuery({projectId});
 
   // Query options list: https://cloud.google.com/bigquery/docs/reference/v2/jobs/query
   const options = {
@@ -100,19 +89,12 @@ function syncQuery(sqlQuery, projectId) {
   };
 
   // Runs the query
-  bigquery
-    .query(options)
-    .then(results => {
-      const rows = results[0];
-      console.log('Rows:');
-      rows.forEach(row => console.log(row));
-    })
-    .catch(err => {
-      console.error('ERROR:', err);
-    });
+  const [rows] = await bigquery.query(options);
+  console.log('Rows:');
+  rows.forEach(row => console.log(row));
 }
 
-function asyncQuery(sqlQuery, projectId) {
+async function asyncQuery(sqlQuery, projectId) {
   // [START bigquery_query]
   // Imports the Google Cloud client library
   const BigQuery = require('@google-cloud/bigquery');
@@ -124,9 +106,7 @@ function asyncQuery(sqlQuery, projectId) {
   // const sqlQuery = "SELECT * FROM publicdata.samples.natality LIMIT 5;";
 
   // Creates a client
-  const bigquery = new BigQuery({
-    projectId: projectId,
-  });
+  const bigquery = new BigQuery({projectId});
 
   // Query options list: https://cloud.google.com/bigquery/docs/reference/v2/jobs/query
   const options = {
@@ -134,39 +114,23 @@ function asyncQuery(sqlQuery, projectId) {
     useLegacySql: false, // Use standard SQL syntax for queries.
   };
 
-  let job;
-
   // Runs the query as a job
-  bigquery
-    .createQueryJob(options)
-    .then(results => {
-      job = results[0];
-      console.log(`Job ${job.id} started.`);
-      return job.promise();
-    })
-    .then(() => {
-      // Get the job's status
-      return job.getMetadata();
-    })
-    .then(metadata => {
-      // Check the job's status for errors
-      const errors = metadata[0].status.errors;
-      if (errors && errors.length > 0) {
-        throw errors;
-      }
-    })
-    .then(() => {
-      console.log(`Job ${job.id} completed.`);
-      return job.getQueryResults();
-    })
-    .then(results => {
-      const rows = results[0];
-      console.log('Rows:');
-      rows.forEach(row => console.log(row));
-    })
-    .catch(err => {
-      console.error('ERROR:', err);
-    });
+  const [job] = await bigquery.createQueryJob(options);
+  console.log(`Job ${job.id} started.`);
+
+  // Get the job's status
+  const metadata = await job.getMetadata();
+
+  // Check the job's status for errors
+  const errors = metadata[0].status.errors;
+  if (errors && errors.length > 0) {
+    throw errors;
+  }
+  console.log(`Job ${job.id} completed.`);
+
+  const [rows] = await job.getQueryResults();
+  console.log('Rows:');
+  rows.forEach(row => console.log(row));
   // [END bigquery_query]
 }
 
