@@ -623,6 +623,130 @@ function loadCSVFromGCSTruncate(datasetId, tableId, projectId) {
   // [END bigquery_load_table_gcs_csv_truncate]
 }
 
+function loadParquetFromGCSTruncate(datasetId, tableId, projectId) {
+  // [START bigquery_load_table_gcs_parquet_truncate]
+  // Imports the Google Cloud client libraries
+  const BigQuery = require('@google-cloud/bigquery');
+  const {Storage} = require('@google-cloud/storage');
+
+  /**
+   * TODO(developer): Uncomment the following lines before running the sample.
+   */
+  // const projectId = "your-project-id";
+  // const datasetId = "my_dataset";
+  // const tableId = "my_table";
+
+  /**
+   * This sample loads the CSV file at
+   * https://storage.googleapis.com/cloud-samples-data/bigquery/us-states/us-states.csv
+   *
+   * TODO(developer): Replace the following lines with the path to your file.
+   */
+  const bucketName = 'cloud-samples-data';
+  const filename = 'bigquery/us-states/us-states.parquet';
+
+  // Instantiates clients
+  const bigquery = new BigQuery({
+    projectId: projectId,
+  });
+
+  const storage = new Storage({
+    projectId: projectId,
+  });
+
+  // Configure the load job. For full list of options, see:
+  // https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs#configuration.load
+  const metadata = {
+    sourceFormat: 'PARQUET',
+    // Set the write disposition to append to an existing table.
+    writeDisposition: 'WRITE_TRUNCATE',
+  };
+
+  // Loads data from a Google Cloud Storage file into the table
+  bigquery
+    .dataset(datasetId)
+    .table(tableId)
+    .load(storage.bucket(bucketName).file(filename), metadata)
+    .then(results => {
+      const job = results[0];
+
+      // load() waits for the job to finish
+      console.log(`Job ${job.id} completed.`);
+
+      // Check the job's status for errors
+      const errors = job.status.errors;
+      if (errors && errors.length > 0) {
+        throw errors;
+      }
+    })
+    .catch(err => {
+      console.error('ERROR:', err);
+    });
+  // [END bigquery_load_table_gcs_parquet_truncate]
+}
+
+function loadOrcFromGCSTruncate(datasetId, tableId, projectId) {
+  // [START bigquery_load_table_gcs_orc_truncate]
+  // Imports the Google Cloud client libraries
+  const BigQuery = require('@google-cloud/bigquery');
+  const {Storage} = require('@google-cloud/storage');
+
+  /**
+   * TODO(developer): Uncomment the following lines before running the sample.
+   */
+  // const projectId = "your-project-id";
+  // const datasetId = "my_dataset";
+  // const tableId = "my_table";
+
+  /**
+   * This sample loads the CSV file at
+   * https://storage.googleapis.com/cloud-samples-data/bigquery/us-states/us-states.csv
+   *
+   * TODO(developer): Replace the following lines with the path to your file.
+   */
+  const bucketName = 'cloud-samples-data';
+  const filename = 'bigquery/us-states/us-states.orc';
+
+  // Instantiates clients
+  const bigquery = new BigQuery({
+    projectId: projectId,
+  });
+
+  const storage = new Storage({
+    projectId: projectId,
+  });
+
+  // Configure the load job. For full list of options, see:
+  // https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs#configuration.load
+  const metadata = {
+    sourceFormat: 'ORC',
+    // Set the write disposition to append to an existing table.
+    writeDisposition: 'WRITE_TRUNCATE',
+  };
+
+  // Loads data from a Google Cloud Storage file into the table
+  bigquery
+    .dataset(datasetId)
+    .table(tableId)
+    .load(storage.bucket(bucketName).file(filename), metadata)
+    .then(results => {
+      const job = results[0];
+
+      // load() waits for the job to finish
+      console.log(`Job ${job.id} completed.`);
+
+      // Check the job's status for errors
+      const errors = job.status.errors;
+      if (errors && errors.length > 0) {
+        throw errors;
+      }
+    })
+    .catch(err => {
+      console.error('ERROR:', err);
+    });
+  // [END bigquery_load_table_gcs_orc_truncate]
+}
+
 function extractTableToGCS(
   datasetId,
   tableId,
@@ -821,6 +945,22 @@ require(`yargs`)
   .command(
     `load-gcs-csv-truncate <projectId> <datasetId> <tableId>`,
     `Loads sample CSV data from GCS, replacing an existing table.`,
+    {},
+    opts => {
+      loadCSVFromGCSTruncate(opts.datasetId, opts.tableId, opts.projectId);
+    }
+  )
+  .command(
+    `load-gcs-parquet-truncate <projectId> <datasetId> <tableId>`,
+    `Loads sample Parquet data from GCS, replacing an existing table.`,
+    {},
+    opts => {
+      loadCSVFromGCSTruncate(opts.datasetId, opts.tableId, opts.projectId);
+    }
+  )
+  .command(
+    `load-gcs-orc-truncate <projectId> <datasetId> <tableId>`,
+    `Loads sample Orc data from GCS, replacing an existing table.`,
     {},
     opts => {
       loadCSVFromGCSTruncate(opts.datasetId, opts.tableId, opts.projectId);

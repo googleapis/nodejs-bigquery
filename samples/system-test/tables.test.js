@@ -277,6 +277,46 @@ test(`should load a GCS CSV file truncate table`, async t => {
     .start();
 });
 
+test(`should load a GCS parquet file truncate table`, async t => {
+  t.plan(1);
+  const tableId = generateUuid();
+
+  const output = await tools.runAsync(
+    `${cmd} load-gcs-parquet-truncate ${projectId} ${datasetId} ${tableId}`,
+    cwd
+  );
+  t.regex(output, /completed\./);
+  await tools
+    .tryTest(async assert => {
+      const [rows] = await bigquery
+        .dataset(datasetId)
+        .table(tableId)
+        .getRows();
+      assert(rows.length > 0);
+    })
+    .start();
+});
+
+test(`should load a GCS ORC file truncate table`, async t => {
+  t.plan(1);
+  const tableId = generateUuid();
+
+  const output = await tools.runAsync(
+    `${cmd} load-gcs-orc-truncate ${projectId} ${datasetId} ${tableId}`,
+    cwd
+  );
+  t.regex(output, /completed\./);
+  await tools
+    .tryTest(async assert => {
+      const [rows] = await bigquery
+        .dataset(datasetId)
+        .table(tableId)
+        .getRows();
+      assert(rows.length > 0);
+    })
+    .start();
+});
+
 test.serial(`should copy a table`, async t => {
   t.plan(1);
   const output = await tools.runAsync(
