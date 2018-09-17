@@ -330,13 +330,7 @@ function loadParquetFromGCS(datasetId, tableId, projectId) {
   // Configure the load job. For full list of options, see:
   // https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs#configuration.load
   const metadata = {
-    sourceFormat: 'PARQUET',
-    schema: {
-      fields: [
-        {name: 'name', type: 'STRING'},
-        {name: 'post_abbr', type: 'STRING'},
-      ],
-    },
+    sourceFormat: 'PARQUET'
   };
 
   // Loads data from a Google Cloud Storage file into the table

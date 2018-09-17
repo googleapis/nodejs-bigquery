@@ -177,7 +177,7 @@ test(`should load a GCS ORC file`, async t => {
     .start();
 });
 
-test(`should load a GCS Parquet file with explicit schema`, async t => {
+test(`should load a GCS Parquet file`, async t => {
   t.plan(1);
   const tableId = generateUuid();
 
