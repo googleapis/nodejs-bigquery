@@ -270,7 +270,7 @@ function loadORCFromGCS(datasetId, tableId, projectId) {
   // Configure the load job. For full list of options, see:
   // https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs#configuration.load
   const metadata = {
-    sourceFormat: 'ORC'
+    sourceFormat: 'ORC',
   };
 
   // Loads data from a Google Cloud Storage file into the table
@@ -330,7 +330,7 @@ function loadParquetFromGCS(datasetId, tableId, projectId) {
   // Configure the load job. For full list of options, see:
   // https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs#configuration.load
   const metadata = {
-    sourceFormat: 'PARQUET'
+    sourceFormat: 'PARQUET',
   };
 
   // Loads data from a Google Cloud Storage file into the table
@@ -1085,7 +1085,7 @@ require(`yargs`)
     }
   )
   .command(
-    `load <projectId> <datasetId> <tableId> <fileName>`,
+    `load-local-csv <projectId> <datasetId> <tableId> <fileName>`,
     `Loads data from a local file into a table.`,
     {},
     opts => {
@@ -1166,7 +1166,7 @@ require(`yargs`)
     `Loads sample JSON data from GCS, replacing an existing table.`,
     {},
     opts => {
-      loadCSVFromGCSTruncate(opts.datasetId, opts.tableId, opts.projectId);
+      loadJSONFromGCSTruncate(opts.datasetId, opts.tableId, opts.projectId);
     }
   )
   .command(
@@ -1174,7 +1174,7 @@ require(`yargs`)
     `Loads sample Parquet data from GCS, replacing an existing table.`,
     {},
     opts => {
-      loadCSVFromGCSTruncate(opts.datasetId, opts.tableId, opts.projectId);
+      loadParquetFromGCSTruncate(opts.datasetId, opts.tableId, opts.projectId);
     }
   )
   .command(
@@ -1182,7 +1182,7 @@ require(`yargs`)
     `Loads sample Orc data from GCS, replacing an existing table.`,
     {},
     opts => {
-      loadCSVFromGCSTruncate(opts.datasetId, opts.tableId, opts.projectId);
+      loadOrcFromGCSTruncate(opts.datasetId, opts.tableId, opts.projectId);
     }
   )
   .command(

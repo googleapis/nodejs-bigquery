@@ -110,10 +110,10 @@ test.serial(`should list tables`, async t => {
     .start();
 });
 
-test.serial(`should load a local file`, async t => {
+test.serial(`should load a local CSV file`, async t => {
   t.plan(1);
   const output = await tools.runAsync(
-    `${cmd} load ${projectId} ${datasetId} ${tableId} ${localFilePath}`,
+    `${cmd} load-local-csv ${projectId} ${datasetId} ${tableId} ${localFilePath}`,
     cwd
   );
   t.regex(output, /completed\./);
