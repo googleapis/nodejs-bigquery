@@ -267,12 +267,12 @@ describe('BigQuery/Table', () => {
     });
 
     it('should trim names', () => {
-      let schema = Table.createSchemaFromString_(' name :type');
+      const schema = Table.createSchemaFromString_(' name :type');
       assert.strictEqual(schema.fields[0].name, 'name');
     });
 
     it('should trim types', () => {
-      let schema = Table.createSchemaFromString_('name: type ');
+      const schema = Table.createSchemaFromString_('name: type ');
       assert.strictEqual(schema.fields[0].type, 'TYPE');
     });
   });
