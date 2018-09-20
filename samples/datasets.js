@@ -15,7 +15,7 @@
 
 'use strict';
 
-function createDataset(datasetId, projectId) {
+async function createDataset(datasetId, projectId) {
   // [START bigquery_create_dataset]
   // Imports the Google Cloud client library
   const BigQuery = require('@google-cloud/bigquery');
@@ -27,24 +27,15 @@ function createDataset(datasetId, projectId) {
   // const datasetId = "my_new_dataset";
 
   // Creates a client
-  const bigquery = new BigQuery({
-    projectId: projectId,
-  });
+  const bigquery = new BigQuery({projectId});
 
   // Creates a new dataset
-  bigquery
-    .createDataset(datasetId)
-    .then(results => {
-      const dataset = results[0];
-      console.log(`Dataset ${dataset.id} created.`);
-    })
-    .catch(err => {
-      console.error('ERROR:', err);
-    });
+  const [dataset] = await bigquery.createDataset(datasetId);
+  console.log(`Dataset ${dataset.id} created.`);
   // [END bigquery_create_dataset]
 }
 
-function deleteDataset(datasetId, projectId) {
+async function deleteDataset(datasetId, projectId) {
   // [START bigquery_delete_dataset]
   // Imports the Google Cloud client library
   const BigQuery = require('@google-cloud/bigquery');
@@ -56,26 +47,18 @@ function deleteDataset(datasetId, projectId) {
   // const datasetId = "my_dataset";
 
   // Creates a client
-  const bigquery = new BigQuery({
-    projectId: projectId,
-  });
+  const bigquery = new BigQuery({projectId});
 
   // Creates a reference to the existing dataset
   const dataset = bigquery.dataset(datasetId);
 
   // Deletes the dataset
-  dataset
-    .delete()
-    .then(() => {
-      console.log(`Dataset ${dataset.id} deleted.`);
-    })
-    .catch(err => {
-      console.error('ERROR:', err);
-    });
+  await dataset.delete();
+  console.log(`Dataset ${dataset.id} deleted.`);
   // [END bigquery_delete_dataset]
 }
 
-function listDatasets(projectId) {
+async function listDatasets(projectId) {
   // [START bigquery_list_datasets]
   // Imports the Google Cloud client library
   const BigQuery = require('@google-cloud/bigquery');
@@ -86,21 +69,12 @@ function listDatasets(projectId) {
   // const projectId = "your-project-id";
 
   // Creates a client
-  const bigquery = new BigQuery({
-    projectId: projectId,
-  });
+  const bigquery = new BigQuery({projectId});
 
   // Lists all datasets in the specified project
-  bigquery
-    .getDatasets()
-    .then(results => {
-      const datasets = results[0];
-      console.log('Datasets:');
-      datasets.forEach(dataset => console.log(dataset.id));
-    })
-    .catch(err => {
-      console.error('ERROR:', err);
-    });
+  const [datasets] = await bigquery.getDatasets();
+  console.log('Datasets:');
+  datasets.forEach(dataset => console.log(dataset.id));
   // [END bigquery_list_datasets]
 }
 

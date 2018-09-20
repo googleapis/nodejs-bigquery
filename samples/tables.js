@@ -15,7 +15,7 @@
 
 'use strict';
 
-function createTable(datasetId, tableId, schema, projectId) {
+async function createTable(datasetId, tableId, schema, projectId) {
   // [START bigquery_create_table]
   // Imports the Google Cloud client library
   const BigQuery = require('@google-cloud/bigquery');
@@ -29,30 +29,21 @@ function createTable(datasetId, tableId, schema, projectId) {
   // const schema = "Name:string, Age:integer, Weight:float, IsMagic:boolean";
 
   // Creates a client
-  const bigquery = new BigQuery({
-    projectId: projectId,
-  });
+  const bigquery = new BigQuery({projectId});
 
   // For all options, see https://cloud.google.com/bigquery/docs/reference/v2/tables#resource
-  const options = {
-    schema: schema,
-  };
+  const options = {schema};
 
   // Create a new table in the dataset
-  bigquery
+  const [table] = await bigquery
     .dataset(datasetId)
-    .createTable(tableId, options)
-    .then(results => {
-      const table = results[0];
-      console.log(`Table ${table.id} created.`);
-    })
-    .catch(err => {
-      console.error('ERROR:', err);
-    });
+    .createTable(tableId, options);
+
+  console.log(`Table ${table.id} created.`);
   // [END bigquery_create_table]
 }
 
-function deleteTable(datasetId, tableId, projectId) {
+async function deleteTable(datasetId, tableId, projectId) {
   // [START bigquery_delete_table]
   // Imports the Google Cloud client library
   const BigQuery = require('@google-cloud/bigquery');
@@ -65,25 +56,19 @@ function deleteTable(datasetId, tableId, projectId) {
   // const tableId = "my_table";
 
   // Creates a client
-  const bigquery = new BigQuery({
-    projectId: projectId,
-  });
+  const bigquery = new BigQuery({projectId});
 
   // Deletes the table
-  bigquery
+  await bigquery
     .dataset(datasetId)
     .table(tableId)
-    .delete()
-    .then(() => {
-      console.log(`Table ${tableId} deleted.`);
-    })
-    .catch(err => {
-      console.error('ERROR:', err);
-    });
+    .delete();
+
+  console.log(`Table ${tableId} deleted.`);
   // [END bigquery_delete_table]
 }
 
-function listTables(datasetId, projectId) {
+async function listTables(datasetId, projectId) {
   // [START bigquery_list_tables]
   // Imports the Google Cloud client library
   const BigQuery = require('@google-cloud/bigquery');
@@ -95,26 +80,17 @@ function listTables(datasetId, projectId) {
   // const datasetId = "my_dataset";
 
   // Creates a client
-  const bigquery = new BigQuery({
-    projectId: projectId,
-  });
+  const bigquery = new BigQuery({projectId});
 
   // Lists all tables in the dataset
-  bigquery
-    .dataset(datasetId)
-    .getTables()
-    .then(results => {
-      const tables = results[0];
-      console.log('Tables:');
-      tables.forEach(table => console.log(table.id));
-    })
-    .catch(err => {
-      console.error('ERROR:', err);
-    });
+  const [tables] = await bigquery.dataset(datasetId).getTables();
+
+  console.log('Tables:');
+  tables.forEach(table => console.log(table.id));
   // [END bigquery_list_tables]
 }
 
-function browseRows(datasetId, tableId, projectId) {
+async function browseRows(datasetId, tableId, projectId) {
   // [START bigquery_browse_table]
   // Imports the Google Cloud client library
   const BigQuery = require('@google-cloud/bigquery');
@@ -127,27 +103,20 @@ function browseRows(datasetId, tableId, projectId) {
   // const tableId = "my_table";
 
   // Creates a client
-  const bigquery = new BigQuery({
-    projectId: projectId,
-  });
+  const bigquery = new BigQuery({projectId});
 
   // Lists rows in the table
-  bigquery
+  const [rows] = await bigquery
     .dataset(datasetId)
     .table(tableId)
-    .getRows()
-    .then(results => {
-      const rows = results[0];
-      console.log('Rows:');
-      rows.forEach(row => console.log(row));
-    })
-    .catch(err => {
-      console.error('ERROR:', err);
-    });
+    .getRows();
+
+  console.log('Rows:');
+  rows.forEach(row => console.log(row));
   // [END bigquery_browse_table]
 }
 
-function copyTable(
+async function copyTable(
   srcDatasetId,
   srcTableId,
   destDatasetId,
@@ -168,34 +137,25 @@ function copyTable(
   // const destTableId = "my_dest_table";
 
   // Creates a client
-  const bigquery = new BigQuery({
-    projectId: projectId,
-  });
+  const bigquery = new BigQuery({projectId});
 
   // Copies the table contents into another table
-  bigquery
+  const [job] = await bigquery
     .dataset(srcDatasetId)
     .table(srcTableId)
-    .copy(bigquery.dataset(destDatasetId).table(destTableId))
-    .then(results => {
-      const job = results[0];
+    .copy(bigquery.dataset(destDatasetId).table(destTableId));
 
-      // load() waits for the job to finish
-      console.log(`Job ${job.id} completed.`);
+  console.log(`Job ${job.id} completed.`);
 
-      // Check the job's status for errors
-      const errors = job.status.errors;
-      if (errors && errors.length > 0) {
-        throw errors;
-      }
-    })
-    .catch(err => {
-      console.error('ERROR:', err);
-    });
+  // Check the job's status for errors
+  const errors = job.status.errors;
+  if (errors && errors.length > 0) {
+    throw errors;
+  }
   // [END bigquery_copy_table]
 }
 
-function loadLocalFile(datasetId, tableId, filename, projectId) {
+async function loadLocalFile(datasetId, tableId, filename, projectId) {
   // [START bigquery_load_from_file]
   // Imports the Google Cloud client library
   const BigQuery = require('@google-cloud/bigquery');
@@ -209,34 +169,25 @@ function loadLocalFile(datasetId, tableId, filename, projectId) {
   // const tableId = "my_table";
 
   // Creates a client
-  const bigquery = new BigQuery({
-    projectId: projectId,
-  });
+  const bigquery = new BigQuery({projectId});
 
   // Loads data from a local file into the table
-  bigquery
+  const [job] = await bigquery
     .dataset(datasetId)
     .table(tableId)
-    .load(filename)
-    .then(results => {
-      const job = results[0];
+    .load(filename);
 
-      // load() waits for the job to finish
-      console.log(`Job ${job.id} completed.`);
+  console.log(`Job ${job.id} completed.`);
 
-      // Check the job's status for errors
-      const errors = job.status.errors;
-      if (errors && errors.length > 0) {
-        throw errors;
-      }
-    })
-    .catch(err => {
-      console.error('ERROR:', err);
-    });
+  // Check the job's status for errors
+  const errors = job.status.errors;
+  if (errors && errors.length > 0) {
+    throw errors;
+  }
   // [END bigquery_load_from_file]
 }
 
-function loadORCFromGCS(datasetId, tableId, projectId) {
+async function loadORCFromGCS(datasetId, tableId, projectId) {
   // [START bigquery_load_table_gcs_orc]
   // Imports the Google Cloud client libraries
   const BigQuery = require('@google-cloud/bigquery');
@@ -259,13 +210,8 @@ function loadORCFromGCS(datasetId, tableId, projectId) {
   const filename = 'bigquery/us-states/us-states.orc';
 
   // Instantiates clients
-  const bigquery = new BigQuery({
-    projectId: projectId,
-  });
-
-  const storage = new Storage({
-    projectId: projectId,
-  });
+  const bigquery = new BigQuery({projectId});
+  const storage = new Storage({projectId});
 
   // Configure the load job. For full list of options, see:
   // https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs#configuration.load
@@ -274,29 +220,23 @@ function loadORCFromGCS(datasetId, tableId, projectId) {
   };
 
   // Loads data from a Google Cloud Storage file into the table
-  bigquery
+  const [job] = await bigquery
     .dataset(datasetId)
     .table(tableId)
-    .load(storage.bucket(bucketName).file(filename), metadata)
-    .then(results => {
-      const job = results[0];
+    .load(storage.bucket(bucketName).file(filename), metadata);
 
-      // load() waits for the job to finish
-      console.log(`Job ${job.id} completed.`);
+  // load() waits for the job to finish
+  console.log(`Job ${job.id} completed.`);
 
-      // Check the job's status for errors
-      const errors = job.status.errors;
-      if (errors && errors.length > 0) {
-        throw errors;
-      }
-    })
-    .catch(err => {
-      console.error('ERROR:', err);
-    });
+  // Check the job's status for errors
+  const errors = job.status.errors;
+  if (errors && errors.length > 0) {
+    throw errors;
+  }
   // [END bigquery_load_table_gcs_orc]
 }
 
-function loadParquetFromGCS(datasetId, tableId, projectId) {
+async function loadParquetFromGCS(datasetId, tableId, projectId) {
   // [START bigquery_load_table_gcs_parquet]
   // Imports the Google Cloud client libraries
   const BigQuery = require('@google-cloud/bigquery');
@@ -319,13 +259,8 @@ function loadParquetFromGCS(datasetId, tableId, projectId) {
   const filename = 'bigquery/us-states/us-states.parquet';
 
   // Instantiates clients
-  const bigquery = new BigQuery({
-    projectId: projectId,
-  });
-
-  const storage = new Storage({
-    projectId: projectId,
-  });
+  const bigquery = new BigQuery({projectId});
+  const storage = new Storage({projectId});
 
   // Configure the load job. For full list of options, see:
   // https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs#configuration.load
@@ -334,25 +269,19 @@ function loadParquetFromGCS(datasetId, tableId, projectId) {
   };
 
   // Loads data from a Google Cloud Storage file into the table
-  bigquery
+  const [job] = await bigquery
     .dataset(datasetId)
     .table(tableId)
-    .load(storage.bucket(bucketName).file(filename), metadata)
-    .then(results => {
-      const job = results[0];
+    .load(storage.bucket(bucketName).file(filename), metadata);
 
-      // load() waits for the job to finish
-      console.log(`Job ${job.id} completed.`);
+  // load() waits for the job to finish
+  console.log(`Job ${job.id} completed.`);
 
-      // Check the job's status for errors
-      const errors = job.status.errors;
-      if (errors && errors.length > 0) {
-        throw errors;
-      }
-    })
-    .catch(err => {
-      console.error('ERROR:', err);
-    });
+  // Check the job's status for errors
+  const errors = job.status.errors;
+  if (errors && errors.length > 0) {
+    throw errors;
+  }
   // [END bigquery_load_table_gcs_parquet]
 }
 
