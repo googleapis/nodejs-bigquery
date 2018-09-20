@@ -20,8 +20,8 @@ function printResult(rows) {
   // [START bigquery_simple_app_print]
   console.log('Query Results:');
   rows.forEach(function(row) {
-    let url = row['url'];
-    let viewCount = row['view_count'];
+    const url = row['url'];
+    const viewCount = row['view_count'];
     console.log(`url: ${url}, ${viewCount} views`);
   });
   // [END bigquery_simple_app_print]
