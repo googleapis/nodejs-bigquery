@@ -16,13 +16,17 @@
 
 'use strict';
 
-import {ServiceObject} from '@google-cloud/common';
+import {ServiceObject, DeleteCallback} from '@google-cloud/common';
 import {paginator} from '@google-cloud/paginator';
 import {promisifyAll} from '@google-cloud/promisify';
 import * as extend from 'extend';
 import * as is from 'is';
 import {Table} from './table';
 import * as request from 'request';
+
+export interface DatasetDeleteOptions {
+  force?: boolean;
+}
 
 /**
  * Interact with your BigQuery dataset. Create a Dataset instance with
@@ -435,11 +439,12 @@ class Dataset extends ServiceObject {
    *   const apiResponse = data[0];
    * });
    */
-  delete(options, callback?) {
-    if (!callback) {
-      callback = options;
-      options = {};
-    }
+  delete(options?: DatasetDeleteOptions): Promise<[request.Response]>;
+  delete(options: DatasetDeleteOptions, callback: DeleteCallback): void;
+  delete(callback: DeleteCallback): void;
+  delete(optionsOrCallback?: DeleteCallback|DatasetDeleteOptions, callback?: DeleteCallback): void|Promise<[request.Response]> {
+    const options = typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
+    callback = typeof optionsOrCallback === 'function' ? optionsOrCallback : callback;
 
     const query = {
       deleteContents: !!options.force,
@@ -451,7 +456,7 @@ class Dataset extends ServiceObject {
         uri: '',
         qs: query,
       },
-      callback
+      callback!
     );
   }
 

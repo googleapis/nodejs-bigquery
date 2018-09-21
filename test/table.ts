@@ -2230,7 +2230,8 @@ describe('BigQuery/Table', () => {
         return formattedMetadata;
       };
 
-      FakeServiceObject.prototype.setMetadata = function(metadata, callback) {
+      // tslint:disable-next-line:no-any
+      (FakeServiceObject.prototype as any).setMetadata = function(metadata, callback) {
         assert.strictEqual(this, table);
         assert.strictEqual(metadata, formattedMetadata);
         assert.strictEqual(callback, done);
