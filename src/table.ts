@@ -18,7 +18,7 @@
 
 import * as arrify from 'arrify';
 import * as Big from 'big.js';
-import {ServiceObject, util} from '@google-cloud/common';
+import {ServiceObject, util, SetMetadataResponse, ResponseCallback} from '@google-cloud/common';
 import {paginator} from '@google-cloud/paginator';
 import {promisifyAll} from '@google-cloud/promisify';
 const duplexify = require('duplexify');
@@ -30,6 +30,11 @@ import * as path from 'path';
 import * as request from 'request';
 const streamEvents = require('stream-events');
 import * as uuid from 'uuid';
+
+export interface SetTableMetadataOptions {
+  description?: string;
+  schema?: string|{};
+}
 
 /**
  * The file formats accepted by BigQuery.
@@ -1834,9 +1839,11 @@ class Table extends ServiceObject {
    *   const apiResponse = data[1];
    * });
    */
-  setMetadata(metadata, callback) {
+  setMetadata(metadata: SetTableMetadataOptions): Promise<SetMetadataResponse>;
+  setMetadata(metadata: SetTableMetadataOptions, callback: ResponseCallback): void;
+  setMetadata(metadata: SetTableMetadataOptions, callback?: ResponseCallback): void|Promise<SetMetadataResponse> {
     const body = Table.formatMetadata_(metadata);
-    super.setMetadata(body, callback);
+    super.setMetadata(body, callback!);
   }
 }
 
