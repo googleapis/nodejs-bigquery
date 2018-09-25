@@ -80,8 +80,6 @@ Commands:
                                                                 into a table.
   tables.js load-gcs-csv-autodetect <projectId> <datasetId>     Loads sample CSV data from a Google Cloud Storage file
   <tableId>                                                     into a table.
-  tables.js load-gcs-csv-append <projectId> <datasetId>         Loads sample CSV data from GCS, adding to an existing
-  <tableId>                                                     table.
   tables.js load-gcs-csv-truncate <projectId> <datasetId>       Loads sample CSV data from GCS, replacing an existing
   <tableId>                                                     table.
   tables.js extract <projectId> <datasetId> <tableId>           Extract a table from BigQuery to Google Cloud Storage.
