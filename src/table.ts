@@ -1709,7 +1709,7 @@ class Table extends ServiceObject {
    *     metadata object should be in the format of the
    *     [`configuration.load`](http://goo.gl/BVcXk4) property of a Jobs resource.
    * @param {string} [metadata.format] The format the data being loaded is in.
-   *     Allowed options are "CSV", "JSON", or "AVRO".
+   *     Allowed options are "AVRO", "CSV", "JSON", "ORC", or "PARQUET".
    * @param {string} [metadata.jobId] Custom id for the underlying job.
    * @param {string} [metadata.jobPrefix] Prefix to apply to the underlying job
    *     id.
