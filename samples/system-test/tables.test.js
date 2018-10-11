@@ -277,26 +277,6 @@ test(`should load a GCS JSON file with autodetected schema`, async t => {
     .start();
 });
 
-test(`should load a GCS CSV file append to table`, async t => {
-  t.plan(1);
-  const tableId = generateUuid();
-
-  const output = await tools.runAsync(
-    `${cmd} load-gcs-csv-append ${projectId} ${datasetId} ${tableId}`,
-    cwd
-  );
-  t.regex(output, /completed\./);
-  await tools
-    .tryTest(async assert => {
-      const [rows] = await bigquery
-        .dataset(datasetId)
-        .table(tableId)
-        .getRows();
-      assert(rows.length > 0);
-    })
-    .start();
-});
-
 test(`should load a GCS CSV file truncate table`, async t => {
   t.plan(1);
   const tableId = generateUuid();
