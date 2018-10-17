@@ -128,21 +128,17 @@ require(`yargs`)
     `stackoverflow`,
     `Queries a public Stack Overflow dataset.`,
     {},
-    opts => queryStackOverflow()
+    queryStackOverflow
   )
-  .command(`query`, `Queries the US Names dataset.`, {}, opts => query())
+  .command(`query`, `Queries the US Names dataset.`, {}, query)
   .command(
     `disable-cache`,
     `Queries the Shakespeare dataset with the cache disabled.`,
     {},
-    opts => queryDisableCache()
+    queryDisableCache
   )
-  .example(
-    `node $0 stackoverflow`, `Queries a public Stackoverflow dataset.`
-  )
-  .example(
-    `node $0 query`, `Queries the US Names dataset.`
-  )
+  .example(`node $0 stackoverflow`, `Queries a public Stackoverflow dataset.`)
+  .example(`node $0 query`, `Queries the US Names dataset.`)
   .example(
     `node $0 disable-cache`,
     `Queries the Shakespeare dataset with the cache disabled.`
