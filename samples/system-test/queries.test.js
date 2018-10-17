@@ -45,6 +45,6 @@ test(`should run a query with the cache disabled`, async t => {
     cwd
   );
   t.true(output.includes(`Rows:`));
-  t.true(output.includes(`name`));
+  t.true(output.includes(`corpus`));
 });
 

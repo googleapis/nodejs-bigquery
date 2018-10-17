@@ -41,7 +41,8 @@ async function queryStackOverflow() {
 
   const options = {
     query: sqlQuery,
-    useLegacySql: false, // Use standard SQL syntax for queries.
+    // Location must match that of the dataset(s) referenced in the query.
+    location: 'US',
   };
 
   // Runs the query
@@ -73,6 +74,8 @@ async function query() {
     LIMIT 100`
   const options = {
     query: query,
+    // Location must match that of the dataset(s) referenced in the query.
+    location: 'US',
   };
 
   // Runs the query as a job
@@ -96,12 +99,13 @@ async function queryDisableCache() {
   // Creates a client
   const bigquery = new BigQuery();
 
-  const query = `SELECT name
-    FROM \`bigquery-public-data.usa_names.usa_1910_2013\`
-    WHERE state = 'TX'
-    LIMIT 100`
+  const query = `SELECT corpus
+    FROM \`bigquery-public-data.samples.shakespeare\`
+    GROUP BY corpus;`
   const options = {
     query: query,
+    // Location must match that of the dataset(s) referenced in the query.
+    location: 'US',
     useQueryCache: false,
   };
 
@@ -134,7 +138,7 @@ require(`yargs`)
   )
   .command(
     `disable-cache`,
-    `Queries the US Names dataset with the cache disabled.`,
+    `Queries the Shakespeare dataset with the cache disabled.`,
     {},
     opts => queryDisableCache()
   )
@@ -148,7 +152,7 @@ require(`yargs`)
   )
   .example(
     `node $0 disable-cache`,
-    `Queries the US Names dataset with the cache disabled.`
+    `Queries the Shakespeare dataset with the cache disabled.`
   )
   .wrap(120)
   .recommendCommands()
