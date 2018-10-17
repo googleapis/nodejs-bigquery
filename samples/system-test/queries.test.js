@@ -21,47 +21,30 @@ const tools = require(`@google-cloud/nodejs-repo-tools`);
 
 const cwd = path.join(__dirname, `..`);
 const cmd = `node queries.js`;
-const projectId = process.env.GCLOUD_PROJECT;
-
-const sqlQuery = `SELECT * FROM publicdata.samples.natality LIMIT 5;`;
-const badQuery = `SELECT * FROM INVALID`;
 
 test.before(tools.checkCredentials);
 
 test(`should query stackoverflow`, async t => {
-  const output = await tools.runAsync(`${cmd} stackoverflow ${projectId}`, cwd);
+  const output = await tools.runAsync(`${cmd} stackoverflow`, cwd);
   t.true(output.includes(`Query Results:`));
   t.true(output.includes(`views`));
 });
 
-test(`should run a sync query`, async t => {
+test(`should run a query`, async t => {
   const output = await tools.runAsync(
-    `${cmd} sync ${projectId} "${sqlQuery}"`,
+    `${cmd} query`,
     cwd
   );
   t.true(output.includes(`Rows:`));
-  t.true(output.includes(`source_year`));
+  t.true(output.includes(`name`));
 });
 
-test(`should run an async query`, async t => {
+test(`should run a query with the cache disabled`, async t => {
   const output = await tools.runAsync(
-    `${cmd} async ${projectId} "${sqlQuery}"`,
+    `${cmd} disable-cache`,
     cwd
   );
   t.true(output.includes(`Rows:`));
-  t.true(output.includes(`source_year`));
+  t.true(output.includes(`name`));
 });
 
-test.skip(`should handle sync query errors`, async t => {
-  await t.throws(
-    tools.runAsync(`${cmd} sync ${projectId} "${badQuery}"`, cwd),
-    /ERROR:/
-  );
-});
-
-test.skip(`should handle async query errors`, async t => {
-  await t.throws(
-    tools.runAsync(`${cmd} async ${projectId} "${badQuery}"`, cwd),
-    /ERROR:/
-  );
-});

@@ -15,32 +15,16 @@
 
 'use strict';
 
-// [START bigquery_simple_app_all]
-function printResult(rows) {
-  // [START bigquery_simple_app_print]
-  console.log('Query Results:');
-  rows.forEach(row => {
-    const url = row['url'];
-    const viewCount = row['view_count'];
-    console.log(`url: ${url}, ${viewCount} views`);
-  });
-  // [END bigquery_simple_app_print]
-}
-
-async function queryStackOverflow(projectId) {
+async function queryStackOverflow() {
+  // [START bigquery_simple_app_all]
   // [START bigquery_simple_app_deps]
   // Imports the Google Cloud client library
   const BigQuery = require('@google-cloud/bigquery');
   // [END bigquery_simple_app_deps]
 
   // [START bigquery_simple_app_client]
-  /**
-   * TODO(developer): Uncomment the following lines before running the sample.
-   */
-  // const projectId = "your-project-id";
-
   // Creates a client
-  const bigquery = new BigQuery({projectId});
+  const bigquery = new BigQuery();
   // [END bigquery_simple_app_client]
 
   // [START bigquery_simple_app_query]
@@ -55,7 +39,6 @@ async function queryStackOverflow(projectId) {
     ORDER BY view_count DESC
     LIMIT 10`;
 
-  // Query options list: https://cloud.google.com/bigquery/docs/reference/v2/jobs/query
   const options = {
     query: sqlQuery,
     useLegacySql: false, // Use standard SQL syntax for queries.
@@ -63,108 +46,109 @@ async function queryStackOverflow(projectId) {
 
   // Runs the query
   const [rows] = await bigquery.query(options);
-  printResult(rows);
   // [END bigquery_simple_app_query]
+
+  // [START bigquery_simple_app_print]
+  console.log('Query Results:');
+  rows.forEach(row => {
+    const url = row['url'];
+    const viewCount = row['view_count'];
+    console.log(`url: ${url}, ${viewCount} views`);
+  });
+  // [END bigquery_simple_app_print]
 }
 // [END bigquery_simple_app_all]
 
-async function syncQuery(sqlQuery, projectId) {
-  // Imports the Google Cloud client library
-  const BigQuery = require('@google-cloud/bigquery');
-
-  /**
-   * TODO(developer): Uncomment the following lines before running the sample.
-   */
-  // const projectId = "your-project-id";
-  // const sqlQuery = "SELECT * FROM publicdata.samples.natality LIMIT 5;";
-
-  // Creates a client
-  const bigquery = new BigQuery({projectId});
-
-  // Query options list: https://cloud.google.com/bigquery/docs/reference/v2/jobs/query
-  const options = {
-    query: sqlQuery,
-    timeoutMs: 10000, // Time out after 10 seconds.
-    useLegacySql: false, // Use standard SQL syntax for queries.
-  };
-
-  // Runs the query
-  const [rows] = await bigquery.query(options);
-  console.log('Rows:');
-  rows.forEach(row => console.log(row));
-}
-
-async function asyncQuery(sqlQuery, projectId) {
+async function query() {
   // [START bigquery_query]
   // Imports the Google Cloud client library
   const BigQuery = require('@google-cloud/bigquery');
 
-  /**
-   * TODO(developer): Uncomment the following lines before running the sample.
-   */
-  // const projectId = "your-project-id";
-  // const sqlQuery = "SELECT * FROM publicdata.samples.natality LIMIT 5;";
-
   // Creates a client
-  const bigquery = new BigQuery({projectId});
+  const bigquery = new BigQuery();
 
-  // Query options list: https://cloud.google.com/bigquery/docs/reference/v2/jobs/query
+  const query = `SELECT name
+    FROM \`bigquery-public-data.usa_names.usa_1910_2013\`
+    WHERE state = 'TX'
+    LIMIT 100`
   const options = {
-    query: sqlQuery,
-    useLegacySql: false, // Use standard SQL syntax for queries.
+    query: query,
   };
 
   // Runs the query as a job
   const [job] = await bigquery.createQueryJob(options);
   console.log(`Job ${job.id} started.`);
 
-  // Get the job's status
-  const metadata = await job.getMetadata();
-
-  // Check the job's status for errors
-  const errors = metadata[0].status.errors;
-  if (errors && errors.length > 0) {
-    throw errors;
-  }
-  console.log(`Job ${job.id} completed.`);
-
+  // Waits for the query to finish
   const [rows] = await job.getQueryResults();
+
+  // Prints the results
   console.log('Rows:');
   rows.forEach(row => console.log(row));
   // [END bigquery_query]
 }
 
+async function queryDisableCache() {
+  // [START bigquery_query_no_cache]
+  // Imports the Google Cloud client library
+  const BigQuery = require('@google-cloud/bigquery');
+
+  // Creates a client
+  const bigquery = new BigQuery();
+
+  const query = `SELECT name
+    FROM \`bigquery-public-data.usa_names.usa_1910_2013\`
+    WHERE state = 'TX'
+    LIMIT 100`
+  const options = {
+    query: query,
+    useQueryCache: false,
+  };
+
+  // Runs the query as a job
+  const [job] = await bigquery.createQueryJob(options);
+  console.log(`Job ${job.id} started.`);
+
+  // Waits for the query to finish
+  const [rows] = await job.getQueryResults();
+
+  // Prints the results
+  console.log('Rows:');
+  rows.forEach(row => console.log(row));
+  // [END bigquery_query_no_cache]
+}
+
 require(`yargs`)
   .demand(1)
   .command(
-    `sync <projectId> <sqlQuery>`,
-    `Run the specified synchronous query.`,
-    {},
-    opts => syncQuery(opts.sqlQuery, opts.projectId)
-  )
-  .command(
-    `async <projectId> <sqlQuery>`,
-    `Start the specified asynchronous query.`,
-    {},
-    opts => asyncQuery(opts.sqlQuery, opts.projectId)
-  )
-  .command(
-    `stackoverflow <projectId>`,
+    `stackoverflow`,
     `Queries a public Stack Overflow dataset.`,
     {},
-    opts => queryStackOverflow(opts.projectId)
+    opts => queryStackOverflow()
+  )
+  .command(
+    `query`,
+    `Queries the US Names dataset.`,
+    {},
+    opts => query()
+  )
+  .command(
+    `disable-cache`,
+    `Queries the US Names dataset with the cache disabled.`,
+    {},
+    opts => queryDisableCache()
   )
   .example(
-    `node $0 sync my-project-id "SELECT * FROM publicdata.samples.natality LIMIT 5;"`,
-    `Synchronously queries the natality dataset.`
+    `node $0 stackoverflow`,
+    `Queries a public Stackoverflow dataset.`
   )
   .example(
-    `node $0 async my-project-id "SELECT * FROM publicdata.samples.natality LIMIT 5;"`,
-    `Queries the natality dataset as a job.`
+    `node $0 query`,
+    `Queries the US Names dataset.`
   )
   .example(
-    `node $0 shakespeare my-project-id`,
-    `Queries a public Shakespeare dataset.`
+    `node $0 disable-cache`,
+    `Queries the US Names dataset with the cache disabled.`
   )
   .wrap(120)
   .recommendCommands()
