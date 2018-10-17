@@ -31,19 +31,13 @@ test(`should query stackoverflow`, async t => {
 });
 
 test(`should run a query`, async t => {
-  const output = await tools.runAsync(
-    `${cmd} query`,
-    cwd
-  );
+  const output = await tools.runAsync(`${cmd} query`, cwd);
   t.true(output.includes(`Rows:`));
   t.true(output.includes(`name`));
 });
 
 test(`should run a query with the cache disabled`, async t => {
-  const output = await tools.runAsync(
-    `${cmd} disable-cache`,
-    cwd
-  );
+  const output = await tools.runAsync(`${cmd} disable-cache`, cwd);
   t.true(output.includes(`Rows:`));
   t.true(output.includes(`corpus`));
 });

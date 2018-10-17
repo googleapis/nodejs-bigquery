@@ -71,7 +71,7 @@ async function query() {
   const query = `SELECT name
     FROM \`bigquery-public-data.usa_names.usa_1910_2013\`
     WHERE state = 'TX'
-    LIMIT 100`
+    LIMIT 100`;
   const options = {
     query: query,
     // Location must match that of the dataset(s) referenced in the query.
@@ -101,7 +101,7 @@ async function queryDisableCache() {
 
   const query = `SELECT corpus
     FROM \`bigquery-public-data.samples.shakespeare\`
-    GROUP BY corpus;`
+    GROUP BY corpus`;
   const options = {
     query: query,
     // Location must match that of the dataset(s) referenced in the query.
@@ -130,12 +130,7 @@ require(`yargs`)
     {},
     opts => queryStackOverflow()
   )
-  .command(
-    `query`,
-    `Queries the US Names dataset.`,
-    {},
-    opts => query()
-  )
+  .command(`query`, `Queries the US Names dataset.`, {}, opts => query())
   .command(
     `disable-cache`,
     `Queries the Shakespeare dataset with the cache disabled.`,
@@ -143,12 +138,10 @@ require(`yargs`)
     opts => queryDisableCache()
   )
   .example(
-    `node $0 stackoverflow`,
-    `Queries a public Stackoverflow dataset.`
+    `node $0 stackoverflow`, `Queries a public Stackoverflow dataset.`
   )
   .example(
-    `node $0 query`,
-    `Queries the US Names dataset.`
+    `node $0 query`, `Queries the US Names dataset.`
   )
   .example(
     `node $0 disable-cache`,
