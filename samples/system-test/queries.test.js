@@ -41,4 +41,3 @@ test(`should run a query with the cache disabled`, async t => {
   t.true(output.includes(`Rows:`));
   t.true(output.includes(`corpus`));
 });
-
