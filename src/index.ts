@@ -81,7 +81,7 @@ import { Table } from './table';
  * npm install --save @google-cloud/bigquery
  *
  * @example <caption>Import the client library</caption>
- * const BigQuery = require('@google-cloud/bigquery');
+ * const {BigQuery} = require('@google-cloud/bigquery');
  *
  * @example <caption>Create a client that uses <a href="https://cloud.google.com/docs/authentication/production#providing_credentials_to_your_application">Application Default Credentials (ADC)</a>:</caption>
  * const bigquery = new BigQuery();
@@ -232,7 +232,7 @@ export class BigQuery extends common.Service {
    * @param {string|number} value.day One or two digits.
    *
    * @example
-   * const BigQuery = require('@google-cloud/bigquery');
+   * const {BigQuery} = require('@google-cloud/bigquery');
    * const date = BigQuery.date('2017-01-01');
    *
    * //-
@@ -261,7 +261,7 @@ export class BigQuery extends common.Service {
    * @param {string|number} value.day One or two digits.
    *
    * @example
-   * const BigQuery = require('@google-cloud/bigquery');
+   * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const date = bigquery.date('2017-01-01');
    *
@@ -301,7 +301,7 @@ export class BigQuery extends common.Service {
    *     precision.
    *
    * @example
-   * const BigQuery = require('@google-cloud/bigquery');
+   * const {BigQuery} = require('@google-cloud/bigquery');
    * const datetime = BigQuery.datetime('2017-01-01 13:00:00');
    *
    * //-
@@ -336,7 +336,7 @@ export class BigQuery extends common.Service {
    *     precision.
    *
    * @example
-   * const BigQuery = require('@google-cloud/bigquery');
+   * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const datetime = bigquery.datetime('2017-01-01 13:00:00');
    *
@@ -374,7 +374,7 @@ export class BigQuery extends common.Service {
    *     precision.
    *
    * @example
-   * const BigQuery = require('@google-cloud/bigquery');
+   * const {BigQuery} = require('@google-cloud/bigquery');
    * const time = BigQuery.time('14:00:00'); // 2:00 PM
    *
    * //-
@@ -401,7 +401,7 @@ export class BigQuery extends common.Service {
    *     precision.
    *
    * @example
-   * const BigQuery = require('@google-cloud/bigquery');
+   * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const time = bigquery.time('14:00:00'); // 2:00 PM
    *
@@ -430,7 +430,7 @@ export class BigQuery extends common.Service {
    * @param {date} value The time.
    *
    * @example
-   * const BigQuery = require('@google-cloud/bigquery');
+   * const {BigQuery} = require('@google-cloud/bigquery');
    * const timestamp = BigQuery.timestamp(new Date());
    */
 
@@ -442,7 +442,7 @@ export class BigQuery extends common.Service {
    * @param {date} value The time.
    *
    * @example
-   * const BigQuery = require('@google-cloud/bigquery');
+   * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const timestamp = bigquery.timestamp(new Date());
    */
@@ -581,7 +581,7 @@ export class BigQuery extends common.Service {
    * @returns {Promise}
    *
    * @example
-   * const BigQuery = require('@google-cloud/bigquery');
+   * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    *
    * bigquery.createDataset('my-dataset', function(err, dataset, apiResponse) {});
@@ -668,7 +668,7 @@ export class BigQuery extends common.Service {
    * @throws {Error} If a Table is not provided as a destination.
    *
    * @example
-   * const BigQuery = require('@google-cloud/bigquery');
+   * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    *
    * const query = 'SELECT url FROM `publicdata.samples.github_nested` LIMIT 100';
@@ -800,7 +800,7 @@ export class BigQuery extends common.Service {
    * @returns {stream}
    *
    * @example
-   * const BigQuery = require('@google-cloud/bigquery');
+   * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    *
    * const query = 'SELECT url FROM `publicdata.samples.github_nested` LIMIT 100';
@@ -854,7 +854,7 @@ export class BigQuery extends common.Service {
    * @returns {Promise}
    *
    * @example
-   * const BigQuery = require('@google-cloud/bigquery');
+   * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    *
    * const options = {
@@ -947,7 +947,7 @@ export class BigQuery extends common.Service {
    * @returns {Dataset}
    *
    * @example
-   * const BigQuery = require('@google-cloud/bigquery');
+   * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('higher_education');
    */
@@ -978,7 +978,7 @@ export class BigQuery extends common.Service {
    * @returns {Promise}
    *
    * @example
-   * const BigQuery = require('@google-cloud/bigquery');
+   * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    *
    * bigquery.getDatasets(function(err, datasets) {
@@ -1062,7 +1062,7 @@ export class BigQuery extends common.Service {
    * @returns {stream}
    *
    * @example
-   * const BigQuery = require('@google-cloud/bigquery');
+   * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    *
    * bigquery.getDatasetsStream()
@@ -1112,7 +1112,7 @@ export class BigQuery extends common.Service {
    * @returns {Promise}
    *
    * @example
-   * const BigQuery = require('@google-cloud/bigquery');
+   * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    *
    * bigquery.getJobs(function(err, jobs) {
@@ -1196,7 +1196,7 @@ export class BigQuery extends common.Service {
    * @returns {stream}
    *
    * @example
-   * const BigQuery = require('@google-cloud/bigquery');
+   * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    *
    * bigquery.getJobsStream()
@@ -1228,7 +1228,7 @@ export class BigQuery extends common.Service {
    * @returns {Job}
    *
    * @example
-   * const BigQuery = require('@google-cloud/bigquery');
+   * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    *
    * const myExistingJob = bigquery.job('job-id');
@@ -1274,7 +1274,7 @@ export class BigQuery extends common.Service {
    * @returns {Promise}
    *
    * @example
-   * const BigQuery = require('@google-cloud/bigquery');
+   * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    *
    * const query = 'SELECT url FROM `publicdata.samples.github_nested` LIMIT 100';
@@ -1472,7 +1472,7 @@ export { Table };
  * npm install --save @google-cloud/bigquery
  *
  * @example <caption>Import the client library</caption>
- * const BigQuery = require('@google-cloud/bigquery');
+ * const {BigQuery} = require('@google-cloud/bigquery');
  *
  * @example <caption>Create a client that uses <a href="https://cloud.google.com/docs/authentication/production#providing_credentials_to_your_application">Application Default Credentials (ADC)</a>:</caption>
  * const bigquery = new BigQuery();

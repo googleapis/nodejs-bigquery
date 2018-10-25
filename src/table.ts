@@ -68,7 +68,7 @@ const FORMATS = {
  *      table.
  *
  * @example
- * const BigQuery = require('@google-cloud/bigquery');
+ * const {BigQuery} = require('@google-cloud/bigquery');
  * const bigquery = new BigQuery();
  * const dataset = bigquery.dataset('my-dataset');
  *
@@ -91,7 +91,7 @@ class Table extends common.ServiceObject {
        * @returns {Promise}
        *
        * @example
-       * const BigQuery = require('@google-cloud/bigquery');
+       * const {BigQuery} = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        * const dataset = bigquery.dataset('my-dataset');
        *
@@ -126,7 +126,7 @@ class Table extends common.ServiceObject {
        * @returns {Promise}
        *
        * @example
-       * const BigQuery = require('@google-cloud/bigquery');
+       * const {BigQuery} = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        * const dataset = bigquery.dataset('my-dataset');
        *
@@ -154,7 +154,7 @@ class Table extends common.ServiceObject {
        * @returns {Promise}
        *
        * @example
-       * const BigQuery = require('@google-cloud/bigquery');
+       * const {BigQuery} = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        * const dataset = bigquery.dataset('my-dataset');
        *
@@ -191,7 +191,7 @@ class Table extends common.ServiceObject {
        * @returns {Promise}
        *
        * @example
-       * const BigQuery = require('@google-cloud/bigquery');
+       * const {BigQuery} = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        * const dataset = bigquery.dataset('my-dataset');
        *
@@ -225,7 +225,7 @@ class Table extends common.ServiceObject {
        * @returns {Promise}
        *
        * @example
-       * const BigQuery = require('@google-cloud/bigquery');
+       * const {BigQuery} = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        * const dataset = bigquery.dataset('my-dataset');
        *
@@ -281,7 +281,7 @@ class Table extends common.ServiceObject {
      * @returns {ReadableStream}
      *
      * @example
-     * const BigQuery = require('@google-cloud/bigquery');
+     * const {BigQuery} = require('@google-cloud/bigquery');
      * const bigquery = new BigQuery();
      * const dataset = bigquery.dataset('my-dataset');
      * const table = dataset.table('my-table');
@@ -447,7 +447,7 @@ class Table extends common.ServiceObject {
    * @throws {Error} If a destination other than a Table object is provided.
    *
    * @example
-   * const BigQuery = require('@google-cloud/bigquery');
+   * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('my-dataset');
    *
@@ -511,7 +511,7 @@ class Table extends common.ServiceObject {
    * @throws {Error} If a source other than a Table object is provided.
    *
    * @example
-   * const BigQuery = require('@google-cloud/bigquery');
+   * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('my-dataset');
    * const table = dataset.table('my-table');
@@ -579,7 +579,7 @@ class Table extends common.ServiceObject {
    * @throws {Error} If a destination other than a Table object is provided.
    *
    * @example
-   * const BigQuery = require('@google-cloud/bigquery');
+   * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('my-dataset');
    * const table = dataset.table('my-table');
@@ -677,7 +677,7 @@ class Table extends common.ServiceObject {
    * @throws {Error} If a source other than a Table object is provided.
    *
    * @example
-   * const BigQuery = require('@google-cloud/bigquery');
+   * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('my-dataset');
    * const table = dataset.table('my-table');
@@ -788,7 +788,7 @@ class Table extends common.ServiceObject {
    *
    * @example
    * const {Storage} = require('@google-cloud/storage');
-   * const BigQuery = require('@google-cloud/bigquery');
+   * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('my-dataset');
    * const table = dataset.table('my-table');
@@ -943,7 +943,7 @@ class Table extends common.ServiceObject {
    *
    * @example
    * const {Storage} = require('@google-cloud/storage');
-   * const BigQuery = require('@google-cloud/bigquery');
+   * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('my-dataset');
    * const table = dataset.table('my-table');
@@ -1226,7 +1226,7 @@ class Table extends common.ServiceObject {
    * @throws {Error} If source format isn't recognized.
    *
    * @example
-   * const BigQuery = require('@google-cloud/bigquery');
+   * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('my-dataset');
    * const table = dataset.table('my-table');
@@ -1309,7 +1309,7 @@ class Table extends common.ServiceObject {
    *
    * @example
    * const Storage = require('@google-cloud/storage');
-   * const BigQuery = require('@google-cloud/bigquery');
+   * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('my-dataset');
    * const table = dataset.table('my-table');
@@ -1387,7 +1387,7 @@ class Table extends common.ServiceObject {
    * @returns {Promise}
    *
    * @example
-   * const BigQuery = require('@google-cloud/bigquery');
+   * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('my-dataset');
    * const table = dataset.table('my-table');
@@ -1516,7 +1516,7 @@ class Table extends common.ServiceObject {
    * @returns {Promise}
    *
    * @example
-   * const BigQuery = require('@google-cloud/bigquery');
+   * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('my-dataset');
    * const table = dataset.table('my-table');
@@ -1734,7 +1734,7 @@ class Table extends common.ServiceObject {
    * @throws {Error} If the source isn't a string file name or a File instance.
    *
    * @example
-   * const BigQuery = require('@google-cloud/bigquery');
+   * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('my-dataset');
    * const table = dataset.table('my-table');
@@ -1834,7 +1834,7 @@ class Table extends common.ServiceObject {
    * @returns {Promise}
    *
    * @example
-   * const BigQuery = require('@google-cloud/bigquery');
+   * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('my-dataset');
    * const table = dataset.table('my-table');

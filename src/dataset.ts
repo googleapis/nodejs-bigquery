@@ -40,7 +40,7 @@ export interface DatasetDeleteOptions {
  *      Defaults to US.
  *
  * @example
- * const BigQuery = require('@google-cloud/bigquery');
+ * const {BigQuery} = require('@google-cloud/bigquery');
  * const bigquery = new BigQuery();
  * const dataset = bigquery.dataset('institutions');
  */
@@ -60,7 +60,7 @@ class Dataset extends ServiceObject {
        * @returns {Promise}
        *
        * @example
-       * const BigQuery = require('@google-cloud/bigquery');
+       * const {BigQuery} = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        * const dataset = bigquery.dataset('institutions');
        * dataset.create((err, dataset, apiResponse) => {
@@ -90,7 +90,7 @@ class Dataset extends ServiceObject {
        * @returns {Promise}
        *
        * @example
-       * const BigQuery = require('@google-cloud/bigquery');
+       * const {BigQuery} = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        * const dataset = bigquery.dataset('institutions');
        * dataset.exists((err, exists) => {});
@@ -123,7 +123,7 @@ class Dataset extends ServiceObject {
        * @returns {Promise}
        *
        * @example
-       * const BigQuery = require('@google-cloud/bigquery');
+       * const {BigQuery} = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        * const dataset = bigquery.dataset('institutions');
        * dataset.get((err, dataset, apiResponse) => {
@@ -156,7 +156,7 @@ class Dataset extends ServiceObject {
        * @returns {Promise}
        *
        * @example
-       * const BigQuery = require('@google-cloud/bigquery');
+       * const {BigQuery} = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        * const dataset = bigquery.dataset('institutions');
        * dataset.getMetadata((err, metadata, apiResponse) => {});
@@ -185,7 +185,7 @@ class Dataset extends ServiceObject {
        * @returns {Promise}
        *
        * @example
-       * const BigQuery = require('@google-cloud/bigquery');
+       * const {BigQuery} = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        * const dataset = bigquery.dataset('institutions');
        *
@@ -248,7 +248,7 @@ class Dataset extends ServiceObject {
      * @return {stream}
      *
      * @example
-     * const BigQuery = require('@google-cloud/bigquery');
+     * const {BigQuery} = require('@google-cloud/bigquery');
      * const bigquery = new BigQuery();
      * const dataset = bigquery.dataset('institutions');
      *
@@ -350,7 +350,7 @@ class Dataset extends ServiceObject {
    * @returns {Promise}
    *
    * @example
-   * const BigQuery = require('@google-cloud/bigquery');
+   * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('institutions');
    *
@@ -420,7 +420,7 @@ class Dataset extends ServiceObject {
    * @returns {Promise}
    *
    * @example
-   * const BigQuery = require('@google-cloud/bigquery');
+   * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('institutions');
    *
@@ -480,7 +480,7 @@ class Dataset extends ServiceObject {
    * @returns {Promise}
    *
    * @example
-   * const BigQuery = require('@google-cloud/bigquery');
+   * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('institutions');
    *
@@ -591,7 +591,7 @@ class Dataset extends ServiceObject {
    * @return {Table}
    *
    * @example
-   * const BigQuery = require('@google-cloud/bigquery');
+   * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('institutions');
    *

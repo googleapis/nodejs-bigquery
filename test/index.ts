@@ -1678,13 +1678,11 @@ describe('BigQuery', () => {
   describe('queryAsStream_', () => {
     it('should call query correctly', done => {
       const query = 'SELECT';
-
       bq.query = (query_, options, callback) => {
         assert.strictEqual(query_, query);
         assert.deepStrictEqual(options, {autoPaginate: false});
         callback(); // done()
       };
-
       bq.queryAsStream_(query, done);
     });
   });

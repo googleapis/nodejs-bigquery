@@ -21,7 +21,7 @@ const test = require(`ava`);
 const tools = require(`@google-cloud/nodejs-repo-tools`);
 const uuid = require(`uuid`);
 
-const BigQuery = proxyquire(`@google-cloud/bigquery`, {});
+const {BigQuery} = proxyquire(`@google-cloud/bigquery`, {});
 const bigquery = new BigQuery();
 
 const expectedDatasetId = `my_new_dataset`;
@@ -67,7 +67,9 @@ test(`quickstart should create a dataset`, async t => {
     };
 
     proxyquire(`../quickstart`, {
-      '@google-cloud/bigquery': sinon.stub().returns(bigqueryMock),
+      '@google-cloud/bigquery': {
+        BigQuery: sinon.stub().returns(bigqueryMock),
+      }
     });
   });
 });

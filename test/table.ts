@@ -27,6 +27,7 @@ import * as uuid from 'uuid';
 import * as pfy from '@google-cloud/promisify';
 import {ServiceObject, util} from '@google-cloud/common';
 import * as sinon from 'sinon';
+import {BigQuery} from '../src';
 
 let promisified = false;
 let makeWritableStreamOverride;
@@ -158,9 +159,9 @@ describe('BigQuery/Table', () => {
     table = new Table(DATASET, TABLE_ID);
     table.bigQuery.request = util.noop;
     table.bigQuery.createJob = util.noop;
-    table.bigQuery.mergeSchemaWithRows_ = (schema, rows) => {
+    sandbox.stub(BigQuery, 'mergeSchemaWithRows_').callsFake((schema, rows) => {
       return rows;
-    };
+    });
   });
 
   describe('instantiation', () => {
@@ -1734,11 +1735,12 @@ describe('BigQuery/Table', () => {
           setImmediate(callback, null, {rows});
         };
 
-        table.bigQuery.mergeSchemaWithRows_ = (schema_, rows_) => {
+        sandbox.restore();
+        sandbox.stub(BigQuery, 'mergeSchemaWithRows_').callsFake((schema_, rows_) => {
           assert.strictEqual(schema_, schema);
           assert.strictEqual(rows_, rows);
           return mergedRows;
-        };
+        });
       });
 
       it('should refresh', done => {
@@ -1793,11 +1795,12 @@ describe('BigQuery/Table', () => {
         callback(null, {rows});
       };
 
-      table.bigQuery.mergeSchemaWithRows_ = (schema_, rows_) => {
+      sandbox.restore();
+      sandbox.stub(BigQuery, 'mergeSchemaWithRows_').callsFake((schema_, rows_) => {
         assert.strictEqual(schema_, schema);
         assert.strictEqual(rows_, rows);
         return merged;
-      };
+      });
 
       table.getRows((err, rows) => {
         assert.ifError(err);
