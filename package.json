@@ -71,7 +71,7 @@
     "pretest": "npm run compile"
   },
   "dependencies": {
-    "@google-cloud/common": "^0.25.0",
+    "@google-cloud/common": "^0.26.0",
     "@google-cloud/paginator": "^0.1.0",
     "@google-cloud/promisify": "^0.3.0",
     "arrify": "^1.0.0",
@@ -87,6 +87,7 @@
     "@google-cloud/nodejs-repo-tools": "^2.2.3",
     "@google-cloud/storage": "^2.0.0",
     "@types/mocha": "^5.2.5",
+    "@types/sinon": "^5.0.5",
     "async": "^2.6.0",
     "codecov": "^3.0.0",
     "eslint": "^5.0.0",

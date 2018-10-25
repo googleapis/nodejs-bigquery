@@ -283,7 +283,9 @@ class Dataset extends ServiceObject {
    * @param {function} [callback] See {@link BigQuery#createQueryJob} for full documentation of this method.
    * @returns {Promise} See {@link BigQuery#createQueryJob} for full documentation of this method.
    */
-  createQueryJob(options, callback) {
+  createQueryJob(options): Promise<any>;
+  createQueryJob(options, callback): void;
+  createQueryJob(options, callback?): void|Promise<any> {
     if (is.string(options)) {
       options = {
         query: options,
@@ -508,7 +510,10 @@ class Dataset extends ServiceObject {
    *   const tables = data[0];
    * });
    */
-  getTables(options, callback) {
+  getTables(options?): Promise<any>;
+  getTables(options, callback): void;
+  getTables(callback): void;
+  getTables(options?, callback?): void|Promise<any> {
     if (is.fn(options)) {
       callback = options;
       options = {};
@@ -592,7 +597,7 @@ class Dataset extends ServiceObject {
    *
    * const institutions = dataset.table('institution_data');
    */
-  table(id, options) {
+  table(id, options?) {
     options = extend(
       {
         location: this.location,

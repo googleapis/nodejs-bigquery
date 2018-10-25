@@ -26,6 +26,7 @@ import * as stream from 'stream';
 import * as uuid from 'uuid';
 import * as pfy from '@google-cloud/promisify';
 import {ServiceObject, util} from '@google-cloud/common';
+import * as sinon from 'sinon';
 
 let promisified = false;
 let makeWritableStreamOverride;
@@ -37,6 +38,7 @@ const fakeUtil = extend({}, util, {
   makeWritableStream: (...args) => {
     (makeWritableStreamOverride || util.makeWritableStream).apply(null, args);
   },
+  noop: () => {}
 });
 const fakePfy = extend({}, pfy, {
   promisifyAll: Class => {
@@ -74,6 +76,10 @@ class FakeServiceObject extends ServiceObject {
     this.calledWith_ = arguments;
   }
 }
+
+let sandbox: sinon.SinonSandbox;
+beforeEach(() => sandbox = sinon.createSandbox());
+afterEach(() => sandbox.restore());
 
 describe('BigQuery/Table', () => {
   const DATASET = {
@@ -1078,10 +1084,7 @@ describe('BigQuery/Table', () => {
     });
 
     it('should return a stream when a string is given', () => {
-      table.createWriteStream_ = () => {
-        return new stream.Writable();
-      };
-
+      sandbox.stub(table, 'createWriteStream_').returns(new stream.Writable());
       assert(table.createLoadJob(FILEPATH) instanceof stream.Stream);
     });
 

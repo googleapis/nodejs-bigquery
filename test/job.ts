@@ -24,10 +24,15 @@ import * as pfy from '@google-cloud/promisify';
 import {util} from '@google-cloud/common';
 import * as sinon from 'sinon';
 
-function FakeOperation() {
-  this.calledWith_ = arguments;
-  this.interceptors = [];
-  this.id = this.calledWith_[0].id;
+class FakeOperation {
+  calledWith_: IArguments;
+  interceptors: {}[];
+  id: {};
+  constructor() {
+    this.calledWith_ = arguments;
+    this.interceptors = [];
+    this.id = this.calledWith_[0].id;
+  }
 }
 
 let promisified = false;

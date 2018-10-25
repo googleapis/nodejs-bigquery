@@ -27,10 +27,11 @@ import {Dataset} from '../src/dataset';
 import {Job} from '../src/job';
 import {Table} from '../src/table';
 
-const BigQuery = require('../src');
-const bigquery = new BigQuery();
+import {BigQuery} from '../src';
 import {Storage} from '@google-cloud/storage';
+import { ApiError } from '@google-cloud/common';
 
+const bigquery = new BigQuery();
 const storage = new Storage();
 
 describe('BigQuery', () => {
@@ -142,7 +143,7 @@ describe('BigQuery', () => {
     const maxApiCalls = 1;
     let numRequestsMade = 0;
 
-    const BigQuery = require('../src');
+    const {BigQuery} = require('../src');
     const bigquery = new BigQuery();
 
     bigquery.interceptors.push({
@@ -172,7 +173,7 @@ describe('BigQuery', () => {
     const maxApiCalls = 1;
     let numRequestsMade = 0;
 
-    const BigQuery = require('../src');
+    const {BigQuery} = require('../src');
     const bigquery = new BigQuery();
 
     bigquery.interceptors.push({
@@ -458,7 +459,7 @@ describe('BigQuery', () => {
           description: 'oh no!',
         },
         err => {
-          assert.strictEqual(err.code, 412); // precondition failed
+          assert.strictEqual((err as ApiError).code, 412); // precondition failed
           done();
         }
       );
@@ -581,7 +582,7 @@ describe('BigQuery', () => {
           const badJob = bigquery.job(job.id);
 
           badJob.getMetadata(err => {
-            assert.strictEqual(err.code, 404);
+            assert.strictEqual((err as ApiError).code, 404);
             done();
           });
         });
@@ -590,7 +591,7 @@ describe('BigQuery', () => {
           const badJob = bigquery.job(job.id, {location: 'US'});
 
           badJob.getMetadata(err => {
-            assert.strictEqual(err.code, 404);
+            assert.strictEqual((err as ApiError).code, 404);
             done();
           });
         });

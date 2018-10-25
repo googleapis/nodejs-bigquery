@@ -16,9 +16,9 @@
 
 'use strict';
 
-const async = require('async');
-const fs = require('fs');
-const BigQuery = require('../src/index.js');
+import * as async from 'async';
+import * as fs from 'fs';
+import {BigQuery} from '../src';
 const env = require('../../../system-test/env.js');
 
 if (process.argv.length < 3) {
@@ -26,7 +26,7 @@ if (process.argv.length < 3) {
     `usage: '${process.argv[0]} ${process.argv[1]} <queries.json>'`);
 }
 
-const queryJson = fs.readFileSync(process.argv[2]);
+const queryJson = fs.readFileSync(process.argv[2], 'utf8');
 const queries = JSON.parse(queryJson);
 const client = new BigQuery(env);
 
