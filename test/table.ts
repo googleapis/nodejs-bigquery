@@ -38,6 +38,7 @@ const fakeUtil = extend({}, util, {
     (makeWritableStreamOverride || util.makeWritableStream).apply(null, args);
   },
 });
+fakeUtil.noop = util.noop;
 const fakePfy = extend({}, pfy, {
   promisifyAll: Class => {
     if (Class.name === 'Table') {

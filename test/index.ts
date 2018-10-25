@@ -99,7 +99,7 @@ const fakePaginator = {
 
 function FakeService() {
   this.calledWith_ = arguments;
-  Service.apply(this, arguments);
+  return new (Service as any)(...arguments);
 }
 
 nodeutil.inherits(FakeService, Service);
