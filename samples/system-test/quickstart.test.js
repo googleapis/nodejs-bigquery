@@ -69,7 +69,7 @@ test(`quickstart should create a dataset`, async t => {
     proxyquire(`../quickstart`, {
       '@google-cloud/bigquery': {
         BigQuery: sinon.stub().returns(bigqueryMock),
-      }
+      },
     });
   });
 });

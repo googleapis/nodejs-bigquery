@@ -27,7 +27,7 @@ import {BigQuery} from '../src';
 
 class FakeOperation {
   calledWith_: IArguments;
-  interceptors: {}[];
+  interceptors: Array<{}>;
   id: {};
   constructor() {
     this.calledWith_ = arguments;
