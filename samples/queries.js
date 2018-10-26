@@ -19,7 +19,7 @@ async function queryStackOverflow() {
   // [START bigquery_simple_app_all]
   // [START bigquery_simple_app_deps]
   // Imports the Google Cloud client library
-  const BigQuery = require('@google-cloud/bigquery');
+  const {BigQuery} = require('@google-cloud/bigquery');
   // [END bigquery_simple_app_deps]
 
   // [START bigquery_simple_app_client]
@@ -63,7 +63,7 @@ async function queryStackOverflow() {
 async function query() {
   // [START bigquery_query]
   // Imports the Google Cloud client library
-  const BigQuery = require('@google-cloud/bigquery');
+  const {BigQuery} = require('@google-cloud/bigquery');
 
   // Creates a client
   const bigquery = new BigQuery();
@@ -94,7 +94,7 @@ async function query() {
 async function queryDisableCache() {
   // [START bigquery_query_no_cache]
   // Imports the Google Cloud client library
-  const BigQuery = require('@google-cloud/bigquery');
+  const {BigQuery} = require('@google-cloud/bigquery');
 
   // Creates a client
   const bigquery = new BigQuery();

@@ -26,6 +26,8 @@ import * as stream from 'stream';
 import * as uuid from 'uuid';
 import * as pfy from '@google-cloud/promisify';
 import {ServiceObject, util} from '@google-cloud/common';
+import * as sinon from 'sinon';
+import {BigQuery} from '../src';
 
 let promisified = false;
 let makeWritableStreamOverride;
@@ -37,6 +39,7 @@ const fakeUtil = extend({}, util, {
   makeWritableStream: (...args) => {
     (makeWritableStreamOverride || util.makeWritableStream).apply(null, args);
   },
+  noop: () => {}
 });
 const fakePfy = extend({}, pfy, {
   promisifyAll: Class => {
@@ -74,6 +77,10 @@ class FakeServiceObject extends ServiceObject {
     this.calledWith_ = arguments;
   }
 }
+
+let sandbox: sinon.SinonSandbox;
+beforeEach(() => sandbox = sinon.createSandbox());
+afterEach(() => sandbox.restore());
 
 describe('BigQuery/Table', () => {
   const DATASET = {
@@ -152,9 +159,9 @@ describe('BigQuery/Table', () => {
     table = new Table(DATASET, TABLE_ID);
     table.bigQuery.request = util.noop;
     table.bigQuery.createJob = util.noop;
-    table.bigQuery.mergeSchemaWithRows_ = (schema, rows) => {
+    sandbox.stub(BigQuery, 'mergeSchemaWithRows_').callsFake((schema, rows) => {
       return rows;
-    };
+    });
   });
 
   describe('instantiation', () => {
@@ -1078,10 +1085,7 @@ describe('BigQuery/Table', () => {
     });
 
     it('should return a stream when a string is given', () => {
-      table.createWriteStream_ = () => {
-        return new stream.Writable();
-      };
-
+      sandbox.stub(table, 'createWriteStream_').returns(new stream.Writable());
       assert(table.createLoadJob(FILEPATH) instanceof stream.Stream);
     });
 
@@ -1731,11 +1735,12 @@ describe('BigQuery/Table', () => {
           setImmediate(callback, null, {rows});
         };
 
-        table.bigQuery.mergeSchemaWithRows_ = (schema_, rows_) => {
+        sandbox.restore();
+        sandbox.stub(BigQuery, 'mergeSchemaWithRows_').callsFake((schema_, rows_) => {
           assert.strictEqual(schema_, schema);
           assert.strictEqual(rows_, rows);
           return mergedRows;
-        };
+        });
       });
 
       it('should refresh', done => {
@@ -1790,11 +1795,12 @@ describe('BigQuery/Table', () => {
         callback(null, {rows});
       };
 
-      table.bigQuery.mergeSchemaWithRows_ = (schema_, rows_) => {
+      sandbox.restore();
+      sandbox.stub(BigQuery, 'mergeSchemaWithRows_').callsFake((schema_, rows_) => {
         assert.strictEqual(schema_, schema);
         assert.strictEqual(rows_, rows);
         return merged;
-      };
+      });
 
       table.getRows((err, rows) => {
         assert.ifError(err);

@@ -26,6 +26,7 @@ import {paginator} from '@google-cloud/paginator';
 import * as extend from 'extend';
 import * as is from 'is';
 import * as request from 'request';
+import {BigQuery} from '../src';
 
 /**
  * Job objects are returned from various places in the BigQuery API:
@@ -50,7 +51,7 @@ import * as request from 'request';
  *      Required except for US and EU.
  *
  * @example
- * const BigQuery = require('@google-cloud/bigquery');
+ * const {BigQuery} = require('@google-cloud/bigquery');
  * const bigquery = new BigQuery();
  *
  * const job = bigquery.job('job-id');
@@ -98,7 +99,7 @@ class Job extends Operation {
        * @returns {Promise}
        *
        * @example
-       * const BigQuery = require('@google-cloud/bigquery');
+       * const {BigQuery} = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        *
        * const job = bigquery.job('job-id');
@@ -125,7 +126,7 @@ class Job extends Operation {
        * @returns {Promise}
        *
        * @example
-       * const BigQuery = require('@google-cloud/bigquery');
+       * const {BigQuery} = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        *
        * const job = bigquery.job('job-id');
@@ -160,7 +161,7 @@ class Job extends Operation {
        * @returns {Promise}
        *
        * @example
-       * const BigQuery = require('@google-cloud/bigquery');
+       * const {BigQuery} = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        *
        * const job = bigquery.job('id');
@@ -195,7 +196,7 @@ class Job extends Operation {
        * @returns {Promise}
        *
        * @example
-       * const BigQuery = require('@google-cloud/bigquery');
+       * const {BigQuery} = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        *
        * const metadata = {
@@ -244,7 +245,7 @@ class Job extends Operation {
     * @example
     * const through2 = require('through2');
     * const fs = require('fs');
-    * const BigQuery = require('@google-cloud/bigquery');
+    * const {BigQuery} = require('@google-cloud/bigquery');
     * const bigquery = new BigQuery();
     *
     * const job = bigquery.job('job-id');
@@ -273,7 +274,7 @@ class Job extends Operation {
    * @returns {Promise}
    *
    * @example
-   * const BigQuery = require('@google-cloud/bigquery');
+   * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    *
    * const job = bigquery.job('job-id');
@@ -347,7 +348,7 @@ class Job extends Operation {
    * @returns {Promise}
    *
    * @example
-   * const BigQuery = require('@google-cloud/bigquery');
+   * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    *
    * const job = bigquery.job('job-id');
@@ -417,7 +418,7 @@ class Job extends Operation {
         let rows = [];
 
         if (resp.schema && resp.rows) {
-          rows = this.bigQuery.mergeSchemaWithRows_(resp.schema, resp.rows);
+          rows = BigQuery.mergeSchemaWithRows_(resp.schema, resp.rows);
         }
 
         let nextQuery = null;

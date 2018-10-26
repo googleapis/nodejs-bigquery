@@ -23,11 +23,17 @@ import * as proxyquire from 'proxyquire';
 import * as pfy from '@google-cloud/promisify';
 import {util} from '@google-cloud/common';
 import * as sinon from 'sinon';
+import {BigQuery} from '../src';
 
-function FakeOperation() {
-  this.calledWith_ = arguments;
-  this.interceptors = [];
-  this.id = this.calledWith_[0].id;
+class FakeOperation {
+  calledWith_: IArguments;
+  interceptors: Array<{}>;
+  id: {};
+  constructor() {
+    this.calledWith_ = arguments;
+    this.interceptors = [];
+    this.id = this.calledWith_[0].id;
+  }
 }
 
 let promisified = false;
@@ -56,6 +62,10 @@ const fakePaginator = {
     },
   }
 };
+
+let sandbox: sinon.SinonSandbox;
+beforeEach(() => sandbox = sinon.createSandbox());
+afterEach(() => sandbox.restore());
 
 describe('BigQuery/Job', () => {
   const BIGQUERY: any = {
@@ -250,11 +260,11 @@ describe('BigQuery/Job', () => {
         callback(null, response);
       };
 
-      BIGQUERY.mergeSchemaWithRows_ = (schema, rows) => {
+      sandbox.stub(BigQuery, 'mergeSchemaWithRows_').callsFake((schema, rows) => {
         assert.strictEqual(schema, response.schema);
         assert.strictEqual(rows, response.rows);
         return mergedRows;
-      };
+      });
 
       job.getQueryResults((err, rows) => {
         assert.ifError(err);
