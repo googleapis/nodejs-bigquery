@@ -195,6 +195,7 @@ describe('BigQuery', () => {
     return bigquery
       .getDatasets({
         autoPaginate: false,
+        filter: `labels.${GCLOUD_TESTS_PREFIX}`,
       })
       .then(data => {
         const datasets = data[0];
