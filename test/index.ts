@@ -38,8 +38,8 @@ class FakeApiError {
 
 let promisified = false;
 const fakePfy = extend({}, pfy, {
-  promisifyAll: (Class, options) => {
-    if (Class.name !== 'BigQuery') {
+  promisifyAll: (c, options) => {
+    if (c.name !== 'BigQuery') {
       return;
     }
     promisified = true;
@@ -75,24 +75,15 @@ class FakeJob {
   }
 }
 
-let mergeSchemaWithRowsOverride;
-(FakeTable as any).mergeSchemaWithRows_ = (...args) => {
-  return (mergeSchemaWithRowsOverride || (Table as any).mergeSchemaWithRows_).apply(
-    null,
-    args
-  );
-};
-
 let extended = false;
 const fakePaginator = {
   paginator: {
-    extend: (Class, methods) => {
-      if (Class.name !== 'BigQuery') {
+    extend: (c, methods) => {
+      if (c.name !== 'BigQuery') {
         return;
       }
-
       methods = arrify(methods);
-      assert.strictEqual(Class.name, 'BigQuery');
+      assert.strictEqual(c.name, 'BigQuery');
       assert.deepStrictEqual(methods, ['getDatasets', 'getJobs']);
       extended = true;
     },
@@ -119,29 +110,32 @@ describe('BigQuery', () => {
   const PROJECT_ID = 'test-project';
   const LOCATION = 'asia-northeast1';
 
+  // tslint:disable-next-line no-any variable-name
   let BigQueryCached;
+  // tslint:disable-next-line no-any variable-name
   let BigQuery;
+  // tslint:disable-next-line no-any
   let bq;
 
   before(() => {
     BigQuery = proxyquire('../src', {
-      uuid: fakeUuid,
-      './dataset': {
-        Dataset: FakeDataset,
-      },
-      './job': {
-        Job: FakeJob,
-      },
-      './table': {
-        Table: FakeTable,
-      },
-      '@google-cloud/common': {
-        Service: FakeService,
-        util: fakeUtil,
-      },
-      '@google-cloud/paginator': fakePaginator,
-      '@google-cloud/promisify': fakePfy,
-    }).BigQuery;
+                 uuid: fakeUuid,
+                 './dataset': {
+                   Dataset: FakeDataset,
+                 },
+                 './job': {
+                   Job: FakeJob,
+                 },
+                 './table': {
+                   Table: FakeTable,
+                 },
+                 '@google-cloud/common': {
+                   Service: FakeService,
+                   util: fakeUtil,
+                 },
+                 '@google-cloud/paginator': fakePaginator,
+                 '@google-cloud/promisify': fakePfy,
+               }).BigQuery;
     BigQueryCached = extend({}, BigQuery);
   });
 
@@ -153,7 +147,7 @@ describe('BigQuery', () => {
 
   describe('instantiation', () => {
     it('should extend the correct methods', () => {
-      assert(extended); // See `fakePaginator.extend`
+      assert(extended);  // See `fakePaginator.extend`
     });
 
     it('should streamify the correct methods', () => {
@@ -177,9 +171,7 @@ describe('BigQuery', () => {
         'https://www.googleapis.com/auth/bigquery',
       ]);
       assert.deepStrictEqual(
-        calledWith.packageJson,
-        require('../../package.json')
-      );
+          calledWith.packageJson, require('../../package.json'));
     });
 
     it('should capture any user specified location', () => {
@@ -620,12 +612,10 @@ describe('BigQuery', () => {
     });
 
     it('should throw if a type cannot be detected', () => {
-      const expectedError = new RegExp(
-        [
-          'This value could not be translated to a BigQuery data type.',
-          undefined,
-        ].join('\n')
-      );
+      const expectedError = new RegExp([
+        'This value could not be translated to a BigQuery data type.',
+        undefined,
+      ].join('\n'));
 
       assert.throws(() => {
         BigQuery.getType_(undefined);
@@ -673,8 +663,8 @@ describe('BigQuery', () => {
       };
 
       sandbox.stub(BigQuery, 'getType_').returns({
-          type: 'DATETIME',
-        });
+        type: 'DATETIME',
+      });
 
       const queryParameter = BigQuery.valueToQueryParameter_(datetime);
       assert.strictEqual(queryParameter.parameterValue.value, datetime.value);
@@ -695,7 +685,7 @@ describe('BigQuery', () => {
 
     it('should format an array', () => {
       const array = [1];
-      sandbox.stub(BigQuery, 'getType_').returns({ type: 'ARRAY' });
+      sandbox.stub(BigQuery, 'getType_').returns({type: 'ARRAY'});
       const queryParameter = BigQuery.valueToQueryParameter_(array);
       const arrayValues = queryParameter.parameterValue.arrayValues;
       assert.deepStrictEqual(arrayValues, [
@@ -1046,13 +1036,11 @@ describe('BigQuery', () => {
       it('should assign destination table to request body', done => {
         bq.request = reqOpts => {
           assert.deepStrictEqual(
-            reqOpts.json.configuration.query.destinationTable,
-            {
-              datasetId: dataset.id,
-              projectId: dataset.bigQuery.projectId,
-              tableId: TABLE_ID,
-            }
-          );
+              reqOpts.json.configuration.query.destinationTable, {
+                datasetId: dataset.id,
+                projectId: dataset.bigQuery.projectId,
+                tableId: TABLE_ID,
+              });
 
           done();
         };
@@ -1091,12 +1079,11 @@ describe('BigQuery', () => {
         };
 
         bq.createQueryJob(
-          {
-            query: QUERY_STRING,
-            params: NAMED_PARAMS,
-          },
-          assert.ifError
-        );
+            {
+              query: QUERY_STRING,
+              params: NAMED_PARAMS,
+            },
+            assert.ifError);
       });
 
       describe('named', () => {
@@ -1108,12 +1095,11 @@ describe('BigQuery', () => {
           };
 
           bq.createQueryJob(
-            {
-              query: QUERY_STRING,
-              params: NAMED_PARAMS,
-            },
-            assert.ifError
-          );
+              {
+                query: QUERY_STRING,
+                params: NAMED_PARAMS,
+              },
+              assert.ifError);
         });
 
         it('should get set the correct query parameters', done => {
@@ -1132,12 +1118,11 @@ describe('BigQuery', () => {
           };
 
           bq.createQueryJob(
-            {
-              query: QUERY_STRING,
-              params: NAMED_PARAMS,
-            },
-            assert.ifError
-          );
+              {
+                query: QUERY_STRING,
+                params: NAMED_PARAMS,
+              },
+              assert.ifError);
         });
       });
 
@@ -1150,12 +1135,11 @@ describe('BigQuery', () => {
           };
 
           bq.createQueryJob(
-            {
-              query: QUERY_STRING,
-              params: POSITIONAL_PARAMS,
-            },
-            assert.ifError
-          );
+              {
+                query: QUERY_STRING,
+                params: POSITIONAL_PARAMS,
+              },
+              assert.ifError);
         });
 
         it('should get set the correct query parameters', done => {
@@ -1173,12 +1157,11 @@ describe('BigQuery', () => {
           };
 
           bq.createQueryJob(
-            {
-              query: QUERY_STRING,
-              params: POSITIONAL_PARAMS,
-            },
-            assert.ifError
-          );
+              {
+                query: QUERY_STRING,
+                params: POSITIONAL_PARAMS,
+              },
+              assert.ifError);
         });
       });
     });
@@ -1245,7 +1228,7 @@ describe('BigQuery', () => {
 
     it('should pass the callback to createJob', done => {
       bq.createJob = (reqOpts, callback) => {
-        callback(); // the done fn
+        callback();  // the done fn
       };
 
       bq.createQueryJob(QUERY_STRING, done);
@@ -1681,7 +1664,7 @@ describe('BigQuery', () => {
       bq.query = (query_, options, callback) => {
         assert.strictEqual(query_, query);
         assert.deepStrictEqual(options, {autoPaginate: false});
-        callback(); // done()
+        callback();  // done()
       };
       bq.queryAsStream_(query, done);
     });

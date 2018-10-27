@@ -56,7 +56,7 @@
   "scripts": {
     "benchmark": "time node benchmark/bench.js benchmark/queries.json",
     "docs": "jsdoc -c .jsdoc.js",
-    "lint": "eslint samples/",
+    "lint": "gts check && eslint samples/",
     "cover": "nyc --reporter=lcov mocha test/*.js && nyc report",
     "samples-test": "cd samples/ && npm link ../ && npm test && cd ../",
     "test": "mocha build/test",
@@ -65,9 +65,10 @@
     "check": "gts check",
     "clean": "gts clean",
     "compile": "tsc -p .",
-    "fix": "eslint --fix '**/*.js'",
+    "fix": "gts fix && eslint --fix '**/*.js'",
     "prepare": "npm run compile",
-    "pretest": "npm run compile"
+    "pretest": "npm run compile",
+    "posttest": "npm run check"
   },
   "dependencies": {
     "@google-cloud/common": "^0.26.0",

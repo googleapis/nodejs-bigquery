@@ -38,8 +38,8 @@ class FakeOperation {
 
 let promisified = false;
 const fakePfy = extend({}, pfy, {
-  promisifyAll: Class => {
-    if (Class.name === 'Job') {
+  promisifyAll: c => {
+    if (c.name === 'Job') {
       promisified = true;
     }
   },
@@ -48,8 +48,8 @@ const fakePfy = extend({}, pfy, {
 let extended = false;
 const fakePaginator = {
   paginator: {
-    extend: (Class, methods) => {
-      if (Class.name !== 'Job') {
+    extend: (c, methods) => {
+      if (c.name !== 'Job') {
         return;
       }
 
@@ -68,6 +68,7 @@ beforeEach(() => sandbox = sinon.createSandbox());
 afterEach(() => sandbox.restore());
 
 describe('BigQuery/Job', () => {
+  // tslint:disable-next-line no-any
   const BIGQUERY: any = {
     projectId: 'my-project',
     Promise,
@@ -75,17 +76,16 @@ describe('BigQuery/Job', () => {
   const JOB_ID = 'job_XYrk_3z';
   const LOCATION = 'asia-northeast1';
 
+  // tslint:disable-next-line no-any variable-name
   let Job;
   let job;
 
   before(() => {
     Job = proxyquire('../src/job.js', {
-      '@google-cloud/common': {
-        Operation: FakeOperation
-      },
-      '@google-cloud/paginator': fakePaginator,
-      '@google-cloud/promisify': fakePfy,
-    }).Job;
+            '@google-cloud/common': {Operation: FakeOperation},
+            '@google-cloud/paginator': fakePaginator,
+            '@google-cloud/promisify': fakePfy,
+          }).Job;
   });
 
   beforeEach(() => {
@@ -260,11 +260,12 @@ describe('BigQuery/Job', () => {
         callback(null, response);
       };
 
-      sandbox.stub(BigQuery, 'mergeSchemaWithRows_').callsFake((schema, rows) => {
-        assert.strictEqual(schema, response.schema);
-        assert.strictEqual(rows, response.rows);
-        return mergedRows;
-      });
+      sandbox.stub(BigQuery, 'mergeSchemaWithRows_')
+          .callsFake((schema, rows) => {
+            assert.strictEqual(schema, response.schema);
+            assert.strictEqual(rows, response.rows);
+            return mergedRows;
+          });
 
       job.getQueryResults((err, rows) => {
         assert.ifError(err);
@@ -313,7 +314,7 @@ describe('BigQuery/Job', () => {
           c: 'd',
           autoPaginate: false,
         });
-        callback(); // done()
+        callback();  // done()
       };
 
       job.getQueryResultsAsStream_(options, done);

@@ -148,8 +148,8 @@ class Job extends Operation {
       get: true,
 
       /**
-       * Get the metadata of the job. This will mostly be useful for checking the
-       * status of a previously-run job.
+       * Get the metadata of the job. This will mostly be useful for checking
+       * the status of a previously-run job.
        *
        * @see [Jobs: get API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/get}
        *
@@ -227,7 +227,7 @@ class Job extends Operation {
       id,
       methods,
       requestModule: request,
-    } as any);
+    });
 
     this.bigQuery = bigQuery;
 
@@ -236,30 +236,29 @@ class Job extends Operation {
     }
 
     /**
-    * Get the results of a job as a readable object stream.
-    *
-    * @param {object} options Configuration object. See
-    *     {@link Job#getQueryResults} for a complete list of options.
-    * @return {stream}
-    *
-    * @example
-    * const through2 = require('through2');
-    * const fs = require('fs');
-    * const {BigQuery} = require('@google-cloud/bigquery');
-    * const bigquery = new BigQuery();
-    *
-    * const job = bigquery.job('job-id');
-    *
-    * job.getQueryResultsStream()
-    *   .pipe(through2.obj(function (row, enc, next) {
-    *     this.push(JSON.stringify(row) + '\n');
-    *     next();
-    *   }))
-    *   .pipe(fs.createWriteStream('./test/testdata/testfile.json'));
-    */
-    this.getQueryResultsStream = paginator.streamify(
-      'getQueryResultsAsStream_'
-    );
+     * Get the results of a job as a readable object stream.
+     *
+     * @param {object} options Configuration object. See
+     *     {@link Job#getQueryResults} for a complete list of options.
+     * @return {stream}
+     *
+     * @example
+     * const through2 = require('through2');
+     * const fs = require('fs');
+     * const {BigQuery} = require('@google-cloud/bigquery');
+     * const bigquery = new BigQuery();
+     *
+     * const job = bigquery.job('job-id');
+     *
+     * job.getQueryResultsStream()
+     *   .pipe(through2.obj(function (row, enc, next) {
+     *     this.push(JSON.stringify(row) + '\n');
+     *     next();
+     *   }))
+     *   .pipe(fs.createWriteStream('./test/testdata/testfile.json'));
+     */
+    this.getQueryResultsStream =
+        paginator.streamify('getQueryResultsAsStream_');
   }
 
   /**
@@ -300,13 +299,12 @@ class Job extends Operation {
     }
 
     this.request(
-      {
-        method: 'POST',
-        uri: '/cancel',
-        qs,
-      },
-      callback
-    );
+        {
+          method: 'POST',
+          uri: '/cancel',
+          qs,
+        },
+        callback);
   }
 
   /**
@@ -335,13 +333,13 @@ class Job extends Operation {
    * @param {number} [options.maxApiCalls] Maximum number of API calls to make.
    * @param {number} [options.maxResults] Maximum number of results to read.
    * @param {string} [options.pageToken] Page token, returned by a previous call,
-   *     to request the next page of results. Note: This is automatically added to
-   *     the `nextQuery` argument of your callback.
+   *     to request the next page of results. Note: This is automatically added
+   * to the `nextQuery` argument of your callback.
    * @param {number} [options.startIndex] Zero-based index of the starting row.
    * @param {number} [options.timeoutMs] How long to wait for the query to
    *     complete, in milliseconds, before returning. Default is to return
-   *     immediately. If the timeout passes before the job completes, the request
-   *     will fail with a `TIMEOUT` error.
+   *     immediately. If the timeout passes before the job completes, the
+   * request will fail with a `TIMEOUT` error.
    * @param {QueryResultsCallback|ManualQueryResultsCallback} [callback] The
    *     callback function. If `autoPaginate` is set to false a
    *     {@link ManualQueryResultsCallback} should be used.
@@ -398,43 +396,41 @@ class Job extends Operation {
     }
 
     options = extend(
-      {
-        location: this.location,
-      },
-      options
-    );
+        {
+          location: this.location,
+        },
+        options);
 
     this.bigQuery.request(
-      {
-        uri: '/queries/' + this.id,
-        qs: options,
-      },
-      (err, resp) => {
-        if (err) {
-          callback(err, null, null, resp);
-          return;
-        }
+        {
+          uri: '/queries/' + this.id,
+          qs: options,
+        },
+        (err, resp) => {
+          if (err) {
+            callback(err, null, null, resp);
+            return;
+          }
 
-        let rows = [];
+          let rows = [];
 
-        if (resp.schema && resp.rows) {
-          rows = BigQuery.mergeSchemaWithRows_(resp.schema, resp.rows);
-        }
+          if (resp.schema && resp.rows) {
+            rows = BigQuery.mergeSchemaWithRows_(resp.schema, resp.rows);
+          }
 
-        let nextQuery = null;
-        if (resp.jobComplete === false) {
-          // Query is still running.
-          nextQuery = extend({}, options);
-        } else if (resp.pageToken) {
-          // More results exist.
-          nextQuery = extend({}, options, {
-            pageToken: resp.pageToken,
-          });
-        }
+          let nextQuery = null;
+          if (resp.jobComplete === false) {
+            // Query is still running.
+            nextQuery = extend({}, options);
+          } else if (resp.pageToken) {
+            // More results exist.
+            nextQuery = extend({}, options, {
+              pageToken: resp.pageToken,
+            });
+          }
 
-        callback(null, rows, nextQuery, resp);
-      }
-    );
+          callback(null, rows, nextQuery, resp);
+        });
   }
 
   /**
@@ -461,7 +457,11 @@ class Job extends Operation {
    */
   poll_(callback) {
     this.getMetadata((err, metadata, apiResponse) => {
-      if (!err && (apiResponse as any).status && (apiResponse as any).status.errors) {
+      // tslint:disable-next-line no-any
+      if (!err && (apiResponse as any).status &&
+          // tslint:disable-next-line no-any
+          (apiResponse as any).status.errors) {
+        // tslint:disable-next-line no-any
         err = new util.ApiError((apiResponse as any).status);
       }
 
@@ -470,7 +470,7 @@ class Job extends Operation {
         return;
       }
 
-      if ((metadata as any).status.state !== 'DONE') {
+      if (metadata.status.state !== 'DONE') {
         callback();
         return;
       }
