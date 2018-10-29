@@ -8,6 +8,24 @@
 
 ### Implementation Changes
 *This release drops support for Node.js 4.x and 9.x. Future releases might not be compatible with your application if they are still on these non-LTS version.*
+*BREAKING CHANGE* This library is now compatible with es module import syntax
+
+
+#### Old Code
+```js
+const BigQuery = require('@google-cloud/bigquery')();
+// or...
+const BigQuery = require('@google-cloud/bigquery');
+const bq = new BigQuery();
+```
+
+#### New Code
+```js
+const {BigQuery} = require('@google-cloud/bigquery');
+const bq = new BigQuery();
+```
+
+- refactor(typescript): convert index to es module ([#227](https://github.com/googleapis/nodejs-bigquery/pull/227)
 - fix: drop support for node.js 4.x and 9.x ([#142](https://github.com/googleapis/nodejs-bigquery/pull/142))
 - wait for job result before emitting complete. ([#85](https://github.com/googleapis/nodejs-bigquery/pull/85))
 - fix: Update table.js ([#78](https://github.com/googleapis/nodejs-bigquery/pull/78))
@@ -22,6 +40,7 @@ BigQuery ORC:
 - Support ORC files. ([#190](https://github.com/googleapis/nodejs-bigquery/pull/190))
 
 ### Dependencies
+- chore(deps): update dependency eslint-plugin-node to v8 ([#234](https://github.com/googleapis/nodejs-bigquery/pull/234))
 - chore(deps): lock file maintenance ([#143](https://github.com/googleapis/nodejs-bigquery/pull/143))
 - chore(deps): update dependency sinon to v7 ([#212](https://github.com/googleapis/nodejs-bigquery/pull/212))
 - chore(deps): update dependency eslint-plugin-prettier to v3 ([#207](https://github.com/googleapis/nodejs-bigquery/pull/207))
@@ -66,6 +85,8 @@ BigQuery ORC:
 - chore: make samples test work ([#113](https://github.com/googleapis/nodejs-bigquery/pull/113))
 
 ### Internal / Testing Changes
+- refactor(ts): re-enable fix and lint ([#232](https://github.com/googleapis/nodejs-bigquery/pull/232))
+- fix(tests): fix system-test ([#231](https://github.com/googleapis/nodejs-bigquery/pull/231))
 - Pass an empty object. ([#191](https://github.com/googleapis/nodejs-bigquery/pull/191))
 - fix: (tests) Use a filter to locate datasets used in tests. ([#177](https://github.com/googleapis/nodejs-bigquery/pull/177))
 - chore: update issue templates ([#229](https://github.com/googleapis/nodejs-bigquery/pull/229))
