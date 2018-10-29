@@ -145,7 +145,7 @@ describe('BigQuery/Table', () => {
 
       Table[tableMethod] = () => {
         return (tableOverrides[tableMethod] || tableCached[tableMethod])
-            .apply(this, arguments);
+            .apply(null, arguments);
       };
     });
   });
@@ -296,17 +296,29 @@ describe('BigQuery/Table', () => {
     });
 
     it('should properly encode custom types', () => {
-      function BigQueryDate(value) {
-        this.value = value;
+      class BigQueryDate {
+        value: {};
+        constructor(value) {
+          this.value = value;
+        }
       }
-      function BigQueryDatetime(value) {
-        this.value = value;
+      class BigQueryDatetime {
+        value: {};
+        constructor(value) {
+          this.value = value;
+        }
       }
-      function BigQueryTime(value) {
-        this.value = value;
+      class BigQueryTime {
+        value: {};
+        constructor(value) {
+          this.value = value;
+        }
       }
-      function BigQueryTimestamp(value) {
-        this.value = value;
+      class BigQueryTimestamp {
+        value: {};
+        constructor(value) {
+          this.value = value;
+        }
       }
 
       const date = new BigQueryDate('date');

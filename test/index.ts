@@ -58,8 +58,11 @@ const fakeUtil = extend({}, util, {
 });
 const originalFakeUtil = extend(true, {}, fakeUtil);
 
-function FakeDataset() {
-  this.calledWith_ = arguments;
+class FakeDataset {
+  calledWith_: IArguments;
+  constructor() {
+    this.calledWith_ = arguments;
+  }
 }
 
 class FakeTable extends Table {
