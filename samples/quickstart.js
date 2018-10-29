@@ -17,7 +17,7 @@
 
 // [START bigquery_quickstart]
 // Imports the Google Cloud client library
-const BigQuery = require('@google-cloud/bigquery');
+const {BigQuery} = require('@google-cloud/bigquery');
 
 // Your Google Cloud Platform project ID
 const projectId = 'YOUR_PROJECT_ID';

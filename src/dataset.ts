@@ -24,6 +24,9 @@ import * as is from 'is';
 import {Table} from './table';
 import * as request from 'request';
 
+// tslint:disable-next-line no-any
+export type TempResponse = any;
+
 export interface DatasetDeleteOptions {
   force?: boolean;
 }
@@ -40,13 +43,12 @@ export interface DatasetDeleteOptions {
  *      Defaults to US.
  *
  * @example
- * const BigQuery = require('@google-cloud/bigquery');
+ * const {BigQuery} = require('@google-cloud/bigquery');
  * const bigquery = new BigQuery();
  * const dataset = bigquery.dataset('institutions');
  */
 class Dataset extends ServiceObject {
   constructor(bigQuery, id, options) {
-
     const methods = {
       /**
        * Create a dataset.
@@ -60,7 +62,7 @@ class Dataset extends ServiceObject {
        * @returns {Promise}
        *
        * @example
-       * const BigQuery = require('@google-cloud/bigquery');
+       * const {BigQuery} = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        * const dataset = bigquery.dataset('institutions');
        * dataset.create((err, dataset, apiResponse) => {
@@ -90,7 +92,7 @@ class Dataset extends ServiceObject {
        * @returns {Promise}
        *
        * @example
-       * const BigQuery = require('@google-cloud/bigquery');
+       * const {BigQuery} = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        * const dataset = bigquery.dataset('institutions');
        * dataset.exists((err, exists) => {});
@@ -107,10 +109,10 @@ class Dataset extends ServiceObject {
       /**
        * Get a dataset if it exists.
        *
-       * You may optionally use this to "get or create" an object by providing an
-       * object with `autoCreate` set to `true`. Any extra configuration that is
-       * normally required for the `create` method must be contained within this
-       * object as well.
+       * You may optionally use this to "get or create" an object by providing
+       * an object with `autoCreate` set to `true`. Any extra configuration that
+       * is normally required for the `create` method must be contained within
+       * this object as well.
        *
        * @method Dataset#get
        * @param {options} [options] Configuration object.
@@ -123,7 +125,7 @@ class Dataset extends ServiceObject {
        * @returns {Promise}
        *
        * @example
-       * const BigQuery = require('@google-cloud/bigquery');
+       * const {BigQuery} = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        * const dataset = bigquery.dataset('institutions');
        * dataset.get((err, dataset, apiResponse) => {
@@ -156,7 +158,7 @@ class Dataset extends ServiceObject {
        * @returns {Promise}
        *
        * @example
-       * const BigQuery = require('@google-cloud/bigquery');
+       * const {BigQuery} = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        * const dataset = bigquery.dataset('institutions');
        * dataset.getMetadata((err, metadata, apiResponse) => {});
@@ -185,7 +187,7 @@ class Dataset extends ServiceObject {
        * @returns {Promise}
        *
        * @example
-       * const BigQuery = require('@google-cloud/bigquery');
+       * const {BigQuery} = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        * const dataset = bigquery.dataset('institutions');
        *
@@ -240,15 +242,15 @@ class Dataset extends ServiceObject {
     });
 
     /**
-     * List all or some of the {module:bigquery/table} objects in your project as a
-     * readable object stream.
+     * List all or some of the {module:bigquery/table} objects in your project
+     * as a readable object stream.
      *
      * @param {object} [options] Configuration object. See
      *     {@link Dataset#getTables} for a complete list of options.
      * @return {stream}
      *
      * @example
-     * const BigQuery = require('@google-cloud/bigquery');
+     * const {BigQuery} = require('@google-cloud/bigquery');
      * const bigquery = new BigQuery();
      * const dataset = bigquery.dataset('institutions');
      *
@@ -283,7 +285,9 @@ class Dataset extends ServiceObject {
    * @param {function} [callback] See {@link BigQuery#createQueryJob} for full documentation of this method.
    * @returns {Promise} See {@link BigQuery#createQueryJob} for full documentation of this method.
    */
-  createQueryJob(options, callback) {
+  createQueryJob(options): Promise<TempResponse>;
+  createQueryJob(options, callback): void;
+  createQueryJob(options, callback?): void|Promise<TempResponse> {
     if (is.string(options)) {
       options = {
         query: options,
@@ -334,7 +338,8 @@ class Dataset extends ServiceObject {
    *
    * @param {string} id Table id.
    * @param {object} [options] See a
-   *     [Table resource](https://cloud.google.com/bigquery/docs/reference/v2/tables#resource).
+   *     [Table
+   * resource](https://cloud.google.com/bigquery/docs/reference/v2/tables#resource).
    * @param {string|object} [options.schema] A comma-separated list of name:type
    *     pairs. Valid types are "string", "integer", "float", "boolean", and
    *     "timestamp". If the type is omitted, it is assumed to be "string".
@@ -348,7 +353,7 @@ class Dataset extends ServiceObject {
    * @returns {Promise}
    *
    * @example
-   * const BigQuery = require('@google-cloud/bigquery');
+   * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('institutions');
    *
@@ -384,25 +389,24 @@ class Dataset extends ServiceObject {
     };
 
     this.request(
-      {
-        method: 'POST',
-        uri: '/tables',
-        json: body,
-      },
-      (err, resp) => {
-        if (err) {
-          callback(err, null, resp);
-          return;
-        }
+        {
+          method: 'POST',
+          uri: '/tables',
+          json: body,
+        },
+        (err, resp) => {
+          if (err) {
+            callback(err, null, resp);
+            return;
+          }
 
-        const table = this.table(resp.tableReference.tableId, {
-          location: resp.location,
+          const table = this.table(resp.tableReference.tableId, {
+            location: resp.location,
+          });
+
+          table.metadata = resp;
+          callback(null, table, resp);
         });
-
-        table.metadata = resp;
-        callback(null, table, resp);
-      }
-    );
   }
 
   /**
@@ -418,7 +422,7 @@ class Dataset extends ServiceObject {
    * @returns {Promise}
    *
    * @example
-   * const BigQuery = require('@google-cloud/bigquery');
+   * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('institutions');
    *
@@ -442,22 +446,25 @@ class Dataset extends ServiceObject {
   delete(options?: DatasetDeleteOptions): Promise<[request.Response]>;
   delete(options: DatasetDeleteOptions, callback: DeleteCallback): void;
   delete(callback: DeleteCallback): void;
-  delete(optionsOrCallback?: DeleteCallback|DatasetDeleteOptions, callback?: DeleteCallback): void|Promise<[request.Response]> {
-    const options = typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
-    callback = typeof optionsOrCallback === 'function' ? optionsOrCallback : callback;
+  delete(
+      optionsOrCallback?: DeleteCallback|DatasetDeleteOptions,
+      callback?: DeleteCallback): void|Promise<[request.Response]> {
+    const options =
+        typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
+    callback =
+        typeof optionsOrCallback === 'function' ? optionsOrCallback : callback;
 
     const query = {
       deleteContents: !!options.force,
     };
 
     this.request(
-      {
-        method: 'DELETE',
-        uri: '',
-        qs: query,
-      },
-      callback!
-    );
+        {
+          method: 'DELETE',
+          uri: '',
+          qs: query,
+        },
+        callback!);
   }
 
   /**
@@ -478,7 +485,7 @@ class Dataset extends ServiceObject {
    * @returns {Promise}
    *
    * @example
-   * const BigQuery = require('@google-cloud/bigquery');
+   * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('institutions');
    *
@@ -508,7 +515,10 @@ class Dataset extends ServiceObject {
    *   const tables = data[0];
    * });
    */
-  getTables(options, callback) {
+  getTables(options?): Promise<TempResponse>;
+  getTables(options, callback): void;
+  getTables(callback): void;
+  getTables(options?, callback?): void|Promise<TempResponse> {
     if (is.fn(options)) {
       callback = options;
       options = {};
@@ -517,33 +527,32 @@ class Dataset extends ServiceObject {
     options = options || {};
 
     this.request(
-      {
-        uri: '/tables',
-        qs: options,
-      },
-      (err, resp) => {
-        if (err) {
-          callback(err, null, null, resp);
-          return;
-        }
+        {
+          uri: '/tables',
+          qs: options,
+        },
+        (err, resp) => {
+          if (err) {
+            callback(err, null, null, resp);
+            return;
+          }
 
-        let nextQuery = null;
-        if (resp.nextPageToken) {
-          nextQuery = extend({}, options, {
-            pageToken: resp.nextPageToken,
-          });
-        }
+          let nextQuery = null;
+          if (resp.nextPageToken) {
+            nextQuery = extend({}, options, {
+              pageToken: resp.nextPageToken,
+            });
+          }
 
-        const tables = (resp.tables || []).map(tableObject => {
-          const table = this.table(tableObject.tableReference.tableId, {
-            location: tableObject.location,
+          const tables = (resp.tables || []).map(tableObject => {
+            const table = this.table(tableObject.tableReference.tableId, {
+              location: tableObject.location,
+            });
+            table.metadata = tableObject;
+            return table;
           });
-          table.metadata = tableObject;
-          return table;
+          callback(null, tables, nextQuery, resp);
         });
-        callback(null, tables, nextQuery, resp);
-      }
-    );
   }
 
   /**
@@ -579,26 +588,25 @@ class Dataset extends ServiceObject {
    * @param {object} [options] Table options.
    * @param {string} [options.location] The geographic location of the table, by
    *      default this value is inherited from the dataset. This can be used to
-   *      configure the location of all jobs created through a table instance. It
-   *      cannot be used to set the actual location of the table. This value will
+   *      configure the location of all jobs created through a table instance.
+   * It cannot be used to set the actual location of the table. This value will
    *      be superseded by any API responses containing location data for the
    *      table.
    * @return {Table}
    *
    * @example
-   * const BigQuery = require('@google-cloud/bigquery');
+   * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('institutions');
    *
    * const institutions = dataset.table('institution_data');
    */
-  table(id, options) {
+  table(id, options?) {
     options = extend(
-      {
-        location: this.location,
-      },
-      options
-    );
+        {
+          location: this.location,
+        },
+        options);
 
     return new Table(this, id, options);
   }

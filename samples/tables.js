@@ -18,7 +18,7 @@
 async function createTable(datasetId, tableId, schema, projectId) {
   // [START bigquery_create_table]
   // Imports the Google Cloud client library
-  const BigQuery = require('@google-cloud/bigquery');
+  const {BigQuery} = require('@google-cloud/bigquery');
 
   /**
    * TODO(developer): Uncomment the following lines before running the sample.
@@ -46,7 +46,7 @@ async function createTable(datasetId, tableId, schema, projectId) {
 async function deleteTable(datasetId, tableId, projectId) {
   // [START bigquery_delete_table]
   // Imports the Google Cloud client library
-  const BigQuery = require('@google-cloud/bigquery');
+  const {BigQuery} = require('@google-cloud/bigquery');
 
   /**
    * TODO(developer): Uncomment the following lines before running the sample.
@@ -71,7 +71,7 @@ async function deleteTable(datasetId, tableId, projectId) {
 async function listTables(datasetId, projectId) {
   // [START bigquery_list_tables]
   // Imports the Google Cloud client library
-  const BigQuery = require('@google-cloud/bigquery');
+  const {BigQuery} = require('@google-cloud/bigquery');
 
   /**
    * TODO(developer): Uncomment the following lines before running the sample.
@@ -93,7 +93,7 @@ async function listTables(datasetId, projectId) {
 async function browseRows(datasetId, tableId, projectId) {
   // [START bigquery_browse_table]
   // Imports the Google Cloud client library
-  const BigQuery = require('@google-cloud/bigquery');
+  const {BigQuery} = require('@google-cloud/bigquery');
 
   /**
    * TODO(developer): Uncomment the following lines before running the sample.
@@ -125,7 +125,7 @@ async function copyTable(
 ) {
   // [START bigquery_copy_table]
   // Imports the Google Cloud client library
-  const BigQuery = require('@google-cloud/bigquery');
+  const {BigQuery} = require('@google-cloud/bigquery');
 
   /**
    * TODO(developer): Uncomment the following lines before running the sample.
@@ -158,7 +158,7 @@ async function copyTable(
 async function loadLocalFile(datasetId, tableId, filename, projectId) {
   // [START bigquery_load_from_file]
   // Imports the Google Cloud client library
-  const BigQuery = require('@google-cloud/bigquery');
+  const {BigQuery} = require('@google-cloud/bigquery');
 
   /**
    * TODO(developer): Uncomment the following lines before running the sample.
@@ -190,7 +190,7 @@ async function loadLocalFile(datasetId, tableId, filename, projectId) {
 async function loadORCFromGCS(datasetId, tableId, projectId) {
   // [START bigquery_load_table_gcs_orc]
   // Imports the Google Cloud client libraries
-  const BigQuery = require('@google-cloud/bigquery');
+  const {BigQuery} = require('@google-cloud/bigquery');
   const {Storage} = require('@google-cloud/storage');
 
   /**
@@ -239,7 +239,7 @@ async function loadORCFromGCS(datasetId, tableId, projectId) {
 async function loadParquetFromGCS(datasetId, tableId, projectId) {
   // [START bigquery_load_table_gcs_parquet]
   // Imports the Google Cloud client libraries
-  const BigQuery = require('@google-cloud/bigquery');
+  const {BigQuery} = require('@google-cloud/bigquery');
   const {Storage} = require('@google-cloud/storage');
 
   /**
@@ -288,7 +288,7 @@ async function loadParquetFromGCS(datasetId, tableId, projectId) {
 function loadCSVFromGCS(datasetId, tableId, projectId) {
   // [START bigquery_load_table_gcs_csv]
   // Imports the Google Cloud client libraries
-  const BigQuery = require('@google-cloud/bigquery');
+  const {BigQuery} = require('@google-cloud/bigquery');
   const {Storage} = require('@google-cloud/storage');
 
   /**
@@ -355,7 +355,7 @@ function loadCSVFromGCS(datasetId, tableId, projectId) {
 function loadJSONFromGCS(datasetId, tableId, projectId) {
   // [START bigquery_load_table_gcs_json]
   // Imports the Google Cloud client libraries
-  const BigQuery = require('@google-cloud/bigquery');
+  const {BigQuery} = require('@google-cloud/bigquery');
   const {Storage} = require('@google-cloud/storage');
 
   /**
@@ -421,7 +421,7 @@ function loadJSONFromGCS(datasetId, tableId, projectId) {
 function loadCSVFromGCSAutodetect(datasetId, tableId, projectId) {
   // [START bigquery_load_table_gcs_csv_autodetect]
   // Imports the Google Cloud client libraries
-  const BigQuery = require('@google-cloud/bigquery');
+  const {BigQuery} = require('@google-cloud/bigquery');
   const {Storage} = require('@google-cloud/storage');
 
   /**
@@ -483,7 +483,7 @@ function loadCSVFromGCSAutodetect(datasetId, tableId, projectId) {
 function loadJSONFromGCSAutodetect(datasetId, tableId, projectId) {
   // [START bigquery_load_table_gcs_json_autodetect]
   // Imports the Google Cloud client libraries
-  const BigQuery = require('@google-cloud/bigquery');
+  const {BigQuery} = require('@google-cloud/bigquery');
   const {Storage} = require('@google-cloud/storage');
 
   /**
@@ -544,7 +544,7 @@ function loadJSONFromGCSAutodetect(datasetId, tableId, projectId) {
 function loadCSVFromGCSTruncate(datasetId, tableId, projectId) {
   // [START bigquery_load_table_gcs_csv_truncate]
   // Imports the Google Cloud client libraries
-  const BigQuery = require('@google-cloud/bigquery');
+  const {BigQuery} = require('@google-cloud/bigquery');
   const {Storage} = require('@google-cloud/storage');
 
   /**
@@ -613,7 +613,7 @@ function loadCSVFromGCSTruncate(datasetId, tableId, projectId) {
 function loadJSONFromGCSTruncate(datasetId, tableId, projectId) {
   // [START bigquery_load_table_gcs_json_truncate]
   // Imports the Google Cloud client libraries
-  const BigQuery = require('@google-cloud/bigquery');
+  const {BigQuery} = require('@google-cloud/bigquery');
   const {Storage} = require('@google-cloud/storage');
 
   /**
@@ -681,7 +681,7 @@ function loadJSONFromGCSTruncate(datasetId, tableId, projectId) {
 function loadParquetFromGCSTruncate(datasetId, tableId, projectId) {
   // [START bigquery_load_table_gcs_parquet_truncate]
   // Imports the Google Cloud client libraries
-  const BigQuery = require('@google-cloud/bigquery');
+  const {BigQuery} = require('@google-cloud/bigquery');
   const {Storage} = require('@google-cloud/storage');
 
   /**
@@ -743,7 +743,7 @@ function loadParquetFromGCSTruncate(datasetId, tableId, projectId) {
 function loadOrcFromGCSTruncate(datasetId, tableId, projectId) {
   // [START bigquery_load_table_gcs_orc_truncate]
   // Imports the Google Cloud client libraries
-  const BigQuery = require('@google-cloud/bigquery');
+  const {BigQuery} = require('@google-cloud/bigquery');
   const {Storage} = require('@google-cloud/storage');
 
   /**
@@ -811,7 +811,7 @@ function extractTableToGCS(
 ) {
   // [START bigquery_extract_table]
   // Imports the Google Cloud client libraries
-  const BigQuery = require('@google-cloud/bigquery');
+  const {BigQuery} = require('@google-cloud/bigquery');
   const {Storage} = require('@google-cloud/storage');
 
   /**
@@ -858,7 +858,7 @@ function extractTableToGCS(
 function insertRowsAsStream(datasetId, tableId, rows, projectId) {
   // [START bigquery_table_insert_rows]
   // Imports the Google Cloud client library
-  const BigQuery = require('@google-cloud/bigquery');
+  const {BigQuery} = require('@google-cloud/bigquery');
 
   /**
    * TODO(developer): Uncomment the following lines before running the sample.

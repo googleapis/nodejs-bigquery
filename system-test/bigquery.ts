@@ -27,10 +27,11 @@ import {Dataset} from '../src/dataset';
 import {Job} from '../src/job';
 import {Table} from '../src/table';
 
-const BigQuery = require('../src');
-const bigquery = new BigQuery();
+import {BigQuery} from '../src';
 import {Storage} from '@google-cloud/storage';
+import {ApiError} from '@google-cloud/common';
 
+const bigquery = new BigQuery();
 const storage = new Storage();
 
 describe('BigQuery', () => {
@@ -93,41 +94,37 @@ describe('BigQuery', () => {
 
   before(done => {
     async.series(
-      [
-        // Remove buckets created for the tests.
-        deleteBuckets,
+        [
+          // Remove buckets created for the tests.
+          deleteBuckets,
 
-        // Remove datasets created for the tests.
-        deleteDatasets,
+          // Remove datasets created for the tests.
+          deleteDatasets,
 
-        // Create the test dataset with a label tagging this as a test run.
-        dataset.create.bind(dataset, {
-          labels: [{[GCLOUD_TESTS_PREFIX]: ''}]
-        }),
+          // Create the test dataset with a label tagging this as a test run.
+          dataset.create.bind(dataset, {labels: [{[GCLOUD_TESTS_PREFIX]: ''}]}),
 
-        // Create the test table.
-        table.create.bind(table, {
-          schema: SCHEMA,
-        }),
+          // Create the test table.
+          table.create.bind(table, {
+            schema: SCHEMA,
+          }),
 
-        // Create a Bucket.
-        bucket.create.bind(bucket),
-      ],
-      done
-    );
+          // Create a Bucket.
+          bucket.create.bind(bucket),
+        ],
+        done);
   });
 
   after(done => {
     async.parallel(
-      [
-        // Remove buckets created for the tests.
-        deleteBuckets,
+        [
+          // Remove buckets created for the tests.
+          deleteBuckets,
 
-        // Remove datasets created for the tests.
-        deleteDatasets,
-      ],
-      done
-    );
+          // Remove datasets created for the tests.
+          deleteDatasets,
+        ],
+        done);
   });
 
   it('should get a list of datasets', done => {
@@ -142,7 +139,7 @@ describe('BigQuery', () => {
     const maxApiCalls = 1;
     let numRequestsMade = 0;
 
-    const BigQuery = require('../src');
+    const {BigQuery} = require('../src');
     const bigquery = new BigQuery();
 
     bigquery.interceptors.push({
@@ -172,7 +169,7 @@ describe('BigQuery', () => {
     const maxApiCalls = 1;
     let numRequestsMade = 0;
 
-    const BigQuery = require('../src');
+    const {BigQuery} = require('../src');
     const bigquery = new BigQuery();
 
     bigquery.interceptors.push({
@@ -183,43 +180,44 @@ describe('BigQuery', () => {
     });
 
     return bigquery
-      .getDatasets({
-        maxApiCalls,
-      })
-      .then(() => {
-        assert.strictEqual(numRequestsMade, maxApiCalls);
-      });
+        .getDatasets({
+          maxApiCalls,
+        })
+        .then(() => {
+          assert.strictEqual(numRequestsMade, maxApiCalls);
+        });
   });
 
   it('should allow for manual pagination in promise mode', () => {
     return bigquery
-      .getDatasets({
-        autoPaginate: false,
-      })
-      .then(data => {
-        const datasets = data[0];
-        const nextQuery = data[1];
-        const apiResponse = data[2];
+        .getDatasets({
+          autoPaginate: false,
+          filter: `labels.${GCLOUD_TESTS_PREFIX}`,
+        })
+        .then(data => {
+          const datasets = data[0];
+          const nextQuery = data[1];
+          const apiResponse = data[2];
 
-        assert(datasets[0] instanceof Dataset);
-        assert.strictEqual(nextQuery, null);
-        assert(apiResponse);
-      });
+          assert(datasets[0] instanceof Dataset);
+          assert.strictEqual(nextQuery, null);
+          assert(apiResponse);
+        });
   });
 
   it('should list datasets as a stream', done => {
     let datasetEmitted = false;
 
-    bigquery
-      .getDatasetsStream()
-      .on('error', done)
-      .on('data', dataset => {
-        datasetEmitted = dataset instanceof Dataset;
-      })
-      .on('end', () => {
-        assert.strictEqual(datasetEmitted, true);
-        done();
-      });
+    bigquery.getDatasetsStream()
+        .on('error', done)
+        .on('data',
+            dataset => {
+              datasetEmitted = dataset instanceof Dataset;
+            })
+        .on('end', () => {
+          assert.strictEqual(datasetEmitted, true);
+          done();
+        });
   });
 
   it('should run a query job, then get results', done => {
@@ -239,39 +237,39 @@ describe('BigQuery', () => {
   it('should run a query job as a promise', () => {
     let job;
 
-    return bigquery
-      .createQueryJob(query)
-      .then(response => {
-        job = response[0];
-        return job.promise();
-      })
-      .then(() => {
-        return job.getQueryResults();
-      })
-      .then(response => {
-        const rows = response[0];
-        assert.strictEqual(rows.length, 100);
-        assert.strictEqual(typeof rows[0].url, 'string');
-      });
+    return bigquery.createQueryJob(query)
+        .then(response => {
+          job = response[0];
+          return job.promise();
+        })
+        .then(() => {
+          return job.getQueryResults();
+        })
+        .then(response => {
+          const rows = response[0];
+          assert.strictEqual(rows.length, 100);
+          assert.strictEqual(typeof rows[0].url, 'string');
+        });
   });
 
   it('should get query results as a stream', done => {
     bigquery.createQueryJob(query, (err, job) => {
       assert.ifError(err);
 
+      // tslint:disable-next-line no-any
       const rowsEmitted: any[] = [];
 
-      job
-        .getQueryResultsStream()
-        .on('error', done)
-        .on('data', row => {
-          rowsEmitted.push(row);
-        })
-        .on('end', () => {
-          assert.strictEqual(rowsEmitted.length, 100);
-          assert.strictEqual(typeof rowsEmitted[0].url, 'string');
-          done();
-        });
+      job.getQueryResultsStream()
+          .on('error', done)
+          .on('data',
+              row => {
+                rowsEmitted.push(row);
+              })
+          .on('end', () => {
+            assert.strictEqual(rowsEmitted.length, 100);
+            assert.strictEqual(typeof rowsEmitted[0].url, 'string');
+            done();
+          });
     });
   });
 
@@ -322,17 +320,17 @@ describe('BigQuery', () => {
   it('should query as a stream', done => {
     let rowsEmitted = 0;
 
-    bigquery
-      .createQueryStream(query)
-      .on('data', row => {
-        rowsEmitted++;
-        assert.strictEqual(typeof row.url, 'string');
-      })
-      .on('error', done)
-      .on('end', () => {
-        assert.strictEqual(rowsEmitted, 100);
-        done();
-      });
+    bigquery.createQueryStream(query)
+        .on('data',
+            row => {
+              rowsEmitted++;
+              assert.strictEqual(typeof row.url, 'string');
+            })
+        .on('error', done)
+        .on('end', () => {
+          assert.strictEqual(rowsEmitted, 100);
+          done();
+        });
   });
 
   it('should query', done => {
@@ -345,32 +343,29 @@ describe('BigQuery', () => {
 
   it('should allow querying in series', done => {
     bigquery.query(
-      query,
-      {
-        maxResults: 10,
-      },
-      (err, rows, nextQuery) => {
-        assert.ifError(err);
-        assert.strictEqual(rows.length, 10);
-        assert.strictEqual(typeof nextQuery.pageToken, 'string');
-        done();
-      }
-    );
+        query, {
+          maxResults: 10,
+        },
+        (err, rows, nextQuery) => {
+          assert.ifError(err);
+          assert.strictEqual(rows.length, 10);
+          assert.strictEqual(typeof nextQuery.pageToken, 'string');
+          done();
+        });
   });
 
   it('should accept the dryRun option', done => {
     bigquery.query(
-      {
-        query,
-        dryRun: true,
-      },
-      (err, rows, resp) => {
-        assert.ifError(err);
-        assert.deepStrictEqual(rows, []);
-        assert(resp.statistics.query);
-        done();
-      }
-    );
+        {
+          query,
+          dryRun: true,
+        },
+        (err, rows, resp) => {
+          assert.ifError(err);
+          assert.deepStrictEqual(rows, []);
+          assert(resp.statistics.query);
+          done();
+        });
   });
 
   it('should get a list of jobs', done => {
@@ -384,16 +379,16 @@ describe('BigQuery', () => {
   it('should list jobs as a stream', done => {
     let jobEmitted = false;
 
-    bigquery
-      .getJobsStream()
-      .on('error', done)
-      .on('data', job => {
-        jobEmitted = job instanceof Job;
-      })
-      .on('end', () => {
-        assert.strictEqual(jobEmitted, true);
-        done();
-      });
+    bigquery.getJobsStream()
+        .on('error', done)
+        .on('data',
+            job => {
+              jobEmitted = job instanceof Job;
+            })
+        .on('end', () => {
+          assert.strictEqual(jobEmitted, true);
+          done();
+        });
   });
 
   it('should cancel a job', done => {
@@ -415,19 +410,18 @@ describe('BigQuery', () => {
   describe('BigQuery/Dataset', () => {
     it('should set & get metadata', done => {
       dataset.setMetadata(
-        {
-          description: 'yay description',
-        },
-        err => {
-          assert.ifError(err);
-
-          dataset.getMetadata((err, metadata) => {
+          {
+            description: 'yay description',
+          },
+          err => {
             assert.ifError(err);
-            assert.strictEqual(metadata.description, 'yay description');
-            done();
+
+            dataset.getMetadata((err, metadata) => {
+              assert.ifError(err);
+              assert.strictEqual(metadata.description, 'yay description');
+              done();
+            });
           });
-        }
-      );
     });
 
     it('should use etags for locking', done => {
@@ -437,31 +431,30 @@ describe('BigQuery', () => {
         const etag = dataset.metadata.etag;
 
         dataset.setMetadata(
-          {
-            etag,
-            description: 'another description',
-          },
-          err => {
-            assert.ifError(err);
-            // the etag should be updated
-            assert.notStrictEqual(etag, dataset.metadata.etag);
-            done();
-          }
-        );
+            {
+              etag,
+              description: 'another description',
+            },
+            err => {
+              assert.ifError(err);
+              // the etag should be updated
+              assert.notStrictEqual(etag, dataset.metadata.etag);
+              done();
+            });
       });
     });
 
     it('should error out for bad etags', done => {
       dataset.setMetadata(
-        {
-          etag: 'a-fake-etag',
-          description: 'oh no!',
-        },
-        err => {
-          assert.strictEqual(err.code, 412); // precondition failed
-          done();
-        }
-      );
+          {
+            etag: 'a-fake-etag',
+            description: 'oh no!',
+          },
+          err => {
+            assert.strictEqual(
+                (err as ApiError).code, 412);  // precondition failed
+            done();
+          });
     });
 
     it('should get tables', done => {
@@ -475,48 +468,24 @@ describe('BigQuery', () => {
     it('should get tables as a stream', done => {
       let tableEmitted = false;
 
-      dataset
-        .getTablesStream()
-        .on('error', done)
-        .on('data', table => {
-          tableEmitted = table instanceof Table;
-        })
-        .on('end', () => {
-          assert.strictEqual(tableEmitted, true);
-          done();
-        });
+      dataset.getTablesStream()
+          .on('error', done)
+          .on('data',
+              table => {
+                tableEmitted = table instanceof Table;
+              })
+          .on('end', () => {
+            assert.strictEqual(tableEmitted, true);
+            done();
+          });
     });
 
     it('should create a Table with a nested schema', done => {
       const table = dataset.table(generateName('table'));
 
       table.create(
-        {
-          schema: {
-            fields: [
-              {
-                name: 'id',
-                type: 'INTEGER',
-              },
-              {
-                name: 'details',
-                fields: [
-                  {
-                    name: 'nested_id',
-                    type: 'INTEGER',
-                  },
-                ],
-              },
-            ],
-          },
-        },
-        err => {
-          assert.ifError(err);
-
-          table.getMetadata((err, metadata) => {
-            assert.ifError(err);
-
-            assert.deepStrictEqual(metadata.schema, {
+          {
+            schema: {
               fields: [
                 {
                   name: 'id',
@@ -524,7 +493,6 @@ describe('BigQuery', () => {
                 },
                 {
                   name: 'details',
-                  type: 'RECORD',
                   fields: [
                     {
                       name: 'nested_id',
@@ -533,12 +501,36 @@ describe('BigQuery', () => {
                   ],
                 },
               ],
-            });
+            },
+          },
+          err => {
+            assert.ifError(err);
 
-            done();
+            table.getMetadata((err, metadata) => {
+              assert.ifError(err);
+
+              assert.deepStrictEqual(metadata.schema, {
+                fields: [
+                  {
+                    name: 'id',
+                    type: 'INTEGER',
+                  },
+                  {
+                    name: 'details',
+                    type: 'RECORD',
+                    fields: [
+                      {
+                        name: 'nested_id',
+                        type: 'INTEGER',
+                      },
+                    ],
+                  },
+                ],
+              });
+
+              done();
+            });
           });
-        }
-      );
     });
 
     describe('location', () => {
@@ -553,23 +545,23 @@ describe('BigQuery', () => {
 
       const QUERY = `SELECT * FROM \`${table.id}\``;
       const SCHEMA = require('../../system-test/data/schema.json');
-      const TEST_DATA_FILE = require.resolve('../../system-test/data/location-test-data.json');
+      const TEST_DATA_FILE =
+          require.resolve('../../system-test/data/location-test-data.json');
 
       before(() => {
         // create a dataset in a certain location will cascade the location
         // to any jobs created through it
-        return dataset
-          .create()
-          .then(() => {
-            return table.create({schema: SCHEMA});
-          })
-          .then(() => {
-            return table.createLoadJob(TEST_DATA_FILE);
-          })
-          .then(data => {
-            job = data[0];
-            return job.promise();
-          });
+        return dataset.create()
+            .then(() => {
+              return table.create({schema: SCHEMA});
+            })
+            .then(() => {
+              return table.createLoadJob(TEST_DATA_FILE);
+            })
+            .then(data => {
+              job = data[0];
+              return job.promise();
+            });
       });
 
       it('should create a load job in the correct location', () => {
@@ -581,7 +573,7 @@ describe('BigQuery', () => {
           const badJob = bigquery.job(job.id);
 
           badJob.getMetadata(err => {
-            assert.strictEqual(err.code, 404);
+            assert.strictEqual((err as ApiError).code, 404);
             done();
           });
         });
@@ -590,7 +582,7 @@ describe('BigQuery', () => {
           const badJob = bigquery.job(job.id, {location: 'US'});
 
           badJob.getMetadata(err => {
-            assert.strictEqual(err.code, 404);
+            assert.strictEqual((err as ApiError).code, 404);
             done();
           });
         });
@@ -634,36 +626,34 @@ describe('BigQuery', () => {
           const badDataset = bigquery.dataset(dataset.id, {location: 'US'});
 
           badDataset.createQueryJob(
-            {
-              query: QUERY,
-            },
-            (err, job) => {
-              assert.strictEqual(err.errors[0].reason, 'notFound');
-              assert.strictEqual(job.location, 'US');
-              done();
-            }
-          );
+              {
+                query: QUERY,
+              },
+              (err, job) => {
+                assert.strictEqual(err.errors[0].reason, 'notFound');
+                assert.strictEqual(job.location, 'US');
+                done();
+              });
         });
 
         it('should get query results', () => {
           let job;
 
-          return dataset
-            .createQueryJob(QUERY)
-            .then(data => {
-              job = data[0];
+          return dataset.createQueryJob(QUERY)
+              .then(data => {
+                job = data[0];
 
-              assert.strictEqual(job.location, LOCATION);
-              return job.promise();
-            })
-            .then(() => {
-              return job.getQueryResults();
-            })
-            .then(data => {
-              const rows = data[0];
+                assert.strictEqual(job.location, LOCATION);
+                return job.promise();
+              })
+              .then(() => {
+                return job.getQueryResults();
+              })
+              .then(data => {
+                const rows = data[0];
 
-              assert(rows.length > 0);
-            });
+                assert(rows.length > 0);
+              });
         });
       });
 
@@ -721,7 +711,8 @@ describe('BigQuery', () => {
   });
 
   describe('BigQuery/Table', () => {
-    const TEST_DATA_JSON_PATH = require.resolve('../../system-test/data/kitten-test-data.json');
+    const TEST_DATA_JSON_PATH =
+        require.resolve('../../system-test/data/kitten-test-data.json');
 
     it('should have created the correct schema', () => {
       assert.deepStrictEqual(table.metadata.schema.fields, SCHEMA);
@@ -736,26 +727,26 @@ describe('BigQuery', () => {
     });
 
     it('should get the rows in a table via stream', done => {
-      table
-        .createReadStream()
-        .on('error', done)
-        .on('data', () => {})
-        .on('end', done);
+      table.createReadStream()
+          .on('error', done)
+          .on('data', () => {})
+          .on('end', done);
     });
 
     it('should insert rows via stream', done => {
       let job;
 
       fs.createReadStream(TEST_DATA_JSON_PATH)
-        .pipe(table.createWriteStream('json'))
-        .on('error', done)
-        .on('complete', _job => {
-          job = _job;
-        })
-        .on('finish', () => {
-          assert.strictEqual(job.metadata.status.state, 'DONE');
-          done();
-        });
+          .pipe(table.createWriteStream('json'))
+          .on('error', done)
+          .on('complete',
+              _job => {
+                job = _job;
+              })
+          .on('finish', () => {
+            assert.strictEqual(job.metadata.status.state, 'DONE');
+            done();
+          });
     });
 
     it('should insert rows with null values', () => {
@@ -767,22 +758,22 @@ describe('BigQuery', () => {
 
     it('should set & get metadata', done => {
       table.setMetadata(
-        {
-          description: 'catsandstuff',
-        },
-        err => {
-          assert.ifError(err);
-
-          table.getMetadata((err, metadata) => {
+          {
+            description: 'catsandstuff',
+          },
+          err => {
             assert.ifError(err);
-            assert.strictEqual(metadata.description, 'catsandstuff');
-            done();
+
+            table.getMetadata((err, metadata) => {
+              assert.ifError(err);
+              assert.strictEqual(metadata.description, 'catsandstuff');
+              done();
+            });
           });
-        }
-      );
     });
 
     describe('copying', () => {
+      // tslint:disable-next-line no-any
       const TABLES: any = {
         1: {
           data: {
@@ -800,27 +791,25 @@ describe('BigQuery', () => {
         TABLES[2].table = dataset.table(generateName('table'));
 
         async.each(
-          TABLES,
-          (tableObject, next) => {
-            const tableInstance = tableObject.table;
+            TABLES,
+            (tableObject, next) => {
+              const tableInstance = tableObject.table;
 
-            tableInstance.create(
-              {
-                schema: SCHEMA,
-              },
-              next
-            );
-          },
-          err => {
-            if (err) {
-              done(err);
-              return;
-            }
+              tableInstance.create(
+                  {
+                    schema: SCHEMA,
+                  },
+                  next);
+            },
+            err => {
+              if (err) {
+                done(err);
+                return;
+              }
 
-            const table1Instance = TABLES[1].table;
-            table1Instance.insert(TABLES[1].data, done);
-          }
-        );
+              const table1Instance = TABLES[1].table;
+              table1Instance.insert(TABLES[1].data, done);
+            });
       });
 
       it('should start copying data from current table', done => {
@@ -895,9 +884,9 @@ describe('BigQuery', () => {
 
       before(done => {
         fs.createReadStream(TEST_DATA_JSON_PATH)
-          .pipe(file.createWriteStream({}))
-          .on('error', done)
-          .on('finish', done);
+            .pipe(file.createWriteStream({}))
+            .on('error', done)
+            .on('finish', done);
       });
 
       after(done => {
@@ -977,478 +966,453 @@ describe('BigQuery', () => {
           schema: SCHEMA,
         };
 
-        return table
-          .insert(row, options)
-          .then(() => {
-            // getting rows immediately after insert
-            // results in an empty array
-            return new Promise(resolve => {
-              setTimeout(resolve, 2500);
-            });
-          })
-          .then(() => {
-            return table.getRows();
-          })
-          .then(data => {
-            const rows = data[0];
+        return table.insert(row, options)
+            .then(() => {
+              // getting rows immediately after insert
+              // results in an empty array
+              return new Promise(resolve => {
+                setTimeout(resolve, 2500);
+              });
+            })
+            .then(() => {
+              return table.getRows();
+            })
+            .then(data => {
+              const rows = data[0];
 
-            assert.strictEqual(rows.length, 1);
-            assert.strictEqual(rows[0].name, row.name);
-          });
+              assert.strictEqual(rows.length, 1);
+              assert.strictEqual(rows[0].name, row.name);
+            });
       });
 
       describe('SQL parameters', () => {
         describe('positional', () => {
           it('should work with strings', done => {
             bigquery.query(
-              {
-                query: [
-                  'SELECT url',
-                  'FROM `publicdata.samples.github_nested`',
-                  'WHERE repository.owner = ?',
-                  'LIMIT 1',
-                ].join(' '),
-                params: ['google'],
-              },
-              (err, rows) => {
-                assert.ifError(err);
-                assert.strictEqual(rows.length, 1);
-                done();
-              }
-            );
+                {
+                  query: [
+                    'SELECT url',
+                    'FROM `publicdata.samples.github_nested`',
+                    'WHERE repository.owner = ?',
+                    'LIMIT 1',
+                  ].join(' '),
+                  params: ['google'],
+                },
+                (err, rows) => {
+                  assert.ifError(err);
+                  assert.strictEqual(rows.length, 1);
+                  done();
+                });
           });
 
           it('should work with ints', done => {
             bigquery.query(
-              {
-                query: [
-                  'SELECT url',
-                  'FROM `publicdata.samples.github_nested`',
-                  'WHERE repository.forks > ?',
-                  'LIMIT 1',
-                ].join(' '),
-                params: [1],
-              },
-              (err, rows) => {
-                assert.ifError(err);
-                assert.strictEqual(rows.length, 1);
-                done();
-              }
-            );
+                {
+                  query: [
+                    'SELECT url',
+                    'FROM `publicdata.samples.github_nested`',
+                    'WHERE repository.forks > ?',
+                    'LIMIT 1',
+                  ].join(' '),
+                  params: [1],
+                },
+                (err, rows) => {
+                  assert.ifError(err);
+                  assert.strictEqual(rows.length, 1);
+                  done();
+                });
           });
 
           it('should work with floats', done => {
             bigquery.query(
-              {
-                query: [
-                  'SELECT snow_depth',
-                  'FROM `publicdata.samples.gsod`',
-                  'WHERE snow_depth >= ?',
-                  'LIMIT 1',
-                ].join(' '),
-                params: [12.5],
-              },
-              (err, rows) => {
-                assert.ifError(err);
-                assert.strictEqual(rows.length, 1);
-                done();
-              }
-            );
+                {
+                  query: [
+                    'SELECT snow_depth',
+                    'FROM `publicdata.samples.gsod`',
+                    'WHERE snow_depth >= ?',
+                    'LIMIT 1',
+                  ].join(' '),
+                  params: [12.5],
+                },
+                (err, rows) => {
+                  assert.ifError(err);
+                  assert.strictEqual(rows.length, 1);
+                  done();
+                });
           });
 
           it('should work with numerics', done => {
             bigquery.query(
-              {
-                query: [
-                  'SELECT x',
-                  'FROM UNNEST([NUMERIC "1", NUMERIC "2", NUMERIC "3"]) x',
-                  'WHERE x = ?',
-                ].join(' '),
-                params: [new Big('2')],
-              },
-              (err, rows) => {
-                assert.ifError(err);
-                assert.strictEqual(rows.length, 1);
-                done();
-              }
-            );
+                {
+                  query: [
+                    'SELECT x',
+                    'FROM UNNEST([NUMERIC "1", NUMERIC "2", NUMERIC "3"]) x',
+                    'WHERE x = ?',
+                  ].join(' '),
+                  params: [new Big('2')],
+                },
+                (err, rows) => {
+                  assert.ifError(err);
+                  assert.strictEqual(rows.length, 1);
+                  done();
+                });
           });
 
           it('should work with booleans', done => {
             bigquery.query(
-              {
-                query: [
-                  'SELECT url',
-                  'FROM `publicdata.samples.github_nested`',
-                  'WHERE public = ?',
-                  'LIMIT 1',
-                ].join(' '),
-                params: [true],
-              },
-              (err, rows) => {
-                assert.ifError(err);
-                assert.strictEqual(rows.length, 1);
-                done();
-              }
-            );
+                {
+                  query: [
+                    'SELECT url',
+                    'FROM `publicdata.samples.github_nested`',
+                    'WHERE public = ?',
+                    'LIMIT 1',
+                  ].join(' '),
+                  params: [true],
+                },
+                (err, rows) => {
+                  assert.ifError(err);
+                  assert.strictEqual(rows.length, 1);
+                  done();
+                });
           });
 
           it('should work with arrays', done => {
             bigquery.query(
-              {
-                query: 'SELECT * FROM UNNEST (?)',
-                params: [[25, 26, 27, 28, 29]],
-              },
-              (err, rows) => {
-                assert.ifError(err);
-                assert.strictEqual(rows.length, 5);
-                done();
-              }
-            );
+                {
+                  query: 'SELECT * FROM UNNEST (?)',
+                  params: [[25, 26, 27, 28, 29]],
+                },
+                (err, rows) => {
+                  assert.ifError(err);
+                  assert.strictEqual(rows.length, 5);
+                  done();
+                });
           });
 
           it('should work with structs', done => {
             bigquery.query(
-              {
-                query: 'SELECT ? obj',
-                params: [
-                  {
-                    b: true,
-                    arr: [2, 3, 4],
-                    d: bigquery.date('2016-12-7'),
-                    f: 3.14,
-                    nested: {
-                      a: 3,
+                {
+                  query: 'SELECT ? obj',
+                  params: [
+                    {
+                      b: true,
+                      arr: [2, 3, 4],
+                      d: bigquery.date('2016-12-7'),
+                      f: 3.14,
+                      nested: {
+                        a: 3,
+                      },
                     },
-                  },
-                ],
-              },
-              (err, rows) => {
-                assert.ifError(err);
-                assert.strictEqual(rows.length, 1);
-                done();
-              }
-            );
+                  ],
+                },
+                (err, rows) => {
+                  assert.ifError(err);
+                  assert.strictEqual(rows.length, 1);
+                  done();
+                });
           });
 
           it('should work with TIMESTAMP types', done => {
             bigquery.query(
-              {
-                query: [
-                  'SELECT subject',
-                  'FROM `bigquery-public-data.github_repos.commits`',
-                  'WHERE author.date < ?',
-                  'LIMIT 1',
-                ].join(' '),
-                params: [new Date()],
-              },
-              (err, rows) => {
-                assert.ifError(err);
-                assert.strictEqual(rows.length, 1);
-                done();
-              }
-            );
+                {
+                  query: [
+                    'SELECT subject',
+                    'FROM `bigquery-public-data.github_repos.commits`',
+                    'WHERE author.date < ?',
+                    'LIMIT 1',
+                  ].join(' '),
+                  params: [new Date()],
+                },
+                (err, rows) => {
+                  assert.ifError(err);
+                  assert.strictEqual(rows.length, 1);
+                  done();
+                });
           });
 
           it('should work with DATE types', done => {
             bigquery.query(
-              {
-                query: 'SELECT ? date',
-                params: [bigquery.date('2016-12-7')],
-              },
-              (err, rows) => {
-                assert.ifError(err);
-                assert.strictEqual(rows.length, 1);
-                done();
-              }
-            );
+                {
+                  query: 'SELECT ? date',
+                  params: [bigquery.date('2016-12-7')],
+                },
+                (err, rows) => {
+                  assert.ifError(err);
+                  assert.strictEqual(rows.length, 1);
+                  done();
+                });
           });
 
           it('should work with DATETIME types', done => {
             bigquery.query(
-              {
-                query: 'SELECT ? datetime',
-                params: [bigquery.datetime('2016-12-7 14:00:00')],
-              },
-              (err, rows) => {
-                assert.ifError(err);
-                assert.strictEqual(rows.length, 1);
-                done();
-              }
-            );
+                {
+                  query: 'SELECT ? datetime',
+                  params: [bigquery.datetime('2016-12-7 14:00:00')],
+                },
+                (err, rows) => {
+                  assert.ifError(err);
+                  assert.strictEqual(rows.length, 1);
+                  done();
+                });
           });
 
           it('should work with TIME types', done => {
             bigquery.query(
-              {
-                query: 'SELECT ? time',
-                params: [bigquery.time('14:00:00')],
-              },
-              (err, rows) => {
-                assert.ifError(err);
-                assert.strictEqual(rows.length, 1);
-                done();
-              }
-            );
+                {
+                  query: 'SELECT ? time',
+                  params: [bigquery.time('14:00:00')],
+                },
+                (err, rows) => {
+                  assert.ifError(err);
+                  assert.strictEqual(rows.length, 1);
+                  done();
+                });
           });
 
           it('should work with multiple types', done => {
             bigquery.query(
-              {
-                query: [
-                  'SELECT url FROM `publicdata.samples.github_nested`',
-                  'WHERE repository.owner = ?',
-                  'AND repository.forks > ?',
-                  'AND public = ?',
-                  'LIMIT 1',
-                ].join(' '),
-                params: ['google', 1, true],
-              },
-              (err, rows) => {
-                assert.ifError(err);
-                assert.strictEqual(rows.length, 1);
-                done();
-              }
-            );
+                {
+                  query: [
+                    'SELECT url FROM `publicdata.samples.github_nested`',
+                    'WHERE repository.owner = ?',
+                    'AND repository.forks > ?',
+                    'AND public = ?',
+                    'LIMIT 1',
+                  ].join(' '),
+                  params: ['google', 1, true],
+                },
+                (err, rows) => {
+                  assert.ifError(err);
+                  assert.strictEqual(rows.length, 1);
+                  done();
+                });
           });
         });
 
         describe('named', () => {
           it('should work with strings', done => {
             bigquery.query(
-              {
-                query: [
-                  'SELECT url FROM `publicdata.samples.github_nested`',
-                  'WHERE repository.owner = @owner',
-                  'LIMIT 1',
-                ].join(' '),
-                params: {
-                  owner: 'google',
+                {
+                  query: [
+                    'SELECT url FROM `publicdata.samples.github_nested`',
+                    'WHERE repository.owner = @owner',
+                    'LIMIT 1',
+                  ].join(' '),
+                  params: {
+                    owner: 'google',
+                  },
                 },
-              },
-              (err, rows) => {
-                assert.ifError(err);
-                assert.strictEqual(rows.length, 1);
-                done();
-              }
-            );
+                (err, rows) => {
+                  assert.ifError(err);
+                  assert.strictEqual(rows.length, 1);
+                  done();
+                });
           });
 
           it('should work with ints', done => {
             bigquery.query(
-              {
-                query: [
-                  'SELECT url',
-                  'FROM `publicdata.samples.github_nested`',
-                  'WHERE repository.forks > @forks',
-                  'LIMIT 1',
-                ].join(' '),
-                params: {
-                  forks: 1,
+                {
+                  query: [
+                    'SELECT url',
+                    'FROM `publicdata.samples.github_nested`',
+                    'WHERE repository.forks > @forks',
+                    'LIMIT 1',
+                  ].join(' '),
+                  params: {
+                    forks: 1,
+                  },
                 },
-              },
-              (err, rows) => {
-                assert.ifError(err);
-                assert.strictEqual(rows.length, 1);
-                done();
-              }
-            );
+                (err, rows) => {
+                  assert.ifError(err);
+                  assert.strictEqual(rows.length, 1);
+                  done();
+                });
           });
 
           it('should work with floats', done => {
             bigquery.query(
-              {
-                query: [
-                  'SELECT snow_depth',
-                  'FROM `publicdata.samples.gsod`',
-                  'WHERE snow_depth >= @depth',
-                  'LIMIT 1',
-                ].join(' '),
-                params: {
-                  depth: 12.5,
+                {
+                  query: [
+                    'SELECT snow_depth',
+                    'FROM `publicdata.samples.gsod`',
+                    'WHERE snow_depth >= @depth',
+                    'LIMIT 1',
+                  ].join(' '),
+                  params: {
+                    depth: 12.5,
+                  },
                 },
-              },
-              (err, rows) => {
-                assert.ifError(err);
-                assert.strictEqual(rows.length, 1);
-                done();
-              }
-            );
+                (err, rows) => {
+                  assert.ifError(err);
+                  assert.strictEqual(rows.length, 1);
+                  done();
+                });
           });
 
           it('should work with numerics', done => {
             bigquery.query(
-              {
-                query: [
-                  'SELECT x',
-                  'FROM UNNEST([NUMERIC "1", NUMERIC "2", NUMERIC "3"]) x',
-                  'WHERE x = @num',
-                ].join(' '),
-                params: {
-                  num: new Big('2'),
+                {
+                  query: [
+                    'SELECT x',
+                    'FROM UNNEST([NUMERIC "1", NUMERIC "2", NUMERIC "3"]) x',
+                    'WHERE x = @num',
+                  ].join(' '),
+                  params: {
+                    num: new Big('2'),
+                  },
                 },
-              },
-              (err, rows) => {
-                assert.ifError(err);
-                assert.strictEqual(rows.length, 1);
-                done();
-              }
-            );
+                (err, rows) => {
+                  assert.ifError(err);
+                  assert.strictEqual(rows.length, 1);
+                  done();
+                });
           });
 
           it('should work with booleans', done => {
             bigquery.query(
-              {
-                query: [
-                  'SELECT url',
-                  'FROM `publicdata.samples.github_nested`',
-                  'WHERE public = @isPublic',
-                  'LIMIT 1',
-                ].join(' '),
-                params: {
-                  isPublic: true,
+                {
+                  query: [
+                    'SELECT url',
+                    'FROM `publicdata.samples.github_nested`',
+                    'WHERE public = @isPublic',
+                    'LIMIT 1',
+                  ].join(' '),
+                  params: {
+                    isPublic: true,
+                  },
                 },
-              },
-              (err, rows) => {
-                assert.ifError(err);
-                assert.strictEqual(rows.length, 1);
-                done();
-              }
-            );
+                (err, rows) => {
+                  assert.ifError(err);
+                  assert.strictEqual(rows.length, 1);
+                  done();
+                });
           });
 
           it('should work with arrays', done => {
             bigquery.query(
-              {
-                query: 'SELECT * FROM UNNEST (@nums)',
-                params: {
-                  nums: [25, 26, 27, 28, 29],
+                {
+                  query: 'SELECT * FROM UNNEST (@nums)',
+                  params: {
+                    nums: [25, 26, 27, 28, 29],
+                  },
                 },
-              },
-              (err, rows) => {
-                assert.ifError(err);
-                assert.strictEqual(rows.length, 5);
-                done();
-              }
-            );
+                (err, rows) => {
+                  assert.ifError(err);
+                  assert.strictEqual(rows.length, 5);
+                  done();
+                });
           });
 
           it('should work with structs', done => {
             bigquery.query(
-              {
-                query: 'SELECT @obj obj',
-                params: {
-                  obj: {
-                    b: true,
-                    arr: [2, 3, 4],
-                    d: bigquery.date('2016-12-7'),
-                    f: 3.14,
-                    nested: {
-                      a: 3,
+                {
+                  query: 'SELECT @obj obj',
+                  params: {
+                    obj: {
+                      b: true,
+                      arr: [2, 3, 4],
+                      d: bigquery.date('2016-12-7'),
+                      f: 3.14,
+                      nested: {
+                        a: 3,
+                      },
                     },
                   },
                 },
-              },
-              (err, rows) => {
-                assert.ifError(err);
-                assert.strictEqual(rows.length, 1);
-                done();
-              }
-            );
+                (err, rows) => {
+                  assert.ifError(err);
+                  assert.strictEqual(rows.length, 1);
+                  done();
+                });
           });
 
           it('should work with TIMESTAMP types', done => {
             bigquery.query(
-              {
-                query: [
-                  'SELECT subject',
-                  'FROM `bigquery-public-data.github_repos.commits`',
-                  'WHERE author.date < @time',
-                  'LIMIT 1',
-                ].join(' '),
-                params: {
-                  time: new Date(),
+                {
+                  query: [
+                    'SELECT subject',
+                    'FROM `bigquery-public-data.github_repos.commits`',
+                    'WHERE author.date < @time',
+                    'LIMIT 1',
+                  ].join(' '),
+                  params: {
+                    time: new Date(),
+                  },
                 },
-              },
-              (err, rows) => {
-                assert.ifError(err);
-                assert.strictEqual(rows.length, 1);
-                done();
-              }
-            );
+                (err, rows) => {
+                  assert.ifError(err);
+                  assert.strictEqual(rows.length, 1);
+                  done();
+                });
           });
 
           it('should work with DATE types', done => {
             bigquery.query(
-              {
-                query: 'SELECT @date date',
-                params: {
-                  date: bigquery.date('2016-12-7'),
+                {
+                  query: 'SELECT @date date',
+                  params: {
+                    date: bigquery.date('2016-12-7'),
+                  },
                 },
-              },
-              (err, rows) => {
-                assert.ifError(err);
-                assert.strictEqual(rows.length, 1);
-                done();
-              }
-            );
+                (err, rows) => {
+                  assert.ifError(err);
+                  assert.strictEqual(rows.length, 1);
+                  done();
+                });
           });
 
           it('should work with DATETIME types', done => {
             bigquery.query(
-              {
-                query: 'SELECT @datetime datetime',
-                params: {
-                  datetime: bigquery.datetime('2016-12-7 14:00:00'),
+                {
+                  query: 'SELECT @datetime datetime',
+                  params: {
+                    datetime: bigquery.datetime('2016-12-7 14:00:00'),
+                  },
                 },
-              },
-              (err, rows) => {
-                assert.ifError(err);
-                assert.strictEqual(rows.length, 1);
-                done();
-              }
-            );
+                (err, rows) => {
+                  assert.ifError(err);
+                  assert.strictEqual(rows.length, 1);
+                  done();
+                });
           });
 
           it('should work with TIME types', done => {
             bigquery.query(
-              {
-                query: 'SELECT @time time',
-                params: {
-                  time: bigquery.time('14:00:00'),
+                {
+                  query: 'SELECT @time time',
+                  params: {
+                    time: bigquery.time('14:00:00'),
+                  },
                 },
-              },
-              (err, rows) => {
-                assert.ifError(err);
-                assert.strictEqual(rows.length, 1);
-                done();
-              }
-            );
+                (err, rows) => {
+                  assert.ifError(err);
+                  assert.strictEqual(rows.length, 1);
+                  done();
+                });
           });
 
           it('should work with multiple types', done => {
             bigquery.query(
-              {
-                query: [
-                  'SELECT url',
-                  'FROM `publicdata.samples.github_nested`',
-                  'WHERE repository.owner = @owner',
-                  'AND repository.forks > @forks',
-                  'AND public = @isPublic',
-                  'LIMIT 1',
-                ].join(' '),
-                params: {
-                  owner: 'google',
-                  forks: 1,
-                  isPublic: true,
+                {
+                  query: [
+                    'SELECT url',
+                    'FROM `publicdata.samples.github_nested`',
+                    'WHERE repository.owner = @owner',
+                    'AND repository.forks > @forks',
+                    'AND public = @isPublic',
+                    'LIMIT 1',
+                  ].join(' '),
+                  params: {
+                    owner: 'google',
+                    forks: 1,
+                    isPublic: true,
+                  },
                 },
-              },
-              (err, rows) => {
-                assert.ifError(err);
-                assert.strictEqual(rows.length, 1);
-                done();
-              }
-            );
+                (err, rows) => {
+                  assert.ifError(err);
+                  assert.strictEqual(rows.length, 1);
+                  done();
+                });
           });
         });
       });
@@ -1589,20 +1553,18 @@ describe('BigQuery', () => {
 
     before(done => {
       async.series(
-        [
-          next => {
-            table.create(
-              {
-                schema,
-              },
-              next
-            );
-          },
-          next => table.insert(testData, next),
-          next => setTimeout(next, 15000)
-        ],
-        done
-      );
+          [
+            next => {
+              table.create(
+                  {
+                    schema,
+                  },
+                  next);
+            },
+            next => table.insert(testData, next),
+            next => setTimeout(next, 15000)
+          ],
+          done);
     });
 
     after(done => {
@@ -1630,9 +1592,7 @@ describe('BigQuery', () => {
 
   function generateName(resourceType) {
     return `${GCLOUD_TESTS_PREFIX}_${resourceType}_${uuid.v1()}`.replace(
-      /-/g,
-      '_'
-    );
+        /-/g, '_');
   }
 
   function deleteBuckets(callback) {
@@ -1655,32 +1615,30 @@ describe('BigQuery', () => {
     }
 
     storage.getBuckets(
-      {
-        prefix: GCLOUD_TESTS_PREFIX,
-      },
-      (err, buckets) => {
-        if (err) {
-          callback(err);
-          return;
-        }
+        {
+          prefix: GCLOUD_TESTS_PREFIX,
+        },
+        (err, buckets) => {
+          if (err) {
+            callback(err);
+            return;
+          }
 
-        async.each(buckets, deleteBucket, callback);
-      }
-    );
+          async.each(buckets, deleteBucket, callback);
+        });
   }
 
   function deleteDatasets(callback) {
     bigquery.getDatasets(
-      {
-        filter: `labels.${GCLOUD_TESTS_PREFIX}`,
-      },
-      (err, datasets) => {
-        if (err) {
-          callback(err);
-          return;
-        }
-        async.each(datasets, exec('delete', {force: true}), callback);
-      }
-    );
+        {
+          filter: `labels.${GCLOUD_TESTS_PREFIX}`,
+        },
+        (err, datasets) => {
+          if (err) {
+            callback(err);
+            return;
+          }
+          async.each(datasets, exec('delete', {force: true}), callback);
+        });
   }
 });

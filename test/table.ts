@@ -26,6 +26,8 @@ import * as stream from 'stream';
 import * as uuid from 'uuid';
 import * as pfy from '@google-cloud/promisify';
 import {ServiceObject, util} from '@google-cloud/common';
+import * as sinon from 'sinon';
+import {BigQuery} from '../src';
 
 let promisified = false;
 let makeWritableStreamOverride;
@@ -37,10 +39,11 @@ const fakeUtil = extend({}, util, {
   makeWritableStream: (...args) => {
     (makeWritableStreamOverride || util.makeWritableStream).apply(null, args);
   },
+  noop: () => {}
 });
 const fakePfy = extend({}, pfy, {
-  promisifyAll: Class => {
-    if (Class.name === 'Table') {
+  promisifyAll: c => {
+    if (c.name === 'Table') {
       promisified = true;
     }
   },
@@ -49,13 +52,13 @@ const fakePfy = extend({}, pfy, {
 let extended = false;
 const fakePaginator = {
   paginator: {
-    extend: (Class, methods) => {
-      if (Class.name !== 'Table') {
+    extend: (c, methods) => {
+      if (c.name !== 'Table') {
         return;
       }
 
       methods = arrify(methods);
-      assert.strictEqual(Class.name, 'Table');
+      assert.strictEqual(c.name, 'Table');
       assert.deepStrictEqual(methods, ['getRows']);
       extended = true;
     },
@@ -74,6 +77,10 @@ class FakeServiceObject extends ServiceObject {
     this.calledWith_ = arguments;
   }
 }
+
+let sandbox: sinon.SinonSandbox;
+beforeEach(() => sandbox = sinon.createSandbox());
+afterEach(() => sandbox.restore());
 
 describe('BigQuery/Table', () => {
   const DATASET = {
@@ -110,21 +117,22 @@ describe('BigQuery/Table', () => {
 
   const LOCATION = 'asia-northeast1';
 
-  let Table;
+  // tslint:disable-next-line no-any variable-name
+  let Table: any;
   const TABLE_ID = 'kittens';
   let table;
-  let tableOverrides: any = {};
+  let tableOverrides = {};
 
   before(() => {
     Table = proxyquire('../src/table.js', {
-      uuid: fakeUuid,
-      '@google-cloud/common': {
-        ServiceObject: FakeServiceObject,
-        util: fakeUtil,
-      },
-      '@google-cloud/paginator': fakePaginator,
-      '@google-cloud/promisify': fakePfy,
-    }).Table;
+              uuid: fakeUuid,
+              '@google-cloud/common': {
+                ServiceObject: FakeServiceObject,
+                util: fakeUtil,
+              },
+              '@google-cloud/paginator': fakePaginator,
+              '@google-cloud/promisify': fakePfy,
+            }).Table;
 
     const tableCached = extend(true, {}, Table);
 
@@ -136,10 +144,8 @@ describe('BigQuery/Table', () => {
       }
 
       Table[tableMethod] = () => {
-        return (tableOverrides[tableMethod] || tableCached[tableMethod]).apply(
-          this,
-          arguments
-        );
+        return (tableOverrides[tableMethod] || tableCached[tableMethod])
+            .apply(this, arguments);
       };
     });
   });
@@ -152,14 +158,14 @@ describe('BigQuery/Table', () => {
     table = new Table(DATASET, TABLE_ID);
     table.bigQuery.request = util.noop;
     table.bigQuery.createJob = util.noop;
-    table.bigQuery.mergeSchemaWithRows_ = (schema, rows) => {
+    sandbox.stub(BigQuery, 'mergeSchemaWithRows_').callsFake((schema, rows) => {
       return rows;
-    };
+    });
   });
 
   describe('instantiation', () => {
     it('should extend the correct methods', () => {
-      assert(extended); // See `fakePaginator.extend`
+      assert(extended);  // See `fakePaginator.extend`
     });
 
     it('should streamify the correct methods', () => {
@@ -261,9 +267,7 @@ describe('BigQuery/Table', () => {
   describe('createSchemaFromString_', () => {
     it('should create a schema object from a string', () => {
       assert.deepStrictEqual(
-        Table.createSchemaFromString_(SCHEMA_STRING),
-        SCHEMA_OBJECT
-      );
+          Table.createSchemaFromString_(SCHEMA_STRING), SCHEMA_OBJECT);
     });
 
     it('should trim names', () => {
@@ -349,13 +353,13 @@ describe('BigQuery/Table', () => {
       assert.strictEqual(Table.encodeValue_(new Big('123.456')), '123.456');
       assert.strictEqual(Table.encodeValue_(new Big('-123.456')), '-123.456');
       assert.strictEqual(
-        Table.encodeValue_(new Big('99999999999999999999999999999.999999999')),
-        '99999999999999999999999999999.999999999'
-      );
+          Table.encodeValue_(
+              new Big('99999999999999999999999999999.999999999')),
+          '99999999999999999999999999999.999999999');
       assert.strictEqual(
-        Table.encodeValue_(new Big('-99999999999999999999999999999.999999999')),
-        '-99999999999999999999999999999.999999999'
-      );
+          Table.encodeValue_(
+              new Big('-99999999999999999999999999999.999999999')),
+          '-99999999999999999999999999999.999999999');
     });
   });
 
@@ -631,7 +635,7 @@ describe('BigQuery/Table', () => {
       table.bigQuery.createJob = (reqOpts, callback) => {
         assert.strictEqual(reqOpts.jobPrefix, fakeJobPrefix);
         assert.strictEqual(reqOpts.configuration.copy.jobPrefix, undefined);
-        callback(); // the done fn
+        callback();  // the done fn
       };
 
       table.createCopyJob(DEST_TABLE, options, done);
@@ -640,7 +644,7 @@ describe('BigQuery/Table', () => {
     it('should use the default location', done => {
       table.bigQuery.createJob = (reqOpts, callback) => {
         assert.strictEqual(reqOpts.location, LOCATION);
-        callback(); // the done fn
+        callback();  // the done fn
       };
 
       table.location = LOCATION;
@@ -654,7 +658,7 @@ describe('BigQuery/Table', () => {
       table.bigQuery.createJob = (reqOpts, callback) => {
         assert.strictEqual(reqOpts.jobId, jobId);
         assert.strictEqual(reqOpts.configuration.copy.jobId, undefined);
-        callback(); // the done fn
+        callback();  // the done fn
       };
 
       table.createCopyJob(DEST_TABLE, options, done);
@@ -663,7 +667,7 @@ describe('BigQuery/Table', () => {
     it('should pass the callback to createJob', done => {
       table.bigQuery.createJob = (reqOpts, callback) => {
         assert.strictEqual(done, callback);
-        callback(); // the done fn
+        callback();  // the done fn
       };
 
       table.createCopyJob(DEST_TABLE, {}, done);
@@ -672,7 +676,7 @@ describe('BigQuery/Table', () => {
     it('should optionally accept metadata', done => {
       table.bigQuery.createJob = (reqOpts, callback) => {
         assert.strictEqual(done, callback);
-        callback(); // the done fn
+        callback();  // the done fn
       };
 
       table.createCopyJob(DEST_TABLE, done);
@@ -763,7 +767,7 @@ describe('BigQuery/Table', () => {
       table.bigQuery.createJob = (reqOpts, callback) => {
         assert.strictEqual(reqOpts.jobPrefix, fakeJobPrefix);
         assert.strictEqual(reqOpts.configuration.copy.jobPrefix, undefined);
-        callback(); // the done fn
+        callback();  // the done fn
       };
 
       table.createCopyFromJob(SOURCE_TABLE, options, done);
@@ -772,7 +776,7 @@ describe('BigQuery/Table', () => {
     it('should use the default location', done => {
       table.bigQuery.createJob = (reqOpts, callback) => {
         assert.strictEqual(reqOpts.location, LOCATION);
-        callback(); // the done fn
+        callback();  // the done fn
       };
 
       table.location = LOCATION;
@@ -786,7 +790,7 @@ describe('BigQuery/Table', () => {
       table.bigQuery.createJob = (reqOpts, callback) => {
         assert.strictEqual(reqOpts.jobId, jobId);
         assert.strictEqual(reqOpts.configuration.copy.jobId, undefined);
-        callback(); // the done fn
+        callback();  // the done fn
       };
 
       table.createCopyFromJob(SOURCE_TABLE, options, done);
@@ -795,7 +799,7 @@ describe('BigQuery/Table', () => {
     it('should pass the callback to createJob', done => {
       table.bigQuery.createJob = (reqOpts, callback) => {
         assert.strictEqual(done, callback);
-        callback(); // the done fn
+        callback();  // the done fn
       };
 
       table.createCopyFromJob(SOURCE_TABLE, {}, done);
@@ -804,7 +808,7 @@ describe('BigQuery/Table', () => {
     it('should optionally accept options', done => {
       table.bigQuery.createJob = (reqOpts, callback) => {
         assert.strictEqual(done, callback);
-        callback(); // the done fn
+        callback();  // the done fn
       };
 
       table.createCopyFromJob(SOURCE_TABLE, done);
@@ -868,9 +872,7 @@ describe('BigQuery/Table', () => {
         table.bigQuery.createJob = reqOpts => {
           const extract = reqOpts.configuration.extract;
           assert.strictEqual(
-            extract.destinationFormat,
-            'NEWLINE_DELIMITED_JSON'
-          );
+              extract.destinationFormat, 'NEWLINE_DELIMITED_JSON');
           done();
         };
 
@@ -990,7 +992,7 @@ describe('BigQuery/Table', () => {
       table.bigQuery.createJob = (reqOpts, callback) => {
         assert.strictEqual(reqOpts.jobPrefix, fakeJobPrefix);
         assert.strictEqual(reqOpts.configuration.extract.jobPrefix, undefined);
-        callback(); // the done fn
+        callback();  // the done fn
       };
 
       table.createExtractJob(FILE, options, done);
@@ -1001,7 +1003,7 @@ describe('BigQuery/Table', () => {
 
       table.bigQuery.createJob = (reqOpts, callback) => {
         assert.strictEqual(reqOpts.location, LOCATION);
-        callback(); // the done fn
+        callback();  // the done fn
       };
 
       table.createExtractJob(FILE, done);
@@ -1014,7 +1016,7 @@ describe('BigQuery/Table', () => {
       table.bigQuery.createJob = (reqOpts, callback) => {
         assert.strictEqual(reqOpts.jobId, jobId);
         assert.strictEqual(reqOpts.configuration.extract.jobId, undefined);
-        callback(); // the done fn
+        callback();  // the done fn
       };
 
       table.createExtractJob(FILE, options, done);
@@ -1023,7 +1025,7 @@ describe('BigQuery/Table', () => {
     it('should pass the callback to createJob', done => {
       table.bigQuery.createJob = (reqOpts, callback) => {
         assert.strictEqual(done, callback);
-        callback(); // the done fn
+        callback();  // the done fn
       };
 
       table.createExtractJob(FILE, {}, done);
@@ -1032,7 +1034,7 @@ describe('BigQuery/Table', () => {
     it('should optionally accept options', done => {
       table.bigQuery.createJob = (reqOpts, callback) => {
         assert.strictEqual(done, callback);
-        callback(); // the done fn
+        callback();  // the done fn
       };
 
       table.createExtractJob(FILE, done);
@@ -1078,10 +1080,7 @@ describe('BigQuery/Table', () => {
     });
 
     it('should return a stream when a string is given', () => {
-      table.createWriteStream_ = () => {
-        return new stream.Writable();
-      };
-
+      sandbox.stub(table, 'createWriteStream_').returns(new stream.Writable());
       assert(table.createLoadJob(FILEPATH) instanceof stream.Stream);
     });
 
@@ -1157,9 +1156,7 @@ describe('BigQuery/Table', () => {
       table.bigQuery.createJob = reqOpts => {
         const sourceUri = reqOpts.configuration.load.sourceUris[0];
         assert.strictEqual(
-          sourceUri,
-          'gs://' + FILE.bucket.name + '/' + FILE.name
-        );
+            sourceUri, 'gs://' + FILE.bucket.name + '/' + FILE.name);
         done();
       };
 
@@ -1184,18 +1181,16 @@ describe('BigQuery/Table', () => {
       };
 
       table.createLoadJob(
-        FILE,
-        {
-          sourceFormat: 'NEWLINE_DELIMITED_JSON',
-        },
-        assert.ifError
-      );
+          FILE, {
+            sourceFormat: 'NEWLINE_DELIMITED_JSON',
+          },
+          assert.ifError);
     });
 
     it('should pass the callback to createJob', done => {
       table.bigQuery.createJob = (reqOpts, callback) => {
         assert.strictEqual(done, callback);
-        callback(); // the done fn
+        callback();  // the done fn
       };
 
       table.createLoadJob(FILE, {}, done);
@@ -1204,7 +1199,7 @@ describe('BigQuery/Table', () => {
     it('should optionally accept options', done => {
       table.bigQuery.createJob = (reqOpts, callback) => {
         assert.strictEqual(done, callback);
-        callback(); // the done fn
+        callback();  // the done fn
       };
 
       table.createLoadJob(FILE, done);
@@ -1220,12 +1215,10 @@ describe('BigQuery/Table', () => {
       };
 
       table.createLoadJob(
-        FILE,
-        {
-          jobPrefix: fakeJobPrefix,
-        },
-        assert.ifError
-      );
+          FILE, {
+            jobPrefix: fakeJobPrefix,
+          },
+          assert.ifError);
     });
 
     it('should use the default location', done => {
@@ -1233,7 +1226,7 @@ describe('BigQuery/Table', () => {
 
       table.bigQuery.createJob = (reqOpts, callback) => {
         assert.strictEqual(reqOpts.location, LOCATION);
-        callback(); // the done fn
+        callback();  // the done fn
       };
 
       table.createLoadJob(FILE, done);
@@ -1360,8 +1353,9 @@ describe('BigQuery/Table', () => {
     it('should format a schema', done => {
       const expectedSchema = {};
 
-      tableOverrides.createSchemaFromString_ = string => {
-        assert.strictEqual(string, SCHEMA_STRING);
+      // tslint:disable-next-line no-any
+      (tableOverrides as any).createSchemaFromString_ = s => {
+        assert.strictEqual(s, SCHEMA_STRING);
         return expectedSchema;
       };
 
@@ -1449,9 +1443,8 @@ describe('BigQuery/Table', () => {
       it('should pass the correct request uri', done => {
         makeWritableStreamOverride = (stream, options) => {
           const uri =
-            'https://www.googleapis.com/upload/bigquery/v2/projects/' +
-            table.bigQuery.projectId +
-            '/jobs';
+              'https://www.googleapis.com/upload/bigquery/v2/projects/' +
+              table.bigQuery.projectId + '/jobs';
           assert.strictEqual(options.request.uri, uri);
           done();
         };
@@ -1528,14 +1521,14 @@ describe('BigQuery/Table', () => {
           callback(metadata);
         };
 
-        table
-          .createWriteStream_()
-          .on('job', job => {
-            assert.strictEqual(job, fakeJob);
-            assert.deepStrictEqual(job.metadata, metadata);
-            done();
-          })
-          .emit('writing');
+        table.createWriteStream_()
+            .on('job',
+                job => {
+                  assert.strictEqual(job, fakeJob);
+                  assert.deepStrictEqual(job.metadata, metadata);
+                  done();
+                })
+            .emit('writing');
       });
     });
   });
@@ -1731,11 +1724,13 @@ describe('BigQuery/Table', () => {
           setImmediate(callback, null, {rows});
         };
 
-        table.bigQuery.mergeSchemaWithRows_ = (schema_, rows_) => {
-          assert.strictEqual(schema_, schema);
-          assert.strictEqual(rows_, rows);
-          return mergedRows;
-        };
+        sandbox.restore();
+        sandbox.stub(BigQuery, 'mergeSchemaWithRows_')
+            .callsFake((schema_, rows_) => {
+              assert.strictEqual(schema_, schema);
+              assert.strictEqual(rows_, rows);
+              return mergedRows;
+            });
       });
 
       it('should refresh', done => {
@@ -1790,11 +1785,13 @@ describe('BigQuery/Table', () => {
         callback(null, {rows});
       };
 
-      table.bigQuery.mergeSchemaWithRows_ = (schema_, rows_) => {
-        assert.strictEqual(schema_, schema);
-        assert.strictEqual(rows_, rows);
-        return merged;
-      };
+      sandbox.restore();
+      sandbox.stub(BigQuery, 'mergeSchemaWithRows_')
+          .callsFake((schema_, rows_) => {
+            assert.strictEqual(schema_, schema);
+            assert.strictEqual(rows_, rows);
+            return merged;
+          });
 
       table.getRows((err, rows) => {
         assert.ifError(err);
@@ -1989,9 +1986,7 @@ describe('BigQuery/Table', () => {
         assert.strictEqual(reqOpts.uri, '/insertAll');
 
         assert.strictEqual(
-          reqOpts.json.ignoreUnknownValues,
-          opts.ignoreUnknownValues
-        );
+            reqOpts.json.ignoreUnknownValues, opts.ignoreUnknownValues);
         assert.strictEqual(reqOpts.json.skipInvalidRows, opts.skipInvalidRows);
         assert.strictEqual(reqOpts.json.templateSuffix, opts.templateSuffix);
 
@@ -2017,16 +2012,11 @@ describe('BigQuery/Table', () => {
       });
 
       beforeEach(() => {
-        (global as any).setTimeout = callback => {
-          callback();
-        };
-
+        sandbox.stub(global, 'setTimeout').callsFake(cb => cb());
         Math.random = _random;
-
         table.request = (reqOpts, callback) => {
           callback({code: 404});
         };
-
         table.create = (reqOpts, callback) => {
           callback(null);
         };
@@ -2064,10 +2054,11 @@ describe('BigQuery/Table', () => {
           return fakeRandomValue;
         };
 
-        (global as any).setTimeout = (callback, delay) => {
+        sandbox.restore();
+        sandbox.stub(global, 'setTimeout').callsFake((callback, delay) => {
           assert.strictEqual(delay, fakeRandomValue * 60000);
           callback();
-        };
+        });
 
         table.create = reqOpts => {
           assert.strictEqual(reqOpts.schema, SCHEMA_STRING);
@@ -2098,7 +2089,8 @@ describe('BigQuery/Table', () => {
         };
 
         let timeouts = 0;
-        (global as any).setTimeout = (callback, delay) => {
+        sandbox.restore();
+        sandbox.stub(global, 'setTimeout').callsFake((callback, delay) => {
           if (++timeouts === 2) {
             assert.strictEqual(delay, 60000);
             done();
@@ -2106,7 +2098,7 @@ describe('BigQuery/Table', () => {
           }
 
           callback(null);
-        };
+        });
 
         table.insert(data, OPTIONS, assert.ifError);
       });
@@ -2231,11 +2223,12 @@ describe('BigQuery/Table', () => {
       };
 
       // tslint:disable-next-line:no-any
-      (FakeServiceObject.prototype as any).setMetadata = function(metadata, callback) {
+      (FakeServiceObject.prototype as any).setMetadata = function(
+          metadata, callback) {
         assert.strictEqual(this, table);
         assert.strictEqual(metadata, formattedMetadata);
         assert.strictEqual(callback, done);
-        callback!(null); // the done fn
+        callback!(null);  // the done fn
       };
 
       table.setMetadata(fakeMetadata, done);

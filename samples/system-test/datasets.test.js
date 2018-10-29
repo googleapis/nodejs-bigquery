@@ -15,7 +15,7 @@
 
 'use strict';
 
-const BigQuery = require(`@google-cloud/bigquery`);
+const {BigQuery} = require(`@google-cloud/bigquery`);
 const path = require(`path`);
 const test = require(`ava`);
 const tools = require(`@google-cloud/nodejs-repo-tools`);

@@ -18,7 +18,7 @@
 async function createDataset(datasetId, projectId) {
   // [START bigquery_create_dataset]
   // Imports the Google Cloud client library
-  const BigQuery = require('@google-cloud/bigquery');
+  const {BigQuery} = require('@google-cloud/bigquery');
 
   /**
    * TODO(developer): Uncomment the following lines before running the sample.
@@ -38,7 +38,7 @@ async function createDataset(datasetId, projectId) {
 async function deleteDataset(datasetId, projectId) {
   // [START bigquery_delete_dataset]
   // Imports the Google Cloud client library
-  const BigQuery = require('@google-cloud/bigquery');
+  const {BigQuery} = require('@google-cloud/bigquery');
 
   /**
    * TODO(developer): Uncomment the following lines before running the sample.
@@ -61,7 +61,7 @@ async function deleteDataset(datasetId, projectId) {
 async function listDatasets(projectId) {
   // [START bigquery_list_datasets]
   // Imports the Google Cloud client library
-  const BigQuery = require('@google-cloud/bigquery');
+  const {BigQuery} = require('@google-cloud/bigquery');
 
   /**
    * TODO(developer): Uncomment the following lines before running the sample.

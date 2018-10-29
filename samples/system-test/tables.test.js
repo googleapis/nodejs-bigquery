@@ -18,11 +18,9 @@
 const test = require(`ava`);
 const path = require(`path`);
 const uuid = require(`uuid`);
-
 const tools = require(`@google-cloud/nodejs-repo-tools`);
 const {Storage} = require(`@google-cloud/storage`);
-
-const BigQuery = require(`@google-cloud/bigquery`);
+const {BigQuery} = require(`@google-cloud/bigquery`);
 
 const storage = new Storage();
 
