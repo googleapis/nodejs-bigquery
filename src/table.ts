@@ -31,6 +31,10 @@ import * as request from 'request';
 const streamEvents = require('stream-events');
 import * as uuid from 'uuid';
 import {BigQuery} from '../src';
+import {GoogleErrorBody} from '@google-cloud/common/build/src/util';
+
+// tslint:disable-next-line no-any
+export type TempResponse = any;
 
 export interface SetTableMetadataOptions {
   description?: string;
@@ -76,7 +80,6 @@ const FORMATS = {
  */
 class Table extends common.ServiceObject {
   constructor(dataset, id, options?) {
-
     const methods = {
       /**
        * Create a table.
@@ -174,10 +177,10 @@ class Table extends common.ServiceObject {
       /**
        * Get a table if it exists.
        *
-       * You may optionally use this to "get or create" an object by providing an
-       * object with `autoCreate` set to `true`. Any extra configuration that is
-       * normally required for the `create` method must be contained within this
-       * object as well.
+       * You may optionally use this to "get or create" an object by providing
+       * an object with `autoCreate` set to `true`. Any extra configuration that
+       * is normally required for the `create` method must be contained within
+       * this object as well.
        *
        * @method Table#get
        * @param {options} [options] Configuration object.
@@ -273,8 +276,8 @@ class Table extends common.ServiceObject {
     });
 
     /**
-     * Create a readable stream of the rows of data in your table. This method is
-     * simply a wrapper around {@link Table#getRows}.
+     * Create a readable stream of the rows of data in your table. This method
+     * is simply a wrapper around {@link Table#getRows}.
      *
      * @see [Tabledata: list API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/tabledata/list}
      *
@@ -315,19 +318,16 @@ class Table extends common.ServiceObject {
    * @returns {object} Table schema in the format the API expects.
    */
   static createSchemaFromString_(str) {
-    return str.split(/\s*,\s*/).reduce(
-      (acc, pair) => {
-        acc.fields.push({
-          name: pair.split(':')[0].trim(),
-          type: (pair.split(':')[1] || 'STRING').toUpperCase().trim(),
-        });
+    return str.split(/\s*,\s*/).reduce((acc, pair) => {
+      acc.fields.push({
+        name: pair.split(':')[0].trim(),
+        type: (pair.split(':')[1] || 'STRING').toUpperCase().trim(),
+      });
 
-        return acc;
-      },
-      {
-        fields: [],
-      }
-    );
+      return acc;
+    }, {
+      fields: [],
+    });
   }
 
   /**
@@ -360,7 +360,8 @@ class Table extends common.ServiceObject {
       'BigQueryTimestamp',
     ];
     const constructorName = value.constructor.name;
-    const isCustomType = customTypeConstructorNames.indexOf(constructorName) > -1;
+    const isCustomType =
+        customTypeConstructorNames.indexOf(constructorName) > -1;
 
     if (isCustomType) {
       return value.value;
@@ -371,12 +372,12 @@ class Table extends common.ServiceObject {
     }
 
     if (is.array(value)) {
-      return value.map((Table as any).encodeValue_);
+      return value.map(Table.encodeValue_);
     }
 
     if (is.object(value)) {
       return Object.keys(value).reduce((acc, key) => {
-        acc[key] = (Table as any).encodeValue_(value[key]);
+        acc[key] = Table.encodeValue_(value[key]);
         return acc;
       }, {});
     }
@@ -395,7 +396,7 @@ class Table extends common.ServiceObject {
     }
 
     if (is.string(options.schema)) {
-      body.schema = (Table as any).createSchemaFromString_(options.schema);
+      body.schema = Table.createSchemaFromString_(options.schema);
     }
 
     if (is.array(options.schema)) {
@@ -435,7 +436,8 @@ class Table extends common.ServiceObject {
    * @param {Table} destination The destination table.
    * @param {object} [metadata] Metadata to set with the copy operation. The
    *     metadata object should be in the format of the
-   *     [`configuration.copy`](http://goo.gl/dKWIyS) property of a Jobs resource.
+   *     [`configuration.copy`](http://goo.gl/dKWIyS) property of a Jobs
+   * resource.
    * @param {string} [metadata.jobId] Custom id for the underlying job.
    * @param {string} [metadata.jobPrefix] Prefix to apply to the underlying job
    *     id.
@@ -457,7 +459,8 @@ class Table extends common.ServiceObject {
    * table.copy(yourTable, (err, apiResponse) => {});
    *
    * //-
-   * // See the <a href="http://goo.gl/dKWIyS">`configuration.copy`</a> object for
+   * // See the <a href="http://goo.gl/dKWIyS">`configuration.copy`</a> object
+   * for
    * // all available options.
    * //-
    * const metadata = {
@@ -499,7 +502,8 @@ class Table extends common.ServiceObject {
    *     source table(s) to copy data from.
    * @param {object=} metadata Metadata to set with the copy operation. The
    *     metadata object should be in the format of the
-   *     [`configuration.copy`](http://goo.gl/dKWIyS) property of a Jobs resource.
+   *     [`configuration.copy`](http://goo.gl/dKWIyS) property of a Jobs
+   * resource.
    * @param {string} [metadata.jobId] Custom id for the underlying job.
    * @param {string} [metadata.jobPrefix] Prefix to apply to the underlying job
    *     id.
@@ -524,7 +528,8 @@ class Table extends common.ServiceObject {
    * table.copyFrom(sourceTables, (err, apiResponse) => {});
    *
    * //-
-   * // See the <a href="http://goo.gl/dKWIyS">`configuration.copy`</a> object for
+   * // See the <a href="http://goo.gl/dKWIyS">`configuration.copy`</a> object
+   * for
    * // all available options.
    * //-
    * const metadata = {
@@ -567,7 +572,8 @@ class Table extends common.ServiceObject {
    * @param {Table} destination The destination table.
    * @param {object} [metadata] Metadata to set with the copy operation. The
    *     metadata object should be in the format of the
-   *     [`configuration.copy`](http://goo.gl/dKWIyS) property of a Jobs resource.
+   *     [`configuration.copy`](http://goo.gl/dKWIyS) property of a Jobs
+   * resource.
    * @param {string} [metadata.jobId] Custom job id.
    * @param {string} [metadata.jobPrefix] Prefix to apply to the job id.
    * @param {function} [callback] The callback function.
@@ -591,7 +597,8 @@ class Table extends common.ServiceObject {
    * });
    *
    * //-
-   * // See the <a href="http://goo.gl/dKWIyS">`configuration.copy`</a> object for
+   * // See the <a href="http://goo.gl/dKWIyS">`configuration.copy`</a> object
+   * for
    * // all available options.
    * //-
    * const metadata = {
@@ -609,10 +616,10 @@ class Table extends common.ServiceObject {
    *   const apiResponse = data[1];
    * });
    */
-  createCopyJob(destination, metadata?): Promise<any>;
+  createCopyJob(destination, metadata?): Promise<TempResponse>;
   createCopyJob(destination, metadata, callback): void;
   createCopyJob(destination, callback): void;
-  createCopyJob(destination, metadata?, callback?): void|Promise<any> {
+  createCopyJob(destination, metadata?, callback?): void|Promise<TempResponse> {
     if (!(destination instanceof Table)) {
       throw new Error('Destination must be a Table object.');
     }
@@ -622,6 +629,7 @@ class Table extends common.ServiceObject {
       metadata = {};
     }
 
+    // tslint:disable-next-line no-any
     const body: any = {
       configuration: {
         copy: extend(true, metadata, {
@@ -665,7 +673,8 @@ class Table extends common.ServiceObject {
    *     source table(s) to copy data from.
    * @param {object} [metadata] Metadata to set with the copy operation. The
    *     metadata object should be in the format of the
-   *     [`configuration.copy`](http://goo.gl/dKWIyS) property of a Jobs resource.
+   *     [`configuration.copy`](http://goo.gl/dKWIyS) property of a Jobs
+   * resource.
    * @param {string} [metadata.jobId] Custom job id.
    * @param {string} [metadata.jobPrefix] Prefix to apply to the job id.
    * @param {function} [callback] The callback function.
@@ -695,7 +704,8 @@ class Table extends common.ServiceObject {
    * table.createCopyFromJob(sourceTables, callback);
    *
    * //-
-   * // See the <a href="http://goo.gl/dKWIyS">`configuration.copy`</a> object for
+   * // See the <a href="http://goo.gl/dKWIyS">`configuration.copy`</a> object
+   * for
    * // all available options.
    * //-
    * const metadata = {
@@ -727,6 +737,7 @@ class Table extends common.ServiceObject {
       metadata = {};
     }
 
+    // tslint:disable-next-line no-any
     const body: any = {
       configuration: {
         copy: extend(true, metadata, {
@@ -770,7 +781,9 @@ class Table extends common.ServiceObject {
    * @see [Jobs: insert API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert}
    *
    * @param {string|File} destination Where the file should be exported
-   *     to. A string or a {@link https://cloud.google.com/nodejs/docs/reference/storage/latest/File File} object.
+   *     to. A string or a {@link
+   * https://cloud.google.com/nodejs/docs/reference/storage/latest/File File}
+   * object.
    * @param {object=} options - The configuration object.
    * @param {string} options.format - The format to export the data in. Allowed
    *     options are "CSV", "JSON", "AVRO", or "PARQUET". Default: "CSV".
@@ -804,7 +817,9 @@ class Table extends common.ServiceObject {
    * }
    *
    * //-
-   * // To use the default options, just pass a {@link https://cloud.google.com/nodejs/docs/reference/storage/latest/File File} object.
+   * // To use the default options, just pass a {@link
+   * https://cloud.google.com/nodejs/docs/reference/storage/latest/File File}
+   * object.
    * //
    * // Note: The exported format type will be inferred by the file's extension.
    * // If you wish to override this, or provide an array of destination files,
@@ -838,10 +853,11 @@ class Table extends common.ServiceObject {
    *   const apiResponse = data[1];
    * });
    */
-  createExtractJob(destination, options?): Promise<any>;
+  createExtractJob(destination, options?): Promise<TempResponse>;
   createExtractJob(destination, options, callback): void;
   createExtractJob(destination, callback): void;
-  createExtractJob(destination, options?, callback?): void|Promise<any> {
+  createExtractJob(destination, options?, callback?):
+      void|Promise<TempResponse> {
     if (is.fn(options)) {
       callback = options;
       options = {};
@@ -854,11 +870,9 @@ class Table extends common.ServiceObject {
         }
 
         // If no explicit format was provided, attempt to find a match from the
-        // file's extension. If no match, don't set, and default upstream to CSV.
-        const format = path
-          .extname(dest.name)
-          .substr(1)
-          .toLowerCase();
+        // file's extension. If no match, don't set, and default upstream to
+        // CSV.
+        const format = path.extname(dest.name).substr(1).toLowerCase();
         if (!options.destinationFormat && !options.format && FORMATS[format]) {
           options.destinationFormat = FORMATS[format];
         }
@@ -883,6 +897,7 @@ class Table extends common.ServiceObject {
       delete options.gzip;
     }
 
+    // tslint:disable-next-line no-any
     const body: any = {
       configuration: {
         extract: extend(true, options, {
@@ -913,11 +928,12 @@ class Table extends common.ServiceObject {
   }
 
   /**
-   * Load data from a local file or Storage {@link https://cloud.google.com/nodejs/docs/reference/storage/latest/File File}.
+   * Load data from a local file or Storage {@link
+   * https://cloud.google.com/nodejs/docs/reference/storage/latest/File File}.
    *
-   * By loading data this way, you create a load job that will run your data load
-   * asynchronously. If you would like instantaneous access to your data, insert
-   * it using {@liink Table#insert}.
+   * By loading data this way, you create a load job that will run your data
+   * load asynchronously. If you would like instantaneous access to your data,
+   * insert it using {@liink Table#insert}.
    *
    * Note: The file type will be inferred by the given file's extension. If you
    * wish to override this, you must provide `metadata.format`.
@@ -925,10 +941,13 @@ class Table extends common.ServiceObject {
    * @see [Jobs: insert API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert}
    *
    * @param {string|File} source The source file to load. A string or a
-   *     {@link https://cloud.google.com/nodejs/docs/reference/storage/latest/File File} object.
+   *     {@link
+   * https://cloud.google.com/nodejs/docs/reference/storage/latest/File File}
+   * object.
    * @param {object} [metadata] Metadata to set with the load operation. The
    *     metadata object should be in the format of the
-   *     [`configuration.load`](http://goo.gl/BVcXk4) property of a Jobs resource.
+   *     [`configuration.load`](http://goo.gl/BVcXk4) property of a Jobs
+   * resource.
    * @param {string} [metadata.format] The format the data being loaded is in.
    *     Allowed options are "AVRO", "CSV", "JSON", "ORC", or "PARQUET".
    * @param {string} [metadata.jobId] Custom job id.
@@ -1016,26 +1035,21 @@ class Table extends common.ServiceObject {
       // A path to a file was given. If a sourceFormat wasn't specified, try to
       // find a match from the file's extension.
       const detectedFormat =
-        FORMATS[
-          path
-            .extname(source)
-            .substr(1)
-            .toLowerCase()
-        ];
+          FORMATS[path.extname(source).substr(1).toLowerCase()];
       if (!metadata.sourceFormat && detectedFormat) {
         metadata.sourceFormat = detectedFormat;
       }
 
       // Read the file into a new write stream.
-      return fs
-        .createReadStream(source)
-        .pipe(this.createWriteStream_(metadata))
-        .on('error', callback)
-        .on('job', (job) => {
-          callback(null, job, job.metadata);
-        });
+      return fs.createReadStream(source)
+          .pipe(this.createWriteStream_(metadata))
+          .on('error', callback)
+          .on('job', (job) => {
+            callback(null, job, job.metadata);
+          });
     }
 
+    // tslint:disable-next-line no-any
     const body: any = {
       configuration: {
         load: {
@@ -1072,13 +1086,7 @@ class Table extends common.ServiceObject {
         // If no explicit format was provided, attempt to find a match from
         // the file's extension. If no match, don't set, and default upstream
         // to CSV.
-        const format =
-          FORMATS[
-            path
-              .extname(src.name)
-              .substr(1)
-              .toLowerCase()
-          ];
+        const format = FORMATS[path.extname(src.name).substr(1).toLowerCase()];
         if (!metadata.sourceFormat && format) {
           body.configuration.load.sourceFormat = format;
         }
@@ -1124,8 +1132,8 @@ class Table extends common.ServiceObject {
    *
    * @param {string|object} [metadata] Metadata to set with the load operation.
    *     The metadata object should be in the format of the
-   *     [`configuration.load`](http://goo.gl/BVcXk4) property of a Jobs resource.
-   *     If a string is given, it will be used as the filetype.
+   *     [`configuration.load`](http://goo.gl/BVcXk4) property of a Jobs
+   * resource. If a string is given, it will be used as the filetype.
    * @param {string} [metadata.jobId] Custom job id.
    * @param {string} [metadata.jobPrefix] Prefix to apply to the job id.
    * @returns {WritableStream}
@@ -1143,7 +1151,7 @@ class Table extends common.ServiceObject {
     }
 
     if (is.string(metadata.schema)) {
-      metadata.schema = (Table as any).createSchemaFromString_(metadata.schema);
+      metadata.schema = Table.createSchemaFromString_(metadata.schema);
     }
 
     extend(true, metadata, {
@@ -1165,10 +1173,8 @@ class Table extends common.ServiceObject {
       delete metadata.jobPrefix;
     }
 
-    if (
-      metadata.hasOwnProperty('sourceFormat') &&
-      fileTypes.indexOf(metadata.sourceFormat) < 0
-    ) {
+    if (metadata.hasOwnProperty('sourceFormat') &&
+        fileTypes.indexOf(metadata.sourceFormat) < 0) {
       throw new Error(`Source format not recognized: ${metadata.sourceFormat}`);
     }
 
@@ -1176,35 +1182,33 @@ class Table extends common.ServiceObject {
 
     dup.once('writing', () => {
       common.util.makeWritableStream(
-        dup,
-        {
-          makeAuthenticatedRequest: this.bigQuery.makeAuthenticatedRequest,
-          requestModule: request,
-          metadata: {
-            configuration: {
-              load: metadata,
-            },
-            jobReference: {
-              jobId,
-              projectId: this.bigQuery.projectId,
-              location: this.location,
+          dup, {
+            makeAuthenticatedRequest: this.bigQuery.makeAuthenticatedRequest,
+            requestModule: request,
+            metadata: {
+              configuration: {
+                load: metadata,
+              },
+              jobReference: {
+                jobId,
+                projectId: this.bigQuery.projectId,
+                location: this.location,
+              },
+            } as {},
+            request: {
+              uri: format('{base}/{projectId}/jobs', {
+                base: 'https://www.googleapis.com/upload/bigquery/v2/projects',
+                projectId: this.bigQuery.projectId,
+              }),
             },
           },
-          request: {
-            uri: format('{base}/{projectId}/jobs', {
-              base: 'https://www.googleapis.com/upload/bigquery/v2/projects',
-              projectId: this.bigQuery.projectId,
-            }),
-          },
-        } as any,
-        (data) => {
-          const job = this.bigQuery.job(data.jobReference.jobId, {
-            location: data.jobReference.location,
+          (data) => {
+            const job = this.bigQuery.job(data.jobReference.jobId, {
+              location: data.jobReference.location,
+            });
+            job.metadata = data;
+            dup.emit('job', job);
           });
-          job.metadata = data;
-          dup.emit('job', job);
-        }
-      );
     });
     return dup;
   }
@@ -1217,8 +1221,8 @@ class Table extends common.ServiceObject {
    *
    * @param {string|object} [metadata] Metadata to set with the load operation.
    *     The metadata object should be in the format of the
-   *     [`configuration.load`](http://goo.gl/BVcXk4) property of a Jobs resource.
-   *     If a string is given, it will be used as the filetype.
+   *     [`configuration.load`](http://goo.gl/BVcXk4) property of a Jobs
+   * resource. If a string is given, it will be used as the filetype.
    * @param {string} [metadata.jobId] Custom job id.
    * @param {string} [metadata.jobPrefix] Prefix to apply to the job id.
    * @returns {WritableStream}
@@ -1276,12 +1280,10 @@ class Table extends common.ServiceObject {
     });
 
     stream.on('job', (job) => {
-      job
-        .on('error', err => stream.destroy(err))
-        .on('complete', () => {
-          stream.emit('complete', job);
-          stream.uncork();
-        });
+      job.on('error', err => stream.destroy(err)).on('complete', () => {
+        stream.emit('complete', job);
+        stream.uncork();
+      });
     });
 
     return stream;
@@ -1291,7 +1293,8 @@ class Table extends common.ServiceObject {
    * Export table to Cloud Storage.
    *
    * @param {string|File} destination Where the file should be exported
-   *     to. A string or a {@link https://cloud.google.com/nodejs/docs/reference/storage/latest/File File}.
+   *     to. A string or a {@link
+   * https://cloud.google.com/nodejs/docs/reference/storage/latest/File File}.
    * @param {object} [options] The configuration object.
    * @param {string} [options.format="CSV"] The format to export the data in.
    *     Allowed options are "AVRO", "CSV", "JSON", "ORC" or "PARQUET".
@@ -1320,7 +1323,9 @@ class Table extends common.ServiceObject {
    * const extractedFile = storage.bucket('institutions').file('2014.csv');
    *
    * //-
-   * // To use the default options, just pass a {@link https://cloud.google.com/nodejs/docs/reference/storage/latest/File File} object.
+   * // To use the default options, just pass a {@link
+   * https://cloud.google.com/nodejs/docs/reference/storage/latest/File File}
+   * object.
    * //
    * // Note: The exported format type will be inferred by the file's extension.
    * // If you wish to override this, or provide an array of destination files,
@@ -1418,12 +1423,12 @@ class Table extends common.ServiceObject {
    * //-
    * table.getRows().then((data) => {
    *   const rows = data[0];
-  });
-  */
-  getRows(options?): Promise<any>;
+   *   });
+   */
+  getRows(options?): Promise<TempResponse>;
   getRows(options, callback): void;
   getRows(callback): void;
-  getRows(options?, callback?): void|Promise<any> {
+  getRows(options?, callback?): void|Promise<TempResponse> {
     if (is.fn(options)) {
       callback = options;
       options = {};
@@ -1439,37 +1444,36 @@ class Table extends common.ServiceObject {
     };
 
     this.request(
-      {
-        uri: '/data',
-        qs: options,
-      },
-      (err, resp) => {
-        if (err) {
-          onComplete(err, null, null, resp);
-          return;
-        }
-        let nextQuery = null;
-        if (resp.pageToken) {
-          nextQuery = extend({}, options, {
-            pageToken: resp.pageToken,
-          });
-        }
+        {
+          uri: '/data',
+          qs: options,
+        },
+        (err, resp) => {
+          if (err) {
+            onComplete(err, null, null, resp);
+            return;
+          }
+          let nextQuery = null;
+          if (resp.pageToken) {
+            nextQuery = extend({}, options, {
+              pageToken: resp.pageToken,
+            });
+          }
 
-        if (resp.rows && resp.rows.length > 0 && !this.metadata.schema) {
-          // We don't know the schema for this table yet. Do a quick stat.
-          this.getMetadata((err, metadata, apiResponse) => {
-            if (err) {
-              onComplete(err, null, null, apiResponse);
-              return;
-            }
-            onComplete(null, resp.rows, nextQuery, resp);
-          });
-          return;
-        }
+          if (resp.rows && resp.rows.length > 0 && !this.metadata.schema) {
+            // We don't know the schema for this table yet. Do a quick stat.
+            this.getMetadata((err, metadata, apiResponse) => {
+              if (err) {
+                onComplete(err, null, null, apiResponse);
+                return;
+              }
+              onComplete(null, resp.rows, nextQuery, resp);
+            });
+            return;
+          }
 
-        onComplete(null, resp.rows, nextQuery, resp);
-      }
-    );
+          onComplete(null, resp.rows, nextQuery, resp);
+        });
   }
 
   /**
@@ -1505,7 +1509,8 @@ class Table extends common.ServiceObject {
    *     base template, and insert the rows into an instance table named
    *     "{destination}{templateSuffix}". BigQuery will manage creation of
    *     the instance table, using the schema of the base template table. See
-   *     [Automatic table creation using template tables](https://cloud.google.com/bigquery/streaming-data-into-bigquery#template-tables)
+   *     [Automatic table creation using template
+   * tables](https://cloud.google.com/bigquery/streaming-data-into-bigquery#template-tables)
    *     for considerations when working with templates tables.
    * @param {function} [callback] The callback function.
    * @param {?error} callback.err An error returned while making this request.
@@ -1545,7 +1550,8 @@ class Table extends common.ServiceObject {
    * table.insert(rows, insertHandler);
    *
    * //-
-   * // Insert a row as according to the <a href="https://cloud.google.com/bigquery/docs/reference/v2/tabledata/insertAll">
+   * // Insert a row as according to the <a
+   * href="https://cloud.google.com/bigquery/docs/reference/v2/tabledata/insertAll">
    * // specification</a>.
    * //-
    * const row = {
@@ -1564,7 +1570,8 @@ class Table extends common.ServiceObject {
    * table.insert(row, options, insertHandler);
    *
    * //-
-   * // Handling the response. See <a href="https://developers.google.com/bigquery/troubleshooting-errors">
+   * // Handling the response. See <a
+   * href="https://developers.google.com/bigquery/troubleshooting-errors">
    * // Troubleshooting Errors</a> for best practices on how to handle errors.
    * //-
    * function insertHandler(err, apiResponse) {
@@ -1602,10 +1609,10 @@ class Table extends common.ServiceObject {
    *     }
    *   });
    */
-  insert(rows, options?): Promise<any>;
+  insert(rows, options?): Promise<TempResponse>;
   insert(rows, options, callback): void;
   insert(rows, callback): void;
-  insert(rows, options?, callback?): void|Promise<any> {
+  insert(rows, options?, callback?): void|Promise<TempResponse> {
     if (is.fn(options)) {
       callback = options;
       options = {};
@@ -1639,7 +1646,8 @@ class Table extends common.ServiceObject {
 
     if (autoCreate) {
       if (!options.schema) {
-        throw new Error('Schema must be provided in order to auto-create Table.');
+        throw new Error(
+            'Schema must be provided in order to auto-create Table.');
       }
 
       schema = options.schema;
@@ -1648,79 +1656,80 @@ class Table extends common.ServiceObject {
 
     const createTableAndRetry = () => {
       this.create(
-        {
-          schema,
-        },
-        (err, table, resp) => {
-          if (err && err.code !== 409) {
-            callback(err, resp);
-            return;
-          }
+          {
+            schema,
+          },
+          (err, table, resp) => {
+            if (err && err.code !== 409) {
+              callback(err, resp);
+              return;
+            }
 
-          setTimeout(() => {
-            this.insert(rows, options, callback);
-          }, 60000);
-        }
-      );
+            setTimeout(() => {
+              this.insert(rows, options, callback);
+            }, 60000);
+          });
     };
 
     this.request(
-      {
-        method: 'POST',
-        uri: '/insertAll',
-        json,
-      },
-      (err, resp) => {
-        if (err) {
-          if ((err as any).code === 404 && autoCreate) {
-            setTimeout(createTableAndRetry, Math.random() * 60000);
-          } else {
-            callback(err, resp);
+        {
+          method: 'POST',
+          uri: '/insertAll',
+          json,
+        },
+        (err, resp) => {
+          if (err) {
+            if ((err as common.ApiError).code === 404 && autoCreate) {
+              setTimeout(createTableAndRetry, Math.random() * 60000);
+            } else {
+              callback(err, resp);
+            }
+            return;
           }
-          return;
-        }
 
-        const partialFailures = (resp.insertErrors || []).map((
-          insertError
-        ) => {
-          return {
-            errors: insertError.errors.map((error) => {
-              return {
-                message: error.message,
-                reason: error.reason,
-              };
-            }),
-            row: rows[insertError.index],
-          };
+          const partialFailures =
+              (resp.insertErrors || []).map((insertError) => {
+                return {
+                  errors: insertError.errors.map((error) => {
+                    return {
+                      message: error.message,
+                      reason: error.reason,
+                    };
+                  }),
+                  row: rows[insertError.index],
+                };
+              });
+
+          if (partialFailures.length > 0) {
+            err = new common.util.PartialFailureError({
+              errors: partialFailures,
+              response: resp,
+            } as GoogleErrorBody);
+          }
+
+          callback(err, resp);
         });
-
-        if (partialFailures.length > 0) {
-          err = new common.util.PartialFailureError({
-            errors: partialFailures,
-            response: resp,
-          } as any);
-        }
-
-        callback(err, resp);
-      }
-    );
   }
 
   /**
-   * Load data from a local file or Storage {@link https://cloud.google.com/nodejs/docs/reference/storage/latest/File File}.
+   * Load data from a local file or Storage {@link
+   * https://cloud.google.com/nodejs/docs/reference/storage/latest/File File}.
    *
-   * By loading data this way, you create a load job that will run your data load
-   * asynchronously. If you would like instantaneous access to your data, insert
-   * it using {@link Table#insert}.
+   * By loading data this way, you create a load job that will run your data
+   * load asynchronously. If you would like instantaneous access to your data,
+   * insert it using {@link Table#insert}.
    *
    * Note: The file type will be inferred by the given file's extension. If you
    * wish to override this, you must provide `metadata.format`.
    *
    * @param {string|File} source The source file to load. A string or a
-   *     {@link https://cloud.google.com/nodejs/docs/reference/storage/latest/File File} object.
+   *     {@link
+   * https://cloud.google.com/nodejs/docs/reference/storage/latest/File File}
+   * object.
    * @param {object} [metadata] Metadata to set with the load operation. The
    *     metadata object should be in the format of the
-   *     [`configuration.load`](http://goo.gl/BVcXk4) property of a Jobs resource.
+   *     [`configuration.load`](http://goo.gl/BVcXk4) property of a Jobs
+   * resource.
    * @param {string} [metadata.format] The format the data being loaded is in.
    *     Allowed options are "AVRO", "CSV", "JSON", "ORC", or "PARQUET".
    * @param {string} [metadata.jobId] Custom id for the underlying job.
@@ -1779,10 +1788,10 @@ class Table extends common.ServiceObject {
    *   const apiResponse = data[0];
    * });
    */
-  load(source, metadata?): Promise<any>;
+  load(source, metadata?): Promise<TempResponse>;
   load(source, metadata, callback): void;
   load(source, callback): void;
-  load(source, metadata, callback?): void|Promise<any> {
+  load(source, metadata, callback?): void|Promise<TempResponse> {
     if (is.fn(metadata)) {
       callback = metadata;
       metadata = {};
@@ -1822,12 +1831,12 @@ class Table extends common.ServiceObject {
    *     table.
    * @param {string} metadata.name A descriptive name for the table.
    * @param {string|object} metadata.schema A comma-separated list of name:type
-   *     pairs. Valid types are "string", "integer", "float", "boolean", "bytes",
-   *     "record", and "timestamp". If the type is omitted, it is assumed to be
-   *     "string". Example: "name:string, age:integer". Schemas can also be
-   *     specified as a JSON array of fields, which allows for nested and repeated
-   *     fields. See a [Table resource](http://goo.gl/sl8Dmg) for more detailed
-   *     information.
+   *     pairs. Valid types are "string", "integer", "float", "boolean",
+   * "bytes", "record", and "timestamp". If the type is omitted, it is assumed
+   * to be "string". Example: "name:string, age:integer". Schemas can also be
+   *     specified as a JSON array of fields, which allows for nested and
+   * repeated fields. See a [Table resource](http://goo.gl/sl8Dmg) for more
+   * detailed information.
    * @param {function} [callback] The callback function.
    * @param {?error} callback.err An error returned while making this request.
    * @param {object} callback.apiResponse The full API response.
@@ -1855,9 +1864,14 @@ class Table extends common.ServiceObject {
    *   const apiResponse = data[1];
    * });
    */
-  setMetadata(metadata: SetTableMetadataOptions): Promise<common.SetMetadataResponse>;
-  setMetadata(metadata: SetTableMetadataOptions, callback: common.ResponseCallback): void;
-  setMetadata(metadata: SetTableMetadataOptions, callback?: common.ResponseCallback): void|Promise<common.SetMetadataResponse> {
+  setMetadata(metadata: SetTableMetadataOptions):
+      Promise<common.SetMetadataResponse>;
+  setMetadata(
+      metadata: SetTableMetadataOptions,
+      callback: common.ResponseCallback): void;
+  setMetadata(
+      metadata: SetTableMetadataOptions, callback?: common.ResponseCallback):
+      void|Promise<common.SetMetadataResponse> {
     const body = Table.formatMetadata_(metadata);
     super.setMetadata(body, callback!);
   }
