@@ -33,6 +33,7 @@ import * as uuid from 'uuid';
 import {BigQuery, Job, Dataset} from '../src';
 import {GoogleErrorBody} from '@google-cloud/common/build/src/util';
 import {Writable} from 'stream';
+import {teenyRequest} from 'teeny-request';
 
 export type CreateCopyJobResponse = [Job, r.Response];
 export interface CreateCopyJobCallback {
@@ -310,7 +311,7 @@ class Table extends common.ServiceObject {
       id,
       createMethod: dataset.createTable.bind(dataset),
       methods,
-      requestModule: r,
+      requestModule: teenyRequest as typeof r,
     });
 
     if (options && options.location) {
@@ -1259,7 +1260,7 @@ class Table extends common.ServiceObject {
       common.util.makeWritableStream(
           dup, {
             makeAuthenticatedRequest: this.bigQuery.makeAuthenticatedRequest,
-            requestModule: r,
+            requestModule: teenyRequest as typeof r,
             metadata: {
               configuration: {
                 load: metadata,

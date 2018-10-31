@@ -26,6 +26,7 @@ const format = require('string-format-obj');
 import * as is from 'is';
 import * as r from 'request';
 import * as uuid from 'uuid';
+import {teenyRequest} from 'teeny-request';
 
 import {Dataset, DataSetOptions} from './dataset';
 import {Job, JobOptions} from './job';
@@ -184,7 +185,7 @@ export class BigQuery extends common.Service {
       baseUrl: 'https://www.googleapis.com/bigquery/v2',
       scopes: ['https://www.googleapis.com/auth/bigquery'],
       packageJson: require('../../package.json'),
-      requestModule: r,
+      requestModule: teenyRequest as typeof r,
     };
 
     if (options.scopes) {
