@@ -81,6 +81,7 @@
     "is": "^3.0.1",
     "stream-events": "^1.0.1",
     "string-format-obj": "^1.0.0",
+    "teeny-request": "^3.11.0",
     "uuid": "^3.1.0"
   },
   "devDependencies": {
@@ -91,6 +92,7 @@
     "@types/extend": "^3.0.0",
     "@types/is": "0.0.20",
     "@types/mocha": "^5.2.5",
+    "@types/request": "^2.48.0",
     "@types/sinon": "^5.0.5",
     "@types/uuid": "^3.4.4",
     "async": "^2.6.0",

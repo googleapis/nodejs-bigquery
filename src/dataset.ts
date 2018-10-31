@@ -23,6 +23,7 @@ import * as extend from 'extend';
 import * as is from 'is';
 import {Table, TableOptions} from './table';
 import * as r from 'request';
+import {teenyRequest} from 'teeny-request';
 import {BigQuery, CreateQueryJobResponse, CreateQueryJobCallback} from '.';
 
 export interface DatasetDeleteOptions {
@@ -238,7 +239,7 @@ class Dataset extends ServiceObject {
       baseUrl: '/datasets',
       id,
       methods,
-      requestModule: r,
+      requestModule: teenyRequest as typeof r,
       createMethod: (
           id: string,
           optionsOrCallback?: CreateDatasetOptions|CreateDatasetCallback,

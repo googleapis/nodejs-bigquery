@@ -26,6 +26,7 @@ import {paginator} from '@google-cloud/paginator';
 import * as extend from 'extend';
 import * as r from 'request';
 import {BigQuery} from '../src';
+import {teenyRequest} from 'teeny-request';
 
 export interface JobOptions {
   location?: string;
@@ -257,7 +258,7 @@ class Job extends Operation {
       baseUrl: '/jobs',
       id,
       methods,
-      requestModule: r,
+      requestModule: teenyRequest as typeof r,
     });
 
     this.bigQuery = bigQuery;
