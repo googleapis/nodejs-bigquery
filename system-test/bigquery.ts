@@ -18,7 +18,7 @@
 
 import * as assert from 'assert';
 import * as async from 'async';
-import * as Big from 'big.js';
+import Big from 'big.js';
 import * as fs from 'fs';
 import * as uuid from 'uuid';
 import * as exec from 'methmeth';
@@ -371,7 +371,7 @@ describe('BigQuery', () => {
   it('should get a list of jobs', done => {
     bigquery.getJobs((err, jobs) => {
       assert.ifError(err);
-      assert(jobs[0] instanceof Job);
+      assert(jobs![0] instanceof Job);
       done();
     });
   });
@@ -460,7 +460,7 @@ describe('BigQuery', () => {
     it('should get tables', done => {
       dataset.getTables((err, tables) => {
         assert.ifError(err);
-        assert(tables[0] instanceof Table);
+        assert(tables![0] instanceof Table);
         done();
       });
     });
@@ -559,7 +559,7 @@ describe('BigQuery', () => {
               return table.createLoadJob(TEST_DATA_FILE);
             })
             .then(data => {
-              job = data[0];
+              job = data![0];
               return job.promise();
             });
       });
@@ -611,7 +611,7 @@ describe('BigQuery', () => {
           const badJob = bigquery.job(job.id, {location: 'US'});
 
           badJob.cancel(err => {
-            assert.strictEqual(err.code, 404);
+            assert.strictEqual((err as ApiError).code, 404);
             done();
           });
         });
@@ -623,7 +623,7 @@ describe('BigQuery', () => {
 
       describe('job.getQueryResults', () => {
         it('should fail if the job location is incorrect', done => {
-          const badDataset = bigquery.dataset(dataset.id, {location: 'US'});
+          const badDataset = bigquery.dataset(dataset.id!, {location: 'US'});
 
           badDataset.createQueryJob(
               {
@@ -662,10 +662,10 @@ describe('BigQuery', () => {
           const otherTable = dataset.table(generateName('table'));
 
           it('should fail if the job location is incorrect', done => {
-            const badTable = dataset.table(table.id, {location: 'US'});
+            const badTable = dataset.table(table.id!, {location: 'US'});
 
             badTable.createCopyJob(otherTable, err => {
-              assert.strictEqual(err.code, 404);
+              assert.strictEqual((err as ApiError).code, 404);
               done();
             });
           });
@@ -689,7 +689,7 @@ describe('BigQuery', () => {
           });
 
           it('should fail if the job location is incorrect', done => {
-            const badTable = dataset.table(table.id, {location: 'US'});
+            const badTable = dataset.table(table.id!, {location: 'US'});
 
             badTable.createExtractJob(extractFile, err => {
               assert.strictEqual(err.code, 404);

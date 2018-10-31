@@ -86,8 +86,13 @@
   "devDependencies": {
     "@google-cloud/nodejs-repo-tools": "^2.2.3",
     "@google-cloud/storage": "^2.0.0",
+    "@types/arrify": "^1.0.4",
+    "@types/big.js": "^4.0.5",
+    "@types/extend": "^3.0.0",
+    "@types/is": "0.0.20",
     "@types/mocha": "^5.2.5",
     "@types/sinon": "^5.0.5",
+    "@types/uuid": "^3.4.4",
     "async": "^2.6.0",
     "codecov": "^3.0.0",
     "eslint": "^5.0.0",

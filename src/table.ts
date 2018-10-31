@@ -17,29 +17,82 @@
 'use strict';
 
 import * as arrify from 'arrify';
-import * as Big from 'big.js';
+import Big from 'big.js';
 import * as common from '@google-cloud/common';
 import {paginator} from '@google-cloud/paginator';
 import {promisifyAll} from '@google-cloud/promisify';
-const duplexify = require('duplexify');
+import * as duplexify from 'duplexify';
 import * as extend from 'extend';
 const format = require('string-format-obj');
 import * as fs from 'fs';
 import * as is from 'is';
 import * as path from 'path';
-import * as request from 'request';
-const streamEvents = require('stream-events');
+import * as r from 'request';
+import * as streamEvents from 'stream-events';
 import * as uuid from 'uuid';
-import {BigQuery} from '../src';
+import {BigQuery, Job, Dataset} from '../src';
 import {GoogleErrorBody} from '@google-cloud/common/build/src/util';
+import {Writable} from 'stream';
 
-// tslint:disable-next-line no-any
-export type TempResponse = any;
+export type CreateCopyJobResponse = [Job, r.Response];
+export interface CreateCopyJobCallback {
+  (err: Error|null, job?: Job, apiResponse?: r.Response): void;
+}
+
+export interface CreateCopyJobMetadata extends CopyTableMetadata {
+  createDisposition?: 'CREATE_IF_NEEDED'|'CREATE_NEVER';
+  destinationEncryptionConfiguration?: {kmsKeyName?: string;};
+  destinationTable?: {datasetId: string; projectId: string; tableId: string;};
+  sourceTable?: {datasetId: string; projectId: string; tableId: string;};
+  sourceTables: Array<{datasetId: string; projectId: string; tableId: string;}>;
+  writeDisposition?: 'WRITE_TRUNCATE'|'WRITE_APPEND'|'WRITE_EMPTY';
+}
 
 export interface SetTableMetadataOptions {
   description?: string;
   schema?: string|{};
 }
+
+export interface CopyTableMetadata {
+  jobId?: string;
+  jobPrefix?: string;
+}
+
+interface FormatMetadataOptions {
+  name?: string;
+  friendlyName: string;
+  schema?: string|TableField[];
+  partitioning?: string;
+  view?: string;
+}
+
+interface FormattedMetadata {
+  schema?: TableSchema;
+  friendlyName: string;
+  name?: string;
+  partitioning?: string;
+  timePartitioning?: {type: string};
+  view: {query: string; useLegacySql: boolean;};
+}
+
+export interface TableSchema {
+  fields: TableField[];
+}
+
+export interface TableField {
+  name: string;
+  type: string;
+  mode?: string;
+  fields?: TableField[];
+}
+
+export type CopyTableResponse = [r.Response];
+export interface CopyTableCallback {
+  (err: Error|null, apiResponse?: r.Response): void;
+}
+
+// tslint:disable-next-line no-any
+export type TempResponse = any;
 
 /**
  * The file formats accepted by BigQuery.
@@ -54,6 +107,10 @@ const FORMATS = {
   orc: 'ORC',
   parquet: 'PARQUET',
 };
+
+export interface TableOptions {
+  location?: string;
+}
 
 /**
  * Table objects are returned by methods such as
@@ -79,7 +136,7 @@ const FORMATS = {
  * const table = dataset.table('my-table');
  */
 class Table extends common.ServiceObject {
-  constructor(dataset, id, options?) {
+  constructor(dataset: Dataset, id: string, options?: TableOptions) {
     const methods = {
       /**
        * Create a table.
@@ -253,7 +310,7 @@ class Table extends common.ServiceObject {
       id,
       createMethod: dataset.createTable.bind(dataset),
       methods,
-      requestModule: request,
+      requestModule: r,
     });
 
     if (options && options.location) {
@@ -266,7 +323,7 @@ class Table extends common.ServiceObject {
     // Catch all for read-modify-write cycle
     // https://cloud.google.com/bigquery/docs/api-performance#read-patch-write
     this.interceptors.push({
-      request: reqOpts => {
+      request: (reqOpts: common.DecorateRequestOptions) => {
         if (reqOpts.method === 'PATCH' && reqOpts.json.etag) {
           reqOpts.headers = reqOpts.headers || {};
           reqOpts.headers['If-Match'] = reqOpts.json.etag;
@@ -317,17 +374,18 @@ class Table extends common.ServiceObject {
    * @param {string} str Comma-separated schema string.
    * @returns {object} Table schema in the format the API expects.
    */
-  static createSchemaFromString_(str) {
-    return str.split(/\s*,\s*/).reduce((acc, pair) => {
-      acc.fields.push({
-        name: pair.split(':')[0].trim(),
-        type: (pair.split(':')[1] || 'STRING').toUpperCase().trim(),
-      });
-
-      return acc;
-    }, {
-      fields: [],
-    });
+  static createSchemaFromString_(str: string): TableSchema {
+    return str.split(/\s*,\s*/).reduce(
+        (acc: {fields: Array<{name: string, type: string}>}, pair) => {
+          acc.fields.push({
+            name: pair.split(':')[0].trim(),
+            type: (pair.split(':')[1] || 'STRING').toUpperCase().trim(),
+          });
+          return acc;
+        },
+        {
+          fields: [],
+        });
   }
 
   /**
@@ -340,8 +398,8 @@ class Table extends common.ServiceObject {
    * @param {*} value The value to be converted.
    * @returns {*} The converted value.
    */
-  static encodeValue_(value) {
-    if (is.undefined(value) || is.null(value)) {
+  static encodeValue_(value?: {}|null): {}|null {
+    if (typeof value === 'undefined' || value === null) {
       return null;
     }
 
@@ -364,22 +422,25 @@ class Table extends common.ServiceObject {
         customTypeConstructorNames.indexOf(constructorName) > -1;
 
     if (isCustomType) {
-      return value.value;
+      return (value as {value: {}}).value;
     }
 
     if (is.date(value)) {
-      return value.toJSON();
+      return (value as Date).toJSON();
     }
 
     if (is.array(value)) {
-      return value.map(Table.encodeValue_);
+      return (value as []).map(Table.encodeValue_);
     }
 
-    if (is.object(value)) {
-      return Object.keys(value).reduce((acc, key) => {
-        acc[key] = Table.encodeValue_(value[key]);
-        return acc;
-      }, {});
+    if (typeof value === 'object') {
+      return Object.keys(value).reduce(
+          (acc: {[index: string]: {}|null}, key) => {
+            acc[key] = Table.encodeValue_(
+                (value as {[index: string]: {} | null})[key]);
+            return acc;
+          },
+          {});
     }
     return value;
   }
@@ -387,8 +448,8 @@ class Table extends common.ServiceObject {
   /**
    * @private
    */
-  static formatMetadata_(options) {
-    const body = extend(true, {}, options);
+  static formatMetadata_(options: FormatMetadataOptions): FormattedMetadata {
+    const body = extend(true, {}, options) as {} as FormattedMetadata;
 
     if (options.name) {
       body.friendlyName = options.name;
@@ -396,12 +457,12 @@ class Table extends common.ServiceObject {
     }
 
     if (is.string(options.schema)) {
-      body.schema = Table.createSchemaFromString_(options.schema);
+      body.schema = Table.createSchemaFromString_(options.schema as string);
     }
 
     if (is.array(options.schema)) {
       body.schema = {
-        fields: options.schema,
+        fields: options.schema as [],
       };
     }
 
@@ -414,15 +475,15 @@ class Table extends common.ServiceObject {
       });
     }
 
-    if (is.string(body.partitioning)) {
+    if (is.string(options.partitioning)) {
       body.timePartitioning = {
-        type: body.partitioning.toUpperCase(),
+        type: body.partitioning!.toUpperCase(),
       };
     }
 
-    if (is.string(body.view)) {
+    if (is.string(options.view)) {
       body.view = {
-        query: body.view,
+        query: options.view!,
         useLegacySql: false,
       };
     }
@@ -477,22 +538,31 @@ class Table extends common.ServiceObject {
    *   const apiResponse = data[0];
    * });
    */
-  copy(destination, metadata, callback) {
-    if (is.fn(metadata)) {
-      callback = metadata;
-      metadata = {};
-    }
+  copy(destination: Table, metadata?: CopyTableMetadata):
+      Promise<CopyTableResponse>;
+  copy(
+      destination: Table, metadata: CopyTableMetadata,
+      callback: CopyTableCallback): void;
+  copy(destination: Table, callback: CopyTableCallback): void;
+  copy(
+      destination: Table,
+      metadataOrCallback?: CopyTableMetadata|CopyTableCallback,
+      cb?: CopyTableCallback): void|Promise<CopyTableResponse> {
+    const metadata =
+        typeof metadataOrCallback === 'object' ? metadataOrCallback : {};
+    const callback =
+        typeof metadataOrCallback === 'function' ? metadataOrCallback : cb;
+    this.createCopyJob(
+        destination, metadata as CreateCopyJobMetadata, (err, job, resp) => {
+          if (err) {
+            callback!(err, resp);
+            return;
+          }
 
-    this.createCopyJob(destination, metadata, (err, job, resp) => {
-      if (err) {
-        callback(err, resp);
-        return;
-      }
-
-      job.on('error', callback).on('complete', (metadata) => {
-        callback(null, metadata);
-      });
-    });
+          job!.on('error', callback!).on('complete', (metadata) => {
+            callback!(null, metadata);
+          });
+        });
   }
 
   /**
@@ -546,7 +616,7 @@ class Table extends common.ServiceObject {
    *   const apiResponse = data[0];
    * });
    */
-  copyFrom(sourceTables, metadata, callback) {
+  copyFrom(sourceTables: Table|Table[], metadata, callback) {
     if (is.fn(metadata)) {
       callback = metadata;
       metadata = {};
@@ -616,18 +686,24 @@ class Table extends common.ServiceObject {
    *   const apiResponse = data[1];
    * });
    */
-  createCopyJob(destination, metadata?): Promise<TempResponse>;
-  createCopyJob(destination, metadata, callback): void;
-  createCopyJob(destination, callback): void;
-  createCopyJob(destination, metadata?, callback?): void|Promise<TempResponse> {
+  createCopyJob(destination: Table, metadata?: CreateCopyJobMetadata):
+      Promise<CreateCopyJobResponse>;
+  createCopyJob(
+      destination: Table, metadata: CreateCopyJobMetadata,
+      callback: CreateCopyJobCallback): void;
+  createCopyJob(destination: Table, callback: CreateCopyJobCallback): void;
+  createCopyJob(
+      destination: Table,
+      metadataOrCallback?: CreateCopyJobMetadata|CreateCopyJobCallback,
+      cb?: CreateCopyJobCallback): void|Promise<CreateCopyJobResponse> {
     if (!(destination instanceof Table)) {
       throw new Error('Destination must be a Table object.');
     }
-
-    if (is.fn(metadata)) {
-      callback = metadata;
-      metadata = {};
-    }
+    const metadata = typeof metadataOrCallback === 'object' ?
+        metadataOrCallback :
+        {} as CreateCopyJobMetadata;
+    const callback =
+        typeof metadataOrCallback === 'function' ? metadataOrCallback : cb;
 
     // tslint:disable-next-line no-any
     const body: any = {
@@ -723,9 +799,8 @@ class Table extends common.ServiceObject {
    *   const apiResponse = data[1];
    * });
    */
-  createCopyFromJob(sourceTables, metadata, callback) {
-    sourceTables = arrify(sourceTables);
-
+  createCopyFromJob(source: Table|Table[], metadata, callback) {
+    const sourceTables = arrify(source);
     sourceTables.forEach((sourceTable) => {
       if (!(sourceTable instanceof Table)) {
         throw new Error('Source must be a Table object.');
@@ -1013,7 +1088,7 @@ class Table extends common.ServiceObject {
    *   const apiResponse = data[1];
    * });
    */
-  createLoadJob(source, metadata?, callback?) {
+  createLoadJob(source, metadata?, callback?): void|Writable {
     if (is.fn(metadata)) {
       callback = metadata;
       metadata = {};
@@ -1138,7 +1213,7 @@ class Table extends common.ServiceObject {
    * @param {string} [metadata.jobPrefix] Prefix to apply to the job id.
    * @returns {WritableStream}
    */
-  createWriteStream_(metadata) {
+  createWriteStream_(metadata): Writable {
     metadata = metadata || {};
     const fileTypes = Object.keys(FORMATS).map((key) => {
       return FORMATS[key];
@@ -1178,13 +1253,13 @@ class Table extends common.ServiceObject {
       throw new Error(`Source format not recognized: ${metadata.sourceFormat}`);
     }
 
-    const dup = streamEvents(duplexify());
+    const dup = streamEvents(duplexify()) as duplexify.Duplexify;
 
     dup.once('writing', () => {
       common.util.makeWritableStream(
           dup, {
             makeAuthenticatedRequest: this.bigQuery.makeAuthenticatedRequest,
-            requestModule: request,
+            requestModule: r,
             metadata: {
               configuration: {
                 load: metadata,
@@ -1872,7 +1947,7 @@ class Table extends common.ServiceObject {
   setMetadata(
       metadata: SetTableMetadataOptions, callback?: common.ResponseCallback):
       void|Promise<common.SetMetadataResponse> {
-    const body = Table.formatMetadata_(metadata);
+    const body = Table.formatMetadata_(metadata as FormatMetadataOptions);
     super.setMetadata(body, callback!);
   }
 }

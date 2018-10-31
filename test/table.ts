@@ -18,7 +18,7 @@
 
 import * as arrify from 'arrify';
 import * as assert from 'assert';
-import * as Big from 'big.js';
+import Big from 'big.js';
 import {EventEmitter} from 'events';
 import * as extend from 'extend';
 import * as proxyquire from 'proxyquire';
@@ -68,7 +68,8 @@ const fakePaginator = {
   }
 };
 
-let fakeUuid = extend(true, {}, uuid);
+// tslint:disable-next-line no-any
+let fakeUuid: any = extend(true, {}, uuid);
 
 class FakeServiceObject extends ServiceObject {
   calledWith_;

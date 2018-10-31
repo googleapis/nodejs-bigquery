@@ -18,7 +18,7 @@
 
 import * as arrify from 'arrify';
 import * as assert from 'assert';
-import * as Big from 'big.js';
+import Big from 'big.js';
 import * as extend from 'extend';
 import * as proxyquire from 'proxyquire';
 import * as uuid from 'uuid';
@@ -26,6 +26,7 @@ import * as pfy from '@google-cloud/promisify';
 import {Service, util} from '@google-cloud/common';
 import * as sinon from 'sinon';
 import {BigQueryDate, Table} from '../src';
+import {TableField} from '../src/table';
 
 const fakeUuid = extend(true, {}, uuid);
 
@@ -213,7 +214,7 @@ describe('BigQuery', () => {
         {name: 'teeth_count', type: 'FLOAT64'},
         {name: 'numeric_col', type: 'NUMERIC'},
       ],
-    };
+    } as {fields: TableField[]};
 
     beforeEach(() => {
       sandbox.stub(BigQuery, 'date').callsFake(input => {
@@ -1438,8 +1439,7 @@ describe('BigQuery', () => {
         assert.deepStrictEqual(reqOpts.qs, {});
         done();
       };
-
-      bq.getJobs(null, assert.ifError);
+      bq.getJobs(assert.ifError);
     });
 
     it('should return error to callback', done => {
