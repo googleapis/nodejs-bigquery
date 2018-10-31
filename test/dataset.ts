@@ -610,7 +610,7 @@ describe('BigQuery/Dataset', () => {
         done();
       };
 
-      ds.getTables(null, assert.ifError);
+      ds.getTables(assert.ifError);
     });
 
     it('should return error to callback', done => {

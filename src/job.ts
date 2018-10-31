@@ -20,13 +20,42 @@
 
 'use strict';
 
-import {Operation, util} from '@google-cloud/common';
+import {Operation, util, GetMetadataCallback} from '@google-cloud/common';
 import {promisifyAll} from '@google-cloud/promisify';
 import {paginator} from '@google-cloud/paginator';
 import * as extend from 'extend';
-import * as is from 'is';
-import * as request from 'request';
+import * as r from 'request';
 import {BigQuery} from '../src';
+
+export interface JobOptions {
+  location?: string;
+}
+
+export interface CancelCallback {
+  (err: Error|null, apiResponse?: r.Response): void;
+}
+
+export type CancelResponse = [r.Response];
+
+export type QueryResultsResponse = [Array<{}>];
+export interface QueryResultsCallback {
+  (error: Error|null, rows: Array<{}>|null): void;
+}
+
+export interface QueryResultsOptions {
+  autoPaginate?: boolean;
+  maxApiCalls?: number;
+  maxResults?: number;
+  pageToken?: string;
+  startIndex?: number;
+  timeoutMs?: number;
+}
+
+export type ManualQueryResultsResponse = [Array<{}>, {}, r.Response];
+export interface ManualQueryResultsCallback {
+  (err: Error|null, rows: Array<{}>|null, nextQuery?: {}|null,
+   apiResponse?: r.Response): void;
+}
 
 /**
  * Job objects are returned from various places in the BigQuery API:
@@ -81,7 +110,9 @@ import {BigQuery} from '../src';
  * job.removeAllListeners();
  */
 class Job extends Operation {
-  constructor(bigQuery, id, options) {
+  bigQuery: BigQuery;
+
+  constructor(bigQuery: BigQuery, id: string, options?: JobOptions) {
     let location;
     if (options && options.location) {
       location = options.location;
@@ -226,7 +257,7 @@ class Job extends Operation {
       baseUrl: '/jobs',
       id,
       methods,
-      requestModule: request,
+      requestModule: r,
     });
 
     this.bigQuery = bigQuery;
@@ -291,7 +322,9 @@ class Job extends Operation {
    *   const apiResponse = data[0];
    * });
    */
-  cancel(callback) {
+  cancel(): Promise<CancelResponse>;
+  cancel(callback: CancelCallback): void;
+  cancel(callback?: CancelCallback): void|Promise<CancelResponse> {
     let qs;
 
     if (this.location) {
@@ -304,7 +337,7 @@ class Job extends Operation {
           uri: '/cancel',
           qs,
         },
-        callback);
+        callback!);
   }
 
   /**
@@ -389,11 +422,22 @@ class Job extends Operation {
    *   const rows = data[0];
    * });
    */
-  getQueryResults(options, callback) {
-    if (is.fn(options)) {
-      callback = options;
-      options = {};
-    }
+  getQueryResults(options?: QueryResultsOptions):
+      Promise<ManualQueryResultsResponse|QueryResultsResponse>;
+  getQueryResults(
+      options: QueryResultsOptions,
+      callback: ManualQueryResultsCallback|QueryResultsCallback): void;
+  getQueryResults(callback: ManualQueryResultsCallback|
+                  QueryResultsCallback): void;
+  getQueryResults(
+      optionsOrCallback?: QueryResultsOptions|ManualQueryResultsCallback|
+      QueryResultsCallback,
+      cb?: ManualQueryResultsCallback|QueryResultsCallback):
+      void|Promise<ManualQueryResultsResponse|QueryResultsResponse> {
+    let options =
+        typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
+    const callback =
+        typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
 
     options = extend(
         {
@@ -408,17 +452,18 @@ class Job extends Operation {
         },
         (err, resp) => {
           if (err) {
-            callback(err, null, null, resp);
+            callback!(err, null, null, resp);
             return;
           }
 
-          let rows = [];
+          // tslint:disable-next-line no-any
+          let rows: any = [];
 
           if (resp.schema && resp.rows) {
             rows = BigQuery.mergeSchemaWithRows_(resp.schema, resp.rows);
           }
 
-          let nextQuery = null;
+          let nextQuery: {}|null = null;
           if (resp.jobComplete === false) {
             // Query is still running.
             nextQuery = extend({}, options);
@@ -429,7 +474,7 @@ class Job extends Operation {
             });
           }
 
-          callback(null, rows, nextQuery, resp);
+          callback!(null, rows, nextQuery, resp);
         });
   }
 
@@ -439,7 +484,9 @@ class Job extends Operation {
    *
    * @private
    */
-  getQueryResultsAsStream_(options, callback) {
+  getQueryResultsAsStream_(
+      options: QueryResultsOptions,
+      callback: ManualQueryResultsCallback): void {
     options = extend({autoPaginate: false}, options);
     this.getQueryResults(options, callback);
   }
@@ -455,7 +502,7 @@ class Job extends Operation {
    *
    * @param {function} callback
    */
-  poll_(callback) {
+  poll_(callback: GetMetadataCallback): void {
     this.getMetadata((err, metadata, apiResponse) => {
       // tslint:disable-next-line no-any
       if (!err && (apiResponse as any).status &&
@@ -471,7 +518,7 @@ class Job extends Operation {
       }
 
       if (metadata.status.state !== 'DONE') {
-        callback();
+        callback(null);
         return;
       }
 

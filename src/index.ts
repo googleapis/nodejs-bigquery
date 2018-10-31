@@ -17,25 +17,90 @@
 'use strict';
 
 import * as arrify from 'arrify';
-import * as Big from 'big.js';
+import Big from 'big.js';
 import * as common from '@google-cloud/common';
 import {promisifyAll} from '@google-cloud/promisify';
 import {paginator} from '@google-cloud/paginator';
 import * as extend from 'extend';
 const format = require('string-format-obj');
 import * as is from 'is';
-import * as request from 'request';
+import * as r from 'request';
 import * as uuid from 'uuid';
 
-import {Dataset, TempResponse} from './dataset';
-import {Job} from './job';
-import {Table} from './table';
+import {Dataset, DataSetOptions} from './dataset';
+import {Job, JobOptions} from './job';
+import {Table, TempResponse} from './table';
 import {GoogleErrorBody} from '@google-cloud/common/build/src/util';
+
+export type CreateQueryJobResponse = [Job, r.Response];
+export interface CreateQueryJobCallback {
+  (err: Error|null, job?: Job, apiResponse?: r.Response): void;
+}
+
+export interface GetJobsOptions {
+  allUsers?: boolean;
+  autoPaginate?: boolean;
+  maxApiCalls?: number;
+  maxResults?: number;
+  pageToken?: string;
+  projection?: 'full'|'minimal';
+  stateFilter?: 'done'|'pending'|'running';
+}
+
+export type GetJobsResponse = [Job[], r.Response];
+export interface GetJobsCallback {
+  (err: Error|null, jobs: Job[]|null, nextQuery?: {}|null,
+   apiResponse?: r.Response): void;
+}
+
+export interface BigQueryTimeOptions {
+  hours?: number|string;
+  minutes?: number|string;
+  seconds?: number|string;
+  fractional?: number|string;
+}
+
+export interface BigQueryDateOptions {
+  year?: number|string;
+  month?: number|string;
+  day?: number|string;
+}
+
+export interface BigQueryDatetimeOptions {
+  year?: string|number;
+  month?: string|number;
+  day?: string|number;
+  hours?: string|number;
+  minutes?: string|number;
+  seconds?: string|number;
+  fractional?: string|number;
+}
 
 export interface QueryParameter {
   name?: string;
   parameterType: {type: string;};
   parameterValue: {arrayValues?: Array<{}>; structValues?: {}; value?: {}};
+}
+
+export interface CreateQueryJobOptions {
+  destination?: Table;
+  dryRun?: boolean;
+  location?: string;
+  jobId?: string;
+  jobPrefix?: string;
+  query?: string;
+  useLegacySql?: boolean;
+}
+
+export type CreateQueryResponse = [Job, r.Response];
+export interface CreateQueryJobCallback {
+  (err: Error|null, job?: Job, apiResponse?: r.Response): void;
+}
+
+export interface BigQueryOptions extends common.GoogleAuthOptions {
+  autoRetry?: boolean;
+  maxRetries?: number;
+  location?: string;
 }
 
 /**
@@ -108,17 +173,18 @@ export interface QueryParameter {
  * Full quickstart example:
  */
 export class BigQuery extends common.Service {
-  location: string;
-  createQueryStream;
-  getDatasetsStream;
-  getJobsStream;
-  constructor(options?) {
+  location?: string;
+  createQueryStream: Function;
+  getDatasetsStream: Function;
+  getJobsStream: Function;
+
+  constructor(options?: BigQueryOptions) {
     options = options || {};
     const config = {
       baseUrl: 'https://www.googleapis.com/bigquery/v2',
       scopes: ['https://www.googleapis.com/auth/bigquery'],
       packageJson: require('../../package.json'),
-      requestModule: request,
+      requestModule: r,
     };
 
     if (options.scopes) {
@@ -169,7 +235,7 @@ export class BigQuery extends common.Service {
     }
 
     function convert(schemaField, value) {
-      if (is.nil(value)) {
+      if (is.null(value)) {
         return value;
       }
 
@@ -285,11 +351,11 @@ export class BigQuery extends common.Service {
    *   day: 1
    * });
    */
-  static date(value) {
+  static date(value: BigQueryDateOptions|string) {
     return new BigQueryDate(value);
   }
 
-  date(value) {
+  date(value: BigQueryDateOptions|string) {
     return BigQuery.date(value);
   }
 
@@ -363,11 +429,11 @@ export class BigQuery extends common.Service {
    *   seconds: 0
    * });
    */
-  static datetime(value) {
+  static datetime(value: BigQueryDatetimeOptions|string) {
     return new BigQueryDatetime(value);
   }
 
-  datetime(value) {
+  datetime(value: BigQueryDatetimeOptions|string) {
     return BigQuery.datetime(value);
   }
 
@@ -425,11 +491,11 @@ export class BigQuery extends common.Service {
    *   seconds: 0
    * });
    */
-  static time(value) {
+  static time(value: BigQueryTimeOptions|string) {
     return new BigQueryTime(value);
   }
 
-  time(value) {
+  time(value: BigQueryTimeOptions|string) {
     return BigQuery.time(value);
   }
 
@@ -457,11 +523,11 @@ export class BigQuery extends common.Service {
    * const bigquery = new BigQuery();
    * const timestamp = bigquery.timestamp(new Date());
    */
-  static timestamp(value) {
+  static timestamp(value: Date|string) {
     return new BigQueryTimestamp(value);
   }
 
-  timestamp(value) {
+  timestamp(value: Date|string) {
     return BigQuery.timestamp(value);
   }
 
@@ -477,7 +543,7 @@ export class BigQuery extends common.Service {
    * @param {*} value The value.
    * @returns {string} The type detected from the value.
    */
-  static getType_(value) {
+  static getType_(value: {}) {
     let typeName;
 
     if (value instanceof BigQueryDate) {
@@ -497,10 +563,10 @@ export class BigQuery extends common.Service {
         type: 'ARRAY',
         arrayType: BigQuery.getType_(value[0]),
       };
-    } else if (is.bool(value)) {
+    } else if (is.boolean(value)) {
       typeName = 'BOOL';
     } else if (is.number(value)) {
-      typeName = value % 1 === 0 ? 'INT64' : 'FLOAT64';
+      typeName = (value as number) % 1 === 0 ? 'INT64' : 'FLOAT64';
     } else if (is.object(value)) {
       return {
         type: 'STRUCT',
@@ -537,9 +603,9 @@ export class BigQuery extends common.Service {
    * @param {*} value The value.
    * @returns {object} A properly-formed `queryParameter` object.
    */
-  static valueToQueryParameter_(value) {
+  static valueToQueryParameter_(value: {}) {
     if (is.date(value)) {
-      value = BigQuery.timestamp(value);
+      value = BigQuery.timestamp(value as Date);
     }
 
     const queryParameter: QueryParameter = {
@@ -550,15 +616,16 @@ export class BigQuery extends common.Service {
     const typeName = queryParameter.parameterType.type;
 
     if (typeName.indexOf('TIME') > -1 || typeName.indexOf('DATE') > -1) {
-      value = value.value;
+      value = (value as {value}).value;
     }
 
     if (typeName === 'ARRAY') {
-      queryParameter.parameterValue.arrayValues = value.map(value => {
-        return {
-          value,
-        };
-      });
+      queryParameter.parameterValue.arrayValues =
+          (value as Array<{}>).map(value => {
+            return {
+              value,
+            };
+          });
     } else if (typeName === 'STRUCT') {
       queryParameter.parameterValue.structValues =
           Object.keys(value).reduce((structValues, prop) => {
@@ -604,7 +671,7 @@ export class BigQuery extends common.Service {
    *   const apiResponse = data[1];
    * });
    */
-  createDataset(id, options, callback) {
+  createDataset(id: string, options, callback) {
     const that = this;
 
     if (is.fn(options)) {
@@ -717,20 +784,21 @@ export class BigQuery extends common.Service {
    *   return job.getQueryResults();
    * });
    */
-  createQueryJob(options): Promise<TempResponse>;
-  createQueryJob(options, callback): void;
-  createQueryJob(options, callback?): void|Promise<TempResponse> {
-    if (is.string(options)) {
-      options = {
-        query: options,
-      };
-    }
-
+  createQueryJob(options: CreateQueryJobOptions|
+                 string): Promise<CreateQueryJobResponse>;
+  createQueryJob(
+      options: CreateQueryJobOptions|string,
+      callback: CreateQueryJobCallback): void;
+  createQueryJob(
+      opts: CreateQueryJobOptions|string,
+      callback?: CreateQueryJobCallback): void|Promise<CreateQueryJobResponse> {
+    const options = typeof opts === 'object' ? opts : {query: opts};
     if (!options || !options.query) {
       throw new Error('A SQL query string is required.');
     }
 
-    const query = extend(
+    // tslint:disable-next-line no-any
+    const query: any = extend(
         true, {
           useLegacySql: false,
         },
@@ -961,11 +1029,10 @@ export class BigQuery extends common.Service {
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('higher_education');
    */
-  dataset(id, options?) {
+  dataset(id: string, options?: DataSetOptions) {
     if (this.location) {
       options = extend({location: this.location}, options);
     }
-
     return new Dataset(this, id, options);
   }
 
@@ -1152,16 +1219,17 @@ export class BigQuery extends common.Service {
    *   const jobs = data[0];
    * });
    */
-  getJobs(options, callback?) {
+  getJobs(options?: GetJobsOptions): Promise<GetJobsResponse>;
+  getJobs(options: GetJobsOptions, callback: GetJobsCallback): void;
+  getJobs(callback: GetJobsCallback): void;
+  getJobs(
+      optionsOrCallback?: GetJobsOptions|GetJobsCallback,
+      cb?: GetJobsCallback): void|Promise<GetJobsResponse> {
     const that = this;
-
-    if (is.fn(options)) {
-      callback = options;
-      options = {};
-    }
-
-    options = options || {};
-
+    const options =
+        typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
+    const callback =
+        typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
     this.request(
         {
           uri: '/jobs',
@@ -1170,11 +1238,11 @@ export class BigQuery extends common.Service {
         },
         (err, resp) => {
           if (err) {
-            callback(err, null, null, resp);
+            callback!(err, null, null, resp);
             return;
           }
 
-          let nextQuery = null;
+          let nextQuery: {}|null = null;
 
           if (resp.nextPageToken) {
             nextQuery = extend({}, options, {
@@ -1182,7 +1250,8 @@ export class BigQuery extends common.Service {
             });
           }
 
-          const jobs = (resp.jobs || []).map((jobObject) => {
+          // tslint:disable-next-line no-any
+          const jobs = (resp.jobs || []).map((jobObject: any) => {
             const job = that.job(jobObject.jobReference.jobId, {
               location: jobObject.jobReference.location,
             });
@@ -1191,7 +1260,7 @@ export class BigQuery extends common.Service {
             return job;
           });
 
-          callback(null, jobs, nextQuery, resp);
+          callback!(null, jobs, nextQuery, resp);
         });
   }
 
@@ -1241,7 +1310,7 @@ export class BigQuery extends common.Service {
    *
    * const myExistingJob = bigquery.job('job-id');
    */
-  job(id, options?) {
+  job(id: string, options?: JobOptions) {
     if (this.location) {
       options = extend({location: this.location}, options);
     }
@@ -1385,9 +1454,9 @@ promisifyAll(BigQuery, {
 });
 
 export class BigQueryDate {
-  value;
-  constructor(value) {
-    if (is.object(value)) {
+  value: string;
+  constructor(value: BigQueryDateOptions|string) {
+    if (typeof value === 'object') {
       value = BigQuery.datetime(value).value;
     }
     this.value = value;
@@ -1395,22 +1464,20 @@ export class BigQueryDate {
 }
 
 export class BigQueryTimestamp {
-  value;
-  constructor(value) {
+  value: string;
+  constructor(value: Date|string) {
     this.value = new Date(value).toJSON();
   }
 }
 
 export class BigQueryDatetime {
-  value;
-  constructor(value) {
-    if (is.object(value)) {
+  value: string;
+  constructor(value: BigQueryDatetimeOptions|string) {
+    if (typeof value === 'object') {
       let time;
-
       if (value.hours) {
         time = BigQuery.time(value).value;
       }
-
       value = format('{y}-{m}-{d}{time}', {
         y: value.year,
         m: value.month,
@@ -1420,15 +1487,14 @@ export class BigQueryDatetime {
     } else {
       value = value.replace(/^(.*)T(.*)Z$/, '$1 $2');
     }
-
-    this.value = value;
+    this.value = value as string;
   }
 }
 
 export class BigQueryTime {
   value: string;
-  constructor(value) {
-    if (is.object(value)) {
+  constructor(value: BigQueryTimeOptions|string) {
+    if (typeof value === 'object') {
       value = format('{h}:{m}:{s}{f}', {
         h: value.hours,
         m: value.minutes || 0,
@@ -1436,7 +1502,7 @@ export class BigQueryTime {
         f: is.defined(value.fractional) ? '.' + value.fractional : '',
       });
     }
-    this.value = value;
+    this.value = value as string;
   }
 }
 
