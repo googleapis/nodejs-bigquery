@@ -4,6 +4,16 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## v2.0.1
+
+### Bug fixes
+- fix: use teeny-request for HTTP requests ([#244](https://github.com/googleapis/nodejs-bigquery/pull/244))
+
+### Internal / Testing Changes
+- chore: include build in eslintignore ([#240](https://github.com/googleapis/nodejs-bigquery/pull/240))
+- refactor(ts): enable noImplicitThis in the tsconfig ([#237](https://github.com/googleapis/nodejs-bigquery/pull/237))
+- refactor(ts): improve typing ([#241](https://github.com/googleapis/nodejs-bigquery/pull/241))
+
 ## v2.0.0
 
 ### Implementation Changes
