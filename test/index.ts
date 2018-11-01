@@ -1308,8 +1308,7 @@ describe('BigQuery', () => {
         assert.deepStrictEqual(reqOpts.qs, {});
         done();
       };
-
-      bq.getDatasets(null, assert.ifError);
+      bq.getDatasets(assert.ifError);
     });
 
     it('should return error to callback', done => {

@@ -30,8 +30,23 @@ import {teenyRequest} from 'teeny-request';
 
 import {Dataset, DataSetOptions} from './dataset';
 import {Job, JobOptions} from './job';
-import {Table, TempResponse} from './table';
+import {Table, TableField} from './table';
 import {GoogleErrorBody} from '@google-cloud/common/build/src/util';
+
+export interface GetDatasetsOptions {
+  all?: boolean;
+  filter?: string;
+  autoPaginate?: boolean;
+  maxApiCalls?: number;
+  maxResults?: number;
+  pageToken?: string;
+}
+
+export type DatasetsResponse = [Dataset[], GetDatasetsOptions, r.Response];
+export interface DatasetsCallback {
+  (err: Error|null, datasets?: Dataset[]|null,
+   nextQuery?: GetDatasetsOptions|null, apiResponse?: r.Response): void;
+}
 
 export type CreateQueryJobResponse = [Job, r.Response];
 export interface CreateQueryJobCallback {
@@ -235,7 +250,7 @@ export class BigQuery extends common.Service {
       });
     }
 
-    function convert(schemaField, value) {
+    function convert(schemaField: TableField, value) {
       if (is.null(value)) {
         return value;
       }
@@ -1085,18 +1100,16 @@ export class BigQuery extends common.Service {
    * //-
    * bigquery.getDatasets().then(function(datasets) {});
    */
-  getDatasets(options?): Promise<TempResponse>;
-  getDatasets(options, callback): void;
-  getDatasets(callback): void;
-  getDatasets(options?, callback?): void|Promise<TempResponse> {
-    const that = this;
-
-    if (is.fn(options)) {
-      callback = options;
-      options = {};
-    }
-
-    options = options || {};
+  getDatasets(options?: GetDatasetsOptions): Promise<DatasetsResponse>;
+  getDatasets(options: GetDatasetsOptions, callback: DatasetsCallback): void;
+  getDatasets(callback: DatasetsCallback): void;
+  getDatasets(
+      optionsOrCallback?: GetDatasetsOptions|DatasetsCallback,
+      cb?: DatasetsCallback): void|Promise<DatasetsResponse> {
+    const options =
+        typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
+    const callback =
+        typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
 
     this.request(
         {
@@ -1105,11 +1118,11 @@ export class BigQuery extends common.Service {
         },
         (err, resp) => {
           if (err) {
-            callback(err, null, null, resp);
+            callback!(err, null, null, resp);
             return;
           }
 
-          let nextQuery = null;
+          let nextQuery: GetDatasetsOptions|null = null;
 
           if (resp.nextPageToken) {
             nextQuery = extend({}, options, {
@@ -1118,7 +1131,7 @@ export class BigQuery extends common.Service {
           }
 
           const datasets = (resp.datasets || []).map((dataset) => {
-            const ds = that.dataset(dataset.datasetReference.datasetId, {
+            const ds = this.dataset(dataset.datasetReference.datasetId, {
               location: dataset.location,
             });
 
@@ -1126,7 +1139,7 @@ export class BigQuery extends common.Service {
             return ds;
           });
 
-          callback(null, datasets, nextQuery, resp);
+          callback!(null, datasets, nextQuery, resp);
         });
   }
 

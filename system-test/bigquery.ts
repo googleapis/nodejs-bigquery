@@ -27,7 +27,7 @@ import {Dataset} from '../src/dataset';
 import {Job} from '../src/job';
 import {Table} from '../src/table';
 
-import {BigQuery} from '../src';
+import {BigQuery, GetDatasetsOptions} from '../src';
 import {Storage} from '@google-cloud/storage';
 import {ApiError} from '@google-cloud/common';
 
@@ -129,8 +129,8 @@ describe('BigQuery', () => {
 
   it('should get a list of datasets', done => {
     bigquery.getDatasets((err, datasets) => {
-      assert(datasets.length > 0);
-      assert(datasets[0] instanceof Dataset);
+      assert(datasets!.length > 0);
+      assert(datasets![0] instanceof Dataset);
       done();
     });
   });
@@ -193,7 +193,7 @@ describe('BigQuery', () => {
         .getDatasets({
           autoPaginate: false,
           filter: `labels.${GCLOUD_TESTS_PREFIX}`,
-        })
+        } as GetDatasetsOptions)
         .then(data => {
           const datasets = data[0];
           const nextQuery = data[1];
@@ -692,7 +692,7 @@ describe('BigQuery', () => {
             const badTable = dataset.table(table.id!, {location: 'US'});
 
             badTable.createExtractJob(extractFile, err => {
-              assert.strictEqual(err.code, 404);
+              assert.strictEqual((err as ApiError).code, 404);
               done();
             });
           });
@@ -896,8 +896,7 @@ describe('BigQuery', () => {
       it('should start to load data from a storage file', done => {
         table.createLoadJob(file, (err, job) => {
           assert.ifError(err);
-
-          job.on('error', done).on('complete', () => {
+          job!.on('error', done).on('complete', () => {
             done();
           });
         });
@@ -1419,11 +1418,9 @@ describe('BigQuery', () => {
 
       it('should start extracting data to a storage file', done => {
         const file = bucket.file('kitten-test-data-backup.json');
-
         table.createExtractJob(file, (err, job) => {
           assert.ifError(err);
-
-          job.on('error', done).on('complete', () => {
+          job!.on('error', done).on('complete', () => {
             done();
           });
         });
@@ -1431,7 +1428,6 @@ describe('BigQuery', () => {
 
       it('should extract data to a storage file', done => {
         const file = bucket.file('kitten-test-data-backup.json');
-
         table.extract(file, (err, resp) => {
           assert.ifError(err);
           assert.strictEqual(resp.status.state, 'DONE');
