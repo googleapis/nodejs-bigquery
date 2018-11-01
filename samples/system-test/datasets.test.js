@@ -29,8 +29,6 @@ const bigquery = new BigQuery();
 
 describe(`Datasets`, () => {
   before(tools.checkCredentials);
-  // beforeEach(tools.stubConsole);
-  afterEach(tools.restoreConsole);
   after(async () => {
     try {
       await bigquery.dataset(datasetId).delete({force: true});

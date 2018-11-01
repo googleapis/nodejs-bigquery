@@ -40,29 +40,29 @@ describe(`Quickstart`, () => {
   it(`quickstart should create a dataset`, async () => {
     await new Promise((resolve, reject) => {
       const bigqueryMock = {
-        createDataset: _datasetId => {
-          assert.strictEqual(_datasetId, expectedDatasetId);
+        createDataset: async _datasetId => {
+          try {
+            assert.strictEqual(_datasetId, expectedDatasetId);
 
-          return bigquery
-            .createDataset(datasetId)
-            .then(([dataset]) => {
-              assert.notStrictEqual(dataset, undefined);
+            const [dataset] = await bigquery.createDataset(datasetId);
+            assert.notStrictEqual(dataset, undefined);
 
-              setTimeout(() => {
-                try {
-                  assert.ok(console.log.calledOnce);
-                  assert.deepStrictEqual(console.log.firstCall.args, [
-                    `Dataset ${dataset.id} created.`,
-                  ]);
-                  resolve();
-                } catch (err) {
-                  reject(err);
-                }
-              }, 200);
+            setTimeout(() => {
+              try {
+                assert.ok(console.log.calledOnce);
+                assert.deepStrictEqual(console.log.firstCall.args, [
+                  `Dataset ${dataset.id} created.`,
+                ]);
+                resolve();
+              } catch (err) {
+                reject(err);
+              }
+            }, 200);
 
-              return [dataset];
-            })
-            .catch(reject);
+            return [dataset];
+          } catch (err) {
+            reject(err);
+          }
         },
       };
 
