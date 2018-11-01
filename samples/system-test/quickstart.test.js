@@ -17,7 +17,7 @@
 
 const proxyquire = require(`proxyquire`).noPreserveCache();
 const sinon = require(`sinon`);
-const test = require(`ava`);
+const assert = require(`assert`);
 const tools = require(`@google-cloud/nodejs-repo-tools`);
 const uuid = require(`uuid`);
 
@@ -28,48 +28,49 @@ const expectedDatasetId = `my_new_dataset`;
 let datasetId = `nodejs-docs-samples-test-${uuid.v4()}`;
 datasetId = datasetId.replace(/-/gi, `_`);
 
-test.after.always(async () => {
-  try {
-    bigquery.dataset(datasetId).delete({force: true});
-  } catch (err) {} // ignore error
-});
+describe(`Quickstart`, () => {
+  beforeEach(tools.stubConsole);
+  afterEach(tools.restoreConsole);
+  after(async () => {
+    try {
+      bigquery.dataset(datasetId).delete({force: true});
+    } catch (err) {} // ignore error
+  });
 
-test.beforeEach(tools.stubConsole);
-test.afterEach.always(tools.restoreConsole);
+  it(`quickstart should create a dataset`, async () => {
+    await new Promise((resolve, reject) => {
+      const bigqueryMock = {
+        createDataset: _datasetId => {
+          assert.strictEqual(_datasetId, expectedDatasetId);
 
-test(`quickstart should create a dataset`, async t => {
-  await new Promise((resolve, reject) => {
-    const bigqueryMock = {
-      createDataset: _datasetId => {
-        t.is(_datasetId, expectedDatasetId);
+          return bigquery
+            .createDataset(datasetId)
+            .then(([dataset]) => {
+              assert.notStrictEqual(dataset, undefined);
 
-        return bigquery
-          .createDataset(datasetId)
-          .then(([dataset]) => {
-            t.not(dataset, undefined);
+              setTimeout(() => {
+                try {
+                  assert.ok(console.log.calledOnce);
+                  assert.deepStrictEqual(console.log.firstCall.args, [
+                    `Dataset ${dataset.id} created.`,
+                  ]);
+                  resolve();
+                } catch (err) {
+                  reject(err);
+                }
+              }, 200);
 
-            setTimeout(() => {
-              try {
-                t.true(console.log.calledOnce);
-                t.deepEqual(console.log.firstCall.args, [
-                  `Dataset ${dataset.id} created.`,
-                ]);
-                resolve();
-              } catch (err) {
-                reject(err);
-              }
-            }, 200);
+              return [dataset];
+            })
+            .catch(reject);
+        },
+      };
 
-            return [dataset];
-          })
-          .catch(reject);
-      },
-    };
-
-    proxyquire(`../quickstart`, {
-      '@google-cloud/bigquery': {
-        BigQuery: sinon.stub().returns(bigqueryMock),
-      },
+      proxyquire(`../quickstart`, {
+        '@google-cloud/bigquery': {
+          BigQuery: sinon.stub().returns(bigqueryMock),
+        },
+      });
     });
   });
 });
