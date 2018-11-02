@@ -30,13 +30,59 @@ import * as path from 'path';
 import * as r from 'request';
 import * as streamEvents from 'stream-events';
 import * as uuid from 'uuid';
-import {BigQuery, Job, Dataset} from '../src';
+import {BigQuery, Job, Dataset, CreateQueryJobResponse, CreateQueryJobCallback} from '../src';
 import {GoogleErrorBody} from '@google-cloud/common/build/src/util';
-import {Writable} from 'stream';
+import {Writable, Readable} from 'stream';
 import {teenyRequest} from 'teeny-request';
+import {File} from '@google-cloud/storage';
+import {CreateQueryJobOptions} from './dataset';
+import {JobOptions} from './job';
 
-export type CreateCopyJobResponse = [Job, r.Response];
-export interface CreateCopyJobCallback {
+export interface JobLoadMetadata {
+  jobId?: string;
+  jobPrefix?: string;
+  allowJaggedRows?: boolean;
+  allowQuotedNewlines?: boolean;
+  autodetect?: boolean;
+  clustering?: {fields: number[];};
+  createDisposition?: string;
+  destinationEncryptionConfiguration?: {kmsKeyName?: string;};
+  destinationTable?: {datasetId: string; projectId: string; tableId: string;};
+  destinationTableProperties?: {description?: string; friendlyName?: string;};
+  encoding?: string;
+  fieldDelimiter?: string;
+  ignoreUnknownValues?: boolean;
+  maxBadRecords?: number;
+  nullMarker?: string;
+  projectionFields?: string[];
+  quote?: string;
+  schema?: {fields: TableField[]};
+  schemaUpdateOptions?: string[];
+  skipLeadingRows?: number;
+  sourceFormat?: string;
+  format?: string;
+  location?: string;
+  sourceUris?: string[];
+  timePartitioning?: {
+    expirationMs?: number;
+    field?: string;
+    requirePartitionFilter?: boolean;
+    type?: string;
+    writeDisposition?: string;
+  };
+}
+
+export interface CreateExtractJobOptions {
+  format?: 'CSV'|'JSON'|'AVRO'|'PARQUET';
+  gzip?: boolean;
+  jobId?: string;
+  jobPrefix?: string;
+  destinationFormat?: string;
+  compression?: string;
+}
+
+export type JobResponse = [Job, r.Response];
+export interface JobCallback {
   (err: Error|null, job?: Job, apiResponse?: r.Response): void;
 }
 
@@ -87,13 +133,10 @@ export interface TableField {
   fields?: TableField[];
 }
 
-export type CopyTableResponse = [r.Response];
-export interface CopyTableCallback {
+export type ApiResponse = [r.Response];
+export interface ApiResponseCallback {
   (err: Error|null, apiResponse?: r.Response): void;
 }
-
-// tslint:disable-next-line no-any
-export type TempResponse = any;
 
 /**
  * The file formats accepted by BigQuery.
@@ -107,7 +150,7 @@ const FORMATS = {
   json: 'NEWLINE_DELIMITED_JSON',
   orc: 'ORC',
   parquet: 'PARQUET',
-};
+} as {[index: string]: string};
 
 export interface TableOptions {
   location?: string;
@@ -137,6 +180,10 @@ export interface TableOptions {
  * const table = dataset.table('my-table');
  */
 class Table extends common.ServiceObject {
+  dataset: Dataset;
+  bigQuery: BigQuery;
+  location?: string;
+  createReadStream: () => Readable;
   constructor(dataset: Dataset, id: string, options?: TableOptions) {
     const methods = {
       /**
@@ -539,16 +586,15 @@ class Table extends common.ServiceObject {
    *   const apiResponse = data[0];
    * });
    */
-  copy(destination: Table, metadata?: CopyTableMetadata):
-      Promise<CopyTableResponse>;
+  copy(destination: Table, metadata?: CopyTableMetadata): Promise<ApiResponse>;
   copy(
       destination: Table, metadata: CopyTableMetadata,
-      callback: CopyTableCallback): void;
-  copy(destination: Table, callback: CopyTableCallback): void;
+      callback: ApiResponseCallback): void;
+  copy(destination: Table, callback: ApiResponseCallback): void;
   copy(
       destination: Table,
-      metadataOrCallback?: CopyTableMetadata|CopyTableCallback,
-      cb?: CopyTableCallback): void|Promise<CopyTableResponse> {
+      metadataOrCallback?: CopyTableMetadata|ApiResponseCallback,
+      cb?: ApiResponseCallback): void|Promise<ApiResponse> {
     const metadata =
         typeof metadataOrCallback === 'object' ? metadataOrCallback : {};
     const callback =
@@ -617,20 +663,27 @@ class Table extends common.ServiceObject {
    *   const apiResponse = data[0];
    * });
    */
-  copyFrom(sourceTables: Table|Table[], metadata, callback) {
-    if (is.fn(metadata)) {
-      callback = metadata;
-      metadata = {};
-    }
-
+  copyFrom(sourceTables: Table|Table[], metadata?: CopyTableMetadata):
+      Promise<ApiResponse>;
+  copyFrom(
+      sourceTables: Table|Table[], metadata: CopyTableMetadata,
+      callback: ApiResponseCallback): void;
+  copyFrom(sourceTables: Table|Table[], callback: ApiResponseCallback): void;
+  copyFrom(
+      sourceTables: Table|Table[],
+      metadataOrCallback?: CopyTableMetadata|ApiResponseCallback,
+      cb?: ApiResponseCallback): void|Promise<ApiResponse> {
+    const metadata =
+        typeof metadataOrCallback === 'object' ? metadataOrCallback : {};
+    const callback =
+        typeof metadataOrCallback === 'function' ? metadataOrCallback : cb;
     this.createCopyFromJob(sourceTables, metadata, (err, job, resp) => {
       if (err) {
-        callback(err, resp);
+        callback!(err, resp);
         return;
       }
-
-      job.on('error', callback).on('complete', (metadata) => {
-        callback(null, metadata);
+      job!.on('error', callback!).on('complete', (metadata) => {
+        callback!(null, metadata);
       });
     });
   }
@@ -688,15 +741,15 @@ class Table extends common.ServiceObject {
    * });
    */
   createCopyJob(destination: Table, metadata?: CreateCopyJobMetadata):
-      Promise<CreateCopyJobResponse>;
+      Promise<JobResponse>;
   createCopyJob(
       destination: Table, metadata: CreateCopyJobMetadata,
-      callback: CreateCopyJobCallback): void;
-  createCopyJob(destination: Table, callback: CreateCopyJobCallback): void;
+      callback: JobCallback): void;
+  createCopyJob(destination: Table, callback: JobCallback): void;
   createCopyJob(
       destination: Table,
-      metadataOrCallback?: CreateCopyJobMetadata|CreateCopyJobCallback,
-      cb?: CreateCopyJobCallback): void|Promise<CreateCopyJobResponse> {
+      metadataOrCallback?: CreateCopyJobMetadata|JobCallback,
+      cb?: JobCallback): void|Promise<JobResponse> {
     if (!(destination instanceof Table)) {
       throw new Error('Destination must be a Table object.');
     }
@@ -800,7 +853,15 @@ class Table extends common.ServiceObject {
    *   const apiResponse = data[1];
    * });
    */
-  createCopyFromJob(source: Table|Table[], metadata, callback) {
+  createCopyFromJob(source: Table|Table[], metadata?: CopyTableMetadata):
+      Promise<JobResponse>;
+  createCopyFromJob(
+      source: Table|Table[], metadata: CopyTableMetadata,
+      callback: JobCallback): void;
+  createCopyFromJob(source: Table|Table[], callback: JobCallback): void;
+  createCopyFromJob(
+      source: Table|Table[], metadataOrCallback?: CopyTableMetadata|JobCallback,
+      cb?: JobCallback): void|Promise<JobResponse> {
     const sourceTables = arrify(source);
     sourceTables.forEach((sourceTable) => {
       if (!(sourceTable instanceof Table)) {
@@ -808,10 +869,10 @@ class Table extends common.ServiceObject {
       }
     });
 
-    if (is.fn(metadata)) {
-      callback = metadata;
-      metadata = {};
-    }
+    const metadata =
+        typeof metadataOrCallback === 'object' ? metadataOrCallback : {};
+    const callback =
+        typeof metadataOrCallback === 'function' ? metadataOrCallback : cb;
 
     // tslint:disable-next-line no-any
     const body: any = {
@@ -929,15 +990,20 @@ class Table extends common.ServiceObject {
    *   const apiResponse = data[1];
    * });
    */
-  createExtractJob(destination, options?): Promise<TempResponse>;
-  createExtractJob(destination, options, callback): void;
-  createExtractJob(destination, callback): void;
-  createExtractJob(destination, options?, callback?):
-      void|Promise<TempResponse> {
-    if (is.fn(options)) {
-      callback = options;
-      options = {};
-    }
+  createExtractJob(destination: File, options?: CreateExtractJobOptions):
+      Promise<JobResponse>;
+  createExtractJob(
+      destination: File, options: CreateExtractJobOptions,
+      callback: JobCallback): void;
+  createExtractJob(destination: File, callback: JobCallback): void;
+  createExtractJob(
+      destination: File,
+      optionsOrCallback?: CreateExtractJobOptions|JobCallback,
+      cb?: JobCallback): void|Promise<JobResponse> {
+    let options =
+        typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
+    const callback =
+        typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
 
     options = extend(true, options, {
       destinationUris: arrify(destination).map((dest) => {
@@ -958,10 +1024,10 @@ class Table extends common.ServiceObject {
     });
 
     if (options.format) {
-      options.format = options.format.toLowerCase();
+      options.format = options.format.toLowerCase() as typeof options.format;
 
-      if (FORMATS[options.format]) {
-        options.destinationFormat = FORMATS[options.format];
+      if (FORMATS[options.format!]) {
+        options.destinationFormat = FORMATS[options.format!];
         delete options.format;
       } else {
         throw new Error('Destination format not recognized: ' + options.format);
@@ -1089,14 +1155,23 @@ class Table extends common.ServiceObject {
    *   const apiResponse = data[1];
    * });
    */
-  createLoadJob(source, metadata?, callback?): void|Writable {
-    if (is.fn(metadata)) {
-      callback = metadata;
-      metadata = {};
-    }
-
-    callback = callback || common.util.noop;
-    metadata = metadata || {};
+  createLoadJob(source: string, metadata?: JobLoadMetadata): Writable;
+  createLoadJob(source: File, metadata?: JobLoadMetadata): Promise<JobResponse>;
+  createLoadJob(
+      source: string, metadata: JobLoadMetadata,
+      callback: JobCallback): Writable;
+  createLoadJob(source: File, metadata: JobLoadMetadata, callback: JobCallback):
+      void;
+  createLoadJob(source: string, callback: JobCallback): Writable;
+  createLoadJob(source: File, callback: JobCallback): void;
+  createLoadJob(
+      source: string|File, metadataOrCallback?: JobLoadMetadata|JobCallback,
+      cb?: JobCallback): void|Promise<JobResponse>|Writable {
+    const metadata =
+        typeof metadataOrCallback === 'object' ? metadataOrCallback : {};
+    const callback = typeof metadataOrCallback === 'function' ?
+        metadataOrCallback :
+        cb || common.util.noop;
 
     if (metadata.format) {
       metadata.sourceFormat = FORMATS[metadata.format.toLowerCase()];
@@ -1107,7 +1182,7 @@ class Table extends common.ServiceObject {
       metadata.location = this.location;
     }
 
-    if (is.string(source)) {
+    if (typeof source === 'string') {
       // A path to a file was given. If a sourceFormat wasn't specified, try to
       // find a match from the file's extension.
       const detectedFormat =
@@ -1181,8 +1256,14 @@ class Table extends common.ServiceObject {
    *
    * See {@link BigQuery#createQueryJob} for full documentation of this method.
    */
-  createQueryJob(options, callback) {
-    return this.dataset.createQueryJob(options, callback);
+  createQueryJob(options: CreateQueryJobOptions):
+      Promise<CreateQueryJobResponse>;
+  createQueryJob(
+      options: CreateQueryJobOptions, callback: CreateQueryJobCallback): void;
+  createQueryJob(
+      options: CreateQueryJobOptions,
+      callback?: CreateQueryJobCallback): void|Promise<CreateQueryJobResponse> {
+    return this.dataset.createQueryJob(options, callback!);
   }
 
   /**
@@ -1196,7 +1277,8 @@ class Table extends common.ServiceObject {
    * @returns {stream} See {@link BigQuery#createQueryStream} for full
    *     documentation of this method.
    */
-  createQueryStream(query) {
+  // tslint:disable-next-line no-any
+  createQueryStream(query: any) {
     return this.dataset.createQueryStream(query);
   }
 
@@ -1214,19 +1296,19 @@ class Table extends common.ServiceObject {
    * @param {string} [metadata.jobPrefix] Prefix to apply to the job id.
    * @returns {WritableStream}
    */
-  createWriteStream_(metadata): Writable {
+  createWriteStream_(metadata: JobLoadMetadata|string): Writable {
     metadata = metadata || {};
     const fileTypes = Object.keys(FORMATS).map((key) => {
       return FORMATS[key];
     });
 
-    if (is.string(metadata)) {
+    if (typeof metadata === 'string') {
       metadata = {
         sourceFormat: FORMATS[metadata.toLowerCase()],
       };
     }
 
-    if (is.string(metadata.schema)) {
+    if (typeof metadata.schema === 'string') {
       metadata.schema = Table.createSchemaFromString_(metadata.schema);
     }
 
@@ -1250,7 +1332,7 @@ class Table extends common.ServiceObject {
     }
 
     if (metadata.hasOwnProperty('sourceFormat') &&
-        fileTypes.indexOf(metadata.sourceFormat) < 0) {
+        fileTypes.indexOf(metadata.sourceFormat!) < 0) {
       throw new Error(`Source format not recognized: ${metadata.sourceFormat}`);
     }
 
@@ -1278,7 +1360,8 @@ class Table extends common.ServiceObject {
               }),
             },
           },
-          (data) => {
+          // tslint:disable-next-line no-any
+          (data: any) => {
             const job = this.bigQuery.job(data.jobReference.jobId, {
               location: data.jobReference.location,
             });
@@ -1348,20 +1431,19 @@ class Table extends common.ServiceObject {
    *     // The job has completed successfully.
    *   });
    */
-  createWriteStream(metadata) {
+  createWriteStream(metadata: JobLoadMetadata|string) {
     const stream = this.createWriteStream_(metadata);
-
     stream.on('prefinish', () => {
       stream.cork();
     });
-
-    stream.on('job', (job) => {
-      job.on('error', err => stream.destroy(err)).on('complete', () => {
+    stream.on('job', (job: Job) => {
+      job.on('error', err => {
+           stream.destroy(err);
+         }).on('complete', () => {
         stream.emit('complete', job);
         stream.uncork();
       });
     });
-
     return stream;
   }
 
@@ -1434,7 +1516,7 @@ class Table extends common.ServiceObject {
    *   const apiResponse = data[0];
    * });
    */
-  extract(destination, options, callback?) {
+  extract(destination: File, options, callback?) {
     if (is.fn(options)) {
       callback = options;
       options = {};
@@ -1445,7 +1527,7 @@ class Table extends common.ServiceObject {
         callback(err, resp);
         return;
       }
-      job.on('error', callback).on('complete', (metadata) => {
+      job!.on('error', callback).on('complete', (metadata) => {
         callback(null, metadata);
       });
     });
@@ -1501,10 +1583,12 @@ class Table extends common.ServiceObject {
    *   const rows = data[0];
    *   });
    */
-  getRows(options?): Promise<TempResponse>;
+  // tslint:disable-next-line no-any
+  getRows(options?): Promise<any>;
   getRows(options, callback): void;
   getRows(callback): void;
-  getRows(options?, callback?): void|Promise<TempResponse> {
+  // tslint:disable-next-line no-any
+  getRows(options?, callback?): void|Promise<any> {
     if (is.fn(options)) {
       callback = options;
       options = {};
@@ -1685,10 +1769,12 @@ class Table extends common.ServiceObject {
    *     }
    *   });
    */
-  insert(rows, options?): Promise<TempResponse>;
+  // tslint:disable-next-line no-any
+  insert(rows, options?): Promise<any>;
   insert(rows, options, callback): void;
   insert(rows, callback): void;
-  insert(rows, options?, callback?): void|Promise<TempResponse> {
+  // tslint:disable-next-line no-any
+  insert(rows, options?, callback?): void|Promise<any> {
     if (is.fn(options)) {
       callback = options;
       options = {};
@@ -1864,10 +1950,12 @@ class Table extends common.ServiceObject {
    *   const apiResponse = data[0];
    * });
    */
-  load(source, metadata?): Promise<TempResponse>;
+  // tslint:disable-next-line no-any
+  load(source, metadata?): Promise<any>;
   load(source, metadata, callback): void;
   load(source, callback): void;
-  load(source, metadata, callback?): void|Promise<TempResponse> {
+  // tslint:disable-next-line no-any
+  load(source, metadata, callback?): void|Promise<any> {
     if (is.fn(metadata)) {
       callback = metadata;
       metadata = {};
@@ -1879,7 +1967,7 @@ class Table extends common.ServiceObject {
         return;
       }
 
-      job.on('error', callback).on('complete', (metadata) => {
+      job!.on('error', callback).on('complete', (metadata) => {
         callback(null, metadata);
       });
     });
