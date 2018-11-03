@@ -25,8 +25,11 @@ import {promisifyAll} from '@google-cloud/promisify';
 import {paginator} from '@google-cloud/paginator';
 import * as extend from 'extend';
 import * as r from 'request';
-import {BigQuery} from '../src';
+import {BigQuery, QueryRowsResponse, QueryRowsCallback} from '../src';
 import {teenyRequest} from 'teeny-request';
+
+// tslint:disable-next-line no-any
+export type JobMetadata = any;
 
 export interface JobOptions {
   location?: string;
@@ -38,10 +41,6 @@ export interface CancelCallback {
 
 export type CancelResponse = [r.Response];
 
-export type QueryResultsResponse = [Array<{}>];
-export interface QueryResultsCallback {
-  (error: Error|null, rows: Array<{}>|null): void;
-}
 
 export interface QueryResultsOptions {
   autoPaginate?: boolean;
@@ -50,12 +49,6 @@ export interface QueryResultsOptions {
   pageToken?: string;
   startIndex?: number;
   timeoutMs?: number;
-}
-
-export type ManualQueryResultsResponse = [Array<{}>, {}, r.Response];
-export interface ManualQueryResultsCallback {
-  (err: Error|null, rows: Array<{}>|null, nextQuery?: {}|null,
-   apiResponse?: r.Response): void;
 }
 
 /**
@@ -423,18 +416,13 @@ class Job extends Operation {
    *   const rows = data[0];
    * });
    */
-  getQueryResults(options?: QueryResultsOptions):
-      Promise<ManualQueryResultsResponse|QueryResultsResponse>;
+  getQueryResults(options?: QueryResultsOptions): Promise<QueryRowsResponse>;
+  getQueryResults(options: QueryResultsOptions, callback: QueryRowsCallback):
+      void;
+  getQueryResults(callback: QueryRowsCallback): void;
   getQueryResults(
-      options: QueryResultsOptions,
-      callback: ManualQueryResultsCallback|QueryResultsCallback): void;
-  getQueryResults(callback: ManualQueryResultsCallback|
-                  QueryResultsCallback): void;
-  getQueryResults(
-      optionsOrCallback?: QueryResultsOptions|ManualQueryResultsCallback|
-      QueryResultsCallback,
-      cb?: ManualQueryResultsCallback|QueryResultsCallback):
-      void|Promise<ManualQueryResultsResponse|QueryResultsResponse> {
+      optionsOrCallback?: QueryResultsOptions|QueryRowsCallback,
+      cb?: QueryRowsCallback): void|Promise<QueryRowsResponse> {
     let options =
         typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
     const callback =
@@ -486,8 +474,7 @@ class Job extends Operation {
    * @private
    */
   getQueryResultsAsStream_(
-      options: QueryResultsOptions,
-      callback: ManualQueryResultsCallback): void {
+      options: QueryResultsOptions, callback: QueryRowsCallback): void {
     options = extend({autoPaginate: false}, options);
     this.getQueryResults(options, callback);
   }

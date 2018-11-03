@@ -88,6 +88,7 @@
     "@google-cloud/nodejs-repo-tools": "^2.2.3",
     "@google-cloud/storage": "^2.0.0",
     "@types/arrify": "^1.0.4",
+    "@types/async": "^2.0.50",
     "@types/big.js": "^4.0.5",
     "@types/extend": "^3.0.0",
     "@types/is": "0.0.20",

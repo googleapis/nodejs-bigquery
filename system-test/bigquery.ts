@@ -14,22 +14,20 @@
  * limitations under the License.
  */
 
-'use strict';
-
+import {ApiError} from '@google-cloud/common';
+import {GoogleErrorBody} from '@google-cloud/common/build/src/util';
+import {Storage} from '@google-cloud/storage';
 import * as assert from 'assert';
 import * as async from 'async';
 import Big from 'big.js';
 import * as fs from 'fs';
-import * as uuid from 'uuid';
 import * as exec from 'methmeth';
+import * as uuid from 'uuid';
 
+import {BigQuery, GetDatasetsOptions} from '../src';
 import {Dataset} from '../src/dataset';
 import {Job} from '../src/job';
 import {Table} from '../src/table';
-
-import {BigQuery, GetDatasetsOptions} from '../src';
-import {Storage} from '@google-cloud/storage';
-import {ApiError} from '@google-cloud/common';
 
 const bigquery = new BigQuery();
 const storage = new Storage();
@@ -225,10 +223,10 @@ describe('BigQuery', () => {
       assert.ifError(err);
       assert(job instanceof Job);
 
-      job.getQueryResults((err, rows) => {
+      job!.getQueryResults((err, rows) => {
         assert.ifError(err);
-        assert.strictEqual(rows.length, 100);
-        assert.strictEqual(typeof rows[0].url, 'string');
+        assert.strictEqual(rows!.length, 100);
+        assert.strictEqual(typeof rows![0].url, 'string');
         done();
       });
     });
@@ -247,7 +245,7 @@ describe('BigQuery', () => {
         })
         .then(response => {
           const rows = response[0];
-          assert.strictEqual(rows.length, 100);
+          assert.strictEqual(rows!.length, 100);
           assert.strictEqual(typeof rows[0].url, 'string');
         });
   });
@@ -259,7 +257,7 @@ describe('BigQuery', () => {
       // tslint:disable-next-line no-any
       const rowsEmitted: any[] = [];
 
-      job.getQueryResultsStream()
+      job!.getQueryResultsStream()
           .on('error', done)
           .on('data',
               row => {
@@ -281,12 +279,12 @@ describe('BigQuery', () => {
 
     bigquery.createQueryJob(options, (err, job) => {
       assert.ifError(err);
-      assert.strictEqual(job.id.indexOf(options.jobPrefix), 0);
+      assert.strictEqual(job!.id!.indexOf(options.jobPrefix), 0);
 
-      job.getQueryResults((err, rows) => {
+      job!.getQueryResults((err, rows) => {
         assert.ifError(err);
-        assert.strictEqual(rows.length, 100);
-        assert.strictEqual(typeof rows[0].url, 'string');
+        assert.strictEqual(rows!.length, 100);
+        assert.strictEqual(typeof rows![0].url, 'string');
         done();
       });
     });
@@ -298,9 +296,9 @@ describe('BigQuery', () => {
 
     bigquery.createQueryJob(options, (err, job) => {
       assert.ifError(err);
-      assert.strictEqual(job.id, jobId);
+      assert.strictEqual(job!.id, jobId);
 
-      job.getQueryResults(done);
+      job!.getQueryResults(done);
     });
   });
 
@@ -312,7 +310,7 @@ describe('BigQuery', () => {
 
     bigquery.createQueryJob(options, (err, job) => {
       assert.ifError(err);
-      assert(job.metadata.statistics);
+      assert(job!.metadata.statistics);
       done();
     });
   });
@@ -336,7 +334,7 @@ describe('BigQuery', () => {
   it('should query', done => {
     bigquery.query(query, (err, rows) => {
       assert.ifError(err);
-      assert.strictEqual(rows.length, 100);
+      assert.strictEqual(rows!.length, 100);
       done();
     });
   });
@@ -348,8 +346,8 @@ describe('BigQuery', () => {
         },
         (err, rows, nextQuery) => {
           assert.ifError(err);
-          assert.strictEqual(rows.length, 10);
-          assert.strictEqual(typeof nextQuery.pageToken, 'string');
+          assert.strictEqual(rows!.length, 10);
+          assert.strictEqual(typeof nextQuery!.pageToken, 'string');
           done();
         });
   });
@@ -363,7 +361,8 @@ describe('BigQuery', () => {
         (err, rows, resp) => {
           assert.ifError(err);
           assert.deepStrictEqual(rows, []);
-          assert(resp.statistics.query);
+          // tslint:disable-next-line no-any
+          assert((resp as any).statistics.query);
           done();
         });
   });
@@ -397,10 +396,10 @@ describe('BigQuery', () => {
     bigquery.createQueryJob(query, (err, job) => {
       assert.ifError(err);
 
-      job.cancel(err => {
+      job!.cancel(err => {
         assert.ifError(err);
 
-        job.on('error', done).on('complete', () => {
+        job!.on('error', done).on('complete', () => {
           done();
         });
       });
@@ -629,9 +628,10 @@ describe('BigQuery', () => {
               {
                 query: QUERY,
               },
-              (err, job) => {
-                assert.strictEqual(err.errors[0].reason, 'notFound');
-                assert.strictEqual(job.location, 'US');
+              (e, job) => {
+                const err = e as {} as GoogleErrorBody;
+                assert.strictEqual(err.errors![0].reason, 'notFound');
+                assert.strictEqual(job!.location, 'US');
                 done();
               });
         });
@@ -652,7 +652,7 @@ describe('BigQuery', () => {
               .then(data => {
                 const rows = data[0];
 
-                assert(rows.length > 0);
+                assert(rows!.length > 0);
               });
         });
       });
@@ -780,7 +780,6 @@ describe('BigQuery', () => {
             tableId: 1,
           },
         },
-
         2: {},
       };
 
@@ -792,7 +791,8 @@ describe('BigQuery', () => {
 
         async.each(
             TABLES,
-            (tableObject, next) => {
+            // tslint:disable-next-line no-any
+            (tableObject: any, next) => {
               const tableInstance = tableObject.table;
 
               tableInstance.create(
@@ -926,10 +926,12 @@ describe('BigQuery', () => {
           name: true,
         };
 
-        table.insert([data, improperData], err => {
-          assert.strictEqual(err.name, 'PartialFailureError');
+        table.insert([data, improperData], e => {
+          const err = e as {} as GoogleErrorBody;
+          // tslint:disable-next-line no-any
+          assert.strictEqual((err as any).name, 'PartialFailureError');
 
-          assert.deepStrictEqual(err.errors[0], {
+          assert.deepStrictEqual(err.errors![0], {
             errors: [
               {
                 message: 'Conversion from bool to string is unsupported.',
@@ -939,7 +941,7 @@ describe('BigQuery', () => {
             row: improperData,
           });
 
-          assert.deepStrictEqual(err.errors[1], {
+          assert.deepStrictEqual(err.errors![1], {
             errors: [
               {
                 message: '',
@@ -979,7 +981,7 @@ describe('BigQuery', () => {
             .then(data => {
               const rows = data[0];
 
-              assert.strictEqual(rows.length, 1);
+              assert.strictEqual(rows!.length, 1);
               assert.strictEqual(rows[0].name, row.name);
             });
       });
@@ -999,7 +1001,7 @@ describe('BigQuery', () => {
                 },
                 (err, rows) => {
                   assert.ifError(err);
-                  assert.strictEqual(rows.length, 1);
+                  assert.strictEqual(rows!.length, 1);
                   done();
                 });
           });
@@ -1017,7 +1019,7 @@ describe('BigQuery', () => {
                 },
                 (err, rows) => {
                   assert.ifError(err);
-                  assert.strictEqual(rows.length, 1);
+                  assert.strictEqual(rows!.length, 1);
                   done();
                 });
           });
@@ -1035,7 +1037,7 @@ describe('BigQuery', () => {
                 },
                 (err, rows) => {
                   assert.ifError(err);
-                  assert.strictEqual(rows.length, 1);
+                  assert.strictEqual(rows!.length, 1);
                   done();
                 });
           });
@@ -1052,7 +1054,7 @@ describe('BigQuery', () => {
                 },
                 (err, rows) => {
                   assert.ifError(err);
-                  assert.strictEqual(rows.length, 1);
+                  assert.strictEqual(rows!.length, 1);
                   done();
                 });
           });
@@ -1070,7 +1072,7 @@ describe('BigQuery', () => {
                 },
                 (err, rows) => {
                   assert.ifError(err);
-                  assert.strictEqual(rows.length, 1);
+                  assert.strictEqual(rows!.length, 1);
                   done();
                 });
           });
@@ -1083,7 +1085,7 @@ describe('BigQuery', () => {
                 },
                 (err, rows) => {
                   assert.ifError(err);
-                  assert.strictEqual(rows.length, 5);
+                  assert.strictEqual(rows!.length, 5);
                   done();
                 });
           });
@@ -1106,7 +1108,7 @@ describe('BigQuery', () => {
                 },
                 (err, rows) => {
                   assert.ifError(err);
-                  assert.strictEqual(rows.length, 1);
+                  assert.strictEqual(rows!.length, 1);
                   done();
                 });
           });
@@ -1124,7 +1126,7 @@ describe('BigQuery', () => {
                 },
                 (err, rows) => {
                   assert.ifError(err);
-                  assert.strictEqual(rows.length, 1);
+                  assert.strictEqual(rows!.length, 1);
                   done();
                 });
           });
@@ -1137,7 +1139,7 @@ describe('BigQuery', () => {
                 },
                 (err, rows) => {
                   assert.ifError(err);
-                  assert.strictEqual(rows.length, 1);
+                  assert.strictEqual(rows!.length, 1);
                   done();
                 });
           });
@@ -1150,7 +1152,7 @@ describe('BigQuery', () => {
                 },
                 (err, rows) => {
                   assert.ifError(err);
-                  assert.strictEqual(rows.length, 1);
+                  assert.strictEqual(rows!.length, 1);
                   done();
                 });
           });
@@ -1163,7 +1165,7 @@ describe('BigQuery', () => {
                 },
                 (err, rows) => {
                   assert.ifError(err);
-                  assert.strictEqual(rows.length, 1);
+                  assert.strictEqual(rows!.length, 1);
                   done();
                 });
           });
@@ -1182,7 +1184,7 @@ describe('BigQuery', () => {
                 },
                 (err, rows) => {
                   assert.ifError(err);
-                  assert.strictEqual(rows.length, 1);
+                  assert.strictEqual(rows!.length, 1);
                   done();
                 });
           });
@@ -1203,7 +1205,7 @@ describe('BigQuery', () => {
                 },
                 (err, rows) => {
                   assert.ifError(err);
-                  assert.strictEqual(rows.length, 1);
+                  assert.strictEqual(rows!.length, 1);
                   done();
                 });
           });
@@ -1223,7 +1225,7 @@ describe('BigQuery', () => {
                 },
                 (err, rows) => {
                   assert.ifError(err);
-                  assert.strictEqual(rows.length, 1);
+                  assert.strictEqual(rows!.length, 1);
                   done();
                 });
           });
@@ -1243,7 +1245,7 @@ describe('BigQuery', () => {
                 },
                 (err, rows) => {
                   assert.ifError(err);
-                  assert.strictEqual(rows.length, 1);
+                  assert.strictEqual(rows!.length, 1);
                   done();
                 });
           });
@@ -1262,7 +1264,7 @@ describe('BigQuery', () => {
                 },
                 (err, rows) => {
                   assert.ifError(err);
-                  assert.strictEqual(rows.length, 1);
+                  assert.strictEqual(rows!.length, 1);
                   done();
                 });
           });
@@ -1282,7 +1284,7 @@ describe('BigQuery', () => {
                 },
                 (err, rows) => {
                   assert.ifError(err);
-                  assert.strictEqual(rows.length, 1);
+                  assert.strictEqual(rows!.length, 1);
                   done();
                 });
           });
@@ -1297,7 +1299,7 @@ describe('BigQuery', () => {
                 },
                 (err, rows) => {
                   assert.ifError(err);
-                  assert.strictEqual(rows.length, 5);
+                  assert.strictEqual(rows!.length, 5);
                   done();
                 });
           });
@@ -1320,7 +1322,7 @@ describe('BigQuery', () => {
                 },
                 (err, rows) => {
                   assert.ifError(err);
-                  assert.strictEqual(rows.length, 1);
+                  assert.strictEqual(rows!.length, 1);
                   done();
                 });
           });
@@ -1340,7 +1342,7 @@ describe('BigQuery', () => {
                 },
                 (err, rows) => {
                   assert.ifError(err);
-                  assert.strictEqual(rows.length, 1);
+                  assert.strictEqual(rows!.length, 1);
                   done();
                 });
           });
@@ -1355,7 +1357,7 @@ describe('BigQuery', () => {
                 },
                 (err, rows) => {
                   assert.ifError(err);
-                  assert.strictEqual(rows.length, 1);
+                  assert.strictEqual(rows!.length, 1);
                   done();
                 });
           });
@@ -1370,7 +1372,7 @@ describe('BigQuery', () => {
                 },
                 (err, rows) => {
                   assert.ifError(err);
-                  assert.strictEqual(rows.length, 1);
+                  assert.strictEqual(rows!.length, 1);
                   done();
                 });
           });
@@ -1385,7 +1387,7 @@ describe('BigQuery', () => {
                 },
                 (err, rows) => {
                   assert.ifError(err);
-                  assert.strictEqual(rows.length, 1);
+                  assert.strictEqual(rows!.length, 1);
                   done();
                 });
           });
@@ -1409,7 +1411,7 @@ describe('BigQuery', () => {
                 },
                 (err, rows) => {
                   assert.ifError(err);
-                  assert.strictEqual(rows.length, 1);
+                  assert.strictEqual(rows!.length, 1);
                   done();
                 });
           });
@@ -1547,20 +1549,10 @@ describe('BigQuery', () => {
       },
     };
 
-    before(done => {
-      async.series(
-          [
-            next => {
-              table.create(
-                  {
-                    schema,
-                  },
-                  next);
-            },
-            next => table.insert(testData, next),
-            next => setTimeout(next, 15000)
-          ],
-          done);
+    before(async () => {
+      await table.create({schema});
+      await table.insert(testData);
+      await new Promise(r => setTimeout(r, 15000));
     });
 
     after(done => {
@@ -1571,12 +1563,12 @@ describe('BigQuery', () => {
       table.getRows((err, rows) => {
         assert.ifError(err);
 
-        if (rows.length === 0) {
+        if (rows!.length === 0) {
           done(new Error('Rows not returned from the API.'));
           return;
         }
 
-        rows.forEach(row => {
+        rows!.forEach(row => {
           const expectedRow = EXPECTED_ROWS[row.Name];
           assert.deepStrictEqual(row, expectedRow);
         });
@@ -1634,7 +1626,7 @@ describe('BigQuery', () => {
             callback(err);
             return;
           }
-          async.each(datasets, exec('delete', {force: true}), callback);
+          async.each(datasets!, exec('delete', {force: true}), callback);
         });
   }
 });

@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-'use strict';
-
-import {ServiceObject, DeleteCallback, DecorateRequestOptions} from '@google-cloud/common';
+import {DecorateRequestOptions, DeleteCallback, ServiceObject} from '@google-cloud/common';
 import {paginator} from '@google-cloud/paginator';
 import {promisifyAll} from '@google-cloud/promisify';
 import * as extend from 'extend';
 import * as is from 'is';
-import {Table, TableOptions} from './table';
 import * as r from 'request';
 import {teenyRequest} from 'teeny-request';
-import {BigQuery, CreateQueryJobResponse, CreateQueryJobCallback} from '.';
+
+import {BigQuery, DatasetCallback, Query, QueryRowsCallback, QueryRowsResponse, SimpleQueryRowsCallback} from '.';
+import {JobCallback, JobResponse, Table, TableMetadata, TableOptions} from './table';
 
 export interface DatasetDeleteOptions {
   force?: boolean;
@@ -35,12 +34,6 @@ export interface DataSetOptions {
 }
 
 export interface CreateDatasetOptions {}
-
-export type CreateDatasetResponse = [r.Response];
-export interface CreateDatasetCallback {
-  (err: Error|null, apiResponse?: r.Response): void;
-}
-
 export interface CreateQueryJobOptions {}
 
 export interface GetTablesOptions {
@@ -54,6 +47,11 @@ export type GetTablesResponse = [Table[], r.Response];
 export interface GetTablesCallback {
   (err: Error|null, tables?: Table[]|null, nextQuery?: {}|null,
    apiResponse?: r.Response): void;
+}
+
+export type TableResponse = [Table, r.Response];
+export interface TableCallback {
+  (err: Error|null, table?: Table|null, apiResponse?: r.Response): void;
 }
 
 /**
@@ -240,17 +238,17 @@ class Dataset extends ServiceObject {
       id,
       methods,
       requestModule: teenyRequest as typeof r,
-      createMethod: (
-          id: string,
-          optionsOrCallback?: CreateDatasetOptions|CreateDatasetCallback,
-          cb?: CreateDatasetCallback) => {
-        let options =
-            typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
-        const callback =
-            typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
-        options = extend({}, options, {location: this.location});
-        return bigQuery.createDataset(id, options, callback);
-      }
+      createMethod:
+          (id: string, optionsOrCallback?: CreateDatasetOptions|DatasetCallback,
+           cb?: DatasetCallback) => {
+            let options =
+                typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
+            const callback = typeof optionsOrCallback === 'function' ?
+                optionsOrCallback as DatasetCallback :
+                cb;
+            options = extend({}, options, {location: this.location});
+            return bigQuery.createDataset(id, options, callback!);
+          }
     });
 
     if (options && options.location) {
@@ -315,14 +313,11 @@ class Dataset extends ServiceObject {
    * @param {function} [callback] See {@link BigQuery#createQueryJob} for full documentation of this method.
    * @returns {Promise} See {@link BigQuery#createQueryJob} for full documentation of this method.
    */
-  createQueryJob(options: string|
-                 CreateQueryJobOptions): Promise<CreateQueryJobResponse>;
-  createQueryJob(
-      options: string|CreateQueryJobOptions,
-      callback: CreateQueryJobCallback): void;
-  createQueryJob(
-      options: string|CreateQueryJobOptions,
-      callback?: CreateQueryJobCallback): void|Promise<CreateQueryJobResponse> {
+  createQueryJob(options: string|CreateQueryJobOptions): Promise<JobResponse>;
+  createQueryJob(options: string|CreateQueryJobOptions, callback: JobCallback):
+      void;
+  createQueryJob(options: string|CreateQueryJobOptions, callback?: JobCallback):
+      void|Promise<JobResponse> {
     if (is.string(options)) {
       options = {
         query: options,
@@ -349,13 +344,12 @@ class Dataset extends ServiceObject {
    *     documentation of this method.
    * @returns {stream}
    */
-  createQueryStream(options) {
-    if (is.string(options)) {
+  createQueryStream(options: Query|string) {
+    if (typeof options === 'string') {
       options = {
         query: options,
       };
     }
-
     options = extend(true, {}, options, {
       defaultDataset: {
         datasetId: this.id,
@@ -409,13 +403,18 @@ class Dataset extends ServiceObject {
    *   const apiResponse = data[1];
    * });
    */
-  createTable(id: string, options, callback) {
-    if (is.fn(options)) {
-      callback = options;
-      options = {};
-    }
-
-    const body = Table.formatMetadata_(options);
+  createTable(id: string, options: TableMetadata): Promise<TableResponse>;
+  createTable(id: string, options: TableMetadata, callback: TableCallback):
+      void;
+  createTable(id: string, callback: TableCallback): void;
+  createTable(
+      id: string, optionsOrCallback?: TableMetadata|TableCallback,
+      cb?: TableCallback): void|Promise<TableResponse> {
+    const options =
+        typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
+    const callback =
+        typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
+    const body = Table.formatMetadata_(options as TableMetadata);
     // tslint:disable-next-line no-any
     (body as any).tableReference = {
       datasetId: this.id,
@@ -431,7 +430,7 @@ class Dataset extends ServiceObject {
         },
         (err, resp) => {
           if (err) {
-            callback(err, null, resp);
+            callback!(err, null, resp);
             return;
           }
 
@@ -440,7 +439,7 @@ class Dataset extends ServiceObject {
           });
 
           table.metadata = resp;
-          callback(null, table, resp);
+          callback!(null, table, resp);
         });
   }
 
@@ -579,7 +578,8 @@ class Dataset extends ServiceObject {
             });
           }
 
-          const tables = (resp.tables || []).map(tableObject => {
+          // tslint:disable-next-line no-any
+          const tables = (resp.tables || []).map((tableObject: any) => {
             const table = this.table(tableObject.tableReference.tableId, {
               location: tableObject.location,
             });
@@ -599,8 +599,11 @@ class Dataset extends ServiceObject {
    * @param {function} [callback] See {@link BigQuery#query} for full documentation of this method.
    * @returns {Promise} See {@link BigQuery#query} for full documentation of this method.
    */
-  query(options, callback) {
-    if (is.string(options)) {
+  query(options: Query): Promise<QueryRowsResponse>;
+  query(options: Query, callback: SimpleQueryRowsCallback): void;
+  query(options: Query, callback?: SimpleQueryRowsCallback):
+      void|Promise<QueryRowsResponse> {
+    if (typeof options === 'string') {
       options = {
         query: options,
       };

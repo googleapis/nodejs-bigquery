@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-'use strict';
-
-import * as arrify from 'arrify';
-import Big from 'big.js';
 import * as common from '@google-cloud/common';
 import {paginator} from '@google-cloud/paginator';
 import {promisifyAll} from '@google-cloud/promisify';
+import * as arrify from 'arrify';
+import Big from 'big.js';
 import * as duplexify from 'duplexify';
 import * as extend from 'extend';
+
 const format = require('string-format-obj');
 import * as fs from 'fs';
 import * as is from 'is';
@@ -30,13 +29,51 @@ import * as path from 'path';
 import * as r from 'request';
 import * as streamEvents from 'stream-events';
 import * as uuid from 'uuid';
-import {BigQuery, Job, Dataset, CreateQueryJobResponse, CreateQueryJobCallback} from '../src';
+import {BigQuery, Job, Dataset, Query, QueryRowsResponse, QueryRowsCallback, SimpleQueryRowsResponse, SimpleQueryRowsCallback} from '../src';
 import {GoogleErrorBody} from '@google-cloud/common/build/src/util';
 import {Writable, Readable} from 'stream';
 import {teenyRequest} from 'teeny-request';
 import {File} from '@google-cloud/storage';
 import {CreateQueryJobOptions} from './dataset';
-import {JobOptions} from './job';
+import {JobMetadata} from './job';
+
+export interface JobMetadataCallback {
+  (err: Error|null, metadataOrResponse: JobMetadata|r.Response): void;
+}
+
+export type JobMetadataResponse = [JobMetadata];
+
+// tslint:disable-next-line no-any
+export type RowMetadata = any;
+
+export interface InsertRowsOptions {
+  autoCreate?: boolean;
+  ignoreUnknownValues?: boolean;
+  raw?: boolean;
+  schema?: string|{};
+  skipInvalidRows?: boolean;
+  templateSuffix?: string;
+}
+
+export type RowsResponse = [RowMetadata[], GetRowsOptions, r.Response];
+export interface RowsCallback {
+  (err: Error|null, rows?: RowMetadata[]|null, nextQuery?: GetRowsOptions|null,
+   apiResponse?: r.Response): void;
+}
+
+export interface TableRow {
+  f: TableRowField[];
+}
+export interface TableRowField {
+  v: string|TableRow|TableRowField[];
+}
+export type TableRowValue = string|TableRow;
+
+export interface GetRowsOptions {
+  autoPaginate?: boolean;
+  maxApiCalls?: number;
+  maxResults?: number;
+}
 
 export interface JobLoadMetadata {
   jobId?: string;
@@ -73,7 +110,7 @@ export interface JobLoadMetadata {
 }
 
 export interface CreateExtractJobOptions {
-  format?: 'CSV'|'JSON'|'AVRO'|'PARQUET';
+  format?: 'CSV'|'JSON'|'AVRO'|'PARQUET'|'ORC';
   gzip?: boolean;
   jobId?: string;
   jobPrefix?: string;
@@ -83,7 +120,7 @@ export interface CreateExtractJobOptions {
 
 export type JobResponse = [Job, r.Response];
 export interface JobCallback {
-  (err: Error|null, job?: Job, apiResponse?: r.Response): void;
+  (err: Error|null, job?: Job|null, apiResponse?: r.Response): void;
 }
 
 export interface CreateCopyJobMetadata extends CopyTableMetadata {
@@ -105,7 +142,7 @@ export interface CopyTableMetadata {
   jobPrefix?: string;
 }
 
-interface FormatMetadataOptions {
+export interface TableMetadata {
   name?: string;
   friendlyName: string;
   schema?: string|TableField[];
@@ -496,7 +533,7 @@ class Table extends common.ServiceObject {
   /**
    * @private
    */
-  static formatMetadata_(options: FormatMetadataOptions): FormattedMetadata {
+  static formatMetadata_(options: TableMetadata): FormattedMetadata {
     const body = extend(true, {}, options) as {} as FormattedMetadata;
 
     if (options.name) {
@@ -586,15 +623,16 @@ class Table extends common.ServiceObject {
    *   const apiResponse = data[0];
    * });
    */
-  copy(destination: Table, metadata?: CopyTableMetadata): Promise<ApiResponse>;
+  copy(destination: Table, metadata?: CopyTableMetadata):
+      Promise<JobMetadataResponse>;
   copy(
       destination: Table, metadata: CopyTableMetadata,
-      callback: ApiResponseCallback): void;
-  copy(destination: Table, callback: ApiResponseCallback): void;
+      callback: JobMetadataCallback): void;
+  copy(destination: Table, callback: JobMetadataCallback): void;
   copy(
       destination: Table,
-      metadataOrCallback?: CopyTableMetadata|ApiResponseCallback,
-      cb?: ApiResponseCallback): void|Promise<ApiResponse> {
+      metadataOrCallback?: CopyTableMetadata|JobMetadataCallback,
+      cb?: JobMetadataCallback): void|Promise<JobMetadataResponse> {
     const metadata =
         typeof metadataOrCallback === 'object' ? metadataOrCallback : {};
     const callback =
@@ -606,9 +644,10 @@ class Table extends common.ServiceObject {
             return;
           }
 
-          job!.on('error', callback!).on('complete', (metadata) => {
-            callback!(null, metadata);
-          });
+          job!.on('error', callback!)
+              .on('complete', (metadata: JobMetadata) => {
+                callback!(null, metadata);
+              });
         });
   }
 
@@ -664,15 +703,15 @@ class Table extends common.ServiceObject {
    * });
    */
   copyFrom(sourceTables: Table|Table[], metadata?: CopyTableMetadata):
-      Promise<ApiResponse>;
+      Promise<JobMetadataResponse>;
   copyFrom(
       sourceTables: Table|Table[], metadata: CopyTableMetadata,
-      callback: ApiResponseCallback): void;
-  copyFrom(sourceTables: Table|Table[], callback: ApiResponseCallback): void;
+      callback: JobMetadataCallback): void;
+  copyFrom(sourceTables: Table|Table[], callback: JobMetadataCallback): void;
   copyFrom(
       sourceTables: Table|Table[],
-      metadataOrCallback?: CopyTableMetadata|ApiResponseCallback,
-      cb?: ApiResponseCallback): void|Promise<ApiResponse> {
+      metadataOrCallback?: CopyTableMetadata|JobMetadataCallback,
+      cb?: JobMetadataCallback): void|Promise<JobMetadataResponse> {
     const metadata =
         typeof metadataOrCallback === 'object' ? metadataOrCallback : {};
     const callback =
@@ -791,7 +830,7 @@ class Table extends common.ServiceObject {
       delete metadata.jobId;
     }
 
-    this.bigQuery.createJob(body, callback);
+    this.bigQuery.createJob(body, callback!);
   }
 
   /**
@@ -909,7 +948,7 @@ class Table extends common.ServiceObject {
       delete metadata.jobId;
     }
 
-    this.bigQuery.createJob(body, callback);
+    this.bigQuery.createJob(body, callback!);
   }
 
   /**
@@ -1066,7 +1105,7 @@ class Table extends common.ServiceObject {
       delete options.jobId;
     }
 
-    this.bigQuery.createJob(body, callback);
+    this.bigQuery.createJob(body, callback!);
   }
 
   /**
@@ -1256,13 +1295,10 @@ class Table extends common.ServiceObject {
    *
    * See {@link BigQuery#createQueryJob} for full documentation of this method.
    */
-  createQueryJob(options: CreateQueryJobOptions):
-      Promise<CreateQueryJobResponse>;
-  createQueryJob(
-      options: CreateQueryJobOptions, callback: CreateQueryJobCallback): void;
-  createQueryJob(
-      options: CreateQueryJobOptions,
-      callback?: CreateQueryJobCallback): void|Promise<CreateQueryJobResponse> {
+  createQueryJob(options: CreateQueryJobOptions): Promise<JobResponse>;
+  createQueryJob(options: CreateQueryJobOptions, callback: JobCallback): void;
+  createQueryJob(options: CreateQueryJobOptions, callback?: JobCallback):
+      void|Promise<JobResponse> {
     return this.dataset.createQueryJob(options, callback!);
   }
 
@@ -1277,8 +1313,7 @@ class Table extends common.ServiceObject {
    * @returns {stream} See {@link BigQuery#createQueryStream} for full
    *     documentation of this method.
    */
-  // tslint:disable-next-line no-any
-  createQueryStream(query: any) {
+  createQueryStream(query: Query) {
     return this.dataset.createQueryStream(query);
   }
 
@@ -1516,19 +1551,27 @@ class Table extends common.ServiceObject {
    *   const apiResponse = data[0];
    * });
    */
-  extract(destination: File, options, callback?) {
-    if (is.fn(options)) {
-      callback = options;
-      options = {};
-    }
-
+  extract(destination: File, options?: CreateExtractJobOptions):
+      Promise<JobMetadataResponse>;
+  extract(
+      destination: File, options: CreateExtractJobOptions,
+      callback?: JobMetadataCallback): void;
+  extract(destination: File, callback?: JobMetadataCallback): void;
+  extract(
+      destination: File,
+      optionsOrCallback?: CreateExtractJobOptions|JobMetadataCallback,
+      cb?: JobMetadataCallback): void|Promise<JobMetadataResponse> {
+    const options =
+        typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
+    const callback =
+        typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
     this.createExtractJob(destination, options, (err, job, resp) => {
       if (err) {
-        callback(err, resp);
+        callback!(err, resp);
         return;
       }
-      job!.on('error', callback).on('complete', (metadata) => {
-        callback(null, metadata);
+      job!.on('error', callback!).on('complete', (metadata) => {
+        callback!(null, metadata);
       });
     });
   }
@@ -1583,25 +1626,26 @@ class Table extends common.ServiceObject {
    *   const rows = data[0];
    *   });
    */
-  // tslint:disable-next-line no-any
-  getRows(options?): Promise<any>;
-  getRows(options, callback): void;
-  getRows(callback): void;
-  // tslint:disable-next-line no-any
-  getRows(options?, callback?): void|Promise<any> {
-    if (is.fn(options)) {
-      callback = options;
-      options = {};
-    }
-
-    const onComplete = (err, rows, nextQuery, resp) => {
-      if (err) {
-        callback(err, null, null, resp);
-        return;
-      }
-      rows = BigQuery.mergeSchemaWithRows_(this.metadata.schema, rows || []);
-      callback(null, rows, nextQuery, resp);
-    };
+  getRows(options?: GetRowsOptions): Promise<RowsResponse>;
+  getRows(options: GetRowsOptions, callback: RowsCallback): void;
+  getRows(callback: RowsCallback): void;
+  getRows(optionsOrCallback?: GetRowsOptions|RowsCallback, cb?: RowsCallback):
+      void|Promise<RowsResponse> {
+    const options =
+        typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
+    const callback =
+        typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
+    const onComplete =
+        (err: Error|null, rows: TableRow[]|null, nextQuery: GetRowsOptions|null,
+         resp: r.Response) => {
+          if (err) {
+            callback!(err, null, null, resp);
+            return;
+          }
+          rows =
+              BigQuery.mergeSchemaWithRows_(this.metadata.schema, rows || []);
+          callback!(null, rows, nextQuery, resp);
+        };
 
     this.request(
         {
@@ -1613,7 +1657,7 @@ class Table extends common.ServiceObject {
             onComplete(err, null, null, resp);
             return;
           }
-          let nextQuery = null;
+          let nextQuery: GetRowsOptions|null = null;
           if (resp.pageToken) {
             nextQuery = extend({}, options, {
               pageToken: resp.pageToken,
@@ -1624,7 +1668,7 @@ class Table extends common.ServiceObject {
             // We don't know the schema for this table yet. Do a quick stat.
             this.getMetadata((err, metadata, apiResponse) => {
               if (err) {
-                onComplete(err, null, null, apiResponse);
+                onComplete(err, null, null, apiResponse!);
                 return;
               }
               onComplete(null, resp.rows, nextQuery, resp);
@@ -1769,16 +1813,20 @@ class Table extends common.ServiceObject {
    *     }
    *   });
    */
-  // tslint:disable-next-line no-any
-  insert(rows, options?): Promise<any>;
-  insert(rows, options, callback): void;
-  insert(rows, callback): void;
-  // tslint:disable-next-line no-any
-  insert(rows, options?, callback?): void|Promise<any> {
-    if (is.fn(options)) {
-      callback = options;
-      options = {};
-    }
+  insert(rows: RowMetadata|RowMetadata[], options?: InsertRowsOptions):
+      Promise<ApiResponse>;
+  insert(
+      rows: RowMetadata|RowMetadata[], options: InsertRowsOptions,
+      callback: ApiResponseCallback): void;
+  insert(rows: RowMetadata|RowMetadata[], callback: ApiResponseCallback): void;
+  insert(
+      rows: RowMetadata|RowMetadata[],
+      optionsOrCallback?: InsertRowsOptions|ApiResponseCallback,
+      cb?: ApiResponseCallback): void|Promise<ApiResponse> {
+    const options =
+        typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
+    const callback =
+        typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
 
     rows = arrify(rows);
 
@@ -1802,7 +1850,7 @@ class Table extends common.ServiceObject {
     delete json.raw;
 
     const autoCreate = !!options.autoCreate;
-    let schema;
+    let schema: string|{};
 
     delete json.autoCreate;
 
@@ -1823,12 +1871,12 @@ class Table extends common.ServiceObject {
           },
           (err, table, resp) => {
             if (err && err.code !== 409) {
-              callback(err, resp);
+              callback!(err, resp);
               return;
             }
 
             setTimeout(() => {
-              this.insert(rows, options, callback);
+              this.insert(rows, options, callback!);
             }, 60000);
           });
     };
@@ -1844,21 +1892,22 @@ class Table extends common.ServiceObject {
             if ((err as common.ApiError).code === 404 && autoCreate) {
               setTimeout(createTableAndRetry, Math.random() * 60000);
             } else {
-              callback(err, resp);
+              callback!(err, resp);
             }
             return;
           }
 
           const partialFailures =
-              (resp.insertErrors || []).map((insertError) => {
+              (resp.insertErrors || []).map((insertError: GoogleErrorBody) => {
                 return {
-                  errors: insertError.errors.map((error) => {
+                  errors: insertError.errors!.map(error => {
                     return {
                       message: error.message,
                       reason: error.reason,
                     };
                   }),
-                  row: rows[insertError.index],
+                  // tslint:disable-next-line: no-any
+                  row: rows[(insertError as any).index],
                 };
               });
 
@@ -1869,7 +1918,7 @@ class Table extends common.ServiceObject {
             } as GoogleErrorBody);
           }
 
-          callback(err, resp);
+          callback!(err, resp);
         });
   }
 
@@ -1950,25 +1999,29 @@ class Table extends common.ServiceObject {
    *   const apiResponse = data[0];
    * });
    */
-  // tslint:disable-next-line no-any
-  load(source, metadata?): Promise<any>;
-  load(source, metadata, callback): void;
-  load(source, callback): void;
-  // tslint:disable-next-line no-any
-  load(source, metadata, callback?): void|Promise<any> {
-    if (is.fn(metadata)) {
-      callback = metadata;
-      metadata = {};
-    }
+  load(source: string|File, metadata?: JobLoadMetadata):
+      Promise<JobMetadataResponse>;
+  load(
+      source: string|File, metadata: JobLoadMetadata,
+      callback: JobMetadataCallback): void;
+  load(source: string|File, callback: JobMetadataCallback): void;
+  load(
+      source: string|File,
+      metadataOrCallback?: JobLoadMetadata|JobMetadataCallback,
+      cb?: JobMetadataCallback): void|Promise<JobMetadataResponse> {
+    const metadata =
+        typeof metadataOrCallback === 'object' ? metadataOrCallback : {};
+    const callback =
+        typeof metadataOrCallback === 'function' ? metadataOrCallback : cb;
 
-    this.createLoadJob(source, metadata, (err, job, resp) => {
+    this.createLoadJob(source as File, metadata, (err, job, resp) => {
       if (err) {
-        callback(err, resp);
+        callback!(err, resp);
         return;
       }
 
-      job!.on('error', callback).on('complete', (metadata) => {
-        callback(null, metadata);
+      job!.on('error', callback!).on('complete', (metadata) => {
+        callback!(null, metadata);
       });
     });
   }
@@ -1981,8 +2034,11 @@ class Table extends common.ServiceObject {
    * @param {function} [callback] See {@link BigQuery#query} for full documentation of this method.
    * @returns {Promise}
    */
-  query(query, callback) {
-    this.dataset.query(query, callback);
+  query(query: Query): Promise<SimpleQueryRowsResponse>;
+  query(query: Query, callback: SimpleQueryRowsCallback): void;
+  query(query: Query, callback?: SimpleQueryRowsCallback):
+      void|Promise<SimpleQueryRowsResponse> {
+    this.dataset.query(query, callback!);
   }
 
   /**
@@ -2036,7 +2092,7 @@ class Table extends common.ServiceObject {
   setMetadata(
       metadata: SetTableMetadataOptions, callback?: common.ResponseCallback):
       void|Promise<common.SetMetadataResponse> {
-    const body = Table.formatMetadata_(metadata as FormatMetadataOptions);
+    const body = Table.formatMetadata_(metadata as TableMetadata);
     super.setMetadata(body, callback!);
   }
 }
