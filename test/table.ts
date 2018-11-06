@@ -28,6 +28,7 @@ import * as pfy from '@google-cloud/promisify';
 import {ServiceObject, util} from '@google-cloud/common';
 import * as sinon from 'sinon';
 import {BigQuery} from '../src';
+import {CopyTableMetadata} from '../src/table';
 
 let promisified = false;
 let makeWritableStreamOverride;
@@ -461,7 +462,10 @@ describe('BigQuery/Table', () => {
 
     it('should pass the arguments to createCopyJob', done => {
       const fakeDestination = {};
-      const fakeMetadata = {};
+      const fakeMetadata: CopyTableMetadata = {
+        createDisposition: 'CREATE_NEVER',
+        writeDisposition: 'WRITE_TRUNCATE'
+      };
 
       table.createCopyJob = (destination, metadata) => {
         assert.strictEqual(destination, fakeDestination);

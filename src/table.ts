@@ -124,12 +124,9 @@ export interface JobCallback {
 }
 
 export interface CreateCopyJobMetadata extends CopyTableMetadata {
-  createDisposition?: 'CREATE_IF_NEEDED'|'CREATE_NEVER';
-  destinationEncryptionConfiguration?: {kmsKeyName?: string;};
   destinationTable?: {datasetId: string; projectId: string; tableId: string;};
   sourceTable?: {datasetId: string; projectId: string; tableId: string;};
   sourceTables: Array<{datasetId: string; projectId: string; tableId: string;}>;
-  writeDisposition?: 'WRITE_TRUNCATE'|'WRITE_APPEND'|'WRITE_EMPTY';
 }
 
 export interface SetTableMetadataOptions {
@@ -140,6 +137,9 @@ export interface SetTableMetadataOptions {
 export interface CopyTableMetadata {
   jobId?: string;
   jobPrefix?: string;
+  createDisposition?: 'CREATE_IF_NEEDED'|'CREATE_NEVER';
+  writeDisposition?: 'WRITE_TRUNCATE'|'WRITE_APPEND'|'WRITE_EMPTY';
+  destinationEncryptionConfiguration?: {kmsKeyName?: string;};
 }
 
 export interface TableMetadata {
