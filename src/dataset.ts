@@ -20,9 +20,10 @@ import {promisifyAll} from '@google-cloud/promisify';
 import * as extend from 'extend';
 import * as is from 'is';
 import * as r from 'request';
+import {Readable} from 'stream';
 import {teenyRequest} from 'teeny-request';
 
-import {BigQuery, DatasetCallback, Query, QueryRowsCallback, QueryRowsResponse, SimpleQueryRowsCallback} from '.';
+import {BigQuery, DatasetCallback, Query, QueryRowsResponse, SimpleQueryRowsCallback} from '.';
 import {JobCallback, JobResponse, Table, TableMetadata, TableOptions} from './table';
 
 export interface DatasetDeleteOptions {
@@ -72,7 +73,8 @@ export interface TableCallback {
  */
 class Dataset extends ServiceObject {
   bigQuery: BigQuery;
-
+  location?: string;
+  getTablesStream: () => Readable;
   constructor(bigQuery: BigQuery, id: string, options?: DataSetOptions) {
     const methods = {
       /**
