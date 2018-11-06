@@ -123,7 +123,8 @@ export interface JobCallback {
   (err: Error|null, job?: Job|null, apiResponse?: r.Response): void;
 }
 
-export interface CopyTableMetadata extends HavingCopyTableMetadata,HavingJobMetadata {}
+export interface CopyTableMetadata extends HavingCopyTableMetadata,
+                                           HavingJobMetadata {}
 
 export interface SetTableMetadataOptions {
   description?: string;
@@ -141,7 +142,8 @@ export interface HavingCopyTableMetadata {
   destinationEncryptionConfiguration?: {kmsKeyName?: string;};
   destinationTable?: {datasetId: string; projectId: string; tableId: string;};
   sourceTable?: {datasetId: string; projectId: string; tableId: string;};
-  sourceTables?: Array<{datasetId: string; projectId: string; tableId: string;}>;
+  sourceTables?:
+      Array<{datasetId: string; projectId: string; tableId: string;}>;
 }
 
 export interface TableMetadata {
@@ -639,18 +641,16 @@ class Table extends common.ServiceObject {
         typeof metadataOrCallback === 'object' ? metadataOrCallback : {};
     const callback =
         typeof metadataOrCallback === 'function' ? metadataOrCallback : cb;
-    this.createCopyJob(
-        destination, metadata, (err, job, resp) => {
-          if (err) {
-            callback!(err, resp);
-            return;
-          }
+    this.createCopyJob(destination, metadata, (err, job, resp) => {
+      if (err) {
+        callback!(err, resp);
+        return;
+      }
 
-          job!.on('error', callback!)
-              .on('complete', (metadata: JobMetadata) => {
-                callback!(null, metadata);
-              });
-        });
+      job!.on('error', callback!).on('complete', (metadata: JobMetadata) => {
+        callback!(null, metadata);
+      });
+    });
   }
 
   /**
@@ -788,8 +788,7 @@ class Table extends common.ServiceObject {
       callback: JobCallback): void;
   createCopyJob(destination: Table, callback: JobCallback): void;
   createCopyJob(
-      destination: Table,
-      metadataOrCallback?: HavingJobMetadata|JobCallback,
+      destination: Table, metadataOrCallback?: HavingJobMetadata|JobCallback,
       cb?: JobCallback): void|Promise<JobResponse> {
     if (!(destination instanceof Table)) {
       throw new Error('Destination must be a Table object.');
