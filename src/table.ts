@@ -123,23 +123,25 @@ export interface JobCallback {
   (err: Error|null, job?: Job|null, apiResponse?: r.Response): void;
 }
 
-export interface CreateCopyJobMetadata extends CopyTableMetadata {
-  destinationTable?: {datasetId: string; projectId: string; tableId: string;};
-  sourceTable?: {datasetId: string; projectId: string; tableId: string;};
-  sourceTables: Array<{datasetId: string; projectId: string; tableId: string;}>;
-}
+export interface CopyTableMetadata extends HavingCopyTableMetadata,HavingJobMetadata {}
 
 export interface SetTableMetadataOptions {
   description?: string;
   schema?: string|{};
 }
 
-export interface CopyTableMetadata {
+export interface HavingJobMetadata {
   jobId?: string;
   jobPrefix?: string;
+}
+
+export interface HavingCopyTableMetadata {
   createDisposition?: 'CREATE_IF_NEEDED'|'CREATE_NEVER';
   writeDisposition?: 'WRITE_TRUNCATE'|'WRITE_APPEND'|'WRITE_EMPTY';
   destinationEncryptionConfiguration?: {kmsKeyName?: string;};
+  destinationTable?: {datasetId: string; projectId: string; tableId: string;};
+  sourceTable?: {datasetId: string; projectId: string; tableId: string;};
+  sourceTables?: Array<{datasetId: string; projectId: string; tableId: string;}>;
 }
 
 export interface TableMetadata {
@@ -638,7 +640,7 @@ class Table extends common.ServiceObject {
     const callback =
         typeof metadataOrCallback === 'function' ? metadataOrCallback : cb;
     this.createCopyJob(
-        destination, metadata as CreateCopyJobMetadata, (err, job, resp) => {
+        destination, metadata, (err, job, resp) => {
           if (err) {
             callback!(err, resp);
             return;
@@ -779,22 +781,22 @@ class Table extends common.ServiceObject {
    *   const apiResponse = data[1];
    * });
    */
-  createCopyJob(destination: Table, metadata?: CreateCopyJobMetadata):
+  createCopyJob(destination: Table, metadata?: HavingJobMetadata):
       Promise<JobResponse>;
   createCopyJob(
-      destination: Table, metadata: CreateCopyJobMetadata,
+      destination: Table, metadata: HavingJobMetadata,
       callback: JobCallback): void;
   createCopyJob(destination: Table, callback: JobCallback): void;
   createCopyJob(
       destination: Table,
-      metadataOrCallback?: CreateCopyJobMetadata|JobCallback,
+      metadataOrCallback?: HavingJobMetadata|JobCallback,
       cb?: JobCallback): void|Promise<JobResponse> {
     if (!(destination instanceof Table)) {
       throw new Error('Destination must be a Table object.');
     }
     const metadata = typeof metadataOrCallback === 'object' ?
         metadataOrCallback :
-        {} as CreateCopyJobMetadata;
+        {} as HavingJobMetadata;
     const callback =
         typeof metadataOrCallback === 'function' ? metadataOrCallback : cb;
 
