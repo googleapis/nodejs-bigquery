@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-'use strict';
-
+import * as common from '@google-cloud/common';
+import {paginator} from '@google-cloud/paginator';
+import {promisifyAll} from '@google-cloud/promisify';
 import * as arrify from 'arrify';
 import Big from 'big.js';
-import * as common from '@google-cloud/common';
-import {promisifyAll} from '@google-cloud/promisify';
-import {paginator} from '@google-cloud/paginator';
 import * as extend from 'extend';
+
 const format = require('string-format-obj');
 import * as is from 'is';
 import * as r from 'request';
@@ -30,7 +29,7 @@ import {teenyRequest} from 'teeny-request';
 
 import {Dataset, DataSetOptions} from './dataset';
 import {Job, JobOptions} from './job';
-import {Table, TableField, TableSchema, TableRow, TableRowField, JobCallback, JobResponse, RowsCallback, RowsResponse} from './table';
+import {Table, TableField, TableSchema, TableRow, TableRowField, JobCallback, JobResponse, RowsCallback, RowsResponse, RowMetadata} from './table';
 import {GoogleErrorBody} from '@google-cloud/common/build/src/util';
 import {Readable, Duplex} from 'stream';
 
@@ -1659,3 +1658,5 @@ export {Table};
  * region_tag:bigquery_quickstart
  * Full quickstart example:
  */
+
+export {RowsCallback, RowsResponse, RowMetadata};

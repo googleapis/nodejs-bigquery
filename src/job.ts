@@ -27,6 +27,7 @@ import * as extend from 'extend';
 import * as r from 'request';
 import {BigQuery, QueryRowsResponse, QueryRowsCallback} from '../src';
 import {teenyRequest} from 'teeny-request';
+import {Readable} from 'stream';
 
 // tslint:disable-next-line no-any
 export type JobMetadata = any;
@@ -105,7 +106,8 @@ export interface QueryResultsOptions {
  */
 class Job extends Operation {
   bigQuery: BigQuery;
-
+  location?: string;
+  getQueryResultsStream: (options?: QueryResultsOptions) => Readable;
   constructor(bigQuery: BigQuery, id: string, options?: JobOptions) {
     let location;
     if (options && options.location) {
