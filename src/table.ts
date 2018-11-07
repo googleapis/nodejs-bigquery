@@ -29,7 +29,7 @@ import * as path from 'path';
 import * as r from 'request';
 import * as streamEvents from 'stream-events';
 import * as uuid from 'uuid';
-import {BigQuery, Job, Dataset, Query, QueryRowsResponse, QueryRowsCallback, SimpleQueryRowsResponse, SimpleQueryRowsCallback} from '../src';
+import {BigQuery, Job, Dataset, Query, SimpleQueryRowsResponse, SimpleQueryRowsCallback} from '../src';
 import {GoogleErrorBody} from '@google-cloud/common/build/src/util';
 import {Writable, Readable} from 'stream';
 import {teenyRequest} from 'teeny-request';
@@ -220,7 +220,7 @@ class Table extends common.ServiceObject {
   dataset: Dataset;
   bigQuery: BigQuery;
   location?: string;
-  createReadStream: () => Readable;
+  createReadStream: (options?: GetRowsOptions) => Readable;
   constructor(dataset: Dataset, id: string, options?: TableOptions) {
     const methods = {
       /**
