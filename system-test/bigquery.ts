@@ -15,19 +15,14 @@
  */
 
 import {ApiError} from '@google-cloud/common';
-import {GoogleErrorBody} from '@google-cloud/common/build/src/util';
+import {DecorateRequestOptions, GoogleErrorBody} from '@google-cloud/common/build/src/util';
 import {Storage} from '@google-cloud/storage';
 import * as assert from 'assert';
-import * as async from 'async';
 import Big from 'big.js';
 import * as fs from 'fs';
-import * as exec from 'methmeth';
 import * as uuid from 'uuid';
 
-import {BigQuery, GetDatasetsOptions} from '../src';
-import {Dataset} from '../src/dataset';
-import {Job} from '../src/job';
-import {Table} from '../src/table';
+import {BigQuery, Dataset, GetDatasetsOptions, Job, RowMetadata, Table} from '../src';
 
 const bigquery = new BigQuery();
 const storage = new Storage();
@@ -90,39 +85,31 @@ describe('BigQuery', () => {
     },
   ];
 
-  before(done => {
-    async.series(
-        [
-          // Remove buckets created for the tests.
-          deleteBuckets,
+  before(async () => {
+    // Remove buckets created for the tests.
+    await deleteBuckets();
 
-          // Remove datasets created for the tests.
-          deleteDatasets,
+    // Remove datasets created for the tests.
+    await deleteDatasets();
 
-          // Create the test dataset with a label tagging this as a test run.
-          dataset.create.bind(dataset, {labels: [{[GCLOUD_TESTS_PREFIX]: ''}]}),
+    // Create the test dataset with a label tagging this as a test run.
+    await dataset.create({labels: [{[GCLOUD_TESTS_PREFIX]: ''}]});
 
-          // Create the test table.
-          table.create.bind(table, {
-            schema: SCHEMA,
-          }),
+    // Create the test table.
+    await table.create({schema: SCHEMA});
 
-          // Create a Bucket.
-          bucket.create.bind(bucket),
-        ],
-        done);
+    // Create a Bucket.
+    await bucket.create();
   });
 
-  after(done => {
-    async.parallel(
-        [
-          // Remove buckets created for the tests.
-          deleteBuckets,
+  after(async () => {
+    await Promise.all([
+      // Remove buckets created for the tests.
+      deleteBuckets(),
 
-          // Remove datasets created for the tests.
-          deleteDatasets,
-        ],
-        done);
+      // Remove datasets created for the tests.
+      deleteDatasets(),
+    ]);
   });
 
   it('should get a list of datasets', done => {
@@ -136,12 +123,11 @@ describe('BigQuery', () => {
   it('should allow limiting API calls', done => {
     const maxApiCalls = 1;
     let numRequestsMade = 0;
-
-    const {BigQuery} = require('../src');
     const bigquery = new BigQuery();
 
-    bigquery.interceptors.push({
-      request: reqOpts => {
+    // tslint:disable-next-line no-any
+    (bigquery as any).interceptors.push({
+      request: (reqOpts: DecorateRequestOptions) => {
         numRequestsMade++;
         return reqOpts;
       },
@@ -157,7 +143,6 @@ describe('BigQuery', () => {
   it('should return a promise', () => {
     return bigquery.getDatasets().then(data => {
       const datasets = data[0];
-
       assert(datasets.length > 0);
       assert(datasets[0] instanceof Dataset);
     });
@@ -166,12 +151,11 @@ describe('BigQuery', () => {
   it('should allow limiting API calls via promises', () => {
     const maxApiCalls = 1;
     let numRequestsMade = 0;
-
-    const {BigQuery} = require('../src');
     const bigquery = new BigQuery();
 
-    bigquery.interceptors.push({
-      request: reqOpts => {
+    // tslint:disable-next-line no-any
+    (bigquery as any).interceptors.push({
+      request: (reqOpts: DecorateRequestOptions) => {
         numRequestsMade++;
         return reqOpts;
       },
@@ -233,7 +217,7 @@ describe('BigQuery', () => {
   });
 
   it('should run a query job as a promise', () => {
-    let job;
+    let job: Job;
 
     return bigquery.createQueryJob(query)
         .then(response => {
@@ -253,16 +237,10 @@ describe('BigQuery', () => {
   it('should get query results as a stream', done => {
     bigquery.createQueryJob(query, (err, job) => {
       assert.ifError(err);
-
-      // tslint:disable-next-line no-any
-      const rowsEmitted: any[] = [];
-
+      const rowsEmitted = new Array<RowMetadata>();
       job!.getQueryResultsStream()
           .on('error', done)
-          .on('data',
-              row => {
-                rowsEmitted.push(row);
-              })
+          .on('data', row => rowsEmitted.push(row))
           .on('end', () => {
             assert.strictEqual(rowsEmitted.length, 100);
             assert.strictEqual(typeof rowsEmitted[0].url, 'string');
@@ -469,10 +447,7 @@ describe('BigQuery', () => {
 
       dataset.getTablesStream()
           .on('error', done)
-          .on('data',
-              table => {
-                tableEmitted = table instanceof Table;
-              })
+          .on('data', table => tableEmitted = table instanceof Table)
           .on('end', () => {
             assert.strictEqual(tableEmitted, true);
             done();
@@ -540,27 +515,20 @@ describe('BigQuery', () => {
       });
 
       const table = dataset.table(generateName('table'));
-      let job;
+      let job: Job;
 
       const QUERY = `SELECT * FROM \`${table.id}\``;
       const SCHEMA = require('../../system-test/data/schema.json');
       const TEST_DATA_FILE =
           require.resolve('../../system-test/data/location-test-data.json');
 
-      before(() => {
+      before(async () => {
         // create a dataset in a certain location will cascade the location
         // to any jobs created through it
-        return dataset.create()
-            .then(() => {
-              return table.create({schema: SCHEMA});
-            })
-            .then(() => {
-              return table.createLoadJob(TEST_DATA_FILE);
-            })
-            .then(data => {
-              job = data![0];
-              return job.promise();
-            });
+        await dataset.create();
+        await table.create({schema: SCHEMA});
+        job = (await table.createLoadJob(TEST_DATA_FILE))[0];
+        await job.promise();
       });
 
       it('should create a load job in the correct location', () => {
@@ -569,7 +537,7 @@ describe('BigQuery', () => {
 
       describe('job.get', () => {
         it('should fail to reload if the location is not set', done => {
-          const badJob = bigquery.job(job.id);
+          const badJob = bigquery.job(job.id!);
 
           badJob.getMetadata(err => {
             assert.strictEqual((err as ApiError).code, 404);
@@ -578,7 +546,7 @@ describe('BigQuery', () => {
         });
 
         it('should fail to reload if the location is wrong', done => {
-          const badJob = bigquery.job(job.id, {location: 'US'});
+          const badJob = bigquery.job(job.id!, {location: 'US'});
 
           badJob.getMetadata(err => {
             assert.strictEqual((err as ApiError).code, 404);
@@ -587,7 +555,7 @@ describe('BigQuery', () => {
         });
 
         it('should reload if the location matches', done => {
-          const goodJob = bigquery.job(job.id, {location: LOCATION});
+          const goodJob = bigquery.job(job.id!, {location: LOCATION});
 
           goodJob.getMetadata(err => {
             assert.ifError(err);
@@ -598,7 +566,7 @@ describe('BigQuery', () => {
       });
 
       describe('job.cancel', () => {
-        let job;
+        let job: Job;
 
         before(() => {
           return dataset.createQueryJob(QUERY).then(data => {
@@ -607,7 +575,7 @@ describe('BigQuery', () => {
         });
 
         it('should fail if the job location is incorrect', done => {
-          const badJob = bigquery.job(job.id, {location: 'US'});
+          const badJob = bigquery.job(job.id!, {location: 'US'});
 
           badJob.cancel(err => {
             assert.strictEqual((err as ApiError).code, 404);
@@ -636,24 +604,12 @@ describe('BigQuery', () => {
               });
         });
 
-        it('should get query results', () => {
-          let job;
-
-          return dataset.createQueryJob(QUERY)
-              .then(data => {
-                job = data[0];
-
-                assert.strictEqual(job.location, LOCATION);
-                return job.promise();
-              })
-              .then(() => {
-                return job.getQueryResults();
-              })
-              .then(data => {
-                const rows = data[0];
-
-                assert(rows!.length > 0);
-              });
+        it('should get query results', async () => {
+          const [job] = await dataset.createQueryJob(QUERY);
+          assert.strictEqual(job.location, LOCATION);
+          await job.promise();
+          const [rows] = await job.getQueryResults();
+          assert(rows!.length > 0);
         });
       });
 
@@ -734,7 +690,7 @@ describe('BigQuery', () => {
     });
 
     it('should insert rows via stream', done => {
-      let job;
+      let job: Job;
 
       fs.createReadStream(TEST_DATA_JSON_PATH)
           .pipe(table.createWriteStream('json'))
@@ -773,56 +729,38 @@ describe('BigQuery', () => {
     });
 
     describe('copying', () => {
-      // tslint:disable-next-line no-any
-      const TABLES: any = {
-        1: {
-          data: {
-            tableId: 1,
-          },
-        },
-        2: {},
-      };
+      interface TableItem {
+        data?: {tableId?: number};
+        table: Table;
+      }
+      const TABLES = [
+        {data: {tableId: 1}},
+        {},
+      ] as {} as TableItem[];
 
       const SCHEMA = 'tableId:integer';
 
-      before(done => {
-        TABLES[1].table = dataset.table(generateName('table'));
-        TABLES[2].table = dataset.table(generateName('table'));
-
-        async.each(
-            TABLES,
-            // tslint:disable-next-line no-any
-            (tableObject: any, next) => {
-              const tableInstance = tableObject.table;
-
-              tableInstance.create(
-                  {
-                    schema: SCHEMA,
-                  },
-                  next);
-            },
-            err => {
-              if (err) {
-                done(err);
-                return;
-              }
-
-              const table1Instance = TABLES[1].table;
-              table1Instance.insert(TABLES[1].data, done);
-            });
+      before(async () => {
+        TABLES.forEach(t => t.table = dataset.table(generateName('table')));
+        await Promise.all(TABLES.map(tableItem => {
+          const tableInstance = tableItem.table;
+          return tableInstance!.create({schema: SCHEMA});
+        }));
+        const table1Instance = TABLES[0].table;
+        await table1Instance.insert(TABLES[0].data);
       });
 
       it('should start copying data from current table', done => {
-        const table1 = TABLES[1];
+        const table1 = TABLES[0];
         const table1Instance = table1.table;
 
-        const table2 = TABLES[2];
+        const table2 = TABLES[1];
         const table2Instance = table2.table;
 
         table1Instance.createCopyJob(table2Instance, (err, job) => {
           assert.ifError(err);
 
-          job.on('error', done).on('complete', () => {
+          job!.on('error', done).on('complete', () => {
             // Data may take up to 90 minutes to be copied*, so we cannot test
             // to see that anything but the request was successful.
             // *https://cloud.google.com/bigquery/streaming-data-into-bigquery
@@ -832,10 +770,10 @@ describe('BigQuery', () => {
       });
 
       it('should copy data from current table', done => {
-        const table1 = TABLES[1];
+        const table1 = TABLES[0];
         const table1Instance = table1.table;
 
-        const table2 = TABLES[2];
+        const table2 = TABLES[1];
         const table2Instance = table2.table;
 
         table1Instance.copy(table2Instance, (err, resp) => {
@@ -846,16 +784,16 @@ describe('BigQuery', () => {
       });
 
       it('should start copying data from another table', done => {
-        const table1 = TABLES[1];
+        const table1 = TABLES[0];
         const table1Instance = table1.table;
 
-        const table2 = TABLES[2];
+        const table2 = TABLES[1];
         const table2Instance = table2.table;
 
         table2Instance.createCopyFromJob(table1Instance, (err, job) => {
           assert.ifError(err);
 
-          job.on('error', done).on('complete', () => {
+          job!.on('error', done).on('complete', () => {
             // Data may take up to 90 minutes to be copied*, so we cannot test
             // to see that anything but the request was successful.
             // *https://cloud.google.com/bigquery/streaming-data-into-bigquery
@@ -865,10 +803,10 @@ describe('BigQuery', () => {
       });
 
       it('should copy data from another table', done => {
-        const table1 = TABLES[1];
+        const table1 = TABLES[0];
         const table1Instance = table1.table;
 
-        const table2 = TABLES[2];
+        const table2 = TABLES[1];
         const table2Instance = table2.table;
 
         table2Instance.copyFrom(table1Instance, (err, resp) => {
@@ -1440,7 +1378,7 @@ describe('BigQuery', () => {
   });
 
   describe('Custom Types', () => {
-    let table;
+    let table: Table;
 
     const DATE = bigquery.date('2017-01-01');
     const DATETIME = bigquery.datetime('2017-01-01 13:00:00');
@@ -1569,7 +1507,8 @@ describe('BigQuery', () => {
         }
 
         rows!.forEach(row => {
-          const expectedRow = EXPECTED_ROWS[row.Name];
+          const expectedRow =
+              (EXPECTED_ROWS as {[index: string]: {}})[row.Name];
           assert.deepStrictEqual(row, expectedRow);
         });
 
@@ -1578,55 +1517,28 @@ describe('BigQuery', () => {
     });
   });
 
-  function generateName(resourceType) {
+  function generateName(resourceType: string) {
     return `${GCLOUD_TESTS_PREFIX}_${resourceType}_${uuid.v1()}`.replace(
         /-/g, '_');
   }
 
-  function deleteBuckets(callback) {
-    function deleteBucket(bucket, callback) {
-      bucket.getFiles((err, files) => {
-        if (err) {
-          callback(err);
-          return;
-        }
-
-        async.each(files, exec('delete'), err => {
-          if (err) {
-            callback(err);
-            return;
-          }
-
-          bucket.delete(callback);
-        });
-      });
-    }
-
-    storage.getBuckets(
-        {
-          prefix: GCLOUD_TESTS_PREFIX,
-        },
-        (err, buckets) => {
-          if (err) {
-            callback(err);
-            return;
-          }
-
-          async.each(buckets, deleteBucket, callback);
-        });
+  async function deleteBuckets() {
+    const [buckets] = await storage.getBuckets({
+      prefix: GCLOUD_TESTS_PREFIX,
+    });
+    await Promise.all(buckets.map(async b => {
+      const [files] = await b.getFiles();
+      await Promise.all(files.map(f => f.delete()));
+      await b.delete();
+    }));
   }
 
-  function deleteDatasets(callback) {
-    bigquery.getDatasets(
-        {
-          filter: `labels.${GCLOUD_TESTS_PREFIX}`,
-        },
-        (err, datasets) => {
-          if (err) {
-            callback(err);
-            return;
-          }
-          async.each(datasets!, exec('delete', {force: true}), callback);
-        });
+  async function deleteDatasets() {
+    const [datasets] = await bigquery.getDatasets({
+      filter: `labels.${GCLOUD_TESTS_PREFIX}`,
+    });
+    await Promise.all(datasets.map(dataset => {
+      return dataset.delete({force: true});
+    }));
   }
 });
