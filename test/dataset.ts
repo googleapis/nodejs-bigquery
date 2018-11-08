@@ -14,18 +14,20 @@
  * limitations under the License.
  */
 
-'use strict';
-
+import {DecorateRequestOptions, ServiceObject, ServiceObjectConfig, util} from '@google-cloud/common';
+import * as pfy from '@google-cloud/promisify';
 import * as arrify from 'arrify';
 import * as assert from 'assert';
 import * as extend from 'extend';
 import * as proxyquire from 'proxyquire';
-import * as pfy from '@google-cloud/promisify';
-import {ServiceObject, util} from '@google-cloud/common';
+
+import * as _root from '../src';
+import {DataSetOptions} from '../src/dataset';
+import {FormattedMetadata, TableOptions} from '../src/table';
 
 let promisified = false;
 const fakePfy = extend({}, pfy, {
-  promisifyAll: (c, options) => {
+  promisifyAll: (c: Function, options: pfy.PromisifyAllOptions) => {
     if (c.name !== 'Dataset') {
       return;
     }
@@ -37,7 +39,7 @@ const fakePfy = extend({}, pfy, {
 let extended = false;
 const fakePaginator = {
   paginator: {
-    extend: (c, methods) => {
+    extend: (c: Function, methods: string[]) => {
       if (c.name !== 'Dataset') {
         return;
       }
@@ -46,15 +48,15 @@ const fakePaginator = {
       assert.deepStrictEqual(methods, ['getTables']);
       extended = true;
     },
-    streamify: methodName => {
+    streamify: (methodName: string) => {
       return methodName;
     },
   }
 };
 
 class FakeServiceObject extends ServiceObject {
-  calledWith_;
-  constructor(config) {
+  calledWith_: IArguments;
+  constructor(config: ServiceObjectConfig) {
     super(config);
     this.calledWith_ = arguments;
   }
@@ -64,16 +66,16 @@ describe('BigQuery/Dataset', () => {
   const BIGQUERY = {
     projectId: 'my-project',
     createDataset: util.noop,
-  };
+  } as {} as _root.BigQuery;
   const DATASET_ID = 'kittens';
   const LOCATION = 'asia-northeast1';
 
-  // tslint:disable-next-line no-any variable-name
-  let Dataset;
-  // tslint:disable-next-line no-any variable-name
-  let Table;
+  // tslint:disable-next-line variable-name
+  let Dataset: typeof _root.Dataset;
+  // tslint:disable-next-line variable-name
+  let Table: typeof _root.Table;
   // tslint:disable-next-line no-any
-  let ds;
+  let ds: any;
 
   before(() => {
     Dataset = proxyquire('../src/dataset', {
@@ -128,9 +130,12 @@ describe('BigQuery/Dataset', () => {
     });
 
     describe('createMethod', () => {
-      let bq;
-      let ds;
-      let config;
+      // tslint:disable-next-line no-any
+      let bq: any;
+      // tslint:disable-next-line no-any
+      let ds: any;
+      // tslint:disable-next-line no-any
+      let config: any;
 
       beforeEach(() => {
         bq = extend(true, {}, BIGQUERY);
@@ -141,7 +146,7 @@ describe('BigQuery/Dataset', () => {
       it('should call through to BigQuery#createDataset', done => {
         const OPTIONS = {};
 
-        bq.createDataset = (id, options, callback) => {
+        bq.createDataset = (id: string, options: {}, callback: Function) => {
           assert.strictEqual(id, DATASET_ID);
           assert.deepStrictEqual(options, OPTIONS);
           callback();  // the done fn
@@ -151,7 +156,7 @@ describe('BigQuery/Dataset', () => {
       });
 
       it('should optionally accept options', done => {
-        bq.createDataset = (id, options, callback) => {
+        bq.createDataset = (id: string, options: {}, callback: Function) => {
           callback();  // the done fn
         };
 
@@ -159,10 +164,11 @@ describe('BigQuery/Dataset', () => {
       });
 
       it('should pass the location', done => {
-        bq.createDataset = (id, options, callback) => {
-          assert.strictEqual(options.location, LOCATION);
-          callback();  // the done fn
-        };
+        bq.createDataset =
+            (id: string, options: DataSetOptions, callback: Function) => {
+              assert.strictEqual(options.location, LOCATION);
+              callback();  // the done fn
+            };
 
         ds.location = LOCATION;
         config.createMethod(DATASET_ID, done);
@@ -242,7 +248,7 @@ describe('BigQuery/Dataset', () => {
             },
           });
 
-      ds.bigQuery.createQueryJob = (options, callback) => {
+      ds.bigQuery.createQueryJob = (options: {}, callback: Function) => {
         assert.deepStrictEqual(options, expectedOptions);
         assert.notStrictEqual(fakeOptions, options);
         callback();  // the done fn
@@ -253,10 +259,11 @@ describe('BigQuery/Dataset', () => {
     });
 
     it('should accept a query string', done => {
-      ds.bigQuery.createQueryJob = (options, callback) => {
-        assert.strictEqual(options.query, FAKE_QUERY);
-        callback();  // the done fn
-      };
+      ds.bigQuery.createQueryJob =
+          (options: _root.Query, callback: Function) => {
+            assert.strictEqual(options.query, FAKE_QUERY);
+            callback();  // the done fn
+          };
 
       ds.createQueryJob(FAKE_QUERY, done);
     });
@@ -289,7 +296,7 @@ describe('BigQuery/Dataset', () => {
     it('should accept a string', done => {
       const query = 'SELECT * FROM allthedata';
 
-      ds.bigQuery.createQueryStream = opts => {
+      ds.bigQuery.createQueryStream = (opts: _root.Query) => {
         assert.strictEqual(opts.query, query);
         done();
       };
@@ -298,7 +305,8 @@ describe('BigQuery/Dataset', () => {
     });
 
     it('should pass along options', done => {
-      ds.bigQuery.createQueryStream = opts => {
+      // tslint:disable-next-line no-any
+      ds.bigQuery.createQueryStream = (opts: any) => {
         assert.strictEqual(opts.a, options.a);
         assert.strictEqual(opts.c, options.c);
         done();
@@ -308,7 +316,7 @@ describe('BigQuery/Dataset', () => {
     });
 
     it('should extend options with defaultDataset', done => {
-      ds.bigQuery.createQueryStream = opts => {
+      ds.bigQuery.createQueryStream = (opts: _root.Query) => {
         assert.deepStrictEqual(opts.defaultDataset, {datasetId: ds.id});
         done();
       };
@@ -317,7 +325,7 @@ describe('BigQuery/Dataset', () => {
     });
 
     it('should extend options with the location', done => {
-      ds.bigQuery.createQueryStream = opts => {
+      ds.bigQuery.createQueryStream = (opts: _root.Query) => {
         assert.strictEqual(opts.location, LOCATION);
         done();
       };
@@ -360,7 +368,7 @@ describe('BigQuery/Dataset', () => {
         schema: SCHEMA_OBJECT,
       };
 
-      ds.request = reqOpts => {
+      ds.request = (reqOpts: DecorateRequestOptions) => {
         assert.strictEqual(reqOpts.method, 'POST');
         assert.strictEqual(reqOpts.uri, '/tables');
 
@@ -378,7 +386,7 @@ describe('BigQuery/Dataset', () => {
     });
 
     it('should not require options', done => {
-      ds.request = (reqOpts, callback) => {
+      ds.request = (reqOpts: DecorateRequestOptions, callback: Function) => {
         callback(null, API_RESPONSE);
       };
 
@@ -392,10 +400,10 @@ describe('BigQuery/Dataset', () => {
 
       Table.formatMetadata_ = options => {
         assert.strictEqual(options, fakeOptions);
-        return formatted;
+        return formatted as {} as FormattedMetadata;
       };
 
-      ds.request = reqOpts => {
+      ds.request = (reqOpts: DecorateRequestOptions) => {
         assert.strictEqual(reqOpts.json, formatted);
 
         Table.formatMetadata_ = formatMetadata_;
@@ -406,7 +414,7 @@ describe('BigQuery/Dataset', () => {
     });
 
     it('should create a schema object from a string', done => {
-      ds.request = reqOpts => {
+      ds.request = (reqOpts: DecorateRequestOptions) => {
         assert.deepStrictEqual(reqOpts.json.schema, SCHEMA_OBJECT);
         done();
       };
@@ -415,7 +423,7 @@ describe('BigQuery/Dataset', () => {
     });
 
     it('should wrap an array schema', done => {
-      ds.request = reqOpts => {
+      ds.request = (reqOpts: DecorateRequestOptions) => {
         assert.deepStrictEqual(
             reqOpts.json.schema.fields, SCHEMA_OBJECT.fields);
         done();
@@ -434,7 +442,7 @@ describe('BigQuery/Dataset', () => {
         fields: [{id: 'nested_name', type: 'STRING'}],
       };
 
-      ds.request = reqOpts => {
+      ds.request = (reqOpts: DecorateRequestOptions) => {
         assert.strictEqual(reqOpts.json.schema.fields[1].type, 'RECORD');
         done();
       };
@@ -451,36 +459,38 @@ describe('BigQuery/Dataset', () => {
     it('should return an error to the callback', done => {
       const error = new Error('Error.');
 
-      ds.request = (reqOpts, callback) => {
+      ds.request = (reqOpts: DecorateRequestOptions, callback: Function) => {
         callback(error);
       };
 
-      ds.createTable(TABLE_ID, {schema: SCHEMA_OBJECT}, err => {
+      ds.createTable(TABLE_ID, {schema: SCHEMA_OBJECT}, (err: Error) => {
         assert.strictEqual(err, error);
         done();
       });
     });
 
     it('should return a Table object', done => {
-      ds.request = (reqOpts, callback) => {
+      ds.request = (reqOpts: DecorateRequestOptions, callback: Function) => {
         callback(null, API_RESPONSE);
       };
 
-      ds.createTable(TABLE_ID, {schema: SCHEMA_OBJECT}, (err, table) => {
-        assert.ifError(err);
-        assert(table instanceof Table);
-        done();
-      });
+      ds.createTable(
+          TABLE_ID, {schema: SCHEMA_OBJECT},
+          (err: Error, table: _root.Table) => {
+            assert.ifError(err);
+            assert(table instanceof Table);
+            done();
+          });
     });
 
     it('should pass the location to the Table', done => {
       const response = extend({location: LOCATION}, API_RESPONSE);
 
-      ds.request = (reqOpts, callback) => {
+      ds.request = (reqOpts: DecorateRequestOptions, callback: Function) => {
         callback(null, response);
       };
 
-      ds.table = (id, options) => {
+      ds.table = (id: string, options: TableOptions) => {
         assert.strictEqual(options.location, LOCATION);
         setImmediate(done);
         return {};
@@ -492,15 +502,16 @@ describe('BigQuery/Dataset', () => {
     it('should return an apiResponse', done => {
       const opts = {id: TABLE_ID, schema: SCHEMA_OBJECT};
 
-      ds.request = (reqOpts, callback) => {
+      ds.request = (reqOpts: DecorateRequestOptions, callback: Function) => {
         callback(null, API_RESPONSE);
       };
 
-      ds.createTable(TABLE_ID, opts, (err, table, apiResponse) => {
-        assert.ifError(err);
-        assert.strictEqual(apiResponse, API_RESPONSE);
-        done();
-      });
+      ds.createTable(
+          TABLE_ID, opts, (err: Error, table: _root.Table, apiResponse: {}) => {
+            assert.ifError(err);
+            assert.strictEqual(apiResponse, API_RESPONSE);
+            done();
+          });
     });
 
     it('should assign metadata to the Table object', done => {
@@ -511,21 +522,23 @@ describe('BigQuery/Dataset', () => {
           },
           API_RESPONSE);
 
-      ds.request = (reqOpts, callback) => {
+      ds.request = (reqOpts: DecorateRequestOptions, callback: Function) => {
         callback(null, apiResponse);
       };
 
-      ds.createTable(TABLE_ID, {schema: SCHEMA_OBJECT}, (err, table) => {
-        assert.ifError(err);
-        assert.strictEqual(table.metadata, apiResponse);
-        done();
-      });
+      ds.createTable(
+          TABLE_ID, {schema: SCHEMA_OBJECT},
+          (err: Error, table: _root.Table) => {
+            assert.ifError(err);
+            assert.strictEqual(table.metadata, apiResponse);
+            done();
+          });
     });
   });
 
   describe('delete', () => {
     it('should delete the dataset via the api', done => {
-      ds.request = reqOpts => {
+      ds.request = (reqOpts: DecorateRequestOptions) => {
         assert.strictEqual(reqOpts.method, 'DELETE');
         assert.strictEqual(reqOpts.uri, '');
         assert.deepStrictEqual(reqOpts.qs, {deleteContents: false});
@@ -536,7 +549,7 @@ describe('BigQuery/Dataset', () => {
     });
 
     it('should allow a force delete', done => {
-      ds.request = reqOpts => {
+      ds.request = (reqOpts: DecorateRequestOptions) => {
         assert.deepStrictEqual(reqOpts.qs, {deleteContents: true});
         done();
       };
@@ -545,7 +558,7 @@ describe('BigQuery/Dataset', () => {
     });
 
     it('should execute callback when done', done => {
-      ds.request = (reqOpts, callback) => {
+      ds.request = (reqOpts: DecorateRequestOptions, callback: Function) => {
         callback();
       };
 
@@ -555,11 +568,11 @@ describe('BigQuery/Dataset', () => {
     it('should pass error to callback', done => {
       const error = new Error('Error.');
 
-      ds.request = (reqOpts, callback) => {
+      ds.request = (reqOpts: DecorateRequestOptions, callback: Function) => {
         callback(error);
       };
 
-      ds.delete(err => {
+      ds.delete((err: Error) => {
         assert.strictEqual(err, error);
         done();
       });
@@ -568,11 +581,11 @@ describe('BigQuery/Dataset', () => {
     it('should pass apiResponse to callback', done => {
       const apiResponse = {};
 
-      ds.request = (reqOpts, callback) => {
+      ds.request = (reqOpts: DecorateRequestOptions, callback: Function) => {
         callback(null, apiResponse);
       };
 
-      ds.delete((err, apiResponse_) => {
+      ds.delete((err: Error, apiResponse_: {}) => {
         assert.strictEqual(apiResponse_, apiResponse);
         done();
       });
@@ -581,7 +594,7 @@ describe('BigQuery/Dataset', () => {
 
   describe('getTables', () => {
     it('should get tables from the api', done => {
-      ds.request = reqOpts => {
+      ds.request = (reqOpts: DecorateRequestOptions) => {
         assert.strictEqual(reqOpts.uri, '/tables');
         assert.deepStrictEqual(reqOpts.qs, {});
         done();
@@ -596,7 +609,7 @@ describe('BigQuery/Dataset', () => {
         pageToken: 'token',
       };
 
-      ds.request = reqOpts => {
+      ds.request = (reqOpts: DecorateRequestOptions) => {
         assert.strictEqual(reqOpts.qs, query);
         done();
       };
@@ -605,7 +618,7 @@ describe('BigQuery/Dataset', () => {
     });
 
     it('should default the query value to an empty object', done => {
-      ds.request = reqOpts => {
+      ds.request = (reqOpts: DecorateRequestOptions) => {
         assert.deepStrictEqual(reqOpts.qs, {});
         done();
       };
@@ -616,11 +629,11 @@ describe('BigQuery/Dataset', () => {
     it('should return error to callback', done => {
       const error = new Error('Error.');
 
-      ds.request = (reqOpts, callback) => {
+      ds.request = (reqOpts: DecorateRequestOptions, callback: Function) => {
         callback(error);
       };
 
-      ds.getTables(err => {
+      ds.getTables((err: Error) => {
         assert.strictEqual(err, error);
         done();
       });
@@ -640,27 +653,29 @@ describe('BigQuery/Dataset', () => {
       };
 
       beforeEach(() => {
-        ds.request = (reqOpts, callback) => {
+        ds.request = (reqOpts: DecorateRequestOptions, callback: Function) => {
           callback(null, apiResponse);
         };
       });
 
       it('should return Table & apiResponse', done => {
-        ds.getTables((err, tables, nextQuery, apiResponse_) => {
-          assert.ifError(err);
+        ds.getTables(
+            (err: Error, tables: _root.Table[], nextQuery: {},
+             apiResponse_: {}) => {
+              assert.ifError(err);
 
-          const table = tables[0];
+              const table = tables[0];
 
-          assert(table instanceof Table);
-          assert.strictEqual(table.id, tableId);
-          assert.strictEqual(table.location, LOCATION);
-          assert.strictEqual(apiResponse_, apiResponse);
-          done();
-        });
+              assert(table instanceof Table);
+              assert.strictEqual(table.id, tableId);
+              assert.strictEqual(table.location, LOCATION);
+              assert.strictEqual(apiResponse_, apiResponse);
+              done();
+            });
       });
 
       it('should assign metadata to the Table objects', done => {
-        ds.getTables((err, tables) => {
+        ds.getTables((err: Error, tables: _root.Table[]) => {
           assert.ifError(err);
           assert.strictEqual(tables[0].metadata, apiResponse.tables[0]);
           done();
@@ -679,15 +694,16 @@ describe('BigQuery/Dataset', () => {
           pageToken,
         };
 
-        ds.request = (reqOpts, callback) => {
+        ds.request = (reqOpts: DecorateRequestOptions, callback: Function) => {
           callback(null, {nextPageToken: pageToken});
         };
 
-        ds.getTables(query, (err, tables, nextQuery) => {
-          assert.ifError(err);
-          assert.deepStrictEqual(nextQuery, expectedNextQuery);
-          done();
-        });
+        ds.getTables(
+            query, (err: Error, tables: _root.Table[], nextQuery: {}) => {
+              assert.ifError(err);
+              assert.deepStrictEqual(nextQuery, expectedNextQuery);
+              done();
+            });
       });
     });
   });
@@ -709,7 +725,7 @@ describe('BigQuery/Dataset', () => {
     it('should accept a string', done => {
       const query = 'SELECT * FROM allthedata';
 
-      ds.bigQuery.query = opts => {
+      ds.bigQuery.query = (opts: _root.Query) => {
         assert.strictEqual(opts.query, query);
         done();
       };
@@ -718,7 +734,8 @@ describe('BigQuery/Dataset', () => {
     });
 
     it('should pass along options', done => {
-      ds.bigQuery.query = opts => {
+      // tslint:disable-next-line no-any
+      ds.bigQuery.query = (opts: any) => {
         assert.strictEqual(opts.a, options.a);
         assert.strictEqual(opts.c, options.c);
         done();
@@ -728,7 +745,7 @@ describe('BigQuery/Dataset', () => {
     });
 
     it('should extend options with defaultDataset', done => {
-      ds.bigQuery.query = opts => {
+      ds.bigQuery.query = (opts: _root.Query) => {
         assert.deepStrictEqual(opts.defaultDataset, {datasetId: ds.id});
         done();
       };
@@ -737,7 +754,7 @@ describe('BigQuery/Dataset', () => {
     });
 
     it('should extend options with the location', done => {
-      ds.bigQuery.query = opts => {
+      ds.bigQuery.query = (opts: _root.Query) => {
         assert.strictEqual(opts.location, LOCATION);
         done();
       };
@@ -758,7 +775,7 @@ describe('BigQuery/Dataset', () => {
     it('should pass callback', done => {
       const callback = util.noop;
 
-      ds.bigQuery.query = (opts, cb) => {
+      ds.bigQuery.query = (opts: _root.Query, cb: Function) => {
         assert.strictEqual(cb, callback);
         done();
       };

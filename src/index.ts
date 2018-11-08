@@ -60,6 +60,8 @@ export interface Query {
   maxResults?: number;
   timeoutMs?: number;
   pageToken?: string;
+  destination?: Table;
+  defaultDataset?: Dataset;
 }
 
 export interface QueryOptions {
@@ -160,16 +162,6 @@ export interface QueryParameter {
   name?: string;
   parameterType: {type: string;};
   parameterValue: {arrayValues?: Array<{}>; structValues?: {}; value?: {}};
-}
-
-export interface CreateQueryJobOptions {
-  destination?: Table;
-  dryRun?: boolean;
-  location?: string;
-  jobId?: string;
-  jobPrefix?: string;
-  query?: string;
-  useLegacySql?: boolean;
 }
 
 export interface BigQueryOptions extends common.GoogleAuthOptions {
@@ -869,10 +861,9 @@ export class BigQuery extends common.Service {
    *   return job.getQueryResults();
    * });
    */
-  createQueryJob(options: CreateQueryJobOptions|string): Promise<JobResponse>;
-  createQueryJob(options: CreateQueryJobOptions|string, callback: JobCallback):
-      void;
-  createQueryJob(opts: CreateQueryJobOptions|string, callback?: JobCallback):
+  createQueryJob(options: Query|string): Promise<JobResponse>;
+  createQueryJob(options: Query|string, callback: JobCallback): void;
+  createQueryJob(opts: Query|string, callback?: JobCallback):
       void|Promise<JobResponse> {
     const options = typeof opts === 'object' ? opts : {query: opts};
     if (!options || !options.query) {

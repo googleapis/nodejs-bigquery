@@ -18,23 +18,21 @@
  * @module bigquery/job
  */
 
-'use strict';
-
-import {Operation, util, GetMetadataCallback} from '@google-cloud/common';
-import {promisifyAll} from '@google-cloud/promisify';
+import {GetMetadataCallback, Operation, util} from '@google-cloud/common';
 import {paginator} from '@google-cloud/paginator';
+import {promisifyAll} from '@google-cloud/promisify';
 import * as extend from 'extend';
 import * as r from 'request';
-import {BigQuery, QueryRowsResponse, QueryRowsCallback} from '../src';
-import {teenyRequest} from 'teeny-request';
 import {Readable} from 'stream';
+import {teenyRequest} from 'teeny-request';
+
+import {BigQuery, QueryRowsCallback, QueryRowsResponse} from '../src';
 
 // tslint:disable-next-line no-any
 export type JobMetadata = any;
 
-export interface JobOptions {
-  location?: string;
-}
+// tslint:disable-next-line no-any
+export type JobOptions = any;
 
 export interface CancelCallback {
   (err: Error|null, apiResponse?: r.Response): void;
