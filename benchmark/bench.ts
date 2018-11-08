@@ -28,7 +28,7 @@ const queries = JSON.parse(queryJson);
 const client = new BigQuery();
 
 Promise
-    .all(queries.map(query => {
+    .all(queries.map((query: string) => {
       return doQuery(query).catch(console.error);
     }))
     .catch(console.error);
@@ -37,8 +37,8 @@ async function doQuery(queryTxt: string) {
   return new Promise((resolve, reject) => {
     const startMilli = new Date().getTime();
     let numRows = 0;
-    let numCols;
-    let timeFirstByteMilli;
+    let numCols: number;
+    let timeFirstByteMilli: number;
 
     const query = {query: queryTxt, useLegacySql: false};
     const stream =

@@ -527,7 +527,8 @@ describe('BigQuery', () => {
         // to any jobs created through it
         await dataset.create();
         await table.create({schema: SCHEMA});
-        job = (await table.createLoadJob(TEST_DATA_FILE))[0];
+        // tslint:disable-next-line no-any
+        job = ((await table.createLoadJob(TEST_DATA_FILE)) as any)[0];
         await job.promise();
       });
 

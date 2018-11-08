@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-'use strict';
-
+import {DecorateRequestOptions, util} from '@google-cloud/common';
+import * as pfy from '@google-cloud/promisify';
 import * as arrify from 'arrify';
 import * as assert from 'assert';
 import * as extend from 'extend';
 import * as proxyquire from 'proxyquire';
-import * as pfy from '@google-cloud/promisify';
-import {util} from '@google-cloud/common';
 import * as sinon from 'sinon';
+
 import {BigQuery} from '../src';
+import {QueryResultsOptions} from '../src/job';
 
 class FakeOperation {
   calledWith_: IArguments;
@@ -38,7 +38,7 @@ class FakeOperation {
 
 let promisified = false;
 const fakePfy = extend({}, pfy, {
-  promisifyAll: c => {
+  promisifyAll: (c: Function) => {
     if (c.name === 'Job') {
       promisified = true;
     }
@@ -48,7 +48,7 @@ const fakePfy = extend({}, pfy, {
 let extended = false;
 const fakePaginator = {
   paginator: {
-    extend: (c, methods) => {
+    extend: (c: Function, methods: string[]) => {
       if (c.name !== 'Job') {
         return;
       }
@@ -57,7 +57,7 @@ const fakePaginator = {
       assert.deepStrictEqual(methods, ['getQueryResults']);
       extended = true;
     },
-    streamify: methodName => {
+    streamify: (methodName: string) => {
       return methodName;
     },
   }
@@ -77,8 +77,9 @@ describe('BigQuery/Job', () => {
   const LOCATION = 'asia-northeast1';
 
   // tslint:disable-next-line no-any variable-name
-  let Job;
-  let job;
+  let Job: any;
+  // tslint:disable-next-line no-any
+  let job: any;
 
   before(() => {
     Job = proxyquire('../src/job.js', {
@@ -146,7 +147,7 @@ describe('BigQuery/Job', () => {
 
   describe('cancel', () => {
     it('should make the correct API request', done => {
-      job.request = reqOpts => {
+      job.request = (reqOpts: DecorateRequestOptions) => {
         assert.strictEqual(reqOpts.method, 'POST');
         assert.strictEqual(reqOpts.uri, '/cancel');
         done();
@@ -158,7 +159,7 @@ describe('BigQuery/Job', () => {
     it('should include the job location', done => {
       const job = new Job(BIGQUERY, JOB_ID, {location: LOCATION});
 
-      job.request = reqOpts => {
+      job.request = (reqOpts: DecorateRequestOptions) => {
         assert.deepStrictEqual(reqOpts.qs, {location: LOCATION});
         done();
       };
@@ -181,17 +182,18 @@ describe('BigQuery/Job', () => {
     };
 
     beforeEach(() => {
-      BIGQUERY.request = (reqOpts, callback) => {
-        callback(null, RESPONSE);
-      };
+      BIGQUERY.request =
+          (reqOpts: DecorateRequestOptions, callback: Function) => {
+            callback(null, RESPONSE);
+          };
 
-      BIGQUERY.mergeSchemaWithRows_ = (schema, rows) => {
+      BIGQUERY.mergeSchemaWithRows_ = (schema: {}, rows: {}) => {
         return rows;
       };
     });
 
     it('should make the correct request', done => {
-      BIGQUERY.request = reqOpts => {
+      BIGQUERY.request = (reqOpts: DecorateRequestOptions) => {
         assert.strictEqual(reqOpts.uri, '/queries/' + JOB_ID);
         done();
       };
@@ -203,7 +205,7 @@ describe('BigQuery/Job', () => {
       const options = {a: 'b'};
       const expectedOptions = extend({location: undefined}, options);
 
-      BIGQUERY.request = reqOpts => {
+      BIGQUERY.request = (reqOpts: DecorateRequestOptions) => {
         assert.deepStrictEqual(reqOpts.qs, expectedOptions);
         done();
       };
@@ -214,7 +216,7 @@ describe('BigQuery/Job', () => {
     it('should inherit the location', done => {
       const job = new Job(BIGQUERY, JOB_ID, {location: LOCATION});
 
-      BIGQUERY.request = reqOpts => {
+      BIGQUERY.request = (reqOpts: DecorateRequestOptions) => {
         assert.deepStrictEqual(reqOpts.qs, {location: LOCATION});
         done();
       };
@@ -226,11 +228,12 @@ describe('BigQuery/Job', () => {
       const error = new Error('err');
       const response = {};
 
-      BIGQUERY.request = (reqOpts, callback) => {
-        callback(error, response);
-      };
+      BIGQUERY.request =
+          (reqOpts: DecorateRequestOptions, callback: Function) => {
+            callback(error, response);
+          };
 
-      job.getQueryResults((err, rows, nextQuery, resp) => {
+      job.getQueryResults((err: Error, rows: {}, nextQuery: {}, resp: {}) => {
         assert.strictEqual(err, error);
         assert.strictEqual(rows, null);
         assert.strictEqual(nextQuery, null);
@@ -240,7 +243,7 @@ describe('BigQuery/Job', () => {
     });
 
     it('should return the rows and response to the callback', done => {
-      job.getQueryResults((err, rows, nextQuery, resp) => {
+      job.getQueryResults((err: {}, rows: {}, nextQuery: {}, resp: {}) => {
         assert.ifError(err);
         assert.deepStrictEqual(rows, []);
         assert.strictEqual(resp, RESPONSE);
@@ -254,11 +257,12 @@ describe('BigQuery/Job', () => {
         rows: [],
       };
 
-      const mergedRows = [];
+      const mergedRows: Array<{}> = [];
 
-      BIGQUERY.request = (reqOpts, callback) => {
-        callback(null, response);
-      };
+      BIGQUERY.request =
+          (reqOpts: DecorateRequestOptions, callback: Function) => {
+            callback(null, response);
+          };
 
       sandbox.stub(BigQuery, 'mergeSchemaWithRows_')
           .callsFake((schema, rows) => {
@@ -267,7 +271,7 @@ describe('BigQuery/Job', () => {
             return mergedRows;
           });
 
-      job.getQueryResults((err, rows) => {
+      job.getQueryResults((err: Error, rows: {}) => {
         assert.ifError(err);
         assert.strictEqual(rows, mergedRows);
         done();
@@ -275,13 +279,14 @@ describe('BigQuery/Job', () => {
     });
 
     it('should return the query when the job is not complete', done => {
-      BIGQUERY.request = (reqOpts, callback) => {
-        callback(null, {
-          jobComplete: false,
-        });
-      };
+      BIGQUERY.request =
+          (reqOpts: DecorateRequestOptions, callback: Function) => {
+            callback(null, {
+              jobComplete: false,
+            });
+          };
 
-      job.getQueryResults(options, (err, rows, nextQuery) => {
+      job.getQueryResults(options, (err: Error, rows: {}, nextQuery: {}) => {
         assert.ifError(err);
         assert.deepStrictEqual(nextQuery, options);
         assert.notStrictEqual(nextQuery, options);
@@ -290,11 +295,12 @@ describe('BigQuery/Job', () => {
     });
 
     it('should populate nextQuery when more results exist', done => {
-      job.getQueryResults(options, (err, rows, nextQuery) => {
-        assert.ifError(err);
-        assert.strictEqual(nextQuery.pageToken, pageToken);
-        done();
-      });
+      job.getQueryResults(
+          options, (err: Error, rows: {}, nextQuery: QueryResultsOptions) => {
+            assert.ifError(err);
+            assert.strictEqual(nextQuery.pageToken, pageToken);
+            done();
+          });
     });
   });
 
@@ -308,14 +314,15 @@ describe('BigQuery/Job', () => {
     it('should call getQueryResults correctly', done => {
       const options = {a: 'b', c: 'd'};
 
-      job.getQueryResults = (options_, callback) => {
-        assert.deepStrictEqual(options_, {
-          a: 'b',
-          c: 'd',
-          autoPaginate: false,
-        });
-        callback();  // done()
-      };
+      job.getQueryResults =
+          (options_: QueryResultsOptions, callback: Function) => {
+            assert.deepStrictEqual(options_, {
+              a: 'b',
+              c: 'd',
+              autoPaginate: false,
+            });
+            callback();  // done()
+          };
 
       job.getQueryResultsAsStream_(options, done);
     });
@@ -334,13 +341,13 @@ describe('BigQuery/Job', () => {
       const error = new Error('Error.');
 
       beforeEach(() => {
-        job.getMetadata = callback => {
+        job.getMetadata = (callback: Function) => {
           callback(error);
         };
       });
 
       it('should return an error', done => {
-        job.poll_(err => {
+        job.poll_((err: Error) => {
           assert.strictEqual(err, error);
           done();
         });
@@ -355,11 +362,10 @@ describe('BigQuery/Job', () => {
         },
       };
 
-      let sandbox;
+      const sandbox = sinon.createSandbox();
 
       beforeEach(() => {
-        sandbox = sinon.createSandbox();
-        job.getMetadata = callback => {
+        job.getMetadata = (callback: Function) => {
           callback(null, apiResponse, apiResponse);
         };
       });
@@ -370,7 +376,7 @@ describe('BigQuery/Job', () => {
           return error;
         });
 
-        job.poll_(err => {
+        job.poll_((err: Error) => {
           assert.strictEqual(err, error);
           done();
         });
@@ -389,13 +395,13 @@ describe('BigQuery/Job', () => {
       };
 
       beforeEach(() => {
-        job.getMetadata = callback => {
+        job.getMetadata = (callback: Function) => {
           callback(null, apiResponse, apiResponse);
         };
       });
 
       it('should execute callback', done => {
-        job.poll_((err, metadata) => {
+        job.poll_((err: Error, metadata: {}) => {
           assert.ifError(err);
           assert.strictEqual(metadata, undefined);
           done();
@@ -411,13 +417,13 @@ describe('BigQuery/Job', () => {
       };
 
       beforeEach(() => {
-        job.getMetadata = callback => {
+        job.getMetadata = (callback: Function) => {
           callback(null, apiResponse, apiResponse);
         };
       });
 
       it('should emit complete with metadata', done => {
-        job.poll_((err, metadata) => {
+        job.poll_((err: Error, metadata: {}) => {
           assert.ifError(err);
           assert.strictEqual(metadata, apiResponse);
           done();

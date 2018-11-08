@@ -18,7 +18,6 @@ import {DecorateRequestOptions, DeleteCallback, ServiceObject} from '@google-clo
 import {paginator} from '@google-cloud/paginator';
 import {promisifyAll} from '@google-cloud/promisify';
 import * as extend from 'extend';
-import * as is from 'is';
 import * as r from 'request';
 import {Readable} from 'stream';
 import {teenyRequest} from 'teeny-request';
@@ -35,7 +34,6 @@ export interface DataSetOptions {
 }
 
 export interface CreateDatasetOptions {}
-export interface CreateQueryJobOptions {}
 
 export interface GetTablesOptions {
   autoPaginate?: boolean;
@@ -315,12 +313,11 @@ class Dataset extends ServiceObject {
    * @param {function} [callback] See {@link BigQuery#createQueryJob} for full documentation of this method.
    * @returns {Promise} See {@link BigQuery#createQueryJob} for full documentation of this method.
    */
-  createQueryJob(options: string|CreateQueryJobOptions): Promise<JobResponse>;
-  createQueryJob(options: string|CreateQueryJobOptions, callback: JobCallback):
-      void;
-  createQueryJob(options: string|CreateQueryJobOptions, callback?: JobCallback):
+  createQueryJob(options: string|Query): Promise<JobResponse>;
+  createQueryJob(options: string|Query, callback: JobCallback): void;
+  createQueryJob(options: string|Query, callback?: JobCallback):
       void|Promise<JobResponse> {
-    if (is.string(options)) {
+    if (typeof options === 'string') {
       options = {
         query: options,
       };
