@@ -38,39 +38,29 @@ describe(`Quickstart`, () => {
   });
 
   it(`quickstart should create a dataset`, async () => {
-    await new Promise((resolve, reject) => {
-      const bigqueryMock = {
-        createDataset: async _datasetId => {
-          try {
-            assert.strictEqual(_datasetId, expectedDatasetId);
+    const bigqueryMock = {
+      createDataset: async _datasetId => {
+        assert.strictEqual(_datasetId, expectedDatasetId);
 
-            const [dataset] = await bigquery.createDataset(datasetId);
-            assert.notStrictEqual(dataset, undefined);
+        const [dataset] = await bigquery.createDataset(datasetId);
+        assert.notStrictEqual(dataset, undefined);
 
-            setTimeout(() => {
-              try {
-                assert.ok(console.log.calledOnce);
-                assert.deepStrictEqual(console.log.firstCall.args, [
-                  `Dataset ${dataset.id} created.`,
-                ]);
-                resolve();
-              } catch (err) {
-                reject(err);
-              }
-            }, 200);
+        await new Promise(
+          setTimeout(() => {
+            assert.ok(console.log.calledOnce);
+            assert.deepStrictEqual(console.log.firstCall.args, [
+              `Dataset ${dataset.id} created.`,
+            ]);
+          }, 200)
+        );
+        return [dataset];
+      },
+    };
 
-            return [dataset];
-          } catch (err) {
-            reject(err);
-          }
-        },
-      };
-
-      proxyquire(`../quickstart`, {
-        '@google-cloud/bigquery': {
-          BigQuery: sinon.stub().returns(bigqueryMock),
-        },
-      });
+    proxyquire(`../quickstart`, {
+      '@google-cloud/bigquery': {
+        BigQuery: sinon.stub().returns(bigqueryMock),
+      },
     });
   });
 });
