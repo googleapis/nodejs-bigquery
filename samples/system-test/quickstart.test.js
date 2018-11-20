@@ -29,8 +29,6 @@ let datasetId = `nodejs-docs-samples-test-${uuid.v4()}`;
 datasetId = datasetId.replace(/-/gi, `_`);
 
 describe(`Quickstart`, () => {
-  beforeEach(tools.stubConsole);
-  afterEach(tools.restoreConsole);
   after(async () => {
     try {
       bigquery.dataset(datasetId).delete({force: true});

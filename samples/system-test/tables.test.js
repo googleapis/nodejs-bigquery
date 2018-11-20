@@ -58,8 +58,6 @@ describe(`Tables`, () => {
       bigquery.createDataset(destDatasetId),
     ]);
   });
-  beforeEach(tools.stubConsole);
-  afterEach(tools.restoreConsole);
   after(async () => {
     try {
       await bigquery.dataset(srcDatasetId).delete({force: true});
