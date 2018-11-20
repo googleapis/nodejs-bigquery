@@ -50,6 +50,7 @@ const bigquery = new BigQuery();
 
 describe(`Tables`, () => {
   before(tools.checkCredentials);
+
   before(async () => {
     const [bucket] = await storage.createBucket(bucketName);
     await Promise.all([
@@ -58,6 +59,7 @@ describe(`Tables`, () => {
       bigquery.createDataset(destDatasetId),
     ]);
   });
+
   after(async () => {
     try {
       await bigquery.dataset(srcDatasetId).delete({force: true});

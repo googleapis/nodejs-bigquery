@@ -19,7 +19,7 @@ const proxyquire = require(`proxyquire`).noPreserveCache();
 const sinon = require(`sinon`);
 const assert = require(`assert`);
 const uuid = require(`uuid`);
-
+const tools = require(`@google-cloud/nodejs-repo-tools`);
 const {BigQuery} = proxyquire(`@google-cloud/bigquery`, {});
 const bigquery = new BigQuery();
 
@@ -28,36 +28,45 @@ let datasetId = `nodejs-docs-samples-test-${uuid.v4()}`;
 datasetId = datasetId.replace(/-/gi, `_`);
 
 describe(`Quickstart`, () => {
+  beforeEach(tools.stubConsole);
+  afterEach(tools.restoreConsole);
+
   after(async () => {
     try {
-      bigquery.dataset(datasetId).delete({force: true});
+      await bigquery.dataset(datasetId).delete({force: true});
     } catch (err) {} // ignore error
   });
 
   it(`quickstart should create a dataset`, async () => {
-    const bigqueryMock = {
-      createDataset: async _datasetId => {
-        assert.strictEqual(_datasetId, expectedDatasetId);
+    await new Promise((resolve, reject) => {
+      const bigqueryMock = {
+        createDataset: async _datasetId => {
+          assert.strictEqual(_datasetId, expectedDatasetId);
 
-        const [dataset] = await bigquery.createDataset(datasetId);
-        assert.notStrictEqual(dataset, undefined);
+          const [dataset] = await bigquery.createDataset(datasetId);
+          assert.notStrictEqual(dataset, undefined);
 
-        await new Promise(
           setTimeout(() => {
-            assert.ok(console.log.calledOnce);
-            assert.deepStrictEqual(console.log.firstCall.args, [
-              `Dataset ${dataset.id} created.`,
-            ]);
-          }, 200)
-        );
-        return [dataset];
-      },
-    };
+            try {
+              assert.ok(console.log.calledOnce);
+              assert.deepStrictEqual(console.log.firstCall.args, [
+                `Dataset ${dataset.id} created.`,
+              ]);
+              resolve();
+            } catch (err) {
+              reject(err);
+            }
+          }, 200);
 
-    proxyquire(`../quickstart`, {
-      '@google-cloud/bigquery': {
-        BigQuery: sinon.stub().returns(bigqueryMock),
-      },
+          return [dataset];
+        },
+      };
+
+      proxyquire(`../quickstart`, {
+        '@google-cloud/bigquery': {
+          BigQuery: sinon.stub().returns(bigqueryMock),
+        },
+      });
     });
   });
 });
