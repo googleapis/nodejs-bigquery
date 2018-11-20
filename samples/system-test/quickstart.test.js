@@ -18,7 +18,6 @@
 const proxyquire = require(`proxyquire`).noPreserveCache();
 const sinon = require(`sinon`);
 const assert = require(`assert`);
-const tools = require(`@google-cloud/nodejs-repo-tools`);
 const uuid = require(`uuid`);
 
 const {BigQuery} = proxyquire(`@google-cloud/bigquery`, {});
