@@ -19,7 +19,7 @@ import {paginator} from '@google-cloud/paginator';
 import {promisifyAll} from '@google-cloud/promisify';
 import * as arrify from 'arrify';
 import Big from 'big.js';
-import * as duplexify from 'duplexify';
+const {duplexify, Duplexify} = require('@justinbeckwith/duplexify');
 import * as extend from 'extend';
 
 const format = require('string-format-obj');
@@ -1370,7 +1370,7 @@ class Table extends common.ServiceObject {
       throw new Error(`Source format not recognized: ${metadata.sourceFormat}`);
     }
 
-    const dup = streamEvents(duplexify()) as duplexify.Duplexify;
+    const dup = streamEvents(duplexify());
 
     dup.once('writing', () => {
       common.util.makeWritableStream(
