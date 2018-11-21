@@ -17,9 +17,9 @@
 import * as common from '@google-cloud/common';
 import {paginator} from '@google-cloud/paginator';
 import {promisifyAll} from '@google-cloud/promisify';
+import {duplexify} from '@justinbeckwith/duplexify';
 import * as arrify from 'arrify';
 import Big from 'big.js';
-const {duplexify, Duplexify} = require('@justinbeckwith/duplexify');
 import * as extend from 'extend';
 
 const format = require('string-format-obj');
