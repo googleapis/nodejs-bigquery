@@ -15,7 +15,7 @@
 
 'use strict';
 
-const test = require(`ava`);
+const assert = require(`assert`);
 const path = require(`path`);
 const uuid = require(`uuid`);
 const tools = require(`@google-cloud/nodejs-repo-tools`);
@@ -48,362 +48,296 @@ const rows = [
 
 const bigquery = new BigQuery();
 
-test.before(tools.checkCredentials);
-test.before(async () => {
-  const [bucket] = await storage.createBucket(bucketName);
-  await Promise.all([
-    bucket.upload(localFilePath),
-    bigquery.createDataset(srcDatasetId),
-    bigquery.createDataset(destDatasetId),
-  ]);
-});
-test.beforeEach(tools.stubConsole);
-test.afterEach.always(tools.restoreConsole);
-test.after.always(async () => {
-  try {
-    await bigquery.dataset(srcDatasetId).delete({force: true});
-  } catch (err) {} // ignore error
-  try {
-    await bigquery.dataset(destDatasetId).delete({force: true});
-  } catch (err) {} // ignore error
-  try {
-    await storage.bucket(bucketName).deleteFiles({force: true});
-  } catch (err) {} // ignore error
-  try {
-    // Try deleting files a second time
-    await storage.bucket(bucketName).deleteFiles({force: true});
-  } catch (err) {} // ignore error
-  try {
-    await bigquery.dataset(srcDatasetId).delete({force: true});
-  } catch (err) {} // ignore error
-  try {
-    await storage.bucket(bucketName).delete();
-  } catch (err) {} // ignore error
-});
+describe(`Tables`, () => {
+  before(tools.checkCredentials);
 
-test.serial(`should create a table`, async t => {
-  const output = await tools.runAsync(
-    `${cmd} create ${projectId} ${datasetId} ${tableId} "${schema}"`,
-    cwd
-  );
-  t.is(output, `Table ${tableId} created.`);
-  const [exists] = await bigquery
-    .dataset(datasetId)
-    .table(tableId)
-    .exists();
-  t.true(exists);
-});
+  before(async () => {
+    const [bucket] = await storage.createBucket(bucketName);
+    await Promise.all([
+      bucket.upload(localFilePath),
+      bigquery.createDataset(srcDatasetId),
+      bigquery.createDataset(destDatasetId),
+    ]);
+  });
 
-test.serial(`should list tables`, async t => {
-  t.plan(0);
-  await tools
-    .tryTest(async assert => {
-      const output = await tools.runAsync(
-        `${cmd} list ${projectId} ${datasetId}`,
-        cwd
-      );
-      assert(output.includes(`Tables:`));
-      assert(output.includes(tableId));
-    })
-    .start();
-});
+  after(async () => {
+    try {
+      await bigquery.dataset(srcDatasetId).delete({force: true});
+    } catch (err) {} // ignore error
+    try {
+      await bigquery.dataset(destDatasetId).delete({force: true});
+    } catch (err) {} // ignore error
+    try {
+      await storage.bucket(bucketName).deleteFiles({force: true});
+    } catch (err) {} // ignore error
+    try {
+      // Try deleting files a second time
+      await storage.bucket(bucketName).deleteFiles({force: true});
+    } catch (err) {} // ignore error
+    try {
+      await bigquery.dataset(srcDatasetId).delete({force: true});
+    } catch (err) {} // ignore error
+    try {
+      await storage.bucket(bucketName).delete();
+    } catch (err) {} // ignore error
+  });
 
-test.serial(`should load a local CSV file`, async t => {
-  t.plan(1);
-  const output = await tools.runAsync(
-    `${cmd} load-local-csv ${projectId} ${datasetId} ${tableId} ${localFilePath}`,
-    cwd
-  );
-  t.regex(output, /completed\./);
-  await tools
-    .tryTest(async assert => {
-      const [rows] = await bigquery
-        .dataset(datasetId)
-        .table(tableId)
-        .getRows();
-      assert.strictEqual(rows.length, 1);
-    })
-    .start();
-});
-
-test.serial(`should browse table rows`, async t => {
-  const output = await tools.runAsync(
-    `${cmd} browse ${projectId} ${datasetId} ${tableId}`,
-    cwd
-  );
-  t.is(
-    output,
-    `Rows:\n{ Name: 'Gandalf', Age: 2000, Weight: 140, IsMagic: true }`
-  );
-});
-
-test.serial(`should extract a table to GCS`, async t => {
-  t.plan(1);
-  const output = await tools.runAsync(
-    `${cmd} extract ${projectId} ${datasetId} ${tableId} ${bucketName} ${exportFileName}`,
-    cwd
-  );
-  t.regex(output, /completed\./);
-  await tools
-    .tryTest(async assert => {
-      const [exists] = await storage
-        .bucket(bucketName)
-        .file(exportFileName)
-        .exists();
-      assert(exists);
-    })
-    .start();
-});
-
-test(`should load a GCS ORC file`, async t => {
-  t.plan(1);
-  const tableId = generateUuid();
-
-  const output = await tools.runAsync(
-    `${cmd} load-gcs-orc ${projectId} ${datasetId} ${tableId}`,
-    cwd
-  );
-  t.regex(output, /completed\./);
-  await tools
-    .tryTest(async assert => {
-      const [rows] = await bigquery
-        .dataset(datasetId)
-        .table(tableId)
-        .getRows();
-      assert(rows.length > 0);
-    })
-    .start();
-});
-
-test(`should load a GCS Parquet file`, async t => {
-  t.plan(1);
-  const tableId = generateUuid();
-
-  const output = await tools.runAsync(
-    `${cmd} load-gcs-parquet ${projectId} ${datasetId} ${tableId}`,
-    cwd
-  );
-  t.regex(output, /completed\./);
-  await tools
-    .tryTest(async assert => {
-      const [rows] = await bigquery
-        .dataset(datasetId)
-        .table(tableId)
-        .getRows();
-      assert(rows.length > 0);
-    })
-    .start();
-});
-
-test(`should load a GCS CSV file with explicit schema`, async t => {
-  t.plan(1);
-  const tableId = generateUuid();
-
-  const output = await tools.runAsync(
-    `${cmd} load-gcs-csv ${projectId} ${datasetId} ${tableId}`,
-    cwd
-  );
-  t.regex(output, /completed\./);
-  await tools
-    .tryTest(async assert => {
-      const [rows] = await bigquery
-        .dataset(datasetId)
-        .table(tableId)
-        .getRows();
-      assert(rows.length > 0);
-    })
-    .start();
-});
-
-test(`should load a GCS JSON file with explicit schema`, async t => {
-  t.plan(1);
-  const tableId = generateUuid();
-
-  const output = await tools.runAsync(
-    `${cmd} load-gcs-json ${projectId} ${datasetId} ${tableId}`,
-    cwd
-  );
-  t.regex(output, /completed\./);
-  await tools
-    .tryTest(async assert => {
-      const [rows] = await bigquery
-        .dataset(datasetId)
-        .table(tableId)
-        .getRows();
-      assert(rows.length > 0);
-    })
-    .start();
-});
-
-test(`should load a GCS CSV file with autodetected schema`, async t => {
-  t.plan(1);
-  const tableId = generateUuid();
-
-  const output = await tools.runAsync(
-    `${cmd} load-gcs-csv-autodetect ${projectId} ${datasetId} ${tableId}`,
-    cwd
-  );
-  t.regex(output, /completed\./);
-  await tools
-    .tryTest(async assert => {
-      const [rows] = await bigquery
-        .dataset(datasetId)
-        .table(tableId)
-        .getRows();
-      assert(rows.length > 0);
-    })
-    .start();
-});
-
-test(`should load a GCS JSON file with autodetected schema`, async t => {
-  t.plan(1);
-  const tableId = generateUuid();
-
-  const output = await tools.runAsync(
-    `${cmd} load-gcs-json-autodetect ${projectId} ${datasetId} ${tableId}`,
-    cwd
-  );
-  t.regex(output, /completed\./);
-  await tools
-    .tryTest(async assert => {
-      const [rows] = await bigquery
-        .dataset(datasetId)
-        .table(tableId)
-        .getRows();
-      assert(rows.length > 0);
-    })
-    .start();
-});
-
-test(`should load a GCS CSV file truncate table`, async t => {
-  t.plan(1);
-  const tableId = generateUuid();
-
-  const output = await tools.runAsync(
-    `${cmd} load-gcs-csv-truncate ${projectId} ${datasetId} ${tableId}`,
-    cwd
-  );
-  t.regex(output, /completed\./);
-  await tools
-    .tryTest(async assert => {
-      const [rows] = await bigquery
-        .dataset(datasetId)
-        .table(tableId)
-        .getRows();
-      assert(rows.length > 0);
-    })
-    .start();
-});
-
-test(`should load a GCS JSON file truncate table`, async t => {
-  t.plan(1);
-  const tableId = generateUuid();
-
-  const output = await tools.runAsync(
-    `${cmd} load-gcs-json-truncate ${projectId} ${datasetId} ${tableId}`,
-    cwd
-  );
-  t.regex(output, /completed\./);
-  await tools
-    .tryTest(async assert => {
-      const [rows] = await bigquery
-        .dataset(datasetId)
-        .table(tableId)
-        .getRows();
-      assert(rows.length > 0);
-    })
-    .start();
-});
-
-test(`should load a GCS parquet file truncate table`, async t => {
-  t.plan(1);
-  const tableId = generateUuid();
-
-  const output = await tools.runAsync(
-    `${cmd} load-gcs-parquet-truncate ${projectId} ${datasetId} ${tableId}`,
-    cwd
-  );
-  t.regex(output, /completed\./);
-  await tools
-    .tryTest(async assert => {
-      const [rows] = await bigquery
-        .dataset(datasetId)
-        .table(tableId)
-        .getRows();
-      assert(rows.length > 0);
-    })
-    .start();
-});
-
-test(`should load a GCS ORC file truncate table`, async t => {
-  t.plan(1);
-  const tableId = generateUuid();
-
-  const output = await tools.runAsync(
-    `${cmd} load-gcs-orc-truncate ${projectId} ${datasetId} ${tableId}`,
-    cwd
-  );
-  t.regex(output, /completed\./);
-  await tools
-    .tryTest(async assert => {
-      const [rows] = await bigquery
-        .dataset(datasetId)
-        .table(tableId)
-        .getRows();
-      assert(rows.length > 0);
-    })
-    .start();
-});
-
-test.serial(`should copy a table`, async t => {
-  t.plan(1);
-  const output = await tools.runAsync(
-    `${cmd} copy ${projectId} ${srcDatasetId} ${srcTableId} ${destDatasetId} ${destTableId}`,
-    cwd
-  );
-  t.regex(output, /completed\./);
-  await tools
-    .tryTest(async assert => {
-      const [rows] = await bigquery
-        .dataset(destDatasetId)
-        .table(destTableId)
-        .getRows();
-      assert(rows.length > 0);
-    })
-    .start();
-});
-
-test.serial(`should insert rows`, async t => {
-  t.plan(3);
-  const err = await t.throws(
-    tools.runAsync(
-      `${cmd} insert ${projectId} ${datasetId} ${tableId} 'foo.bar'`,
+  it(`should create a table`, async () => {
+    const output = await tools.runAsync(
+      `${cmd} create ${projectId} ${datasetId} ${tableId} "${schema}"`,
       cwd
-    )
-  );
-  t.true(
-    err.message.includes(
-      `"json_or_file" (or the file it points to) is not a valid JSON array.`
-    )
-  );
-  const output = await tools.runAsync(
-    `${cmd} insert ${projectId} ${datasetId} ${tableId} '${JSON.stringify(
-      rows
-    )}'`,
-    cwd
-  );
-  t.is(output.includes(`Inserted 2 rows`), true);
-});
+    );
+    assert.strictEqual(output, `Table ${tableId} created.`);
+    const [exists] = await bigquery
+      .dataset(datasetId)
+      .table(tableId)
+      .exists();
+    assert.ok(exists);
+  });
 
-test.serial(`should delete a table`, async t => {
-  const output = await tools.runAsync(
-    `${cmd} delete ${projectId} ${datasetId} ${tableId}`,
-    cwd
-  );
-  t.is(output, `Table ${tableId} deleted.`);
-  const [exists] = await bigquery
-    .dataset(datasetId)
-    .table(tableId)
-    .exists();
-  t.false(exists);
+  it(`should list tables`, async () => {
+    const output = await tools.runAsync(
+      `${cmd} list ${projectId} ${datasetId}`,
+      cwd
+    );
+    assert.ok(output.includes(`Tables:`));
+    assert.ok(output.includes(tableId));
+  });
+
+  it(`should load a local CSV file`, async () => {
+    const output = await tools.runAsync(
+      `${cmd} load-local-csv ${projectId} ${datasetId} ${tableId} ${localFilePath}`,
+      cwd
+    );
+    assert.ok(new RegExp(/completed\./).test(output));
+    const [rows] = await bigquery
+      .dataset(datasetId)
+      .table(tableId)
+      .getRows();
+    assert.strictEqual(rows.length, 1);
+  });
+
+  it(`should browse table rows`, async () => {
+    const output = await tools.runAsync(
+      `${cmd} browse ${projectId} ${datasetId} ${tableId}`,
+      cwd
+    );
+    assert.strictEqual(
+      output,
+      `Rows:\n{ Name: 'Gandalf', Age: 2000, Weight: 140, IsMagic: true }`
+    );
+  });
+
+  it(`should extract a table to GCS`, async () => {
+    const output = await tools.runAsync(
+      `${cmd} extract ${projectId} ${datasetId} ${tableId} ${bucketName} ${exportFileName}`,
+      cwd
+    );
+
+    assert.ok(new RegExp(/completed\./).test(output));
+    const [exists] = await storage
+      .bucket(bucketName)
+      .file(exportFileName)
+      .exists();
+    assert.ok(exists);
+  });
+
+  it(`should load a GCS ORC file`, async () => {
+    const tableId = generateUuid();
+
+    const output = await tools.runAsync(
+      `${cmd} load-gcs-orc ${projectId} ${datasetId} ${tableId}`,
+      cwd
+    );
+    assert.ok(new RegExp(/completed\./).test(output));
+    const [rows] = await bigquery
+      .dataset(datasetId)
+      .table(tableId)
+      .getRows();
+    assert.ok(rows.length > 0);
+  });
+
+  it(`should load a GCS Parquet file`, async () => {
+    const tableId = generateUuid();
+
+    const output = await tools.runAsync(
+      `${cmd} load-gcs-parquet ${projectId} ${datasetId} ${tableId}`,
+      cwd
+    );
+    assert.ok(new RegExp(/completed\./).test(output));
+    const [rows] = await bigquery
+      .dataset(datasetId)
+      .table(tableId)
+      .getRows();
+    assert.ok(rows.length > 0);
+  });
+
+  it(`should load a GCS CSV file with explicit schema`, async () => {
+    const tableId = generateUuid();
+
+    const output = await tools.runAsync(
+      `${cmd} load-gcs-csv ${projectId} ${datasetId} ${tableId}`,
+      cwd
+    );
+    assert.ok(new RegExp(/completed\./).test(output));
+    const [rows] = await bigquery
+      .dataset(datasetId)
+      .table(tableId)
+      .getRows();
+    assert.ok(rows.length > 0);
+  });
+
+  it(`should load a GCS JSON file with explicit schema`, async () => {
+    const tableId = generateUuid();
+
+    const output = await tools.runAsync(
+      `${cmd} load-gcs-json ${projectId} ${datasetId} ${tableId}`,
+      cwd
+    );
+    assert.ok(new RegExp(/completed\./).test(output));
+    const [rows] = await bigquery
+      .dataset(datasetId)
+      .table(tableId)
+      .getRows();
+    assert.ok(rows.length > 0);
+  });
+
+  it(`should load a GCS CSV file with autodetected schema`, async () => {
+    const tableId = generateUuid();
+
+    const output = await tools.runAsync(
+      `${cmd} load-gcs-csv-autodetect ${projectId} ${datasetId} ${tableId}`,
+      cwd
+    );
+    assert.ok(new RegExp(/completed\./).test(output));
+    const [rows] = await bigquery
+      .dataset(datasetId)
+      .table(tableId)
+      .getRows();
+    assert.ok(rows.length > 0);
+  });
+
+  it(`should load a GCS JSON file with autodetected schema`, async () => {
+    const tableId = generateUuid();
+
+    const output = await tools.runAsync(
+      `${cmd} load-gcs-json-autodetect ${projectId} ${datasetId} ${tableId}`,
+      cwd
+    );
+    assert.ok(new RegExp(/completed\./).test(output));
+    const [rows] = await bigquery
+      .dataset(datasetId)
+      .table(tableId)
+      .getRows();
+    assert.ok(rows.length > 0);
+  });
+
+  it(`should load a GCS CSV file truncate table`, async () => {
+    const tableId = generateUuid();
+
+    const output = await tools.runAsync(
+      `${cmd} load-gcs-csv-truncate ${projectId} ${datasetId} ${tableId}`,
+      cwd
+    );
+    assert.ok(new RegExp(/completed\./).test(output));
+    const [rows] = await bigquery
+      .dataset(datasetId)
+      .table(tableId)
+      .getRows();
+    assert.ok(rows.length > 0);
+  });
+
+  it(`should load a GCS JSON file truncate table`, async () => {
+    const tableId = generateUuid();
+
+    const output = await tools.runAsync(
+      `${cmd} load-gcs-json-truncate ${projectId} ${datasetId} ${tableId}`,
+      cwd
+    );
+    assert.ok(new RegExp(/completed\./).test(output));
+    const [rows] = await bigquery
+      .dataset(datasetId)
+      .table(tableId)
+      .getRows();
+    assert.ok(rows.length > 0);
+  });
+
+  it(`should load a GCS parquet file truncate table`, async () => {
+    const tableId = generateUuid();
+
+    const output = await tools.runAsync(
+      `${cmd} load-gcs-parquet-truncate ${projectId} ${datasetId} ${tableId}`,
+      cwd
+    );
+    assert.ok(new RegExp(/completed\./).test(output));
+    const [rows] = await bigquery
+      .dataset(datasetId)
+      .table(tableId)
+      .getRows();
+    assert.ok(rows.length > 0);
+  });
+
+  it(`should load a GCS ORC file truncate table`, async () => {
+    const tableId = generateUuid();
+
+    const output = await tools.runAsync(
+      `${cmd} load-gcs-orc-truncate ${projectId} ${datasetId} ${tableId}`,
+      cwd
+    );
+    assert.ok(new RegExp(/completed\./).test(output));
+    const [rows] = await bigquery
+      .dataset(datasetId)
+      .table(tableId)
+      .getRows();
+    assert.ok(rows.length > 0);
+  });
+
+  it(`should copy a table`, async () => {
+    const output = await tools.runAsync(
+      `${cmd} copy ${projectId} ${srcDatasetId} ${srcTableId} ${destDatasetId} ${destTableId}`,
+      cwd
+    );
+    assert.ok(new RegExp(/completed\./).test(output));
+    const [rows] = await bigquery
+      .dataset(destDatasetId)
+      .table(destTableId)
+      .getRows();
+    assert.ok(rows.length > 0);
+  });
+
+  it(`should insert rows`, async () => {
+    tools
+      .runAsync(
+        `${cmd} insert ${projectId} ${datasetId} ${tableId} 'foo.bar'`,
+        cwd
+      )
+      .catch(err => {
+        assert.ok(
+          err.message.includes(
+            `"json_or_file" (or the file it points to) is not a valid JSON array.`
+          )
+        );
+      });
+
+    const output = await tools.runAsync(
+      `${cmd} insert ${projectId} ${datasetId} ${tableId} '${JSON.stringify(
+        rows
+      )}'`,
+      cwd
+    );
+    assert.ok(output.includes(`Inserted 2 rows`));
+  });
+
+  it(`should delete a table`, async () => {
+    const output = await tools.runAsync(
+      `${cmd} delete ${projectId} ${datasetId} ${tableId}`,
+      cwd
+    );
+    assert.strictEqual(output, `Table ${tableId} deleted.`);
+    const [exists] = await bigquery
+      .dataset(datasetId)
+      .table(tableId)
+      .exists();
+    assert.strictEqual(exists, false);
+  });
 });
