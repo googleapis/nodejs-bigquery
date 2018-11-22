@@ -352,7 +352,7 @@ function loadCSVFromGCS(datasetId, tableId, projectId) {
   // [END bigquery_load_table_gcs_csv]
 }
 
-function loadJSONFromGCS(datasetId, tableId, projectId) {
+async function loadJSONFromGCS(datasetId, tableId, projectId) {
   // [START bigquery_load_table_gcs_json]
   // Imports the Google Cloud client libraries
   const {BigQuery} = require('@google-cloud/bigquery');
@@ -396,29 +396,22 @@ function loadJSONFromGCS(datasetId, tableId, projectId) {
   };
 
   // Loads data from a Google Cloud Storage file into the table
-  bigquery
+  const [job] = await bigquery
     .dataset(datasetId)
     .table(tableId)
-    .load(storage.bucket(bucketName).file(filename), metadata)
-    .then(results => {
-      const job = results[0];
+    .load(storage.bucket(bucketName).file(filename), metadata);
+  // load() waits for the job to finish
+  console.log(`Job ${job.id} completed.`);
 
-      // load() waits for the job to finish
-      console.log(`Job ${job.id} completed.`);
-
-      // Check the job's status for errors
-      const errors = job.status.errors;
-      if (errors && errors.length > 0) {
-        throw errors;
-      }
-    })
-    .catch(err => {
-      console.error('ERROR:', err);
-    });
+  // Check the job's status for errors
+  const errors = job.status.errors;
+  if (errors && errors.length > 0) {
+    throw errors;
+  }
   // [END bigquery_load_table_gcs_json]
 }
 
-function loadCSVFromGCSAutodetect(datasetId, tableId, projectId) {
+async function loadCSVFromGCSAutodetect(datasetId, tableId, projectId) {
   // [START bigquery_load_table_gcs_csv_autodetect]
   // Imports the Google Cloud client libraries
   const {BigQuery} = require('@google-cloud/bigquery');
@@ -458,29 +451,22 @@ function loadCSVFromGCSAutodetect(datasetId, tableId, projectId) {
   };
 
   // Loads data from a Google Cloud Storage file into the table
-  bigquery
+  const [job] = await bigquery
     .dataset(datasetId)
     .table(tableId)
-    .load(storage.bucket(bucketName).file(filename), metadata)
-    .then(results => {
-      const job = results[0];
+    .load(storage.bucket(bucketName).file(filename), metadata);
+  // load() waits for the job to finish
+  console.log(`Job ${job.id} completed.`);
 
-      // load() waits for the job to finish
-      console.log(`Job ${job.id} completed.`);
-
-      // Check the job's status for errors
-      const errors = job.status.errors;
-      if (errors && errors.length > 0) {
-        throw errors;
-      }
-    })
-    .catch(err => {
-      console.error('ERROR:', err);
-    });
+  // Check the job's status for errors
+  const errors = job.status.errors;
+  if (errors && errors.length > 0) {
+    throw errors;
+  }
   // [END bigquery_load_table_gcs_csv_autodetect]
 }
 
-function loadJSONFromGCSAutodetect(datasetId, tableId, projectId) {
+async function loadJSONFromGCSAutodetect(datasetId, tableId, projectId) {
   // [START bigquery_load_table_gcs_json_autodetect]
   // Imports the Google Cloud client libraries
   const {BigQuery} = require('@google-cloud/bigquery');
@@ -519,29 +505,22 @@ function loadJSONFromGCSAutodetect(datasetId, tableId, projectId) {
   };
 
   // Loads data from a Google Cloud Storage file into the table
-  bigquery
+  const [job] = await bigquery
     .dataset(datasetId)
     .table(tableId)
-    .load(storage.bucket(bucketName).file(filename), metadata)
-    .then(results => {
-      const job = results[0];
+    .load(storage.bucket(bucketName).file(filename), metadata);
+  // load() waits for the job to finish
+  console.log(`Job ${job.id} completed.`);
 
-      // load() waits for the job to finish
-      console.log(`Job ${job.id} completed.`);
-
-      // Check the job's status for errors
-      const errors = job.status.errors;
-      if (errors && errors.length > 0) {
-        throw errors;
-      }
-    })
-    .catch(err => {
-      console.error('ERROR:', err);
-    });
+  // Check the job's status for errors
+  const errors = job.status.errors;
+  if (errors && errors.length > 0) {
+    throw errors;
+  }
   // [END bigquery_load_table_gcs_json_autodetect]
 }
 
-function loadCSVFromGCSTruncate(datasetId, tableId, projectId) {
+async function loadCSVFromGCSTruncate(datasetId, tableId, projectId) {
   // [START bigquery_load_table_gcs_csv_truncate]
   // Imports the Google Cloud client libraries
   const {BigQuery} = require('@google-cloud/bigquery');
@@ -588,29 +567,22 @@ function loadCSVFromGCSTruncate(datasetId, tableId, projectId) {
   };
 
   // Loads data from a Google Cloud Storage file into the table
-  bigquery
+  const [job] = await bigquery
     .dataset(datasetId)
     .table(tableId)
-    .load(storage.bucket(bucketName).file(filename), metadata)
-    .then(results => {
-      const job = results[0];
+    .load(storage.bucket(bucketName).file(filename), metadata);
+  // load() waits for the job to finish
+  console.log(`Job ${job.id} completed.`);
 
-      // load() waits for the job to finish
-      console.log(`Job ${job.id} completed.`);
-
-      // Check the job's status for errors
-      const errors = job.status.errors;
-      if (errors && errors.length > 0) {
-        throw errors;
-      }
-    })
-    .catch(err => {
-      console.error('ERROR:', err);
-    });
+  // Check the job's status for errors
+  const errors = job.status.errors;
+  if (errors && errors.length > 0) {
+    throw errors;
+  }
   // [END bigquery_load_table_gcs_csv_truncate]
 }
 
-function loadJSONFromGCSTruncate(datasetId, tableId, projectId) {
+async function loadJSONFromGCSTruncate(datasetId, tableId, projectId) {
   // [START bigquery_load_table_gcs_json_truncate]
   // Imports the Google Cloud client libraries
   const {BigQuery} = require('@google-cloud/bigquery');
@@ -656,29 +628,22 @@ function loadJSONFromGCSTruncate(datasetId, tableId, projectId) {
   };
 
   // Loads data from a Google Cloud Storage file into the table
-  bigquery
+  const [job] = await bigquery
     .dataset(datasetId)
     .table(tableId)
-    .load(storage.bucket(bucketName).file(filename), metadata)
-    .then(results => {
-      const job = results[0];
+    .load(storage.bucket(bucketName).file(filename), metadata);
+  // load() waits for the job to finish
+  console.log(`Job ${job.id} completed.`);
 
-      // load() waits for the job to finish
-      console.log(`Job ${job.id} completed.`);
-
-      // Check the job's status for errors
-      const errors = job.status.errors;
-      if (errors && errors.length > 0) {
-        throw errors;
-      }
-    })
-    .catch(err => {
-      console.error('ERROR:', err);
-    });
+  // Check the job's status for errors
+  const errors = job.status.errors;
+  if (errors && errors.length > 0) {
+    throw errors;
+  }
   // [END bigquery_load_table_gcs_json_truncate]
 }
 
-function loadParquetFromGCSTruncate(datasetId, tableId, projectId) {
+async function loadParquetFromGCSTruncate(datasetId, tableId, projectId) {
   // [START bigquery_load_table_gcs_parquet_truncate]
   // Imports the Google Cloud client libraries
   const {BigQuery} = require('@google-cloud/bigquery');
@@ -718,29 +683,22 @@ function loadParquetFromGCSTruncate(datasetId, tableId, projectId) {
   };
 
   // Loads data from a Google Cloud Storage file into the table
-  bigquery
+  const [job] = await bigquery
     .dataset(datasetId)
     .table(tableId)
-    .load(storage.bucket(bucketName).file(filename), metadata)
-    .then(results => {
-      const job = results[0];
+    .load(storage.bucket(bucketName).file(filename), metadata);
+  // load() waits for the job to finish
+  console.log(`Job ${job.id} completed.`);
 
-      // load() waits for the job to finish
-      console.log(`Job ${job.id} completed.`);
-
-      // Check the job's status for errors
-      const errors = job.status.errors;
-      if (errors && errors.length > 0) {
-        throw errors;
-      }
-    })
-    .catch(err => {
-      console.error('ERROR:', err);
-    });
+  // Check the job's status for errors
+  const errors = job.status.errors;
+  if (errors && errors.length > 0) {
+    throw errors;
+  }
   // [END bigquery_load_table_gcs_parquet_truncate]
 }
 
-function loadOrcFromGCSTruncate(datasetId, tableId, projectId) {
+async function loadOrcFromGCSTruncate(datasetId, tableId, projectId) {
   // [START bigquery_load_table_gcs_orc_truncate]
   // Imports the Google Cloud client libraries
   const {BigQuery} = require('@google-cloud/bigquery');
@@ -780,29 +738,22 @@ function loadOrcFromGCSTruncate(datasetId, tableId, projectId) {
   };
 
   // Loads data from a Google Cloud Storage file into the table
-  bigquery
+  const [job] = await bigquery
     .dataset(datasetId)
     .table(tableId)
-    .load(storage.bucket(bucketName).file(filename), metadata)
-    .then(results => {
-      const job = results[0];
+    .load(storage.bucket(bucketName).file(filename), metadata);
+  // load() waits for the job to finish
+  console.log(`Job ${job.id} completed.`);
 
-      // load() waits for the job to finish
-      console.log(`Job ${job.id} completed.`);
-
-      // Check the job's status for errors
-      const errors = job.status.errors;
-      if (errors && errors.length > 0) {
-        throw errors;
-      }
-    })
-    .catch(err => {
-      console.error('ERROR:', err);
-    });
+  // Check the job's status for errors
+  const errors = job.status.errors;
+  if (errors && errors.length > 0) {
+    throw errors;
+  }
   // [END bigquery_load_table_gcs_orc_truncate]
 }
 
-function extractTableToGCS(
+async function extractTableToGCS(
   datasetId,
   tableId,
   bucketName,
@@ -833,29 +784,22 @@ function extractTableToGCS(
   });
 
   // Exports data from the table into a Google Cloud Storage file
-  bigquery
+  const [job] = await bigquery
     .dataset(datasetId)
     .table(tableId)
-    .extract(storage.bucket(bucketName).file(filename))
-    .then(results => {
-      const job = results[0];
+    .extract(storage.bucket(bucketName).file(filename));
+  // load() waits for the job to finish
+  console.log(`Job ${job.id} completed.`);
 
-      // load() waits for the job to finish
-      console.log(`Job ${job.id} completed.`);
-
-      // Check the job's status for errors
-      const errors = job.status.errors;
-      if (errors && errors.length > 0) {
-        throw errors;
-      }
-    })
-    .catch(err => {
-      console.error('ERROR:', err);
-    });
+  // Check the job's status for errors
+  const errors = job.status.errors;
+  if (errors && errors.length > 0) {
+    throw errors;
+  }
   // [END bigquery_extract_table]
 }
 
-function insertRowsAsStream(datasetId, tableId, rows, projectId) {
+async function insertRowsAsStream(datasetId, tableId, rows, projectId) {
   // [START bigquery_table_insert_rows]
   // Imports the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
@@ -874,264 +818,262 @@ function insertRowsAsStream(datasetId, tableId, rows, projectId) {
   });
 
   // Inserts data into a table
-  bigquery
+  await bigquery
     .dataset(datasetId)
     .table(tableId)
-    .insert(rows)
-    .then(() => {
-      console.log(`Inserted ${rows.length} rows`);
-    })
-    .catch(err => {
-      if (err && err.name === 'PartialFailureError') {
-        if (err.errors && err.errors.length > 0) {
-          console.log('Insert errors:');
-          err.errors.forEach(err => console.error(err));
-        }
-      } else {
-        console.error('ERROR:', err);
-      }
-    });
+    .insert(rows);
+  console.log(`Inserted ${rows.length} rows`);
   // [END bigquery_table_insert_rows]
 }
 
-const fs = require(`fs`);
+async function main() {
+  const fs = require(`fs`);
 
-require(`yargs`)
-  .demand(1)
-  .command(
-    `create <projectId> <datasetId> <tableId> <schema>`,
-    `Creates a new table.`,
-    {},
-    opts => {
-      createTable(opts.datasetId, opts.tableId, opts.schema, opts.projectId);
-    }
-  )
-  .command(
-    `list <projectId> <datasetId>`,
-    `Lists all tables in a dataset.`,
-    {},
-    opts => {
-      listTables(opts.datasetId, opts.projectId);
-    }
-  )
-  .command(
-    `delete <projectId> <datasetId> <tableId>`,
-    `Deletes a table.`,
-    {},
-    opts => {
-      deleteTable(opts.datasetId, opts.tableId, opts.projectId);
-    }
-  )
-  .command(
-    `copy <projectId> <srcDatasetId> <srcTableId> <destDatasetId> <destTableId>`,
-    `Makes a copy of a table.`,
-    {},
-    opts => {
-      copyTable(
-        opts.srcDatasetId,
-        opts.srcTableId,
-        opts.destDatasetId,
-        opts.destTableId,
-        opts.projectId
-      );
-    }
-  )
-  .command(
-    `browse <projectId> <datasetId> <tableId>`,
-    `Lists rows in a table.`,
-    {},
-    opts => {
-      browseRows(opts.datasetId, opts.tableId, opts.projectId);
-    }
-  )
-  .command(
-    `load-local-csv <projectId> <datasetId> <tableId> <fileName>`,
-    `Loads data from a local file into a table.`,
-    {},
-    opts => {
-      loadLocalFile(
-        opts.datasetId,
-        opts.tableId,
-        opts.fileName,
-        opts.projectId
-      );
-    }
-  )
-  .command(
-    `load-gcs-orc <projectId> <datasetId> <tableId>`,
-    `Loads sample ORC data from a Google Cloud Storage file into a table.`,
-    {},
-    opts => {
-      loadORCFromGCS(opts.datasetId, opts.tableId, opts.projectId);
-    }
-  )
-  .command(
-    `load-gcs-parquet <projectId> <datasetId> <tableId>`,
-    `Loads sample Parquet data from a Google Cloud Storage file into a table.`,
-    {},
-    opts => {
-      loadParquetFromGCS(opts.datasetId, opts.tableId, opts.projectId);
-    }
-  )
-  .command(
-    `load-gcs-csv <projectId> <datasetId> <tableId>`,
-    `Loads sample CSV data from a Google Cloud Storage file into a table.`,
-    {},
-    opts => {
-      loadCSVFromGCS(opts.datasetId, opts.tableId, opts.projectId);
-    }
-  )
-  .command(
-    `load-gcs-json <projectId> <datasetId> <tableId>`,
-    `Loads sample JSON data from a Google Cloud Storage file into a table.`,
-    {},
-    opts => {
-      loadJSONFromGCS(opts.datasetId, opts.tableId, opts.projectId);
-    }
-  )
-  .command(
-    `load-gcs-csv-autodetect <projectId> <datasetId> <tableId>`,
-    `Loads sample CSV data from a Google Cloud Storage file into a table.`,
-    {},
-    opts => {
-      loadCSVFromGCSAutodetect(opts.datasetId, opts.tableId, opts.projectId);
-    }
-  )
-  .command(
-    `load-gcs-json-autodetect <projectId> <datasetId> <tableId>`,
-    `Loads sample JSON data from a Google Cloud Storage file into a table.`,
-    {},
-    opts => {
-      loadJSONFromGCSAutodetect(opts.datasetId, opts.tableId, opts.projectId);
-    }
-  )
-  .command(
-    `load-gcs-csv-truncate <projectId> <datasetId> <tableId>`,
-    `Loads sample CSV data from GCS, replacing an existing table.`,
-    {},
-    opts => {
-      loadCSVFromGCSTruncate(opts.datasetId, opts.tableId, opts.projectId);
-    }
-  )
-  .command(
-    `load-gcs-json-truncate <projectId> <datasetId> <tableId>`,
-    `Loads sample JSON data from GCS, replacing an existing table.`,
-    {},
-    opts => {
-      loadJSONFromGCSTruncate(opts.datasetId, opts.tableId, opts.projectId);
-    }
-  )
-  .command(
-    `load-gcs-parquet-truncate <projectId> <datasetId> <tableId>`,
-    `Loads sample Parquet data from GCS, replacing an existing table.`,
-    {},
-    opts => {
-      loadParquetFromGCSTruncate(opts.datasetId, opts.tableId, opts.projectId);
-    }
-  )
-  .command(
-    `load-gcs-orc-truncate <projectId> <datasetId> <tableId>`,
-    `Loads sample Orc data from GCS, replacing an existing table.`,
-    {},
-    opts => {
-      loadOrcFromGCSTruncate(opts.datasetId, opts.tableId, opts.projectId);
-    }
-  )
-  .command(
-    `extract <projectId> <datasetId> <tableId> <bucketName> <fileName>`,
-    `Extract a table from BigQuery to Google Cloud Storage.`,
-    {},
-    opts => {
-      extractTableToGCS(
-        opts.datasetId,
-        opts.tableId,
-        opts.bucketName,
-        opts.fileName,
-        opts.projectId
-      );
-    }
-  )
-  .command(
-    `insert <projectId> <datasetId> <tableId> <json_or_file>`,
-    `Insert a JSON array (as a string or newline-delimited file) into a BigQuery table.`,
-    {},
-    opts => {
-      let content;
-      try {
-        content = fs.readFileSync(opts.json_or_file);
-      } catch (err) {
-        content = opts.json_or_file;
+  require(`yargs`)
+    .demand(1)
+    .command(
+      `create <projectId> <datasetId> <tableId> <schema>`,
+      `Creates a new table.`,
+      {},
+      opts => {
+        createTable(opts.datasetId, opts.tableId, opts.schema, opts.projectId);
       }
-
-      let rows = null;
-      try {
-        rows = JSON.parse(content);
-      } catch (err) {
-        throw new Error(
-          `"json_or_file" (or the file it points to) is not a valid JSON array.`
+    )
+    .command(
+      `list <projectId> <datasetId>`,
+      `Lists all tables in a dataset.`,
+      {},
+      opts => {
+        listTables(opts.datasetId, opts.projectId);
+      }
+    )
+    .command(
+      `delete <projectId> <datasetId> <tableId>`,
+      `Deletes a table.`,
+      {},
+      opts => {
+        deleteTable(opts.datasetId, opts.tableId, opts.projectId);
+      }
+    )
+    .command(
+      `copy <projectId> <srcDatasetId> <srcTableId> <destDatasetId> <destTableId>`,
+      `Makes a copy of a table.`,
+      {},
+      opts => {
+        copyTable(
+          opts.srcDatasetId,
+          opts.srcTableId,
+          opts.destDatasetId,
+          opts.destTableId,
+          opts.projectId
         );
       }
-
-      if (!Array.isArray(rows)) {
-        throw new Error(
-          `"json_or_file" (or the file it points to) is not a valid JSON array.`
+    )
+    .command(
+      `browse <projectId> <datasetId> <tableId>`,
+      `Lists rows in a table.`,
+      {},
+      opts => {
+        browseRows(opts.datasetId, opts.tableId, opts.projectId);
+      }
+    )
+    .command(
+      `load-local-csv <projectId> <datasetId> <tableId> <fileName>`,
+      `Loads data from a local file into a table.`,
+      {},
+      opts => {
+        loadLocalFile(
+          opts.datasetId,
+          opts.tableId,
+          opts.fileName,
+          opts.projectId
         );
       }
+    )
+    .command(
+      `load-gcs-orc <projectId> <datasetId> <tableId>`,
+      `Loads sample ORC data from a Google Cloud Storage file into a table.`,
+      {},
+      opts => {
+        loadORCFromGCS(opts.datasetId, opts.tableId, opts.projectId);
+      }
+    )
+    .command(
+      `load-gcs-parquet <projectId> <datasetId> <tableId>`,
+      `Loads sample Parquet data from a Google Cloud Storage file into a table.`,
+      {},
+      opts => {
+        loadParquetFromGCS(opts.datasetId, opts.tableId, opts.projectId);
+      }
+    )
+    .command(
+      `load-gcs-csv <projectId> <datasetId> <tableId>`,
+      `Loads sample CSV data from a Google Cloud Storage file into a table.`,
+      {},
+      opts => {
+        loadCSVFromGCS(opts.datasetId, opts.tableId, opts.projectId);
+      }
+    )
+    .command(
+      `load-gcs-json <projectId> <datasetId> <tableId>`,
+      `Loads sample JSON data from a Google Cloud Storage file into a table.`,
+      {},
+      opts => {
+        loadJSONFromGCS(opts.datasetId, opts.tableId, opts.projectId);
+      }
+    )
+    .command(
+      `load-gcs-csv-autodetect <projectId> <datasetId> <tableId>`,
+      `Loads sample CSV data from a Google Cloud Storage file into a table.`,
+      {},
+      opts => {
+        loadCSVFromGCSAutodetect(opts.datasetId, opts.tableId, opts.projectId);
+      }
+    )
+    .command(
+      `load-gcs-json-autodetect <projectId> <datasetId> <tableId>`,
+      `Loads sample JSON data from a Google Cloud Storage file into a table.`,
+      {},
+      opts => {
+        loadJSONFromGCSAutodetect(opts.datasetId, opts.tableId, opts.projectId);
+      }
+    )
+    .command(
+      `load-gcs-csv-truncate <projectId> <datasetId> <tableId>`,
+      `Loads sample CSV data from GCS, replacing an existing table.`,
+      {},
+      opts => {
+        loadCSVFromGCSTruncate(opts.datasetId, opts.tableId, opts.projectId);
+      }
+    )
+    .command(
+      `load-gcs-json-truncate <projectId> <datasetId> <tableId>`,
+      `Loads sample JSON data from GCS, replacing an existing table.`,
+      {},
+      opts => {
+        loadJSONFromGCSTruncate(opts.datasetId, opts.tableId, opts.projectId);
+      }
+    )
+    .command(
+      `load-gcs-parquet-truncate <projectId> <datasetId> <tableId>`,
+      `Loads sample Parquet data from GCS, replacing an existing table.`,
+      {},
+      opts => {
+        loadParquetFromGCSTruncate(
+          opts.datasetId,
+          opts.tableId,
+          opts.projectId
+        );
+      }
+    )
+    .command(
+      `load-gcs-orc-truncate <projectId> <datasetId> <tableId>`,
+      `Loads sample Orc data from GCS, replacing an existing table.`,
+      {},
+      opts => {
+        loadOrcFromGCSTruncate(opts.datasetId, opts.tableId, opts.projectId);
+      }
+    )
+    .command(
+      `extract <projectId> <datasetId> <tableId> <bucketName> <fileName>`,
+      `Extract a table from BigQuery to Google Cloud Storage.`,
+      {},
+      opts => {
+        extractTableToGCS(
+          opts.datasetId,
+          opts.tableId,
+          opts.bucketName,
+          opts.fileName,
+          opts.projectId
+        );
+      }
+    )
+    .command(
+      `insert <projectId> <datasetId> <tableId> <json_or_file>`,
+      `Insert a JSON array (as a string or newline-delimited file) into a BigQuery table.`,
+      {},
+      opts => {
+        let content;
+        try {
+          content = fs.readFileSync(opts.json_or_file);
+        } catch (err) {
+          content = opts.json_or_file;
+        }
 
-      insertRowsAsStream(
-        opts.datasetId,
-        opts.tableId,
-        rows,
-        opts.projectId || process.env.GCLOUD_PROJECT
-      );
-    }
-  )
-  .example(
-    `node $0 create my-project-id my_dataset my_table "Name:string, Age:integer, Weight:float, IsMagic:boolean"`,
-    `Creates a new table named "my_table" in "my_dataset".`
-  )
-  .example(
-    `node $0 list my-project-id my_dataset`,
-    `Lists tables in "my_dataset".`
-  )
-  .example(
-    `node $0 browse my-project-id my_dataset my_table`,
-    `Displays rows from "my_table" in "my_dataset".`
-  )
-  .example(
-    `node $0 delete my-project-id my_dataset my_table`,
-    `Deletes "my_table" from "my_dataset".`
-  )
-  .example(
-    `node $0 load my-project-id my_dataset my_table ./data.csv`,
-    `Imports a local file into a table.`
-  )
-  .example(
-    `node $0 load-gcs my-project-id my_dataset my_table my-bucket data.csv`,
-    `Imports a GCS file into a table.`
-  )
-  .example(
-    `node $0 extract my-project-id my_dataset my_table my-bucket my-file`,
-    `Exports my_dataset:my_table to gcs://my-bucket/my-file as raw CSV.`
-  )
-  .example(
-    `node $0 extract my-project-id my_dataset my_table my-bucket my-file -f JSON --gzip`,
-    `Exports my_dataset:my_table to gcs://my-bucket/my-file as gzipped JSON.`
-  )
-  .example(
-    `node $0 insert my-project-id my_dataset my_table json_string`,
-    `Inserts the JSON array represented by json_string into my_dataset:my_table.`
-  )
-  .example(
-    `node $0 insert my-project-id my_dataset my_table json_file`,
-    `Inserts the JSON objects contained in json_file (one per line) into my_dataset:my_table.`
-  )
-  .example(
-    `node $0 copy my-project-id src_dataset src_table dest_dataset dest_table`,
-    `Copies src_dataset:src_table to dest_dataset:dest_table.`
-  )
-  .wrap(120)
-  .recommendCommands()
-  .epilogue(`For more information, see https://cloud.google.com/bigquery/docs`)
-  .help()
-  .strict().argv;
+        let rows = null;
+        try {
+          rows = JSON.parse(content);
+        } catch (err) {
+          throw new Error(
+            `"json_or_file" (or the file it points to) is not a valid JSON array.`
+          );
+        }
+
+        if (!Array.isArray(rows)) {
+          throw new Error(
+            `"json_or_file" (or the file it points to) is not a valid JSON array.`
+          );
+        }
+
+        insertRowsAsStream(
+          opts.datasetId,
+          opts.tableId,
+          rows,
+          opts.projectId || process.env.GCLOUD_PROJECT
+        );
+      }
+    )
+    .example(
+      `node $0 create my-project-id my_dataset my_table "Name:string, Age:integer, Weight:float, IsMagic:boolean"`,
+      `Creates a new table named "my_table" in "my_dataset".`
+    )
+    .example(
+      `node $0 list my-project-id my_dataset`,
+      `Lists tables in "my_dataset".`
+    )
+    .example(
+      `node $0 browse my-project-id my_dataset my_table`,
+      `Displays rows from "my_table" in "my_dataset".`
+    )
+    .example(
+      `node $0 delete my-project-id my_dataset my_table`,
+      `Deletes "my_table" from "my_dataset".`
+    )
+    .example(
+      `node $0 load my-project-id my_dataset my_table ./data.csv`,
+      `Imports a local file into a table.`
+    )
+    .example(
+      `node $0 load-gcs my-project-id my_dataset my_table my-bucket data.csv`,
+      `Imports a GCS file into a table.`
+    )
+    .example(
+      `node $0 extract my-project-id my_dataset my_table my-bucket my-file`,
+      `Exports my_dataset:my_table to gcs://my-bucket/my-file as raw CSV.`
+    )
+    .example(
+      `node $0 extract my-project-id my_dataset my_table my-bucket my-file -f JSON --gzip`,
+      `Exports my_dataset:my_table to gcs://my-bucket/my-file as gzipped JSON.`
+    )
+    .example(
+      `node $0 insert my-project-id my_dataset my_table json_string`,
+      `Inserts the JSON array represented by json_string into my_dataset:my_table.`
+    )
+    .example(
+      `node $0 insert my-project-id my_dataset my_table json_file`,
+      `Inserts the JSON objects contained in json_file (one per line) into my_dataset:my_table.`
+    )
+    .example(
+      `node $0 copy my-project-id src_dataset src_table dest_dataset dest_table`,
+      `Copies src_dataset:src_table to dest_dataset:dest_table.`
+    )
+    .wrap(120)
+    .recommendCommands()
+    .epilogue(
+      `For more information, see https://cloud.google.com/bigquery/docs`
+    )
+    .help()
+    .strict().argv;
+}
+
+main().catch(console.error);
