@@ -5,8 +5,7 @@
 # [Google BigQuery: Node.js Client](https://github.com/googleapis/nodejs-bigquery)
 
 [![release level](https://img.shields.io/badge/release%20level-general%20availability%20%28GA%29-brightgreen.svg?style&#x3D;flat)](https://cloud.google.com/terms/launch-stages)
-[![CircleCI](https://img.shields.io/circleci/project/github/googleapis/nodejs-bigquery.svg?style=flat)](https://circleci.com/gh/googleapis/nodejs-bigquery)
-[![AppVeyor](https://ci.appveyor.com/api/projects/status/github/googleapis/nodejs-bigquery?branch=master&svg=true)](https://ci.appveyor.com/project/googleapis/nodejs-bigquery)
+[![npm version](https://img.shields.io/npm/v/@google-cloud/bigquery.svg)](https://www.npmjs.org/package/@google-cloud/bigquery)
 [![codecov](https://img.shields.io/codecov/c/github/googleapis/nodejs-bigquery/master.svg?style=flat)](https://codecov.io/gh/googleapis/nodejs-bigquery)
 
 > Node.js idiomatic client for [BigQuery][product-docs].
@@ -133,3 +132,4 @@ See [LICENSE](https://github.com/googleapis/nodejs-bigquery/blob/master/LICENSE)
 [client-docs]: https://googlecloudplatform.github.io/google-cloud-node/#/docs/bigquery/latest/bigquery
 [product-docs]: https://cloud.google.com/bigquery/docs
 [shell_img]: https://gstatic.com/cloudssh/images/open-btn.png
+
