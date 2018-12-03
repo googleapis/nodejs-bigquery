@@ -585,7 +585,7 @@ export class BigQuery extends common.Service {
    * zone or convention such as Daylight Savings Time.
    *
    * @method BigQuery#timestamp
-   * @param {date} value The time.
+   * @param {date} value The time represented by a `Date` or `string`
    *
    * @example
    * const {BigQuery} = require('@google-cloud/bigquery');
