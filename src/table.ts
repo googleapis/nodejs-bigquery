@@ -1932,8 +1932,8 @@ class Table extends common.ServiceObject {
    * Note: The file type will be inferred by the given file's extension. If you
    * wish to override this, you must provide `metadata.format`.
    *
-   * @param {string|File} source The source file to load. A string or a
-   *     {@link
+   * @param {string|File} source The source file to load. A filepath as a string
+   *     or a {@link
    * https://cloud.google.com/nodejs/docs/reference/storage/latest/File File}
    * object.
    * @param {object} [metadata] Metadata to set with the load operation. The
