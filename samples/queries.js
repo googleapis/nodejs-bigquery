@@ -57,8 +57,8 @@ async function queryStackOverflow() {
     console.log(`url: ${url}, ${viewCount} views`);
   });
   // [END bigquery_simple_app_print]
+  // [END bigquery_simple_app_all]
 }
-// [END bigquery_simple_app_all]
 
 async function query() {
   // [START bigquery_query]

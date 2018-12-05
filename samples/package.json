@@ -9,7 +9,7 @@
     "node": ">=8"
   },
   "scripts": {
-    "test": "npm run cover",
+    "test": "nyc mocha",
     "cover": "nyc --reporter=lcov --cache mocha system-test/*.test.js --timeout 1800000 && nyc report"
   },
   "dependencies": {
