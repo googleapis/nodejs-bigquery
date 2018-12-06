@@ -194,8 +194,8 @@ export interface TableOptions {
 
 /**
  * Table objects are returned by methods such as
- * {@link BigQuery/dataset#table}, {@link BigQuery/dataset#createTable}, and
- * {@link BigQuery/dataset#getTables}.
+ * {@link Dataset#table}, {@link Dataset#createTable}, and
+ * {@link Dataset#getTables}.
  *
  * @class
  * @param {Dataset} dataset {@link Dataset} instance.
