@@ -57,10 +57,10 @@ export interface QueryResultsOptions {
  * - {@link BigQuery#job}
  * - {@link BigQuery#query}
  * - {@link BigQuery#createJob}
- * - {@link BigQuery/table#copy}
- * - {@link BigQuery/table#createWriteStream}
- * - {@link BigQuery/table#extract}
- * - {@link BigQuery/table#load}
+ * - {@link Table#copy}
+ * - {@link Table#createWriteStream}
+ * - {@link Table#extract}
+ * - {@link Table#load}
  *
  * They can be used to check the status of a running job or fetching the results
  * of a previously-executed one.
