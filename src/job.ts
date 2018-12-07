@@ -51,16 +51,32 @@ export interface QueryResultsOptions {
 }
 
 /**
+ * @callback QueryResultsCallback
+ * @param {?Error} err An error returned while making this request.
+ * @param {array} rows The results of the job.
+ */
+/**
+ * @callback ManualQueryResultsCallback
+ * @param {?Error} err An error returned while making this request.
+ * @param {array} rows The results of the job.
+ * @param {?object} nextQuery A pre-made configuration object for your next
+ *     request. This will be `null` if no additional results are available.
+ *     If the query is not yet complete, you may get empty `rows` and
+ *     non-`null` `nextQuery` that you should use for your next request.
+ * @param {object} apiResponse The full API response.
+ */
+
+/**
  * Job objects are returned from various places in the BigQuery API:
  *
  * - {@link BigQuery#getJobs}
  * - {@link BigQuery#job}
  * - {@link BigQuery#query}
  * - {@link BigQuery#createJob}
- * - {@link BigQuery/table#copy}
- * - {@link BigQuery/table#createWriteStream}
- * - {@link BigQuery/table#extract}
- * - {@link BigQuery/table#load}
+ * - {@link Table#copy}
+ * - {@link Table#createWriteStream}
+ * - {@link Table#extract}
+ * - {@link Table#load}
  *
  * They can be used to check the status of a running job or fetching the results
  * of a previously-executed one.
@@ -286,6 +302,8 @@ class Job extends Operation {
         paginator.streamify('getQueryResultsAsStream_');
   }
 
+  cancel(): Promise<CancelResponse>;
+  cancel(callback: CancelCallback): void;
   /**
    * Cancel a job. Use {@link Job#getMetadata} to see if the cancel
    * completes successfully. See an example implementation below.
@@ -316,8 +334,6 @@ class Job extends Operation {
    *   const apiResponse = data[0];
    * });
    */
-  cancel(): Promise<CancelResponse>;
-  cancel(callback: CancelCallback): void;
   cancel(callback?: CancelCallback): void|Promise<CancelResponse> {
     let qs;
 
@@ -334,21 +350,10 @@ class Job extends Operation {
         callback!);
   }
 
-  /**
-   * @callback QueryResultsCallback
-   * @param {?Error} err An error returned while making this request.
-   * @param {array} rows The results of the job.
-   */
-  /**
-   * @callback ManualQueryResultsCallback
-   * @param {?Error} err An error returned while making this request.
-   * @param {array} rows The results of the job.
-   * @param {?object} nextQuery A pre-made configuration object for your next
-   *     request. This will be `null` if no additional results are available.
-   *     If the query is not yet complete, you may get empty `rows` and
-   *     non-`null` `nextQuery` that you should use for your next request.
-   * @param {object} apiResponse The full API response.
-   */
+  getQueryResults(options?: QueryResultsOptions): Promise<QueryRowsResponse>;
+  getQueryResults(options: QueryResultsOptions, callback: QueryRowsCallback):
+      void;
+  getQueryResults(callback: QueryRowsCallback): void;
   /**
    * Get the results of a job.
    *
@@ -416,10 +421,6 @@ class Job extends Operation {
    *   const rows = data[0];
    * });
    */
-  getQueryResults(options?: QueryResultsOptions): Promise<QueryRowsResponse>;
-  getQueryResults(options: QueryResultsOptions, callback: QueryRowsCallback):
-      void;
-  getQueryResults(callback: QueryRowsCallback): void;
   getQueryResults(
       optionsOrCallback?: QueryResultsOptions|QueryRowsCallback,
       cb?: QueryRowsCallback): void|Promise<QueryRowsResponse> {

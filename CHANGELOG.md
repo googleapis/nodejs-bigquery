@@ -4,6 +4,58 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## v2.0.3
+
+12-06-2018 17:10 PST
+
+### Documentation
+- fix(docs): move comments above last overload ([#292](https://github.com/googleapis/nodejs-bigquery/pull/292))
+- fix(docs): internal links ([#293](https://github.com/googleapis/nodejs-bigquery/pull/293))
+- fix(docs): change source location to ./build for ts project ([#291](https://github.com/googleapis/nodejs-bigquery/pull/291))
+- docs: fix region tag placement typo ([#286](https://github.com/googleapis/nodejs-bigquery/pull/286))
+
+### Internal / Testing Changes
+- chore: always nyc report before calling codecov ([#290](https://github.com/googleapis/nodejs-bigquery/pull/290))
+- chore: nyc ignore build/test by default ([#289](https://github.com/googleapis/nodejs-bigquery/pull/289))
+
+## v2.0.2
+
+12-04-2018 14:04 PST
+
+### Implementation Changes
+
+*TypeScript related changes:*
+- fix: Changing import of Big from big.js so it doesn't use default ([#270](https://github.com/googleapis/nodejs-bigquery/pull/270))
+- refactor(ts): enable noImplicitAny ([#259](https://github.com/googleapis/nodejs-bigquery/pull/259))
+- refactor(ts): add @types/proxyquire ([#256](https://github.com/googleapis/nodejs-bigquery/pull/256))
+- refactor(ts): refactor system tests to drop unused deps ([#254](https://github.com/googleapis/nodejs-bigquery/pull/254))
+- fix(ts): CopyTableMetadata type can’t receive optional values
+- refactor(ts): complete type annotations for src ([#250](https://github.com/googleapis/nodejs-bigquery/pull/250))
+- refactor(ts): add more types ([#246](https://github.com/googleapis/nodejs-bigquery/pull/246))
+
+### Dependencies
+- fix: Pin @types/sinon to last compatible version ([#267](https://github.com/googleapis/nodejs-bigquery/pull/267))
+- chore(deps): update dependency typescript to ~3.2.0 ([#276](https://github.com/googleapis/nodejs-bigquery/pull/276))
+- chore(deps): update dependency gts to ^0.9.0 ([#263](https://github.com/googleapis/nodejs-bigquery/pull/263))
+- chore(deps): update dependency @google-cloud/nodejs-repo-tools to v3 ([#261](https://github.com/googleapis/nodejs-bigquery/pull/261))
+- chore(deps): update dependency @types/is to v0.0.21 ([#258](https://github.com/googleapis/nodejs-bigquery/pull/258))
+
+### Documentation
+- chore: update license file ([#283](https://github.com/googleapis/nodejs-bigquery/pull/283))
+- docs: Improve timestamp documentation. ([#280](https://github.com/googleapis/nodejs-bigquery/pull/280))
+- docs: Improve documentationfor load method ([#281](https://github.com/googleapis/nodejs-bigquery/pull/281))
+- docs: update readme badges ([#279](https://github.com/googleapis/nodejs-bigquery/pull/279))
+- refactor(samples): replace promise with async await ([#268](https://github.com/googleapis/nodejs-bigquery/pull/268))
+
+### Internal / Testing Changes
+- fix(build): fix system key decryption ([#277](https://github.com/googleapis/nodejs-bigquery/pull/277))
+- refactor(tests): convert samples tests from ava to mocha ([#248](https://github.com/googleapis/nodejs-bigquery/pull/248))
+- chore: add synth.metadata
+- chore: update eslintignore config ([#262](https://github.com/googleapis/nodejs-bigquery/pull/262))
+- chore: drop contributors from multiple places ([#260](https://github.com/googleapis/nodejs-bigquery/pull/260))
+- chore: use latest npm on Windows ([#257](https://github.com/googleapis/nodejs-bigquery/pull/257))
+- chore: update CircleCI config ([#249](https://github.com/googleapis/nodejs-bigquery/pull/249))
+
 ## v2.0.1
 
 ### Bug fixes
