@@ -33,8 +33,15 @@ import {BigQuery, Job, Dataset, Query, SimpleQueryRowsResponse, SimpleQueryRowsC
 import {GoogleErrorBody} from '@google-cloud/common/build/src/util';
 import {Writable, Readable} from 'stream';
 import {teenyRequest} from 'teeny-request';
-import {File} from '@google-cloud/storage';
 import {JobMetadata} from './job';
+
+// This is supposed to be a @google-cloud/storage `File` type. The storage npm
+// module includes these types, but is current installed as a devDependency.
+// Unless it's included as a production dependency, the types would not be
+// included.  The storage module is fairly large, and only really needed for
+// types.  We need to figure out how to include these types properly.
+// tslint:disable-next-line no-any
+export type File = any;
 
 export interface JobMetadataCallback {
   (err: Error|null, metadataOrResponse: JobMetadata|r.Response): void;
