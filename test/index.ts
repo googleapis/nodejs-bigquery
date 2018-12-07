@@ -1340,7 +1340,7 @@ describe('BigQuery', () => {
         });
       };
 
-      bq.getDatasets((err: Error, datasets: Dataset[]) => {
+      bq.getDatasets((err: Error, datasets: FakeDataset[]) => {
         assert.ifError(err);
 
         const dataset = datasets[0];
@@ -1472,7 +1472,7 @@ describe('BigQuery', () => {
         });
       };
 
-      bq.getJobs((err: Error, jobs: Job[]) => {
+      bq.getJobs((err: Error, jobs: FakeJob[]) => {
         assert.ifError(err);
 
         const job = jobs[0];
