@@ -4,6 +4,20 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## v2.0.3
+
+12-06-2018 17:10 PST
+
+### Documentation
+- fix(docs): move comments above last overload ([#292](https://github.com/googleapis/nodejs-bigquery/pull/292))
+- fix(docs): internal links ([#293](https://github.com/googleapis/nodejs-bigquery/pull/293))
+- fix(docs): change source location to ./build for ts project ([#291](https://github.com/googleapis/nodejs-bigquery/pull/291))
+- docs: fix region tag placement typo ([#286](https://github.com/googleapis/nodejs-bigquery/pull/286))
+
+### Internal / Testing Changes
+- chore: always nyc report before calling codecov ([#290](https://github.com/googleapis/nodejs-bigquery/pull/290))
+- chore: nyc ignore build/test by default ([#289](https://github.com/googleapis/nodejs-bigquery/pull/289))
+
 ## v2.0.2
 
 12-04-2018 14:04 PST
