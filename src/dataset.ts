@@ -301,6 +301,8 @@ class Dataset extends ServiceObject {
     this.getTablesStream = paginator.streamify('getTables');
   }
 
+  createQueryJob(options: string|Query): Promise<JobResponse>;
+  createQueryJob(options: string|Query, callback: JobCallback): void;
   /**
    * Run a query as a job. No results are immediately returned. Instead, your
    * callback will be executed with a {@link Job} object that you must
@@ -313,8 +315,6 @@ class Dataset extends ServiceObject {
    * @param {function} [callback] See {@link BigQuery#createQueryJob} for full documentation of this method.
    * @returns {Promise} See {@link BigQuery#createQueryJob} for full documentation of this method.
    */
-  createQueryJob(options: string|Query): Promise<JobResponse>;
-  createQueryJob(options: string|Query, callback: JobCallback): void;
   createQueryJob(options: string|Query, callback?: JobCallback):
       void|Promise<JobResponse> {
     if (typeof options === 'string') {
@@ -359,6 +359,10 @@ class Dataset extends ServiceObject {
     return this.bigQuery.createQueryStream(options);
   }
 
+  createTable(id: string, options: TableMetadata): Promise<TableResponse>;
+  createTable(id: string, options: TableMetadata, callback: TableCallback):
+      void;
+  createTable(id: string, callback: TableCallback): void;
   /**
    * Create a table given a tableId or configuration object.
    *
@@ -402,10 +406,6 @@ class Dataset extends ServiceObject {
    *   const apiResponse = data[1];
    * });
    */
-  createTable(id: string, options: TableMetadata): Promise<TableResponse>;
-  createTable(id: string, options: TableMetadata, callback: TableCallback):
-      void;
-  createTable(id: string, callback: TableCallback): void;
   createTable(
       id: string, optionsOrCallback?: TableMetadata|TableCallback,
       cb?: TableCallback): void|Promise<TableResponse> {
@@ -442,6 +442,9 @@ class Dataset extends ServiceObject {
         });
   }
 
+  delete(options?: DatasetDeleteOptions): Promise<[r.Response]>;
+  delete(options: DatasetDeleteOptions, callback: DeleteCallback): void;
+  delete(callback: DeleteCallback): void;
   /**
    * Delete the dataset.
    *
@@ -476,9 +479,6 @@ class Dataset extends ServiceObject {
    *   const apiResponse = data[0];
    * });
    */
-  delete(options?: DatasetDeleteOptions): Promise<[r.Response]>;
-  delete(options: DatasetDeleteOptions, callback: DeleteCallback): void;
-  delete(callback: DeleteCallback): void;
   delete(
       optionsOrCallback?: DeleteCallback|DatasetDeleteOptions,
       callback?: DeleteCallback): void|Promise<[r.Response]> {

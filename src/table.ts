@@ -575,6 +575,12 @@ class Table extends common.ServiceObject {
     return body;
   }
 
+  copy(destination: Table, metadata?: CopyTableMetadata):
+      Promise<JobMetadataResponse>;
+  copy(
+      destination: Table, metadata: CopyTableMetadata,
+      callback: JobMetadataCallback): void;
+  copy(destination: Table, callback: JobMetadataCallback): void;
   /**
    * Copy data from one table to another, optionally creating that table.
    *
@@ -622,12 +628,6 @@ class Table extends common.ServiceObject {
    *   const apiResponse = data[0];
    * });
    */
-  copy(destination: Table, metadata?: CopyTableMetadata):
-      Promise<JobMetadataResponse>;
-  copy(
-      destination: Table, metadata: CopyTableMetadata,
-      callback: JobMetadataCallback): void;
-  copy(destination: Table, callback: JobMetadataCallback): void;
   copy(
       destination: Table,
       metadataOrCallback?: CopyTableMetadata|JobMetadataCallback,
@@ -650,6 +650,12 @@ class Table extends common.ServiceObject {
         });
   }
 
+  copyFrom(sourceTables: Table|Table[], metadata?: CopyTableMetadata):
+      Promise<JobMetadataResponse>;
+  copyFrom(
+      sourceTables: Table|Table[], metadata: CopyTableMetadata,
+      callback: JobMetadataCallback): void;
+  copyFrom(sourceTables: Table|Table[], callback: JobMetadataCallback): void;
   /**
    * Copy data from multiple tables into this table.
    *
@@ -701,12 +707,6 @@ class Table extends common.ServiceObject {
    *   const apiResponse = data[0];
    * });
    */
-  copyFrom(sourceTables: Table|Table[], metadata?: CopyTableMetadata):
-      Promise<JobMetadataResponse>;
-  copyFrom(
-      sourceTables: Table|Table[], metadata: CopyTableMetadata,
-      callback: JobMetadataCallback): void;
-  copyFrom(sourceTables: Table|Table[], callback: JobMetadataCallback): void;
   copyFrom(
       sourceTables: Table|Table[],
       metadataOrCallback?: CopyTableMetadata|JobMetadataCallback,
@@ -726,6 +726,12 @@ class Table extends common.ServiceObject {
     });
   }
 
+  createCopyJob(destination: Table, metadata?: CreateCopyJobMetadata):
+      Promise<JobResponse>;
+  createCopyJob(
+      destination: Table, metadata: CreateCopyJobMetadata,
+      callback: JobCallback): void;
+  createCopyJob(destination: Table, callback: JobCallback): void;
   /**
    * Copy data from one table to another, optionally creating that table.
    *
@@ -778,12 +784,6 @@ class Table extends common.ServiceObject {
    *   const apiResponse = data[1];
    * });
    */
-  createCopyJob(destination: Table, metadata?: CreateCopyJobMetadata):
-      Promise<JobResponse>;
-  createCopyJob(
-      destination: Table, metadata: CreateCopyJobMetadata,
-      callback: JobCallback): void;
-  createCopyJob(destination: Table, callback: JobCallback): void;
   createCopyJob(
       destination: Table,
       metadataOrCallback?: CreateCopyJobMetadata|JobCallback,
@@ -832,6 +832,12 @@ class Table extends common.ServiceObject {
     this.bigQuery.createJob(body, callback!);
   }
 
+  createCopyFromJob(source: Table|Table[], metadata?: CopyTableMetadata):
+      Promise<JobResponse>;
+  createCopyFromJob(
+      source: Table|Table[], metadata: CopyTableMetadata,
+      callback: JobCallback): void;
+  createCopyFromJob(source: Table|Table[], callback: JobCallback): void;
   /**
    * Copy data from multiple tables into this table.
    *
@@ -891,12 +897,6 @@ class Table extends common.ServiceObject {
    *   const apiResponse = data[1];
    * });
    */
-  createCopyFromJob(source: Table|Table[], metadata?: CopyTableMetadata):
-      Promise<JobResponse>;
-  createCopyFromJob(
-      source: Table|Table[], metadata: CopyTableMetadata,
-      callback: JobCallback): void;
-  createCopyFromJob(source: Table|Table[], callback: JobCallback): void;
   createCopyFromJob(
       source: Table|Table[], metadataOrCallback?: CopyTableMetadata|JobCallback,
       cb?: JobCallback): void|Promise<JobResponse> {
@@ -950,6 +950,12 @@ class Table extends common.ServiceObject {
     this.bigQuery.createJob(body, callback!);
   }
 
+  createExtractJob(destination: File, options?: CreateExtractJobOptions):
+      Promise<JobResponse>;
+  createExtractJob(
+      destination: File, options: CreateExtractJobOptions,
+      callback: JobCallback): void;
+  createExtractJob(destination: File, callback: JobCallback): void;
   /**
    * Export table to Cloud Storage.
    *
@@ -1028,12 +1034,6 @@ class Table extends common.ServiceObject {
    *   const apiResponse = data[1];
    * });
    */
-  createExtractJob(destination: File, options?: CreateExtractJobOptions):
-      Promise<JobResponse>;
-  createExtractJob(
-      destination: File, options: CreateExtractJobOptions,
-      callback: JobCallback): void;
-  createExtractJob(destination: File, callback: JobCallback): void;
   createExtractJob(
       destination: File,
       optionsOrCallback?: CreateExtractJobOptions|JobCallback,
@@ -1107,6 +1107,15 @@ class Table extends common.ServiceObject {
     this.bigQuery.createJob(body, callback!);
   }
 
+  createLoadJob(source: string, metadata?: JobLoadMetadata): Writable;
+  createLoadJob(source: File, metadata?: JobLoadMetadata): Promise<JobResponse>;
+  createLoadJob(
+      source: string, metadata: JobLoadMetadata,
+      callback: JobCallback): Writable;
+  createLoadJob(source: File, metadata: JobLoadMetadata, callback: JobCallback):
+      void;
+  createLoadJob(source: string, callback: JobCallback): Writable;
+  createLoadJob(source: File, callback: JobCallback): void;
   /**
    * Load data from a local file or Storage {@link
    * https://cloud.google.com/nodejs/docs/reference/storage/latest/File File}.
@@ -1193,15 +1202,6 @@ class Table extends common.ServiceObject {
    *   const apiResponse = data[1];
    * });
    */
-  createLoadJob(source: string, metadata?: JobLoadMetadata): Writable;
-  createLoadJob(source: File, metadata?: JobLoadMetadata): Promise<JobResponse>;
-  createLoadJob(
-      source: string, metadata: JobLoadMetadata,
-      callback: JobCallback): Writable;
-  createLoadJob(source: File, metadata: JobLoadMetadata, callback: JobCallback):
-      void;
-  createLoadJob(source: string, callback: JobCallback): Writable;
-  createLoadJob(source: File, callback: JobCallback): void;
   createLoadJob(
       source: string|File, metadataOrCallback?: JobLoadMetadata|JobCallback,
       cb?: JobCallback): void|Promise<JobResponse>|Writable {
@@ -1286,6 +1286,8 @@ class Table extends common.ServiceObject {
     this.bigQuery.createJob(body, callback);
   }
 
+  createQueryJob(options: Query): Promise<JobResponse>;
+  createQueryJob(options: Query, callback: JobCallback): void;
   /**
    * Run a query as a job. No results are immediately returned. Instead, your
    * callback will be executed with a {@link Job} object that you must
@@ -1294,8 +1296,6 @@ class Table extends common.ServiceObject {
    *
    * See {@link BigQuery#createQueryJob} for full documentation of this method.
    */
-  createQueryJob(options: Query): Promise<JobResponse>;
-  createQueryJob(options: Query, callback: JobCallback): void;
   createQueryJob(options: Query, callback?: JobCallback):
       void|Promise<JobResponse> {
     return this.dataset.createQueryJob(options, callback!);
@@ -1481,6 +1481,12 @@ class Table extends common.ServiceObject {
     return stream;
   }
 
+  extract(destination: File, options?: CreateExtractJobOptions):
+      Promise<JobMetadataResponse>;
+  extract(
+      destination: File, options: CreateExtractJobOptions,
+      callback?: JobMetadataCallback): void;
+  extract(destination: File, callback?: JobMetadataCallback): void;
   /**
    * Export table to Cloud Storage.
    *
@@ -1550,12 +1556,6 @@ class Table extends common.ServiceObject {
    *   const apiResponse = data[0];
    * });
    */
-  extract(destination: File, options?: CreateExtractJobOptions):
-      Promise<JobMetadataResponse>;
-  extract(
-      destination: File, options: CreateExtractJobOptions,
-      callback?: JobMetadataCallback): void;
-  extract(destination: File, callback?: JobMetadataCallback): void;
   extract(
       destination: File,
       optionsOrCallback?: CreateExtractJobOptions|JobMetadataCallback,
@@ -1575,6 +1575,9 @@ class Table extends common.ServiceObject {
     });
   }
 
+  getRows(options?: GetRowsOptions): Promise<RowsResponse>;
+  getRows(options: GetRowsOptions, callback: RowsCallback): void;
+  getRows(callback: RowsCallback): void;
   /**
    * Retrieves table data from a specified set of rows. The rows are returned to
    * your callback as an array of objects matching your table's schema.
@@ -1625,9 +1628,6 @@ class Table extends common.ServiceObject {
    *   const rows = data[0];
    *   });
    */
-  getRows(options?: GetRowsOptions): Promise<RowsResponse>;
-  getRows(options: GetRowsOptions, callback: RowsCallback): void;
-  getRows(callback: RowsCallback): void;
   getRows(optionsOrCallback?: GetRowsOptions|RowsCallback, cb?: RowsCallback):
       void|Promise<RowsResponse> {
     const options =
@@ -1679,6 +1679,12 @@ class Table extends common.ServiceObject {
         });
   }
 
+  insert(rows: RowMetadata|RowMetadata[], options?: InsertRowsOptions):
+      Promise<ApiResponse>;
+  insert(
+      rows: RowMetadata|RowMetadata[], options: InsertRowsOptions,
+      callback: ApiResponseCallback): void;
+  insert(rows: RowMetadata|RowMetadata[], callback: ApiResponseCallback): void;
   /**
    * Stream data into BigQuery one record at a time without running a load job.
    *
@@ -1812,12 +1818,6 @@ class Table extends common.ServiceObject {
    *     }
    *   });
    */
-  insert(rows: RowMetadata|RowMetadata[], options?: InsertRowsOptions):
-      Promise<ApiResponse>;
-  insert(
-      rows: RowMetadata|RowMetadata[], options: InsertRowsOptions,
-      callback: ApiResponseCallback): void;
-  insert(rows: RowMetadata|RowMetadata[], callback: ApiResponseCallback): void;
   insert(
       rows: RowMetadata|RowMetadata[],
       optionsOrCallback?: InsertRowsOptions|ApiResponseCallback,
@@ -1921,6 +1921,12 @@ class Table extends common.ServiceObject {
         });
   }
 
+  load(source: string|File, metadata?: JobLoadMetadata):
+      Promise<JobMetadataResponse>;
+  load(
+      source: string|File, metadata: JobLoadMetadata,
+      callback: JobMetadataCallback): void;
+  load(source: string|File, callback: JobMetadataCallback): void;
   /**
    * Load data from a local file or Storage {@link
    * https://cloud.google.com/nodejs/docs/reference/storage/latest/File File}.
@@ -1998,12 +2004,6 @@ class Table extends common.ServiceObject {
    *   const apiResponse = data[0];
    * });
    */
-  load(source: string|File, metadata?: JobLoadMetadata):
-      Promise<JobMetadataResponse>;
-  load(
-      source: string|File, metadata: JobLoadMetadata,
-      callback: JobMetadataCallback): void;
-  load(source: string|File, callback: JobMetadataCallback): void;
   load(
       source: string|File,
       metadataOrCallback?: JobLoadMetadata|JobMetadataCallback,
@@ -2025,6 +2025,8 @@ class Table extends common.ServiceObject {
     });
   }
 
+  query(query: Query): Promise<SimpleQueryRowsResponse>;
+  query(query: Query, callback: SimpleQueryRowsCallback): void;
   /**
    * Run a query scoped to your dataset.
    *
@@ -2033,13 +2035,16 @@ class Table extends common.ServiceObject {
    * @param {function} [callback] See {@link BigQuery#query} for full documentation of this method.
    * @returns {Promise}
    */
-  query(query: Query): Promise<SimpleQueryRowsResponse>;
-  query(query: Query, callback: SimpleQueryRowsCallback): void;
   query(query: Query, callback?: SimpleQueryRowsCallback):
       void|Promise<SimpleQueryRowsResponse> {
     this.dataset.query(query, callback!);
   }
 
+  setMetadata(metadata: SetTableMetadataOptions):
+      Promise<common.SetMetadataResponse>;
+  setMetadata(
+      metadata: SetTableMetadataOptions,
+      callback: common.ResponseCallback): void;
   /**
    * Set the metadata on the table.
    *
@@ -2083,11 +2088,6 @@ class Table extends common.ServiceObject {
    *   const apiResponse = data[1];
    * });
    */
-  setMetadata(metadata: SetTableMetadataOptions):
-      Promise<common.SetMetadataResponse>;
-  setMetadata(
-      metadata: SetTableMetadataOptions,
-      callback: common.ResponseCallback): void;
   setMetadata(
       metadata: SetTableMetadataOptions, callback?: common.ResponseCallback):
       void|Promise<common.SetMetadataResponse> {
