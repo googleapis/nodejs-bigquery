@@ -40,8 +40,14 @@ import {JobMetadata} from './job';
 // Unless it's included as a production dependency, the types would not be
 // included.  The storage module is fairly large, and only really needed for
 // types.  We need to figure out how to include these types properly.
-// tslint:disable-next-line no-any
-export type File = any;
+export interface File {
+  // tslint:disable-next-line no-any
+  bucket: any;
+  kmsKeyName?: string;
+  userProject?: string;
+  name: string;
+  generation?: number;
+}
 
 export interface JobMetadataCallback {
   (err: Error|null, metadataOrResponse: JobMetadata|r.Response): void;
