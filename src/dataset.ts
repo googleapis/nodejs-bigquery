@@ -19,7 +19,7 @@ import {paginator} from '@google-cloud/paginator';
 import {promisifyAll} from '@google-cloud/promisify';
 import * as extend from 'extend';
 import * as r from 'request';
-import {Readable} from 'stream';
+import {Duplex, Readable} from 'stream';
 import {teenyRequest} from 'teeny-request';
 
 import {BigQuery, DatasetCallback, Query, QueryRowsResponse, SimpleQueryRowsCallback} from '.';
@@ -343,7 +343,7 @@ class Dataset extends ServiceObject {
    *     documentation of this method.
    * @returns {stream}
    */
-  createQueryStream(options: Query|string) {
+  createQueryStream(options: Query|string): Duplex {
     if (typeof options === 'string') {
       options = {
         query: options,

@@ -31,7 +31,7 @@ import * as streamEvents from 'stream-events';
 import * as uuid from 'uuid';
 import {BigQuery, Job, Dataset, Query, SimpleQueryRowsResponse, SimpleQueryRowsCallback} from '../src';
 import {GoogleErrorBody} from '@google-cloud/common/build/src/util';
-import {Writable, Readable} from 'stream';
+import {Duplex, Readable, Writable} from 'stream';
 import {teenyRequest} from 'teeny-request';
 import {JobMetadata} from './job';
 
@@ -1325,7 +1325,7 @@ class Table extends common.ServiceObject {
    * @returns {stream} See {@link BigQuery#createQueryStream} for full
    *     documentation of this method.
    */
-  createQueryStream(query: Query) {
+  createQueryStream(query: Query): Duplex {
     return this.dataset.createQueryStream(query);
   }
 
