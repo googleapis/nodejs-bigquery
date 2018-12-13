@@ -2055,7 +2055,10 @@ describe('BigQuery/Table', () => {
       });
 
       beforeEach(() => {
-        sandbox.stub(global, 'setTimeout').callsFake(cb => cb());
+        sandbox.stub(global, 'setTimeout').callsFake(cb => {
+          cb();
+          return {} as NodeJS.Timeout;
+        });
         Math.random = _random;
         table.request = (reqOpts: JobOptions, callback: Function) => {
           callback({code: 404});
@@ -2101,6 +2104,7 @@ describe('BigQuery/Table', () => {
         sandbox.stub(global, 'setTimeout').callsFake((callback, delay) => {
           assert.strictEqual(delay, fakeRandomValue * 60000);
           callback();
+          return {} as NodeJS.Timeout;
         });
 
         table.create = (reqOpts: JobOptions) => {
@@ -2137,10 +2141,9 @@ describe('BigQuery/Table', () => {
           if (++timeouts === 2) {
             assert.strictEqual(delay, 60000);
             done();
-            return;
           }
-
           callback(null);
+          return {} as NodeJS.Timeout;
         });
 
         table.insert(data, OPTIONS, assert.ifError);
