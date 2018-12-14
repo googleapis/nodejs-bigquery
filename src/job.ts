@@ -18,7 +18,7 @@
  * @module bigquery/job
  */
 
-import {GetMetadataCallback, Operation, util} from '@google-cloud/common';
+import {MetadataCallback, Operation, util} from '@google-cloud/common';
 import {paginator} from '@google-cloud/paginator';
 import {promisifyAll} from '@google-cloud/promisify';
 import * as extend from 'extend';
@@ -491,7 +491,7 @@ class Job extends Operation {
    *
    * @param {function} callback
    */
-  poll_(callback: GetMetadataCallback): void {
+  poll_(callback: MetadataCallback): void {
     this.getMetadata((err, metadata, apiResponse) => {
       // tslint:disable-next-line no-any
       if (!err && (apiResponse as any).status &&
