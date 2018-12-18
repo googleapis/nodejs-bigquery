@@ -241,108 +241,8 @@ export interface BigQueryOptions extends common.GoogleAuthOptions {
 export class BigQuery extends common.Service {
   location?: string;
 
-  /**
-   * @method BigQuery#createQueryStream
-   * Run a query scoped to your project as a readable object stream.
-   *
-   * @param {object} query Configuration object. See {@link Query} for a complete
-   *     list of options.
-   * @returns {stream}
-   *
-   * @example
-   * const {BigQuery} = require('@google-cloud/bigquery');
-   * const bigquery = new BigQuery();
-   *
-   * const query = 'SELECT url FROM `publicdata.samples.github_nested` LIMIT
-   * 100';
-   *
-   * bigquery.createQueryStream(query)
-   *   .on('error', console.error)
-   *   .on('data', function(row) {
-   *     // row is a result from your query.
-   *   })
-   *   .on('end', function() {
-   *     // All rows retrieved.
-   *   });
-   *
-   * //-
-   * // If you anticipate many results, you can end a stream early to prevent
-   * // unnecessary processing and API requests.
-   * //-
-   * bigquery.createQueryStream(query)
-   *   .on('data', function(row) {
-   *     this.end();
-   *   });
-   */
   createQueryStream: (options?: Query|string) => Duplex;
-
-  /**
-   * @method BigQuery#getDatasetsStream
-   *
-   * List all or some of the {@link Dataset} objects in your project as
-   * a readable object stream.
-   *
-   * @param {object} [options] Configuration object. See
-   *     {@link BigQuery#getDatasets} for a complete list of options.
-   * @returns {stream}
-   *
-   * @example
-   * const {BigQuery} = require('@google-cloud/bigquery');
-   * const bigquery = new BigQuery();
-   *
-   * bigquery.getDatasetsStream()
-   *   .on('error', console.error)
-   *   .on('data', function(dataset) {
-   *     // dataset is a Dataset object.
-   *   })
-   *   .on('end', function() {
-   *     // All datasets retrieved.
-   *   });
-   *
-   * //-
-   * // If you anticipate many results, you can end a stream early to prevent
-   * // unnecessary processing and API requests.
-   * //-
-   * bigquery.getDatasetsStream()
-   *   .on('data', function(dataset) {
-   *     this.end();
-   *   });
-   */
   getDatasetsStream: () => Readable;
-
-  /**
-   * @method BigQuery#getJobsStream
-   *
-   * List all or some of the {@link Job} objects in your project as a
-   * readable object stream.
-   *
-   * @param {object} [options] Configuration object. See
-   *     {@link BigQuery#getJobs} for a complete list of options.
-   * @returns {stream}
-   *
-   * @example
-   * const {BigQuery} = require('@google-cloud/bigquery');
-   * const bigquery = new BigQuery();
-   *
-   * bigquery.getJobsStream()
-   *   .on('error', console.error)
-   *   .on('data', function(job) {
-   *     // job is a Job object.
-   *   })
-   *   .on('end', function() {
-   *     // All jobs retrieved.
-   *   });
-   *
-   * //-
-   * // If you anticipate many results, you can end a stream early to prevent
-   * // unnecessary processing and API requests.
-   * //-
-   * bigquery.getJobsStream()
-   *   .on('data', function(job) {
-   *     this.end();
-   *   });
-   */
-
   getJobsStream: () => Readable;
 
   constructor(options?: BigQueryOptions) {
@@ -365,8 +265,102 @@ export class BigQuery extends common.Service {
      * @type {string}
      */
     this.location = options.location;
+    /**
+     * Run a query scoped to your project as a readable object stream.
+     *
+     * @param {object} query Configuration object. See {@link Query} for a complete
+     *     list of options.
+     * @returns {stream}
+     *
+     * @example
+     * const {BigQuery} = require('@google-cloud/bigquery');
+     * const bigquery = new BigQuery();
+     *
+     * const query = 'SELECT url FROM `publicdata.samples.github_nested` LIMIT
+     * 100';
+     *
+     * bigquery.createQueryStream(query)
+     *   .on('error', console.error)
+     *   .on('data', function(row) {
+     *     // row is a result from your query.
+     *   })
+     *   .on('end', function() {
+     *     // All rows retrieved.
+     *   });
+     *
+     * //-
+     * // If you anticipate many results, you can end a stream early to prevent
+     * // unnecessary processing and API requests.
+     * //-
+     * bigquery.createQueryStream(query)
+     *   .on('data', function(row) {
+     *     this.end();
+     *   });
+     */
     this.createQueryStream = paginator.streamify('queryAsStream_');
+
+    /**
+     * List all or some of the {@link Dataset} objects in your project as
+     * a readable object stream.
+     *
+     * @param {object} [options] Configuration object. See
+     *     {@link BigQuery#getDatasets} for a complete list of options.
+     * @returns {stream}
+     *
+     * @example
+     * const {BigQuery} = require('@google-cloud/bigquery');
+     * const bigquery = new BigQuery();
+     *
+     * bigquery.getDatasetsStream()
+     *   .on('error', console.error)
+     *   .on('data', function(dataset) {
+     *     // dataset is a Dataset object.
+     *   })
+     *   .on('end', function() {
+     *     // All datasets retrieved.
+     *   });
+     *
+     * //-
+     * // If you anticipate many results, you can end a stream early to prevent
+     * // unnecessary processing and API requests.
+     * //-
+     * bigquery.getDatasetsStream()
+     *   .on('data', function(dataset) {
+     *     this.end();
+     *   });
+     */
     this.getDatasetsStream = paginator.streamify('getDatasets');
+
+    /**
+     * List all or some of the {@link Job} objects in your project as a
+     * readable object stream.
+     *
+     * @param {object} [options] Configuration object. See
+     *     {@link BigQuery#getJobs} for a complete list of options.
+     * @returns {stream}
+     *
+     * @example
+     * const {BigQuery} = require('@google-cloud/bigquery');
+     * const bigquery = new BigQuery();
+     *
+     * bigquery.getJobsStream()
+     *   .on('error', console.error)
+     *   .on('data', function(job) {
+     *     // job is a Job object.
+     *   })
+     *   .on('end', function() {
+     *     // All jobs retrieved.
+     *   });
+     *
+     * //-
+     * // If you anticipate many results, you can end a stream early to prevent
+     * // unnecessary processing and API requests.
+     * //-
+     * bigquery.getJobsStream()
+     *   .on('data', function(job) {
+     *     this.end();
+     *   });
+     */
     this.getJobsStream = paginator.streamify('getJobs');
   }
 
