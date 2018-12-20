@@ -93,7 +93,7 @@ describe('BigQuery', () => {
     await deleteDatasets();
 
     // Create the test dataset with a label tagging this as a test run.
-    await dataset.create({labels: [{[GCLOUD_TESTS_PREFIX]: ''}]});
+    await dataset.create({labels: {[GCLOUD_TESTS_PREFIX]: ''}});
 
     // Create the test table.
     await table.create({schema: SCHEMA});
