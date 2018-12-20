@@ -4,6 +4,29 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## v2.0.4
+
+12-19-2018 14:35 PST
+
+### Implementation Changes
+- fix(ts): explicit usage of Duplex ([#300](https://github.com/googleapis/nodejs-bigquery/pull/300))
+- fix: fix typescript compilation ([#295](https://github.com/googleapis/nodejs-bigquery/pull/295))
+
+### Dependencies
+- fix(deps): update dependency @google-cloud/common to ^0.28.0 ([#308](https://github.com/googleapis/nodejs-bigquery/pull/308))
+- chore(deps): update dependency @types/sinon to v7 ([#307](https://github.com/googleapis/nodejs-bigquery/pull/307))
+- fix(deps): update dependency @google-cloud/common to ^0.27.0 ([#274](https://github.com/googleapis/nodejs-bigquery/pull/274))
+
+### Documentation
+- fix(docs): move doc comments so stream methods show up in docs correctly ([#309](https://github.com/googleapis/nodejs-bigquery/pull/309))
+
+### Internal / Testing Changes
+- chore(build): inject yoshi automation key ([#306](https://github.com/googleapis/nodejs-bigquery/pull/306))
+- chore: update nyc and eslint configs ([#305](https://github.com/googleapis/nodejs-bigquery/pull/305))
+- chore: fix publish.sh permission +x ([#302](https://github.com/googleapis/nodejs-bigquery/pull/302))
+- fix(build): fix Kokoro release script ([#301](https://github.com/googleapis/nodejs-bigquery/pull/301))
+- build: add Kokoro configs for autorelease ([#298](https://github.com/googleapis/nodejs-bigquery/pull/298))
+
 ## v2.0.3
 
 12-06-2018 17:10 PST
