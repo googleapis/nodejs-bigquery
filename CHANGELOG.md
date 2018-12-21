@@ -12,6 +12,7 @@
 - fix: createQueryJob should accept pageToken ([#313](https://github.com/googleapis/nodejs-bigquery/pull/313))
 
 ### Internal / Testing Changes
+- fix(test): skip flaky invalid etag test ([#317](https://github.com/googleapis/nodejs-bigquery/pull/317))
 - fix(test): labels: should be an object, not arry ([#315](https://github.com/googleapis/nodejs-bigquery/pull/315))
 
 ## v2.0.4
