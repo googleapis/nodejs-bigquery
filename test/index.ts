@@ -1007,7 +1007,7 @@ describe('BigQuery', () => {
   describe('createQueryJob', () => {
     const QUERY_STRING = 'SELECT * FROM [dataset.table]';
 
-    it('should throw if a query is not provided', () => {
+    it('should throw if neither a query or a pageToken is provided', () => {
       assert.throws(() => {
         bq.createQueryJob();
       }, /SQL query string is required/);
@@ -1015,6 +1015,10 @@ describe('BigQuery', () => {
       assert.throws(() => {
         bq.createQueryJob({noQuery: 'here'});
       }, /SQL query string is required/);
+
+      assert.doesNotThrow(() => {
+        bq.createQueryJob({pageToken: 'NEXT_PAGE_TOKEN'}, util.noop);
+      });
     });
 
     describe('with destination', () => {

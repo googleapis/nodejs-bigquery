@@ -957,7 +957,7 @@ export class BigQuery extends common.Service {
   createQueryJob(opts: Query|string, callback?: JobCallback):
       void|Promise<JobResponse> {
     const options = typeof opts === 'object' ? opts : {query: opts};
-    if (!options || !options.query) {
+    if ((!options || !options.query) && !options.pageToken) {
       throw new Error('A SQL query string is required.');
     }
 
