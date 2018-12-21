@@ -4,6 +4,16 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## v2.0.5
+
+12-21-2018 13:19 PST
+
+### Bug fixes
+- fix: createQueryJob should accept pageToken ([#313](https://github.com/googleapis/nodejs-bigquery/pull/313))
+
+### Internal / Testing Changes
+- fix(test): labels: should be an object, not arry ([#315](https://github.com/googleapis/nodejs-bigquery/pull/315))
+
 ## v2.0.4
 
 12-19-2018 14:35 PST
