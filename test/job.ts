@@ -117,7 +117,6 @@ describe('BigQuery/Job', () => {
       assert.deepStrictEqual(calledWith.methods, {
         exists: true,
         get: true,
-        setMetadata: true,
         getMetadata: {
           reqOpts: {
             qs: {location: undefined},
