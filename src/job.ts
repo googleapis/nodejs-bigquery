@@ -221,45 +221,6 @@ class Job extends Operation {
           qs: {location},
         },
       },
-
-      /**
-       * Set the metadata for this job. This can be useful for updating job
-       * labels.
-       *
-       * @see [Jobs: patch API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/patch}
-       *
-       * @method Job#setMetadata
-       * @param {object} metadata Metadata to save on the Job.
-       * @param {function} [callback] The callback function.
-       * @param {?error} callback.err An error returned while making this
-       *     request.
-       * @param {object} callback.apiResponse The full API response.
-       * @returns {Promise}
-       *
-       * @example
-       * const {BigQuery} = require('@google-cloud/bigquery');
-       * const bigquery = new BigQuery();
-       *
-       * const metadata = {
-       *   configuration: {
-       *     labels: {
-       *       foo: 'bar'
-       *     }
-       *   }
-       * };
-       *
-       * const job = bigquery.job('job-id');
-       *
-       * job.setMetadata(metadata, (err, apiResponse) => {});
-       *
-       * //-
-       * // If the callback is omitted, we'll return a Promise.
-       * //-
-       * job.setMetadata(metadata).then((data) => {
-       *   const apiResponse = data[0];
-       * });
-       */
-      setMetadata: true,
     };
 
     super({
