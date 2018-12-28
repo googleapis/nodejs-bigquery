@@ -194,6 +194,7 @@ class Job extends Operation {
        *
        * @see [Jobs: get API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/get}
        *
+       * @method Job#getMetadata
        * @param {function} [callback] The callback function.
        * @param {?error} callback.err An error returned while making this
        *     request.
