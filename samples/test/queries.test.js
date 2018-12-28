@@ -15,31 +15,32 @@
 
 'use strict';
 
-const path = require(`path`);
-const assert = require(`assert`);
-const tools = require(`@google-cloud/nodejs-repo-tools`);
+const {assert} = require('chai');
+const execa = require('execa');
 
-const cwd = path.join(__dirname, `..`);
 const cmd = `node queries.js`;
+const exec = async cmd => {
+  const res = await execa.shell(cmd);
+  assert.isEmpty(res.stderr);
+  return res.stdout;
+};
 
 describe(`Queries`, () => {
-  before(tools.checkCredentials);
-
   it(`should query stackoverflow`, async () => {
-    const output = await tools.runAsync(`${cmd} stackoverflow`, cwd);
-    assert.ok(output.includes(`Query Results:`));
-    assert.ok(output.includes(`views`));
+    const output = await exec(`${cmd} stackoverflow`);
+    assert.match(output, /Query Results:/);
+    assert.match(output, /views/);
   });
 
   it(`should run a query`, async () => {
-    const output = await tools.runAsync(`${cmd} query`, cwd);
-    assert.ok(output.includes(`Rows:`));
-    assert.ok(output.includes(`name`));
+    const output = await exec(`${cmd} query`);
+    assert.match(output, /Rows:/);
+    assert.match(output, /name/);
   });
 
   it(`should run a query with the cache disabled`, async () => {
-    const output = await tools.runAsync(`${cmd} disable-cache`, cwd);
-    assert.ok(output.includes(`Rows:`));
-    assert.ok(output.includes(`corpus`));
+    const output = await exec(`${cmd} disable-cache`);
+    assert.match(output, /Rows:/);
+    assert.match(output, /corpus/);
   });
 });

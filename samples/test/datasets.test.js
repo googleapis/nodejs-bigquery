@@ -15,47 +15,47 @@
 
 'use strict';
 
-const {BigQuery} = require(`@google-cloud/bigquery`);
-const path = require(`path`);
-const assert = require(`assert`);
-const tools = require(`@google-cloud/nodejs-repo-tools`);
-const uuid = require(`uuid`);
+const {BigQuery} = require('@google-cloud/bigquery');
+const {assert} = require('chai');
+const execa = require('execa');
+const uuid = require('uuid');
 
-const cwd = path.join(__dirname, `..`);
-const cmd = `node datasets.js`;
-const datasetId = `nodejs-docs-samples-test-${uuid.v4()}`.replace(/-/gi, '_');
-const projectId = process.env.GCLOUD_PROJECT;
+const cmd = 'node datasets.js';
+const exec = async cmd => {
+  const res = await execa.shell(cmd);
+  assert.isEmpty(res.stderr);
+  return res.stdout;
+};
+const datasetId = `gcloud_tests_${uuid.v4()}`.replace(/-/gi, '_');
 const bigquery = new BigQuery();
 
 describe(`Datasets`, () => {
-  before(tools.checkCredentials);
+  let projectId;
+  before(async () => {
+    projectId = await bigquery.getProjectId();
+  });
   after(async () => {
-    try {
-      await bigquery.dataset(datasetId).delete({force: true});
-    } catch (err) {} // ignore error
+    await bigquery
+      .dataset(datasetId)
+      .delete({force: true})
+      .catch(console.warn);
   });
 
   it(`should create a dataset`, async () => {
-    const output = await tools.runAsync(
-      `${cmd} create ${projectId} ${datasetId}`,
-      cwd
-    );
+    const output = await exec(`${cmd} create ${projectId} ${datasetId}`);
     assert.strictEqual(output, `Dataset ${datasetId} created.`);
     const [exists] = await bigquery.dataset(datasetId).exists();
     assert.ok(exists);
   });
 
   it(`should list datasets`, async () => {
-    const output = await tools.runAsync(`${cmd} list ${projectId}`, cwd);
-    assert.ok(output.includes(`Datasets:`));
-    assert.ok(output.includes(datasetId));
+    const output = await exec(`${cmd} list ${projectId}`);
+    assert.match(output, /Datasets:/);
+    assert.match(output, new RegExp(datasetId));
   });
 
   it(`should delete a dataset`, async () => {
-    const output = await tools.runAsync(
-      `${cmd} delete ${projectId} ${datasetId}`,
-      cwd
-    );
+    const output = await exec(`${cmd} delete ${projectId} ${datasetId}`);
     assert.strictEqual(output, `Dataset ${datasetId} deleted.`);
     const [exists] = await bigquery.dataset(datasetId).exists();
     assert.strictEqual(exists, false);
