@@ -1625,13 +1625,13 @@ export {Job};
 export {Table};
 
 /**
- * The default export of the `@google-cloud/bigquery` package is the {@link
- * BigQuery} class.
+ * The `@google-cloud/bigquery` package exports an object that contains the
+ * {@link BigQuery} class.
  *
  * See {@link BigQuery} and {@link BigQueryOptions} for client methods and
  * configuration options.
  *
- * @module {constructor} @google-cloud/bigquery
+ * @module {object} @google-cloud/bigquery
  * @alias nodejs-bigquery
  *
  * @example <caption>Install the client library with <a
