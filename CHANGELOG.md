@@ -4,6 +4,22 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## v2.0.6
+
+01-08-2019 13:52 PST
+
+### Fixes
+- fix: correctly iterate query results within stream ([#323](https://github.com/googleapis/nodejs-bigquery/pull/323))
+- fix: remove Job.setMetadata method ([#319](https://github.com/googleapis/nodejs-bigquery/pull/319))
+- fix(deps): update dependency @google-cloud/common to ^0.29.0 ([#314](https://github.com/googleapis/nodejs-bigquery/pull/314))
+
+### Documentation
+- fix(docs): package exports an object, not the BigQuery ctor ([#322](https://github.com/googleapis/nodejs-bigquery/pull/322))
+- docs: regenerate README.md ([#321](https://github.com/googleapis/nodejs-bigquery/pull/321))
+
+### Internal / Testing Changes
+- refactor: modernize the sample tests ([#318](https://github.com/googleapis/nodejs-bigquery/pull/318))
+
 ## v2.0.5
 
 12-21-2018 13:19 PST
