@@ -51,6 +51,7 @@ export interface SimpleQueryRowsCallback {
 export interface Query {
   dryRun?: boolean;
   location?: string;
+  job?: Job;
   jobId?: string;
   jobPrefix?: string;
   // tslint:disable-next-line no-any
@@ -1489,7 +1490,7 @@ export class BigQuery extends common.Service {
       QueryRowsCallback,
       cb?: SimpleQueryRowsCallback|QueryRowsCallback):
       void|Promise<SimpleQueryRowsResponse>|Promise<QueryRowsResponse> {
-    const options =
+    let options =
         typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
     const callback =
         typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
@@ -1502,6 +1503,9 @@ export class BigQuery extends common.Service {
         (callback as SimpleQueryRowsCallback)(null, [], resp);
         return;
       }
+      // The Job is important for the `queryAsStream_` method, so a new query
+      // isn't created each time results are polled for.
+      options = extend({job}, options);
       job!.getQueryResults(options, callback as QueryRowsCallback);
     });
   }
@@ -1513,6 +1517,10 @@ export class BigQuery extends common.Service {
    * @private
    */
   queryAsStream_(query: Query, callback?: SimpleQueryRowsCallback) {
+    if (query.job) {
+      query.job.getQueryResults(query, callback as QueryRowsCallback);
+      return;
+    }
     this.query(query, {autoPaginate: false}, callback);
   }
 }

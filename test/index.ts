@@ -1633,7 +1633,6 @@ describe('BigQuery', () => {
     it('should call job#getQueryResults', done => {
       const fakeJob = {
         getQueryResults: (options: {}, callback: Function) => {
-          assert.deepStrictEqual(options, {});
           callback(null, FAKE_ROWS, FAKE_RESPONSE);
         },
       };
@@ -1650,11 +1649,27 @@ describe('BigQuery', () => {
       });
     });
 
+    it('should assign Job on the options', done => {
+      const fakeJob = {
+        getQueryResults: (options: {}, callback: Function) => {
+          assert.deepStrictEqual(options, {job: fakeJob});
+          done();
+        },
+      };
+
+      bq.createQueryJob = (query: {}, callback: Function) => {
+        callback(null, fakeJob, FAKE_RESPONSE);
+      };
+
+      bq.query(QUERY_STRING, assert.ifError);
+    });
+
     it('should optionally accept options', done => {
       const fakeOptions = {};
       const fakeJob = {
         getQueryResults: (options: {}) => {
-          assert.strictEqual(options, fakeOptions);
+          assert.notStrictEqual(options, fakeOptions);
+          assert.deepStrictEqual(options, {job: fakeJob});
           done();
         },
       };
