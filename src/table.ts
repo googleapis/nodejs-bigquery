@@ -82,6 +82,8 @@ export interface TableRowField {
 export type TableRowValue = string|TableRow;
 
 export interface GetRowsOptions {
+  startIndex?: number;
+  selectedFields?: string;
   autoPaginate?: boolean;
   maxApiCalls?: number;
   maxResults?: number;
