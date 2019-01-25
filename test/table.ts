@@ -30,7 +30,7 @@ import * as uuid from 'uuid';
 
 import {BigQuery} from '../src';
 import {Job, JobOptions} from '../src/job';
-import {CopyTableMetadata, JobLoadMetadata, Table, TableOptions} from '../src/table';
+import {CopyTableMetadata, JobLoadMetadata, Table, TableOptions, ViewDefinition} from '../src/table';
 
 let promisified = false;
 let makeWritableStreamOverride: Function|null;
@@ -452,6 +452,15 @@ describe('BigQuery/Table', () => {
       assert.strictEqual(formatted.view.query, VIEW);
       assert.strictEqual(formatted.view.useLegacySql, false);
     });
+
+    it('should allow the view option to be passed as a pre-formatted object',
+       () => {
+         const view: ViewDefinition = {query: 'abc', useLegacySql: false};
+
+         const {view: formattedView} = Table.formatMetadata_({view});
+
+         assert.deepEqual(formattedView, view);
+       });
   });
 
   describe('copy', () => {
