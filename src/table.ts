@@ -161,7 +161,12 @@ export interface TableMetadata {
   friendlyName: string;
   schema?: string|TableField[];
   partitioning?: string;
-  view?: string;
+  view?: string|ViewDefinition;
+}
+
+export interface ViewDefinition {
+  query: string;
+  useLegacySql?: boolean;
 }
 
 export interface FormattedMetadata {
@@ -170,7 +175,7 @@ export interface FormattedMetadata {
   name?: string;
   partitioning?: string;
   timePartitioning?: {type: string};
-  view: {query: string; useLegacySql: boolean;};
+  view: ViewDefinition;
 }
 
 export interface TableSchema {
@@ -582,7 +587,7 @@ class Table extends common.ServiceObject {
 
     if (is.string(options.view)) {
       body.view = {
-        query: options.view!,
+        query: options.view! as string,
         useLegacySql: false,
       };
     }
