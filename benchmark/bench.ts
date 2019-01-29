@@ -23,6 +23,8 @@ if (process.argv.length < 3) {
       `usage: '${process.argv[0]} ${process.argv[1]} <queries.json>'`);
 }
 
+console.log('query,rows,cols,first_byte,total');
+
 const queryJson = fs.readFileSync(process.argv[2], 'utf8');
 const queries = JSON.parse(queryJson);
 const client = new BigQuery();
@@ -62,11 +64,8 @@ async function doQuery(queryTxt: string) {
                 })
             .on('end', () => {
               const timeTotalMilli = new Date().getTime() - startMilli;
-              console.log(
-                  `query ${queryTxt}:`, `got ${numRows} rows,`,
-                  `${numCols} cols,`,
-                  `first byte ${timeFirstByteMilli / 1000} sec,`,
-                  `total ${timeTotalMilli / 1000} sec`);
+              console.log(`"${queryTxt}",${numRows},${numCols},${
+                  timeFirstByteMilli / 1000},${timeTotalMilli / 1000}`);
               resolve();
             });
   });
