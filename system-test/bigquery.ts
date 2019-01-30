@@ -405,8 +405,8 @@ describe('BigQuery', () => {
       assert.notStrictEqual(etag, dataset.metadata.etag);
     });
 
-    it('should error out for bad etags', done => {
-      assert.rejects(
+    it('should error out for bad etags', async () => {
+      await assert.rejects(
           dataset.setMetadata({
             etag: 'a-fake-etag',
             description: 'oh no!',
@@ -492,16 +492,16 @@ describe('BigQuery', () => {
       });
 
       describe('job.get', async () => {
-        it('should fail to reload if the location is not set', done => {
+        it('should fail to reload if the location is not set', async () => {
           const badJob = bigquery.job(job.id!);
-          assert.rejects(badJob.getMetadata(), (err: ApiError) => {
+          await assert.rejects(badJob.getMetadata(), (err: ApiError) => {
             assert.strictEqual(err.code, 404);
           });
         });
 
         it('should fail to reload if the location is wrong', async () => {
           const badJob = bigquery.job(job.id!, {location: 'US'});
-          assert.rejects(badJob.getMetadata(), (err: ApiError) => {
+          await assert.rejects(badJob.getMetadata(), (err: ApiError) => {
             assert.strictEqual(err.code, 404);
           });
         });
