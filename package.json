@@ -12,10 +12,7 @@
   "types": "./build/src/index.d.ts",
   "files": [
     "build/src",
-    "!build/src/**/*.map",
-    "AUTHORS",
-    "CONTRIBUTORS",
-    "LICENSE"
+    "!build/src/**/*.map"
   ],
   "keywords": [
     "google apis client",
@@ -30,7 +27,8 @@
     "bigquery"
   ],
   "scripts": {
-    "benchmark": "time node benchmark/bench.js benchmark/queries.json",
+    "prebenchmark": "npm run compile",
+    "benchmark": "node build/benchmark/bench.js benchmark/queries.json",
     "docs": "jsdoc -c .jsdoc.js",
     "lint": "gts check && eslint samples/",
     "samples-test": "cd samples/ && npm link ../ && npm test && cd ../",
