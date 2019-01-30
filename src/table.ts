@@ -1685,13 +1685,15 @@ class Table extends common.ServiceObject {
 
           if (resp.rows && resp.rows.length > 0 && !this.metadata.schema) {
             // We don't know the schema for this table yet. Do a quick stat.
-            this.getMetadata((err, metadata, apiResponse) => {
-              if (err) {
-                onComplete(err, null, null, apiResponse!);
-                return;
-              }
-              onComplete(null, resp.rows, nextQuery, resp);
-            });
+            this.getMetadata(
+                (err: Error, metadata: common.Metadata,
+                 apiResponse: r.Response) => {
+                  if (err) {
+                    onComplete(err, null, null, apiResponse!);
+                    return;
+                  }
+                  onComplete(null, resp.rows, nextQuery, resp);
+                });
             return;
           }
 

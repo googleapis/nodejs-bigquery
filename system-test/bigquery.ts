@@ -385,57 +385,37 @@ describe('BigQuery', () => {
   });
 
   describe('BigQuery/Dataset', () => {
-    it('should set & get metadata', done => {
-      dataset.setMetadata(
-          {
-            description: 'yay description',
-          },
-          err => {
-            assert.ifError(err);
-
-            dataset.getMetadata((err, metadata) => {
-              assert.ifError(err);
-              assert.strictEqual(metadata.description, 'yay description');
-              done();
-            });
-          });
+    it('should set & get metadata', async () => {
+      const metadata = {
+        description: 'yay description',
+      };
+      await dataset.setMetadata(metadata);
+      const [result] = await dataset.getMetadata();
+      assert.strictEqual(result.description, metadata.description);
     });
 
-    it('should use etags for locking', done => {
-      dataset.getMetadata(err => {
-        assert.ifError(err);
-
-        const etag = dataset.metadata.etag;
-
-        dataset.setMetadata(
-            {
-              etag,
-              description: 'another description',
-            },
-            err => {
-              assert.ifError(err);
-              // the etag should be updated
-              assert.notStrictEqual(etag, dataset.metadata.etag);
-              done();
-            });
+    it('should use etags for locking', async () => {
+      await dataset.getMetadata();
+      const etag = dataset.metadata.etag;
+      await dataset.setMetadata({
+        etag,
+        description: 'another description',
       });
+      // the etag should be updated
+      assert.notStrictEqual(etag, dataset.metadata.etag);
     });
 
     it('should error out for bad etags', done => {
-      dataset.setMetadata(
-          {
+      assert.rejects(
+          dataset.setMetadata({
             etag: 'a-fake-etag',
             description: 'oh no!',
-          },
-          err => {
-            assert.ok(err);
-            assert.ok(err!.message.match(/precondition/i));
-            // TODO: temp. skip flaky assertion:
-            // https://github.com/googleapis/nodejs-bigquery/pull/315#issuecomment-449202488
-            // assert.strictEqual(
-            //    (err as ApiError).code, 412);  // precondition failed
-            done();
-          });
+          }),
+          /precondition/i);
+      // TODO: temp. skip flaky assertion:
+      // https://github.com/googleapis/nodejs-bigquery/pull/315#issuecomment-449202488
+      // assert.strictEqual(
+      //    (err as ApiError).code, 412);  // precondition failed
     });
 
     it('should get tables', done => {
@@ -458,57 +438,28 @@ describe('BigQuery', () => {
           });
     });
 
-    it('should create a Table with a nested schema', done => {
+    it('should create a Table with a nested schema', async () => {
       const table = dataset.table(generateName('table'));
-
-      table.create(
+      const schema = {
+        fields: [
           {
-            schema: {
-              fields: [
-                {
-                  name: 'id',
-                  type: 'INTEGER',
-                },
-                {
-                  name: 'details',
-                  fields: [
-                    {
-                      name: 'nested_id',
-                      type: 'INTEGER',
-                    },
-                  ],
-                },
-              ],
-            },
+            name: 'id',
+            type: 'INTEGER',
           },
-          err => {
-            assert.ifError(err);
-
-            table.getMetadata((err, metadata) => {
-              assert.ifError(err);
-
-              assert.deepStrictEqual(metadata.schema, {
-                fields: [
-                  {
-                    name: 'id',
-                    type: 'INTEGER',
-                  },
-                  {
-                    name: 'details',
-                    type: 'RECORD',
-                    fields: [
-                      {
-                        name: 'nested_id',
-                        type: 'INTEGER',
-                      },
-                    ],
-                  },
-                ],
-              });
-
-              done();
-            });
-          });
+          {
+            name: 'details',
+            fields: [
+              {
+                name: 'nested_id',
+                type: 'INTEGER',
+              },
+            ],
+          },
+        ],
+      };
+      await table.create({schema});
+      const [metadata] = await table.getMetadata();
+      assert.deepStrictEqual(metadata.schema, schema);
     });
 
     describe('location', () => {
@@ -540,33 +491,25 @@ describe('BigQuery', () => {
         assert.strictEqual(job.location, LOCATION);
       });
 
-      describe('job.get', () => {
+      describe('job.get', async () => {
         it('should fail to reload if the location is not set', done => {
           const badJob = bigquery.job(job.id!);
-
-          badJob.getMetadata(err => {
-            assert.strictEqual((err as ApiError).code, 404);
-            done();
+          assert.rejects(badJob.getMetadata(), (err: ApiError) => {
+            assert.strictEqual(err.code, 404);
           });
         });
 
-        it('should fail to reload if the location is wrong', done => {
+        it('should fail to reload if the location is wrong', async () => {
           const badJob = bigquery.job(job.id!, {location: 'US'});
-
-          badJob.getMetadata(err => {
-            assert.strictEqual((err as ApiError).code, 404);
-            done();
+          assert.rejects(badJob.getMetadata(), (err: ApiError) => {
+            assert.strictEqual(err.code, 404);
           });
         });
 
-        it('should reload if the location matches', done => {
+        it('should reload if the location matches', async () => {
           const goodJob = bigquery.job(job.id!, {location: LOCATION});
-
-          goodJob.getMetadata(err => {
-            assert.ifError(err);
-            assert.strictEqual(goodJob.location, LOCATION);
-            done();
-          });
+          await goodJob.getMetadata();
+          assert.strictEqual(goodJob.location, LOCATION);
         });
       });
 
@@ -717,20 +660,11 @@ describe('BigQuery', () => {
       });
     });
 
-    it('should set & get metadata', done => {
-      table.setMetadata(
-          {
-            description: 'catsandstuff',
-          },
-          err => {
-            assert.ifError(err);
-
-            table.getMetadata((err, metadata) => {
-              assert.ifError(err);
-              assert.strictEqual(metadata.description, 'catsandstuff');
-              done();
-            });
-          });
+    it('should set & get metadata', async () => {
+      const description = 'catsandstuff';
+      await table.setMetadata({description});
+      const [metadata] = await table.getMetadata();
+      assert.strictEqual(metadata.description, description);
     });
 
     describe('copying', () => {
