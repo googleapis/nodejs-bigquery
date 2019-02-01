@@ -639,6 +639,10 @@ class Dataset extends ServiceObject {
    * const institutions = dataset.table('institution_data');
    */
   table(id: string, options?: TableOptions) {
+    if (typeof id !== 'string') {
+      throw new TypeError('A table ID is required.');
+    }
+
     options = extend(
         {
           location: this.location,

@@ -1163,6 +1163,10 @@ export class BigQuery extends common.Service {
    * const dataset = bigquery.dataset('higher_education');
    */
   dataset(id: string, options?: DataSetOptions) {
+    if (typeof id !== 'string') {
+      throw new TypeError('A dataset ID is required.');
+    }
+
     if (this.location) {
       options = extend({location: this.location}, options);
     }

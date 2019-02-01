@@ -785,6 +785,11 @@ describe('BigQuery/Dataset', () => {
   });
 
   describe('table', () => {
+    it('should throw an error if the id is missing', () => {
+      const expectedErr = /A table ID is required\./;
+      assert.throws(() => ds.table(), expectedErr);
+    });
+
     it('should return a Table object', () => {
       const tableId = 'tableId';
       const table = ds.table(tableId);
