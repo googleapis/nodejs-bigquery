@@ -149,9 +149,10 @@ describe('BigQuery/Table', () => {
         return;
       }
 
-      Table[tableMethod] = () => {
-        return (tableOverrides[tableMethod] || tableCached[tableMethod])
-            .apply(null, arguments);
+      // tslint:disable-next-line no-any
+      Table[tableMethod] = (...args: any[]) => {
+        const method = tableOverrides[tableMethod] || tableCached[tableMethod];
+        return method(...args);
       };
     });
   });
