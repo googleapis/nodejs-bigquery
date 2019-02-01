@@ -621,6 +621,8 @@ class Dataset extends ServiceObject {
   /**
    * Create a Table object.
    *
+   * @throws {TypeError} if table ID is missing.
+   *
    * @param {string} id The ID of the table.
    * @param {object} [options] Table options.
    * @param {string} [options.location] The geographic location of the table, by
