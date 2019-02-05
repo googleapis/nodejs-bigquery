@@ -50,7 +50,7 @@
     "@google-cloud/promisify": "^0.3.0",
     "arrify": "^1.0.0",
     "big.js": "^5.1.2",
-    "duplexify": "^3.5.0",
+    "duplexify": "^4.0.0",
     "extend": "^3.0.1",
     "is": "^3.0.1",
     "stream-events": "^1.0.1",
