@@ -8,6 +8,7 @@
     "src/*.ts",
     "test/*.ts",
     "system-test/*.ts",
+    "install-test/*.ts",
     "benchmark/*.ts"
   ]
 }

@@ -31,7 +31,7 @@ it('should be able to use the d.ts', async () => {
   await execa('npm', ['pack'], {stdio: 'inherit'});
   const tarball = `google-cloud-bigquery-${pkg.version}.tgz`;
   await mvp(tarball, `${stagingPath}/google-cloud-bigquery.tgz`);
-  await ncpp('system-test/fixtures/kitchen', `${stagingPath}/`);
+  await ncpp('install-test/fixtures/kitchen', `${stagingPath}/`);
   await execa('npm', ['install'], {cwd: `${stagingPath}/`, stdio: 'inherit'});
 }).timeout(40000);
 

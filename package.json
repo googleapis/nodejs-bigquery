@@ -34,6 +34,7 @@
     "samples-test": "cd samples/ && npm link ../ && npm test && cd ../",
     "test": "nyc mocha build/test",
     "system-test": "mocha build/system-test --timeout 600000",
+    "install-test": "mocha build/install-test --timeout 600000",
     "presystem-test": "npm run compile",
     "check": "gts check",
     "clean": "gts clean",
