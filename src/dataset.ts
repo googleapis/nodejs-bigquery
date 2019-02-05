@@ -621,6 +621,8 @@ class Dataset extends ServiceObject {
   /**
    * Create a Table object.
    *
+   * @throws {TypeError} if table ID is missing.
+   *
    * @param {string} id The ID of the table.
    * @param {object} [options] Table options.
    * @param {string} [options.location] The geographic location of the table, by
@@ -639,6 +641,10 @@ class Dataset extends ServiceObject {
    * const institutions = dataset.table('institution_data');
    */
   table(id: string, options?: TableOptions) {
+    if (typeof id !== 'string') {
+      throw new TypeError('A table ID is required.');
+    }
+
     options = extend(
         {
           location: this.location,
