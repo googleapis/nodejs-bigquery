@@ -17,4 +17,5 @@
 set -xeo pipefail
 
 # Run an installation test to verify compiled Javascript is valid
+npm install
 npm run install-test
