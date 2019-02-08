@@ -29,7 +29,7 @@ const stagingPath = stagingDir.name;
 const pkg = require('../../package.json');
 
 describe('Installation test', () => {
-  before(function () {
+  before(function() {
     if (RUNNING_IN_VPCSC) this.skip();
   });
 
