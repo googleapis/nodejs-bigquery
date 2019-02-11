@@ -42,7 +42,9 @@
     "predocs": "npm run compile",
     "prepare": "npm run compile",
     "pretest": "npm run compile",
-    "posttest": "npm run check"
+    "posttest": "npm run check",
+    "docs-test": "blcl docs -r --exclude www.googleapis.com",
+    "predocs-test": "npm run docs"
   },
   "dependencies": {
     "@google-cloud/common": "^0.29.0",
@@ -95,6 +97,7 @@
     "source-map-support": "^0.5.6",
     "tmp": "0.0.33",
     "typescript": "~3.3.0",
-    "jsdoc-baseline": "git+https://github.com/hegemonic/jsdoc-baseline.git"
+    "jsdoc-baseline": "git+https://github.com/hegemonic/jsdoc-baseline.git",
+    "broken-link-checker-local": "^0.2.0"
   }
 }
