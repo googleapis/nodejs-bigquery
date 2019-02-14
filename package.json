@@ -43,7 +43,7 @@
     "prepare": "npm run compile",
     "pretest": "npm run compile",
     "posttest": "npm run check",
-    "docs-test": "blcl docs -r --exclude www.googleapis.com",
+    "docs-test": "linkinator docs -r --skip www.googleapis.com",
     "predocs-test": "npm run docs"
   },
   "dependencies": {
@@ -98,6 +98,6 @@
     "tmp": "0.0.33",
     "typescript": "~3.3.0",
     "jsdoc-baseline": "git+https://github.com/hegemonic/jsdoc-baseline.git",
-    "broken-link-checker-local": "^0.2.0"
+    "linkinator": "^1.1.2"
   }
 }
