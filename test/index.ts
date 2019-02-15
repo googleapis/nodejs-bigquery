@@ -1248,6 +1248,11 @@ describe('BigQuery', () => {
   describe('dataset', () => {
     const DATASET_ID = 'dataset-id';
 
+    it('should throw an error if the id is missing', () => {
+      const expectedErr = /A dataset ID is required\./;
+      assert.throws(() => bq.dataset(), expectedErr);
+    });
+
     it('returns a Dataset instance', () => {
       const ds = bq.dataset(DATASET_ID);
       assert(ds instanceof FakeDataset);
