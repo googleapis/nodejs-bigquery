@@ -1382,7 +1382,7 @@ describe('BigQuery', () => {
     });
   });
 
-  describe.only('Custom Types', () => {
+  describe('Custom Types', () => {
     let table: Table;
 
     const DATE = bigquery.date('2017-01-01');
