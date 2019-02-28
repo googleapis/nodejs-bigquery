@@ -28,7 +28,7 @@ const bigquery = new BigQuery();
 const storage = new Storage();
 
 describe('BigQuery', () => {
-  const GCLOUD_TESTS_PREFIX = 'nodejs_bq_test';
+  const GCLOUD_TESTS_PREFIX = `nodejs_bq_test${Date.now()}`;
 
   const dataset = bigquery.dataset(generateName('dataset'));
   const table = dataset.table(generateName('table'));
@@ -1457,8 +1457,9 @@ describe('BigQuery', () => {
   });
 
   function generateName(resourceType: string) {
-    return `${GCLOUD_TESTS_PREFIX}_${resourceType}_${uuid.v1()}`.replace(
-        /-/g, '_');
+    return `${GCLOUD_TESTS_PREFIX}_${resourceType}_${uuid.v1()}`
+        .replace(/-/g, '_')
+        .substr(0, 63);
   }
 
   async function deleteBuckets() {
