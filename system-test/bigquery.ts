@@ -28,7 +28,7 @@ const bigquery = new BigQuery();
 const storage = new Storage();
 
 describe('BigQuery', () => {
-  const GCLOUD_TESTS_PREFIX = `nodejs_bq_test${Date.now()}`;
+  const GCLOUD_TESTS_PREFIX = 'nodejs_bq_test';
 
   const dataset = bigquery.dataset(generateName('dataset'));
   const table = dataset.table(generateName('table'));
@@ -1523,28 +1523,51 @@ describe('BigQuery', () => {
   });
 
   function generateName(resourceType: string) {
-    return `${GCLOUD_TESTS_PREFIX}_${resourceType}_${uuid.v1()}`
-        .replace(/-/g, '_')
-        .substr(0, 63);
+    return `${GCLOUD_TESTS_PREFIX}_${resourceType}_${uuid.v1()}`.replace(
+        /-/g, '_');
+  }
+
+  // Only delete a resource if it is older than 24 hours. That will prevent
+  // collisions with parallel CI test runs.
+  function isResourceStale(creationTime: number|string) {
+    const oneDayMs = 86400000;
+    const now = new Date();
+    const created = new Date(creationTime);
+    console.log(now.getTime(), creationTime, created.getTime());
+    return now.getTime() - created.getTime() >= oneDayMs;
   }
 
   async function deleteBuckets() {
     const [buckets] = await storage.getBuckets({
       prefix: GCLOUD_TESTS_PREFIX,
     });
-    await Promise.all(buckets.map(async b => {
-      const [files] = await b.getFiles();
-      await Promise.all(files.map(f => f.delete()));
-      await b.delete();
-    }));
+
+    const deleteBucketPromises =
+        buckets.filter(bucket => isResourceStale(bucket.metadata.timeCreated))
+            .map(async b => {
+              const [files] = await b.getFiles();
+              await Promise.all(files.map(f => f.delete()));
+              await b.delete();
+            });
+
+    await Promise.all(deleteBucketPromises);
   }
 
   async function deleteDatasets() {
     const [datasets] = await bigquery.getDatasets({
       filter: `labels.${GCLOUD_TESTS_PREFIX}`,
     });
-    await Promise.all(datasets.map(dataset => {
-      return dataset.delete({force: true});
-    }));
+
+    const deleteDatasetPromises =
+        datasets
+            .filter(dataset => {
+              const creationTime = dataset.metadata.creationTime;
+              return creationTime && isResourceStale(creationTime);
+            })
+            .map(dataset => {
+              return dataset.delete({force: true});
+            });
+
+    await Promise.all(deleteDatasetPromises);
   }
 });
