@@ -1382,7 +1382,7 @@ describe('BigQuery', () => {
     });
   });
 
-  describe('Custom Types', () => {
+  describe.only('Custom Types', () => {
     let table: Table;
 
     const DATE = bigquery.date('2017-01-01');
@@ -1527,23 +1527,47 @@ describe('BigQuery', () => {
         /-/g, '_');
   }
 
+  // Only delete a resource if it is older than 24 hours. That will prevent
+  // collisions with parallel CI test runs.
+  function isResourceStale(creationTime: number|string) {
+    const oneDayMs = 86400000;
+    const now = new Date();
+    const created = new Date(creationTime);
+    console.log(now.getTime(), creationTime, created.getTime());
+    return now.getTime() - created.getTime() >= oneDayMs;
+  }
+
   async function deleteBuckets() {
     const [buckets] = await storage.getBuckets({
       prefix: GCLOUD_TESTS_PREFIX,
     });
-    await Promise.all(buckets.map(async b => {
-      const [files] = await b.getFiles();
-      await Promise.all(files.map(f => f.delete()));
-      await b.delete();
-    }));
+
+    const deleteBucketPromises =
+        buckets.filter(bucket => isResourceStale(bucket.metadata.timeCreated))
+            .map(async b => {
+              const [files] = await b.getFiles();
+              await Promise.all(files.map(f => f.delete()));
+              await b.delete();
+            });
+
+    await Promise.all(deleteBucketPromises);
   }
 
   async function deleteDatasets() {
     const [datasets] = await bigquery.getDatasets({
       filter: `labels.${GCLOUD_TESTS_PREFIX}`,
     });
-    await Promise.all(datasets.map(dataset => {
-      return dataset.delete({force: true});
-    }));
+
+    const deleteDatasetPromises =
+        datasets
+            .filter(dataset => {
+              const creationTime = dataset.metadata.creationTime;
+              return creationTime && isResourceStale(creationTime);
+            })
+            .map(dataset => {
+              return dataset.delete({force: true});
+            });
+
+    await Promise.all(deleteDatasetPromises);
   }
 });
