@@ -119,8 +119,8 @@ export interface JobLoadMetadata {
     field?: string;
     requirePartitionFilter?: boolean;
     type?: string;
-    writeDisposition?: string;
   };
+  writeDisposition?: string;
 }
 
 export interface CreateExtractJobOptions {
