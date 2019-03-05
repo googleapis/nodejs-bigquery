@@ -20,31 +20,29 @@ const {assert} = require('chai');
 const execa = require('execa');
 const uuid = require('uuid');
 
-const cmd = 'node datasets.js';
-const exec = async cmd => {
-  const res = await execa.shell(cmd);
-  assert.isEmpty(res.stderr);
-  return res.stdout;
-};
-const datasetId = `gcloud_tests_${uuid.v4()}`.replace(/-/gi, '_');
+const cmd = 'node bigquery_list_dataset.js';
+const exec = async cmd => (await execa.shell(cmd)).stdout;
+const REGION_TAG = 'bigquery_list_datasets';
+const PROJECT_ID = process.env.GCLOUD_PROJECT;
+const DATASET_ID = `gcloud_tests_${uuid.v4()}`.replace(/-/gi, '_');
 const bigquery = new BigQuery();
 
-describe(`Create Dataset`, () => {
-  let projectId;
+describe(`BigQuery List Datasets`, () => {
+  let PROJECT_ID;
   before(async () => {
-    projectId = await bigquery.getProjectId();
+    PROJECT_ID = await bigquery.getProjectId();
+    await exec(`node bigquery_create_dataset.js ${PROJECT_ID} ${DATASET_ID}`);
   });
   after(async () => {
     await bigquery
-      .dataset(datasetId)
+      .dataset(DATASET_ID)
       .delete({force: true})
       .catch(console.warn);
   });
 
-  it(`should create a dataset`, async () => {
-    const output = await exec(`${cmd} create ${projectId} ${datasetId}`);
-    assert.strictEqual(output, `Dataset ${datasetId} created.`);
-    const [exists] = await bigquery.dataset(datasetId).exists();
-    assert.ok(exists);
+  it(`should list datasets`, async () => {
+    const output = await exec(`node ${REGION_TAG}.js ${PROJECT_ID}`);
+    assert.match(output, /Datasets:/);
+    assert.match(output, new RegExp(DATASET_ID));
   });
 });

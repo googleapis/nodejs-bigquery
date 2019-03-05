@@ -14,28 +14,25 @@
  */
 'use strict';
 
-async function createDataset() {
+// [START bigquery_list_datasets]
+async function bigquery_list_datasets(PROJECT_ID = 'YOUR_PROJECT_ID') {
   // Imports the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
 
-  /**
-   * TODO(developer): Uncomment the following lines before running the sample.
-   */
-  // const projectId = "your-project-id";
-  // const datasetId = "my_new_dataset";
-
   // Creates a client
-  const bigquery = new BigQuery({projectId});
+  const bigquery = new BigQuery({PROJECT_ID});
 
-  // Creates a new dataset
+  // Lists all datasets in the specified project
   await bigquery
-    .createDataset(datasetId)
+    .getDatasets()
     .then(response => {
-      console.log(`Dataset ${response[0].id} created.`);
+      console.log('Datasets:');
+      response[0].forEach(dataset => console.log(dataset.id));
     })
     .catch(error => {
-      console.log(error.errors[0].message);
+      console.log(error);
     });
 }
+// [END bigquery_list_datasets]
 
-createDataset();
+bigquery_list_datasets(...process.argv.slice(2));
