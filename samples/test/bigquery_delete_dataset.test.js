@@ -23,7 +23,6 @@ const uuid = require('uuid');
 const cmd = 'node bigquery_delete_dataset.js';
 const exec = async cmd => (await execa.shell(cmd)).stdout;
 const REGION_TAG = 'bigquery_delete_dataset';
-const PROJECT_ID = process.env.GCLOUD_PROJECT;
 const DATASET_ID = `gcloud_tests_${uuid.v4()}`.replace(/-/gi, '_');
 const bigquery = new BigQuery();
 
@@ -35,7 +34,9 @@ describe(`BigQuery Delete Dataset`, () => {
   });
 
   it(`should delete a dataset`, async () => {
-    const output = await exec(`node ${REGION_TAG}.js ${PROJECT_ID} ${DATASET_ID}`);
+    const output = await exec(
+      `node ${REGION_TAG}.js ${PROJECT_ID} ${DATASET_ID}`
+    );
     assert.strictEqual(output, `Dataset ${DATASET_ID} deleted.`);
     const [exists] = await bigquery.dataset(DATASET_ID).exists();
     assert.strictEqual(exists, false);

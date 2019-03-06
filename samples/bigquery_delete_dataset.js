@@ -30,11 +30,14 @@ async function bigquery_delete_dataset(
   const dataset = bigquery.dataset(DATASET_ID);
 
   // Deletes the dataset
-  await dataset.delete().then(()=>{
-    console.log(`Dataset ${dataset.id} deleted.`);
-  }).catch(error => {
-    console.log(error);
-  });
+  await dataset
+    .delete()
+    .then(() => {
+      console.log(`Dataset ${dataset.id} deleted.`);
+    })
+    .catch(error => {
+      console.log(error);
+    });
 }
 // [END bigquery_delete_dataset]
 

@@ -23,7 +23,6 @@ const uuid = require('uuid');
 const cmd = 'node bigquery_list_dataset.js';
 const exec = async cmd => (await execa.shell(cmd)).stdout;
 const REGION_TAG = 'bigquery_list_datasets';
-const PROJECT_ID = process.env.GCLOUD_PROJECT;
 const DATASET_ID = `gcloud_tests_${uuid.v4()}`.replace(/-/gi, '_');
 const bigquery = new BigQuery();
 

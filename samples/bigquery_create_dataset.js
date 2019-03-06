@@ -34,7 +34,7 @@ async function bigquery_create_dataset(
     .catch(error => {
       console.log(error.errors[0].message);
     });
-};
+}
 // [END bigquery_create_dataset]
 
 bigquery_create_dataset(...process.argv.slice(2));
