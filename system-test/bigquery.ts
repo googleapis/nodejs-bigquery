@@ -407,15 +407,11 @@ describe('BigQuery', () => {
 
     it('should error out for bad etags', async () => {
       await assert.rejects(
-          dataset.setMetadata({
+          () => dataset.setMetadata({
             etag: 'a-fake-etag',
             description: 'oh no!',
           }),
           /precondition/i);
-      // TODO: temp. skip flaky assertion:
-      // https://github.com/googleapis/nodejs-bigquery/pull/315#issuecomment-449202488
-      // assert.strictEqual(
-      //    (err as ApiError).code, 412);  // precondition failed
     });
 
     it('should get tables', done => {
@@ -1464,7 +1460,6 @@ describe('BigQuery', () => {
     const oneDayMs = 86400000;
     const now = new Date();
     const created = new Date(creationTime);
-    console.log(now.getTime(), creationTime, created.getTime());
     return now.getTime() - created.getTime() >= oneDayMs;
   }
 
