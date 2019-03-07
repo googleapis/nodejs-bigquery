@@ -448,6 +448,7 @@ describe('BigQuery', () => {
           },
           {
             name: 'details',
+            type: 'RECORD',
             fields: [
               {
                 name: 'nested_id',
@@ -494,16 +495,12 @@ describe('BigQuery', () => {
       describe('job.get', async () => {
         it('should fail to reload if the location is not set', async () => {
           const badJob = bigquery.job(job.id!);
-          await assert.rejects(badJob.getMetadata(), (err: ApiError) => {
-            assert.strictEqual(err.code, 404);
-          });
+          await assert.rejects(() => badJob.getMetadata(), {code: 404});
         });
 
         it('should fail to reload if the location is wrong', async () => {
           const badJob = bigquery.job(job.id!, {location: 'US'});
-          await assert.rejects(badJob.getMetadata(), (err: ApiError) => {
-            assert.strictEqual(err.code, 404);
-          });
+          await assert.rejects(() => badJob.getMetadata(), {code: 404});
         });
 
         it('should reload if the location matches', async () => {
