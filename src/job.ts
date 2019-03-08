@@ -18,7 +18,7 @@
  * @module bigquery/job
  */
 
-import {MetadataCallback, Operation, util} from '@google-cloud/common';
+import {Metadata, MetadataCallback, Operation, util} from '@google-cloud/common';
 import {paginator} from '@google-cloud/paginator';
 import {promisifyAll} from '@google-cloud/promisify';
 import * as extend from 'extend';
@@ -454,27 +454,28 @@ class Job extends Operation {
    * @param {function} callback
    */
   poll_(callback: MetadataCallback): void {
-    this.getMetadata((err, metadata, apiResponse) => {
-      // tslint:disable-next-line no-any
-      if (!err && (apiResponse as any).status &&
+    this.getMetadata(
+        (err: Error, metadata: Metadata, apiResponse: r.Response) => {
           // tslint:disable-next-line no-any
-          (apiResponse as any).status.errors) {
-        // tslint:disable-next-line no-any
-        err = new util.ApiError((apiResponse as any).status);
-      }
+          if (!err && (apiResponse as any).status &&
+              // tslint:disable-next-line no-any
+              (apiResponse as any).status.errors) {
+            // tslint:disable-next-line no-any
+            err = new util.ApiError((apiResponse as any).status);
+          }
 
-      if (err) {
-        callback(err);
-        return;
-      }
+          if (err) {
+            callback(err);
+            return;
+          }
 
-      if (metadata.status.state !== 'DONE') {
-        callback(null);
-        return;
-      }
+          if (metadata.status.state !== 'DONE') {
+            callback(null);
+            return;
+          }
 
-      callback(null, metadata);
-    });
+          callback(null, metadata);
+        });
   }
 }
 
