@@ -42,6 +42,7 @@
     "predocs": "npm run compile",
     "prepare": "npm run compile",
     "pretest": "npm run compile",
+    "prettier": "prettier --write samples/*.js samples/test/*.js",
     "posttest": "npm run check"
   },
   "dependencies": {

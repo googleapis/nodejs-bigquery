@@ -16,29 +16,20 @@
 'use strict';
 
 // [START bigquery_delete_dataset]
-async function bigquery_delete_dataset(
-  PROJECT_ID = 'YOUR_PROJECT_ID',
-  DATASET_ID = 'YOUR_DATASET_ID'
-) {
+async function bigquery_delete_dataset(DATASET_ID = 'YOUR_DATASET_ID') {
   // Imports the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
 
   // Creates a client
-  const bigquery = new BigQuery({PROJECT_ID});
+  const bigquery = new BigQuery();
 
   // Creates a reference to the existing dataset
   const dataset = bigquery.dataset(DATASET_ID);
 
   // Deletes the dataset
-  await dataset
-    .delete()
-    .then(() => {
-      console.log(`Dataset ${dataset.id} deleted.`);
-    })
-    .catch(error => {
-      console.log(error);
-    });
+  await dataset.delete();
+  console.log(`Dataset ${dataset.id} deleted.`);
 }
 // [END bigquery_delete_dataset]
 
-bigquery_delete_dataset(...process.argv.slice(2));
+bigquery_delete_dataset(...process.argv.slice(2)).catch(console.error);
