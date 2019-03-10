@@ -44,7 +44,8 @@
     "pretest": "npm run compile",
     "posttest": "npm run check",
     "docs-test": "linkinator docs -r --skip www.googleapis.com",
-    "predocs-test": "npm run docs"
+    "predocs-test": "npm run docs",
+    "generate-scaffolding": "repo-tools generate all && repo-tools generate lib_samples_readme -l samples/ --config ../.cloud-repo-tools.json"
   },
   "dependencies": {
     "@google-cloud/common": "^0.31.0",

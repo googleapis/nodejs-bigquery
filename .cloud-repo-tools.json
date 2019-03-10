@@ -6,11 +6,22 @@
   "release_quality": "ga",
   "samples": [
     {
-      "id": "datasets",
-      "name": "Datasets",
-      "file": "datasets.js",
-      "docs_link": "https://cloud.google.com/nodejs/docs/reference/bigquery/latest/",
-      "usage": "node datasets.js --help"
+      "id": "dataset-create",
+      "name": "Dataset create",
+      "file": "createDataset.js",
+      "docs_link": "https://cloud.google.com/nodejs/docs/reference/bigquery/latest/"
+    },
+    {
+      "id": "dataset-delete",
+      "name": "Dataset delete",
+      "file": "deleteDataset.js",
+      "docs_link": "https://cloud.google.com/nodejs/docs/reference/bigquery/latest/"
+    },
+    {
+      "id": "dataset-list",
+      "name": "Dataset list",
+      "file": "listDatasets.js",
+      "docs_link": "https://cloud.google.com/nodejs/docs/reference/bigquery/latest/"
     },
     {
       "id": "tables",
