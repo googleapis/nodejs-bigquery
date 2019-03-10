@@ -12,24 +12,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 'use strict';
 
-// [START bigquery_delete_dataset]
-async function bigquery_delete_dataset(DATASET_ID = 'YOUR_DATASET_ID') {
+async function createDataset(DATASET_ID = 'YOUR_DATASET_ID') {
+  // [START bigquery_create_dataset]
   // Imports the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
 
   // Creates a client
   const bigquery = new BigQuery();
 
-  // Creates a reference to the existing dataset
-  const dataset = bigquery.dataset(DATASET_ID);
-
-  // Deletes the dataset
-  await dataset.delete();
-  console.log(`Dataset ${dataset.id} deleted.`);
+  // Creates a new dataset
+  const [dataset] = await bigquery.createDataset(DATASET_ID);
+  console.log(`Dataset ${dataset.id} created.`);
+  // [END bigquery_create_dataset]
 }
-// [END bigquery_delete_dataset]
 
-bigquery_delete_dataset(...process.argv.slice(2)).catch(console.error);
+createDataset(...process.argv.slice(2)).catch(console.error);
