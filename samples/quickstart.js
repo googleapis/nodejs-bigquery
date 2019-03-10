@@ -15,10 +15,10 @@
 
 'use strict';
 
-// [START bigquery_quickstart]
 async function createDataset(
   datasetName = 'my_new_dataset' // Name for the new dataset
 ) {
+  // [START bigquery_quickstart]
   // Imports the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
 
@@ -28,8 +28,8 @@ async function createDataset(
   // Create the dataset
   const [dataset] = await bigquery.createDataset(datasetName);
   console.log(`Dataset ${dataset.id} created.`);
+  // [END bigquery_quickstart]
 }
-// [END bigquery_quickstart]
 
 const args = process.argv.slice(2);
 createDataset(...args).catch(console.error);
