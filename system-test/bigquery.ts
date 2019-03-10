@@ -170,21 +170,14 @@ describe('BigQuery', () => {
         });
   });
 
-  it('should allow for manual pagination in promise mode', () => {
-    return bigquery
-        .getDatasets({
-          autoPaginate: false,
-          filter: `labels.${GCLOUD_TESTS_PREFIX}`,
-        } as GetDatasetsOptions)
-        .then(data => {
-          const datasets = data[0];
-          const nextQuery = data[1];
-          const apiResponse = data[2];
-
-          assert(datasets[0] instanceof Dataset);
-          assert.strictEqual(nextQuery, null);
-          assert(apiResponse);
-        });
+  it('should allow for manual pagination in promise mode', async () => {
+    const [datasets, nextQuery, apiResponse] = await bigquery.getDatasets({
+      autoPaginate: false,
+      filter: `labels.${GCLOUD_TESTS_PREFIX}`,
+    });
+    assert(datasets[0] instanceof Dataset);
+    assert.strictEqual(nextQuery, null);
+    assert(apiResponse);
   });
 
   it('should list datasets as a stream', done => {
