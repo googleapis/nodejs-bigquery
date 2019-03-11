@@ -1710,11 +1710,11 @@ class Table extends common.ServiceObject {
   /**
    * Stream data into BigQuery one record at a time without running a load job.
    *
-   * There are more strict quota limits using this method so it is highly
-   * recommended that you load data into BigQuery using
+   * If you need to create an entire table from a file, consider using
    * {@link Table#load} instead.
    *
    * @see [Tabledata: insertAll API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/tabledata/insertAll}
+   * @see [Streaming Insert Limits]{@link https://cloud.google.com/bigquery/quotas#streaming_inserts}
    * @see [Troubleshooting Errors]{@link https://developers.google.com/bigquery/troubleshooting-errors}
    *
    * @param {object|object[]} rows The rows to insert into the table.
