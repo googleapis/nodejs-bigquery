@@ -176,7 +176,6 @@ describe('BigQuery', () => {
       filter: `labels.${GCLOUD_TESTS_PREFIX}`,
     });
     assert(datasets[0] instanceof Dataset);
-    assert.strictEqual(nextQuery, null);
     assert(apiResponse);
   });
 
