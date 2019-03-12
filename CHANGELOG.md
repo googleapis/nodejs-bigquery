@@ -4,6 +4,50 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## v2.1.0
+
+03-12-2019 15:30 PDT
+
+### New Features
+- feat: throw errors for missing resource ids ([#342](https://github.com/googleapis/nodejs-bigquery/pull/342))
+
+### Bug Fixes
+- fix(types): move JobLoadMetadata writeDisposition ([#365](https://github.com/googleapis/nodejs-bigquery/pull/365))
+- fix(types): Allow views to be configured using an object or a string ([#333](https://github.com/googleapis/nodejs-bigquery/pull/333))
+- fix(types): add missing parameters (selectedFields, startIndex) in table.getRows() options ([#331](https://github.com/googleapis/nodejs-bigquery/pull/331))
+
+### Dependencies
+- fix(deps): update dependency @google-cloud/paginator to ^0.2.0 ([#373](https://github.com/googleapis/nodejs-bigquery/pull/373))
+- fix(deps): update dependency @google-cloud/common to ^0.31.0 ([#371](https://github.com/googleapis/nodejs-bigquery/pull/371))
+- fix(deps): update dependency @google-cloud/promisify to ^0.4.0 ([#356](https://github.com/googleapis/nodejs-bigquery/pull/356))
+- fix(deps): update dependency duplexify to v4 ([#343](https://github.com/googleapis/nodejs-bigquery/pull/343))
+
+### Documentation
+- docs(table): link to upstream limit docs ([#376](https://github.com/googleapis/nodejs-bigquery/pull/376))
+- docs: update samples and docs to match rubric ([#374](https://github.com/googleapis/nodejs-bigquery/pull/374))
+- docs: update links in contrib guide ([#358](https://github.com/googleapis/nodejs-bigquery/pull/358))
+- docs: update contributing path in README ([#350](https://github.com/googleapis/nodejs-bigquery/pull/350))
+- docs: move CONTRIBUTING.md to root ([#349](https://github.com/googleapis/nodejs-bigquery/pull/349))
+- docs: add lint/fix example to contributing guide ([#344](https://github.com/googleapis/nodejs-bigquery/pull/344))
+
+### Internal / Testing Changes
+- testing: remove nextQuery assertion ([#377](https://github.com/googleapis/nodejs-bigquery/pull/377))
+- refactor(samples): split samples into their own files ([#368](https://github.com/googleapis/nodejs-bigquery/pull/368))
+- build: Add docuploader credentials to node publish jobs ([#370](https://github.com/googleapis/nodejs-bigquery/pull/370))
+- build: use node10 to run samples-test, system-test etc ([#369](https://github.com/googleapis/nodejs-bigquery/pull/369))
+- build: system-tests only delete stale resources
+- chore: make test prefix unique per run ([#363](https://github.com/googleapis/nodejs-bigquery/pull/363))
+- chore(deps): update dependency mocha to v6 ([#360](https://github.com/googleapis/nodejs-bigquery/pull/360))
+- test: skip installation test if GOOGLE_CLOUD_TESTS_IN_VPCSC is passed ([#345](https://github.com/googleapis/nodejs-bigquery/pull/345))
+- build: use linkinator for docs test ([#354](https://github.com/googleapis/nodejs-bigquery/pull/354))
+- fix(deps): update dependency yargs to v13 ([#353](https://github.com/googleapis/nodejs-bigquery/pull/353))
+- chore(deps): update dependency @types/tmp to v0.0.34 ([#355](https://github.com/googleapis/nodejs-bigquery/pull/355))
+- build: create docs test npm scripts ([#352](https://github.com/googleapis/nodejs-bigquery/pull/352))
+- build: test using @grpc/grpc-js in CI ([#351](https://github.com/googleapis/nodejs-bigquery/pull/351))
+- build: check for 404s in the docs ([#337](https://github.com/googleapis/nodejs-bigquery/pull/337))
+- build: output benchmark data in csv format ([#339](https://github.com/googleapis/nodejs-bigquery/pull/339))
+- chore(deps): update dependency eslint-config-prettier to v4 ([#338](https://github.com/googleapis/nodejs-bigquery/pull/338))
+
 ## v2.0.6
 
 01-08-2019 13:52 PST
