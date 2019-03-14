@@ -20,7 +20,7 @@ module.exports = {
   opts: {
     readme: './README.md',
     package: './package.json',
-    template: './node_modules/jsdoc-baseline',
+    template: './node_modules/ink-docstrap/template',
     recurse: true,
     verbose: true,
     destination: './docs/'
@@ -31,7 +31,7 @@ module.exports = {
   source: {
     excludePattern: '(^|\\/|\\\\)[._]',
     include: [
-      'build/src'
+      'src'
     ],
     includePattern: '\\.js$'
   },

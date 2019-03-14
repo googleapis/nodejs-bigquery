@@ -17,6 +17,8 @@
   * [Dataset list](#dataset-list)
   * [Tables](#tables)
   * [Queries](#queries)
+  * [Query named params](#query-named-params)
+  * [Query positional params](#query-positional-params)
 
 ## Before you begin
 
@@ -153,6 +155,20 @@ For more information, see https://cloud.google.com/bigquery/docs
 
 [queries_4_docs]: https://cloud.google.com/nodejs/docs/reference/bigquery/latest/
 [queries_4_code]: queries.js
+
+### Query named params
+
+View the [source code][query-params-named_5_code].
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/queryParamsNamed.js,samples/README.md)[query-params-named_5_docs]: https://cloud.google.com/nodejs/docs/reference/bigquery/latest/
+[query-params-named_5_code]: queryParamsNamed.js
+
+### Query positional params
+
+View the [source code][query-params-positional_6_code].
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/queryParamsPositional.js,samples/README.md)[query-params-positional_6_docs]: https://cloud.google.com/nodejs/docs/reference/bigquery/latest/
+[query-params-positional_6_code]: queryParamsPositional.js
 
 [shell_img]: https://gstatic.com/cloudssh/images/open-btn.png
 [shell_link]: https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/README.md
