@@ -6,22 +6,22 @@ const execa = require('execa');
 const uuid = require('uuid');
 
 const exec = async cmd => (await execa.shell(cmd)).stdout;
-const DATASET_ID = `gcloud_tests_${uuid.v4()}`.replace(/-/gi, '_');
+const datasetId = `gcloud_tests_${uuid.v4()}`.replace(/-/gi, '_');
 const bigquery = new BigQuery();
 
 describe(`Datasets`, () => {
   after(async () => {
     await bigquery
-      .dataset(DATASET_ID)
+      .dataset(datasetId)
       .delete({force: true})
       .catch(console.warn);
   });
 
   it(`should create a dataset`, async () => {
     const REGION_TAG = 'bigquery_create_dataset';
-    const output = await exec(`node ${REGION_TAG}.js ${DATASET_ID}`);
-    assert.strictEqual(output, `Dataset ${DATASET_ID} created.`);
-    const [exists] = await bigquery.dataset(DATASET_ID).exists();
+    const output = await exec(`node ${REGION_TAG}.js ${datasetId}`);
+    assert.strictEqual(output, `Dataset ${datasetId} created.`);
+    const [exists] = await bigquery.dataset(datasetId).exists();
     assert.ok(exists);
   });
 
@@ -29,14 +29,14 @@ describe(`Datasets`, () => {
     const REGION_TAG = 'bigquery_list_datasets';
     const output = await exec(`node ${REGION_TAG}.js`);
     assert.match(output, /Datasets:/);
-    assert.match(output, new RegExp(DATASET_ID));
+    assert.match(output, new RegExp(datasetId));
   });
 
   it(`should delete a dataset`, async () => {
     const REGION_TAG = 'bigquery_delete_dataset';
-    const output = await exec(`node ${REGION_TAG}.js ${DATASET_ID}`);
-    assert.strictEqual(output, `Dataset ${DATASET_ID} deleted.`);
-    const [exists] = await bigquery.dataset(DATASET_ID).exists();
+    const output = await exec(`node ${REGION_TAG}.js ${datasetId}`);
+    assert.strictEqual(output, `Dataset ${datasetId} deleted.`);
+    const [exists] = await bigquery.dataset(datasetId).exists();
     assert.strictEqual(exists, false);
   });
 });

@@ -28,7 +28,6 @@ const exec = async cmd => {
   assert.isEmpty(res.stderr);
   return res.stdout;
 };
-const cmd = `node tables.js`;
 const generateUuid = () => `gcloud-tests-${uuid.v4()}`.replace(/-/gi, '_');
 
 const datasetId = generateUuid();
@@ -46,7 +45,7 @@ const rows = [
   {Name: `foo`, Age: 27, Weight: 80.3, IsMagic: true},
   {Name: `bar`, Age: 13, Weight: 54.6, IsMagic: false},
 ];
-
+const cmd = 'node tables.js'
 const bigquery = new BigQuery();
 
 describe('Tables', () => {
@@ -89,8 +88,9 @@ describe('Tables', () => {
   });
 
   it(`should create a table`, async () => {
+    const REGION_TAG = 'bigquery_create_table';
     const output = await exec(
-      `${cmd} create ${projectId} ${datasetId} ${tableId} "${schema}"`
+      `node ${REGION_TAG}.js ${datasetId} ${tableId} "${schema}"`
     );
     assert.strictEqual(output, `Table ${tableId} created.`);
     const [exists] = await bigquery
@@ -101,14 +101,16 @@ describe('Tables', () => {
   });
 
   it(`should list tables`, async () => {
-    const output = await exec(`${cmd} list ${projectId} ${datasetId}`);
+    const REGION_TAG = 'bigquery_list_tables';
+    const output = await exec(`node ${REGION_TAG}.js ${datasetId}`);
     assert.match(output, /Tables:/);
     assert.match(output, new RegExp(tableId));
   });
 
   it(`should load a local CSV file`, async () => {
+    const REGION_TAG = 'bigquery_load_local_file';
     const output = await exec(
-      `${cmd} load-local-csv ${projectId} ${datasetId} ${tableId} ${localFilePath}`
+      `node ${REGION_TAG}.js ${datasetId} ${tableId} ${localFilePath}`
     );
     assert.match(output, /completed\./);
     const [rows] = await bigquery
@@ -119,8 +121,9 @@ describe('Tables', () => {
   });
 
   it(`should browse table rows`, async () => {
+    const REGION_TAG = 'bigquery_browse_rows';
     const output = await exec(
-      `${cmd} browse ${projectId} ${datasetId} ${tableId}`
+      `node ${REGION_TAG}.js ${datasetId} ${tableId}`
     );
     assert.strictEqual(
       output,
@@ -142,9 +145,10 @@ describe('Tables', () => {
   });
 
   it(`should load a GCS ORC file`, async () => {
+    const REGION_TAG = 'bigquery_load_table_gcs_orc';
     const tableId = generateUuid();
     const output = await exec(
-      `${cmd} load-gcs-orc ${projectId} ${datasetId} ${tableId}`
+      `node ${REGION_TAG}.js ${datasetId} ${tableId}`
     );
     assert.match(output, /completed\./);
     const [rows] = await bigquery
@@ -272,8 +276,9 @@ describe('Tables', () => {
   });
 
   it(`should copy a table`, async () => {
+    const REGION_TAG = 'bigquery_copy_table';
     const output = await exec(
-      `${cmd} copy ${projectId} ${srcDatasetId} ${srcTableId} ${destDatasetId} ${destTableId}`
+      `node ${REGION_TAG}.js ${srcDatasetId} ${srcTableId} ${destDatasetId} ${destTableId}`
     );
     assert.match(output, /completed\./);
     const [rows] = await bigquery
@@ -300,8 +305,9 @@ describe('Tables', () => {
   });
 
   it(`should delete a table`, async () => {
+    const REGION_TAG = 'bigquery_delete_table';
     const output = await exec(
-      `${cmd} delete ${projectId} ${datasetId} ${tableId}`
+      `node ${ß}.js ${datasetId} ${tableId}`
     );
     assert.strictEqual(output, `Table ${tableId} deleted.`);
     const [exists] = await bigquery

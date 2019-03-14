@@ -16,28 +16,42 @@
 
 'use strict';
 
-// [START bigquery_create_dataset]
-async function createDataset(datasetId) {
+// [START bigquery_copy_table]
+async function copyTable(
+  srcDatasetId,
+  srcTableId,
+  destDatasetId,
+  destTableId
+) {
+
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
 
   /**
    * TODO(developer): Uncomment the following lines before running the sample
    */
-  // const datasetId = "my_new_dataset";
+  // const srcDatasetId = "my_src_dataset";
+  // const srcTableId = "my_src_table";
+  // const destDatasetId = "my_dest_dataset";
+  // const destTableId = "my_dest_table";
 
   // Create a client
   const bigquery = new BigQuery();
 
-  // Specify the geographic location where the dataset should reside
-  const options = {
-    location: 'US'
+  // Copy the table contents into another table
+  const [job] = await bigquery
+    .dataset(srcDatasetId)
+    .table(srcTableId)
+    .copy(bigquery.dataset(destDatasetId).table(destTableId));
+
+  console.log(`Job ${job.id} completed.`);
+
+  // Check the job's status for errors
+  const errors = job.status.errors;
+  if (errors && errors.length > 0) {
+    throw errors;
   }
-
-  // Create a new dataset
-  const [dataset] = await bigquery.createDataset(datasetId, options);
-  console.log(`Dataset ${dataset.id} created.`);
 }
-// [END bigquery_create_dataset]
+// [END bigquery_copy_table]
 
-createDataset(...process.argv.slice(2)).catch(console.error);
+copyTable(...process.argv.slice(2)).catch(console.error);

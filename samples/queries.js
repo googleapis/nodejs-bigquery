@@ -60,8 +60,8 @@ async function queryStackOverflow() {
   // [END bigquery_simple_app_all]
 }
 
+// [START bigquery_query]
 async function query() {
-  // [START bigquery_query]
   // Imports the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
 
@@ -88,11 +88,11 @@ async function query() {
   // Prints the results
   console.log('Rows:');
   rows.forEach(row => console.log(row));
-  // [END bigquery_query]
 }
+// [END bigquery_query]
 
+// [START bigquery_query_no_cache]
 async function queryDisableCache() {
-  // [START bigquery_query_no_cache]
   // Imports the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
 
@@ -119,8 +119,8 @@ async function queryDisableCache() {
   // Prints the results
   console.log('Rows:');
   rows.forEach(row => console.log(row));
-  // [END bigquery_query_no_cache]
 }
+// [END bigquery_query_no_cache]
 
 require(`yargs`)
   .demand(1)

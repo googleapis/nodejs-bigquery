@@ -16,19 +16,29 @@
 
 'use strict';
 
-// [START bigquery_list_datasets]
-async function listDatasets() {
+// [START bigquery_browse_table]
+async function browseRows(datasetId, tableId) {
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
+
+  /**
+   * TODO(developer): Uncomment the following lines before running the sample
+   */
+  // const datasetId = "my_dataset";
+  // const tableId = "my_table";
 
   // Create a client
   const bigquery = new BigQuery();
 
-  // Lists all datasets in the specified project
-  const [datasets] = await bigquery.getDatasets();
-  console.log('Datasets:');
-  datasets.forEach(dataset => console.log(dataset.id));
-}
-// [END bigquery_list_datasets]
+  // List rows in the table
+  const [rows] = await bigquery
+    .dataset(datasetId)
+    .table(tableId)
+    .getRows();
 
-listDatasets(...process.argv.slice(2)).catch(console.error);
+  console.log('Rows:');
+  rows.forEach(row => console.log(row));
+}
+// [END bigquery_browse_table]
+
+browseRows(...process.argv.slice(2)).catch(console.error);

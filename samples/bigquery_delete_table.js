@@ -16,19 +16,28 @@
 
 'use strict';
 
-// [START bigquery_list_datasets]
-async function listDatasets() {
+// [START bigquery_delete_table]
+async function deleteTable(datasetId, tableId) {
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
+
+  /**
+   * TODO(developer): Uncomment the following lines before running the sample.
+   */
+  // const datasetId = "my_dataset";
+  // const tableId = "my_table";
 
   // Create a client
   const bigquery = new BigQuery();
 
-  // Lists all datasets in the specified project
-  const [datasets] = await bigquery.getDatasets();
-  console.log('Datasets:');
-  datasets.forEach(dataset => console.log(dataset.id));
-}
-// [END bigquery_list_datasets]
+  // Delete the table
+  await bigquery
+    .dataset(datasetId)
+    .table(tableId)
+    .delete();
 
-listDatasets(...process.argv.slice(2)).catch(console.error);
+  console.log(`Table ${tableId} deleted.`);
+}
+// [END bigquery_delete_table]
+
+deleteTable(...process.argv.slice(2)).catch(console.error);

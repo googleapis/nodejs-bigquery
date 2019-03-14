@@ -15,226 +15,226 @@
 
 'use strict';
 
-async function createTable(datasetId, tableId, schema, projectId) {
-  // [START bigquery_create_table]
-  // Imports the Google Cloud client library
-  const {BigQuery} = require('@google-cloud/bigquery');
+// async function createTable(datasetId, tableId, schema, projectId) {
+//   // [START bigquery_create_table]
+//   // Imports the Google Cloud client library
+//   const {BigQuery} = require('@google-cloud/bigquery');
+//
+//   /**
+//    * TODO(developer): Uncomment the following lines before running the sample.
+//    */
+//   // const projectId = "your-project-id";
+//   // const datasetId = "my_new_dataset";
+//   // const tableId = "my_new_table";
+//   // const schema = "Name:string, Age:integer, Weight:float, IsMagic:boolean";
+//
+//   // Creates a client
+//   const bigquery = new BigQuery({projectId});
+//
+//   // For all options, see https://cloud.google.com/bigquery/docs/reference/v2/tables#resource
+//   const options = {schema};
+//
+//   // Create a new table in the dataset
+//   const [table] = await bigquery
+//     .dataset(datasetId)
+//     .createTable(tableId, options);
+//
+//   console.log(`Table ${table.id} created.`);
+//   // [END bigquery_create_table]
+// }
 
-  /**
-   * TODO(developer): Uncomment the following lines before running the sample.
-   */
-  // const projectId = "your-project-id";
-  // const datasetId = "my_new_dataset";
-  // const tableId = "my_new_table";
-  // const schema = "Name:string, Age:integer, Weight:float, IsMagic:boolean";
+// async function deleteTable(datasetId, tableId, projectId) {
+//   // [START bigquery_delete_table]
+//   // Imports the Google Cloud client library
+//   const {BigQuery} = require('@google-cloud/bigquery');
+//
+//   /**
+//    * TODO(developer): Uncomment the following lines before running the sample.
+//    */
+//   // const projectId = "your-project-id";
+//   // const datasetId = "my_dataset";
+//   // const tableId = "my_table";
+//
+//   // Creates a client
+//   const bigquery = new BigQuery({projectId});
+//
+//   // Deletes the table
+//   await bigquery
+//     .dataset(datasetId)
+//     .table(tableId)
+//     .delete();
+//
+//   console.log(`Table ${tableId} deleted.`);
+//   // [END bigquery_delete_table]
+// }
 
-  // Creates a client
-  const bigquery = new BigQuery({projectId});
+// async function listTables(datasetId, projectId) {
+//   // [START bigquery_list_tables]
+//   // Imports the Google Cloud client library
+//   const {BigQuery} = require('@google-cloud/bigquery');
+//
+//   /**
+//    * TODO(developer): Uncomment the following lines before running the sample.
+//    */
+//   // const projectId = "your-project-id";
+//   // const datasetId = "my_dataset";
+//
+//   // Creates a client
+//   const bigquery = new BigQuery({projectId});
+//
+//   // Lists all tables in the dataset
+//   const [tables] = await bigquery.dataset(datasetId).getTables();
+//
+//   console.log('Tables:');
+//   tables.forEach(table => console.log(table.id));
+//   // [END bigquery_list_tables]
+// }
+//
+// async function browseRows(datasetId, tableId, projectId) {
+//   // [START bigquery_browse_table]
+//   // Imports the Google Cloud client library
+//   const {BigQuery} = require('@google-cloud/bigquery');
+//
+//   /**
+//    * TODO(developer): Uncomment the following lines before running the sample.
+//    */
+//   // const projectId = "your-project-id";
+//   // const datasetId = "my_dataset";
+//   // const tableId = "my_table";
+//
+//   // Creates a client
+//   const bigquery = new BigQuery({projectId});
+//
+//   // Lists rows in the table
+//   const [rows] = await bigquery
+//     .dataset(datasetId)
+//     .table(tableId)
+//     .getRows();
+//
+//   console.log('Rows:');
+//   rows.forEach(row => console.log(row));
+//   // [END bigquery_browse_table]
+// }
 
-  // For all options, see https://cloud.google.com/bigquery/docs/reference/v2/tables#resource
-  const options = {schema};
+// async function copyTable(
+//   srcDatasetId,
+//   srcTableId,
+//   destDatasetId,
+//   destTableId,
+//   projectId
+// ) {
+//   // [START bigquery_copy_table]
+//   // Imports the Google Cloud client library
+//   const {BigQuery} = require('@google-cloud/bigquery');
+//
+//   /**
+//    * TODO(developer): Uncomment the following lines before running the sample.
+//    */
+//   // const projectId = "your-project-id";
+//   // const srcDatasetId = "my_src_dataset";
+//   // const srcTableId = "my_src_table";
+//   // const destDatasetId = "my_dest_dataset";
+//   // const destTableId = "my_dest_table";
+//
+//   // Creates a client
+//   const bigquery = new BigQuery({projectId});
+//
+//   // Copies the table contents into another table
+//   const [job] = await bigquery
+//     .dataset(srcDatasetId)
+//     .table(srcTableId)
+//     .copy(bigquery.dataset(destDatasetId).table(destTableId));
+//
+//   console.log(`Job ${job.id} completed.`);
+//
+//   // Check the job's status for errors
+//   const errors = job.status.errors;
+//   if (errors && errors.length > 0) {
+//     throw errors;
+//   }
+//   // [END bigquery_copy_table]
+// }
 
-  // Create a new table in the dataset
-  const [table] = await bigquery
-    .dataset(datasetId)
-    .createTable(tableId, options);
+// async function loadLocalFile(datasetId, tableId, filename, projectId) {
+//   // [START bigquery_load_from_file]
+//   // Imports the Google Cloud client library
+//   const {BigQuery} = require('@google-cloud/bigquery');
+//
+//   /**
+//    * TODO(developer): Uncomment the following lines before running the sample.
+//    */
+//   // const projectId = "your-project-id";
+//   // const filename = "/path/to/file.csv";
+//   // const datasetId = "my_dataset";
+//   // const tableId = "my_table";
+//
+//   // Creates a client
+//   const bigquery = new BigQuery({projectId});
+//
+//   // Loads data from a local file into the table
+//   const [job] = await bigquery
+//     .dataset(datasetId)
+//     .table(tableId)
+//     .load(filename);
+//
+//   console.log(`Job ${job.id} completed.`);
+//
+//   // Check the job's status for errors
+//   const errors = job.status.errors;
+//   if (errors && errors.length > 0) {
+//     throw errors;
+//   }
+//   // [END bigquery_load_from_file]
+// }
 
-  console.log(`Table ${table.id} created.`);
-  // [END bigquery_create_table]
-}
-
-async function deleteTable(datasetId, tableId, projectId) {
-  // [START bigquery_delete_table]
-  // Imports the Google Cloud client library
-  const {BigQuery} = require('@google-cloud/bigquery');
-
-  /**
-   * TODO(developer): Uncomment the following lines before running the sample.
-   */
-  // const projectId = "your-project-id";
-  // const datasetId = "my_dataset";
-  // const tableId = "my_table";
-
-  // Creates a client
-  const bigquery = new BigQuery({projectId});
-
-  // Deletes the table
-  await bigquery
-    .dataset(datasetId)
-    .table(tableId)
-    .delete();
-
-  console.log(`Table ${tableId} deleted.`);
-  // [END bigquery_delete_table]
-}
-
-async function listTables(datasetId, projectId) {
-  // [START bigquery_list_tables]
-  // Imports the Google Cloud client library
-  const {BigQuery} = require('@google-cloud/bigquery');
-
-  /**
-   * TODO(developer): Uncomment the following lines before running the sample.
-   */
-  // const projectId = "your-project-id";
-  // const datasetId = "my_dataset";
-
-  // Creates a client
-  const bigquery = new BigQuery({projectId});
-
-  // Lists all tables in the dataset
-  const [tables] = await bigquery.dataset(datasetId).getTables();
-
-  console.log('Tables:');
-  tables.forEach(table => console.log(table.id));
-  // [END bigquery_list_tables]
-}
-
-async function browseRows(datasetId, tableId, projectId) {
-  // [START bigquery_browse_table]
-  // Imports the Google Cloud client library
-  const {BigQuery} = require('@google-cloud/bigquery');
-
-  /**
-   * TODO(developer): Uncomment the following lines before running the sample.
-   */
-  // const projectId = "your-project-id";
-  // const datasetId = "my_dataset";
-  // const tableId = "my_table";
-
-  // Creates a client
-  const bigquery = new BigQuery({projectId});
-
-  // Lists rows in the table
-  const [rows] = await bigquery
-    .dataset(datasetId)
-    .table(tableId)
-    .getRows();
-
-  console.log('Rows:');
-  rows.forEach(row => console.log(row));
-  // [END bigquery_browse_table]
-}
-
-async function copyTable(
-  srcDatasetId,
-  srcTableId,
-  destDatasetId,
-  destTableId,
-  projectId
-) {
-  // [START bigquery_copy_table]
-  // Imports the Google Cloud client library
-  const {BigQuery} = require('@google-cloud/bigquery');
-
-  /**
-   * TODO(developer): Uncomment the following lines before running the sample.
-   */
-  // const projectId = "your-project-id";
-  // const srcDatasetId = "my_src_dataset";
-  // const srcTableId = "my_src_table";
-  // const destDatasetId = "my_dest_dataset";
-  // const destTableId = "my_dest_table";
-
-  // Creates a client
-  const bigquery = new BigQuery({projectId});
-
-  // Copies the table contents into another table
-  const [job] = await bigquery
-    .dataset(srcDatasetId)
-    .table(srcTableId)
-    .copy(bigquery.dataset(destDatasetId).table(destTableId));
-
-  console.log(`Job ${job.id} completed.`);
-
-  // Check the job's status for errors
-  const errors = job.status.errors;
-  if (errors && errors.length > 0) {
-    throw errors;
-  }
-  // [END bigquery_copy_table]
-}
-
-async function loadLocalFile(datasetId, tableId, filename, projectId) {
-  // [START bigquery_load_from_file]
-  // Imports the Google Cloud client library
-  const {BigQuery} = require('@google-cloud/bigquery');
-
-  /**
-   * TODO(developer): Uncomment the following lines before running the sample.
-   */
-  // const projectId = "your-project-id";
-  // const filename = "/path/to/file.csv";
-  // const datasetId = "my_dataset";
-  // const tableId = "my_table";
-
-  // Creates a client
-  const bigquery = new BigQuery({projectId});
-
-  // Loads data from a local file into the table
-  const [job] = await bigquery
-    .dataset(datasetId)
-    .table(tableId)
-    .load(filename);
-
-  console.log(`Job ${job.id} completed.`);
-
-  // Check the job's status for errors
-  const errors = job.status.errors;
-  if (errors && errors.length > 0) {
-    throw errors;
-  }
-  // [END bigquery_load_from_file]
-}
-
-async function loadORCFromGCS(datasetId, tableId, projectId) {
-  // [START bigquery_load_table_gcs_orc]
-  // Imports the Google Cloud client libraries
-  const {BigQuery} = require('@google-cloud/bigquery');
-  const {Storage} = require('@google-cloud/storage');
-
-  /**
-   * TODO(developer): Uncomment the following lines before running the sample.
-   */
-  // const projectId = "your-project-id";
-  // const datasetId = "my_dataset";
-  // const tableId = "my_table";
-
-  /**
-   * This sample loads the ORC file at
-   * https://storage.googleapis.com/cloud-samples-data/bigquery/us-states/us-states.orc
-   *
-   * TODO(developer): Replace the following lines with the path to your file.
-   */
-  const bucketName = 'cloud-samples-data';
-  const filename = 'bigquery/us-states/us-states.orc';
-
-  // Instantiates clients
-  const bigquery = new BigQuery({projectId});
-  const storage = new Storage({projectId});
-
-  // Configure the load job. For full list of options, see:
-  // https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs#configuration.load
-  const metadata = {
-    sourceFormat: 'ORC',
-  };
-
-  // Loads data from a Google Cloud Storage file into the table
-  const [job] = await bigquery
-    .dataset(datasetId)
-    .table(tableId)
-    .load(storage.bucket(bucketName).file(filename), metadata);
-
-  // load() waits for the job to finish
-  console.log(`Job ${job.id} completed.`);
-
-  // Check the job's status for errors
-  const errors = job.status.errors;
-  if (errors && errors.length > 0) {
-    throw errors;
-  }
-  // [END bigquery_load_table_gcs_orc]
-}
+// async function loadORCFromGCS(datasetId, tableId, projectId) {
+//   // [START bigquery_load_table_gcs_orc]
+//   // Imports the Google Cloud client libraries
+//   const {BigQuery} = require('@google-cloud/bigquery');
+//   const {Storage} = require('@google-cloud/storage');
+//
+//   /**
+//    * TODO(developer): Uncomment the following lines before running the sample.
+//    */
+//   // const projectId = "your-project-id";
+//   // const datasetId = "my_dataset";
+//   // const tableId = "my_table";
+//
+//   /**
+//    * This sample loads the ORC file at
+//    * https://storage.googleapis.com/cloud-samples-data/bigquery/us-states/us-states.orc
+//    *
+//    * TODO(developer): Replace the following lines with the path to your file.
+//    */
+//   const bucketName = 'cloud-samples-data';
+//   const filename = 'bigquery/us-states/us-states.orc';
+//
+//   // Instantiates clients
+//   const bigquery = new BigQuery({projectId});
+//   const storage = new Storage({projectId});
+//
+//   // Configure the load job. For full list of options, see:
+//   // https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs#configuration.load
+//   const metadata = {
+//     sourceFormat: 'ORC',
+//   };
+//
+//   // Loads data from a Google Cloud Storage file into the table
+//   const [job] = await bigquery
+//     .dataset(datasetId)
+//     .table(tableId)
+//     .load(storage.bucket(bucketName).file(filename), metadata);
+//
+//   // load() waits for the job to finish
+//   console.log(`Job ${job.id} completed.`);
+//
+//   // Check the job's status for errors
+//   const errors = job.status.errors;
+//   if (errors && errors.length > 0) {
+//     throw errors;
+//   }
+//   // [END bigquery_load_table_gcs_orc]
+// }
 
 async function loadParquetFromGCS(datasetId, tableId, projectId) {
   // [START bigquery_load_table_gcs_parquet]
