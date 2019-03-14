@@ -16,26 +16,19 @@
 
 'use strict';
 
-// [START bigquery_delete_dataset]
-async function deleteDataset(datasetId) {
+async function listDatasets() {
+  // [START bigquery_list_datasets]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
-
-  /**
-   * TODO(developer): Uncomment the following lines before running the sample.
-   */
-  // const datasetId = "my_new_dataset";
 
   // Create a client
   const bigquery = new BigQuery();
 
-  // Create a reference to the existing dataset
-  const dataset = bigquery.dataset(datasetId);
-
-  // Delete the dataset and its contents
-  await dataset.delete({force: true});
-  console.log(`Dataset ${dataset.id} deleted.`);
+  // Lists all datasets in the specified project
+  const [datasets] = await bigquery.getDatasets();
+  console.log('Datasets:');
+  datasets.forEach(dataset => console.log(dataset.id));
+  // [END bigquery_list_datasets]
 }
-// [END bigquery_delete_dataset]
 
-deleteDataset(...process.argv.slice(2)).catch(console.error);
+listDatasets(...process.argv.slice(2)).catch(console.error);

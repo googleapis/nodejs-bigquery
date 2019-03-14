@@ -1,57 +1,57 @@
+[//]: # "This README.md file is auto-generated, all changes to this file will be lost."
+[//]: # "To regenerate it, use `npm run generate-scaffolding`."
 <img src="https://avatars2.githubusercontent.com/u/2810941?v=3&s=96" alt="Google Cloud Platform logo" title="Google Cloud Platform" align="right" height="96" width="96"/>
 
 # Google BigQuery: Node.js Samples
 
-[![Build](https://storage.googleapis.com/.svg)]()
+[![Open in Cloud Shell][shell_img]][shell_link]
 
 [BigQuery](https://cloud.google.com/bigquery/docs) is Google&#x27;s fully managed, petabyte scale, low cost analytics data warehouse. BigQuery is NoOps—there is no infrastructure to manage and you don&#x27;t need a database administrator—so you can focus on analyzing data to find meaningful insights, use familiar SQL, and take advantage of our pay-as-you-go model.
 
 ## Table of Contents
 
-* [Setup](#setup)
+* [Before you begin](#before-you-begin)
 * [Samples](#samples)
-  * [Datasets](#datasets)
+  * [Dataset create](#dataset-create)
+  * [Dataset delete](#dataset-delete)
+  * [Dataset list](#dataset-list)
   * [Tables](#tables)
   * [Queries](#queries)
-* [Running the tests](#running-the-tests)
 
-## Setup
+## Before you begin
 
+Before running the samples, make sure you've followed the steps in the
+[Before you begin section](../README.md#before-you-begin) of the client
+library's README.
 
 ## Samples
 
-### Datasets
+### Dataset create
 
-View the [documentation][datasets_0_docs] or the [source code][datasets_0_code].
+View the [source code][dataset-create_0_code].
 
-__Usage:__ `node datasets.js --help`
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/createDataset.js,samples/README.md)[dataset-create_0_docs]: https://cloud.google.com/nodejs/docs/reference/bigquery/latest/
+[dataset-create_0_code]: createDataset.js
 
-```
-datasets.js <command>
+### Dataset delete
 
-Commands:
-  datasets.js create <projectId> <datasetId>  Creates a new dataset.
-  datasets.js delete <projectId> <datasetId>  Deletes a dataset.
-  datasets.js list <projectId>                Lists datasets.
+View the [source code][dataset-delete_1_code].
 
-Options:
-  --version  Show version number                                                                               [boolean]
-  --help     Show help                                                                                         [boolean]
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/deleteDataset.js,samples/README.md)[dataset-delete_1_docs]: https://cloud.google.com/nodejs/docs/reference/bigquery/latest/
+[dataset-delete_1_code]: deleteDataset.js
 
-Examples:
-  node datasets.js create my-project-id my_dataset  Creates a new dataset named "my_dataset".
-  node datasets.js delete my-project-id my_dataset  Deletes a dataset named "my_dataset".
-  node datasets.js list my-project-id               Lists all datasets in my-project-id.
+### Dataset list
 
-For more information, see https://cloud.google.com/bigquery/docs
-```
+View the [source code][dataset-list_2_code].
 
-[datasets_0_docs]: https://cloud.google.com/nodejs/docs/reference/bigquery/latest/
-[datasets_0_code]: datasets.js
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/listDatasets.js,samples/README.md)[dataset-list_2_docs]: https://cloud.google.com/nodejs/docs/reference/bigquery/latest/
+[dataset-list_2_code]: listDatasets.js
 
 ### Tables
 
-View the [documentation][tables_1_docs] or the [source code][tables_1_code].
+View the [source code][tables_3_code].
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/tables.js,samples/README.md)
 
 __Usage:__ `node tables.js --help`
 
@@ -120,12 +120,14 @@ Examples:
 For more information, see https://cloud.google.com/bigquery/docs
 ```
 
-[tables_1_docs]: https://cloud.google.com/nodejs/docs/reference/bigquery/latest/
-[tables_1_code]: tables.js
+[tables_3_docs]: https://cloud.google.com/nodejs/docs/reference/bigquery/latest/
+[tables_3_code]: tables.js
 
 ### Queries
 
-View the [documentation][queries_2_docs] or the [source code][queries_2_code].
+View the [source code][queries_4_code].
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/queries.js,samples/README.md)
 
 __Usage:__ `node queries.js --help`
 
@@ -149,8 +151,8 @@ Examples:
 For more information, see https://cloud.google.com/bigquery/docs
 ```
 
-[queries_2_docs]: https://cloud.google.com/nodejs/docs/reference/bigquery/latest/
-[queries_2_code]: queries.js
+[queries_4_docs]: https://cloud.google.com/nodejs/docs/reference/bigquery/latest/
+[queries_4_code]: queries.js
 
-## Running the tests
-
+[shell_img]: https://gstatic.com/cloudssh/images/open-btn.png
+[shell_link]: https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/README.md

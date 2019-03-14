@@ -16,8 +16,9 @@
 
 'use strict';
 
-// [START bigquery_list_tables]
+
 async function listTables(datasetId) {
+  // [START bigquery_list_tables]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
 
@@ -34,7 +35,7 @@ async function listTables(datasetId) {
 
   console.log('Tables:');
   tables.forEach(table => console.log(table.id));
+  // [END bigquery_list_tables]
 }
-// [END bigquery_list_tables]
 
 listTables(...process.argv.slice(2)).catch(console.error);

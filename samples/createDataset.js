@@ -16,8 +16,8 @@
 
 'use strict';
 
-// [START bigquery_create_table]
-async function createTable(datasetId, tableId, schema) {
+async function createDataset(datasetId) {
+  // [START bigquery_create_dataset]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
 
@@ -25,22 +25,19 @@ async function createTable(datasetId, tableId, schema) {
    * TODO(developer): Uncomment the following lines before running the sample
    */
   // const datasetId = "my_new_dataset";
-  // const tableId = "my_new_table";
-  // const schema = "Name:string, Age:integer, Weight:float, IsMagic:boolean";
 
   // Create a client
   const bigquery = new BigQuery();
 
-  // For all options, see https://cloud.google.com/bigquery/docs/reference/v2/tables#resource
-  const options = {schema};
+  // Specify the geographic location where the dataset should reside
+  const options = {
+    location: 'US'
+  }
 
-  // Create a new table in the dataset
-  const [table] = await bigquery
-    .dataset(datasetId)
-    .createTable(tableId, options);
-
-  console.log(`Table ${table.id} created.`);
+  // Create a new dataset
+  const [dataset] = await bigquery.createDataset(datasetId, options);
+  console.log(`Dataset ${dataset.id} created.`);
+  // [END bigquery_create_dataset]
 }
-// [END bigquery_create_table]
 
-createTable(...process.argv.slice(2)).catch(console.error);
+createDataset(...process.argv.slice(2)).catch(console.error);

@@ -16,28 +16,36 @@
 
 'use strict';
 
-// [START bigquery_delete_table]
-async function deleteTable(datasetId, tableId) {
-  // Import the Google Cloud client library
+
+async function loadLocalFile(datasetId, tableId, filename) {
+  // [START bigquery_load_from_file]
+  // Imports the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
 
   /**
    * TODO(developer): Uncomment the following lines before running the sample.
    */
+  // const filename = "/path/to/file.csv";
   // const datasetId = "my_dataset";
   // const tableId = "my_table";
 
   // Create a client
   const bigquery = new BigQuery();
 
-  // Delete the table
-  await bigquery
+  // Load data from a local file into the table
+  const [job] = await bigquery
     .dataset(datasetId)
     .table(tableId)
-    .delete();
+    .load(filename);
 
-  console.log(`Table ${tableId} deleted.`);
+  console.log(`Job ${job.id} completed.`);
+
+  // Check the job's status for errors
+  const errors = job.status.errors;
+  if (errors && errors.length > 0) {
+    throw errors;
+  }
+  // [END bigquery_load_from_file]
 }
-// [END bigquery_delete_table]
 
-deleteTable(...process.argv.slice(2)).catch(console.error);
+loadLocalFile(...process.argv.slice(2)).catch(console.error);

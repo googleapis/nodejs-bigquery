@@ -16,8 +16,9 @@
 
 'use strict';
 
-// [START bigquery_browse_table]
+
 async function browseRows(datasetId, tableId) {
+  // [START bigquery_browse_table]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
 
@@ -38,7 +39,7 @@ async function browseRows(datasetId, tableId) {
 
   console.log('Rows:');
   rows.forEach(row => console.log(row));
+  // [END bigquery_browse_table]
 }
-// [END bigquery_browse_table]
 
 browseRows(...process.argv.slice(2)).catch(console.error);

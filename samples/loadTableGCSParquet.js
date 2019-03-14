@@ -16,27 +16,27 @@
 
 'use strict';
 
-// [START bigquery_load_table_gcs_orc]
-async function loadTableGCSORC(datasetId, tableId) {
+
+async function (datasetId, tableId) {
+  // [START bigquery_load_table_gcs_parquet]
   // Import the Google Cloud client libraries
   const {BigQuery} = require('@google-cloud/bigquery');
   const {Storage} = require('@google-cloud/storage');
 
   /**
-   * TODO(developer): Uncomment the following line before running the sample.
+   * TODO(developer): Uncomment the following lines before running the sample.
    */
   // const datasetId = "my_dataset";
-  // const tableId = "my_table"
+  // const tableId = "my_table";
 
   /**
-   * This sample loads the ORC file at
-   * https://storage.googleapis.com/cloud-samples-data/bigquery/us-states/us-states.orc
+   * This sample loads the Parquet file at
+   * https://storage.googleapis.com/cloud-samples-data/bigquery/us-states/us-states.parquet
    *
    * TODO(developer): Replace the following lines with the path to your file.
    */
   const bucketName = 'cloud-samples-data';
-  const filename = 'bigquery/us-states/us-states.orc';
-
+  const filename = 'bigquery/us-states/us-states.parquet';
 
   // Instantiate clients
   const bigquery = new BigQuery();
@@ -45,7 +45,7 @@ async function loadTableGCSORC(datasetId, tableId) {
   // Configure the load job. For full list of options, see:
   // https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs#configuration.load
   const metadata = {
-    sourceFormat: 'ORC',
+    sourceFormat: 'PARQUET',
   };
 
   // Load data from a Google Cloud Storage file into the table
@@ -62,7 +62,7 @@ async function loadTableGCSORC(datasetId, tableId) {
   if (errors && errors.length > 0) {
     throw errors;
   }
+  // [END bigquery_load_table_gcs_parquet]
 }
-// [END bigquery_load_table_gcs_orc]
 
-loadTableGCSORC(...process.argv.slice(2)).catch(console.error);
+loadTableGCSParquet(...process.argv.slice(2)).catch(console.error);

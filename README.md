@@ -35,9 +35,6 @@
 1. Try an example:
 
 ```javascript
-async function createDataset(
-  datasetName = 'my_new_dataset' // Name for the new dataset
-) {
   // Imports the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
 
@@ -47,7 +44,6 @@ async function createDataset(
   // Create the dataset
   const [dataset] = await bigquery.createDataset(datasetName);
   console.log(`Dataset ${dataset.id} created.`);
-}
 ```
 
 ## Samples
@@ -57,7 +53,9 @@ has instructions for running the samples.
 
 | Sample                      | Source Code                       | Try it |
 | --------------------------- | --------------------------------- | ------ |
-| Datasets | [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/datasets.js) | [![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/datasets.js,samples/README.md) |
+| Dataset create | [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/createDataset.js) | [![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/createDataset.js,samples/README.md) |
+| Dataset delete | [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/deleteDataset.js) | [![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/deleteDataset.js,samples/README.md) |
+| Dataset list | [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/listDatasets.js) | [![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/listDatasets.js,samples/README.md) |
 | Tables | [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/tables.js) | [![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/tables.js,samples/README.md) |
 | Queries | [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/queries.js) | [![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/queries.js,samples/README.md) |
 

@@ -16,14 +16,14 @@
 
 'use strict';
 
-// [START bigquery_copy_table]
+
 async function copyTable(
   srcDatasetId,
   srcTableId,
   destDatasetId,
   destTableId
 ) {
-
+  // [START bigquery_copy_table]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
 
@@ -51,7 +51,7 @@ async function copyTable(
   if (errors && errors.length > 0) {
     throw errors;
   }
+  // [END bigquery_copy_table]
 }
-// [END bigquery_copy_table]
 
 copyTable(...process.argv.slice(2)).catch(console.error);
