@@ -120,11 +120,22 @@
       "docs_link": "https://cloud.google.com/nodejs/docs/reference/bigquery/latest/"
     },
     {
-      "id": "queries",
-      "name": "Queries",
-      "file": "queries.js",
+      "id": "query",
+      "name": "Query",
+      "file": "query.js",
       "docs_link": "https://cloud.google.com/nodejs/docs/reference/bigquery/latest/",
-      "usage": "node queries.js --help"
+    },
+    {
+      "id": "query-disable-cache",
+      "name": "Query disable cache",
+      "file": "queryDisableCache.js",
+      "docs_link": "https://cloud.google.com/nodejs/docs/reference/bigquery/latest/",
+    },
+    {
+      "id": "query-stackoverflow",
+      "name": "Query Stackoverflow",
+      "file": "queryStackoverflow.js",
+      "docs_link": "https://cloud.google.com/nodejs/docs/reference/bigquery/latest/",
     }
   ]
 }
