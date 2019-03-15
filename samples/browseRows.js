@@ -16,14 +16,15 @@
 
 'use strict';
 
-
 async function browseRows(datasetId, tableId) {
+  // Displays rows from "my_table" in "my_dataset".
+
   // [START bigquery_browse_table]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
 
   /**
-   * TODO(developer): Uncomment the following lines before running the sample
+   * TODO(developer): Uncomment the following lines before running the sample.
    */
   // const datasetId = "my_dataset";
   // const tableId = "my_table";

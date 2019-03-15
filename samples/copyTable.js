@@ -16,13 +16,9 @@
 
 'use strict';
 
+async function copyTable(srcDatasetId, srcTableId, destDatasetId, destTableId) {
+  // Copies src_dataset:src_table to dest_dataset:dest_table.
 
-async function copyTable(
-  srcDatasetId,
-  srcTableId,
-  destDatasetId,
-  destTableId
-) {
   // [START bigquery_copy_table]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');

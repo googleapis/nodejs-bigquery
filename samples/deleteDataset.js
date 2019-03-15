@@ -17,6 +17,8 @@
 'use strict';
 
 async function deleteDataset(datasetId) {
+  // Deletes a dataset named "my_dataset".
+  
   // [START bigquery_delete_dataset]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');

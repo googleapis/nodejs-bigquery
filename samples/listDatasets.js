@@ -17,6 +17,8 @@
 'use strict';
 
 async function listDatasets() {
+  // Lists all datasets in current GCP project.
+  
   // [START bigquery_list_datasets]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');

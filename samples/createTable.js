@@ -17,6 +17,8 @@
 'use strict';
 
 async function createTable(datasetId, tableId, schema) {
+  // Creates a new table named "my_table" in "my_dataset".
+
   // [START bigquery_create_table]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
@@ -32,7 +34,10 @@ async function createTable(datasetId, tableId, schema) {
   const bigquery = new BigQuery();
 
   // For all options, see https://cloud.google.com/bigquery/docs/reference/v2/tables#resource
-  const options = {schema};
+  const options = {
+    schema: schema,
+    location: 'US',
+  };
 
   // Create a new table in the dataset
   const [table] = await bigquery

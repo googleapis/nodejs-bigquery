@@ -16,8 +16,9 @@
 
 'use strict';
 
-
 async function deleteTable(datasetId, tableId) {
+  // Deletes "my_table" from "my_dataset".
+
   // [START bigquery_delete_table]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');

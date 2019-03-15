@@ -16,29 +16,37 @@
 
 'use strict';
 
-async function loadLocalFile(datasetId, tableId, filename) {
-  // Imports a local file into a table.
+async function extractTableToGCS(datasetId, tableId, bucketName, filename) {
+  // Exports my_dataset:my_table to gcs://my-bucket/my-file as raw CSV.
 
-  // [START bigquery_load_from_file]
-  // Imports the Google Cloud client library
+  // [START bigquery_extract_table]
+  // Import the Google Cloud client libraries
   const {BigQuery} = require('@google-cloud/bigquery');
+  const {Storage} = require('@google-cloud/storage');
 
   /**
    * TODO(developer): Uncomment the following lines before running the sample.
    */
-  // const filename = "/path/to/file.csv";
   // const datasetId = "my_dataset";
   // const tableId = "my_table";
+  // const bucketName = "my-bucket";
+  // const filename = "file.csv";
 
-  // Create a client
+  // Instantiate clients
   const bigquery = new BigQuery();
+  const storage = new Storage();
 
-  // Load data from a local file into the table
+  // Location must match that of the source table.
+  const options = {
+    location: 'US',
+  };
+
+  // Export data from the table into a Google Cloud Storage file
   const [job] = await bigquery
     .dataset(datasetId)
     .table(tableId)
-    .load(filename);
-
+    .extract(storage.bucket(bucketName).file(filename), options);
+  // load() waits for the job to finish
   console.log(`Job ${job.id} completed.`);
 
   // Check the job's status for errors
@@ -46,7 +54,7 @@ async function loadLocalFile(datasetId, tableId, filename) {
   if (errors && errors.length > 0) {
     throw errors;
   }
-  // [END bigquery_load_from_file]
+  // [END bigquery_extract_table]
 }
 
-loadLocalFile(...process.argv.slice(2)).catch(console.error);
+extractTableToGCS(...process.argv.slice(2)).catch(console.error);

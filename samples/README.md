@@ -15,7 +15,22 @@
   * [Dataset create](#dataset-create)
   * [Dataset delete](#dataset-delete)
   * [Dataset list](#dataset-list)
-  * [Tables](#tables)
+  * [Browse rows](#browse-rows)
+  * [Copy table](#copy-table)
+  * [Create table](#create-table)
+  * [Delete table](#delete-table)
+  * [Extract table to GCS](#extract-table-to-gcs)
+  * [Insert rows as stream](#insert-rows-as-stream)
+  * [List tables](#list-tables)
+  * [Load CSV from GCS](#load-csv-from-gcs)
+  * [Load CSV from GCS autodetect](#load-csv-from-gcs-autodetect)
+  * [Load CSV from GCS truncate](#load-csv-from-gcs-truncate)
+  * [Load JSON from GCS](#load-json-from-gcs)
+  * [Load JSON from GCS autodetect](#load-json-from-gcs-autodetect)
+  * [Load JSON from GCS truncate](#load-json-from-gcs-truncate)
+  * [Load local file](#load-local-file)
+  * [Load ORC from GCS truncate](#load-orc-from-gcs-truncate)
+  * [Load Parquet from GCS truncate](#load-parquet-from-gcs-truncate)
   * [Queries](#queries)
 
 ## Before you begin
@@ -47,85 +62,121 @@ View the [source code][dataset-list_2_code].
 [![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/listDatasets.js,samples/README.md)[dataset-list_2_docs]: https://cloud.google.com/nodejs/docs/reference/bigquery/latest/
 [dataset-list_2_code]: listDatasets.js
 
-### Tables
+### Browse rows
 
-View the [source code][tables_3_code].
+View the [source code][browse-rows_3_code].
 
-[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/tables.js,samples/README.md)
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/browseRows.js,samples/README.md)[browse-rows_3_docs]: https://cloud.google.com/nodejs/docs/reference/bigquery/latest/
+[browse-rows_3_code]: browseRows.js
 
-__Usage:__ `node tables.js --help`
+### Copy table
 
-```
-tables.js <command>
+View the [source code][copy-table_4_code].
 
-Commands:
-  tables.js create <projectId> <datasetId> <tableId> <schema>   Creates a new table.
-  tables.js list <projectId> <datasetId>                        Lists all tables in a dataset.
-  tables.js delete <projectId> <datasetId> <tableId>            Deletes a table.
-  tables.js copy <projectId> <srcDatasetId> <srcTableId>        Makes a copy of a table.
-  <destDatasetId> <destTableId>
-  tables.js browse <projectId> <datasetId> <tableId>            Lists rows in a table.
-  tables.js load-local-csv <projectId> <datasetId> <tableId>    Loads data from a local file into a table.
-  <fileName>
-  tables.js load-gcs-orc <projectId> <datasetId> <tableId>      Loads sample ORC data from a Google Cloud Storage file
-                                                                into a table.
-  tables.js load-gcs-parquet <projectId> <datasetId> <tableId>  Loads sample Parquet data from a Google Cloud Storage
-                                                                file into a table.
-  tables.js load-gcs-csv <projectId> <datasetId> <tableId>      Loads sample CSV data from a Google Cloud Storage file
-                                                                into a table.
-  tables.js load-gcs-json <projectId> <datasetId> <tableId>     Loads sample JSON data from a Google Cloud Storage file
-                                                                into a table.
-  tables.js load-gcs-csv-autodetect <projectId> <datasetId>     Loads sample CSV data from a Google Cloud Storage file
-  <tableId>                                                     into a table.
-  tables.js load-gcs-json-autodetect <projectId> <datasetId>    Loads sample JSON data from a Google Cloud Storage file
-  <tableId>                                                     into a table.
-  tables.js load-gcs-csv-truncate <projectId> <datasetId>       Loads sample CSV data from GCS, replacing an existing
-  <tableId>                                                     table.
-  tables.js load-gcs-json-truncate <projectId> <datasetId>      Loads sample JSON data from GCS, replacing an existing
-  <tableId>                                                     table.
-  tables.js load-gcs-parquet-truncate <projectId> <datasetId>   Loads sample Parquet data from GCS, replacing an
-  <tableId>                                                     existing table.
-  tables.js load-gcs-orc-truncate <projectId> <datasetId>       Loads sample Orc data from GCS, replacing an existing
-  <tableId>                                                     table.
-  tables.js extract <projectId> <datasetId> <tableId>           Extract a table from BigQuery to Google Cloud Storage.
-  <bucketName> <fileName>
-  tables.js insert <projectId> <datasetId> <tableId>            Insert a JSON array (as a string or newline-delimited
-  <json_or_file>                                                file) into a BigQuery table.
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/copyTable.js,samples/README.md)[copy-table_4_docs]: https://cloud.google.com/nodejs/docs/reference/bigquery/latest/
+[copy-table_4_code]: copyTable.js
 
-Options:
-  --version  Show version number                                                                               [boolean]
-  --help     Show help                                                                                         [boolean]
+### Create table
 
-Examples:
-  node tables.js create my-project-id my_dataset my_table       Creates a new table named "my_table" in "my_dataset".
-  "Name:string, Age:integer, Weight:float, IsMagic:boolean"
-  node tables.js list my-project-id my_dataset                  Lists tables in "my_dataset".
-  node tables.js browse my-project-id my_dataset my_table       Displays rows from "my_table" in "my_dataset".
-  node tables.js delete my-project-id my_dataset my_table       Deletes "my_table" from "my_dataset".
-  node tables.js load my-project-id my_dataset my_table         Imports a local file into a table.
-  ./data.csv
-  node tables.js load-gcs my-project-id my_dataset my_table     Imports a GCS file into a table.
-  my-bucket data.csv
-  node tables.js extract my-project-id my_dataset my_table      Exports my_dataset:my_table to gcs://my-bucket/my-file
-  my-bucket my-file                                             as raw CSV.
-  node tables.js extract my-project-id my_dataset my_table      Exports my_dataset:my_table to gcs://my-bucket/my-file
-  my-bucket my-file -f JSON --gzip                              as gzipped JSON.
-  node tables.js insert my-project-id my_dataset my_table       Inserts the JSON array represented by json_string into
-  json_string                                                   my_dataset:my_table.
-  node tables.js insert my-project-id my_dataset my_table       Inserts the JSON objects contained in json_file (one per
-  json_file                                                     line) into my_dataset:my_table.
-  node tables.js copy my-project-id src_dataset src_table       Copies src_dataset:src_table to dest_dataset:dest_table.
-  dest_dataset dest_table
+View the [source code][create-table_5_code].
 
-For more information, see https://cloud.google.com/bigquery/docs
-```
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/createTable.js,samples/README.md)[create-table_5_docs]: https://cloud.google.com/nodejs/docs/reference/bigquery/latest/
+[create-table_5_code]: createTable.js
 
-[tables_3_docs]: https://cloud.google.com/nodejs/docs/reference/bigquery/latest/
-[tables_3_code]: tables.js
+### Delete table
+
+View the [source code][delete-table_6_code].
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/deleteTable.js,samples/README.md)[delete-table_6_docs]: https://cloud.google.com/nodejs/docs/reference/bigquery/latest/
+[delete-table_6_code]: deleteTable.js
+
+### Extract table to GCS
+
+View the [source code][extract-table-to-GCS_7_code].
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/extractTableToGCS.js,samples/README.md)[extract-table-to-GCS_7_docs]: https://cloud.google.com/nodejs/docs/reference/bigquery/latest/
+[extract-table-to-GCS_7_code]: extractTableToGCS.js
+
+### Insert rows as stream
+
+View the [source code][insert-rows-as-stream_8_code].
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/insertRowsAsStream.js,samples/README.md)[insert-rows-as-stream_8_docs]: https://cloud.google.com/nodejs/docs/reference/bigquery/latest/
+[insert-rows-as-stream_8_code]: insertRowsAsStream.js
+
+### List tables
+
+View the [source code][list-tables_9_code].
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/listTables.js,samples/README.md)[list-tables_9_docs]: https://cloud.google.com/nodejs/docs/reference/bigquery/latest/
+[list-tables_9_code]: listTables.js
+
+### Load CSV from GCS
+
+View the [source code][load-CSV-from-GCS_10_code].
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/loadCSVFromGCS.js,samples/README.md)[load-CSV-from-GCS_10_docs]: https://cloud.google.com/nodejs/docs/reference/bigquery/latest/
+[load-CSV-from-GCS_10_code]: loadCSVFromGCS.js
+
+### Load CSV from GCS autodetect
+
+View the [source code][load-CSV-from-GCS-autodetect_11_code].
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/loadCSVFromGCSAutodetect.js,samples/README.md)[load-CSV-from-GCS-autodetect_11_docs]: https://cloud.google.com/nodejs/docs/reference/bigquery/latest/
+[load-CSV-from-GCS-autodetect_11_code]: loadCSVFromGCSAutodetect.js
+
+### Load CSV from GCS truncate
+
+View the [source code][load-CSV-from-GCS-truncate_12_code].
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/loadCSVFromGCSTruncate.js,samples/README.md)[load-CSV-from-GCS-truncate_12_docs]: https://cloud.google.com/nodejs/docs/reference/bigquery/latest/
+[load-CSV-from-GCS-truncate_12_code]: loadCSVFromGCSTruncate.js
+
+### Load JSON from GCS
+
+View the [source code][load-JSON-from-GCS_13_code].
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/loadJSONFromGCS.js,samples/README.md)[load-JSON-from-GCS_13_docs]: https://cloud.google.com/nodejs/docs/reference/bigquery/latest/
+[load-JSON-from-GCS_13_code]: loadJSONFromGCS.js
+
+### Load JSON from GCS autodetect
+
+View the [source code][load-JSON-from-GCS-autodetect_14_code].
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/loadJSONFromGCSAutodetect.js,samples/README.md)[load-JSON-from-GCS-autodetect_14_docs]: https://cloud.google.com/nodejs/docs/reference/bigquery/latest/
+[load-JSON-from-GCS-autodetect_14_code]: loadJSONFromGCSAutodetect.js
+
+### Load JSON from GCS truncate
+
+View the [source code][load-JSON-from-GCS-truncate_15_code].
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/loadJSONFromGCSTruncate.js,samples/README.md)[load-JSON-from-GCS-truncate_15_docs]: https://cloud.google.com/nodejs/docs/reference/bigquery/latest/
+[load-JSON-from-GCS-truncate_15_code]: loadJSONFromGCSTruncate.js
+
+### Load local file
+
+View the [source code][load-local-file_16_code].
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/loadLocalFile.js,samples/README.md)[load-local-file_16_docs]: https://cloud.google.com/nodejs/docs/reference/bigquery/latest/
+[load-local-file_16_code]: loadLocalFile.js
+
+### Load ORC from GCS truncate
+
+View the [source code][load-ORC-from-GCS-truncate_17_code].
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/loadORCFromGCSTruncate.js,samples/README.md)[load-ORC-from-GCS-truncate_17_docs]: https://cloud.google.com/nodejs/docs/reference/bigquery/latest/
+[load-ORC-from-GCS-truncate_17_code]: loadORCFromGCSTruncate.js
+
+### Load Parquet from GCS truncate
+
+View the [source code][load-Parquet-from-GCS-truncate_18_code].
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/loadParquetFromGCSTruncate.js,samples/README.md)[load-Parquet-from-GCS-truncate_18_docs]: https://cloud.google.com/nodejs/docs/reference/bigquery/latest/
+[load-Parquet-from-GCS-truncate_18_code]: loadParquetFromGCSTruncate.js
 
 ### Queries
 
-View the [source code][queries_4_code].
+View the [source code][queries_19_code].
 
 [![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/queries.js,samples/README.md)
 
@@ -151,8 +202,8 @@ Examples:
 For more information, see https://cloud.google.com/bigquery/docs
 ```
 
-[queries_4_docs]: https://cloud.google.com/nodejs/docs/reference/bigquery/latest/
-[queries_4_code]: queries.js
+[queries_19_docs]: https://cloud.google.com/nodejs/docs/reference/bigquery/latest/
+[queries_19_code]: queries.js
 
 [shell_img]: https://gstatic.com/cloudssh/images/open-btn.png
 [shell_link]: https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/README.md

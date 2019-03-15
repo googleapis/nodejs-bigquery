@@ -16,10 +16,10 @@
 
 'use strict';
 
-async function loadTableGCSParquet(datasetId, tableId) {
-  // Imports a GCS file into a table with Parquet source format.
+async function loadCSVFromGCS(datasetId, tableId) {
+  // Imports a GCS file into a table with manually defined schema.
 
-  // [START bigquery_load_table_gcs_parquet]
+  // [START bigquery_load_table_gcs_csv]
   // Import the Google Cloud client libraries
   const {BigQuery} = require('@google-cloud/bigquery');
   const {Storage} = require('@google-cloud/storage');
@@ -31,23 +31,31 @@ async function loadTableGCSParquet(datasetId, tableId) {
   // const tableId = "my_table";
 
   /**
-   * This sample loads the Parquet file at
-   * https://storage.googleapis.com/cloud-samples-data/bigquery/us-states/us-states.parquet
+   * This sample loads the CSV file at
+   * https://storage.googleapis.com/cloud-samples-data/bigquery/us-states/us-states.csv
    *
    * TODO(developer): Replace the following lines with the path to your file.
    */
   const bucketName = 'cloud-samples-data';
-  const filename = 'bigquery/us-states/us-states.parquet';
+  const filename = 'bigquery/us-states/us-states.csv';
 
   // Instantiate clients
   const bigquery = new BigQuery();
+
   const storage = new Storage();
 
   // Configure the load job. For full list of options, see:
   // https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs#configuration.load
   const metadata = {
-    sourceFormat: 'PARQUET',
-    location: 'US'
+    sourceFormat: 'CSV',
+    skipLeadingRows: 1,
+    schema: {
+      fields: [
+        {name: 'name', type: 'STRING'},
+        {name: 'post_abbr', type: 'STRING'},
+      ],
+    },
+    location: 'US',
   };
 
   // Load data from a Google Cloud Storage file into the table
@@ -64,7 +72,7 @@ async function loadTableGCSParquet(datasetId, tableId) {
   if (errors && errors.length > 0) {
     throw errors;
   }
-  // [END bigquery_load_table_gcs_parquet]
+  // [END bigquery_load_table_gcs_csv]
 }
 
-loadTableGCSParquet(...process.argv.slice(2)).catch(console.error);
+loadCSVFromGCS(...process.argv.slice(2)).catch(console.error);

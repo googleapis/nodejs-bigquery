@@ -16,10 +16,14 @@
 
 'use strict';
 
-async function listTables(datasetId) {
-  // Lists tables in "my_dataset".
+async function insertRowsAsStream(
+  datasetId,
+  tableId,
+  rows = [{name: 'Tom', age: 30}, {name: 'Jane', age: 32}]
+) {
+  // Inserts the JSON objects into my_dataset:my_table.
 
-  // [START bigquery_list_tables]
+  // [START bigquery_table_insert_rows]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
 
@@ -27,16 +31,18 @@ async function listTables(datasetId) {
    * TODO(developer): Uncomment the following lines before running the sample.
    */
   // const datasetId = "my_dataset";
+  // const tableId = "my_table";
 
   // Create a client
   const bigquery = new BigQuery();
 
-  // List all tables in the dataset
-  const [tables] = await bigquery.dataset(datasetId).getTables();
-
-  console.log('Tables:');
-  tables.forEach(table => console.log(table.id));
-  // [END bigquery_list_tables]
+  // Insert data into a table
+  await bigquery
+    .dataset(datasetId)
+    .table(tableId)
+    .insert(rows);
+  console.log(`Inserted ${rows.length} rows`);
+  // [END bigquery_table_insert_rows]
 }
 
-listTables(...process.argv.slice(2)).catch(console.error);
+insertRowsAsStream(...process.argv.slice(2)).catch(console.error);

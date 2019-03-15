@@ -16,8 +16,9 @@
 
 'use strict';
 
-
 async function loadTableGCSORC(datasetId, tableId) {
+  // Imports a GCS file into a table with ORC source format.
+
   // [START bigquery_load_table_gcs_orc]
   // Import the Google Cloud client libraries
   const {BigQuery} = require('@google-cloud/bigquery');
@@ -38,7 +39,6 @@ async function loadTableGCSORC(datasetId, tableId) {
   const bucketName = 'cloud-samples-data';
   const filename = 'bigquery/us-states/us-states.orc';
 
-
   // Instantiate clients
   const bigquery = new BigQuery();
   const storage = new Storage();
@@ -47,6 +47,7 @@ async function loadTableGCSORC(datasetId, tableId) {
   // https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs#configuration.load
   const metadata = {
     sourceFormat: 'ORC',
+    location: 'US'
   };
 
   // Load data from a Google Cloud Storage file into the table

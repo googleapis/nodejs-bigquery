@@ -16,10 +16,13 @@
 
 'use strict';
 
-async function loadTableGCSParquet(datasetId, tableId) {
-  // Imports a GCS file into a table with Parquet source format.
+async function loadParquetFromGCSTruncate(datasetId, tableId) {
+  /**
+  * Imports a GCS file into a table and overwrites
+  * table data if table already exists.
+  */
 
-  // [START bigquery_load_table_gcs_parquet]
+  // [START bigquery_load_table_gcs_parquet_truncate]
   // Import the Google Cloud client libraries
   const {BigQuery} = require('@google-cloud/bigquery');
   const {Storage} = require('@google-cloud/storage');
@@ -31,8 +34,8 @@ async function loadTableGCSParquet(datasetId, tableId) {
   // const tableId = "my_table";
 
   /**
-   * This sample loads the Parquet file at
-   * https://storage.googleapis.com/cloud-samples-data/bigquery/us-states/us-states.parquet
+   * This sample loads the CSV file at
+   * https://storage.googleapis.com/cloud-samples-data/bigquery/us-states/us-states.csv
    *
    * TODO(developer): Replace the following lines with the path to your file.
    */
@@ -47,6 +50,8 @@ async function loadTableGCSParquet(datasetId, tableId) {
   // https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs#configuration.load
   const metadata = {
     sourceFormat: 'PARQUET',
+    // Set the write disposition to overwrite existing table data.
+    writeDisposition: 'WRITE_TRUNCATE',
     location: 'US'
   };
 
@@ -55,7 +60,6 @@ async function loadTableGCSParquet(datasetId, tableId) {
     .dataset(datasetId)
     .table(tableId)
     .load(storage.bucket(bucketName).file(filename), metadata);
-
   // load() waits for the job to finish
   console.log(`Job ${job.id} completed.`);
 
@@ -64,7 +68,7 @@ async function loadTableGCSParquet(datasetId, tableId) {
   if (errors && errors.length > 0) {
     throw errors;
   }
-  // [END bigquery_load_table_gcs_parquet]
+  // [END bigquery_load_table_gcs_parquet_truncate]
 }
 
-loadTableGCSParquet(...process.argv.slice(2)).catch(console.error);
+loadParquetFromGCSTruncate(...process.argv.slice(2)).catch(console.error);
