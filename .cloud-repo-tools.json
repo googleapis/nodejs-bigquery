@@ -136,6 +136,18 @@
       "name": "Query Stackoverflow",
       "file": "queryStackoverflow.js",
       "docs_link": "https://cloud.google.com/nodejs/docs/reference/bigquery/latest/",
+    },
+    {
+      "id": "query-params-named",
+      "name": "Query named params",
+      "file": "queryParamsNamed.js",
+      "docs_link": "https://cloud.google.com/nodejs/docs/reference/bigquery/latest/"
+    },
+    {
+      "id": "query-params-positional",
+      "name": "Query positional params",
+      "file": "queryParamsPositional.js",
+      "docs_link": "https://cloud.google.com/nodejs/docs/reference/bigquery/latest/"
     }
   ]
 }
