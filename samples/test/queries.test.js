@@ -43,4 +43,16 @@ describe(`Queries`, () => {
     assert.match(output, /Rows:/);
     assert.match(output, /corpus/);
   });
+
+  it(`should run a query with named params`, async () => {
+    const output = await exec(`node queryParamsNamed.js`);
+    assert.match(output, /Rows:/);
+    assert.match(output, /word_count/);
+  });
+
+  it(`should run a query with positional params`, async () => {
+    const output = await exec(`node queryParamsNamed.js`);
+    assert.match(output, /Rows:/);
+    assert.match(output, /word_count/);
+  });
 });

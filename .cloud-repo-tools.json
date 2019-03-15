@@ -36,6 +36,18 @@
       "file": "queries.js",
       "docs_link": "https://cloud.google.com/nodejs/docs/reference/bigquery/latest/",
       "usage": "node queries.js --help"
+    },
+    {
+      "id": "query-params-named",
+      "name": "Query named params",
+      "file": "queryParamsNamed.js",
+      "docs_link": "https://cloud.google.com/nodejs/docs/reference/bigquery/latest/"
+    },
+    {
+      "id": "query-params-positional",
+      "name": "Query positional params",
+      "file": "queryParamsPositional.js",
+      "docs_link": "https://cloud.google.com/nodejs/docs/reference/bigquery/latest/"
     }
   ]
 }
