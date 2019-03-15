@@ -47,7 +47,7 @@ async function loadTableGCSORC(datasetId, tableId) {
   // https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs#configuration.load
   const metadata = {
     sourceFormat: 'ORC',
-    location: 'US'
+    location: 'US',
   };
 
   // Load data from a Google Cloud Storage file into the table

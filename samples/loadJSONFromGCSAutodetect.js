@@ -48,7 +48,7 @@ async function loadJSONFromGCSAutodetect(datasetId, tableId) {
   const metadata = {
     sourceFormat: 'NEWLINE_DELIMITED_JSON',
     autodetect: true,
-    location: 'US'
+    location: 'US',
   };
 
   // Load data from a Google Cloud Storage file into the table

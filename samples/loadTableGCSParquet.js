@@ -47,7 +47,7 @@ async function loadTableGCSParquet(datasetId, tableId) {
   // https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs#configuration.load
   const metadata = {
     sourceFormat: 'PARQUET',
-    location: 'US'
+    location: 'US',
   };
 
   // Load data from a Google Cloud Storage file into the table

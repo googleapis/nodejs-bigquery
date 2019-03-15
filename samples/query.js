@@ -18,7 +18,7 @@
 
 async function query() {
   // Queries the Shakespeare dataset with the cache disabled.
-  
+
   // [START bigquery_query]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');

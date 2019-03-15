@@ -18,9 +18,9 @@
 
 async function loadCSVFromGCSTruncate(datasetId, tableId) {
   /**
-  * Imports a GCS file into a table and overwrites
-  * table data if table already exists.
-  */
+   * Imports a GCS file into a table and overwrites
+   * table data if table already exists.
+   */
 
   // [START bigquery_load_table_gcs_csv_truncate]
   // Import the Google Cloud client libraries
@@ -59,7 +59,7 @@ async function loadCSVFromGCSTruncate(datasetId, tableId) {
     },
     // Set the write disposition to overwrite existing table data.
     writeDisposition: 'WRITE_TRUNCATE',
-    location: 'US'
+    location: 'US',
   };
 
   // Load data from a Google Cloud Storage file into the table

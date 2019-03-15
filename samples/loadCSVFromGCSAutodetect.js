@@ -49,7 +49,7 @@ async function loadCSVFromGCSAutodetect(datasetId, tableId) {
     sourceFormat: 'CSV',
     skipLeadingRows: 1,
     autodetect: true,
-    location: 'US'
+    location: 'US',
   };
 
   // Load data from a Google Cloud Storage file into the table

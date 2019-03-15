@@ -53,7 +53,7 @@ async function loadJSONFromGCS(datasetId, tableId) {
         {name: 'post_abbr', type: 'STRING'},
       ],
     },
-    loation: 'US'
+    loation: 'US',
   };
 
   // Load data from a Google Cloud Storage file into the table
