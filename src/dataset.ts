@@ -15,15 +15,16 @@
  */
 
 import {DecorateRequestOptions, DeleteCallback, ServiceObject} from '@google-cloud/common';
-import {paginator} from '@google-cloud/paginator';
+import {paginator, ResourceStream} from '@google-cloud/paginator';
 import {promisifyAll} from '@google-cloud/promisify';
 import * as extend from 'extend';
 import * as r from 'request';
 import {Duplex, Readable} from 'stream';
 import {teenyRequest} from 'teeny-request';
 
-import {BigQuery, DatasetCallback, Query, QueryRowsResponse, SimpleQueryRowsCallback} from '.';
+import {BigQuery, DatasetCallback, PagedCallback, PagedRequest, PagedResponse, Query, QueryRowsResponse, ResourceCallback, SimpleQueryRowsCallback} from '.';
 import {JobCallback, JobResponse, Table, TableMetadata, TableOptions} from './table';
+import {bigquery} from './types';
 
 export interface DatasetDeleteOptions {
   force?: boolean;
@@ -33,25 +34,16 @@ export interface DataSetOptions {
   location?: string;
 }
 
-export interface CreateDatasetOptions {}
+export type CreateDatasetOptions = bigquery.IDataset;
 
-export interface GetTablesOptions {
-  autoPaginate?: boolean;
-  maxApiCalls?: number;
-  maxResults?: number;
-  pageToken?: string;
-}
+export type GetTablesOptions = PagedRequest<bigquery.IListTablesRequest>;
+export type GetTablesResponse =
+    PagedResponse<Table, GetTablesOptions, bigquery.IListTablesResponse>;
+export type GetTablesCallback =
+    PagedCallback<Table, GetTablesOptions, bigquery.IListTablesResponse>;
 
-export type GetTablesResponse = [Table[], r.Response];
-export interface GetTablesCallback {
-  (err: Error|null, tables?: Table[]|null, nextQuery?: {}|null,
-   apiResponse?: r.Response): void;
-}
-
-export type TableResponse = [Table, r.Response];
-export interface TableCallback {
-  (err: Error|null, table?: Table|null, apiResponse?: r.Response): void;
-}
+export type TableResponse = [Table, bigquery.ITable];
+export type TableCallback = ResourceCallback<Table, bigquery.ITable>;
 
 /**
  * Interact with your BigQuery dataset. Create a Dataset instance with
@@ -72,7 +64,7 @@ export interface TableCallback {
 class Dataset extends ServiceObject {
   bigQuery: BigQuery;
   location?: string;
-  getTablesStream: () => Readable;
+  getTablesStream: (options?: GetTablesOptions) => ResourceStream<Table>;
   constructor(bigQuery: BigQuery, id: string, options?: DataSetOptions) {
     const methods = {
       /**
@@ -298,7 +290,7 @@ class Dataset extends ServiceObject {
      *     this.end();
      *   });
      */
-    this.getTablesStream = paginator.streamify('getTables');
+    this.getTablesStream = paginator.streamify<Table>('getTables');
   }
 
   createQueryJob(options: string|Query): Promise<JobResponse>;

@@ -37,7 +37,7 @@
     "presystem-test": "npm run compile",
     "check": "gts check",
     "clean": "gts clean",
-    "compile": "tsc -p .",
+    "compile": "tsc -p . && cp src/types.d.ts build/src/",
     "fix": "gts fix && eslint --fix '**/*.js'",
     "predocs": "npm run compile",
     "prepare": "npm run compile",
