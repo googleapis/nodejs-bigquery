@@ -28,7 +28,6 @@ const exec = async cmd => {
   assert.isEmpty(res.stderr);
   return res.stdout;
 };
-const cmd = `node tables.js`;
 const generateUuid = () => `gcloud-tests-${uuid.v4()}`.replace(/-/gi, '_');
 
 const datasetId = generateUuid();
@@ -42,17 +41,11 @@ const bucketName = generateUuid();
 const exportFileName = `data.json`;
 const importFileName = `data.avro`;
 const localFilePath = path.join(__dirname, `../resources/${importFileName}`);
-const rows = [
-  {Name: `foo`, Age: 27, Weight: 80.3, IsMagic: true},
-  {Name: `bar`, Age: 13, Weight: 54.6, IsMagic: false},
-];
 
 const bigquery = new BigQuery();
 
 describe('Tables', () => {
-  let projectId;
   before(async () => {
-    projectId = await bigquery.getProjectId();
     const [bucket] = await storage.createBucket(bucketName);
     await Promise.all([
       bucket.upload(localFilePath),
@@ -90,7 +83,7 @@ describe('Tables', () => {
 
   it(`should create a table`, async () => {
     const output = await exec(
-      `${cmd} create ${projectId} ${datasetId} ${tableId} "${schema}"`
+      `node createTable.js ${datasetId} ${tableId} "${schema}"`
     );
     assert.strictEqual(output, `Table ${tableId} created.`);
     const [exists] = await bigquery
@@ -101,14 +94,14 @@ describe('Tables', () => {
   });
 
   it(`should list tables`, async () => {
-    const output = await exec(`${cmd} list ${projectId} ${datasetId}`);
+    const output = await exec(`node listTables.js ${datasetId}`);
     assert.match(output, /Tables:/);
     assert.match(output, new RegExp(tableId));
   });
 
   it(`should load a local CSV file`, async () => {
     const output = await exec(
-      `${cmd} load-local-csv ${projectId} ${datasetId} ${tableId} ${localFilePath}`
+      `node loadLocalFile.js ${datasetId} ${tableId} ${localFilePath}`
     );
     assert.match(output, /completed\./);
     const [rows] = await bigquery
@@ -119,9 +112,7 @@ describe('Tables', () => {
   });
 
   it(`should browse table rows`, async () => {
-    const output = await exec(
-      `${cmd} browse ${projectId} ${datasetId} ${tableId}`
-    );
+    const output = await exec(`node browseRows.js ${datasetId} ${tableId}`);
     assert.strictEqual(
       output,
       `Rows:\n{ Name: 'Gandalf', Age: 2000, Weight: 140, IsMagic: true }`
@@ -130,7 +121,7 @@ describe('Tables', () => {
 
   it(`should extract a table to GCS`, async () => {
     const output = await exec(
-      `${cmd} extract ${projectId} ${datasetId} ${tableId} ${bucketName} ${exportFileName}`
+      `node extractTableToGCS.js ${datasetId} ${tableId} ${bucketName} ${exportFileName}`
     );
 
     assert.match(output, /completed\./);
@@ -144,7 +135,7 @@ describe('Tables', () => {
   it(`should load a GCS ORC file`, async () => {
     const tableId = generateUuid();
     const output = await exec(
-      `${cmd} load-gcs-orc ${projectId} ${datasetId} ${tableId}`
+      `node loadTableGCSORC.js ${datasetId} ${tableId}`
     );
     assert.match(output, /completed\./);
     const [rows] = await bigquery
@@ -157,7 +148,7 @@ describe('Tables', () => {
   it(`should load a GCS Parquet file`, async () => {
     const tableId = generateUuid();
     const output = await exec(
-      `${cmd} load-gcs-parquet ${projectId} ${datasetId} ${tableId}`
+      `node loadTableGCSParquet.js ${datasetId} ${tableId}`
     );
     assert.match(output, /completed\./);
     const [rows] = await bigquery
@@ -169,9 +160,7 @@ describe('Tables', () => {
 
   it(`should load a GCS CSV file with explicit schema`, async () => {
     const tableId = generateUuid();
-    const output = await exec(
-      `${cmd} load-gcs-csv ${projectId} ${datasetId} ${tableId}`
-    );
+    const output = await exec(`node loadCSVFromGCS.js ${datasetId} ${tableId}`);
     assert.match(output, /completed\./);
     const [rows] = await bigquery
       .dataset(datasetId)
@@ -183,7 +172,7 @@ describe('Tables', () => {
   it(`should load a GCS JSON file with explicit schema`, async () => {
     const tableId = generateUuid();
     const output = await exec(
-      `${cmd} load-gcs-json ${projectId} ${datasetId} ${tableId}`
+      `node loadJSONFromGCS.js ${datasetId} ${tableId}`
     );
     assert.match(output, /completed\./);
     const [rows] = await bigquery
@@ -196,7 +185,7 @@ describe('Tables', () => {
   it(`should load a GCS CSV file with autodetected schema`, async () => {
     const tableId = generateUuid();
     const output = await exec(
-      `${cmd} load-gcs-csv-autodetect ${projectId} ${datasetId} ${tableId}`
+      `node loadCSVFromGCSAutodetect.js ${datasetId} ${tableId}`
     );
     assert.match(output, /completed\./);
     const [rows] = await bigquery
@@ -209,7 +198,7 @@ describe('Tables', () => {
   it(`should load a GCS JSON file with autodetected schema`, async () => {
     const tableId = generateUuid();
     const output = await exec(
-      `${cmd} load-gcs-json-autodetect ${projectId} ${datasetId} ${tableId}`
+      `node loadJSONFromGCSAutodetect.js ${datasetId} ${tableId}`
     );
     assert.match(output, /completed\./);
     const [rows] = await bigquery
@@ -222,7 +211,7 @@ describe('Tables', () => {
   it(`should load a GCS CSV file truncate table`, async () => {
     const tableId = generateUuid();
     const output = await exec(
-      `${cmd} load-gcs-csv-truncate ${projectId} ${datasetId} ${tableId}`
+      `node loadCSVFromGCSTruncate.js ${datasetId} ${tableId}`
     );
     assert.match(output, /completed\./);
     const [rows] = await bigquery
@@ -235,7 +224,7 @@ describe('Tables', () => {
   it(`should load a GCS JSON file truncate table`, async () => {
     const tableId = generateUuid();
     const output = await exec(
-      `${cmd} load-gcs-json-truncate ${projectId} ${datasetId} ${tableId}`
+      `node loadJSONFromGCSTruncate.js ${datasetId} ${tableId}`
     );
     assert.match(output, /completed\./);
     const [rows] = await bigquery
@@ -248,7 +237,7 @@ describe('Tables', () => {
   it(`should load a GCS parquet file truncate table`, async () => {
     const tableId = generateUuid();
     const output = await exec(
-      `${cmd} load-gcs-parquet-truncate ${projectId} ${datasetId} ${tableId}`
+      `node loadParquetFromGCSTruncate.js ${datasetId} ${tableId}`
     );
     assert.match(output, /completed\./);
     const [rows] = await bigquery
@@ -261,7 +250,7 @@ describe('Tables', () => {
   it(`should load a GCS ORC file truncate table`, async () => {
     const tableId = generateUuid();
     const output = await exec(
-      `${cmd} load-gcs-orc-truncate ${projectId} ${datasetId} ${tableId}`
+      `node loadOrcFromGCSTruncate.js ${datasetId} ${tableId}`
     );
     assert.match(output, /completed\./);
     const [rows] = await bigquery
@@ -273,7 +262,7 @@ describe('Tables', () => {
 
   it(`should copy a table`, async () => {
     const output = await exec(
-      `${cmd} copy ${projectId} ${srcDatasetId} ${srcTableId} ${destDatasetId} ${destTableId}`
+      `node copyTable.js ${srcDatasetId} ${srcTableId} ${destDatasetId} ${destTableId}`
     );
     assert.match(output, /completed\./);
     const [rows] = await bigquery
@@ -284,25 +273,14 @@ describe('Tables', () => {
   });
 
   it(`should insert rows`, async () => {
-    const res = await execa.shell(
-      `${cmd} insert ${projectId} ${datasetId} ${tableId} 'foo.bar'`
-    );
-    assert.match(
-      res.stderr,
-      /"json_or_file" \(or the file it points to\) is not a valid JSON array\./
-    );
     const output = await exec(
-      `${cmd} insert ${projectId} ${datasetId} ${tableId} '${JSON.stringify(
-        rows
-      )}'`
+      `node insertRowsAsStream.js ${datasetId} ${tableId}`
     );
     assert.match(output, /Inserted 2 rows/);
   });
 
   it(`should delete a table`, async () => {
-    const output = await exec(
-      `${cmd} delete ${projectId} ${datasetId} ${tableId}`
-    );
+    const output = await exec(`node deleteTable.js ${datasetId} ${tableId}`);
     assert.strictEqual(output, `Table ${tableId} deleted.`);
     const [exists] = await bigquery
       .dataset(datasetId)

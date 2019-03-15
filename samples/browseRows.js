@@ -16,30 +16,31 @@
 
 'use strict';
 
-async function createDataset(datasetId) {
-  // Creates a new dataset named "my_dataset".
+async function browseRows(datasetId, tableId) {
+  // Displays rows from "my_table" in "my_dataset".
 
-  // [START bigquery_create_dataset]
+  // [START bigquery_browse_table]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
 
   /**
    * TODO(developer): Uncomment the following lines before running the sample.
    */
-  // const datasetId = "my_new_dataset";
+  // const datasetId = "my_dataset";
+  // const tableId = "my_table";
 
   // Create a client
   const bigquery = new BigQuery();
 
-  // Specify the geographic location where the dataset should reside
-  const options = {
-    location: 'US',
-  };
+  // List rows in the table
+  const [rows] = await bigquery
+    .dataset(datasetId)
+    .table(tableId)
+    .getRows();
 
-  // Create a new dataset
-  const [dataset] = await bigquery.createDataset(datasetId, options);
-  console.log(`Dataset ${dataset.id} created.`);
-  // [END bigquery_create_dataset]
+  console.log('Rows:');
+  rows.forEach(row => console.log(row));
+  // [END bigquery_browse_table]
 }
 
-createDataset(...process.argv.slice(2)).catch(console.error);
+browseRows(...process.argv.slice(2)).catch(console.error);

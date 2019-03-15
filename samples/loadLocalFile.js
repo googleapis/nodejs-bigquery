@@ -16,30 +16,37 @@
 
 'use strict';
 
-async function createDataset(datasetId) {
-  // Creates a new dataset named "my_dataset".
+async function loadLocalFile(datasetId, tableId, filename) {
+  // Imports a local file into a table.
 
-  // [START bigquery_create_dataset]
-  // Import the Google Cloud client library
+  // [START bigquery_load_from_file]
+  // Imports the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
 
   /**
    * TODO(developer): Uncomment the following lines before running the sample.
    */
-  // const datasetId = "my_new_dataset";
+  // const filename = "/path/to/file.csv";
+  // const datasetId = "my_dataset";
+  // const tableId = "my_table";
 
   // Create a client
   const bigquery = new BigQuery();
 
-  // Specify the geographic location where the dataset should reside
-  const options = {
-    location: 'US',
-  };
+  // Load data from a local file into the table
+  const [job] = await bigquery
+    .dataset(datasetId)
+    .table(tableId)
+    .load(filename);
 
-  // Create a new dataset
-  const [dataset] = await bigquery.createDataset(datasetId, options);
-  console.log(`Dataset ${dataset.id} created.`);
-  // [END bigquery_create_dataset]
+  console.log(`Job ${job.id} completed.`);
+
+  // Check the job's status for errors
+  const errors = job.status.errors;
+  if (errors && errors.length > 0) {
+    throw errors;
+  }
+  // [END bigquery_load_from_file]
 }
 
-createDataset(...process.argv.slice(2)).catch(console.error);
+loadLocalFile(...process.argv.slice(2)).catch(console.error);

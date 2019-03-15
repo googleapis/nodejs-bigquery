@@ -16,30 +16,30 @@
 
 'use strict';
 
-async function createDataset(datasetId) {
-  // Creates a new dataset named "my_dataset".
+async function deleteTable(datasetId, tableId) {
+  // Deletes "my_table" from "my_dataset".
 
-  // [START bigquery_create_dataset]
+  // [START bigquery_delete_table]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
 
   /**
    * TODO(developer): Uncomment the following lines before running the sample.
    */
-  // const datasetId = "my_new_dataset";
+  // const datasetId = "my_dataset";
+  // const tableId = "my_table";
 
   // Create a client
   const bigquery = new BigQuery();
 
-  // Specify the geographic location where the dataset should reside
-  const options = {
-    location: 'US',
-  };
+  // Delete the table
+  await bigquery
+    .dataset(datasetId)
+    .table(tableId)
+    .delete();
 
-  // Create a new dataset
-  const [dataset] = await bigquery.createDataset(datasetId, options);
-  console.log(`Dataset ${dataset.id} created.`);
-  // [END bigquery_create_dataset]
+  console.log(`Table ${tableId} deleted.`);
+  // [END bigquery_delete_table]
 }
 
-createDataset(...process.argv.slice(2)).catch(console.error);
+deleteTable(...process.argv.slice(2)).catch(console.error);

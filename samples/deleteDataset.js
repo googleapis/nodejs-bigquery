@@ -1,10 +1,11 @@
 /**
- * Copyright 2017, Google, Inc.
+ * Copyright 2019 Google LLC
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *   https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,19 +16,26 @@
 
 'use strict';
 
-async function deleteDataset(DATASET_ID = 'YOUR_DATASET_ID') {
+async function deleteDataset(datasetId) {
+  // Deletes a dataset named "my_dataset".
+
   // [START bigquery_delete_dataset]
-  // Imports the Google Cloud client library
+  // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
 
-  // Creates a client
+  /**
+   * TODO(developer): Uncomment the following lines before running the sample.
+   */
+  // const datasetId = "my_new_dataset";
+
+  // Create a client
   const bigquery = new BigQuery();
 
-  // Creates a reference to the existing dataset
-  const dataset = bigquery.dataset(DATASET_ID);
+  // Create a reference to the existing dataset
+  const dataset = bigquery.dataset(datasetId);
 
-  // Deletes the dataset
-  await dataset.delete();
+  // Delete the dataset and its contents
+  await dataset.delete({force: true});
   console.log(`Dataset ${dataset.id} deleted.`);
   // [END bigquery_delete_dataset]
 }

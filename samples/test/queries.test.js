@@ -18,7 +18,7 @@
 const {assert} = require('chai');
 const execa = require('execa');
 
-const cmd = `node queries.js`;
+// const cmd = `node queries.js`;
 const exec = async cmd => {
   const res = await execa.shell(cmd);
   assert.isEmpty(res.stderr);
@@ -27,19 +27,19 @@ const exec = async cmd => {
 
 describe(`Queries`, () => {
   it(`should query stackoverflow`, async () => {
-    const output = await exec(`${cmd} stackoverflow`);
+    const output = await exec(`node queryStackOverflow.js`);
     assert.match(output, /Query Results:/);
     assert.match(output, /views/);
   });
 
   it(`should run a query`, async () => {
-    const output = await exec(`${cmd} query`);
+    const output = await exec(`node query.js`);
     assert.match(output, /Rows:/);
     assert.match(output, /name/);
   });
 
   it(`should run a query with the cache disabled`, async () => {
-    const output = await exec(`${cmd} disable-cache`);
+    const output = await exec(`node queryDisableCache.js`);
     assert.match(output, /Rows:/);
     assert.match(output, /corpus/);
   });

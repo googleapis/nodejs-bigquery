@@ -16,30 +16,37 @@
 
 'use strict';
 
-async function createDataset(datasetId) {
-  // Creates a new dataset named "my_dataset".
+async function query() {
+  // Queries the Shakespeare dataset with the cache disabled.
 
-  // [START bigquery_create_dataset]
+  // [START bigquery_query]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
-
-  /**
-   * TODO(developer): Uncomment the following lines before running the sample.
-   */
-  // const datasetId = "my_new_dataset";
 
   // Create a client
   const bigquery = new BigQuery();
 
-  // Specify the geographic location where the dataset should reside
+  const query = `SELECT name
+    FROM \`bigquery-public-data.usa_names.usa_1910_2013\`
+    WHERE state = 'TX'
+    LIMIT 100`;
   const options = {
+    query: query,
+    // Location must match that of the dataset(s) referenced in the query.
     location: 'US',
   };
 
-  // Create a new dataset
-  const [dataset] = await bigquery.createDataset(datasetId, options);
-  console.log(`Dataset ${dataset.id} created.`);
-  // [END bigquery_create_dataset]
+  // Run the query as a job
+  const [job] = await bigquery.createQueryJob(options);
+  console.log(`Job ${job.id} started.`);
+
+  // Wait for the query to finish
+  const [rows] = await job.getQueryResults();
+
+  // Print the results
+  console.log('Rows:');
+  rows.forEach(row => console.log(row));
+  // [END bigquery_query]
 }
 
-createDataset(...process.argv.slice(2)).catch(console.error);
+query(...process.argv.slice(2)).catch(console.error);

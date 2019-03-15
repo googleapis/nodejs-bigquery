@@ -16,30 +16,33 @@
 
 'use strict';
 
-async function createDataset(datasetId) {
-  // Creates a new dataset named "my_dataset".
+async function insertRowsAsStream(
+  datasetId,
+  tableId,
+  rows = [{name: 'Tom', age: 30}, {name: 'Jane', age: 32}]
+) {
+  // Inserts the JSON objects into my_dataset:my_table.
 
-  // [START bigquery_create_dataset]
+  // [START bigquery_table_insert_rows]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
 
   /**
    * TODO(developer): Uncomment the following lines before running the sample.
    */
-  // const datasetId = "my_new_dataset";
+  // const datasetId = "my_dataset";
+  // const tableId = "my_table";
 
   // Create a client
   const bigquery = new BigQuery();
 
-  // Specify the geographic location where the dataset should reside
-  const options = {
-    location: 'US',
-  };
-
-  // Create a new dataset
-  const [dataset] = await bigquery.createDataset(datasetId, options);
-  console.log(`Dataset ${dataset.id} created.`);
-  // [END bigquery_create_dataset]
+  // Insert data into a table
+  await bigquery
+    .dataset(datasetId)
+    .table(tableId)
+    .insert(rows);
+  console.log(`Inserted ${rows.length} rows`);
+  // [END bigquery_table_insert_rows]
 }
 
-createDataset(...process.argv.slice(2)).catch(console.error);
+insertRowsAsStream(...process.argv.slice(2)).catch(console.error);
