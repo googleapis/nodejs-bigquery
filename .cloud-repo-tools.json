@@ -110,7 +110,7 @@
     {
       "id": "load-ORC-from-GCS-truncate",
       "name": "Load ORC from GCS truncate",
-      "file": "loadORCFromGCSTruncate.js",
+      "file": "loadOrcFromGCSTruncate.js",
       "docs_link": "https://cloud.google.com/nodejs/docs/reference/bigquery/latest/"
     },
     {
