@@ -31,7 +31,7 @@
   * [Load local file](#load-local-file)
   * [Load ORC from GCS truncate](#load-orc-from-gcs-truncate)
   * [Load Parquet from GCS truncate](#load-parquet-from-gcs-truncate)
-  * [Queries](#queries)
+  * [Query](#query)
   * [Query named params](#query-named-params)
   * [Query positional params](#query-positional-params)
 
