@@ -16,13 +16,13 @@
 
 'use strict';
 
-async function loadCSVFromGCSTruncate(datasetId, tableId) {
+async function loadJSONFromGCSTruncate(datasetId, tableId) {
   /**
    * Imports a GCS file into a table and overwrites
    * table data if table already exists.
    */
 
-  // [START bigquery_load_table_gcs_csv_truncate]
+  // [START bigquery_load_table_gcs_json_truncate]
   // Import the Google Cloud client libraries
   const {BigQuery} = require('@google-cloud/bigquery');
   const {Storage} = require('@google-cloud/storage');
@@ -34,23 +34,23 @@ async function loadCSVFromGCSTruncate(datasetId, tableId) {
   // const tableId = "my_table";
 
   /**
-   * This sample loads the CSV file at
-   * https://storage.googleapis.com/cloud-samples-data/bigquery/us-states/us-states.csv
+   * This sample loads the JSON file at
+   * https://storage.googleapis.com/cloud-samples-data/bigquery/us-states/us-states.json
    *
    * TODO(developer): Replace the following lines with the path to your file.
    */
   const bucketName = 'cloud-samples-data';
-  const filename = 'bigquery/us-states/us-states.csv';
+  const filename = 'bigquery/us-states/us-states.json';
 
   // Instantiate clients
   const bigquery = new BigQuery();
+
   const storage = new Storage();
 
   // Configure the load job. For full list of options, see:
   // https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs#configuration.load
   const metadata = {
-    sourceFormat: 'CSV',
-    skipLeadingRows: 1,
+    sourceFormat: 'NEWLINE_DELIMITED_JSON',
     schema: {
       fields: [
         {name: 'name', type: 'STRING'},
@@ -59,7 +59,6 @@ async function loadCSVFromGCSTruncate(datasetId, tableId) {
     },
     // Set the write disposition to overwrite existing table data.
     writeDisposition: 'WRITE_TRUNCATE',
-    location: 'US',
   };
 
   // Load data from a Google Cloud Storage file into the table
@@ -75,7 +74,7 @@ async function loadCSVFromGCSTruncate(datasetId, tableId) {
   if (errors && errors.length > 0) {
     throw errors;
   }
-  // [END bigquery_load_table_gcs_csv_truncate]
+  // [END bigquery_load_table_gcs_json_truncate]
 }
 
-loadCSVFromGCSTruncate(...process.argv.slice(2)).catch(console.error);
+loadJSONFromGCSTruncate(...process.argv.slice(2)).catch(console.error);
