@@ -16,7 +16,7 @@
 
 'use strict';
 
-async function loadOrcFromGCSTruncate(datasetId, tableId) {
+async function loadORCFromGCSTruncate(datasetId, tableId) {
   /**
    * Imports a GCS file into a table and overwrites
    * table data if table already exists.
@@ -71,4 +71,4 @@ async function loadOrcFromGCSTruncate(datasetId, tableId) {
   // [END bigquery_load_table_gcs_orc_truncate]
 }
 
-loadOrcFromGCSTruncate(...process.argv.slice(2)).catch(console.error);
+loadORCFromGCSTruncate(...process.argv.slice(2)).catch(console.error);
