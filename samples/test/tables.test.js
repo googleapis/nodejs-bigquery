@@ -250,7 +250,7 @@ describe('Tables', () => {
   it(`should load a GCS ORC file truncate table`, async () => {
     const tableId = generateUuid();
     const output = await exec(
-      `node loadORCFromGCSTruncate.js ${datasetId} ${tableId}`
+      `node loadOrcFromGCSTruncate.js ${datasetId} ${tableId}`
     );
     assert.match(output, /completed\./);
     const [rows] = await bigquery
