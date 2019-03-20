@@ -978,12 +978,7 @@ describe('BigQuery', () => {
           it('should work with TIMESTAMP types', done => {
             bigquery.query(
                 {
-                  query: [
-                    'SELECT subject',
-                    'FROM `bigquery-public-data.github_repos.commits`',
-                    'WHERE author.date < ?',
-                    'LIMIT 1',
-                  ].join(' '),
+                  query: 'SELECT ? timestamp',
                   params: [new Date()],
                 },
                 (err, rows) => {
@@ -1192,12 +1187,7 @@ describe('BigQuery', () => {
           it('should work with TIMESTAMP types', done => {
             bigquery.query(
                 {
-                  query: [
-                    'SELECT subject',
-                    'FROM `bigquery-public-data.github_repos.commits`',
-                    'WHERE author.date < @time',
-                    'LIMIT 1',
-                  ].join(' '),
+                  query: 'SELECT @time timestamp',
                   params: {
                     time: new Date(),
                   },
