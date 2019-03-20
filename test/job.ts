@@ -357,7 +357,8 @@ describe('BigQuery/Job', () => {
       const error = new Error('Error.');
       const apiResponse = {
         status: {
-          errors: error,
+          errorResult: error,
+          errors: [error],
         },
       };
 
@@ -365,7 +366,7 @@ describe('BigQuery/Job', () => {
 
       beforeEach(() => {
         job.getMetadata = (callback: Function) => {
-          callback(null, apiResponse, apiResponse);
+          callback(null, apiResponse);
         };
       });
 
