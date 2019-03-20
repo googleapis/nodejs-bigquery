@@ -161,7 +161,7 @@ export interface BigQueryDatetimeOptions {
 
 export interface QueryParameter {
   name?: string;
-  parameterType: {type: string;};
+  parameterType: ValueType;
   parameterValue: {arrayValues?: Array<{}>; structValues?: {}; value?: {}};
 }
 
@@ -771,23 +771,16 @@ export class BigQuery extends common.Service {
       value = BigQuery.timestamp(value as Date);
     }
 
-    const queryParameter: QueryParameter = {
-      parameterType: BigQuery.getType_(value),
-      parameterValue: {},
-    };
+    const parameterType = BigQuery.getType_(value);
+    const queryParameter: QueryParameter = {parameterType, parameterValue: {}};
 
-    const typeName = queryParameter.parameterType.type;
-
-    if (typeName.indexOf('TIME') > -1 || typeName.indexOf('DATE') > -1) {
-      value = value.value;
-    }
+    const typeName = parameterType.type;
 
     if (typeName === 'ARRAY') {
       queryParameter.parameterValue.arrayValues =
-          (value as Array<{}>).map(value => {
-            return {
-              value,
-            };
+          (value as Array<{}>).map(itemValue => {
+            const value = getValue(itemValue, parameterType.arrayType!);
+            return {value};
           });
     } else if (typeName === 'STRUCT') {
       queryParameter.parameterValue.structValues =
@@ -799,10 +792,19 @@ export class BigQuery extends common.Service {
             return structValues;
           }, {});
     } else {
-      queryParameter.parameterValue.value = value;
+      queryParameter.parameterValue.value = getValue(value, parameterType);
     }
 
     return queryParameter;
+
+    // tslint:disable-next-line no-any
+    function getValue(value: any, type: ValueType): any {
+      return isCustomType(type) ? value.value : value;
+    }
+
+    function isCustomType({type}: ValueType): boolean {
+      return type.indexOf('TIME') > -1 || type.indexOf('DATE') > -1;
+    }
   }
 
   createDataset(id: string, options?: DatasetResource):
