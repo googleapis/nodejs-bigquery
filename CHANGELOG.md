@@ -4,6 +4,24 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## v2.1.1
+
+03-21-2019 11:40 PDT
+
+### Bug Fixes
+- fix: correctly encode nested custom date/time parameters ([#393](https://github.com/googleapis/nodejs-bigquery/pull/393))
+- fix(job): check for `errorResult` when polling jobs ([#387](https://github.com/googleapis/nodejs-bigquery/pull/387))
+
+### Documentation
+- docs(samples): adds queryParamsNamed and queryParamsPositional ([#381](https://github.com/googleapis/nodejs-bigquery/pull/381))
+- refactor(samples): fix loadJSONFromGCSTruncate wrong function ([#386](https://github.com/googleapis/nodejs-bigquery/pull/386))
+- refactor(samples): split query and table samples into separate files ([#384](https://github.com/googleapis/nodejs-bigquery/pull/384))
+
+### Internal / Testing Changes
+- fix(tests): update TIMESTAMP param tests ([#394](https://github.com/googleapis/nodejs-bigquery/pull/394))
+- chore: publish to npm using wombat ([#390](https://github.com/googleapis/nodejs-bigquery/pull/390))
+- build: use per-repo npm publish token ([#382](https://github.com/googleapis/nodejs-bigquery/pull/382))
+
 ## v2.1.0
 
 03-12-2019 15:30 PDT
