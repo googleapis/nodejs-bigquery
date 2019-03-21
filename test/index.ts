@@ -673,6 +673,20 @@ describe('BigQuery', () => {
       assert.strictEqual(queryParameter.parameterValue.value, datetime.value);
     });
 
+    it('should locate the value on nested DATETIME objects', () => {
+      const datetimes = [{
+        value: 'value',
+      }];
+
+      sandbox.stub(BigQuery, 'getType_').returns({
+        type: 'ARRAY',
+        arrayType: {type: 'DATETIME'},
+      });
+
+      const {parameterValue} = BigQuery.valueToQueryParameter_(datetimes);
+      assert.deepStrictEqual(parameterValue.arrayValues, datetimes);
+    });
+
     it('should locate the value on TIME objects', () => {
       const time = {
         value: 'value',
@@ -686,9 +700,28 @@ describe('BigQuery', () => {
       assert.strictEqual(queryParameter.parameterValue.value, time.value);
     });
 
+    it('should locate the value on nested TIME objects', () => {
+      const times = [{
+        value: 'value',
+      }];
+
+      sandbox.stub(BigQuery, 'getType_').returns({
+        type: 'ARRAY',
+        arrayType: {type: 'TIME'},
+      });
+
+      const {parameterValue} = BigQuery.valueToQueryParameter_(times);
+      assert.deepStrictEqual(parameterValue.arrayValues, times);
+    });
+
     it('should format an array', () => {
       const array = [1];
-      sandbox.stub(BigQuery, 'getType_').returns({type: 'ARRAY'});
+
+      sandbox.stub(BigQuery, 'getType_').returns({
+        type: 'ARRAY',
+        arrayType: {type: 'INT64'},
+      });
+
       const queryParameter = BigQuery.valueToQueryParameter_(array);
       const arrayValues = queryParameter.parameterValue.arrayValues;
       assert.deepStrictEqual(arrayValues, [
