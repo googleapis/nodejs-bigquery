@@ -32,7 +32,7 @@ import {Job, JobOptions, QueryResultsOptions} from './job';
 import {Table, TableField, TableSchema, TableRow, TableRowField, JobCallback, JobResponse, RowsCallback, RowsResponse, RowMetadata} from './table';
 import {GoogleErrorBody} from '@google-cloud/common/build/src/util';
 import {Readable, Duplex} from 'stream';
-import {bigquery} from './types';
+import bigquery from './types';
 
 export interface RequestCallback<T> {
   (err: Error|null, response?: T|null): void;
@@ -60,9 +60,9 @@ export type PagedRequest<P> = P&{
 };
 
 export type QueryRowsResponse =
-    PagedResponse<RowMetadata, Query, bigquery.IListTableDataResponse>;
+    PagedResponse<RowMetadata, Query, bigquery.ITableDataList>;
 export type QueryRowsCallback =
-    PagedCallback<RowMetadata, Query, bigquery.IListTableDataResponse>;
+    PagedCallback<RowMetadata, Query, bigquery.ITableDataList>;
 
 export type SimpleQueryRowsResponse = [RowMetadata[], bigquery.IJob];
 export type SimpleQueryRowsCallback =
@@ -84,20 +84,20 @@ export type QueryOptions = QueryResultsOptions;
 export type DatasetResource = bigquery.IDataset;
 export type ValueType = bigquery.IQueryParameterType;
 
-export type GetDatasetsOptions = PagedRequest<bigquery.IListDatasetsRequest>;
+export type GetDatasetsOptions = PagedRequest<bigquery.datasets.IListParams>;
 export type DatasetsResponse =
-    PagedResponse<Dataset, GetDatasetsOptions, bigquery.IListDatasetsResponse>;
+    PagedResponse<Dataset, GetDatasetsOptions, bigquery.IDatasetList>;
 export type DatasetsCallback =
-    PagedCallback<Dataset, GetDatasetsOptions, bigquery.IListDatasetsResponse>;
+    PagedCallback<Dataset, GetDatasetsOptions, bigquery.IDatasetList>;
 
 export type DatasetResponse = [Dataset, bigquery.IDataset];
 export type DatasetCallback = ResourceCallback<Dataset, bigquery.IDataset>;
 
-export type GetJobsOptions = PagedRequest<bigquery.IListJobsRequest>;
+export type GetJobsOptions = PagedRequest<bigquery.jobs.IListParams>;
 export type GetJobsResponse =
-    PagedResponse<Job, GetJobsOptions, bigquery.IListJobsResponse>;
+    PagedResponse<Job, GetJobsOptions, bigquery.IJobList>;
 export type GetJobsCallback =
-    PagedCallback<Job, GetJobsOptions, bigquery.IListJobsResponse>;
+    PagedCallback<Job, GetJobsOptions, bigquery.IJobList>;
 
 export interface BigQueryTimeOptions {
   hours?: number|string;

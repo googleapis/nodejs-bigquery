@@ -24,7 +24,7 @@ import {teenyRequest} from 'teeny-request';
 
 import {BigQuery, DatasetCallback, PagedCallback, PagedRequest, PagedResponse, Query, QueryRowsResponse, ResourceCallback, SimpleQueryRowsCallback} from '.';
 import {JobCallback, JobResponse, Table, TableMetadata, TableOptions} from './table';
-import {bigquery} from './types';
+import bigquery from './types';
 
 export interface DatasetDeleteOptions {
   force?: boolean;
@@ -36,11 +36,11 @@ export interface DataSetOptions {
 
 export type CreateDatasetOptions = bigquery.IDataset;
 
-export type GetTablesOptions = PagedRequest<bigquery.IListTablesRequest>;
+export type GetTablesOptions = PagedRequest<bigquery.tables.IListParams>;
 export type GetTablesResponse =
-    PagedResponse<Table, GetTablesOptions, bigquery.IListTablesResponse>;
+    PagedResponse<Table, GetTablesOptions, bigquery.ITableList>;
 export type GetTablesCallback =
-    PagedCallback<Table, GetTablesOptions, bigquery.IListTablesResponse>;
+    PagedCallback<Table, GetTablesOptions, bigquery.ITableList>;
 
 export type TableResponse = [Table, bigquery.ITable];
 export type TableCallback = ResourceCallback<Table, bigquery.ITable>;

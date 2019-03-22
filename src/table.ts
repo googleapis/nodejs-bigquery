@@ -34,7 +34,7 @@ import {GoogleErrorBody} from '@google-cloud/common/build/src/util';
 import {Duplex, Readable, Writable} from 'stream';
 import {teenyRequest} from 'teeny-request';
 import {JobMetadata} from './job';
-import {bigquery} from './types';
+import bigquery from './types';
 
 // This is supposed to be a @google-cloud/storage `File` type. The storage npm
 // module includes these types, but is current installed as a devDependency.
@@ -56,7 +56,7 @@ export type JobMetadataResponse = [JobMetadata];
 // tslint:disable-next-line no-any
 export type RowMetadata = any;
 
-export type InsertRowsOptions = bigquery.IInsertAllTableDataRequest&{
+export type InsertRowsOptions = bigquery.ITableDataInsertAllRequest&{
   autoCreate?: boolean;
   raw?: boolean;
   schema: string|{};
@@ -64,22 +64,20 @@ export type InsertRowsOptions = bigquery.IInsertAllTableDataRequest&{
 
 // @TODO when breaking changes are cool, rename these to have suffix InsertRows
 export type ApiResponse =
-    [bigquery.IInsertAllTableDataResponse | bigquery.ITable];
+    [bigquery.ITableDataInsertAllResponse | bigquery.ITable];
 export type ApiResponseCallback =
-    RequestCallback<bigquery.IInsertAllTableDataResponse|bigquery.ITable>;
+    RequestCallback<bigquery.ITableDataInsertAllResponse|bigquery.ITable>;
 
 export type RowsResponse = PagedResponse<
-    RowMetadata, GetRowsOptions,
-    bigquery.IListTableDataResponse|bigquery.ITable>;
+    RowMetadata, GetRowsOptions, bigquery.ITableDataList|bigquery.ITable>;
 export type RowsCallback = PagedCallback<
-    RowMetadata, GetRowsOptions,
-    bigquery.IListTableDataResponse|bigquery.ITable>;
+    RowMetadata, GetRowsOptions, bigquery.ITableDataList|bigquery.ITable>;
 
 export type TableRow = bigquery.ITableRow;
 export type TableRowField = bigquery.ITableCell;
 export type TableRowValue = string|TableRow;
 
-export type GetRowsOptions = PagedRequest<bigquery.IListTableDataRequest>;
+export type GetRowsOptions = PagedRequest<bigquery.tabledata.IListParams>;
 
 export type JobLoadMetadata = JobRequest<bigquery.IJobConfigurationLoad>&{
   format?: string;
@@ -1573,7 +1571,7 @@ class Table extends common.ServiceObject {
         typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
     const onComplete =
         (err: Error|null, rows: TableRow[]|null, nextQuery: GetRowsOptions|null,
-         resp: bigquery.IListTableDataResponse) => {
+         resp: bigquery.ITableList) => {
           if (err) {
             callback!(err, null, null, resp);
             return;

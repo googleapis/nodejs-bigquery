@@ -28,16 +28,16 @@ import {teenyRequest} from 'teeny-request';
 
 import {BigQuery, JobRequest, PagedRequest, QueryRowsCallback, QueryRowsResponse, RequestCallback} from '../src';
 import {RowMetadata} from './table';
-import {bigquery} from './types';
+import bigquery from './types';
 
 export type JobMetadata = bigquery.IJob;
 export type JobOptions = JobRequest<JobMetadata>;
 
-export type CancelCallback = RequestCallback<bigquery.ICancelJobResponse>;
-export type CancelResponse = [bigquery.ICancelJobResponse];
+export type CancelCallback = RequestCallback<bigquery.IJobCancelResponse>;
+export type CancelResponse = [bigquery.IJobCancelResponse];
 
 export type QueryResultsOptions =
-    PagedRequest<bigquery.IGetQueryResultsRequest>;
+    PagedRequest<bigquery.jobs.IGetQueryResultsParams>;
 
 /**
  * @callback QueryResultsCallback

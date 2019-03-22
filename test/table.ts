@@ -31,7 +31,7 @@ import * as uuid from 'uuid';
 import {BigQuery, Query} from '../src';
 import {Job, JobOptions} from '../src/job';
 import {CopyTableMetadata, JobLoadMetadata, Table, TableMetadata, TableOptions, ViewDefinition} from '../src/table';
-import {bigquery} from '../src/types';
+import bigquery from '../src/types';
 
 let promisified = false;
 let makeWritableStreamOverride: Function|null;
