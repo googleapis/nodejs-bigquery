@@ -38,6 +38,10 @@ describe('BigQuery', () => {
 
   const SCHEMA = [
     {
+      name: 'place',
+      type: 'GEOGRAPHY',
+    },
+    {
       name: 'id',
       type: 'INTEGER',
     },
@@ -1299,6 +1303,7 @@ describe('BigQuery', () => {
     const TIME = bigquery.time('14:00:00');
     const TIMESTAMP = bigquery.timestamp(new Date());
     const NUMERIC = new Big('123.456');
+    const GEOGRAPHY = bigquery.geography('POINT(1 2)');
 
     before(() => {
       table = dataset.table(generateName('table'));
@@ -1309,6 +1314,7 @@ describe('BigQuery', () => {
           'time:TIME',
           'timestamp:TIMESTAMP',
           'numeric:NUMERIC',
+          'geography:GEOGRAPHY'
         ].join(', '),
       });
     });
@@ -1320,6 +1326,7 @@ describe('BigQuery', () => {
         time: TIME,
         timestamp: TIMESTAMP,
         numeric: NUMERIC,
+        geography: GEOGRAPHY,
       });
     });
   });

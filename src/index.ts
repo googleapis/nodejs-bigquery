@@ -445,6 +445,10 @@ export class BigQuery extends common.Service {
           value = BigQuery.timestamp(new Date(value * 1000));
           break;
         }
+        case 'GEOGRAPHY': {
+          value = BigQuery.geography(value);
+          break;
+        }
         default:
           break;
       }
@@ -690,6 +694,38 @@ export class BigQuery extends common.Service {
 
   timestamp(value: Date|string) {
     return BigQuery.timestamp(value);
+  }
+
+  /**
+   * A geography value represents a surface area on the Earth
+   * in Well-known Text (WKT) format.
+   *
+   * @method BigQuery.geography
+   * @param {string} value The geospatial data.
+   *
+   * @example
+   * const {BigQuery} = require('@google-cloud/bigquery');
+   * const geography = BigQuery.geography('POINT(1, 2)');
+   */
+
+  /**
+   * A geography value represents a surface area on the Earth
+   * in Well-known Text (WKT) format.
+   *
+   * @method BigQuery#geography
+   * @param {string} value The geospatial data.
+   *
+   * @example
+   * const {BigQuery} = require('@google-cloud/bigquery');
+   * const bigquery = new BigQuery();
+   * const geography = bigquery.geography('POINT(1, 2)');
+   */
+  static geography(value: string) {
+    return new Geography(value);
+  }
+
+  geography(value: string) {
+    return BigQuery.geography(value);
   }
 
   /**
@@ -1555,6 +1591,16 @@ export class BigQueryDate {
     if (typeof value === 'object') {
       value = BigQuery.datetime(value).value;
     }
+    this.value = value;
+  }
+}
+
+/**
+ * Geography class for BigQuery.
+ */
+export class Geography {
+  value: string;
+  constructor(value: string) {
     this.value = value;
   }
 }
