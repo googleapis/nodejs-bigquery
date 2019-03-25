@@ -1579,7 +1579,15 @@ paginator.extend(BigQuery, ['getDatasets', 'getJobs']);
  * that a callback is omitted.
  */
 promisifyAll(BigQuery, {
-  exclude: ['dataset', 'date', 'datetime', 'job', 'time', 'timestamp'],
+  exclude: [
+    'dataset',
+    'date',
+    'datetime',
+    'geography',
+    'job',
+    'time',
+    'timestamp',
+  ],
 });
 
 /**
