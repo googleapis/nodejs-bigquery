@@ -520,6 +520,7 @@ class Table extends common.ServiceObject {
       'BigQueryDatetime',
       'BigQueryTime',
       'BigQueryTimestamp',
+      'Geography',
     ];
     const constructorName = value.constructor.name;
     const isCustomType =
