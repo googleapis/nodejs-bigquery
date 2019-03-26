@@ -27,7 +27,7 @@ import * as r from 'request';
 import * as uuid from 'uuid';
 import {teenyRequest} from 'teeny-request';
 
-import {Dataset, DataSetOptions} from './dataset';
+import {Dataset, DatasetOptions} from './dataset';
 import {Job, JobOptions, QueryResultsOptions} from './job';
 import {Table, TableField, TableSchema, TableRow, TableRowField, JobCallback, JobResponse, RowsCallback, RowsResponse, RowMetadata} from './table';
 import {GoogleErrorBody} from '@google-cloud/common/build/src/util';
@@ -1124,7 +1124,7 @@ export class BigQuery extends common.Service {
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('higher_education');
    */
-  dataset(id: string, options?: DataSetOptions) {
+  dataset(id: string, options?: DatasetOptions) {
     if (typeof id !== 'string') {
       throw new TypeError('A dataset ID is required.');
     }

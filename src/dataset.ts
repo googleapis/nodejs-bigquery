@@ -30,7 +30,7 @@ export interface DatasetDeleteOptions {
   force?: boolean;
 }
 
-export interface DataSetOptions {
+export interface DatasetOptions {
   location?: string;
 }
 
@@ -65,7 +65,7 @@ class Dataset extends ServiceObject {
   bigQuery: BigQuery;
   location?: string;
   getTablesStream: (options?: GetTablesOptions) => ResourceStream<Table>;
-  constructor(bigQuery: BigQuery, id: string, options?: DataSetOptions) {
+  constructor(bigQuery: BigQuery, id: string, options?: DatasetOptions) {
     const methods = {
       /**
        * Create a dataset.

@@ -22,7 +22,7 @@ import * as extend from 'extend';
 import * as proxyquire from 'proxyquire';
 
 import * as _root from '../src';
-import {DataSetOptions} from '../src/dataset';
+import {DatasetOptions} from '../src/dataset';
 import {FormattedMetadata, TableOptions} from '../src/table';
 
 let promisified = false;
@@ -165,7 +165,7 @@ describe('BigQuery/Dataset', () => {
 
       it('should pass the location', done => {
         bq.createDataset =
-            (id: string, options: DataSetOptions, callback: Function) => {
+            (id: string, options: DatasetOptions, callback: Function) => {
               assert.strictEqual(options.location, LOCATION);
               callback();  // the done fn
             };
