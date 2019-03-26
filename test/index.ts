@@ -48,6 +48,7 @@ const fakePfy = extend({}, pfy, {
       'dataset',
       'date',
       'datetime',
+      'geography',
       'job',
       'time',
       'timestamp',
@@ -570,6 +571,34 @@ describe('BigQuery', () => {
     it('should accept a Date object', () => {
       const timestamp = bq.timestamp(INPUT_DATE);
       assert.strictEqual(timestamp.value, EXPECTED_VALUE);
+    });
+  });
+  // *************
+  // ********
+  // *****
+  // ***
+  // *
+  describe('geography', () => {
+    const INPUT_STRING = 'POINT(1 2)';
+
+    it.skip('should expose static and instance constructors', () => {
+      const staticG = BigQuery.geography(INPUT_STRING);
+      assert(staticG instanceof BigQuery.geography);
+      assert(staticG instanceof bq.geography);
+
+      const instanceG = bq.geography(INPUT_STRING);
+      assert(instanceG instanceof BigQuery.geography);
+      assert(instanceG instanceof bq.geography);
+    });
+
+    it('should have the correct constructor name', () => {
+      const geography = bq.geography(INPUT_STRING);
+      assert.strictEqual(geography.constructor.name, 'Geography');
+    });
+
+    it('should accept a string', () => {
+      const geography = bq.geography(INPUT_STRING);
+      assert.strictEqual(geography.value, INPUT_STRING);
     });
   });
 

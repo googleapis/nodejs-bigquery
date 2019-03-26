@@ -1031,6 +1031,19 @@ describe('BigQuery', () => {
                 });
           });
 
+          it('should work with GEOGRAPHY types', done => {
+            bigquery.query(
+                {
+                  query: 'SELECT ? geography',
+                  params: [bigquery.geography('POINT(1 2)')],
+                },
+                (err, rows) => {
+                  assert.ifError(err);
+                  assert.strictEqual(rows!.length, 1);
+                  done();
+                });
+          });
+
           it('should work with multiple types', done => {
             bigquery.query(
                 {
@@ -1239,6 +1252,21 @@ describe('BigQuery', () => {
                   query: 'SELECT @time time',
                   params: {
                     time: bigquery.time('14:00:00'),
+                  },
+                },
+                (err, rows) => {
+                  assert.ifError(err);
+                  assert.strictEqual(rows!.length, 1);
+                  done();
+                });
+          });
+
+          it('should work with GEOGRAPHY types', done => {
+            bigquery.query(
+                {
+                  query: 'SELECT @place geography',
+                  params: {
+                    place: bigquery.geography('POINT(1 2)'),
                   },
                 },
                 (err, rows) => {
