@@ -62,10 +62,9 @@ export type InsertRowsOptions = bigquery.ITableDataInsertAllRequest&{
   schema: string|{};
 };
 
-// @TODO when breaking changes are cool, rename these to have suffix InsertRows
-export type ApiResponse =
+export type InsertRowsResponse =
     [bigquery.ITableDataInsertAllResponse | bigquery.ITable];
-export type ApiResponseCallback =
+export type InsertRowsCallback =
     RequestCallback<bigquery.ITableDataInsertAllResponse|bigquery.ITable>;
 
 export type RowsResponse = PagedResponse<
@@ -1617,11 +1616,11 @@ class Table extends common.ServiceObject {
   }
 
   insert(rows: RowMetadata|RowMetadata[], options?: InsertRowsOptions):
-      Promise<ApiResponse>;
+      Promise<InsertRowsResponse>;
   insert(
       rows: RowMetadata|RowMetadata[], options: InsertRowsOptions,
-      callback: ApiResponseCallback): void;
-  insert(rows: RowMetadata|RowMetadata[], callback: ApiResponseCallback): void;
+      callback: InsertRowsCallback): void;
+  insert(rows: RowMetadata|RowMetadata[], callback: InsertRowsCallback): void;
   /**
    * Stream data into BigQuery one record at a time without running a load job.
    *
@@ -1757,14 +1756,14 @@ class Table extends common.ServiceObject {
    */
   insert(
       rows: RowMetadata|RowMetadata[],
-      optionsOrCallback?: InsertRowsOptions|ApiResponseCallback,
-      cb?: ApiResponseCallback): void|Promise<ApiResponse> {
+      optionsOrCallback?: InsertRowsOptions|InsertRowsCallback,
+      cb?: InsertRowsCallback): void|Promise<InsertRowsResponse> {
     const options = typeof optionsOrCallback === 'object' ?
         optionsOrCallback :
         {} as InsertRowsOptions;
     const callback = typeof optionsOrCallback === 'function' ?
         optionsOrCallback :
-        cb as ApiResponseCallback;
+        cb as InsertRowsCallback;
 
     rows = arrify(rows);
 
