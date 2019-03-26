@@ -32,10 +32,10 @@ function main(datasetId, tableId) {
     // Displays rows from "my_table" in "my_dataset".
 
     // Create a client
-    const bigquery = new BigQuery();
+    const bigqueryClient = new BigQuery();
 
     // List rows in the table
-    const [rows] = await bigquery
+    const [rows] = await bigqueryClient
       .dataset(datasetId)
       .table(tableId)
       .getRows();
