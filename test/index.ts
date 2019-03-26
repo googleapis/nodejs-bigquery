@@ -244,6 +244,13 @@ describe('BigQuery', () => {
           input,
         };
       });
+
+      sandbox.stub(BigQuery, 'geography').callsFake(input => {
+        return {
+          type: 'fakeGeography',
+          input,
+        };
+      });
     });
 
     it('should merge the schema and flatten the rows', () => {
@@ -254,15 +261,9 @@ describe('BigQuery', () => {
         {
           raw: {
             f: [
-              {v: '3'},
-              {v: 'Milo'},
-              {v: String(now.valueOf() / 1000)},
-              {v: 'false'},
-              {v: 'true'},
-              {v: '5.222330009847'},
-              {v: '30.2232138'},
-              {v: '3.14'},
-              {
+              {v: '3'}, {v: 'Milo'}, {v: String(now.valueOf() / 1000)},
+              {v: 'false'}, {v: 'true'}, {v: '5.222330009847'},
+              {v: '30.2232138'}, {v: '3.14'}, {
                 v: [
                   {
                     v: '10',
@@ -276,9 +277,7 @@ describe('BigQuery', () => {
                   },
                 ],
               },
-              {v: null},
-              {v: buffer.toString('base64')},
-              {
+              {v: null}, {v: buffer.toString('base64')}, {
                 v: [
                   {
                     v: {
@@ -297,9 +296,8 @@ describe('BigQuery', () => {
                   },
                 ],
               },
-              {v: 'date-input'},
-              {v: 'datetime-input'},
-              {v: 'time-input'},
+              {v: 'date-input'}, {v: 'datetime-input'}, {v: 'time-input'},
+              {v: 'geography-input'}
             ],
           },
           expected: {
@@ -336,6 +334,10 @@ describe('BigQuery', () => {
             time: {
               input: 'time-input',
               type: 'fakeTime',
+            },
+            geography: {
+              input: 'geography-input',
+              type: 'fakeGeography',
             },
           },
         },
@@ -397,6 +399,11 @@ describe('BigQuery', () => {
       schemaObject.fields.push({
         name: 'time',
         type: 'TIME',
+      });
+
+      schemaObject.fields.push({
+        name: 'geography',
+        type: 'GEOGRAPHY',
       });
 
       const rawRows = rows.map(x => x.raw);
