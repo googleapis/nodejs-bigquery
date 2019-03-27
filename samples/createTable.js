@@ -16,36 +16,38 @@
 
 'use strict';
 
-async function createTable(datasetId, tableId, schema) {
-  // Creates a new table named "my_table" in "my_dataset".
-
+function main(datasetId, tableId, schema) {
   // [START bigquery_create_table]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
 
-  /**
-   * TODO(developer): Uncomment the following lines before running the sample
-   */
-  // const datasetId = "my_new_dataset";
-  // const tableId = "my_new_table";
-  // const schema = "Name:string, Age:integer, Weight:float, IsMagic:boolean";
+  async function createTable() {
+    // Creates a new table named "my_table" in "my_dataset".
 
-  // Create a client
-  const bigquery = new BigQuery();
+    /**
+     * TODO(developer): Uncomment the following lines before running the sample
+     */
+    // const datasetId = "my_new_dataset";
+    // const tableId = "my_new_table";
+    // const schema = "Name:string, Age:integer, Weight:float, IsMagic:boolean";
 
-  // For all options, see https://cloud.google.com/bigquery/docs/reference/v2/tables#resource
-  const options = {
-    schema: schema,
-    location: 'US',
-  };
+    // Create a client
+    const bigqueryClient = new BigQuery();
 
-  // Create a new table in the dataset
-  const [table] = await bigquery
-    .dataset(datasetId)
-    .createTable(tableId, options);
+    // For all options, see https://cloud.google.com/bigquery/docs/reference/v2/tables#resource
+    const options = {
+      schema: schema,
+      location: 'US',
+    };
 
-  console.log(`Table ${table.id} created.`);
+    // Create a new table in the dataset
+    const [table] = await bigqueryClient
+      .dataset(datasetId)
+      .createTable(tableId, options);
+
+    console.log(`Table ${table.id} created.`);
+  }
+  createTable();
   // [END bigquery_create_table]
 }
-
-createTable(...process.argv.slice(2)).catch(console.error);
+main(...process.argv.slice(2));

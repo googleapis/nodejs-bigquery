@@ -16,33 +16,35 @@
 
 'use strict';
 
-async function insertRowsAsStream(
+function main(
   datasetId,
   tableId,
   rows = [{name: 'Tom', age: 30}, {name: 'Jane', age: 32}]
 ) {
-  // Inserts the JSON objects into my_dataset:my_table.
-
   // [START bigquery_table_insert_rows]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
 
-  /**
-   * TODO(developer): Uncomment the following lines before running the sample.
-   */
-  // const datasetId = "my_dataset";
-  // const tableId = "my_table";
+  async function insertRowsAsStream() {
+    // Inserts the JSON objects into my_dataset:my_table.
 
-  // Create a client
-  const bigquery = new BigQuery();
+    /**
+     * TODO(developer): Uncomment the following lines before running the sample.
+     */
+    // const datasetId = "my_dataset";
+    // const tableId = "my_table";
 
-  // Insert data into a table
-  await bigquery
-    .dataset(datasetId)
-    .table(tableId)
-    .insert(rows);
-  console.log(`Inserted ${rows.length} rows`);
+    // Create a client
+    const bigqueryClient = new BigQuery();
+
+    // Insert data into a table
+    await bigqueryClient
+      .dataset(datasetId)
+      .table(tableId)
+      .insert(rows);
+    console.log(`Inserted ${rows.length} rows`);
+  }
+  insertRowsAsStream();
   // [END bigquery_table_insert_rows]
 }
-
-insertRowsAsStream(...process.argv.slice(2)).catch(console.error);
+main(...process.argv.slice(2));

@@ -16,45 +16,47 @@
 
 'use strict';
 
-async function extractTableToGCS(datasetId, tableId, bucketName, filename) {
-  // Exports my_dataset:my_table to gcs://my-bucket/my-file as raw CSV.
-
+function main(datasetId, tableId, bucketName, filename) {
   // [START bigquery_extract_table]
   // Import the Google Cloud client libraries
   const {BigQuery} = require('@google-cloud/bigquery');
   const {Storage} = require('@google-cloud/storage');
 
-  /**
-   * TODO(developer): Uncomment the following lines before running the sample.
-   */
-  // const datasetId = "my_dataset";
-  // const tableId = "my_table";
-  // const bucketName = "my-bucket";
-  // const filename = "file.csv";
+  async function extractTableToGCS() {
+    // Exports my_dataset:my_table to gcs://my-bucket/my-file as raw CSV.
 
-  // Instantiate clients
-  const bigquery = new BigQuery();
-  const storage = new Storage();
+    /**
+     * TODO(developer): Uncomment the following lines before running the sample.
+     */
+    // const datasetId = "my_dataset";
+    // const tableId = "my_table";
+    // const bucketName = "my-bucket";
+    // const filename = "file.csv";
 
-  // Location must match that of the source table.
-  const options = {
-    location: 'US',
-  };
+    // Instantiate clients
+    const bigqueryClient = new BigQuery();
+    const storageClient = new Storage();
 
-  // Export data from the table into a Google Cloud Storage file
-  const [job] = await bigquery
-    .dataset(datasetId)
-    .table(tableId)
-    .extract(storage.bucket(bucketName).file(filename), options);
-  // load() waits for the job to finish
-  console.log(`Job ${job.id} completed.`);
+    // Location must match that of the source table.
+    const options = {
+      location: 'US',
+    };
 
-  // Check the job's status for errors
-  const errors = job.status.errors;
-  if (errors && errors.length > 0) {
-    throw errors;
+    // Export data from the table into a Google Cloud Storage file
+    const [job] = await bigqueryClient
+      .dataset(datasetId)
+      .table(tableId)
+      .extract(storageClient.bucket(bucketName).file(filename), options);
+    // load() waits for the job to finish
+    console.log(`Job ${job.id} completed.`);
+
+    // Check the job's status for errors
+    const errors = job.status.errors;
+    if (errors && errors.length > 0) {
+      throw errors;
+    }
   }
+  extractTableToGCS();
   // [END bigquery_extract_table]
 }
-
-extractTableToGCS(...process.argv.slice(2)).catch(console.error);
+main(...process.argv.slice(2));

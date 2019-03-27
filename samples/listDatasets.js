@@ -16,21 +16,23 @@
 
 'use strict';
 
-async function listDatasets() {
-  // Lists all datasets in current GCP project.
-
+function main() {
   // [START bigquery_list_datasets]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
 
-  // Create a client
-  const bigquery = new BigQuery();
+  async function listDatasets() {
+    // Lists all datasets in current GCP project.
 
-  // Lists all datasets in the specified project
-  const [datasets] = await bigquery.getDatasets();
-  console.log('Datasets:');
-  datasets.forEach(dataset => console.log(dataset.id));
+    // Create a client
+    const bigqueryClient = new BigQuery();
+
+    // Lists all datasets in the specified project
+    const [datasets] = await bigqueryClient.getDatasets();
+    console.log('Datasets:');
+    datasets.forEach(dataset => console.log(dataset.id));
+  }
+  listDatasets();
   // [END bigquery_list_datasets]
 }
-
-listDatasets(...process.argv.slice(2)).catch(console.error);
+main(...process.argv.slice(2));
