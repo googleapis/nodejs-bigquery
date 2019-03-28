@@ -16,9 +16,7 @@
 
 'use strict';
 
-async function loadLocalFile(datasetId, tableId, filename) {
-  // Imports a local file into a table.
-
+function main(datasetId, tableId, filename) {
   // [START bigquery_load_from_file]
   // Imports the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
@@ -30,23 +28,28 @@ async function loadLocalFile(datasetId, tableId, filename) {
   // const datasetId = "my_dataset";
   // const tableId = "my_table";
 
-  // Create a client
-  const bigquery = new BigQuery();
+  async function loadLocalFile() {
+    // Imports a local file into a table.
 
-  // Load data from a local file into the table
-  const [job] = await bigquery
-    .dataset(datasetId)
-    .table(tableId)
-    .load(filename);
+    // Create a client
+    const bigqueryClient = new BigQuery();
 
-  console.log(`Job ${job.id} completed.`);
+    // Load data from a local file into the table
+    const [job] = await bigqueryClient
+      .dataset(datasetId)
+      .table(tableId)
+      .load(filename);
 
-  // Check the job's status for errors
-  const errors = job.status.errors;
-  if (errors && errors.length > 0) {
-    throw errors;
+    console.log(`Job ${job.id} completed.`);
+
+    // Check the job's status for errors
+    const errors = job.status.errors;
+    if (errors && errors.length > 0) {
+      throw errors;
+    }
   }
+  loadLocalFile();
   // [END bigquery_load_from_file]
 }
 
-loadLocalFile(...process.argv.slice(2)).catch(console.error);
+main(...process.argv.slice(2));

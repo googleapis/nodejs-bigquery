@@ -16,12 +16,7 @@
 
 'use strict';
 
-async function loadParquetFromGCSTruncate(datasetId, tableId) {
-  /**
-   * Imports a GCS file into a table and overwrites
-   * table data if table already exists.
-   */
-
+function main(datasetId, tableId) {
   // [START bigquery_load_table_gcs_parquet_truncate]
   // Import the Google Cloud client libraries
   const {BigQuery} = require('@google-cloud/bigquery');
@@ -42,33 +37,41 @@ async function loadParquetFromGCSTruncate(datasetId, tableId) {
   const bucketName = 'cloud-samples-data';
   const filename = 'bigquery/us-states/us-states.parquet';
 
-  // Instantiate clients
-  const bigquery = new BigQuery();
-  const storage = new Storage();
+  async function loadParquetFromGCSTruncate() {
+    /**
+     * Imports a GCS file into a table and overwrites
+     * table data if table already exists.
+     */
 
-  // Configure the load job. For full list of options, see:
-  // https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs#configuration.load
-  const metadata = {
-    sourceFormat: 'PARQUET',
-    // Set the write disposition to overwrite existing table data.
-    writeDisposition: 'WRITE_TRUNCATE',
-    location: 'US',
-  };
+    // Instantiate clients
+    const bigqueryClient = new BigQuery();
+    const storageClient = new Storage();
 
-  // Load data from a Google Cloud Storage file into the table
-  const [job] = await bigquery
-    .dataset(datasetId)
-    .table(tableId)
-    .load(storage.bucket(bucketName).file(filename), metadata);
-  // load() waits for the job to finish
-  console.log(`Job ${job.id} completed.`);
+    // Configure the load job. For full list of options, see:
+    // https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs#configuration.load
+    const metadata = {
+      sourceFormat: 'PARQUET',
+      // Set the write disposition to overwrite existing table data.
+      writeDisposition: 'WRITE_TRUNCATE',
+      location: 'US',
+    };
 
-  // Check the job's status for errors
-  const errors = job.status.errors;
-  if (errors && errors.length > 0) {
-    throw errors;
+    // Load data from a Google Cloud Storage file into the table
+    const [job] = await bigqueryClient
+      .dataset(datasetId)
+      .table(tableId)
+      .load(storageClient.bucket(bucketName).file(filename), metadata);
+    // load() waits for the job to finish
+    console.log(`Job ${job.id} completed.`);
+
+    // Check the job's status for errors
+    const errors = job.status.errors;
+    if (errors && errors.length > 0) {
+      throw errors;
+    }
   }
+  loadParquetFromGCSTruncate();
   // [END bigquery_load_table_gcs_parquet_truncate]
 }
 
-loadParquetFromGCSTruncate(...process.argv.slice(2)).catch(console.error);
+main(...process.argv.slice(2));

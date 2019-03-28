@@ -16,9 +16,7 @@
 
 'use strict';
 
-async function loadCSVFromGCS(datasetId, tableId) {
-  // Imports a GCS file into a table with manually defined schema.
-
+function main(datasetId, tableId) {
   // [START bigquery_load_table_gcs_csv]
   // Import the Google Cloud client libraries
   const {BigQuery} = require('@google-cloud/bigquery');
@@ -39,40 +37,43 @@ async function loadCSVFromGCS(datasetId, tableId) {
   const bucketName = 'cloud-samples-data';
   const filename = 'bigquery/us-states/us-states.csv';
 
-  // Instantiate clients
-  const bigquery = new BigQuery();
+  async function loadCSVFromGCS() {
+    // Imports a GCS file into a table with manually defined schema.
 
-  const storage = new Storage();
+    // Instantiate clients
+    const bigqueryClient = new BigQuery();
+    const storageClient = new Storage();
 
-  // Configure the load job. For full list of options, see:
-  // https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs#configuration.load
-  const metadata = {
-    sourceFormat: 'CSV',
-    skipLeadingRows: 1,
-    schema: {
-      fields: [
-        {name: 'name', type: 'STRING'},
-        {name: 'post_abbr', type: 'STRING'},
-      ],
-    },
-    location: 'US',
-  };
+    // Configure the load job. For full list of options, see:
+    // https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs#configuration.load
+    const metadata = {
+      sourceFormat: 'CSV',
+      skipLeadingRows: 1,
+      schema: {
+        fields: [
+          {name: 'name', type: 'STRING'},
+          {name: 'post_abbr', type: 'STRING'},
+        ],
+      },
+      location: 'US',
+    };
 
-  // Load data from a Google Cloud Storage file into the table
-  const [job] = await bigquery
-    .dataset(datasetId)
-    .table(tableId)
-    .load(storage.bucket(bucketName).file(filename), metadata);
+    // Load data from a Google Cloud Storage file into the table
+    const [job] = await bigqueryClient
+      .dataset(datasetId)
+      .table(tableId)
+      .load(storageClient.bucket(bucketName).file(filename), metadata);
 
-  // load() waits for the job to finish
-  console.log(`Job ${job.id} completed.`);
+    // load() waits for the job to finish
+    console.log(`Job ${job.id} completed.`);
 
-  // Check the job's status for errors
-  const errors = job.status.errors;
-  if (errors && errors.length > 0) {
-    throw errors;
+    // Check the job's status for errors
+    const errors = job.status.errors;
+    if (errors && errors.length > 0) {
+      throw errors;
+    }
   }
+  loadCSVFromGCS();
   // [END bigquery_load_table_gcs_csv]
 }
-
-loadCSVFromGCS(...process.argv.slice(2)).catch(console.error);
+main(...process.argv.slice(2));
