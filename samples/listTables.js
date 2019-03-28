@@ -16,9 +16,7 @@
 
 'use strict';
 
-async function listTables(datasetId) {
-  // Lists tables in "my_dataset".
-
+function main(datasetId) {
   // [START bigquery_list_tables]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
@@ -29,14 +27,19 @@ async function listTables(datasetId) {
   // const datasetId = "my_dataset";
 
   // Create a client
-  const bigquery = new BigQuery();
+  const bigqueryClient = new BigQuery();
 
-  // List all tables in the dataset
-  const [tables] = await bigquery.dataset(datasetId).getTables();
+  async function listTables() {
+    // Lists tables in "my_dataset".
 
-  console.log('Tables:');
-  tables.forEach(table => console.log(table.id));
+    // List all tables in the dataset
+    const [tables] = await bigqueryClient.dataset(datasetId).getTables();
+
+    console.log('Tables:');
+    tables.forEach(table => console.log(table.id));
+  }
+  listTables();
   // [END bigquery_list_tables]
 }
 
-listTables(...process.argv.slice(2)).catch(console.error);
+main(...process.argv.slice(2));

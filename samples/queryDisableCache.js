@@ -16,37 +16,39 @@
 
 'use strict';
 
-async function queryDisableCache() {
-  // Queries the Shakespeare dataset with the cache disabled.
-
+function main() {
   // [START bigquery_query_no_cache]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
 
-  // Create a client
-  const bigquery = new BigQuery();
+  async function queryDisableCache() {
+    // Queries the Shakespeare dataset with the cache disabled.
 
-  const query = `SELECT corpus
-    FROM \`bigquery-public-data.samples.shakespeare\`
-    GROUP BY corpus`;
-  const options = {
-    query: query,
-    // Location must match that of the dataset(s) referenced in the query.
-    location: 'US',
-    useQueryCache: false,
-  };
+    // Create a client
+    const bigqueryClient = new BigQuery();
 
-  // Run the query as a job
-  const [job] = await bigquery.createQueryJob(options);
-  console.log(`Job ${job.id} started.`);
+    const query = `SELECT corpus
+      FROM \`bigquery-public-data.samples.shakespeare\`
+      GROUP BY corpus`;
+    const options = {
+      query: query,
+      // Location must match that of the dataset(s) referenced in the query.
+      location: 'US',
+      useQueryCache: false,
+    };
 
-  // Wait for the query to finish
-  const [rows] = await job.getQueryResults();
+    // Run the query as a job
+    const [job] = await bigqueryClient.createQueryJob(options);
+    console.log(`Job ${job.id} started.`);
 
-  // Print the results
-  console.log('Rows:');
-  rows.forEach(row => console.log(row));
+    // Wait for the query to finish
+    const [rows] = await job.getQueryResults();
+
+    // Print the results
+    console.log('Rows:');
+    rows.forEach(row => console.log(row));
+  }
+  queryDisableCache();
   // [END bigquery_query_no_cache]
 }
-
-queryDisableCache(...process.argv.slice(2)).catch(console.error);
+main(...process.argv.slice(2));
