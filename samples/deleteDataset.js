@@ -16,28 +16,31 @@
 
 'use strict';
 
-async function deleteDataset(datasetId) {
-  // Deletes a dataset named "my_dataset".
-
+function main(datasetId) {
   // [START bigquery_delete_dataset]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
 
-  /**
-   * TODO(developer): Uncomment the following lines before running the sample.
-   */
-  // const datasetId = "my_new_dataset";
+  async function deleteDataset() {
+    // Deletes a dataset named "my_dataset".
 
-  // Create a client
-  const bigquery = new BigQuery();
+    /**
+     * TODO(developer): Uncomment the following lines before running the sample.
+     */
+    // const datasetId = "my_new_dataset";
 
-  // Create a reference to the existing dataset
-  const dataset = bigquery.dataset(datasetId);
+    // Create a client
+    const bigqueryClient = new BigQuery();
 
-  // Delete the dataset and its contents
-  await dataset.delete({force: true});
-  console.log(`Dataset ${dataset.id} deleted.`);
+    // Create a reference to the existing dataset
+    const dataset = bigqueryClient.dataset(datasetId);
+
+    // Delete the dataset and its contents
+    await dataset.delete({force: true});
+    console.log(`Dataset ${dataset.id} deleted.`);
+  }
+  deleteDataset();
   // [END bigquery_delete_dataset]
 }
 
-deleteDataset(...process.argv.slice(2)).catch(console.error);
+main(...process.argv.slice(2));

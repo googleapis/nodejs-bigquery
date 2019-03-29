@@ -16,9 +16,7 @@
 
 'use strict';
 
-async function copyTable(srcDatasetId, srcTableId, destDatasetId, destTableId) {
-  // Copies src_dataset:src_table to dest_dataset:dest_table.
-
+function main(srcDatasetId, srcTableId, destDatasetId, destTableId) {
   // [START bigquery_copy_table]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
@@ -32,22 +30,27 @@ async function copyTable(srcDatasetId, srcTableId, destDatasetId, destTableId) {
   // const destTableId = "my_dest_table";
 
   // Create a client
-  const bigquery = new BigQuery();
+  const bigqueryClient = new BigQuery();
 
-  // Copy the table contents into another table
-  const [job] = await bigquery
-    .dataset(srcDatasetId)
-    .table(srcTableId)
-    .copy(bigquery.dataset(destDatasetId).table(destTableId));
+  async function copyTable() {
+    // Copies src_dataset:src_table to dest_dataset:dest_table.
 
-  console.log(`Job ${job.id} completed.`);
+    // Copy the table contents into another table
+    const [job] = await bigqueryClient
+      .dataset(srcDatasetId)
+      .table(srcTableId)
+      .copy(bigqueryClient.dataset(destDatasetId).table(destTableId));
 
-  // Check the job's status for errors
-  const errors = job.status.errors;
-  if (errors && errors.length > 0) {
-    throw errors;
+    console.log(`Job ${job.id} completed.`);
+
+    // Check the job's status for errors
+    const errors = job.status.errors;
+    if (errors && errors.length > 0) {
+      throw errors;
+    }
   }
+
+  copyTable();
   // [END bigquery_copy_table]
 }
-
-copyTable(...process.argv.slice(2)).catch(console.error);
+main(...process.argv.slice(2));

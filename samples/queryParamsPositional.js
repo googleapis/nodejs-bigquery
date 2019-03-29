@@ -16,36 +16,38 @@
 
 'use strict';
 
-async function queryParamsPositional() {
+function main() {
   // [START bigquery_query_params_positional]
   // Run a query using positional query parameters
 
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
 
-  // Create a client
-  const bigquery = new BigQuery();
+  async function queryParamsPositional() {
+    // Create a client
+    const bigqueryClient = new BigQuery();
 
-  // The SQL query to run
-  const sqlQuery = `SELECT word, word_count
-        FROM \`bigquery-public-data.samples.shakespeare\`
-        WHERE corpus = ?
-        AND word_count >= ?
-        ORDER BY word_count DESC`;
+    // The SQL query to run
+    const sqlQuery = `SELECT word, word_count
+          FROM \`bigquery-public-data.samples.shakespeare\`
+          WHERE corpus = ?
+          AND word_count >= ?
+          ORDER BY word_count DESC`;
 
-  const options = {
-    query: sqlQuery,
-    // Location must match that of the dataset(s) referenced in the query.
-    location: 'US',
-    params: ['romeoandjuliet', 250],
-  };
+    const options = {
+      query: sqlQuery,
+      // Location must match that of the dataset(s) referenced in the query.
+      location: 'US',
+      params: ['romeoandjuliet', 250],
+    };
 
-  // Run the query
-  const [rows] = await bigquery.query(options);
+    // Run the query
+    const [rows] = await bigqueryClient.query(options);
 
-  console.log('Rows:');
-  rows.forEach(row => console.log(row));
+    console.log('Rows:');
+    rows.forEach(row => console.log(row));
+  }
+  queryParamsPositional();
   // [END bigquery_query_params_positional]
 }
-
-queryParamsPositional(...process.argv.slice(2)).catch(console.error);
+main(...process.argv.slice(2));
