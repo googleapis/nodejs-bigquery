@@ -580,11 +580,7 @@ describe('BigQuery', () => {
       assert.strictEqual(timestamp.value, EXPECTED_VALUE);
     });
   });
-  // *************
-  // ********
-  // *****
-  // ***
-  // *
+
   describe('geography', () => {
     const INPUT_STRING = 'POINT(1 2)';
 
