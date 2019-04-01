@@ -593,6 +593,17 @@ describe('BigQuery', () => {
       const geography = BigQuery.geography(INPUT_STRING);
       assert.strictEqual(geography.value, INPUT_STRING);
     });
+
+    it('should call through to the static method', () => {
+      const fakeGeography = {value: 'foo'};
+
+      sandbox.stub(BigQuery, 'geography')
+          .withArgs(INPUT_STRING)
+          .returns(fakeGeography);
+
+      const geography = bq.geography(INPUT_STRING);
+      assert.strictEqual(geography, fakeGeography);
+    });
   });
 
   describe('getType_', () => {
