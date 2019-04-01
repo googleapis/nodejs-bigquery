@@ -1337,8 +1337,12 @@ describe('BigQuery', () => {
       table = dataset.table(generateName('table'));
       return table.create({
         schema: [
-          'date:DATE', 'datetime:DATETIME', 'time:TIME', 'timestamp:TIMESTAMP',
-          'numeric:NUMERIC', 'geography:GEOGRAPHY'
+          'date:DATE',
+          'datetime:DATETIME',
+          'time:TIME',
+          'timestamp:TIMESTAMP',
+          'numeric:NUMERIC',
+          'geography:GEOGRAPHY',
         ].join(', '),
       });
     });
