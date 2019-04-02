@@ -48,6 +48,7 @@ const fakePfy = extend({}, pfy, {
       'dataset',
       'date',
       'datetime',
+      'geography',
       'job',
       'time',
       'timestamp',
@@ -243,6 +244,13 @@ describe('BigQuery', () => {
           input,
         };
       });
+
+      sandbox.stub(BigQuery, 'geography').callsFake(input => {
+        return {
+          type: 'fakeGeography',
+          input,
+        };
+      });
     });
 
     it('should merge the schema and flatten the rows', () => {
@@ -299,6 +307,7 @@ describe('BigQuery', () => {
               {v: 'date-input'},
               {v: 'datetime-input'},
               {v: 'time-input'},
+              {v: 'geography-input'},
             ],
           },
           expected: {
@@ -335,6 +344,10 @@ describe('BigQuery', () => {
             time: {
               input: 'time-input',
               type: 'fakeTime',
+            },
+            geography: {
+              input: 'geography-input',
+              type: 'fakeGeography',
             },
           },
         },
@@ -396,6 +409,11 @@ describe('BigQuery', () => {
       schemaObject.fields.push({
         name: 'time',
         type: 'TIME',
+      });
+
+      schemaObject.fields.push({
+        name: 'geography',
+        type: 'GEOGRAPHY',
       });
 
       const rawRows = rows.map(x => x.raw);
@@ -570,6 +588,31 @@ describe('BigQuery', () => {
     it('should accept a Date object', () => {
       const timestamp = bq.timestamp(INPUT_DATE);
       assert.strictEqual(timestamp.value, EXPECTED_VALUE);
+    });
+  });
+
+  describe('geography', () => {
+    const INPUT_STRING = 'POINT(1 2)';
+
+    it('should have the correct constructor name', () => {
+      const geography = BigQuery.geography(INPUT_STRING);
+      assert.strictEqual(geography.constructor.name, 'Geography');
+    });
+
+    it('should accept a string', () => {
+      const geography = BigQuery.geography(INPUT_STRING);
+      assert.strictEqual(geography.value, INPUT_STRING);
+    });
+
+    it('should call through to the static method', () => {
+      const fakeGeography = {value: 'foo'};
+
+      sandbox.stub(BigQuery, 'geography')
+          .withArgs(INPUT_STRING)
+          .returns(fakeGeography);
+
+      const geography = bq.geography(INPUT_STRING);
+      assert.strictEqual(geography, fakeGeography);
     });
   });
 

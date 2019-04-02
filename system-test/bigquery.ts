@@ -38,6 +38,10 @@ describe('BigQuery', () => {
 
   const SCHEMA = [
     {
+      name: 'place',
+      type: 'GEOGRAPHY',
+    },
+    {
       name: 'id',
       type: 'INTEGER',
     },
@@ -1027,6 +1031,19 @@ describe('BigQuery', () => {
                 });
           });
 
+          it('should work with GEOGRAPHY types', done => {
+            bigquery.query(
+                {
+                  query: 'SELECT ? geography',
+                  params: [bigquery.geography('POINT(1 2)')],
+                },
+                (err, rows) => {
+                  assert.ifError(err);
+                  assert.strictEqual(rows!.length, 1);
+                  done();
+                });
+          });
+
           it('should work with multiple types', done => {
             bigquery.query(
                 {
@@ -1244,6 +1261,21 @@ describe('BigQuery', () => {
                 });
           });
 
+          it('should work with GEOGRAPHY types', done => {
+            bigquery.query(
+                {
+                  query: 'SELECT @place geography',
+                  params: {
+                    place: bigquery.geography('POINT(1 2)'),
+                  },
+                },
+                (err, rows) => {
+                  assert.ifError(err);
+                  assert.strictEqual(rows!.length, 1);
+                  done();
+                });
+          });
+
           it('should work with multiple types', done => {
             bigquery.query(
                 {
@@ -1299,6 +1331,7 @@ describe('BigQuery', () => {
     const TIME = bigquery.time('14:00:00');
     const TIMESTAMP = bigquery.timestamp(new Date());
     const NUMERIC = new Big('123.456');
+    const GEOGRAPHY = bigquery.geography('POINT(1 2)');
 
     before(() => {
       table = dataset.table(generateName('table'));
@@ -1309,6 +1342,7 @@ describe('BigQuery', () => {
           'time:TIME',
           'timestamp:TIMESTAMP',
           'numeric:NUMERIC',
+          'geography:GEOGRAPHY',
         ].join(', '),
       });
     });
@@ -1320,6 +1354,7 @@ describe('BigQuery', () => {
         time: TIME,
         timestamp: TIMESTAMP,
         numeric: NUMERIC,
+        geography: GEOGRAPHY,
       });
     });
   });
