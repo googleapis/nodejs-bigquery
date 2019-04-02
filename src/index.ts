@@ -15,7 +15,7 @@
  */
 
 import * as common from '@google-cloud/common';
-import {paginator} from '@google-cloud/paginator';
+import {paginator, ResourceStream} from '@google-cloud/paginator';
 import {promisifyAll} from '@google-cloud/promisify';
 import * as arrify from 'arrify';
 import {Big} from 'big.js';
@@ -27,114 +27,77 @@ import * as r from 'request';
 import * as uuid from 'uuid';
 import {teenyRequest} from 'teeny-request';
 
-import {Dataset, DataSetOptions} from './dataset';
-import {Job, JobOptions} from './job';
+import {Dataset, DatasetOptions} from './dataset';
+import {Job, JobOptions, QueryResultsOptions} from './job';
 import {Table, TableField, TableSchema, TableRow, TableRowField, JobCallback, JobResponse, RowsCallback, RowsResponse, RowMetadata} from './table';
 import {GoogleErrorBody} from '@google-cloud/common/build/src/util';
 import {Readable, Duplex} from 'stream';
+import bigquery from './types';
 
-// tslint:disable-next-line no-any
-export type QueryRowsResponse = [any[], Query, r.Response];
-export interface QueryRowsCallback {
-  // tslint:disable-next-line no-any
-  (err: Error|null, rows?: any[]|null, nextQuery?: Query|null,
-   apiResponse?: r.Response): void;
+export interface RequestCallback<T> {
+  (err: Error|null, response?: T|null): void;
 }
 
-// tslint:disable-next-line no-any
-export type SimpleQueryRowsResponse = [any[], r.Response];
-export interface SimpleQueryRowsCallback {
-  // tslint:disable-next-line no-any
-  (err: Error|null, rows?: any[]|null, apiResponse?: r.Response): void;
+export interface ResourceCallback<T, R> {
+  (err: Error|null, resource?: T|null, response?: R|null): void;
 }
 
-export interface Query {
-  dryRun?: boolean;
-  location?: string;
-  job?: Job;
+export type PagedResponse<T, Q, R> = [T[]]|[T[], Q | null, R];
+export interface PagedCallback<T, Q, R> {
+  (err: Error|null, resource?: T[]|null, nextQuery?: Q|null,
+   response?: R|null): void;
+}
+
+export type JobRequest<J> = J&{
   jobId?: string;
   jobPrefix?: string;
-  // tslint:disable-next-line no-any
-  params?: any;
-  query?: string;
-  useLegacySql?: boolean;
-  maxResults?: number;
-  timeoutMs?: number;
-  pageToken?: string;
-  destination?: Table;
-  defaultDataset?: Dataset;
-}
-
-export interface QueryOptions {
-  maxResults?: number;
-  timeoutMs?: number;
-  autoPaginate?: boolean;
-}
-
-export interface DatasetResource {
-  etag?: string;
-  id?: string;
-  selfLink?: string;
-  datasetReference?: {datasetId?: string, projectId?: string};
-  friendlyName?: string;
-  description?: string;
-  defaultTableExpirationMs?: number;
-  defaultPartitionExpirationMs?: number;
-  labels?: {[index: string]: string};
-  access?: [{
-    role?: string;
-    userByEmail?: string;
-    groupByEmail?: string;
-    domain?: string;
-    specialGroup?: string;
-    view?: {projectId?: string; datasetId?: string; tableId?: string;}
-  }];
-  creationTime?: number;
-  lastModifiedTime?: number;
   location?: string;
-}
+};
 
-export interface ValueType {
-  type: string;
-  arrayType?: ValueType;
-  structTypes?: Array<{name: string; type: ValueType;}>;
-}
-
-export interface GetDatasetsOptions {
-  all?: boolean;
-  filter?: string;
+export type PagedRequest<P> = P&{
   autoPaginate?: boolean;
   maxApiCalls?: number;
+};
+
+export type QueryRowsResponse =
+    PagedResponse<RowMetadata, Query, bigquery.ITableDataList>;
+export type QueryRowsCallback =
+    PagedCallback<RowMetadata, Query, bigquery.ITableDataList>;
+
+export type SimpleQueryRowsResponse = [RowMetadata[], bigquery.IJob];
+export type SimpleQueryRowsCallback =
+    ResourceCallback<RowMetadata[], bigquery.IJob>;
+
+export type Query = JobRequest<bigquery.IJobConfigurationQuery>&{
+  destination?: Table;
+  // tslint:disable-next-line no-any
+  params?: any[]|{[param: string]: any};
+  dryRun?: boolean;
+  defaultDataset?: Dataset;
+  job?: Job;
   maxResults?: number;
+  timeoutMs?: number;
   pageToken?: string;
-}
+};
 
-export type DatasetsResponse = [Dataset[], GetDatasetsOptions, r.Response];
-export interface DatasetsCallback {
-  (err: Error|null, datasets?: Dataset[]|null,
-   nextQuery?: GetDatasetsOptions|null, apiResponse?: r.Response): void;
-}
+export type QueryOptions = QueryResultsOptions;
+export type DatasetResource = bigquery.IDataset;
+export type ValueType = bigquery.IQueryParameterType;
 
-export type DatasetResponse = [Dataset, r.Response];
-export interface DatasetCallback {
-  (err: Error|null, dataset?: Dataset|null, apiResponse?: r.Response): void;
-}
+export type GetDatasetsOptions = PagedRequest<bigquery.datasets.IListParams>;
+export type DatasetsResponse =
+    PagedResponse<Dataset, GetDatasetsOptions, bigquery.IDatasetList>;
+export type DatasetsCallback =
+    PagedCallback<Dataset, GetDatasetsOptions, bigquery.IDatasetList>;
 
-export interface GetJobsOptions {
-  allUsers?: boolean;
-  autoPaginate?: boolean;
-  maxApiCalls?: number;
-  maxResults?: number;
-  pageToken?: string;
-  projection?: 'full'|'minimal';
-  stateFilter?: 'done'|'pending'|'running';
-}
+export type DatasetResponse = [Dataset, bigquery.IDataset];
+export type DatasetCallback = ResourceCallback<Dataset, bigquery.IDataset>;
 
-export type GetJobsResponse = [Job[], r.Response];
-export interface GetJobsCallback {
-  (err: Error|null, jobs: Job[]|null, nextQuery?: {}|null,
-   apiResponse?: r.Response): void;
-}
+export type GetJobsOptions = PagedRequest<bigquery.jobs.IListParams>;
+export type GetJobsResponse =
+    PagedResponse<Job, GetJobsOptions, bigquery.IJobList>;
+export type GetJobsCallback =
+    PagedCallback<Job, GetJobsOptions, bigquery.IJobList>;
 
 export interface BigQueryTimeOptions {
   hours?: number|string;
@@ -159,11 +122,7 @@ export interface BigQueryDatetimeOptions {
   fractional?: string|number;
 }
 
-export interface QueryParameter {
-  name?: string;
-  parameterType: ValueType;
-  parameterValue: {arrayValues?: Array<{}>; structValues?: {}; value?: {}};
-}
+export type QueryParameter = bigquery.IQueryParameter;
 
 /**
  * @typedef {object} BigQueryOptions
@@ -242,9 +201,9 @@ export interface BigQueryOptions extends common.GoogleAuthOptions {
 export class BigQuery extends common.Service {
   location?: string;
 
-  createQueryStream: (options?: Query|string) => Duplex;
-  getDatasetsStream: () => Readable;
-  getJobsStream: () => Readable;
+  createQueryStream: (options?: Query|string) => ResourceStream<RowMetadata>;
+  getDatasetsStream: (options?: GetDatasetsOptions) => ResourceStream<Dataset>;
+  getJobsStream: (options?: GetJobsOptions) => ResourceStream<Job>;
 
   constructor(options?: BigQueryOptions) {
     options = options || {};
@@ -298,7 +257,7 @@ export class BigQuery extends common.Service {
      *     this.end();
      *   });
      */
-    this.createQueryStream = paginator.streamify('queryAsStream_');
+    this.createQueryStream = paginator.streamify<RowMetadata>('queryAsStream_');
 
     /**
      * List all or some of the {@link Dataset} objects in your project as
@@ -330,7 +289,7 @@ export class BigQuery extends common.Service {
      *     this.end();
      *   });
      */
-    this.getDatasetsStream = paginator.streamify('getDatasets');
+    this.getDatasetsStream = paginator.streamify<Dataset>('getDatasets');
 
     /**
      * List all or some of the {@link Job} objects in your project as a
@@ -362,7 +321,7 @@ export class BigQuery extends common.Service {
      *     this.end();
      *   });
      */
-    this.getJobsStream = paginator.streamify('getJobs');
+    this.getJobsStream = paginator.streamify<Job>('getJobs');
   }
 
   /**
@@ -378,7 +337,7 @@ export class BigQuery extends common.Service {
       schema: TableSchema|TableField, rows: TableRow[]) {
     return arrify(rows).map(mergeSchema).map(flattenRows);
     function mergeSchema(row: TableRow) {
-      return row.f.map((field: TableRowField, index: number) => {
+      return row.f!.map((field: TableRowField, index: number) => {
         const schemaField = schema.fields![index];
         let value = field.v;
         if (schemaField.mode === 'REPEATED') {
@@ -390,7 +349,7 @@ export class BigQuery extends common.Service {
         }
         // tslint:disable-next-line no-any
         const fieldObject: any = {};
-        fieldObject[schemaField.name] = value;
+        fieldObject[schemaField.name!] = value;
         return fieldObject;
       });
     }
@@ -810,16 +769,17 @@ export class BigQuery extends common.Service {
     const parameterType = BigQuery.getType_(value);
     const queryParameter: QueryParameter = {parameterType, parameterValue: {}};
 
-    const typeName = parameterType.type;
+
+    const typeName = queryParameter!.parameterType!.type!;
 
     if (typeName === 'ARRAY') {
-      queryParameter.parameterValue.arrayValues =
+      queryParameter.parameterValue!.arrayValues =
           (value as Array<{}>).map(itemValue => {
             const value = getValue(itemValue, parameterType.arrayType!);
-            return {value};
+            return {value} as bigquery.IQueryParameterValue;
           });
     } else if (typeName === 'STRUCT') {
-      queryParameter.parameterValue.structValues =
+      queryParameter.parameterValue!.structValues =
           Object.keys(value).reduce((structValues, prop) => {
             const nestedQueryParameter =
                 BigQuery.valueToQueryParameter_(value[prop]);
@@ -828,7 +788,7 @@ export class BigQuery extends common.Service {
             return structValues;
           }, {});
     } else {
-      queryParameter.parameterValue.value = getValue(value, parameterType);
+      queryParameter.parameterValue!.value = getValue(value, parameterType);
     }
 
     return queryParameter;
@@ -839,7 +799,7 @@ export class BigQuery extends common.Service {
     }
 
     function isCustomType({type}: ValueType): boolean {
-      return type.indexOf('TIME') > -1 || type.indexOf('DATE') > -1;
+      return type!.indexOf('TIME') > -1 || type!.indexOf('DATE') > -1;
     }
   }
 
@@ -1200,7 +1160,7 @@ export class BigQuery extends common.Service {
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('higher_education');
    */
-  dataset(id: string, options?: DataSetOptions) {
+  dataset(id: string, options?: DatasetOptions) {
     if (typeof id !== 'string') {
       throw new TypeError('A dataset ID is required.');
     }
@@ -1290,14 +1250,15 @@ export class BigQuery extends common.Service {
           }
 
           // tslint:disable-next-line no-any
-          const datasets = (resp.datasets || []).map((dataset: any) => {
-            const ds = this.dataset(dataset.datasetReference.datasetId, {
-              location: dataset.location,
-            });
+          const datasets =
+              (resp.datasets || []).map((dataset: bigquery.IDataset) => {
+                const ds = this.dataset(dataset.datasetReference!.datasetId!, {
+                  location: dataset.location!,
+                });
 
-            ds.metadata = dataset;
-            return ds;
-          });
+                ds.metadata = dataset!;
+                return ds;
+              });
 
           callback!(null, datasets, nextQuery, resp);
         });
@@ -1393,12 +1354,12 @@ export class BigQuery extends common.Service {
           }
 
           // tslint:disable-next-line no-any
-          const jobs = (resp.jobs || []).map((jobObject: any) => {
-            const job = that.job(jobObject.jobReference.jobId, {
-              location: jobObject.jobReference.location,
+          const jobs = (resp.jobs || []).map((jobObject: bigquery.IJob) => {
+            const job = that.job(jobObject.jobReference!.jobId!, {
+              location: jobObject.jobReference!.location!,
             });
 
-            job.metadata = jobObject;
+            job.metadata = jobObject!;
             return job;
           });
 

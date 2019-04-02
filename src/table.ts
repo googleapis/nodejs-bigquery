@@ -15,7 +15,7 @@
  */
 
 import * as common from '@google-cloud/common';
-import {paginator} from '@google-cloud/paginator';
+import {paginator, ResourceStream} from '@google-cloud/paginator';
 import {promisifyAll} from '@google-cloud/promisify';
 import * as arrify from 'arrify';
 import Big from 'big.js';
@@ -29,11 +29,12 @@ import * as path from 'path';
 import * as r from 'request';
 import * as streamEvents from 'stream-events';
 import * as uuid from 'uuid';
-import {BigQuery, Job, Dataset, Query, SimpleQueryRowsResponse, SimpleQueryRowsCallback} from '../src';
+import {BigQuery, Job, Dataset, Query, SimpleQueryRowsResponse, SimpleQueryRowsCallback, ResourceCallback, RequestCallback, PagedResponse, PagedCallback, JobRequest, PagedRequest} from '../src';
 import {GoogleErrorBody} from '@google-cloud/common/build/src/util';
 import {Duplex, Readable, Writable} from 'stream';
 import {teenyRequest} from 'teeny-request';
 import {JobMetadata} from './job';
+import bigquery from './types';
 
 // This is supposed to be a @google-cloud/storage `File` type. The storage npm
 // module includes these types, but is current installed as a devDependency.
@@ -49,150 +50,62 @@ export interface File {
   generation?: number;
 }
 
-export interface JobMetadataCallback {
-  (err: Error|null, metadataOrResponse: JobMetadata|r.Response): void;
-}
-
+export type JobMetadataCallback = RequestCallback<JobMetadata>;
 export type JobMetadataResponse = [JobMetadata];
 
 // tslint:disable-next-line no-any
 export type RowMetadata = any;
 
-export interface InsertRowsOptions {
+export type InsertRowsOptions = bigquery.ITableDataInsertAllRequest&{
   autoCreate?: boolean;
-  ignoreUnknownValues?: boolean;
   raw?: boolean;
-  schema?: string|{};
-  skipInvalidRows?: boolean;
-  templateSuffix?: string;
-}
+  schema: string|{};
+};
 
-export type RowsResponse = [RowMetadata[], GetRowsOptions, r.Response];
-export interface RowsCallback {
-  (err: Error|null, rows?: RowMetadata[]|null, nextQuery?: GetRowsOptions|null,
-   apiResponse?: r.Response): void;
-}
+export type InsertRowsResponse =
+    [bigquery.ITableDataInsertAllResponse | bigquery.ITable];
+export type InsertRowsCallback =
+    RequestCallback<bigquery.ITableDataInsertAllResponse|bigquery.ITable>;
 
-export interface TableRow {
-  f: TableRowField[];
-}
-export interface TableRowField {
-  v: string|TableRow|TableRowField[];
-}
+export type RowsResponse = PagedResponse<
+    RowMetadata, GetRowsOptions, bigquery.ITableDataList|bigquery.ITable>;
+export type RowsCallback = PagedCallback<
+    RowMetadata, GetRowsOptions, bigquery.ITableDataList|bigquery.ITable>;
+
+export type TableRow = bigquery.ITableRow;
+export type TableRowField = bigquery.ITableCell;
 export type TableRowValue = string|TableRow;
 
-export interface GetRowsOptions {
-  startIndex?: number;
-  selectedFields?: string;
-  autoPaginate?: boolean;
-  maxApiCalls?: number;
-  maxResults?: number;
-}
+export type GetRowsOptions = PagedRequest<bigquery.tabledata.IListParams>;
 
-export interface JobLoadMetadata {
-  jobId?: string;
-  jobPrefix?: string;
-  allowJaggedRows?: boolean;
-  allowQuotedNewlines?: boolean;
-  autodetect?: boolean;
-  clustering?: {fields: number[];};
-  createDisposition?: string;
-  destinationEncryptionConfiguration?: {kmsKeyName?: string;};
-  destinationTable?: {datasetId: string; projectId: string; tableId: string;};
-  destinationTableProperties?: {description?: string; friendlyName?: string;};
-  encoding?: string;
-  fieldDelimiter?: string;
-  ignoreUnknownValues?: boolean;
-  maxBadRecords?: number;
-  nullMarker?: string;
-  projectionFields?: string[];
-  quote?: string;
-  schema?: {fields: TableField[]};
-  schemaUpdateOptions?: string[];
-  skipLeadingRows?: number;
-  sourceFormat?: string;
+export type JobLoadMetadata = JobRequest<bigquery.IJobConfigurationLoad>&{
   format?: string;
-  location?: string;
-  sourceUris?: string[];
-  timePartitioning?: {
-    expirationMs?: number;
-    field?: string;
-    requirePartitionFilter?: boolean;
-    type?: string;
-  };
-  writeDisposition?: string;
-}
+};
 
-export interface CreateExtractJobOptions {
+export type CreateExtractJobOptions =
+    JobRequest<bigquery.IJobConfigurationExtract>&{
   format?: 'CSV'|'JSON'|'AVRO'|'PARQUET'|'ORC';
   gzip?: boolean;
-  jobId?: string;
-  jobPrefix?: string;
-  destinationFormat?: string;
-  compression?: string;
-}
+};
 
-export type JobResponse = [Job, r.Response];
-export interface JobCallback {
-  (err: Error|null, job?: Job|null, apiResponse?: r.Response): void;
-}
+export type JobResponse = [Job, bigquery.IJob];
+export type JobCallback = ResourceCallback<Job, bigquery.IJob>;
 
-export interface CreateCopyJobMetadata extends CopyTableMetadata {
-  destinationTable?: {datasetId: string; projectId: string; tableId: string;};
-  sourceTable?: {datasetId: string; projectId: string; tableId: string;};
-  sourceTables: Array<{datasetId: string; projectId: string; tableId: string;}>;
-}
+export type CreateCopyJobMetadata = CopyTableMetadata;
+export type SetTableMetadataOptions = TableMetadata;
+export type CopyTableMetadata = JobRequest<bigquery.IJobConfigurationTableCopy>;
 
-export interface SetTableMetadataOptions {
-  description?: string;
-  schema?: string|{};
-}
-
-export interface CopyTableMetadata {
-  jobId?: string;
-  jobPrefix?: string;
-  createDisposition?: 'CREATE_IF_NEEDED'|'CREATE_NEVER';
-  writeDisposition?: 'WRITE_TRUNCATE'|'WRITE_APPEND'|'WRITE_EMPTY';
-  destinationEncryptionConfiguration?: {kmsKeyName?: string;};
-}
-
-export interface TableMetadata {
+export type TableMetadata = bigquery.ITable&{
   name?: string;
-  friendlyName: string;
   schema?: string|TableField[];
   partitioning?: string;
   view?: string|ViewDefinition;
-}
+};
 
-export interface ViewDefinition {
-  query: string;
-  useLegacySql?: boolean;
-}
-
-export interface FormattedMetadata {
-  schema?: TableSchema;
-  friendlyName: string;
-  name?: string;
-  partitioning?: string;
-  timePartitioning?: {type: string};
-  view: ViewDefinition;
-}
-
-export interface TableSchema {
-  fields: TableField[];
-}
-
-export interface TableField {
-  name: string;
-  type: string;
-  mode?: string;
-  fields?: TableField[];
-}
-
-export type ApiResponse = [r.Response];
-export interface ApiResponseCallback {
-  (err: Error|null, apiResponse?: r.Response): void;
-}
+export type ViewDefinition = bigquery.IViewDefinition;
+export type FormattedMetadata = bigquery.ITable;
+export type TableSchema = bigquery.ITableSchema;
+export type TableField = bigquery.ITableFieldSchema;
 
 /**
  * The file formats accepted by BigQuery.
@@ -239,7 +152,7 @@ class Table extends common.ServiceObject {
   dataset: Dataset;
   bigQuery: BigQuery;
   location?: string;
-  createReadStream: (options?: GetRowsOptions) => Readable;
+  createReadStream: (options?: GetRowsOptions) => ResourceStream<RowMetadata>;
   constructor(dataset: Dataset, id: string, options?: TableOptions) {
     const methods = {
       /**
@@ -466,7 +379,7 @@ class Table extends common.ServiceObject {
      *     this.end();
      *   });
      */
-    this.createReadStream = paginator.streamify('getRows');
+    this.createReadStream = paginator.streamify<RowMetadata>('getRows');
   }
 
   /**
@@ -558,7 +471,7 @@ class Table extends common.ServiceObject {
 
     if (options.name) {
       body.friendlyName = options.name;
-      delete body.name;
+      delete (body as TableMetadata).name;
     }
 
     if (is.string(options.schema)) {
@@ -582,8 +495,9 @@ class Table extends common.ServiceObject {
 
     if (is.string(options.partitioning)) {
       body.timePartitioning = {
-        type: body.partitioning!.toUpperCase(),
+        type: options.partitioning!.toUpperCase(),
       };
+      delete (body as TableMetadata).partitioning;
     }
 
     if (is.string(options.view)) {
@@ -1657,7 +1571,7 @@ class Table extends common.ServiceObject {
         typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
     const onComplete =
         (err: Error|null, rows: TableRow[]|null, nextQuery: GetRowsOptions|null,
-         resp: r.Response) => {
+         resp: bigquery.ITableList) => {
           if (err) {
             callback!(err, null, null, resp);
             return;
@@ -1688,7 +1602,7 @@ class Table extends common.ServiceObject {
             // We don't know the schema for this table yet. Do a quick stat.
             this.getMetadata(
                 (err: Error, metadata: common.Metadata,
-                 apiResponse: r.Response) => {
+                 apiResponse: bigquery.ITable) => {
                   if (err) {
                     onComplete(err, null, null, apiResponse!);
                     return;
@@ -1703,11 +1617,11 @@ class Table extends common.ServiceObject {
   }
 
   insert(rows: RowMetadata|RowMetadata[], options?: InsertRowsOptions):
-      Promise<ApiResponse>;
+      Promise<InsertRowsResponse>;
   insert(
       rows: RowMetadata|RowMetadata[], options: InsertRowsOptions,
-      callback: ApiResponseCallback): void;
-  insert(rows: RowMetadata|RowMetadata[], callback: ApiResponseCallback): void;
+      callback: InsertRowsCallback): void;
+  insert(rows: RowMetadata|RowMetadata[], callback: InsertRowsCallback): void;
   /**
    * Stream data into BigQuery one record at a time without running a load job.
    *
@@ -1843,12 +1757,14 @@ class Table extends common.ServiceObject {
    */
   insert(
       rows: RowMetadata|RowMetadata[],
-      optionsOrCallback?: InsertRowsOptions|ApiResponseCallback,
-      cb?: ApiResponseCallback): void|Promise<ApiResponse> {
-    const options =
-        typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
-    const callback =
-        typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
+      optionsOrCallback?: InsertRowsOptions|InsertRowsCallback,
+      cb?: InsertRowsCallback): void|Promise<InsertRowsResponse> {
+    const options = typeof optionsOrCallback === 'object' ?
+        optionsOrCallback :
+        {} as InsertRowsOptions;
+    const callback = typeof optionsOrCallback === 'function' ?
+        optionsOrCallback :
+        cb as InsertRowsCallback;
 
     rows = arrify(rows);
 

@@ -706,7 +706,7 @@ describe('BigQuery', () => {
 
         table1Instance.copy(table2Instance, (err, resp) => {
           assert.ifError(err);
-          assert.strictEqual(resp.status.state, 'DONE');
+          assert.strictEqual(resp!.status!.state, 'DONE');
           done();
         });
       });
@@ -739,7 +739,7 @@ describe('BigQuery', () => {
 
         table2Instance.copyFrom(table1Instance, (err, resp) => {
           assert.ifError(err);
-          assert.strictEqual(resp.status.state, 'DONE');
+          assert.strictEqual(resp!.status!.state, 'DONE');
           done();
         });
       });
@@ -771,7 +771,7 @@ describe('BigQuery', () => {
       it('should load data from a storage file', done => {
         table.load(file, (err, resp) => {
           assert.ifError(err);
-          assert.strictEqual(resp.status.state, 'DONE');
+          assert.strictEqual(resp!.status!.state, 'DONE');
           done();
         });
       });
@@ -779,7 +779,7 @@ describe('BigQuery', () => {
       it('should load data from a file via promises', () => {
         return table.load(file).then(results => {
           const metadata = results[0];
-          assert.strictEqual(metadata.status.state, 'DONE');
+          assert.strictEqual(metadata!.status!.state, 'DONE');
         });
       });
 
@@ -1316,7 +1316,7 @@ describe('BigQuery', () => {
         const file = bucket.file('kitten-test-data-backup.json');
         table.extract(file, (err, resp) => {
           assert.ifError(err);
-          assert.strictEqual(resp.status.state, 'DONE');
+          assert.strictEqual(resp!.status!.state, 'DONE');
           done();
         });
       });
