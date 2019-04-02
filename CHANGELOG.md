@@ -14,7 +14,7 @@
 - fix(job): check for `errorResult` when polling jobs ([#387](https://github.com/googleapis/nodejs-bigquery/pull/387))
 
 
-**BREAKING CHANGE** Previously when polling a BigQuery Job the Node.js client would check for the presence of the `errors` field when trying to determine if the job suceeded. We have since changed this logic to instead check for the `errorResult` field. This is significatnt because the `errors` array may now be present for passing jobs, however these errors should serve more as warnings. If your application logic depended on this functionality you'll need to manually check for `errors` now.
+**BREAKING CHANGE** Previously when polling a BigQuery Job the Node.js client would check for the presence of the `errors` field when trying to determine if the job suceeded. We have since changed this logic to instead check for the `errorResult` field. This is significant because the `errors` array may now be present for passing jobs, however these errors should serve more as warnings. If your application logic depended on this functionality you'll need to manually check for `errors` now.
 
 ```js
 await job.promise();
@@ -26,7 +26,7 @@ if (job.metadata.status.errors) {
 
 - fix(ts): provide complete and correct types ([#385](https://github.com/googleapis/nodejs-bigquery/pull/385))
 
-**BREAKING CHANGE** A number of the BigQuery TypeScript types were incomplete, this change provides more complete types for the entire client. 
+**BREAKING CHANGE** A number of the BigQuery TypeScript types were incomplete, this change provides more complete types for the entire client.
 
 ### New Features
 - feat(geo): add support for geography ([#397](https://github.com/googleapis/nodejs-bigquery/pull/397))
