@@ -1117,7 +1117,8 @@ describe('BigQuery', () => {
 
       it('should delete the params option', done => {
         bq.createJob = (reqOpts: JobOptions) => {
-          assert.strictEqual(reqOpts.params, undefined);
+          // tslint:disable-next-line no-any
+          assert.strictEqual((reqOpts as any).params, undefined);
           done();
         };
 
@@ -1132,7 +1133,7 @@ describe('BigQuery', () => {
       describe('named', () => {
         it('should set the correct parameter mode', done => {
           bq.createJob = (reqOpts: JobOptions) => {
-            const query = reqOpts.configuration.query;
+            const query = reqOpts.configuration!.query!;
             assert.strictEqual(query.parameterMode, 'named');
             done();
           };
@@ -1154,9 +1155,9 @@ describe('BigQuery', () => {
           };
 
           bq.createJob = (reqOpts: JobOptions) => {
-            const query = reqOpts.configuration.query;
-            assert.strictEqual(query.queryParameters[0], queryParameter);
-            assert.strictEqual(query.queryParameters[0].name, 'key');
+            const query = reqOpts.configuration!.query!;
+            assert.strictEqual(query.queryParameters![0], queryParameter);
+            assert.strictEqual(query.queryParameters![0].name, 'key');
             done();
           };
 
@@ -1172,7 +1173,7 @@ describe('BigQuery', () => {
       describe('positional', () => {
         it('should set the correct parameter mode', done => {
           bq.createJob = (reqOpts: JobOptions) => {
-            const query = reqOpts.configuration.query;
+            const query = reqOpts.configuration!.query!;
             assert.strictEqual(query.parameterMode, 'positional');
             done();
           };
@@ -1194,8 +1195,8 @@ describe('BigQuery', () => {
           };
 
           bq.createJob = (reqOpts: JobOptions) => {
-            const query = reqOpts.configuration.query;
-            assert.strictEqual(query.queryParameters[0], queryParameter);
+            const query = reqOpts.configuration!.query!;
+            assert.strictEqual(query.queryParameters![0], queryParameter);
             done();
           };
 
@@ -1216,8 +1217,10 @@ describe('BigQuery', () => {
       };
 
       bq.createJob = (reqOpts: JobOptions) => {
-        assert.strictEqual(reqOpts.configuration.query.dryRun, undefined);
-        assert.strictEqual(reqOpts.configuration.dryRun, options.dryRun);
+        assert.strictEqual(
+            // tslint:disable-next-line no-any
+            (reqOpts.configuration!.query as any).dryRun, undefined);
+        assert.strictEqual(reqOpts.configuration!.dryRun, options.dryRun);
         done();
       };
 
@@ -1231,7 +1234,9 @@ describe('BigQuery', () => {
       };
 
       bq.createJob = (reqOpts: JobOptions) => {
-        assert.strictEqual(reqOpts.configuration.query.jobPrefix, undefined);
+        assert.strictEqual(
+            // tslint:disable-next-line no-any
+            (reqOpts.configuration!.query as any).jobPrefix, undefined);
         assert.strictEqual(reqOpts.jobPrefix, options.jobPrefix);
         done();
       };
@@ -1246,7 +1251,9 @@ describe('BigQuery', () => {
       };
 
       bq.createJob = (reqOpts: JobOptions) => {
-        assert.strictEqual(reqOpts.configuration.query.location, undefined);
+        assert.strictEqual(
+            // tslint:disable-next-line no-any
+            (reqOpts.configuration!.query as any).location, undefined);
         assert.strictEqual(reqOpts.location, LOCATION);
         done();
       };
@@ -1261,7 +1268,9 @@ describe('BigQuery', () => {
       };
 
       bq.createJob = (reqOpts: JobOptions) => {
-        assert.strictEqual(reqOpts.configuration.query.jobId, undefined);
+        assert.strictEqual(
+            // tslint:disable-next-line no-any
+            (reqOpts.configuration!.query as any).jobId, undefined);
         assert.strictEqual(reqOpts.jobId, options.jobId);
         done();
       };
