@@ -18,9 +18,11 @@
 const {assert} = require('chai');
 const path = require('path');
 const uuid = require('uuid');
-const {execSync} = require('child_process');
+const cp = require('child_process');
 const {Storage} = require('@google-cloud/storage');
 const {BigQuery} = require('@google-cloud/bigquery');
+
+const execSync = (cmd) => cp.execSync(cmd, {encoding: 'utf-8'});
 
 const storage = new Storage();
 const generateUuid = () => `gcloud-tests-${uuid.v4()}`.replace(/-/gi, '_');
