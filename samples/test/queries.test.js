@@ -16,42 +16,35 @@
 'use strict';
 
 const {assert} = require('chai');
-const execa = require('execa');
-
-// const cmd = `node queries.js`;
-const exec = async cmd => {
-  const res = await execa.shell(cmd);
-  assert.isEmpty(res.stderr);
-  return res.stdout;
-};
+const {execSync} = require('child_process');
 
 describe(`Queries`, () => {
   it(`should query stackoverflow`, async () => {
-    const output = await exec(`node queryStackOverflow.js`);
+    const output = execSync(`node queryStackOverflow.js`);
     assert.match(output, /Query Results:/);
     assert.match(output, /views/);
   });
 
   it(`should run a query`, async () => {
-    const output = await exec(`node query.js`);
+    const output = execSync(`node query.js`);
     assert.match(output, /Rows:/);
     assert.match(output, /name/);
   });
 
   it(`should run a query with the cache disabled`, async () => {
-    const output = await exec(`node queryDisableCache.js`);
+    const output = execSync(`node queryDisableCache.js`);
     assert.match(output, /Rows:/);
     assert.match(output, /corpus/);
   });
 
   it(`should run a query with named params`, async () => {
-    const output = await exec(`node queryParamsNamed.js`);
+    const output = execSync(`node queryParamsNamed.js`);
     assert.match(output, /Rows:/);
     assert.match(output, /word_count/);
   });
 
   it(`should run a query with positional params`, async () => {
-    const output = await exec(`node queryParamsNamed.js`);
+    const output = execSync(`node queryParamsNamed.js`);
     assert.match(output, /Rows:/);
     assert.match(output, /word_count/);
   });
