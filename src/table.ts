@@ -59,7 +59,7 @@ export type RowMetadata = any;
 export type InsertRowsOptions = bigquery.ITableDataInsertAllRequest&{
   autoCreate?: boolean;
   raw?: boolean;
-  schema: string|{};
+  schema?: string|{};
 };
 
 export type InsertRowsResponse =
