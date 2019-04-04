@@ -19,36 +19,25 @@
  */
 
 import {Metadata, MetadataCallback, Operation, util} from '@google-cloud/common';
-import {paginator} from '@google-cloud/paginator';
+import {paginator, ResourceStream} from '@google-cloud/paginator';
 import {promisifyAll} from '@google-cloud/promisify';
 import * as extend from 'extend';
 import * as r from 'request';
 import {Readable} from 'stream';
 import {teenyRequest} from 'teeny-request';
 
-import {BigQuery, QueryRowsCallback, QueryRowsResponse} from '../src';
+import {BigQuery, JobRequest, PagedRequest, QueryRowsCallback, QueryRowsResponse, RequestCallback} from '../src';
+import {RowMetadata} from './table';
+import bigquery from './types';
 
-// tslint:disable-next-line no-any
-export type JobMetadata = any;
+export type JobMetadata = bigquery.IJob;
+export type JobOptions = JobRequest<JobMetadata>;
 
-// tslint:disable-next-line no-any
-export type JobOptions = any;
+export type CancelCallback = RequestCallback<bigquery.IJobCancelResponse>;
+export type CancelResponse = [bigquery.IJobCancelResponse];
 
-export interface CancelCallback {
-  (err: Error|null, apiResponse?: r.Response): void;
-}
-
-export type CancelResponse = [r.Response];
-
-
-export interface QueryResultsOptions {
-  autoPaginate?: boolean;
-  maxApiCalls?: number;
-  maxResults?: number;
-  pageToken?: string;
-  startIndex?: number;
-  timeoutMs?: number;
-}
+export type QueryResultsOptions =
+    PagedRequest<bigquery.jobs.IGetQueryResultsParams>;
 
 /**
  * @callback QueryResultsCallback
@@ -121,7 +110,8 @@ export interface QueryResultsOptions {
 class Job extends Operation {
   bigQuery: BigQuery;
   location?: string;
-  getQueryResultsStream: (options?: QueryResultsOptions) => Readable;
+  getQueryResultsStream:
+      (options?: QueryResultsOptions) => ResourceStream<RowMetadata>;
   constructor(bigQuery: BigQuery, id: string, options?: JobOptions) {
     let location;
     if (options && options.location) {
@@ -261,7 +251,7 @@ class Job extends Operation {
      *   .pipe(fs.createWriteStream('./test/testdata/testfile.json'));
      */
     this.getQueryResultsStream =
-        paginator.streamify('getQueryResultsAsStream_');
+        paginator.streamify<RowMetadata>('getQueryResultsAsStream_');
   }
 
   cancel(): Promise<CancelResponse>;

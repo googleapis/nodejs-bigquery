@@ -4,6 +4,52 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## v3.0.0
+
+04-02-2019 10:02 PDT
+
+
+### Implementation Changes
+
+- fix(job): check for `errorResult` when polling jobs ([#387](https://github.com/googleapis/nodejs-bigquery/pull/387))
+
+
+**BREAKING CHANGE** Previously when polling a BigQuery Job the Node.js client would check for the presence of the `errors` field when trying to determine if the job suceeded. We have since changed this logic to instead check for the `errorResult` field. This is significant because the `errors` array may now be present for passing jobs, however these errors should serve more as warnings. If your application logic depended on this functionality you'll need to manually check for `errors` now.
+
+```js
+await job.promise();
+
+if (job.metadata.status.errors) {
+  // optionally handle warnings
+}
+```
+
+- fix(ts): provide complete and correct types ([#385](https://github.com/googleapis/nodejs-bigquery/pull/385))
+
+**BREAKING CHANGE** A number of the BigQuery TypeScript types were incomplete, this change provides more complete types for the entire client.
+
+### New Features
+- feat(geo): add support for geography ([#397](https://github.com/googleapis/nodejs-bigquery/pull/397))
+
+### Bug Fixes
+- fix: correctly encode nested custom date/time parameters ([#393](https://github.com/googleapis/nodejs-bigquery/pull/393))
+
+### Dependencies
+- chore(deps): update dependency tmp to v0.1.0 ([#398](https://github.com/googleapis/nodejs-bigquery/pull/398))
+- chore(deps): update dependency @types/tmp to v0.1.0
+- chore(deps): update dependency typescript to ~3.4.0
+
+### Documentation
+- docs(samples): adds queryParamsNamed and queryParamsPositional ([#381](https://github.com/googleapis/nodejs-bigquery/pull/381))
+- refactor(samples): split query and table samples into separate files ([#384](https://github.com/googleapis/nodejs-bigquery/pull/384))
+- refactor(samples): fix loadJSONFromGCSTruncate wrong function ([#386](https://github.com/googleapis/nodejs-bigquery/pull/386))
+- refactor(samples): add main() function wrappers to samples
+
+### Internal / Testing Changes
+- build: use per-repo npm publish token ([#382](https://github.com/googleapis/nodejs-bigquery/pull/382))
+- chore: publish to npm using wombat ([#390](https://github.com/googleapis/nodejs-bigquery/pull/390))
+- fix(tests): update TIMESTAMP param tests ([#394](https://github.com/googleapis/nodejs-bigquery/pull/394))
+
 ## v2.1.0
 
 03-12-2019 15:30 PDT
