@@ -1,0 +1,11 @@
+{
+    "name": "@google-cloud/bigquery",
+    "name_pretty": "Google Cloud Bigquery",
+    "product_documentation": "https://cloud.google.com/bigquery",
+    "client_documentation": "https://cloud.google.com/nodejs/docs/reference/bigquery/latest/",
+    "release_level": "ga",
+    "language": "nodejs",
+    "repo": "googleapis/nodejs-bigquery",
+    "distribution_name": "@google-cloud/bigquery",
+    "requires_billing": true
+  }
