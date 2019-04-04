@@ -56,19 +56,11 @@ export type JobMetadataResponse = [JobMetadata];
 // tslint:disable-next-line no-any
 export type RowMetadata = any;
 
-export type InsertRowsOptionsAutoCreate = {
-  autoCreate?: false;
-  schema?: string | {};
-}|{
-  autoCreate: true;
-  schema: string|{};
-};
-export type InsertRowsOptionsRaw = {
+export type InsertRowsOptions = bigquery.ITableDataInsertAllRequest&{
+  autoCreate?: boolean;
   raw?: boolean;
+  schema?: string|{};
 };
-export type InsertRowsOptions = bigquery.ITableDataInsertAllRequest&
-                                InsertRowsOptionsAutoCreate&
-                                InsertRowsOptionsRaw;
 
 export type InsertRowsResponse =
     [bigquery.ITableDataInsertAllResponse | bigquery.ITable];
