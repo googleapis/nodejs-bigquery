@@ -7,5 +7,5 @@
     "language": "nodejs",
     "repo": "googleapis/nodejs-bigquery",
     "distribution_name": "@google-cloud/bigquery",
-    "requires_billing": true
+    "requires_billing": false
   }
