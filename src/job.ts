@@ -22,9 +22,6 @@ import {Metadata, MetadataCallback, Operation, util} from '@google-cloud/common'
 import {paginator, ResourceStream} from '@google-cloud/paginator';
 import {promisifyAll} from '@google-cloud/promisify';
 import * as extend from 'extend';
-import * as r from 'request';
-import {Readable} from 'stream';
-import {teenyRequest} from 'teeny-request';
 
 import {BigQuery, JobRequest, PagedRequest, QueryRowsCallback, QueryRowsResponse, RequestCallback} from '../src';
 import {RowMetadata} from './table';
@@ -219,7 +216,6 @@ class Job extends Operation {
       baseUrl: '/jobs',
       id,
       methods,
-      requestModule: teenyRequest as typeof r,
     });
 
     this.bigQuery = bigQuery;

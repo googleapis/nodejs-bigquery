@@ -58,7 +58,6 @@
     "is": "^3.0.1",
     "stream-events": "^1.0.1",
     "string-format-obj": "^1.0.0",
-    "teeny-request": "^3.11.0",
     "uuid": "^3.1.0"
   },
   "devDependencies": {

@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
-import {DecorateRequestOptions, DeleteCallback, ServiceObject} from '@google-cloud/common';
+import {DecorateRequestOptions, DeleteCallback, Metadata, ServiceObject} from '@google-cloud/common';
 import {paginator, ResourceStream} from '@google-cloud/paginator';
 import {promisifyAll} from '@google-cloud/promisify';
 import * as extend from 'extend';
-import * as r from 'request';
-import {Duplex, Readable} from 'stream';
-import {teenyRequest} from 'teeny-request';
+import {Duplex} from 'stream';
 
 import {BigQuery, DatasetCallback, PagedCallback, PagedRequest, PagedResponse, Query, QueryRowsResponse, ResourceCallback, SimpleQueryRowsCallback} from '.';
 import {JobCallback, JobResponse, Table, TableMetadata, TableOptions} from './table';
@@ -229,7 +227,6 @@ class Dataset extends ServiceObject {
       baseUrl: '/datasets',
       id,
       methods,
-      requestModule: teenyRequest as typeof r,
       createMethod:
           (id: string, optionsOrCallback?: CreateDatasetOptions|DatasetCallback,
            cb?: DatasetCallback) => {
@@ -434,7 +431,7 @@ class Dataset extends ServiceObject {
         });
   }
 
-  delete(options?: DatasetDeleteOptions): Promise<[r.Response]>;
+  delete(options?: DatasetDeleteOptions): Promise<[Metadata]>;
   delete(options: DatasetDeleteOptions, callback: DeleteCallback): void;
   delete(callback: DeleteCallback): void;
   /**
@@ -473,7 +470,7 @@ class Dataset extends ServiceObject {
    */
   delete(
       optionsOrCallback?: DeleteCallback|DatasetDeleteOptions,
-      callback?: DeleteCallback): void|Promise<[r.Response]> {
+      callback?: DeleteCallback): void|Promise<[Metadata]> {
     const options =
         typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
     callback =
