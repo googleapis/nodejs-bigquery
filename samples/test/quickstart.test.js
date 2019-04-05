@@ -33,6 +33,6 @@ describe('Quickstart', () => {
 
   it('quickstart should create a dataset', async () => {
     const output = execSync(`node quickstart ${datasetName}`);
-    assert.strictEqual(output, `Dataset ${datasetName} created.`);
+    assert.include(output, `Dataset ${datasetName} created.`);
   });
 });

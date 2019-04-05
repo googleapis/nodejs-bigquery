@@ -82,7 +82,7 @@ describe('Tables', () => {
     const output = execSync(
       `node createTable.js ${datasetId} ${tableId} "${schema}"`
     );
-    assert.strictEqual(output, `Table ${tableId} created.`);
+    assert.include(output, `Table ${tableId} created.`);
     const [exists] = await bigquery
       .dataset(datasetId)
       .table(tableId)
@@ -110,7 +110,7 @@ describe('Tables', () => {
 
   it(`should browse table rows`, async () => {
     const output = execSync(`node browseRows.js ${datasetId} ${tableId}`);
-    assert.strictEqual(
+    assert.include(
       output,
       `Rows:\n{ Name: 'Gandalf', Age: 2000, Weight: 140, IsMagic: true }`
     );
@@ -278,7 +278,7 @@ describe('Tables', () => {
 
   it(`should delete a table`, async () => {
     const output = execSync(`node deleteTable.js ${datasetId} ${tableId}`);
-    assert.strictEqual(output, `Table ${tableId} deleted.`);
+    assert.include(output, `Table ${tableId} deleted.`);
     const [exists] = await bigquery
       .dataset(datasetId)
       .table(tableId)

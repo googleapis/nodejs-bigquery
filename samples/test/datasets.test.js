@@ -35,7 +35,7 @@ describe(`Datasets`, () => {
 
   it(`should create a dataset`, async () => {
     const output = execSync(`node createDataset.js ${datasetId}`);
-    assert.strictEqual(output, `Dataset ${datasetId} created.`);
+    assert.include(output, `Dataset ${datasetId} created.`);
     const [exists] = await bigquery.dataset(datasetId).exists();
     assert.ok(exists);
   });
@@ -48,7 +48,7 @@ describe(`Datasets`, () => {
 
   it(`should delete a dataset`, async () => {
     const output = execSync(`node deleteDataset.js ${datasetId}`);
-    assert.strictEqual(output, `Dataset ${datasetId} deleted.`);
+    assert.include(output, `Dataset ${datasetId} deleted.`);
     const [exists] = await bigquery.dataset(datasetId).exists();
     assert.strictEqual(exists, false);
   });
