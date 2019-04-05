@@ -20,7 +20,7 @@ const uuid = require('uuid');
 const cp = require('child_process');
 const {BigQuery} = require('@google-cloud/bigquery');
 
-const execSync = (cmd) => cp.execSync(cmd, {encoding: 'utf-8'});
+const execSync = cmd => cp.execSync(cmd, {encoding: 'utf-8'});
 
 const bigquery = new BigQuery();
 
