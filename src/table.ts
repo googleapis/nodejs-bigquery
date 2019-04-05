@@ -19,7 +19,6 @@ import {paginator, ResourceStream} from '@google-cloud/paginator';
 import {promisifyAll} from '@google-cloud/promisify';
 import * as arrify from 'arrify';
 import Big from 'big.js';
-import * as duplexify from 'duplexify';
 import * as extend from 'extend';
 
 const format = require('string-format-obj');
@@ -31,10 +30,11 @@ import * as streamEvents from 'stream-events';
 import * as uuid from 'uuid';
 import {BigQuery, Job, Dataset, Query, SimpleQueryRowsResponse, SimpleQueryRowsCallback, ResourceCallback, RequestCallback, PagedResponse, PagedCallback, JobRequest, PagedRequest} from '../src';
 import {GoogleErrorBody} from '@google-cloud/common/build/src/util';
-import {Duplex, Readable, Writable} from 'stream';
-import {teenyRequest} from 'teeny-request';
+import {Duplex, Writable} from 'stream';
 import {JobMetadata} from './job';
 import bigquery from './types';
+
+const duplexify = require('duplexify');
 
 // This is supposed to be a @google-cloud/storage `File` type. The storage npm
 // module includes these types, but is current installed as a devDependency.
@@ -327,7 +327,6 @@ class Table extends common.ServiceObject {
       id,
       createMethod: dataset.createTable.bind(dataset),
       methods,
-      requestModule: teenyRequest as typeof r,
     });
 
     if (options && options.location) {
@@ -1305,13 +1304,12 @@ class Table extends common.ServiceObject {
       throw new Error(`Source format not recognized: ${metadata.sourceFormat}`);
     }
 
-    const dup = streamEvents(duplexify()) as duplexify.Duplexify;
+    const dup = streamEvents(duplexify());
 
     dup.once('writing', () => {
       common.util.makeWritableStream(
           dup, {
             makeAuthenticatedRequest: this.bigQuery.makeAuthenticatedRequest,
-            requestModule: teenyRequest as typeof r,
             metadata: {
               configuration: {
                 load: metadata,
