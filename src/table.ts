@@ -17,7 +17,7 @@
 import * as common from '@google-cloud/common';
 import {paginator, ResourceStream} from '@google-cloud/paginator';
 import {promisifyAll} from '@google-cloud/promisify';
-import * as arrify from 'arrify';
+import arrify = require('arrify');
 import Big from 'big.js';
 import * as extend from 'extend';
 
@@ -834,7 +834,7 @@ class Table extends common.ServiceObject {
   createCopyFromJob(
       source: Table|Table[], metadataOrCallback?: CopyTableMetadata|JobCallback,
       cb?: JobCallback): void|Promise<JobResponse> {
-    const sourceTables = arrify(source);
+    const sourceTables = arrify(source) as Table[];
     sourceTables.forEach((sourceTable) => {
       if (!(sourceTable instanceof Table)) {
         throw new Error('Source must be a Table object.');
