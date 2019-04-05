@@ -35,10 +35,7 @@ None
   * [Load Table G C S Parquet](#load-table-g-c-s-parquet)
   * [Query](#query)
   * [Query Disable Cache](#query-disable-cache)
-  * [Query Params Arrays](#query-params-arrays)
   * [Query Params Named](#query-params-named)
-  * [Query Params Positional](#query-params-positional)
-  * [Query Params Structs](#query-params-structs)
   * [Query Params Timestamps](#query-params-timestamps)
   * [Query Stack Overflow](#query-stack-overflow)
   * [Quickstart](#quickstart)
@@ -443,23 +440,6 @@ __Usage:__
 
 
 
-### Query Params Arrays
-
-View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/queryParamsArrays.js).
-
-[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/queryParamsArrays.js,samples/README.md)
-
-__Usage:__
-
-
-`node queryParamsArrays.js`
-
-
------
-
-
-
-
 ### Query Params Named
 
 View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/queryParamsNamed.js).
@@ -491,39 +471,6 @@ __Usage:__
 
 -----
 
-
-
-
-### Query Params Structs
-
-View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/queryParamsStructs.js).
-
-[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/queryParamsStructs.js,samples/README.md)
-
-__Usage:__
-
-
-`node queryParamsStructs.js`
-
-
------
-
-
-
-
-### Query Params Timestamps
-
-View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/queryParamsTimestamps.js).
-
-[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/queryParamsTimestamps.js,samples/README.md)
-
-__Usage:__
-
-
-`node queryParamsTimestamps.js`
-
-
------
 
 
 
