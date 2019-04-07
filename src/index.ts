@@ -17,7 +17,7 @@
 import * as common from '@google-cloud/common';
 import {paginator, ResourceStream} from '@google-cloud/paginator';
 import {promisifyAll} from '@google-cloud/promisify';
-import * as arrify from 'arrify';
+import arrify = require('arrify');
 import {Big} from 'big.js';
 import * as extend from 'extend';
 
