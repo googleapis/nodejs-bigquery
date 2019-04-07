@@ -131,9 +131,7 @@ describe('Tables', () => {
 
   it(`should load a GCS ORC file`, async () => {
     const tableId = generateUuid();
-    const output = execSync(
-      `node loadTableGCSORC.js ${datasetId} ${tableId}`
-    );
+    const output = execSync(`node loadTableGCSORC.js ${datasetId} ${tableId}`);
     assert.match(output, /completed\./);
     const [rows] = await bigquery
       .dataset(datasetId)
@@ -168,9 +166,7 @@ describe('Tables', () => {
 
   it(`should load a GCS JSON file with explicit schema`, async () => {
     const tableId = generateUuid();
-    const output = execSync(
-      `node loadJSONFromGCS.js ${datasetId} ${tableId}`
-    );
+    const output = execSync(`node loadJSONFromGCS.js ${datasetId} ${tableId}`);
     assert.match(output, /completed\./);
     const [rows] = await bigquery
       .dataset(datasetId)
