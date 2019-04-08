@@ -17,15 +17,12 @@
 
 const {assert} = require('chai');
 const uuid = require('uuid');
-const execa = require('execa');
+const cp = require('child_process');
 const {BigQuery} = require('@google-cloud/bigquery');
 
+const execSync = cmd => cp.execSync(cmd, {encoding: 'utf-8'});
+
 const bigquery = new BigQuery();
-const exec = async cmd => {
-  const res = await execa.shell(cmd);
-  assert.isEmpty(res.stderr);
-  return res.stdout;
-};
 
 describe('Quickstart', () => {
   const datasetName = `gcloud_tests_${uuid.v4()}`.replace(/-/gi, '_');
@@ -35,7 +32,7 @@ describe('Quickstart', () => {
   });
 
   it('quickstart should create a dataset', async () => {
-    const output = await exec(`node quickstart ${datasetName}`);
-    assert.strictEqual(output, `Dataset ${datasetName} created.`);
+    const output = execSync(`node quickstart ${datasetName}`);
+    assert.include(output, `Dataset ${datasetName} created.`);
   });
 });
