@@ -18,7 +18,7 @@ import {DecorateRequestOptions, ServiceObject, ServiceObjectConfig, util} from '
 import {GoogleErrorBody} from '@google-cloud/common/build/src/util';
 import * as pfy from '@google-cloud/promisify';
 import {File} from '@google-cloud/storage';
-import * as arrify from 'arrify';
+import arrify = require('arrify');
 import * as assert from 'assert';
 import Big from 'big.js';
 import {EventEmitter} from 'events';

@@ -17,21 +17,18 @@
 import * as common from '@google-cloud/common';
 import {paginator, ResourceStream} from '@google-cloud/paginator';
 import {promisifyAll} from '@google-cloud/promisify';
-import * as arrify from 'arrify';
+import arrify = require('arrify');
 import {Big} from 'big.js';
 import * as extend from 'extend';
 
 const format = require('string-format-obj');
 import * as is from 'is';
-import * as r from 'request';
 import * as uuid from 'uuid';
-import {teenyRequest} from 'teeny-request';
 
 import {Dataset, DatasetOptions} from './dataset';
 import {Job, JobOptions, QueryResultsOptions} from './job';
 import {Table, TableField, TableSchema, TableRow, TableRowField, JobCallback, JobResponse, RowsCallback, RowsResponse, RowMetadata} from './table';
 import {GoogleErrorBody} from '@google-cloud/common/build/src/util';
-import {Readable, Duplex} from 'stream';
 import bigquery from './types';
 
 export interface RequestCallback<T> {
@@ -211,7 +208,6 @@ export class BigQuery extends common.Service {
       baseUrl: 'https://www.googleapis.com/bigquery/v2',
       scopes: ['https://www.googleapis.com/auth/bigquery'],
       packageJson: require('../../package.json'),
-      requestModule: teenyRequest as typeof r,
     };
 
     if (options.scopes) {
