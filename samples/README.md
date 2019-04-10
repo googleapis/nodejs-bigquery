@@ -18,24 +18,27 @@ None
   * [Create Table](#create-table)
   * [Delete Dataset](#delete-dataset)
   * [Delete Table](#delete-table)
-  * [Extract Table To G C S](#extract-table-to-g-c-s)
+  * [Extract Table To GCS](#extract-table-to-gcs)
   * [Insert Rows As Stream](#insert-rows-as-stream)
   * [List Datasets](#list-datasets)
   * [List Tables](#list-tables)
-  * [Load C S V From G C S](#load-c-s-v-from-g-c-s)
-  * [Load C S V From G C S Autodetect](#load-c-s-v-from-g-c-s-autodetect)
-  * [Load C S V From G C S Truncate](#load-c-s-v-from-g-c-s-truncate)
-  * [Load J S O N From G C S](#load-j-s-o-n-from-g-c-s)
-  * [Load J S O N From G C S Autodetect](#load-j-s-o-n-from-g-c-s-autodetect)
-  * [Load J S O N From G C S Truncate](#load-j-s-o-n-from-g-c-s-truncate)
+  * [Load CSV From GCS](#load-csv-from-gcs)
+  * [Load CSV From GCS Autodetect](#load-csv-from-gcs-autodetect)
+  * [Load CSV From GCS Truncate](#load-csv-from-gcs-truncate)
+  * [Load JSON From GCS](#load-json-from-gcs)
+  * [Load JSON From GCS Autodetect](#load-json-from-gcs-autodetect)
+  * [Load JSON From GCS Truncate](#load-json-from-gcs-truncate)
   * [Load Local File](#load-local-file)
-  * [Load Orc From G C S Truncate](#load-orc-from-g-c-s-truncate)
-  * [Load Parquet From G C S Truncate](#load-parquet-from-g-c-s-truncate)
-  * [Load Table G C S O R C](#load-table-g-c-s-o-r-c)
-  * [Load Table G C S Parquet](#load-table-g-c-s-parquet)
+  * [Load Orc From GCS Truncate](#load-orc-from-gcs-truncate)
+  * [Load Parquet From GCS Truncate](#load-parquet-from-gcs-truncate)
+  * [Load Table GCSORC](#load-table-gcsorc)
+  * [Load Table GCS Parquet](#load-table-gcs-parquet)
   * [Query](#query)
   * [Query Disable Cache](#query-disable-cache)
+  * [Query Params Arrays](#query-params-arrays)
   * [Query Params Named](#query-params-named)
+  * [Query Params Positional](#query-params-positional)
+  * [Query Params Structs](#query-params-structs)
   * [Query Params Timestamps](#query-params-timestamps)
   * [Query Stack Overflow](#query-stack-overflow)
   * [Quickstart](#quickstart)
@@ -151,7 +154,7 @@ __Usage:__
 
 
 
-### Extract Table To G C S
+### Extract Table To GCS
 
 View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/extractTableToGCS.js).
 
@@ -219,7 +222,7 @@ __Usage:__
 
 
 
-### Load C S V From G C S
+### Load CSV From GCS
 
 View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/loadCSVFromGCS.js).
 
@@ -236,7 +239,7 @@ __Usage:__
 
 
 
-### Load C S V From G C S Autodetect
+### Load CSV From GCS Autodetect
 
 View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/loadCSVFromGCSAutodetect.js).
 
@@ -253,7 +256,7 @@ __Usage:__
 
 
 
-### Load C S V From G C S Truncate
+### Load CSV From GCS Truncate
 
 View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/loadCSVFromGCSTruncate.js).
 
@@ -270,7 +273,7 @@ __Usage:__
 
 
 
-### Load J S O N From G C S
+### Load JSON From GCS
 
 View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/loadJSONFromGCS.js).
 
@@ -287,7 +290,7 @@ __Usage:__
 
 
 
-### Load J S O N From G C S Autodetect
+### Load JSON From GCS Autodetect
 
 View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/loadJSONFromGCSAutodetect.js).
 
@@ -304,7 +307,7 @@ __Usage:__
 
 
 
-### Load J S O N From G C S Truncate
+### Load JSON From GCS Truncate
 
 View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/loadJSONFromGCSTruncate.js).
 
@@ -338,7 +341,7 @@ __Usage:__
 
 
 
-### Load Orc From G C S Truncate
+### Load Orc From GCS Truncate
 
 View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/loadOrcFromGCSTruncate.js).
 
@@ -355,7 +358,7 @@ __Usage:__
 
 
 
-### Load Parquet From G C S Truncate
+### Load Parquet From GCS Truncate
 
 View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/loadParquetFromGCSTruncate.js).
 
@@ -372,7 +375,7 @@ __Usage:__
 
 
 
-### Load Table G C S O R C
+### Load Table GCSORC
 
 View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/loadTableGCSORC.js).
 
@@ -389,7 +392,7 @@ __Usage:__
 
 
 
-### Load Table G C S Parquet
+### Load Table GCS Parquet
 
 View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/loadTableGCSParquet.js).
 
@@ -440,6 +443,23 @@ __Usage:__
 
 
 
+### Query Params Arrays
+
+View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/queryParamsArrays.js).
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/queryParamsArrays.js,samples/README.md)
+
+__Usage:__
+
+
+`node queryParamsArrays.js`
+
+
+-----
+
+
+
+
 ### Query Params Named
 
 View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/queryParamsNamed.js).
@@ -471,6 +491,39 @@ __Usage:__
 
 -----
 
+
+
+
+### Query Params Structs
+
+View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/queryParamsStructs.js).
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/queryParamsStructs.js,samples/README.md)
+
+__Usage:__
+
+
+`node queryParamsStructs.js`
+
+
+-----
+
+
+
+
+### Query Params Timestamps
+
+View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/queryParamsTimestamps.js).
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/queryParamsTimestamps.js,samples/README.md)
+
+__Usage:__
+
+
+`node queryParamsTimestamps.js`
+
+
+-----
 
 
 
