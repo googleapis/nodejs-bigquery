@@ -1764,7 +1764,7 @@ class Table extends common.ServiceObject {
         optionsOrCallback :
         cb as InsertRowsCallback;
 
-    rows = arrify(rows);
+    rows = arrify(rows) as RowMetadata[];
 
     if (!rows.length) {
       throw new Error('You must provide at least 1 row to be inserted.');
@@ -1775,7 +1775,7 @@ class Table extends common.ServiceObject {
     });
 
     if (!options.raw) {
-      json.rows = arrify(rows).map((row) => {
+      json.rows = rows.map((row: RowMetadata) => {
         return {
           insertId: uuid.v4(),
           json: Table.encodeValue_(row),
