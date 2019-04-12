@@ -148,6 +148,24 @@
       "name": "Query positional params",
       "file": "queryParamsPositional.js",
       "docs_link": "https://cloud.google.com/nodejs/docs/reference/bigquery/latest/"
+    },
+    {
+      "id": "query-params-arrays",
+      "name": "Query array params",
+      "file": "queryParamsArrays.js",
+      "docs_link": "https://cloud.google.com/nodejs/docs/reference/bigquery/latest/"
+    },
+    {
+      "id": "query-params-structs",
+      "name": "Query struct params",
+      "file": "queryParamsStructs.js",
+      "docs_link": "https://cloud.google.com/nodejs/docs/reference/bigquery/latest/"
+    },
+    {
+      "id": "query-params-timestamps",
+      "name": "Query timestamp params",
+      "file": "queryParamsTimestamps.js",
+      "docs_link": "https://cloud.google.com/nodejs/docs/reference/bigquery/latest/"
     }
   ]
 }

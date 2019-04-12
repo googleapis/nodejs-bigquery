@@ -46,8 +46,26 @@ describe(`Queries`, () => {
   });
 
   it(`should run a query with positional params`, async () => {
-    const output = execSync(`node queryParamsNamed.js`);
+    const output = execSync(`node queryParamsPositional.js`);
     assert.match(output, /Rows:/);
     assert.match(output, /word_count/);
+  });
+
+  it(`should run a query with struct params`, async () => {
+    const output = execSync(`node queryParamsStructs.js`);
+    assert.match(output, /Rows:/);
+    assert.match(output, /foo/);
+  });
+
+  it(`should run a query with array params`, async () => {
+    const output = execSync(`node queryParamsArrays.js`);
+    assert.match(output, /Rows:/);
+    assert.match(output, /count/);
+  });
+
+  it(`should run a query with timestamp params`, async () => {
+    const output = execSync(`node queryParamsTimestamps.js`);
+    assert.match(output, /Rows:/);
+    assert.match(output, /BigQueryTimestamp/);
   });
 });

@@ -44,9 +44,8 @@
     "pretest": "npm run compile",
     "posttest": "npm run check",
     "docs-test": "linkinator docs -r --skip www.googleapis.com",
-    "predocs-test": "npm run docs",
-    "generate-scaffolding": "repo-tools generate all && repo-tools generate lib_samples_readme -l samples/ --config ../.cloud-repo-tools.json"
-  },
+    "predocs-test": "npm run docs"
+},
   "dependencies": {
     "@google-cloud/common": "^0.32.0",
     "@google-cloud/paginator": "^0.2.0",
@@ -61,7 +60,6 @@
     "uuid": "^3.1.0"
   },
   "devDependencies": {
-    "@google-cloud/nodejs-repo-tools": "^3.0.0",
     "@google-cloud/storage": "^2.0.0",
     "@types/big.js": "^4.0.5",
     "@types/execa": "^0.9.0",
