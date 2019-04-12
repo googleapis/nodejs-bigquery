@@ -1764,7 +1764,7 @@ class Table extends common.ServiceObject {
         optionsOrCallback :
         cb as InsertRowsCallback;
 
-    rows = arrify(rows);
+    rows = arrify(rows) as RowMetadata[];
 
     if (!rows.length) {
       throw new Error('You must provide at least 1 row to be inserted.');
