@@ -1775,7 +1775,7 @@ class Table extends common.ServiceObject {
     });
 
     if (!options.raw) {
-      json.rows = arrify(rows).map((row) => {
+      json.rows = rows.map((row: RowMetadata) => {
         return {
           insertId: uuid.v4(),
           json: Table.encodeValue_(row),
