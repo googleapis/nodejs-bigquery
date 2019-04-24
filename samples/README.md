@@ -6,7 +6,7 @@
 
 [![Open in Cloud Shell][shell_img]][shell_link]
 
-None
+
 
 ## Table of Contents
 
