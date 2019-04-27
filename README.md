@@ -27,7 +27,7 @@ Google APIs Client Libraries, in [Client Libraries Explained][explained].
 
 
 * [Quickstart](#quickstart)
-
+  * [Before you begin](#before-you-begin)
   * [Installing the client library](#installing-the-client-library)
   * [Using the client library](#using-the-client-library)
 * [Samples](#samples)
@@ -36,6 +36,13 @@ Google APIs Client Libraries, in [Client Libraries Explained][explained].
 * [License](#license)
 
 ## Quickstart
+
+### Before you begin
+
+1.  [Select or create a Cloud Platform project][projects].
+1.  [Enable the Google Cloud Bigquery API][enable_api].
+1.  [Set up authentication with a service account][auth] so you can access the
+    API from your local workstation.
 
 ### Installing the client library
 
@@ -141,5 +148,5 @@ See [LICENSE](https://github.com/googleapis/nodejs-bigquery/blob/master/LICENSE)
 [shell_img]: https://gstatic.com/cloudssh/images/open-btn.png
 [projects]: https://console.cloud.google.com/project
 [billing]: https://support.google.com/cloud/answer/6293499#enable-billing
-
+[enable_api]: https://console.cloud.google.com/flows/enableapi?apiid=bigquery.googleapis.com
 [auth]: https://cloud.google.com/docs/authentication/getting-started
