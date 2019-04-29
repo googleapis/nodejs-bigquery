@@ -57,7 +57,6 @@ export type JobMetadataResponse = [JobMetadata];
 export type RowMetadata = any;
 
 export type InsertRowsOptions = bigquery.ITableDataInsertAllRequest&{
-  autoCreate?: boolean;
   raw?: boolean;
   schema?: string|{};
 };
@@ -1632,17 +1631,15 @@ class Table extends common.ServiceObject {
    *
    * @param {object|object[]} rows The rows to insert into the table.
    * @param {object} [options] Configuration object.
-   * @param {boolean} [options.autoCreate] Automatically create the table if it
-   *     doesn't already exist. In order for this to succeed the `schema` option
-   *     must also be set. Note that this can take longer than 2 minutes to
-   *     complete.
    * @param {boolean} [options.ignoreUnknownValues=false] Accept rows that contain
    *     values that do not match the schema. The unknown values are ignored.
    * @param {boolean} [options.raw] If `true`, the `rows` argument is expected to
    *     be formatted as according to the
    *     [specification](https://cloud.google.com/bigquery/docs/reference/v2/tabledata/insertAll).
-   * @param {string|object} [options.schema] A comma-separated list of name:type
-   *     pairs. Valid types are "string", "integer", "float", "boolean", and
+   * @param {string|object} [options.schema] If provided will atomatically create
+   *     a table if it doesn't already exist. Note that this can take longer
+   *     than 2 minutes to complete. A comma-separated list of name:type pairs.
+   *     Valid types are "string", "integer", "float", "boolean", and
    *     "timestamp". If the type is omitted, it is assumed to be "string".
    *     Example: "name:string, age:integer". Schemas can also be specified as a
    *     JSON array of fields, which allows for nested and repeated fields. See
@@ -1785,17 +1782,9 @@ class Table extends common.ServiceObject {
 
     delete json.raw;
 
-    const autoCreate = !!options.autoCreate;
     let schema: string|{};
 
-    delete json.autoCreate;
-
-    if (autoCreate) {
-      if (!options.schema) {
-        throw new Error(
-            'Schema must be provided in order to auto-create Table.');
-      }
-
+    if (options.schema) {
       schema = options.schema;
       delete json.schema;
     }
@@ -1825,7 +1814,7 @@ class Table extends common.ServiceObject {
         },
         (err, resp) => {
           if (err) {
-            if ((err as common.ApiError).code === 404 && autoCreate) {
+            if ((err as common.ApiError).code === 404 && schema) {
               setTimeout(createTableAndRetry, Math.random() * 60000);
             } else {
               callback!(err, resp);
