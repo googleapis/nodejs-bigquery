@@ -2077,7 +2077,6 @@ describe('BigQuery/Table', () => {
 
     describe('create table and retry', () => {
       const OPTIONS = {
-        autoCreate: true,
         schema: SCHEMA_STRING,
       };
 
@@ -2111,20 +2110,9 @@ describe('BigQuery/Table', () => {
         Math.random = _random;
       });
 
-      it('should throw if autoCreate is set with no schema', () => {
-        const options = {
-          autoCreate: true,
-        };
-
-        assert.throws(() => {
-          table.insert(data, options);
-        }, /Schema must be provided in order to auto-create Table\./);
-      });
-
       it('should not include the schema in the insert request', done => {
         table.request = (reqOpts: DecorateRequestOptions) => {
           assert.strictEqual(reqOpts.json.schema, undefined);
-          assert.strictEqual(reqOpts.json.autoCreate, undefined);
           done();
         };
 
