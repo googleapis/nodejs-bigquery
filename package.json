@@ -5,7 +5,7 @@
   "license": "Apache-2.0",
   "author": "Google LLC",
   "engines": {
-    "node": ">=6.0.0"
+    "node": ">=8.10.0"
   },
   "repository": "googleapis/nodejs-bigquery",
   "main": "./build/src/index.js",
@@ -45,7 +45,7 @@
     "posttest": "npm run check",
     "docs-test": "linkinator docs -r --skip www.googleapis.com",
     "predocs-test": "npm run docs"
-},
+  },
   "dependencies": {
     "@google-cloud/common": "^0.32.0",
     "@google-cloud/paginator": "^0.2.0",
