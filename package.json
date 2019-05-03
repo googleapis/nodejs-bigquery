@@ -49,7 +49,7 @@
   "dependencies": {
     "@google-cloud/common": "^0.32.0",
     "@google-cloud/paginator": "^0.2.0",
-    "@google-cloud/promisify": "^0.4.0",
+    "@google-cloud/promisify": "^1.0.0",
     "arrify": "^2.0.0",
     "big.js": "^5.1.2",
     "duplexify": "^4.0.0",
@@ -76,7 +76,7 @@
     "codecov": "^3.0.0",
     "eslint": "^5.0.0",
     "eslint-config-prettier": "^4.0.0",
-    "eslint-plugin-node": "^8.0.0",
+    "eslint-plugin-node": "^9.0.0",
     "eslint-plugin-prettier": "^3.0.0",
     "gts": "^0.9.0",
     "ink-docstrap": "^1.3.2",
