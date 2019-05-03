@@ -22,7 +22,7 @@ import {promisify} from 'util';
 
 const RUNNING_IN_VPCSC = !!process.env['GOOGLE_CLOUD_TESTS_IN_VPCSC'];
 
-const mvp = promisify(mv) as {} as (...args: string[]) => Promise<void>;
+const mvp = (promisify(mv) as {}) as (...args: string[]) => Promise<void>;
 const ncpp = promisify(ncp);
 const stagingDir = tmp.dirSync({unsafeCleanup: true});
 const stagingPath = stagingDir.name;

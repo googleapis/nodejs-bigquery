@@ -19,8 +19,9 @@ import {BigQuery} from '../src';
 
 if (process.argv.length < 3) {
   throw new Error(
-      `need query file; ` +
-      `usage: '${process.argv[0]} ${process.argv[1]} <queries.json>'`);
+    `need query file; ` +
+      `usage: '${process.argv[0]} ${process.argv[1]} <queries.json>'`
+  );
 }
 
 console.log('query,rows,cols,first_byte,total');
@@ -29,11 +30,11 @@ const queryJson = fs.readFileSync(process.argv[2], 'utf8');
 const queries = JSON.parse(queryJson);
 const client = new BigQuery();
 
-Promise
-    .all(queries.map((query: string) => {
-      return doQuery(query).catch(console.error);
-    }))
-    .catch(console.error);
+Promise.all(
+  queries.map((query: string) => {
+    return doQuery(query).catch(console.error);
+  })
+).catch(console.error);
 
 async function doQuery(queryTxt: string) {
   return new Promise((resolve, reject) => {
@@ -43,30 +44,31 @@ async function doQuery(queryTxt: string) {
     let timeFirstByteMilli: number;
 
     const query = {query: queryTxt, useLegacySql: false};
-    const stream =
-        client.createQueryStream(query)
-            .on('error', reject)
-            .on('data',
-                row => {
-                  if (numRows === 0) {
-                    numCols = Object.keys(row).length;
-                    timeFirstByteMilli = new Date().getTime() - startMilli;
-                  } else if (numCols !== Object.keys(row).length) {
-                    stream.end();
-                    const receivedCols = Object.keys(row).length;
-                    const error = new Error(
-                        `query "${queryTxt}": ` +
-                        `wrong number of columns, want ${numCols} got ${
-                            receivedCols}`);
-                    reject(error);
-                  }
-                  numRows++;
-                })
-            .on('end', () => {
-              const timeTotalMilli = new Date().getTime() - startMilli;
-              console.log(`"${queryTxt}",${numRows},${numCols},${
-                  timeFirstByteMilli / 1000},${timeTotalMilli / 1000}`);
-              resolve();
-            });
+    const stream = client
+      .createQueryStream(query)
+      .on('error', reject)
+      .on('data', row => {
+        if (numRows === 0) {
+          numCols = Object.keys(row).length;
+          timeFirstByteMilli = new Date().getTime() - startMilli;
+        } else if (numCols !== Object.keys(row).length) {
+          stream.end();
+          const receivedCols = Object.keys(row).length;
+          const error = new Error(
+            `query "${queryTxt}": ` +
+              `wrong number of columns, want ${numCols} got ${receivedCols}`
+          );
+          reject(error);
+        }
+        numRows++;
+      })
+      .on('end', () => {
+        const timeTotalMilli = new Date().getTime() - startMilli;
+        console.log(
+          `"${queryTxt}",${numRows},${numCols},${timeFirstByteMilli /
+            1000},${timeTotalMilli / 1000}`
+        );
+        resolve();
+      });
   });
 }

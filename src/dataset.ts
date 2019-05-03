@@ -14,14 +14,35 @@
  * limitations under the License.
  */
 
-import {DecorateRequestOptions, DeleteCallback, Metadata, ServiceObject} from '@google-cloud/common';
+import {
+  DecorateRequestOptions,
+  DeleteCallback,
+  Metadata,
+  ServiceObject,
+} from '@google-cloud/common';
 import {paginator, ResourceStream} from '@google-cloud/paginator';
 import {promisifyAll} from '@google-cloud/promisify';
 import * as extend from 'extend';
 import {Duplex} from 'stream';
 
-import {BigQuery, DatasetCallback, PagedCallback, PagedRequest, PagedResponse, Query, QueryRowsResponse, ResourceCallback, SimpleQueryRowsCallback} from '.';
-import {JobCallback, JobResponse, Table, TableMetadata, TableOptions} from './table';
+import {
+  BigQuery,
+  DatasetCallback,
+  PagedCallback,
+  PagedRequest,
+  PagedResponse,
+  Query,
+  QueryRowsResponse,
+  ResourceCallback,
+  SimpleQueryRowsCallback,
+} from '.';
+import {
+  JobCallback,
+  JobResponse,
+  Table,
+  TableMetadata,
+  TableOptions,
+} from './table';
 import bigquery from './types';
 
 export interface DatasetDeleteOptions {
@@ -35,10 +56,16 @@ export interface DatasetOptions {
 export type CreateDatasetOptions = bigquery.IDataset;
 
 export type GetTablesOptions = PagedRequest<bigquery.tables.IListParams>;
-export type GetTablesResponse =
-    PagedResponse<Table, GetTablesOptions, bigquery.ITableList>;
-export type GetTablesCallback =
-    PagedCallback<Table, GetTablesOptions, bigquery.ITableList>;
+export type GetTablesResponse = PagedResponse<
+  Table,
+  GetTablesOptions,
+  bigquery.ITableList
+>;
+export type GetTablesCallback = PagedCallback<
+  Table,
+  GetTablesOptions,
+  bigquery.ITableList
+>;
 
 export type TableResponse = [Table, bigquery.ITable];
 export type TableCallback = ResourceCallback<Table, bigquery.ITable>;
@@ -227,17 +254,20 @@ class Dataset extends ServiceObject {
       baseUrl: '/datasets',
       id,
       methods,
-      createMethod:
-          (id: string, optionsOrCallback?: CreateDatasetOptions|DatasetCallback,
-           cb?: DatasetCallback) => {
-            let options =
-                typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
-            const callback = typeof optionsOrCallback === 'function' ?
-                optionsOrCallback as DatasetCallback :
-                cb;
-            options = extend({}, options, {location: this.location});
-            return bigQuery.createDataset(id, options, callback!);
-          }
+      createMethod: (
+        id: string,
+        optionsOrCallback?: CreateDatasetOptions | DatasetCallback,
+        cb?: DatasetCallback
+      ) => {
+        let options =
+          typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
+        const callback =
+          typeof optionsOrCallback === 'function'
+            ? (optionsOrCallback as DatasetCallback)
+            : cb;
+        options = extend({}, options, {location: this.location});
+        return bigQuery.createDataset(id, options, callback!);
+      },
     });
 
     if (options && options.location) {
@@ -290,8 +320,8 @@ class Dataset extends ServiceObject {
     this.getTablesStream = paginator.streamify<Table>('getTables');
   }
 
-  createQueryJob(options: string|Query): Promise<JobResponse>;
-  createQueryJob(options: string|Query, callback: JobCallback): void;
+  createQueryJob(options: string | Query): Promise<JobResponse>;
+  createQueryJob(options: string | Query, callback: JobCallback): void;
   /**
    * Run a query as a job. No results are immediately returned. Instead, your
    * callback will be executed with a {@link Job} object that you must
@@ -304,8 +334,10 @@ class Dataset extends ServiceObject {
    * @param {function} [callback] See {@link BigQuery#createQueryJob} for full documentation of this method.
    * @returns {Promise} See {@link BigQuery#createQueryJob} for full documentation of this method.
    */
-  createQueryJob(options: string|Query, callback?: JobCallback):
-      void|Promise<JobResponse> {
+  createQueryJob(
+    options: string | Query,
+    callback?: JobCallback
+  ): void | Promise<JobResponse> {
     if (typeof options === 'string') {
       options = {
         query: options,
@@ -332,7 +364,7 @@ class Dataset extends ServiceObject {
    *     documentation of this method.
    * @returns {stream}
    */
-  createQueryStream(options: Query|string): Duplex {
+  createQueryStream(options: Query | string): Duplex {
     if (typeof options === 'string') {
       options = {
         query: options,
@@ -349,8 +381,11 @@ class Dataset extends ServiceObject {
   }
 
   createTable(id: string, options: TableMetadata): Promise<TableResponse>;
-  createTable(id: string, options: TableMetadata, callback: TableCallback):
-      void;
+  createTable(
+    id: string,
+    options: TableMetadata,
+    callback: TableCallback
+  ): void;
   createTable(id: string, callback: TableCallback): void;
   /**
    * Create a table given a tableId or configuration object.
@@ -396,12 +431,14 @@ class Dataset extends ServiceObject {
    * });
    */
   createTable(
-      id: string, optionsOrCallback?: TableMetadata|TableCallback,
-      cb?: TableCallback): void|Promise<TableResponse> {
+    id: string,
+    optionsOrCallback?: TableMetadata | TableCallback,
+    cb?: TableCallback
+  ): void | Promise<TableResponse> {
     const options =
-        typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
+      typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
     const callback =
-        typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
+      typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
     const body = Table.formatMetadata_(options as TableMetadata);
     // tslint:disable-next-line no-any
     (body as any).tableReference = {
@@ -411,24 +448,25 @@ class Dataset extends ServiceObject {
     };
 
     this.request(
-        {
-          method: 'POST',
-          uri: '/tables',
-          json: body,
-        },
-        (err, resp) => {
-          if (err) {
-            callback!(err, null, resp);
-            return;
-          }
+      {
+        method: 'POST',
+        uri: '/tables',
+        json: body,
+      },
+      (err, resp) => {
+        if (err) {
+          callback!(err, null, resp);
+          return;
+        }
 
-          const table = this.table(resp.tableReference.tableId, {
-            location: resp.location,
-          });
-
-          table.metadata = resp;
-          callback!(null, table, resp);
+        const table = this.table(resp.tableReference.tableId, {
+          location: resp.location,
         });
+
+        table.metadata = resp;
+        callback!(null, table, resp);
+      }
+    );
   }
 
   delete(options?: DatasetDeleteOptions): Promise<[Metadata]>;
@@ -469,24 +507,26 @@ class Dataset extends ServiceObject {
    * });
    */
   delete(
-      optionsOrCallback?: DeleteCallback|DatasetDeleteOptions,
-      callback?: DeleteCallback): void|Promise<[Metadata]> {
+    optionsOrCallback?: DeleteCallback | DatasetDeleteOptions,
+    callback?: DeleteCallback
+  ): void | Promise<[Metadata]> {
     const options =
-        typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
+      typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
     callback =
-        typeof optionsOrCallback === 'function' ? optionsOrCallback : callback;
+      typeof optionsOrCallback === 'function' ? optionsOrCallback : callback;
 
     const query = {
       deleteContents: !!options.force,
     };
 
     this.request(
-        {
-          method: 'DELETE',
-          uri: '',
-          qs: query,
-        },
-        callback!);
+      {
+        method: 'DELETE',
+        uri: '',
+        qs: query,
+      },
+      callback!
+    );
   }
 
   /**
@@ -541,41 +581,43 @@ class Dataset extends ServiceObject {
   getTables(options: GetTablesOptions, callback: GetTablesCallback): void;
   getTables(callback: GetTablesCallback): void;
   getTables(
-      optionsOrCallback?: GetTablesOptions|GetTablesCallback,
-      cb?: GetTablesCallback): void|Promise<GetTablesResponse> {
+    optionsOrCallback?: GetTablesOptions | GetTablesCallback,
+    cb?: GetTablesCallback
+  ): void | Promise<GetTablesResponse> {
     const options =
-        typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
+      typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
     const callback =
-        typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
+      typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
 
     this.request(
-        {
-          uri: '/tables',
-          qs: options,
-        },
-        (err, resp) => {
-          if (err) {
-            callback!(err, null, null, resp);
-            return;
-          }
+      {
+        uri: '/tables',
+        qs: options,
+      },
+      (err, resp) => {
+        if (err) {
+          callback!(err, null, null, resp);
+          return;
+        }
 
-          let nextQuery: {}|null = null;
-          if (resp.nextPageToken) {
-            nextQuery = extend({}, options, {
-              pageToken: resp.nextPageToken,
-            });
-          }
-
-          // tslint:disable-next-line no-any
-          const tables = (resp.tables || []).map((tableObject: any) => {
-            const table = this.table(tableObject.tableReference.tableId, {
-              location: tableObject.location,
-            });
-            table.metadata = tableObject;
-            return table;
+        let nextQuery: {} | null = null;
+        if (resp.nextPageToken) {
+          nextQuery = extend({}, options, {
+            pageToken: resp.nextPageToken,
           });
-          callback!(null, tables, nextQuery, resp);
+        }
+
+        // tslint:disable-next-line no-any
+        const tables = (resp.tables || []).map((tableObject: any) => {
+          const table = this.table(tableObject.tableReference.tableId, {
+            location: tableObject.location,
+          });
+          table.metadata = tableObject;
+          return table;
         });
+        callback!(null, tables, nextQuery, resp);
+      }
+    );
   }
 
   /**
@@ -589,8 +631,10 @@ class Dataset extends ServiceObject {
    */
   query(options: Query): Promise<QueryRowsResponse>;
   query(options: Query, callback: SimpleQueryRowsCallback): void;
-  query(options: Query, callback?: SimpleQueryRowsCallback):
-      void|Promise<QueryRowsResponse> {
+  query(
+    options: Query,
+    callback?: SimpleQueryRowsCallback
+  ): void | Promise<QueryRowsResponse> {
     if (typeof options === 'string') {
       options = {
         query: options,
@@ -635,10 +679,11 @@ class Dataset extends ServiceObject {
     }
 
     options = extend(
-        {
-          location: this.location,
-        },
-        options);
+      {
+        location: this.location,
+      },
+      options
+    );
     return new Table(this, id, options);
   }
 }
