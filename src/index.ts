@@ -27,48 +27,71 @@ import * as uuid from 'uuid';
 
 import {Dataset, DatasetOptions} from './dataset';
 import {Job, JobOptions, QueryResultsOptions} from './job';
-import {Table, TableField, TableSchema, TableRow, TableRowField, JobCallback, JobResponse, RowsCallback, RowsResponse, RowMetadata} from './table';
+import {
+  Table,
+  TableField,
+  TableSchema,
+  TableRow,
+  TableRowField,
+  JobCallback,
+  JobResponse,
+  RowsCallback,
+  RowsResponse,
+  RowMetadata,
+} from './table';
 import {GoogleErrorBody} from '@google-cloud/common/build/src/util';
 import bigquery from './types';
 
 export interface RequestCallback<T> {
-  (err: Error|null, response?: T|null): void;
+  (err: Error | null, response?: T | null): void;
 }
 
 export interface ResourceCallback<T, R> {
-  (err: Error|null, resource?: T|null, response?: R|null): void;
+  (err: Error | null, resource?: T | null, response?: R | null): void;
 }
 
-export type PagedResponse<T, Q, R> = [T[]]|[T[], Q | null, R];
+export type PagedResponse<T, Q, R> = [T[]] | [T[], Q | null, R];
 export interface PagedCallback<T, Q, R> {
-  (err: Error|null, resource?: T[]|null, nextQuery?: Q|null,
-   response?: R|null): void;
+  (
+    err: Error | null,
+    resource?: T[] | null,
+    nextQuery?: Q | null,
+    response?: R | null
+  ): void;
 }
 
-export type JobRequest<J> = J&{
+export type JobRequest<J> = J & {
   jobId?: string;
   jobPrefix?: string;
   location?: string;
 };
 
-export type PagedRequest<P> = P&{
+export type PagedRequest<P> = P & {
   autoPaginate?: boolean;
   maxApiCalls?: number;
 };
 
-export type QueryRowsResponse =
-    PagedResponse<RowMetadata, Query, bigquery.ITableDataList>;
-export type QueryRowsCallback =
-    PagedCallback<RowMetadata, Query, bigquery.ITableDataList>;
+export type QueryRowsResponse = PagedResponse<
+  RowMetadata,
+  Query,
+  bigquery.ITableDataList
+>;
+export type QueryRowsCallback = PagedCallback<
+  RowMetadata,
+  Query,
+  bigquery.ITableDataList
+>;
 
 export type SimpleQueryRowsResponse = [RowMetadata[], bigquery.IJob];
-export type SimpleQueryRowsCallback =
-    ResourceCallback<RowMetadata[], bigquery.IJob>;
+export type SimpleQueryRowsCallback = ResourceCallback<
+  RowMetadata[],
+  bigquery.IJob
+>;
 
-export type Query = JobRequest<bigquery.IJobConfigurationQuery>&{
+export type Query = JobRequest<bigquery.IJobConfigurationQuery> & {
   destination?: Table;
   // tslint:disable-next-line no-any
-  params?: any[]|{[param: string]: any};
+  params?: any[] | {[param: string]: any};
   dryRun?: boolean;
   defaultDataset?: Dataset;
   job?: Job;
@@ -82,41 +105,53 @@ export type DatasetResource = bigquery.IDataset;
 export type ValueType = bigquery.IQueryParameterType;
 
 export type GetDatasetsOptions = PagedRequest<bigquery.datasets.IListParams>;
-export type DatasetsResponse =
-    PagedResponse<Dataset, GetDatasetsOptions, bigquery.IDatasetList>;
-export type DatasetsCallback =
-    PagedCallback<Dataset, GetDatasetsOptions, bigquery.IDatasetList>;
+export type DatasetsResponse = PagedResponse<
+  Dataset,
+  GetDatasetsOptions,
+  bigquery.IDatasetList
+>;
+export type DatasetsCallback = PagedCallback<
+  Dataset,
+  GetDatasetsOptions,
+  bigquery.IDatasetList
+>;
 
 export type DatasetResponse = [Dataset, bigquery.IDataset];
 export type DatasetCallback = ResourceCallback<Dataset, bigquery.IDataset>;
 
 export type GetJobsOptions = PagedRequest<bigquery.jobs.IListParams>;
-export type GetJobsResponse =
-    PagedResponse<Job, GetJobsOptions, bigquery.IJobList>;
-export type GetJobsCallback =
-    PagedCallback<Job, GetJobsOptions, bigquery.IJobList>;
+export type GetJobsResponse = PagedResponse<
+  Job,
+  GetJobsOptions,
+  bigquery.IJobList
+>;
+export type GetJobsCallback = PagedCallback<
+  Job,
+  GetJobsOptions,
+  bigquery.IJobList
+>;
 
 export interface BigQueryTimeOptions {
-  hours?: number|string;
-  minutes?: number|string;
-  seconds?: number|string;
-  fractional?: number|string;
+  hours?: number | string;
+  minutes?: number | string;
+  seconds?: number | string;
+  fractional?: number | string;
 }
 
 export interface BigQueryDateOptions {
-  year?: number|string;
-  month?: number|string;
-  day?: number|string;
+  year?: number | string;
+  month?: number | string;
+  day?: number | string;
 }
 
 export interface BigQueryDatetimeOptions {
-  year?: string|number;
-  month?: string|number;
-  day?: string|number;
-  hours?: string|number;
-  minutes?: string|number;
-  seconds?: string|number;
-  fractional?: string|number;
+  year?: string | number;
+  month?: string | number;
+  day?: string | number;
+  hours?: string | number;
+  minutes?: string | number;
+  seconds?: string | number;
+  fractional?: string | number;
 }
 
 export type QueryParameter = bigquery.IQueryParameter;
@@ -198,7 +233,7 @@ export interface BigQueryOptions extends common.GoogleAuthOptions {
 export class BigQuery extends common.Service {
   location?: string;
 
-  createQueryStream: (options?: Query|string) => ResourceStream<RowMetadata>;
+  createQueryStream: (options?: Query | string) => ResourceStream<RowMetadata>;
   getDatasetsStream: (options?: GetDatasetsOptions) => ResourceStream<Dataset>;
   getJobsStream: (options?: GetJobsOptions) => ResourceStream<Job>;
 
@@ -330,8 +365,12 @@ export class BigQuery extends common.Service {
    * @returns {array} Fields using their matching names from the table's schema.
    */
   static mergeSchemaWithRows_(
-      schema: TableSchema|TableField, rows: TableRow[]) {
-    return arrify(rows).map(mergeSchema).map(flattenRows);
+    schema: TableSchema | TableField,
+    rows: TableRow[]
+  ) {
+    return arrify(rows)
+      .map(mergeSchema)
+      .map(flattenRows);
     function mergeSchema(row: TableRow) {
       return row.f!.map((field: TableRowField, index: number) => {
         const schemaField = schema.fields![index];
@@ -449,7 +488,7 @@ export class BigQuery extends common.Service {
    *   day: 1
    * });
    */
-  static date(value: BigQueryDateOptions|string) {
+  static date(value: BigQueryDateOptions | string) {
     return new BigQueryDate(value);
   }
 
@@ -475,7 +514,7 @@ export class BigQuery extends common.Service {
    * });
    */
 
-  date(value: BigQueryDateOptions|string) {
+  date(value: BigQueryDateOptions | string) {
     return BigQuery.date(value);
   }
 
@@ -549,11 +588,11 @@ export class BigQuery extends common.Service {
    *   seconds: 0
    * });
    */
-  static datetime(value: BigQueryDatetimeOptions|string) {
+  static datetime(value: BigQueryDatetimeOptions | string) {
     return new BigQueryDatetime(value);
   }
 
-  datetime(value: BigQueryDatetimeOptions|string) {
+  datetime(value: BigQueryDatetimeOptions | string) {
     return BigQuery.datetime(value);
   }
 
@@ -611,11 +650,11 @@ export class BigQuery extends common.Service {
    *   seconds: 0
    * });
    */
-  static time(value: BigQueryTimeOptions|string) {
+  static time(value: BigQueryTimeOptions | string) {
     return new BigQueryTime(value);
   }
 
-  time(value: BigQueryTimeOptions|string) {
+  time(value: BigQueryTimeOptions | string) {
     return BigQuery.time(value);
   }
 
@@ -643,11 +682,11 @@ export class BigQuery extends common.Service {
    * const bigquery = new BigQuery();
    * const timestamp = bigquery.timestamp(new Date());
    */
-  static timestamp(value: Date|string) {
+  static timestamp(value: Date | string) {
     return new BigQueryTimestamp(value);
   }
 
-  timestamp(value: Date|string) {
+  timestamp(value: Date | string) {
     return BigQuery.timestamp(value);
   }
 
@@ -735,10 +774,12 @@ export class BigQuery extends common.Service {
     }
 
     if (!typeName) {
-      throw new Error([
-        'This value could not be translated to a BigQuery data type.',
-        value,
-      ].join('\n'));
+      throw new Error(
+        [
+          'This value could not be translated to a BigQuery data type.',
+          value,
+        ].join('\n')
+      );
     }
 
     return {
@@ -765,24 +806,27 @@ export class BigQuery extends common.Service {
     const parameterType = BigQuery.getType_(value);
     const queryParameter: QueryParameter = {parameterType, parameterValue: {}};
 
-
     const typeName = queryParameter!.parameterType!.type!;
 
     if (typeName === 'ARRAY') {
-      queryParameter.parameterValue!.arrayValues =
-          (value as Array<{}>).map(itemValue => {
-            const value = getValue(itemValue, parameterType.arrayType!);
-            return {value} as bigquery.IQueryParameterValue;
-          });
+      queryParameter.parameterValue!.arrayValues = (value as Array<{}>).map(
+        itemValue => {
+          const value = getValue(itemValue, parameterType.arrayType!);
+          return {value} as bigquery.IQueryParameterValue;
+        }
+      );
     } else if (typeName === 'STRUCT') {
-      queryParameter.parameterValue!.structValues =
-          Object.keys(value).reduce((structValues, prop) => {
-            const nestedQueryParameter =
-                BigQuery.valueToQueryParameter_(value[prop]);
-            // tslint:disable-next-line no-any
-            (structValues as any)[prop] = nestedQueryParameter.parameterValue;
-            return structValues;
-          }, {});
+      queryParameter.parameterValue!.structValues = Object.keys(value).reduce(
+        (structValues, prop) => {
+          const nestedQueryParameter = BigQuery.valueToQueryParameter_(
+            value[prop]
+          );
+          // tslint:disable-next-line no-any
+          (structValues as any)[prop] = nestedQueryParameter.parameterValue;
+          return structValues;
+        },
+        {}
+      );
     } else {
       queryParameter.parameterValue!.value = getValue(value, parameterType);
     }
@@ -799,10 +843,15 @@ export class BigQuery extends common.Service {
     }
   }
 
-  createDataset(id: string, options?: DatasetResource):
-      Promise<DatasetResponse>;
   createDataset(
-      id: string, options: DatasetResource, callback: DatasetCallback): void;
+    id: string,
+    options?: DatasetResource
+  ): Promise<DatasetResponse>;
+  createDataset(
+    id: string,
+    options: DatasetResource,
+    callback: DatasetCallback
+  ): void;
   createDataset(id: string, callback: DatasetCallback): void;
   /**
    * Create a dataset.
@@ -835,42 +884,48 @@ export class BigQuery extends common.Service {
    * });
    */
   createDataset(
-      id: string, optionsOrCallback?: DatasetResource|DatasetCallback,
-      cb?: DatasetCallback): void|Promise<DatasetResponse> {
+    id: string,
+    optionsOrCallback?: DatasetResource | DatasetCallback,
+    cb?: DatasetCallback
+  ): void | Promise<DatasetResponse> {
     const options =
-        typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
+      typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
     const callback =
-        typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
+      typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
 
     this.request(
-        {
-          method: 'POST',
-          uri: '/datasets',
-          json: extend(
-              true, {
-                location: this.location,
-              },
-              options, {
-                datasetReference: {
-                  datasetId: id,
-                },
-              }),
-        },
-        (err, resp) => {
-          if (err) {
-            callback!(err, null, resp);
-            return;
+      {
+        method: 'POST',
+        uri: '/datasets',
+        json: extend(
+          true,
+          {
+            location: this.location,
+          },
+          options,
+          {
+            datasetReference: {
+              datasetId: id,
+            },
           }
+        ),
+      },
+      (err, resp) => {
+        if (err) {
+          callback!(err, null, resp);
+          return;
+        }
 
-          const dataset = this.dataset(id);
-          dataset.metadata = resp;
+        const dataset = this.dataset(id);
+        dataset.metadata = resp;
 
-          callback!(null, dataset, resp);
-        });
+        callback!(null, dataset, resp);
+      }
+    );
   }
 
-  createQueryJob(options: Query|string): Promise<JobResponse>;
-  createQueryJob(options: Query|string, callback: JobCallback): void;
+  createQueryJob(options: Query | string): Promise<JobResponse>;
+  createQueryJob(options: Query | string, callback: JobCallback): void;
   /**
    * Run a query as a job. No results are immediately returned. Instead, your
    * callback will be executed with a {@link Job} object that you must
@@ -949,8 +1004,10 @@ export class BigQuery extends common.Service {
    *   return job.getQueryResults();
    * });
    */
-  createQueryJob(opts: Query|string, callback?: JobCallback):
-      void|Promise<JobResponse> {
+  createQueryJob(
+    opts: Query | string,
+    callback?: JobCallback
+  ): void | Promise<JobResponse> {
     const options = typeof opts === 'object' ? opts : {query: opts};
     if ((!options || !options.query) && !options.pageToken) {
       throw new Error('A SQL query string is required.');
@@ -958,10 +1015,12 @@ export class BigQuery extends common.Service {
 
     // tslint:disable-next-line no-any
     const query: any = extend(
-        true, {
-          useLegacySql: false,
-        },
-        options);
+      true,
+      {
+        useLegacySql: false,
+      },
+      options
+    );
 
     if (options.destination) {
       if (!(options.destination instanceof Table)) {
@@ -991,8 +1050,9 @@ export class BigQuery extends common.Service {
           query.queryParameters.push(queryParameter);
         }
       } else {
-        query.queryParameters =
-            query.params.map(BigQuery.valueToQueryParameter_);
+        query.queryParameters = query.params.map(
+          BigQuery.valueToQueryParameter_
+        );
       }
 
       delete query.params;
@@ -1088,8 +1148,10 @@ export class BigQuery extends common.Service {
    *   return job.getQueryResults();
    * });
    */
-  createJob(options: JobOptions, callback?: JobCallback):
-      void|Promise<JobResponse> {
+  createJob(
+    options: JobOptions,
+    callback?: JobCallback
+  ): void | Promise<JobResponse> {
     // tslint:disable-next-line no-any
     const reqOpts: any = extend({}, options);
     let jobId = reqOpts.jobId || uuid.v4();
@@ -1115,31 +1177,32 @@ export class BigQuery extends common.Service {
     }
 
     this.request(
-        {
-          method: 'POST',
-          uri: '/jobs',
-          json: reqOpts,
-        },
-        (err, resp) => {
-          if (err) {
-            callback!(err, null, resp);
-            return;
-          }
+      {
+        method: 'POST',
+        uri: '/jobs',
+        json: reqOpts,
+      },
+      (err, resp) => {
+        if (err) {
+          callback!(err, null, resp);
+          return;
+        }
 
-          if (resp.status.errors) {
-            err = new common.util.ApiError({
-              errors: resp.status.errors,
-              response: resp,
-            } as GoogleErrorBody);
-          }
+        if (resp.status.errors) {
+          err = new common.util.ApiError({
+            errors: resp.status.errors,
+            response: resp,
+          } as GoogleErrorBody);
+        }
 
-          const job = this.job(jobId, {
-            location: resp.jobReference.location,
-          });
-
-          job.metadata = resp;
-          callback!(err, job, resp);
+        const job = this.job(jobId, {
+          location: resp.jobReference.location,
         });
+
+        job.metadata = resp;
+        callback!(err, job, resp);
+      }
+    );
   }
 
   /**
@@ -1219,45 +1282,48 @@ export class BigQuery extends common.Service {
    * bigquery.getDatasets().then(function(datasets) {});
    */
   getDatasets(
-      optionsOrCallback?: GetDatasetsOptions|DatasetsCallback,
-      cb?: DatasetsCallback): void|Promise<DatasetsResponse> {
+    optionsOrCallback?: GetDatasetsOptions | DatasetsCallback,
+    cb?: DatasetsCallback
+  ): void | Promise<DatasetsResponse> {
     const options =
-        typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
+      typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
     const callback =
-        typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
+      typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
 
     this.request(
-        {
-          uri: '/datasets',
-          qs: options,
-        },
-        (err, resp) => {
-          if (err) {
-            callback!(err, null, null, resp);
-            return;
-          }
+      {
+        uri: '/datasets',
+        qs: options,
+      },
+      (err, resp) => {
+        if (err) {
+          callback!(err, null, null, resp);
+          return;
+        }
 
-          let nextQuery: GetDatasetsOptions|null = null;
+        let nextQuery: GetDatasetsOptions | null = null;
 
-          if (resp.nextPageToken) {
-            nextQuery = extend({}, options, {
-              pageToken: resp.nextPageToken,
+        if (resp.nextPageToken) {
+          nextQuery = extend({}, options, {
+            pageToken: resp.nextPageToken,
+          });
+        }
+
+        // tslint:disable-next-line no-any
+        const datasets = (resp.datasets || []).map(
+          (dataset: bigquery.IDataset) => {
+            const ds = this.dataset(dataset.datasetReference!.datasetId!, {
+              location: dataset.location!,
             });
+
+            ds.metadata = dataset!;
+            return ds;
           }
+        );
 
-          // tslint:disable-next-line no-any
-          const datasets =
-              (resp.datasets || []).map((dataset: bigquery.IDataset) => {
-                const ds = this.dataset(dataset.datasetReference!.datasetId!, {
-                  location: dataset.location!,
-                });
-
-                ds.metadata = dataset!;
-                return ds;
-              });
-
-          callback!(null, datasets, nextQuery, resp);
-        });
+        callback!(null, datasets, nextQuery, resp);
+      }
+    );
   }
 
   getJobs(options?: GetJobsOptions): Promise<GetJobsResponse>;
@@ -1322,45 +1388,47 @@ export class BigQuery extends common.Service {
    * });
    */
   getJobs(
-      optionsOrCallback?: GetJobsOptions|GetJobsCallback,
-      cb?: GetJobsCallback): void|Promise<GetJobsResponse> {
+    optionsOrCallback?: GetJobsOptions | GetJobsCallback,
+    cb?: GetJobsCallback
+  ): void | Promise<GetJobsResponse> {
     const that = this;
     const options =
-        typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
+      typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
     const callback =
-        typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
+      typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
     this.request(
-        {
-          uri: '/jobs',
-          qs: options,
-          useQuerystring: true,
-        },
-        (err, resp) => {
-          if (err) {
-            callback!(err, null, null, resp);
-            return;
-          }
+      {
+        uri: '/jobs',
+        qs: options,
+        useQuerystring: true,
+      },
+      (err, resp) => {
+        if (err) {
+          callback!(err, null, null, resp);
+          return;
+        }
 
-          let nextQuery: {}|null = null;
+        let nextQuery: {} | null = null;
 
-          if (resp.nextPageToken) {
-            nextQuery = extend({}, options, {
-              pageToken: resp.nextPageToken,
-            });
-          }
+        if (resp.nextPageToken) {
+          nextQuery = extend({}, options, {
+            pageToken: resp.nextPageToken,
+          });
+        }
 
-          // tslint:disable-next-line no-any
-          const jobs = (resp.jobs || []).map((jobObject: bigquery.IJob) => {
-            const job = that.job(jobObject.jobReference!.jobId!, {
-              location: jobObject.jobReference!.location!,
-            });
-
-            job.metadata = jobObject!;
-            return job;
+        // tslint:disable-next-line no-any
+        const jobs = (resp.jobs || []).map((jobObject: bigquery.IJob) => {
+          const job = that.job(jobObject.jobReference!.jobId!, {
+            location: jobObject.jobReference!.location!,
           });
 
-          callback!(null, jobs, nextQuery, resp);
+          job.metadata = jobObject!;
+          return job;
         });
+
+        callback!(null, jobs, nextQuery, resp);
+      }
+    );
   }
 
   /**
@@ -1387,11 +1455,16 @@ export class BigQuery extends common.Service {
 
   query(query: string, options?: QueryOptions): Promise<QueryRowsResponse>;
   query(query: Query, options?: QueryOptions): Promise<SimpleQueryRowsResponse>;
-  query(query: string, options: QueryOptions, callback?: QueryRowsCallback):
-      void;
   query(
-      query: Query, options: QueryOptions,
-      callback?: SimpleQueryRowsCallback): void;
+    query: string,
+    options: QueryOptions,
+    callback?: QueryRowsCallback
+  ): void;
+  query(
+    query: Query,
+    options: QueryOptions,
+    callback?: SimpleQueryRowsCallback
+  ): void;
   query(query: string, callback?: QueryRowsCallback): void;
   query(query: Query, callback?: SimpleQueryRowsCallback): void;
   /**
@@ -1484,15 +1557,17 @@ export class BigQuery extends common.Service {
    * });
    */
   query(
-      query: string|Query,
-      optionsOrCallback?: QueryOptions|SimpleQueryRowsCallback|
-      QueryRowsCallback,
-      cb?: SimpleQueryRowsCallback|QueryRowsCallback):
-      void|Promise<SimpleQueryRowsResponse>|Promise<QueryRowsResponse> {
+    query: string | Query,
+    optionsOrCallback?:
+      | QueryOptions
+      | SimpleQueryRowsCallback
+      | QueryRowsCallback,
+    cb?: SimpleQueryRowsCallback | QueryRowsCallback
+  ): void | Promise<SimpleQueryRowsResponse> | Promise<QueryRowsResponse> {
     let options =
-        typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
+      typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
     const callback =
-        typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
+      typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
     this.createQueryJob(query, (err, job, resp) => {
       if (err) {
         (callback as SimpleQueryRowsCallback)(err, null, resp);
@@ -1552,7 +1627,7 @@ promisifyAll(BigQuery, {
  */
 export class BigQueryDate {
   value: string;
-  constructor(value: BigQueryDateOptions|string) {
+  constructor(value: BigQueryDateOptions | string) {
     if (typeof value === 'object') {
       value = BigQuery.datetime(value).value;
     }
@@ -1575,7 +1650,7 @@ export class Geography {
  */
 export class BigQueryTimestamp {
   value: string;
-  constructor(value: Date|string) {
+  constructor(value: Date | string) {
     this.value = new Date(value).toJSON();
   }
 }
@@ -1585,7 +1660,7 @@ export class BigQueryTimestamp {
  */
 export class BigQueryDatetime {
   value: string;
-  constructor(value: BigQueryDatetimeOptions|string) {
+  constructor(value: BigQueryDatetimeOptions | string) {
     if (typeof value === 'object') {
       let time;
       if (value.hours) {
@@ -1609,7 +1684,7 @@ export class BigQueryDatetime {
  */
 export class BigQueryTime {
   value: string;
-  constructor(value: BigQueryTimeOptions|string) {
+  constructor(value: BigQueryTimeOptions | string) {
     if (typeof value === 'object') {
       value = format('{h}:{m}:{s}{f}', {
         h: value.hours,

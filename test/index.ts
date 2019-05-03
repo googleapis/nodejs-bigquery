@@ -14,7 +14,13 @@
  * limitations under the License.
  */
 
-import {DecorateRequestOptions, Service, ServiceConfig, ServiceOptions, util} from '@google-cloud/common';
+import {
+  DecorateRequestOptions,
+  Service,
+  ServiceConfig,
+  ServiceOptions,
+  util,
+} from '@google-cloud/common';
 import * as pfy from '@google-cloud/promisify';
 import arrify = require('arrify');
 import * as assert from 'assert';
@@ -95,7 +101,7 @@ const fakePaginator = {
     streamify: (methodName: string) => {
       return methodName;
     },
-  }
+  },
 };
 
 class FakeService extends Service {
@@ -123,23 +129,23 @@ describe('BigQuery', () => {
 
   before(() => {
     BigQuery = proxyquire('../src', {
-                 uuid: fakeUuid,
-                 './dataset': {
-                   Dataset: FakeDataset,
-                 },
-                 './job': {
-                   Job: FakeJob,
-                 },
-                 './table': {
-                   Table: FakeTable,
-                 },
-                 '@google-cloud/common': {
-                   Service: FakeService,
-                   util: fakeUtil,
-                 },
-                 '@google-cloud/paginator': fakePaginator,
-                 '@google-cloud/promisify': fakePfy,
-               }).BigQuery;
+      uuid: fakeUuid,
+      './dataset': {
+        Dataset: FakeDataset,
+      },
+      './job': {
+        Job: FakeJob,
+      },
+      './table': {
+        Table: FakeTable,
+      },
+      '@google-cloud/common': {
+        Service: FakeService,
+        util: fakeUtil,
+      },
+      '@google-cloud/paginator': fakePaginator,
+      '@google-cloud/promisify': fakePfy,
+    }).BigQuery;
     BigQueryCached = extend({}, BigQuery);
   });
 
@@ -151,7 +157,7 @@ describe('BigQuery', () => {
 
   describe('instantiation', () => {
     it('should extend the correct methods', () => {
-      assert(extended);  // See `fakePaginator.extend`
+      assert(extended); // See `fakePaginator.extend`
     });
 
     it('should streamify the correct methods', () => {
@@ -175,7 +181,9 @@ describe('BigQuery', () => {
         'https://www.googleapis.com/auth/bigquery',
       ]);
       assert.deepStrictEqual(
-          calledWith.packageJson, require('../../package.json'));
+        calledWith.packageJson,
+        require('../../package.json')
+      );
     });
 
     it('should capture any user specified location', () => {
@@ -433,6 +441,7 @@ describe('BigQuery', () => {
       day: 1,
     };
 
+    // tslint:disable-next-line ban
     it.skip('should expose static and instance constructors', () => {
       const staticD = BigQuery.date();
       assert(staticD instanceof BigQueryDate);
@@ -474,6 +483,7 @@ describe('BigQuery', () => {
 
     const EXPECTED_VALUE = '2017-1-1 14:2:38.883388';
 
+    // tslint:disable-next-line ban
     it.skip('should expose static and instance constructors', () => {
       const staticDt = BigQuery.datetime(INPUT_OBJ);
       assert(staticDt instanceof BigQuery.datetime);
@@ -519,6 +529,7 @@ describe('BigQuery', () => {
       fractional: 883388,
     };
 
+    // tslint:disable-next-line ban
     it.skip('should expose static and instance constructors', () => {
       const staticT = BigQuery.time();
       assert(staticT instanceof BigQuery.time);
@@ -565,6 +576,7 @@ describe('BigQuery', () => {
     const INPUT_DATE = new Date(INPUT_STRING);
     const EXPECTED_VALUE = INPUT_DATE.toJSON();
 
+    // tslint:disable-next-line ban
     it.skip('should expose static and instance constructors', () => {
       const staticT = BigQuery.timestamp(INPUT_DATE);
       assert(staticT instanceof BigQuery.timestamp);
@@ -607,9 +619,10 @@ describe('BigQuery', () => {
     it('should call through to the static method', () => {
       const fakeGeography = {value: 'foo'};
 
-      sandbox.stub(BigQuery, 'geography')
-          .withArgs(INPUT_STRING)
-          .returns(fakeGeography);
+      sandbox
+        .stub(BigQuery, 'geography')
+        .withArgs(INPUT_STRING)
+        .returns(fakeGeography);
 
       const geography = bq.geography(INPUT_STRING);
       assert.strictEqual(geography, fakeGeography);
@@ -658,10 +671,12 @@ describe('BigQuery', () => {
     });
 
     it('should throw if a type cannot be detected', () => {
-      const expectedError = new RegExp([
-        'This value could not be translated to a BigQuery data type.',
-        undefined,
-      ].join('\n'));
+      const expectedError = new RegExp(
+        [
+          'This value could not be translated to a BigQuery data type.',
+          undefined,
+        ].join('\n')
+      );
 
       assert.throws(() => {
         BigQuery.getType_(undefined);
@@ -717,9 +732,11 @@ describe('BigQuery', () => {
     });
 
     it('should locate the value on nested DATETIME objects', () => {
-      const datetimes = [{
-        value: 'value',
-      }];
+      const datetimes = [
+        {
+          value: 'value',
+        },
+      ];
 
       sandbox.stub(BigQuery, 'getType_').returns({
         type: 'ARRAY',
@@ -744,9 +761,11 @@ describe('BigQuery', () => {
     });
 
     it('should locate the value on nested TIME objects', () => {
-      const times = [{
-        value: 'value',
-      }];
+      const times = [
+        {
+          value: 'value',
+        },
+      ];
 
       sandbox.stub(BigQuery, 'getType_').returns({
         type: 'ARRAY',
@@ -897,11 +916,13 @@ describe('BigQuery', () => {
       };
 
       bq.createDataset(
-          DATASET_ID, (err: Error, dataset: Dataset, apiResponse: {}) => {
-            assert.ifError(err);
-            assert.deepStrictEqual(apiResponse, resp);
-            done();
-          });
+        DATASET_ID,
+        (err: Error, dataset: Dataset, apiResponse: {}) => {
+          assert.ifError(err);
+          assert.deepStrictEqual(apiResponse, resp);
+          done();
+        }
+      );
     });
 
     it('should assign metadata to the Dataset object', done => {
@@ -1122,11 +1143,13 @@ describe('BigQuery', () => {
       it('should assign destination table to request body', done => {
         bq.request = (reqOpts: DecorateRequestOptions) => {
           assert.deepStrictEqual(
-              reqOpts.json.configuration.query.destinationTable, {
-                datasetId: dataset.id,
-                projectId: dataset.bigQuery.projectId,
-                tableId: TABLE_ID,
-              });
+            reqOpts.json.configuration.query.destinationTable,
+            {
+              datasetId: dataset.id,
+              projectId: dataset.bigQuery.projectId,
+              tableId: TABLE_ID,
+            }
+          );
 
           done();
         };
@@ -1166,11 +1189,12 @@ describe('BigQuery', () => {
         };
 
         bq.createQueryJob(
-            {
-              query: QUERY_STRING,
-              params: NAMED_PARAMS,
-            },
-            assert.ifError);
+          {
+            query: QUERY_STRING,
+            params: NAMED_PARAMS,
+          },
+          assert.ifError
+        );
       });
 
       describe('named', () => {
@@ -1182,11 +1206,12 @@ describe('BigQuery', () => {
           };
 
           bq.createQueryJob(
-              {
-                query: QUERY_STRING,
-                params: NAMED_PARAMS,
-              },
-              assert.ifError);
+            {
+              query: QUERY_STRING,
+              params: NAMED_PARAMS,
+            },
+            assert.ifError
+          );
         });
 
         it('should get set the correct query parameters', done => {
@@ -1205,11 +1230,12 @@ describe('BigQuery', () => {
           };
 
           bq.createQueryJob(
-              {
-                query: QUERY_STRING,
-                params: NAMED_PARAMS,
-              },
-              assert.ifError);
+            {
+              query: QUERY_STRING,
+              params: NAMED_PARAMS,
+            },
+            assert.ifError
+          );
         });
       });
 
@@ -1222,11 +1248,12 @@ describe('BigQuery', () => {
           };
 
           bq.createQueryJob(
-              {
-                query: QUERY_STRING,
-                params: POSITIONAL_PARAMS,
-              },
-              assert.ifError);
+            {
+              query: QUERY_STRING,
+              params: POSITIONAL_PARAMS,
+            },
+            assert.ifError
+          );
         });
 
         it('should get set the correct query parameters', done => {
@@ -1244,11 +1271,12 @@ describe('BigQuery', () => {
           };
 
           bq.createQueryJob(
-              {
-                query: QUERY_STRING,
-                params: POSITIONAL_PARAMS,
-              },
-              assert.ifError);
+            {
+              query: QUERY_STRING,
+              params: POSITIONAL_PARAMS,
+            },
+            assert.ifError
+          );
         });
       });
     });
@@ -1261,8 +1289,10 @@ describe('BigQuery', () => {
 
       bq.createJob = (reqOpts: JobOptions) => {
         assert.strictEqual(
-            // tslint:disable-next-line no-any
-            (reqOpts.configuration!.query as any).dryRun, undefined);
+          // tslint:disable-next-line no-any
+          (reqOpts.configuration!.query as any).dryRun,
+          undefined
+        );
         assert.strictEqual(reqOpts.configuration!.dryRun, options.dryRun);
         done();
       };
@@ -1278,8 +1308,10 @@ describe('BigQuery', () => {
 
       bq.createJob = (reqOpts: JobOptions) => {
         assert.strictEqual(
-            // tslint:disable-next-line no-any
-            (reqOpts.configuration!.query as any).jobPrefix, undefined);
+          // tslint:disable-next-line no-any
+          (reqOpts.configuration!.query as any).jobPrefix,
+          undefined
+        );
         assert.strictEqual(reqOpts.jobPrefix, options.jobPrefix);
         done();
       };
@@ -1295,8 +1327,10 @@ describe('BigQuery', () => {
 
       bq.createJob = (reqOpts: JobOptions) => {
         assert.strictEqual(
-            // tslint:disable-next-line no-any
-            (reqOpts.configuration!.query as any).location, undefined);
+          // tslint:disable-next-line no-any
+          (reqOpts.configuration!.query as any).location,
+          undefined
+        );
         assert.strictEqual(reqOpts.location, LOCATION);
         done();
       };
@@ -1312,8 +1346,10 @@ describe('BigQuery', () => {
 
       bq.createJob = (reqOpts: JobOptions) => {
         assert.strictEqual(
-            // tslint:disable-next-line no-any
-            (reqOpts.configuration!.query as any).jobId, undefined);
+          // tslint:disable-next-line no-any
+          (reqOpts.configuration!.query as any).jobId,
+          undefined
+        );
         assert.strictEqual(reqOpts.jobId, options.jobId);
         done();
       };
@@ -1323,7 +1359,7 @@ describe('BigQuery', () => {
 
     it('should pass the callback to createJob', done => {
       bq.createJob = (reqOpts: DecorateRequestOptions, callback: Function) => {
-        callback();  // the done fn
+        callback(); // the done fn
       };
 
       bq.createQueryJob(QUERY_STRING, done);
@@ -1456,11 +1492,12 @@ describe('BigQuery', () => {
       };
 
       bq.getDatasets(
-          (err: Error, datasets: {}, nextQuery: {}, apiResponse: {}) => {
-            assert.ifError(err);
-            assert.strictEqual(apiResponse, resp);
-            done();
-          });
+        (err: Error, datasets: {}, nextQuery: {}, apiResponse: {}) => {
+          assert.ifError(err);
+          assert.strictEqual(apiResponse, resp);
+          done();
+        }
+      );
     });
 
     it('should assign metadata to the Dataset objects', done => {
@@ -1778,7 +1815,7 @@ describe('BigQuery', () => {
       bq.query = (query_: {}, options: {}, callback: Function) => {
         assert.strictEqual(query_, query);
         assert.deepStrictEqual(options, {autoPaginate: false});
-        callback();  // done()
+        callback(); // done()
       };
       bq.queryAsStream_(query, done);
     });

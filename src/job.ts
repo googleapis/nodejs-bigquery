@@ -18,12 +18,24 @@
  * @module bigquery/job
  */
 
-import {Metadata, MetadataCallback, Operation, util} from '@google-cloud/common';
+import {
+  Metadata,
+  MetadataCallback,
+  Operation,
+  util,
+} from '@google-cloud/common';
 import {paginator, ResourceStream} from '@google-cloud/paginator';
 import {promisifyAll} from '@google-cloud/promisify';
 import * as extend from 'extend';
 
-import {BigQuery, JobRequest, PagedRequest, QueryRowsCallback, QueryRowsResponse, RequestCallback} from '../src';
+import {
+  BigQuery,
+  JobRequest,
+  PagedRequest,
+  QueryRowsCallback,
+  QueryRowsResponse,
+  RequestCallback,
+} from '../src';
 import {RowMetadata} from './table';
 import bigquery from './types';
 
@@ -33,8 +45,9 @@ export type JobOptions = JobRequest<JobMetadata>;
 export type CancelCallback = RequestCallback<bigquery.IJobCancelResponse>;
 export type CancelResponse = [bigquery.IJobCancelResponse];
 
-export type QueryResultsOptions =
-    PagedRequest<bigquery.jobs.IGetQueryResultsParams>;
+export type QueryResultsOptions = PagedRequest<
+  bigquery.jobs.IGetQueryResultsParams
+>;
 
 /**
  * @callback QueryResultsCallback
@@ -107,8 +120,9 @@ export type QueryResultsOptions =
 class Job extends Operation {
   bigQuery: BigQuery;
   location?: string;
-  getQueryResultsStream:
-      (options?: QueryResultsOptions) => ResourceStream<RowMetadata>;
+  getQueryResultsStream: (
+    options?: QueryResultsOptions
+  ) => ResourceStream<RowMetadata>;
   constructor(bigQuery: BigQuery, id: string, options?: JobOptions) {
     let location;
     if (options && options.location) {
@@ -246,8 +260,9 @@ class Job extends Operation {
      *   }))
      *   .pipe(fs.createWriteStream('./test/testdata/testfile.json'));
      */
-    this.getQueryResultsStream =
-        paginator.streamify<RowMetadata>('getQueryResultsAsStream_');
+    this.getQueryResultsStream = paginator.streamify<RowMetadata>(
+      'getQueryResultsAsStream_'
+    );
   }
 
   cancel(): Promise<CancelResponse>;
@@ -282,7 +297,7 @@ class Job extends Operation {
    *   const apiResponse = data[0];
    * });
    */
-  cancel(callback?: CancelCallback): void|Promise<CancelResponse> {
+  cancel(callback?: CancelCallback): void | Promise<CancelResponse> {
     let qs;
 
     if (this.location) {
@@ -290,17 +305,20 @@ class Job extends Operation {
     }
 
     this.request(
-        {
-          method: 'POST',
-          uri: '/cancel',
-          qs,
-        },
-        callback!);
+      {
+        method: 'POST',
+        uri: '/cancel',
+        qs,
+      },
+      callback!
+    );
   }
 
   getQueryResults(options?: QueryResultsOptions): Promise<QueryRowsResponse>;
-  getQueryResults(options: QueryResultsOptions, callback: QueryRowsCallback):
-      void;
+  getQueryResults(
+    options: QueryResultsOptions,
+    callback: QueryRowsCallback
+  ): void;
   getQueryResults(callback: QueryRowsCallback): void;
   /**
    * Get the results of a job.
@@ -370,50 +388,53 @@ class Job extends Operation {
    * });
    */
   getQueryResults(
-      optionsOrCallback?: QueryResultsOptions|QueryRowsCallback,
-      cb?: QueryRowsCallback): void|Promise<QueryRowsResponse> {
+    optionsOrCallback?: QueryResultsOptions | QueryRowsCallback,
+    cb?: QueryRowsCallback
+  ): void | Promise<QueryRowsResponse> {
     let options =
-        typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
+      typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
     const callback =
-        typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
+      typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
 
     options = extend(
-        {
-          location: this.location,
-        },
-        options);
+      {
+        location: this.location,
+      },
+      options
+    );
 
     this.bigQuery.request(
-        {
-          uri: '/queries/' + this.id,
-          qs: options,
-        },
-        (err, resp) => {
-          if (err) {
-            callback!(err, null, null, resp);
-            return;
-          }
+      {
+        uri: '/queries/' + this.id,
+        qs: options,
+      },
+      (err, resp) => {
+        if (err) {
+          callback!(err, null, null, resp);
+          return;
+        }
 
-          // tslint:disable-next-line no-any
-          let rows: any = [];
+        // tslint:disable-next-line no-any
+        let rows: any = [];
 
-          if (resp.schema && resp.rows) {
-            rows = BigQuery.mergeSchemaWithRows_(resp.schema, resp.rows);
-          }
+        if (resp.schema && resp.rows) {
+          rows = BigQuery.mergeSchemaWithRows_(resp.schema, resp.rows);
+        }
 
-          let nextQuery: {}|null = null;
-          if (resp.jobComplete === false) {
-            // Query is still running.
-            nextQuery = extend({}, options);
-          } else if (resp.pageToken) {
-            // More results exist.
-            nextQuery = extend({}, options, {
-              pageToken: resp.pageToken,
-            });
-          }
+        let nextQuery: {} | null = null;
+        if (resp.jobComplete === false) {
+          // Query is still running.
+          nextQuery = extend({}, options);
+        } else if (resp.pageToken) {
+          // More results exist.
+          nextQuery = extend({}, options, {
+            pageToken: resp.pageToken,
+          });
+        }
 
-          callback!(null, rows, nextQuery, resp);
-        });
+        callback!(null, rows, nextQuery, resp);
+      }
+    );
   }
 
   /**
@@ -423,7 +444,9 @@ class Job extends Operation {
    * @private
    */
   getQueryResultsAsStream_(
-      options: QueryResultsOptions, callback: QueryRowsCallback): void {
+    options: QueryResultsOptions,
+    callback: QueryRowsCallback
+  ): void {
     options = extend({autoPaginate: false}, options);
     this.getQueryResults(options, callback);
   }

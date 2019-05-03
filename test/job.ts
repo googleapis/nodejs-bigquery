@@ -60,11 +60,11 @@ const fakePaginator = {
     streamify: (methodName: string) => {
       return methodName;
     },
-  }
+  },
 };
 
 let sandbox: sinon.SinonSandbox;
-beforeEach(() => sandbox = sinon.createSandbox());
+beforeEach(() => (sandbox = sinon.createSandbox()));
 afterEach(() => sandbox.restore());
 
 describe('BigQuery/Job', () => {
@@ -83,10 +83,10 @@ describe('BigQuery/Job', () => {
 
   before(() => {
     Job = proxyquire('../src/job.js', {
-            '@google-cloud/common': {Operation: FakeOperation},
-            '@google-cloud/paginator': fakePaginator,
-            '@google-cloud/promisify': fakePfy,
-          }).Job;
+      '@google-cloud/common': {Operation: FakeOperation},
+      '@google-cloud/paginator': fakePaginator,
+      '@google-cloud/promisify': fakePfy,
+    }).Job;
   });
 
   beforeEach(() => {
@@ -181,10 +181,12 @@ describe('BigQuery/Job', () => {
     };
 
     beforeEach(() => {
-      BIGQUERY.request =
-          (reqOpts: DecorateRequestOptions, callback: Function) => {
-            callback(null, RESPONSE);
-          };
+      BIGQUERY.request = (
+        reqOpts: DecorateRequestOptions,
+        callback: Function
+      ) => {
+        callback(null, RESPONSE);
+      };
 
       BIGQUERY.mergeSchemaWithRows_ = (schema: {}, rows: {}) => {
         return rows;
@@ -227,10 +229,12 @@ describe('BigQuery/Job', () => {
       const error = new Error('err');
       const response = {};
 
-      BIGQUERY.request =
-          (reqOpts: DecorateRequestOptions, callback: Function) => {
-            callback(error, response);
-          };
+      BIGQUERY.request = (
+        reqOpts: DecorateRequestOptions,
+        callback: Function
+      ) => {
+        callback(error, response);
+      };
 
       job.getQueryResults((err: Error, rows: {}, nextQuery: {}, resp: {}) => {
         assert.strictEqual(err, error);
@@ -258,17 +262,20 @@ describe('BigQuery/Job', () => {
 
       const mergedRows: Array<{}> = [];
 
-      BIGQUERY.request =
-          (reqOpts: DecorateRequestOptions, callback: Function) => {
-            callback(null, response);
-          };
+      BIGQUERY.request = (
+        reqOpts: DecorateRequestOptions,
+        callback: Function
+      ) => {
+        callback(null, response);
+      };
 
-      sandbox.stub(BigQuery, 'mergeSchemaWithRows_')
-          .callsFake((schema, rows) => {
-            assert.strictEqual(schema, response.schema);
-            assert.strictEqual(rows, response.rows);
-            return mergedRows;
-          });
+      sandbox
+        .stub(BigQuery, 'mergeSchemaWithRows_')
+        .callsFake((schema, rows) => {
+          assert.strictEqual(schema, response.schema);
+          assert.strictEqual(rows, response.rows);
+          return mergedRows;
+        });
 
       job.getQueryResults((err: Error, rows: {}) => {
         assert.ifError(err);
@@ -278,12 +285,14 @@ describe('BigQuery/Job', () => {
     });
 
     it('should return the query when the job is not complete', done => {
-      BIGQUERY.request =
-          (reqOpts: DecorateRequestOptions, callback: Function) => {
-            callback(null, {
-              jobComplete: false,
-            });
-          };
+      BIGQUERY.request = (
+        reqOpts: DecorateRequestOptions,
+        callback: Function
+      ) => {
+        callback(null, {
+          jobComplete: false,
+        });
+      };
 
       job.getQueryResults(options, (err: Error, rows: {}, nextQuery: {}) => {
         assert.ifError(err);
@@ -295,11 +304,13 @@ describe('BigQuery/Job', () => {
 
     it('should populate nextQuery when more results exist', done => {
       job.getQueryResults(
-          options, (err: Error, rows: {}, nextQuery: QueryResultsOptions) => {
-            assert.ifError(err);
-            assert.strictEqual(nextQuery.pageToken, pageToken);
-            done();
-          });
+        options,
+        (err: Error, rows: {}, nextQuery: QueryResultsOptions) => {
+          assert.ifError(err);
+          assert.strictEqual(nextQuery.pageToken, pageToken);
+          done();
+        }
+      );
     });
   });
 
@@ -313,15 +324,17 @@ describe('BigQuery/Job', () => {
     it('should call getQueryResults correctly', done => {
       const options = {a: 'b', c: 'd'};
 
-      job.getQueryResults =
-          (options_: QueryResultsOptions, callback: Function) => {
-            assert.deepStrictEqual(options_, {
-              a: 'b',
-              c: 'd',
-              autoPaginate: false,
-            });
-            callback();  // done()
-          };
+      job.getQueryResults = (
+        options_: QueryResultsOptions,
+        callback: Function
+      ) => {
+        assert.deepStrictEqual(options_, {
+          a: 'b',
+          c: 'd',
+          autoPaginate: false,
+        });
+        callback(); // done()
+      };
 
       job.getQueryResultsAsStream_(options, done);
     });
