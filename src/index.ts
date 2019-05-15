@@ -812,6 +812,9 @@ export class BigQuery extends common.Service {
       queryParameter.parameterValue!.arrayValues = (value as Array<{}>).map(
         itemValue => {
           const value = getValue(itemValue, parameterType.arrayType!);
+          if (is.object(value) || is.array(value)) {
+            return BigQuery.valueToQueryParameter_(value).parameterValue!;
+          }
           return {value} as bigquery.IQueryParameterValue;
         }
       );
