@@ -118,7 +118,7 @@ export type CopyTableMetadata = JobRequest<bigquery.IJobConfigurationTableCopy>;
 
 export type TableMetadata = bigquery.ITable & {
   name?: string;
-  schema?: string | TableField[];
+  schema?: string | TableField[] | TableSchema;
   partitioning?: string;
   view?: string | ViewDefinition;
 };
