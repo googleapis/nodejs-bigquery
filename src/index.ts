@@ -76,6 +76,7 @@ export type QueryRowsResponse = PagedResponse<
   Query,
   bigquery.ITableDataList
 >;
+//*- this is a type that handles pagination and takes in data array, query, and response
 export type QueryRowsCallback = PagedCallback<
   RowMetadata,
   Query,
@@ -1012,7 +1013,7 @@ export class BigQuery extends common.Service {
     if ((!options || !options.query) && !options.pageToken) {
       throw new Error('A SQL query string is required.');
     }
-
+    
     // tslint:disable-next-line no-any
     const query: any = extend(
       true,
@@ -1579,8 +1580,16 @@ export class BigQuery extends common.Service {
       }
       // The Job is important for the `queryAsStream_` method, so a new query
       // isn't created each time results are polled for.
+      
       options = extend({job}, options);
-      job!.getQueryResults(options, callback as QueryRowsCallback);
+      // console.log(job!.metadata.configuration.query.destinationTable)
+      const datasetId = job!.metadata.configuration.query.destinationTable.datasetId
+      const tableId = job!.metadata.configuration.query.destinationTable.tableId
+      const dataset = this.dataset(datasetId);
+      const table = dataset.table(tableId);
+
+      table.getRows(options, callback as RowsCallback)
+      // job!.getQueryResults(options, callback as QueryRowsCallback);
     });
   }
 
