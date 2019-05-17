@@ -1757,13 +1757,19 @@ describe('BigQuery', () => {
       });
     });
 
-    it('should call job#getQueryResults', done => {
+    it('should call table#getRows', done => {
       const fakeJob = {
-        getQueryResults: (options: {}, callback: Function) => {
-          callback(null, FAKE_ROWS, FAKE_RESPONSE);
-        },
+        metadata: { 
+          configuration: {
+            query: { 
+              destinationTable: {
+                datasetId: 1,
+                tableId: 1
+              }
+            }
+          }
+        }
       };
-
       bq.createQueryJob = (query: {}, callback: Function) => {
         callback(null, fakeJob, FAKE_RESPONSE);
       };

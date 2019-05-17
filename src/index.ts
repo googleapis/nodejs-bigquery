@@ -1452,8 +1452,7 @@ export class BigQuery extends common.Service {
     return new Job(this, id, options);
   }
 
-  query(query: string, options?: QueryOptions): Promise<QueryRowsResponse>;
-  query(query: Query, options?: QueryOptions): Promise<SimpleQueryRowsResponse>;
+  query(query: string, options?: QueryOptions): Promise<RowsResponse>;
   query(
     query: string,
     options: QueryOptions,
@@ -1560,9 +1559,9 @@ export class BigQuery extends common.Service {
     optionsOrCallback?:
       | QueryOptions
       | SimpleQueryRowsCallback
-      | QueryRowsCallback,
-    cb?: SimpleQueryRowsCallback | QueryRowsCallback
-  ): void | Promise<SimpleQueryRowsResponse> | Promise<QueryRowsResponse> {
+      | RowsCallback,
+    cb?: SimpleQueryRowsCallback | RowsCallback
+  ): void | Promise<RowsResponse> {
     let options =
       typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
     const callback =
@@ -1580,7 +1579,6 @@ export class BigQuery extends common.Service {
       // isn't created each time results are polled for.
       
       options = extend({job}, options);
-
       const datasetId = job!.metadata.configuration.query.destinationTable.datasetId
       const tableId = job!.metadata.configuration.query.destinationTable.tableId
       const dataset = this.dataset(datasetId);
@@ -1598,7 +1596,7 @@ export class BigQuery extends common.Service {
    */
   queryAsStream_(query: Query, callback?: SimpleQueryRowsCallback) {
     if (query.job) {
-      query.job.getQueryResults(query, callback as QueryRowsCallback);
+      query.job.getQueryResults(query, callback as RowsCallback);
       return;
     }
     this.query(query, {autoPaginate: false}, callback);
