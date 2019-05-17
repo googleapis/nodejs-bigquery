@@ -4,6 +4,43 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## [4.0.0](https://www.github.com/googleapis/nodejs-bigquery/compare/v3.0.0...v4.0.0) (2019-05-17)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @google-cloud/common to ^0.32.0 ([8e28b62](https://www.github.com/googleapis/nodejs-bigquery/commit/8e28b62)), closes [#8203](https://www.github.com/googleapis/nodejs-bigquery/issues/8203)
+* **deps:** update dependency @google-cloud/common to v1 ([#434](https://www.github.com/googleapis/nodejs-bigquery/issues/434)) ([0e4aeef](https://www.github.com/googleapis/nodejs-bigquery/commit/0e4aeef))
+* **deps:** update dependency @google-cloud/paginator to v1 ([#428](https://www.github.com/googleapis/nodejs-bigquery/issues/428)) ([5d925af](https://www.github.com/googleapis/nodejs-bigquery/commit/5d925af))
+* **deps:** update dependency @google-cloud/promisify to v1 ([#427](https://www.github.com/googleapis/nodejs-bigquery/issues/427)) ([fdeb862](https://www.github.com/googleapis/nodejs-bigquery/commit/fdeb862))
+* **deps:** update dependency arrify to v2 ([de0f687](https://www.github.com/googleapis/nodejs-bigquery/commit/de0f687))
+* **table:** allow for TableSchema to be used ([#438](https://www.github.com/googleapis/nodejs-bigquery/issues/438)) ([7995be0](https://www.github.com/googleapis/nodejs-bigquery/commit/7995be0))
+* **types:** correct  interface ([#407](https://www.github.com/googleapis/nodejs-bigquery/issues/407)) ([da5ed01](https://www.github.com/googleapis/nodejs-bigquery/commit/da5ed01))
+* correctly encode nested struct/array params ([#439](https://www.github.com/googleapis/nodejs-bigquery/issues/439)) ([d7006bd](https://www.github.com/googleapis/nodejs-bigquery/commit/d7006bd))
+* remove teeny-request as a direct dependency ([#412](https://www.github.com/googleapis/nodejs-bigquery/issues/412)) ([c6de54a](https://www.github.com/googleapis/nodejs-bigquery/commit/c6de54a))
+
+
+### Build System
+
+* upgrade engines field to >=8.10.0 ([#424](https://www.github.com/googleapis/nodejs-bigquery/issues/424)) ([cea017e](https://www.github.com/googleapis/nodejs-bigquery/commit/cea017e))
+
+
+### Code Refactoring
+
+* drop autoCreate in table.insert in favor of schema ([#421](https://www.github.com/googleapis/nodejs-bigquery/issues/421)) ([b59cd7f](https://www.github.com/googleapis/nodejs-bigquery/commit/b59cd7f))
+
+
+### Miscellaneous Chores
+
+* **deps:** update dependency gts to v1 ([#419](https://www.github.com/googleapis/nodejs-bigquery/issues/419)) ([7b0e76a](https://www.github.com/googleapis/nodejs-bigquery/commit/7b0e76a))
+
+
+### BREAKING CHANGES
+
+* **deps:** this will ship async/await with the generated code.
+* upgrade engines field to >=8.10.0 (#424)
+* This removes the `autoCreate` option which may result in a breaking change for TypeScript users.
+
 ## v3.0.0
 
 04-02-2019 10:02 PDT
@@ -325,4 +362,3 @@ BigQuery ORC:
 - chore: lock files ([#109](https://github.com/googleapis/nodejs-bigquery/pull/109))
 - chore: timeout for system test ([#107](https://github.com/googleapis/nodejs-bigquery/pull/107))
 - chore: lock files maintenance ([#106](https://github.com/googleapis/nodejs-bigquery/pull/106))
-
