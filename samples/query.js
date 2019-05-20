@@ -22,7 +22,7 @@ function main() {
   const {BigQuery} = require('@google-cloud/bigquery');
 
   async function query() {
-    // Queries the Shakespeare dataset with the cache disabled.
+    // Queries the U.S. given names dataset for the state of Texas.
 
     // Create a client
     const bigqueryClient = new BigQuery();
