@@ -30,7 +30,7 @@ describe('BigQuery/Model', () => {
   const MODEL_ID = 'my_model';
   const DATASET = {id: 'my_dataset'} as Dataset;
 
-  // tslint:disable-next-line no-any variable-name
+  // tslint:disable-next-line variable-name
   let Model: typeof m.Model;
   let model: m.Model;
 
