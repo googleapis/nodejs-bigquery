@@ -623,7 +623,7 @@ class Dataset extends ServiceObject {
    */
   getModels(
     optsOrCb?: GetModelsOptions | GetModelsCallback,
-    cb: GetModelsCallback
+    cb?: GetModelsCallback
   ): void | Promise<GetModelsResponse> {
     const options = typeof optsOrCb === 'object' ? optsOrCb : {};
     const callback = typeof optsOrCb === 'function' ? optsOrCb : cb;
