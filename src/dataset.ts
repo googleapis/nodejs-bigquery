@@ -57,7 +57,7 @@ export interface DatasetOptions {
 export type CreateDatasetOptions = bigquery.IDataset;
 
 export type GetModelsOptions = PagedRequest<bigquery.models.IListParams>;
-export type GetModelsResponse = PagedRequest<
+export type GetModelsResponse = PagedResponse<
   Model,
   GetModelsOptions,
   bigquery.IListModelsResponse
@@ -647,7 +647,7 @@ class Dataset extends ServiceObject {
         }
 
         const models = (resp.models || []).map(modelObject => {
-          const model = this.model(modelObject.modelReference.modelId);
+          const model = this.model(modelObject.modelReference!.modelId!);
           model.metadata = modelObject;
           return model;
         });
@@ -851,7 +851,7 @@ paginator.extend(Dataset, ['getModels', 'getTables']);
  * that a callback is omitted.
  */
 promisifyAll(Dataset, {
-  exclude: ['table'],
+  exclude: ['model', 'table'],
 });
 
 /**
