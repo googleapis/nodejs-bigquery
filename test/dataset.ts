@@ -37,7 +37,7 @@ const fakePfy = extend({}, pfy, {
       return;
     }
     promisified = true;
-    assert.deepStrictEqual(options.exclude, ['table']);
+    assert.deepStrictEqual(options.exclude, ['model', 'table']);
   },
 });
 
@@ -50,7 +50,7 @@ const fakePaginator = {
       }
       methods = arrify(methods);
       assert.strictEqual(c.name, 'Dataset');
-      assert.deepStrictEqual(methods, ['getTables']);
+      assert.deepStrictEqual(methods, ['getModels', 'getTables']);
       extended = true;
     },
     streamify: (methodName: string) => {
@@ -104,6 +104,7 @@ describe('BigQuery/Dataset', () => {
 
     it('should streamify the correct methods', () => {
       assert.strictEqual(ds.getTablesStream, 'getTables');
+      assert.strictEqual(ds.getModelsStream, 'getModels');
     });
 
     it('should promisify all the things', () => {
@@ -621,6 +622,127 @@ describe('BigQuery/Dataset', () => {
     });
   });
 
+  describe('getModels', () => {
+    it('should get models from the api', done => {
+      ds.request = (reqOpts: DecorateRequestOptions) => {
+        assert.strictEqual(reqOpts.uri, '/models');
+        assert.deepStrictEqual(reqOpts.qs, {});
+        done();
+      };
+
+      ds.getModels(assert.ifError);
+    });
+
+    it('should accept a query', done => {
+      const query = {
+        maxResults: 8,
+        pageToken: 'token',
+      };
+
+      ds.request = (reqOpts: DecorateRequestOptions) => {
+        assert.strictEqual(reqOpts.qs, query);
+        done();
+      };
+
+      ds.getModels(query, assert.ifError);
+    });
+
+    it('should default the query value to an empty object', done => {
+      ds.request = (reqOpts: DecorateRequestOptions) => {
+        assert.deepStrictEqual(reqOpts.qs, {});
+        done();
+      };
+
+      ds.getModels(assert.ifError);
+    });
+
+    it('should return error to callback', done => {
+      const error = new Error('Error.');
+
+      ds.request = (reqOpts: DecorateRequestOptions, callback: Function) => {
+        callback(error);
+      };
+
+      ds.getModels((err: Error) => {
+        assert.strictEqual(err, error);
+        done();
+      });
+    });
+
+    describe('success', () => {
+      const modelId = 'modelName';
+      const apiResponse = {
+        models: [
+          {
+            a: 'b',
+            c: 'd',
+            modelReference: {modelId},
+          },
+        ],
+      };
+
+      beforeEach(() => {
+        ds.request = (reqOpts: DecorateRequestOptions, callback: Function) => {
+          callback(null, apiResponse);
+        };
+      });
+
+      it('should return Model & apiResponse', done => {
+        ds.getModels(
+          (
+            err: Error,
+            models: _root.Model[],
+            nextQuery: {},
+            apiResponse_: {}
+          ) => {
+            assert.ifError(err);
+
+            const model = models[0];
+
+            assert(model instanceof _root.Model);
+            assert.strictEqual(model.id, modelId);
+            assert.strictEqual(apiResponse_, apiResponse);
+            done();
+          }
+        );
+      });
+
+      it('should assign metadata to the Model objects', done => {
+        ds.getModels((err: Error, models: _root.Model[]) => {
+          assert.ifError(err);
+          assert.strictEqual(models[0].metadata, apiResponse.models[0]);
+          done();
+        });
+      });
+
+      it('should return token if more results exist', done => {
+        const pageToken = 'token';
+
+        const query = {
+          maxResults: 5,
+        };
+
+        const expectedNextQuery = {
+          maxResults: 5,
+          pageToken,
+        };
+
+        ds.request = (reqOpts: DecorateRequestOptions, callback: Function) => {
+          callback(null, {nextPageToken: pageToken});
+        };
+
+        ds.getModels(
+          query,
+          (err: Error, tables: _root.Model[], nextQuery: {}) => {
+            assert.ifError(err);
+            assert.deepStrictEqual(nextQuery, expectedNextQuery);
+            done();
+          }
+        );
+      });
+    });
+  });
+
   describe('getTables', () => {
     it('should get tables from the api', done => {
       ds.request = (reqOpts: DecorateRequestOptions) => {
@@ -741,6 +863,20 @@ describe('BigQuery/Dataset', () => {
           }
         );
       });
+    });
+  });
+
+  describe('model', () => {
+    it('should throw an error if the id is missing', () => {
+      const expectedErr = /A model ID is required\./;
+      assert.throws(() => ds.model(), expectedErr);
+    });
+
+    it('should return a Model object', () => {
+      const modelId = 'modelId';
+      const model = ds.model(modelId);
+      assert(model instanceof _root.Model);
+      assert.strictEqual(model.id, modelId);
     });
   });
 
