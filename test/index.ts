@@ -819,6 +819,31 @@ describe('BigQuery', () => {
       assert.strictEqual(structValues.key, expectedParameterValue);
     });
 
+    it('should format an array of structs', () => {
+      const structs = [{name: 'Stephen'}];
+      const expectedParam = {
+        parameterType: {
+          type: 'ARRAY',
+          arrayType: {
+            type: 'STRUCT',
+            structTypes: [{name: 'name', type: {type: 'STRING'}}],
+          },
+        },
+        parameterValue: {
+          arrayValues: [
+            {
+              structValues: {
+                name: {value: 'Stephen'},
+              },
+            },
+          ],
+        },
+      };
+
+      const param = BigQuery.valueToQueryParameter_(structs);
+      assert.deepStrictEqual(param, expectedParam);
+    });
+
     it('should format all other types', () => {
       const typeName = 'ANY-TYPE';
       sandbox.stub(BigQuery, 'getType_').returns({
