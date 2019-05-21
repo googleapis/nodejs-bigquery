@@ -44,7 +44,8 @@
     "pretest": "npm run compile",
     "posttest": "npm run check",
     "docs-test": "linkinator docs -r --skip www.googleapis.com",
-    "predocs-test": "npm run docs"
+    "predocs-test": "npm run docs",
+    "types": "dtsd bigquery v2 > ./src/types.d.ts"
   },
   "dependencies": {
     "@google-cloud/common": "^1.0.0",
@@ -74,6 +75,7 @@
     "@types/tmp": "0.1.0",
     "@types/uuid": "^3.4.4",
     "codecov": "^3.0.0",
+    "discovery-tsd": "^0.1.0",
     "eslint": "^5.0.0",
     "eslint-config-prettier": "^4.0.0",
     "eslint-plugin-node": "^9.0.0",
