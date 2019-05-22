@@ -749,7 +749,7 @@ class Dataset extends ServiceObject {
   }
 
   /**
-   * Create a Model object.
+   * Create a {@link Model} object.
    *
    * @throws {TypeError} if model ID is missing.
    *

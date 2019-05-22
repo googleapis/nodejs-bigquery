@@ -36,7 +36,7 @@ class Model extends common.ServiceObject {
   constructor(dataset: Dataset, id: string) {
     const methods = {
       /**
-       * Delete a model.
+       * Delete the model.
        *
        * @see [Models: delete API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/rest/v2/models/delete}
        *
@@ -55,7 +55,7 @@ class Model extends common.ServiceObject {
        *
        * model.delete((err, apiResponse) => {});
        *
-       * @example <caption>If the callback is omitted we'll return a Promise
+       * @example <caption>If the callback is omitted we'll return a Promise.
        * </caption>
        * const [apiResponse] = await model.delete();
        */
@@ -79,7 +79,7 @@ class Model extends common.ServiceObject {
        *
        * model.exists((err, exists) => {});
        *
-       * @example <caption>If the callback is omitted we'll return a Promise
+       * @example <caption>If the callback is omitted we'll return a Promise.
        * </caption>
        * const [exists] = await model.exists();
        */
@@ -104,18 +104,20 @@ class Model extends common.ServiceObject {
        * const dataset = bigquery.dataset('my-dataset');
        * const model = dataset.model('my-model');
        *
-       * model.get((err, model2, apiResponse) => {
-       *   // `model.metadata` has been populated.
+       * model.get(err => {
+       *   if (!err) {
+       *     // `model.metadata` has been populated.
+       *   }
        * });
        *
-       * @example <caption>If the callback is omitted we'll return a Promise
+       * @example <caption>If the callback is omitted we'll return a Promise.
        * </caption>
-       * const [model2, apiResponse] = await model.get();
+       * await model.get();
        */
       get: true,
 
       /**
-       * Return the metadata associated with the Model.
+       * Return the metadata associated with the model.
        *
        * @see [Models: get API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/rest/v2/models/get}
        *
@@ -123,7 +125,7 @@ class Model extends common.ServiceObject {
        * @param {function} [callback] The callback function.
        * @param {?error} callback.err An error returned while making this
        *     request.
-       * @param {object} callback.metadata The metadata of the Model.
+       * @param {object} callback.metadata The metadata of the model.
        * @param {object} callback.apiResponse The full API response.
        * @returns {Promise}
        *
@@ -135,7 +137,7 @@ class Model extends common.ServiceObject {
        *
        * model.getMetadata((err, metadata, apiResponse) => {});
        *
-       * @example <caption>If the callback is omitted we'll return a Promise
+       * @example <caption>If the callback is omitted we'll return a Promise.
        * </caption>
        * const [metadata, apiResponse] = await model.getMetadata();
        */
@@ -149,7 +151,7 @@ class Model extends common.ServiceObject {
        * @param {function} [callback] The callback function.
        * @param {?error} callback.err An error returned while making this
        *     request.
-       * @param {object} callback.metadata The updated metadata of the Model.
+       * @param {object} callback.metadata The updated metadata of the model.
        * @param {object} callback.apiResponse The full API response.
        * @returns {Promise}
        *
@@ -160,12 +162,12 @@ class Model extends common.ServiceObject {
        * const model = dataset.model('my-model');
        *
        * const metadata = {
-       *   friendlyName: 'thebestmodelever'
+       *   friendlyName: 'TheBestModelEver'
        * };
        *
        * model.setMetadata(metadata, (err, metadata, apiResponse) => {});
        *
-       * @example <caption>If the callback is omitted we'll return a Promise
+       * @example <caption>If the callback is omitted we'll return a Promise.
        * </caption>
        * const [metadata, apiResponse] = await model.setMetadata(metadata);
        */
