@@ -43,6 +43,7 @@ import {
   TableMetadata,
   TableOptions,
 } from './table';
+import {Model} from './model';
 import bigquery from './types';
 
 export interface DatasetDeleteOptions {
@@ -54,6 +55,18 @@ export interface DatasetOptions {
 }
 
 export type CreateDatasetOptions = bigquery.IDataset;
+
+export type GetModelsOptions = PagedRequest<bigquery.models.IListParams>;
+export type GetModelsResponse = PagedResponse<
+  Model,
+  GetModelsOptions,
+  bigquery.IListModelsResponse
+>;
+export type GetModelsCallback = PagedCallback<
+  Model,
+  GetModelsOptions,
+  bigquery.IListModelsResponse
+>;
 
 export type GetTablesOptions = PagedRequest<bigquery.tables.IListParams>;
 export type GetTablesResponse = PagedResponse<
@@ -89,6 +102,7 @@ export type TableCallback = ResourceCallback<Table, bigquery.ITable>;
 class Dataset extends ServiceObject {
   bigQuery: BigQuery;
   location?: string;
+  getModelsStream: (options?: GetModelsOptions) => ResourceStream<Model>;
   getTablesStream: (options?: GetTablesOptions) => ResourceStream<Table>;
   constructor(bigQuery: BigQuery, id: string, options?: DatasetOptions) {
     const methods = {
@@ -287,6 +301,35 @@ class Dataset extends ServiceObject {
         return reqOpts;
       },
     });
+
+    /**
+     * List all or some of the {module:bigquery/model} objects in your project
+     * as a readable object stream.
+     *
+     * @param {object} [options] Configuration object. See
+     *     {@link Dataset#getModels} for a complete list of options.
+     * @return {stream}
+     *
+     * @example
+     * const {BigQuery} = require('@google-cloud/bigquery');
+     * const bigquery = new BigQuery();
+     * const dataset = bigquery.dataset('institutions');
+     *
+     * dataset.getModelsStream()
+     *   .on('error', console.error)
+     *   .on('data', (model) => {})
+     *   .on('end', () => {
+     *     // All models have been retrieved
+     *   });
+     *
+     * @example <caption>If you anticipate many results, you can end a stream
+     * early to prevent unnecessary processing and API requests.</caption>
+     * dataset.getModelsStream()
+     *   .on('data', function(model) {
+     *     this.end();
+     *   });
+     */
+    this.getModelsStream = paginator.streamify<Model>('getModels');
 
     /**
      * List all or some of the {module:bigquery/table} objects in your project
@@ -529,6 +572,91 @@ class Dataset extends ServiceObject {
     );
   }
 
+  getModels(options?: GetModelsOptions): Promise<GetModelsResponse>;
+  getModels(options: GetModelsOptions, callback: GetModelsCallback): void;
+  getModels(callback: GetModelsCallback): void;
+  /**
+   * Get a list of models.
+   *
+   * @see [Models: list API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/rest/v2/models/list}
+   *
+   * @param {object} [options] Configuration object.
+   * @param {boolean} [options.autoPaginate=true] Have pagination handled
+   *     automatically.
+   * @param {number} [options.maxApiCalls] Maximum number of API calls to make.
+   * @param {number} [options.maxResults] Maximum number of results to return.
+   * @param {string} [options.pageToken] Token returned from a previous call, to
+   *     request the next page of results.
+   * @param {function} [callback] The callback function.
+   * @param {?error} callback.err An error returned while making this request
+   * @param {Model[]} callback.models The list of models from
+   *     your Dataset.
+   * @returns {Promise}
+   *
+   * @example
+   * const {BigQuery} = require('@google-cloud/bigquery');
+   * const bigquery = new BigQuery();
+   * const dataset = bigquery.dataset('institutions');
+   *
+   * dataset.getModels((err, models) => {
+   *   // models is an array of `Model` objects.
+   * });
+   *
+   * @example <caption>To control how many API requests are made and page
+   * through the results manually, set `autoPaginate` to `false`.</caption>
+   * function manualPaginationCallback(err, models, nextQuery, apiResponse) {
+   *   if (nextQuery) {
+   *     // More results exist.
+   *     dataset.getModels(nextQuery, manualPaginationCallback);
+   *   }
+   * }
+   *
+   * dataset.getModels({
+   *   autoPaginate: false
+   * }, manualPaginationCallback);
+   *
+   * @example <caption>If the callback is omitted, we'll return a Promise.
+   * </caption>
+   * dataset.getModels().then((data) => {
+   *   const models = data[0];
+   * });
+   */
+  getModels(
+    optsOrCb?: GetModelsOptions | GetModelsCallback,
+    cb?: GetModelsCallback
+  ): void | Promise<GetModelsResponse> {
+    const options = typeof optsOrCb === 'object' ? optsOrCb : {};
+    const callback = typeof optsOrCb === 'function' ? optsOrCb : cb;
+
+    this.request(
+      {
+        uri: '/models',
+        qs: options,
+      },
+      (err: null | Error, resp: bigquery.IListModelsResponse) => {
+        if (err) {
+          callback!(err, null, null, resp);
+          return;
+        }
+
+        let nextQuery: {} | null = null;
+        if (resp.nextPageToken) {
+          nextQuery = extend({}, options, {
+            pageToken: resp.nextPageToken,
+          });
+        }
+
+        const models = (resp.models || []).map(modelObject => {
+          const model = this.model(modelObject.modelReference!.modelId!);
+          model.metadata = modelObject;
+          return model;
+        });
+
+        callback!(null, models, nextQuery, resp);
+      }
+    );
+  }
+
   /**
    * Get a list of tables.
    *
@@ -621,6 +749,29 @@ class Dataset extends ServiceObject {
   }
 
   /**
+   * Create a {@link Model} object.
+   *
+   * @throws {TypeError} if model ID is missing.
+   *
+   * @param {string} id The ID of the model.
+   * @return {Model}
+   *
+   * @example
+   * const {BigQuery} = require('@google-cloud/bigquery');
+   * const bigquery = new BigQuery();
+   * const dataset = bigquery.dataset('institutions');
+   *
+   * const model = dataset.model('my-model');
+   */
+  model(id: string): Model {
+    if (typeof id !== 'string') {
+      throw new TypeError('A model ID is required.');
+    }
+
+    return new Model(this, id);
+  }
+
+  /**
    * Run a query scoped to your dataset.
    *
    * See {@link BigQuery#query} for full documentation of this method.
@@ -692,7 +843,7 @@ class Dataset extends ServiceObject {
  *
  * These methods can be auto-paginated.
  */
-paginator.extend(Dataset, ['getTables']);
+paginator.extend(Dataset, ['getModels', 'getTables']);
 
 /*! Developer Documentation
  *
@@ -700,7 +851,7 @@ paginator.extend(Dataset, ['getTables']);
  * that a callback is omitted.
  */
 promisifyAll(Dataset, {
-  exclude: ['table'],
+  exclude: ['model', 'table'],
 });
 
 /**
