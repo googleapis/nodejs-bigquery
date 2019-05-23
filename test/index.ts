@@ -66,52 +66,6 @@ const fakeUtil = extend({}, util, {
 });
 const originalFakeUtil = extend(true, {}, fakeUtil);
 
-class FakeDataset {
-  calledWith_: IArguments;
-  constructor() {
-    this.calledWith_ = arguments;
-  }
-}
-
-class FakeTable extends Table {
-  constructor(a: Dataset, b: string) {
-    super(a, b);
-  }
-}
-
-class FakeJob {
-  calledWith_: IArguments;
-  constructor() {
-    this.calledWith_ = arguments;
-  }
-}
-
-let extended = false;
-const fakePaginator = {
-  paginator: {
-    extend: (c: Function, methods: string[]) => {
-      if (c.name !== 'BigQuery') {
-        return;
-      }
-      methods = arrify(methods);
-      assert.strictEqual(c.name, 'BigQuery');
-      assert.deepStrictEqual(methods, ['getDatasets', 'getJobs']);
-      extended = true;
-    },
-    streamify: (methodName: string) => {
-      return methodName;
-    },
-  },
-};
-
-class FakeService extends Service {
-  calledWith_: IArguments;
-  constructor(config: ServiceConfig, options: ServiceOptions) {
-    super(config, options);
-    this.calledWith_ = arguments;
-  }
-}
-
 const sandbox = sinon.createSandbox();
 afterEach(() => sandbox.restore());
 
@@ -126,6 +80,57 @@ describe('BigQuery', () => {
   let BigQuery: any;
   // tslint:disable-next-line no-any
   let bq: any;
+
+  class FakeTable extends Table {
+    constructor(a: Dataset, b: string) {
+      super(a, b);
+    }
+  }
+
+  class FakeDataset extends Dataset {
+    calledWith_: IArguments;
+    constructor() {
+      super(bq, '1');
+      this.calledWith_ = arguments;
+    }
+
+    table(id: string): FakeTable {
+      return new FakeTable(this, id);
+    }
+  }
+
+  class FakeJob {
+    calledWith_: IArguments;
+    constructor() {
+      this.calledWith_ = arguments;
+    }
+  }
+
+  let extended = false;
+  const fakePaginator = {
+    paginator: {
+      extend: (c: Function, methods: string[]) => {
+        if (c.name !== 'BigQuery') {
+          return;
+        }
+        methods = arrify(methods);
+        assert.strictEqual(c.name, 'BigQuery');
+        assert.deepStrictEqual(methods, ['getDatasets', 'getJobs']);
+        extended = true;
+      },
+      streamify: (methodName: string) => {
+        return methodName;
+      },
+    },
+  };
+
+  class FakeService extends Service {
+    calledWith_: IArguments;
+    constructor(config: ServiceConfig, options: ServiceOptions) {
+      super(config, options);
+      this.calledWith_ = arguments;
+    }
+  }
 
   before(() => {
     BigQuery = proxyquire('../src', {
@@ -1722,8 +1727,7 @@ describe('BigQuery', () => {
     const FAKE_ROWS = [{}, {}, {}];
     const FAKE_RESPONSE = {};
     const QUERY_STRING = 'SELECT * FROM [dataset.table]';
-
-    it('should return any errors from createQueryJob', done => {
+    const FAKE_JOB = it('should return any errors from createQueryJob', done => {
       const error = new Error('err');
 
       bq.createQueryJob = (query: {}, callback: Function) => {
@@ -1759,59 +1763,44 @@ describe('BigQuery', () => {
 
     it('should call table#getRows', done => {
       const fakeJob = {
-        metadata: { 
+        metadata: {
           configuration: {
-            query: { 
+            query: {
               destinationTable: {
-                datasetId: 1,
-                tableId: 1
-              }
-            }
-          }
-        }
+                datasetId: '1',
+                tableId: '1',
+              },
+            },
+          },
+        },
       };
       bq.createQueryJob = (query: {}, callback: Function) => {
         callback(null, fakeJob, FAKE_RESPONSE);
       };
 
-      bq.query(QUERY_STRING, (err: Error, rows: {}, resp: {}) => {
+      const finalCallback = (err: Error | null, rows: {}, resp: {}) => {
         assert.ifError(err);
         assert.strictEqual(rows, FAKE_ROWS);
         assert.strictEqual(resp, FAKE_RESPONSE);
         done();
-      });
-    });
+      };
 
-    it('should assign Job on the options', done => {
-      const fakeJob = {
-        getQueryResults: (options: {}, callback: Function) => {
+      const fakeTable = {
+        getRows(options: {}, cb: Function) {
           assert.deepStrictEqual(options, {job: fakeJob});
-          done();
+          assert.strictEqual(cb, finalCallback);
+          finalCallback(null, FAKE_ROWS, FAKE_RESPONSE);
+        },
+      };
+      const fakeDataset = {
+        table(id: string) {
+          return fakeTable;
         },
       };
 
-      bq.createQueryJob = (query: {}, callback: Function) => {
-        callback(null, fakeJob, FAKE_RESPONSE);
-      };
+      bq.dataset = (id: string) => fakeDataset;
 
-      bq.query(QUERY_STRING, assert.ifError);
-    });
-
-    it('should optionally accept options', done => {
-      const fakeOptions = {};
-      const fakeJob = {
-        getQueryResults: (options: {}) => {
-          assert.notStrictEqual(options, fakeOptions);
-          assert.deepStrictEqual(options, {job: fakeJob});
-          done();
-        },
-      };
-
-      bq.createQueryJob = (query: {}, callback: Function) => {
-        callback(null, fakeJob, FAKE_RESPONSE);
-      };
-
-      bq.query(QUERY_STRING, fakeOptions, assert.ifError);
+      bq.query(QUERY_STRING, finalCallback);
     });
   });
 
