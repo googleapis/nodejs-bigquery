@@ -25,7 +25,6 @@ const format = require('string-format-obj');
 import * as fs from 'fs';
 import * as is from 'is';
 import * as path from 'path';
-import * as r from 'request';
 import * as streamEvents from 'stream-events';
 import * as uuid from 'uuid';
 import {
@@ -118,7 +117,7 @@ export type CopyTableMetadata = JobRequest<bigquery.IJobConfigurationTableCopy>;
 
 export type TableMetadata = bigquery.ITable & {
   name?: string;
-  schema?: string | TableField[];
+  schema?: string | TableField[] | TableSchema;
   partitioning?: string;
   view?: string | ViewDefinition;
 };

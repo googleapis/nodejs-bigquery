@@ -27,6 +27,7 @@ import * as uuid from 'uuid';
 
 import {Dataset, DatasetOptions} from './dataset';
 import {Job, JobOptions, QueryResultsOptions} from './job';
+import {Model} from './model';
 import {
   Table,
   TableField,
@@ -812,6 +813,9 @@ export class BigQuery extends common.Service {
       queryParameter.parameterValue!.arrayValues = (value as Array<{}>).map(
         itemValue => {
           const value = getValue(itemValue, parameterType.arrayType!);
+          if (is.object(value) || is.array(value)) {
+            return BigQuery.valueToQueryParameter_(value).parameterValue!;
+          }
           return {value} as bigquery.IQueryParameterValue;
         }
       );
@@ -1717,6 +1721,15 @@ export {Dataset};
  * @type {constructor}
  */
 export {Job};
+
+/**
+ * {@link Model} class.
+ *
+ * @name BigQuery.Model
+ * @see Model
+ * @type {constructor}
+ */
+export {Model};
 
 /**
  * {@link Table} class.
