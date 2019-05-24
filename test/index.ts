@@ -29,6 +29,7 @@ import * as extend from 'extend';
 import * as proxyquire from 'proxyquire';
 import * as sinon from 'sinon';
 import * as uuid from 'uuid';
+import {EventEmitter} from 'events';
 
 import {BigQueryDate, Dataset, Job, Query, Table} from '../src';
 import {JobOptions} from '../src/job';
@@ -1787,27 +1788,29 @@ describe('BigQuery', () => {
     });
 
     it('should call table#getRows', done => {
-      const fakeJob = {
-        metadata: {
-          configuration: {
-            query: {
-              destinationTable: {
-                datasetId: '1',
-                tableId: '1',
-              },
+      const metadata = {
+        configuration: {
+          query: {
+            destinationTable: {
+              datasetId: '1',
+              tableId: '1',
             },
           },
         },
       };
+
+      const fakeJob = new EventEmitter();
+      fakeJob.emit('complete', metadata);
+
       bq.createQueryJob = (query: {}, callback: Function) => {
         callback(null, fakeJob, FAKE_RESPONSE);
+        done();
       };
 
       const finalCallback = (err: Error | null, rows: {}, resp: {}) => {
         assert.ifError(err);
         assert.strictEqual(rows, FAKE_ROWS);
         assert.strictEqual(resp, FAKE_RESPONSE);
-        done();
       };
 
       const fakeTable = {
@@ -1817,6 +1820,7 @@ describe('BigQuery', () => {
           finalCallback(null, FAKE_ROWS, FAKE_RESPONSE);
         },
       };
+
       const fakeDataset = {
         table(id: string) {
           return fakeTable;
@@ -1824,7 +1828,6 @@ describe('BigQuery', () => {
       };
 
       bq.dataset = (id: string) => fakeDataset;
-
       bq.query(QUERY_STRING, finalCallback);
     });
   });
