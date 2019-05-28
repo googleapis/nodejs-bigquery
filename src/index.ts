@@ -1560,7 +1560,11 @@ export class BigQuery extends common.Service {
    */
   query(
     query: string | Query,
-    optionsOrCallback?: QueryOptions | SimpleQueryRowsCallback | RowsCallback,
+    optionsOrCallback?:
+      | QueryOptions
+      | SimpleQueryRowsCallback
+      | RowsCallback
+      | QueryRowsCallback,
     cb?: SimpleQueryRowsCallback | RowsCallback
   ): void | Promise<RowsResponse> {
     let options =
@@ -1578,19 +1582,25 @@ export class BigQuery extends common.Service {
       }
       // The Job is important for the `queryAsStream_` method, so a new query
       // isn't created each time results are polled for.
-
       job!
         .on('error', err => callback!(err))
         .on('complete', () => {
           options = extend({job}, options);
 
-          const datasetId = job!.metadata.configuration.query.destinationTable
-            .datasetId;
-          const tableId = job!.metadata.configuration.query.destinationTable
-            .tableId;
-          const dataset = this.dataset(datasetId);
-          const table = dataset.table(tableId);
-          table.getRows(options, callback as RowsCallback);
+          if (
+            typeof query === 'string' &&
+            (query.includes('CREATE MODEL') || query.includes('REPLACE MODEL'))
+          ) {
+            job!.getQueryResults(options, callback as QueryRowsCallback);
+          } else {
+            const datasetId = job!.metadata.configuration.query.destinationTable
+              .datasetId;
+            const tableId = job!.metadata.configuration.query.destinationTable
+              .tableId;
+            const dataset = this.dataset(datasetId);
+            const table = dataset.table(tableId);
+            table.getRows(options, callback as RowsCallback);
+          }
         });
     });
   }
