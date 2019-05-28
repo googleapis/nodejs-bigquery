@@ -26,12 +26,11 @@ const execSync = cmd => cp.execSync(cmd, {encoding: 'utf-8'});
 const bigquery = new BigQuery();
 
 describe(`Models`, () => {
-    const datasetId = `gcloud_tests_${uuid.v4()}`.replace(/-/gi, '_');
-    const modelId = `gcloud_tests_${uuid.v4()}`.replace(/-/gi, '_');
+  const datasetId = `gcloud_tests_${uuid.v4()}`.replace(/-/gi, '_');
+  const modelId = `gcloud_tests_${uuid.v4()}`.replace(/-/gi, '_');
 
-   before(async () => {
-        
-        const query = `CREATE OR REPLACE MODEL \`${datasetId}.${modelId}\` 
+  before(async () => {
+    const query = `CREATE OR REPLACE MODEL \`${datasetId}.${modelId}\` 
         OPTIONS(model_type='logistic_reg') AS
         SELECT
           IF(totals.transactions IS NULL, 0, 1) AS label,
@@ -45,22 +44,22 @@ describe(`Models`, () => {
           _TABLE_SUFFIX BETWEEN '20160801' AND '20170631'
         LIMIT  100000;`;
 
-        const datasetOptions = {
-            location: 'US',
-          };
-          
-        const queryOptions = {
-            query: query,
-        }
+    const datasetOptions = {
+      location: 'US',
+    };
 
-        const [dataset] = await bigquery.createDataset(datasetId, datasetOptions);
+    const queryOptions = {
+      query: query,
+    };
 
-        // runs query to create a model
-        const [job] = await bigquery.createQueryJob(queryOptions);
-    
-        // Wait for the query to finish
-        await job.getQueryResults();
-    });
+    await bigquery.createDataset(datasetId, datasetOptions);
+
+    // Run query to create a model
+    const [job] = await bigquery.createQueryJob(queryOptions);
+
+    // Wait for the query to finish
+    await job.getQueryResults();
+  });
 
   after(async () => {
     await bigquery
@@ -89,17 +88,19 @@ describe(`Models`, () => {
 
   it(`should update model's metadata`, async () => {
     const output = execSync(`node updateModel.js ${datasetId} ${modelId}`);
-    assert.match(output, new RegExp(`${modelId} description: A really great model.`));
+    assert.match(
+      output,
+      new RegExp(`${modelId} description: A really great model.`)
+    );
   });
-
 });
 
 describe(`Delete Model`, () => {
-    const datasetId = `gcloud_tests_${uuid.v4()}`.replace(/-/gi, '_');
-    const modelId = `gcloud_tests_${uuid.v4()}`.replace(/-/gi, '_');
+  const datasetId = `gcloud_tests_${uuid.v4()}`.replace(/-/gi, '_');
+  const modelId = `gcloud_tests_${uuid.v4()}`.replace(/-/gi, '_');
 
-    before(async () => {
-         const query = `CREATE OR REPLACE MODEL \`${datasetId}.${modelId}\` 
+  before(async () => {
+    const query = `CREATE OR REPLACE MODEL \`${datasetId}.${modelId}\` 
          OPTIONS(model_type='logistic_reg') AS
          SELECT
            IF(totals.transactions IS NULL, 0, 1) AS label,
@@ -112,36 +113,38 @@ describe(`Delete Model`, () => {
          WHERE
            _TABLE_SUFFIX BETWEEN '20160801' AND '20170631'
          LIMIT  100000;`;
- 
-         const datasetOptions = {
-             location: 'US',
-           };
-           
-         const queryOptions = {
-             query: query,
-         }
- 
-         const [dataset] = await bigquery.createDataset(datasetId, datasetOptions);
- 
-         // runs query to create a model
-         const [job] = await bigquery.createQueryJob(queryOptions);
-     
-         // Wait for the query to finish
-         await job.getQueryResults();
-     });
- 
-   after(async () => {
-     await bigquery
-       .dataset(datasetId)
-       .delete({force: true})
-       .catch(console.warn);
-   });
- 
-   it(`should delete a model`, async () => {
-     const output = execSync(`node deleteModel.js ${datasetId} ${modelId}`);
-     assert.include(output, `Model ${modelId} deleted.`);
-     const [exists] = await bigquery.dataset(datasetId).model(modelId).exists();
-     assert.strictEqual(exists, false);
-   });
+
+    const datasetOptions = {
+      location: 'US',
+    };
+
+    const queryOptions = {
+      query: query,
+    };
+
+    await bigquery.createDataset(datasetId, datasetOptions);
+
+    // Run query to create a model
+    const [job] = await bigquery.createQueryJob(queryOptions);
+
+    // Wait for the query to finish
+    await job.getQueryResults();
+  });
+
+  after(async () => {
+    await bigquery
+      .dataset(datasetId)
+      .delete({force: true})
+      .catch(console.warn);
+  });
+
+  it(`should delete a model`, async () => {
+    const output = execSync(`node deleteModel.js ${datasetId} ${modelId}`);
+    assert.include(output, `Model ${modelId} deleted.`);
+    const [exists] = await bigquery
+      .dataset(datasetId)
+      .model(modelId)
+      .exists();
+    assert.strictEqual(exists, false);
+  });
 });
- 

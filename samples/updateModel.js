@@ -34,14 +34,14 @@ function main(datasetId, modelId) {
     const bigqueryClient = new BigQuery();
 
     const metadata = {
-        description: "A really great model."
+      description: 'A really great model.',
     };
 
     const dataset = bigqueryClient.dataset(datasetId);
     const [apiResponse] = await dataset.model(modelId).setMetadata(metadata);
-    const newDescription = apiResponse.description
+    const newDescription = apiResponse.description;
 
-    console.log(`${modelId} description: ${newDescription}`)
+    console.log(`${modelId} description: ${newDescription}`);
   }
   updateModel();
   // [END bigquery_update_model_description]

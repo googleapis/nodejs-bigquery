@@ -22,7 +22,7 @@ function main(datasetId, modelId) {
   const {BigQuery} = require('@google-cloud/bigquery');
 
   async function deleteModel() {
-    // Deletes a model named "my_existing_model" in "my_dataset".
+    // Deletes a model named "my_model" from "my_dataset".
 
     /**
      * TODO(developer): Uncomment the following lines before running the sample
@@ -34,8 +34,8 @@ function main(datasetId, modelId) {
     const bigqueryClient = new BigQuery();
 
     const dataset = bigqueryClient.dataset(datasetId);
-    const model = dataset.model(modelId)
-    const [apiResponse] = await model.delete();
+    const model = dataset.model(modelId);
+    await model.delete();
 
     console.log(`Model ${modelId} deleted.`);
   }

@@ -35,11 +35,11 @@ function main(datasetId) {
 
     const dataset = bigqueryClient.dataset(datasetId);
 
-    dataset.getModels().then((data) => {
-        const models = data[0];
-        console.log('Models:')
-        models.forEach(model => console.log(model.metadata));
-        });
+    dataset.getModels().then(data => {
+      const models = data[0];
+      console.log('Models:');
+      models.forEach(model => console.log(model.metadata));
+    });
   }
   listModels();
   // [END bigquery_list_models]

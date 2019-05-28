@@ -42,7 +42,7 @@ function main(datasetId) {
         console.log(model.metadata);
       })
       .on('end', () => {
-        console.log('All models have been retrieved.')
+        console.log('All models have been retrieved.');
       });
   }
   listModels();

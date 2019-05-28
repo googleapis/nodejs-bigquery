@@ -36,7 +36,7 @@ function main(datasetId, modelId) {
     const dataset = bigqueryClient.dataset(datasetId);
     const [model] = await dataset.model(modelId).get();
 
-    console.log('Model:')
+    console.log('Model:');
     console.log(model.metadata.modelReference);
   }
   getModel();
