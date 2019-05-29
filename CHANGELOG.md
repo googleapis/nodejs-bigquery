@@ -4,6 +4,14 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## [4.1.0](https://www.github.com/googleapis/nodejs-bigquery/compare/v4.0.0...v4.1.0) (2019-05-29)
+
+
+### Features
+
+* **model:** dataset model support ([#449](https://www.github.com/googleapis/nodejs-bigquery/issues/449)) ([3ad884f](https://www.github.com/googleapis/nodejs-bigquery/commit/3ad884f))
+* accept apiEndpoint override ([#455](https://www.github.com/googleapis/nodejs-bigquery/issues/455)) ([1eda8ff](https://www.github.com/googleapis/nodejs-bigquery/commit/1eda8ff))
+
 ## [4.0.0](https://www.github.com/googleapis/nodejs-bigquery/compare/v3.0.0...v4.0.0) (2019-05-20)
 
 
