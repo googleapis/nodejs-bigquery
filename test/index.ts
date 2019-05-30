@@ -30,7 +30,7 @@ import * as proxyquire from 'proxyquire';
 import * as sinon from 'sinon';
 import * as uuid from 'uuid';
 
-import {BigQueryDate, Dataset, Job, Query, Table} from '../src';
+import {BigQueryDate, Dataset, Job, Table} from '../src';
 import {JobOptions} from '../src/job';
 import {TableField} from '../src/table';
 
@@ -186,12 +186,23 @@ describe('BigQuery', () => {
       );
     });
 
+    it('should allow overriding the apiEndpoint', () => {
+      const apiEndpoint = 'not.real.local';
+      bq = new BigQuery({
+        apiEndpoint,
+      });
+      const calledWith = bq.calledWith_[0];
+      assert.strictEqual(
+        calledWith.baseUrl,
+        `https://${apiEndpoint}/bigquery/v2`
+      );
+    });
+
     it('should capture any user specified location', () => {
       const bq = new BigQuery({
         projectId: PROJECT_ID,
         location: LOCATION,
       });
-
       assert.strictEqual(bq.location, LOCATION);
     });
 
