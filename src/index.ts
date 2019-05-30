@@ -1613,7 +1613,7 @@ export class BigQuery extends common.Service {
    */
   queryAsStream_(query: Query, callback?: SimpleQueryRowsCallback) {
     if (query.job) {
-      query.job.getQueryResults(query, callback as RowsCallback);
+      query.job.getQueryResults(query, callback as QueryRowsCallback);
       return;
     }
     this.query(query, {autoPaginate: false}, callback);

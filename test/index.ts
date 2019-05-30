@@ -1788,12 +1788,14 @@ describe('BigQuery', () => {
     });
 
     it('should call table#getRows', done => {
+      const TABLE_ID = 'bq_table';
+      const DATASET_ID = 'bq_dataset';
       const metadata = {
         configuration: {
           query: {
             destinationTable: {
-              datasetId: '1',
-              tableId: '1',
+              datasetId: DATASET_ID,
+              tableId: TABLE_ID,
             },
           },
         },
@@ -1823,12 +1825,41 @@ describe('BigQuery', () => {
 
       const fakeDataset = {
         table(id: string) {
+          assert.strictEqual(id, TABLE_ID);
           return fakeTable;
         },
       };
 
-      bq.dataset = (id: string) => fakeDataset;
+      bq.dataset = (id: string) => {
+        assert.strictEqual(id, DATASET_ID);
+        return fakeDataset;
+      };
+
       bq.query(QUERY_STRING, finalCallback);
+    });
+
+    it('should call job#getQueryResults for model query', done => {
+      const MODEL_QUERY_STRING = `CREATE OR REPLACE MODEL \`dataset.model\``;
+
+      const metadata = {
+        getQueryResults: (options: {}, callback: Function) => {
+          callback(null, FAKE_ROWS, FAKE_RESPONSE);
+        },
+      };
+
+      const fakeJob = new EventEmitter();
+      fakeJob.emit('complete', metadata);
+
+      bq.createQueryJob = (query: {}, callback: Function) => {
+        callback(null, fakeJob, FAKE_RESPONSE);
+        done();
+      };
+
+      bq.query(MODEL_QUERY_STRING, (err: Error, rows: {}, resp: {}) => {
+        assert.ifError(err);
+        assert.strictEqual(rows, FAKE_ROWS);
+        assert.strictEqual(resp, FAKE_RESPONSE);
+      });
     });
   });
 
@@ -1840,6 +1871,26 @@ describe('BigQuery', () => {
         assert.deepStrictEqual(options, {autoPaginate: false});
         callback(); // done()
       };
+      bq.queryAsStream_(query, done);
+    });
+
+    it('should call query correctly with a job', done => {
+      const FAKE_ROWS = [{}, {}, {}];
+      const FAKE_RESPONSE = {};
+      const fakeJob = {
+        getQueryResults: (query: {}, callback: Function) => {
+          assert.strictEqual(query, query);
+          callback(null, FAKE_ROWS, FAKE_RESPONSE);
+        },
+      };
+
+      const query = {job: fakeJob};
+
+      bq.query = (query_: {}, options: {}, callback: Function) => {
+        assert.strictEqual(query_, query);
+        callback(); // done()
+      };
+
       bq.queryAsStream_(query, done);
     });
   });
