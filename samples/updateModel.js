@@ -16,6 +16,11 @@
 
 'use strict';
 
+// sample-metadata:
+//   title: BigQuery Update Model
+//   description: Updates a model's metadata.
+//   usage: node updateModel.js <DATASET_ID> <MODEL_ID>
+
 function main(datasetId, modelId) {
   // [START bigquery_update_model_description]
   // Import the Google Cloud client library

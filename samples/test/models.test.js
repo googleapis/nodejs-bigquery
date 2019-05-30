@@ -70,27 +70,26 @@ describe(`Models`, () => {
 
   it(`should retrieve a model if it exists`, async () => {
     const output = execSync(`node getModel.js ${datasetId} ${modelId}`);
-    assert.match(output, /Model:/);
-    assert.match(output, new RegExp(datasetId));
-    assert.match(output, new RegExp(modelId));
+    assert.include(output, 'Model:');
+    assert.include(output, (datasetId && modelId));
   });
 
   it(`should list models`, async () => {
     const output = execSync(`node listModels.js ${datasetId}`);
-    assert.match(output, /Models:/);
-    assert.match(output, new RegExp(datasetId));
+    assert.include(output, 'Models:');
+    assert.include(output, datasetId);
   });
 
   it(`should list models streaming`, async () => {
     const output = execSync(`node getModel.js ${datasetId} ${modelId}`);
-    assert.match(output, new RegExp(modelId));
+    assert.include(output, modelId);
   });
 
   it(`should update model's metadata`, async () => {
     const output = execSync(`node updateModel.js ${datasetId} ${modelId}`);
-    assert.match(
+    assert.include(
       output,
-      new RegExp(`${modelId} description: A really great model.`)
+      `${modelId} description: A really great model.`
     );
   });
 });

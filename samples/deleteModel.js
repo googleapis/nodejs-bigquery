@@ -16,6 +16,11 @@
 
 'use strict';
 
+// sample-metadata:
+//   title: BigQuery Delete Model
+//   description: Deletes a model.
+//   usage: node deleteModel.js <DATASET_ID> <MODEL_ID>
+
 function main(datasetId, modelId) {
   // [START bigquery_delete_model]
   // Import the Google Cloud client library

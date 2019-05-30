@@ -16,6 +16,11 @@
 
 'use strict';
 
+// sample-metadata:
+//   title: BigQuery List Models
+//   description: Lists all existing models in the dataset.
+//   usage: node listModels.js <DATASET_ID>
+
 function main(datasetId) {
   // [START bigquery_list_models]
 

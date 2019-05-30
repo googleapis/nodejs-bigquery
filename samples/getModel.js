@@ -16,6 +16,11 @@
 
 'use strict';
 
+// sample-metadata:
+//   title: BigQuery Get Model
+//   description: Retrieves an existing model from a dataset.
+//   usage: node getModel.js <DATASET_ID> <MODEL_ID>
+
 function main(datasetId, modelId) {
   // [START bigquery_get_model]
   // Import the Google Cloud client library

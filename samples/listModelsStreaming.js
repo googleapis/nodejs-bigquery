@@ -16,6 +16,11 @@
 
 'use strict';
 
+// sample-metadata:
+//   title: BigQuery List Models Streaming
+//   description: Lists all existing models in the dataset using streaming method.
+//   usage: node listModelsStreaming.js <DATASET_ID>
+
 function main(datasetId) {
   // [START bigquery_list_models_streaming]
 
