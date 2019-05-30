@@ -94,7 +94,7 @@ export type Query = JobRequest<bigquery.IJobConfigurationQuery> & {
   params?: any[] | {[param: string]: any};
   dryRun?: boolean;
   defaultDataset?: Dataset;
-  job?: Job;
+  job?: string;
   maxResults?: number;
   timeoutMs?: number;
   pageToken?: string;
@@ -1582,7 +1582,7 @@ export class BigQuery extends common.Service {
       }
       // The Job is important for the `queryAsStream_` method, so a new query
       // isn't created each time results are polled for.
-      options = extend({job}, options);
+      options = extend({job: job!.id}, options);
       job!.getQueryResults(options, callback as QueryRowsCallback);
     });
   }
@@ -1595,7 +1595,8 @@ export class BigQuery extends common.Service {
    */
   queryAsStream_(query: Query, callback?: SimpleQueryRowsCallback) {
     if (query.job) {
-      query.job.getQueryResults(query, callback as QueryRowsCallback);
+      const job = this.job(query.job);
+      job.getQueryResults(query, callback as QueryRowsCallback);
       return;
     }
     this.query(query, {autoPaginate: false}, callback);

@@ -1801,10 +1801,11 @@ describe('BigQuery', () => {
       });
     });
 
-    it('should assign Job on the options', done => {
+    it('should assign Job ID on the options', done => {
       const fakeJob = {
+        id: 'job-id',
         getQueryResults: (options: {}, callback: Function) => {
-          assert.deepStrictEqual(options, {job: fakeJob});
+          assert.deepStrictEqual(options, {job: fakeJob.id});
           done();
         },
       };
@@ -1819,9 +1820,10 @@ describe('BigQuery', () => {
     it('should optionally accept options', done => {
       const fakeOptions = {};
       const fakeJob = {
+        id: 'job-id',
         getQueryResults: (options: {}) => {
           assert.notStrictEqual(options, fakeOptions);
-          assert.deepStrictEqual(options, {job: fakeJob});
+          assert.deepStrictEqual(options, {job: fakeJob.id});
           done();
         },
       };
@@ -1843,6 +1845,26 @@ describe('BigQuery', () => {
         callback(); // done()
       };
       bq.queryAsStream_(query, done);
+    });
+
+    it('should create a job instance if need be', done => {
+      const fakeQuery = {
+        job: 'fake-id',
+      };
+
+      const fakeJob = {
+        getQueryResults: (query: {}, callback: Function) => {
+          assert.strictEqual(query, fakeQuery);
+          callback(); // the done fn
+        },
+      };
+
+      bq.job = (id: string) => {
+        assert.strictEqual(id, fakeQuery.job);
+        return fakeJob;
+      };
+
+      bq.queryAsStream_(fakeQuery, done);
     });
   });
 });
