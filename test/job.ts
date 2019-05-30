@@ -225,6 +225,18 @@ describe('BigQuery/Job', () => {
       job.getQueryResults(assert.ifError);
     });
 
+    it('should delete any cached jobs', done => {
+      const options = {job: {}, a: 'b'};
+      const expectedOptions = {location: undefined, a: 'b'};
+
+      BIGQUERY.request = (reqOpts: DecorateRequestOptions) => {
+        assert.deepStrictEqual(reqOpts.qs, expectedOptions);
+        done();
+      };
+
+      job.getQueryResults(options, assert.ifError);
+    });
+
     it('should return any errors to the callback', done => {
       const error = new Error('err');
       const response = {};
