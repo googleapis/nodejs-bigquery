@@ -27,6 +27,7 @@ import * as uuid from 'uuid';
 
 import {Dataset, DatasetOptions} from './dataset';
 import {Job, JobOptions, QueryResultsOptions} from './job';
+import {Model} from './model';
 import {
   Table,
   TableField,
@@ -193,6 +194,11 @@ export interface BigQueryOptions extends common.GoogleAuthOptions {
   autoRetry?: boolean;
   maxRetries?: number;
   location?: string;
+  /**
+   * The API endpoint of the service used to make requests.
+   * Defaults to `www.googleapis.com`.
+   */
+  apiEndpoint?: string;
 }
 
 /**
@@ -237,10 +243,11 @@ export class BigQuery extends common.Service {
   getDatasetsStream: (options?: GetDatasetsOptions) => ResourceStream<Dataset>;
   getJobsStream: (options?: GetJobsOptions) => ResourceStream<Job>;
 
-  constructor(options?: BigQueryOptions) {
-    options = options || {};
+  constructor(options: BigQueryOptions = {}) {
+    options.apiEndpoint = options.apiEndpoint || 'www.googleapis.com';
     const config = {
-      baseUrl: 'https://www.googleapis.com/bigquery/v2',
+      apiEndpoint: options.apiEndpoint,
+      baseUrl: `https://${options.apiEndpoint}/bigquery/v2`,
       scopes: ['https://www.googleapis.com/auth/bigquery'],
       packageJson: require('../../package.json'),
     };
@@ -1717,6 +1724,15 @@ export {Dataset};
  * @type {constructor}
  */
 export {Job};
+
+/**
+ * {@link Model} class.
+ *
+ * @name BigQuery.Model
+ * @see Model
+ * @type {constructor}
+ */
+export {Model};
 
 /**
  * {@link Table} class.

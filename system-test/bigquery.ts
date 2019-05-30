@@ -30,6 +30,7 @@ import {
   Dataset,
   GetDatasetsOptions,
   Job,
+  Model,
   RowMetadata,
   Table,
 } from '../src';
@@ -620,6 +621,57 @@ describe('BigQuery', () => {
           });
         });
       });
+    });
+  });
+
+  describe('BigQuery/Model', () => {
+    let model: Model;
+
+    before(() => {
+      model = dataset.model('testmodel');
+      return bigquery.query(`
+        CREATE MODEL \`${dataset.id}.${model.id}\`
+        OPTIONS (
+          model_type='linear_reg',
+          max_iterations=1,
+          learn_rate=0.4,
+          learn_rate_strategy='constant'
+        ) AS (
+          SELECT 'a' AS f1, 2.0 AS label
+          UNION ALL
+          SELECT 'b' AS f2, 3.8 AS label
+        )
+      `);
+    });
+
+    after(() => model.delete());
+
+    it('should get a list of models', async () => {
+      const [models] = await dataset.getModels();
+      assert.strictEqual(models.length, 1);
+      assert.ok(models[0] instanceof Model);
+    });
+
+    it('should check if a model exists', async () => {
+      const [exists] = await model.exists();
+      assert.ok(exists);
+    });
+
+    it('should get a model', async () => {
+      const [model2] = await model.get();
+      assert.deepStrictEqual(model, model2);
+    });
+
+    it('should get a model metadata', async () => {
+      const [metadata] = await model.getMetadata();
+      assert.deepStrictEqual(metadata, model.metadata);
+    });
+
+    it('should set model metadata', async () => {
+      const friendlyName = 'modelfriend';
+      await model.setMetadata({friendlyName});
+      const [metadata] = await model.getMetadata();
+      assert.strictEqual(metadata.friendlyName, friendlyName);
     });
   });
 

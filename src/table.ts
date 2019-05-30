@@ -25,7 +25,6 @@ const format = require('string-format-obj');
 import * as fs from 'fs';
 import * as is from 'is';
 import * as path from 'path';
-import * as r from 'request';
 import * as streamEvents from 'stream-events';
 import * as uuid from 'uuid';
 import {
@@ -1403,7 +1402,9 @@ class Table extends common.ServiceObject {
           } as {},
           request: {
             uri: format('{base}/{projectId}/jobs', {
-              base: 'https://www.googleapis.com/upload/bigquery/v2/projects',
+              base: `https://${
+                this.bigQuery.apiEndpoint
+              }/upload/bigquery/v2/projects`,
               projectId: this.bigQuery.projectId,
             }),
           },
