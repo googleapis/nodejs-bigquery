@@ -1376,13 +1376,6 @@ class Table extends common.ServiceObject {
       delete metadata.jobPrefix;
     }
 
-    if (
-      metadata.hasOwnProperty('sourceFormat') &&
-      fileTypes.indexOf(metadata.sourceFormat!) < 0
-    ) {
-      throw new Error(`Source format not recognized: ${metadata.sourceFormat}`);
-    }
-
     const dup = streamEvents(duplexify());
 
     dup.once('writing', () => {

@@ -1490,23 +1490,6 @@ describe('BigQuery/Table', () => {
       table.createWriteStream_({schema: SCHEMA_STRING}).emit('writing');
     });
 
-    it('should throw if a given source format is not recognized', () => {
-      assert.throws(() => {
-        table.createWriteStream_('zip');
-      }, /Source format not recognized/);
-
-      assert.throws(() => {
-        table.createWriteStream_({
-          sourceFormat: 'zip',
-        });
-      }, /Source format not recognized/);
-
-      assert.doesNotThrow(() => {
-        table.createWriteStream_();
-        table.createWriteStream_({});
-      });
-    });
-
     it('should return a stream', () => {
       assert(table.createWriteStream_() instanceof stream.Stream);
     });
