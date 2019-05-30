@@ -40,7 +40,6 @@ import {
   JobLoadMetadata,
   Table,
   TableMetadata,
-  TableOptions,
   ViewDefinition,
 } from '../src/table';
 import bigquery from '../src/types';
@@ -113,6 +112,7 @@ describe('BigQuery/Table', () => {
       job: (id: string) => {
         return {id};
       },
+      apiEndpoint: 'www.googleapis.com',
       request: util.noop,
     },
   };

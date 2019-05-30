@@ -1402,7 +1402,9 @@ class Table extends common.ServiceObject {
           } as {},
           request: {
             uri: format('{base}/{projectId}/jobs', {
-              base: 'https://www.googleapis.com/upload/bigquery/v2/projects',
+              base: `https://${
+                this.bigQuery.apiEndpoint
+              }/upload/bigquery/v2/projects`,
               projectId: this.bigQuery.projectId,
             }),
           },

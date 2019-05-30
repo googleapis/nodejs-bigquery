@@ -71,7 +71,7 @@ describe(`Models`, () => {
   it(`should retrieve a model if it exists`, async () => {
     const output = execSync(`node getModel.js ${datasetId} ${modelId}`);
     assert.include(output, 'Model:');
-    assert.include(output, (datasetId && modelId));
+    assert.include(output, datasetId && modelId);
   });
 
   it(`should list models`, async () => {
@@ -87,10 +87,7 @@ describe(`Models`, () => {
 
   it(`should update model's metadata`, async () => {
     const output = execSync(`node updateModel.js ${datasetId} ${modelId}`);
-    assert.include(
-      output,
-      `${modelId} description: A really great model.`
-    );
+    assert.include(output, `${modelId} description: A really great model.`);
   });
 });
 
