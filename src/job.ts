@@ -45,7 +45,7 @@ export type JobOptions = JobRequest<JobMetadata>;
 export type CancelCallback = RequestCallback<bigquery.IJobCancelResponse>;
 export type CancelResponse = [bigquery.IJobCancelResponse];
 
-export type QueryResultsOptions = PagedRequest<
+export type QueryResultsOptions = {job?: Job} & PagedRequest<
   bigquery.jobs.IGetQueryResultsParams
 >;
 
@@ -391,22 +391,24 @@ class Job extends Operation {
     optionsOrCallback?: QueryResultsOptions | QueryRowsCallback,
     cb?: QueryRowsCallback
   ): void | Promise<QueryRowsResponse> {
-    let options =
+    const options =
       typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
     const callback =
       typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
 
-    options = extend(
+    const qs = extend(
       {
         location: this.location,
       },
       options
     );
 
+    delete qs.job;
+
     this.bigQuery.request(
       {
         uri: '/queries/' + this.id,
-        qs: options,
+        qs,
       },
       (err, resp) => {
         if (err) {
