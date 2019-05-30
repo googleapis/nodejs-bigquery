@@ -12,7 +12,7 @@
     "node": ">=8"
   },
   "scripts": {
-    "test": "mocha --timeout 90000"
+    "test": "mocha --timeout 100000"
   },
   "dependencies": {
     "@google-cloud/bigquery": "^4.1.0",
