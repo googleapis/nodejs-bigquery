@@ -1829,24 +1829,21 @@ describe('BigQuery', () => {
     it('should call job#getQueryResults for model query', done => {
       const MODEL_QUERY_STRING = `CREATE OR REPLACE MODEL \`dataset.model\``;
 
-      const metadata = {
+      const fakeJob = {
         getQueryResults: (options: {}, callback: Function) => {
           callback(null, FAKE_ROWS, FAKE_RESPONSE);
         },
       };
 
-      const fakeJob = new EventEmitter();
-      fakeJob.emit('complete', metadata);
-
       bq.createQueryJob = (query: {}, callback: Function) => {
         callback(null, fakeJob, FAKE_RESPONSE);
-        done();
       };
 
       bq.query(MODEL_QUERY_STRING, (err: Error, rows: {}, resp: {}) => {
         assert.ifError(err);
         assert.strictEqual(rows, FAKE_ROWS);
         assert.strictEqual(resp, FAKE_RESPONSE);
+        done();
       });
     });
   });
