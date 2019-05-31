@@ -1583,6 +1583,10 @@ export class BigQuery extends common.Service {
       // The Job is important for the `queryAsStream_` method, so a new query
       // isn't created each time results are polled for.
       options = extend({job}, options);
+
+      // table#getRows uses listTableData endpoint, which is a faster method
+      // to read rows of the results. However, it won't work for model queries,
+      // so use the original job#getQueryResults for model queries.
       if (
         typeof query === 'string' &&
         (query.includes('CREATE MODEL') || query.includes('REPLACE MODEL'))

@@ -1753,6 +1753,7 @@ describe('BigQuery', () => {
     const FAKE_ROWS = [{}, {}, {}];
     const FAKE_RESPONSE = {};
     const QUERY_STRING = 'SELECT * FROM [dataset.table]';
+    const MODEL_QUERY_STRING = `CREATE OR REPLACE MODEL \`dataset.model\``;
 
     it('should exit early if dryRun is set', done => {
       const options = {
@@ -1805,8 +1806,7 @@ describe('BigQuery', () => {
       const fakeTable = {
         getRows(options: {}, cb: Function) {
           assert.deepStrictEqual(options, {job: fakeJob});
-          assert.strictEqual(cb, finalCallback);
-          finalCallback(null, FAKE_ROWS, FAKE_RESPONSE);
+          cb(); // done()
         },
       };
 
@@ -1822,13 +1822,11 @@ describe('BigQuery', () => {
         return fakeDataset;
       };
 
-      bq.query(QUERY_STRING, finalCallback);
+      bq.query(QUERY_STRING, done);
       fakeJob.emit('complete', metadata);
     });
 
     it('should call job#getQueryResults for model query', done => {
-      const MODEL_QUERY_STRING = `CREATE OR REPLACE MODEL \`dataset.model\``;
-
       const fakeJob = {
         getQueryResults: (options: {}, callback: Function) => {
           callback(null, FAKE_ROWS, FAKE_RESPONSE);
@@ -1846,9 +1844,27 @@ describe('BigQuery', () => {
         done();
       });
     });
+
+    it('should return any errors from createQueryJob', done => {
+      const error = new Error('err');
+
+      bq.createQueryJob = (query: {}, callback: Function) => {
+        callback(error, null, FAKE_RESPONSE);
+      };
+
+      bq.query(QUERY_STRING, (err: Error, rows: {}, resp: {}) => {
+        assert.strictEqual(err, error);
+        assert.strictEqual(rows, null);
+        assert.strictEqual(resp, FAKE_RESPONSE);
+        done();
+      });
+    });
   });
 
   describe('queryAsStream_', () => {
+    const FAKE_ROWS = [{}, {}, {}];
+    const FAKE_RESPONSE = {};
+
     it('should call query correctly', done => {
       const query = 'SELECT';
       bq.query = (query_: {}, options: {}, callback: Function) => {
@@ -1860,8 +1876,6 @@ describe('BigQuery', () => {
     });
 
     it('should call query correctly with a job', done => {
-      const FAKE_ROWS = [{}, {}, {}];
-      const FAKE_RESPONSE = {};
       const fakeJob = {
         getQueryResults: (query: {}, callback: Function) => {
           assert.strictEqual(query, query);
@@ -1875,7 +1889,6 @@ describe('BigQuery', () => {
         assert.strictEqual(query_, query);
         callback(); // done()
       };
-
       bq.queryAsStream_(query, done);
     });
   });
