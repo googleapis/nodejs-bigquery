@@ -1586,7 +1586,7 @@ export class BigQuery extends common.Service {
         .on('error', err => callback!(err))
         .on('complete', () => {
           options = extend({job}, options);
-          
+
           if (
             typeof query === 'string' &&
             (query.includes('CREATE MODEL') || query.includes('REPLACE MODEL'))

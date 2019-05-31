@@ -1787,9 +1787,9 @@ describe('BigQuery', () => {
         },
       };
 
-      const fakeJob = new EventEmitter(); 
+      const fakeJob = new EventEmitter();
       // tslint:disable-next-line: no-any
-      (fakeJob as any).metadata = metadata;   
+      (fakeJob as any).metadata = metadata;
 
       bq.createQueryJob = (query: {}, callback: Function) => {
         callback(null, fakeJob, FAKE_RESPONSE);
