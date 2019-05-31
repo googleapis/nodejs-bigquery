@@ -1,7 +1,7 @@
 {
   "name": "@google-cloud/bigquery",
   "description": "Google BigQuery Client Library for Node.js",
-  "version": "4.0.0",
+  "version": "4.1.1",
   "license": "Apache-2.0",
   "author": "Google LLC",
   "engines": {
@@ -48,7 +48,7 @@
     "types": "dtsd bigquery v2 > ./src/types.d.ts"
   },
   "dependencies": {
-    "@google-cloud/common": "^1.0.0",
+    "@google-cloud/common": "^2.0.0",
     "@google-cloud/paginator": "^1.0.0",
     "@google-cloud/promisify": "^1.0.0",
     "arrify": "^2.0.0",
@@ -95,6 +95,6 @@
     "sinon": "^7.0.0",
     "source-map-support": "^0.5.6",
     "tmp": "0.1.0",
-    "typescript": "~3.4.0"
+    "typescript": "~3.5.0"
   }
 }
