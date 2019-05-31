@@ -1753,20 +1753,6 @@ describe('BigQuery', () => {
     const FAKE_ROWS = [{}, {}, {}];
     const FAKE_RESPONSE = {};
     const QUERY_STRING = 'SELECT * FROM [dataset.table]';
-    const FAKE_JOB = it('should return any errors from createQueryJob', done => {
-      const error = new Error('err');
-
-      bq.createQueryJob = (query: {}, callback: Function) => {
-        callback(error, null, FAKE_RESPONSE);
-      };
-
-      bq.query(QUERY_STRING, (err: Error, rows: {}, resp: {}) => {
-        assert.strictEqual(err, error);
-        assert.strictEqual(rows, null);
-        assert.strictEqual(resp, FAKE_RESPONSE);
-        done();
-      });
-    });
 
     it('should exit early if dryRun is set', done => {
       const options = {
@@ -1801,18 +1787,19 @@ describe('BigQuery', () => {
         },
       };
 
-      const fakeJob = new EventEmitter();
-      fakeJob.emit('complete', metadata);
+      const fakeJob = new EventEmitter(); 
+      // tslint:disable-next-line: no-any
+      (fakeJob as any).metadata = metadata;   
 
       bq.createQueryJob = (query: {}, callback: Function) => {
         callback(null, fakeJob, FAKE_RESPONSE);
-        done();
       };
 
       const finalCallback = (err: Error | null, rows: {}, resp: {}) => {
         assert.ifError(err);
         assert.strictEqual(rows, FAKE_ROWS);
         assert.strictEqual(resp, FAKE_RESPONSE);
+        done();
       };
 
       const fakeTable = {
@@ -1836,6 +1823,7 @@ describe('BigQuery', () => {
       };
 
       bq.query(QUERY_STRING, finalCallback);
+      fakeJob.emit('complete', metadata);
     });
 
     it('should call job#getQueryResults for model query', done => {
