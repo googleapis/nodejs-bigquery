@@ -1587,10 +1587,8 @@ export class BigQuery extends common.Service {
       // table#getRows uses listTableData endpoint, which is a faster method
       // to read rows of the results. However, it won't work for model queries,
       // so use the original job#getQueryResults for model queries.
-      if (
-        typeof query === 'string' &&
-        (query.includes('CREATE MODEL') || query.includes('REPLACE MODEL'))
-      ) {
+      const modelQueryRegex = new RegExp('\\b((create|replace) model)\\b', 'i');
+      if (typeof query === 'string' && query.match(modelQueryRegex)) {
         job!.getQueryResults(options, callback as QueryRowsCallback);
         return;
       }
