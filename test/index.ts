@@ -1765,6 +1765,18 @@ describe('BigQuery', () => {
     const FAKE_RESPONSE = {};
     const QUERY_STRING = 'SELECT * FROM [dataset.table]';
     const MODEL_QUERY_STRING = `CREATE OR REPLACE MODEL \`dataset.model\``;
+    const TABLE_ID = 'bq_table';
+    const DATASET_ID = 'bq_dataset';
+    const METADATA = {
+      configuration: {
+        query: {
+          destinationTable: {
+            datasetId: DATASET_ID,
+            tableId: TABLE_ID,
+          },
+        },
+      },
+    };
 
     it('should exit early if dryRun is set', done => {
       const options = {
@@ -1786,32 +1798,12 @@ describe('BigQuery', () => {
     });
 
     it('should call table#getRows', done => {
-      const TABLE_ID = 'bq_table';
-      const DATASET_ID = 'bq_dataset';
-      const metadata = {
-        configuration: {
-          query: {
-            destinationTable: {
-              datasetId: DATASET_ID,
-              tableId: TABLE_ID,
-            },
-          },
-        },
-      };
-
       const fakeJob = new EventEmitter();
       // tslint:disable-next-line: no-any
-      (fakeJob as any).metadata = metadata;
+      (fakeJob as any).metadata = METADATA;
 
       bq.createQueryJob = (query: {}, callback: Function) => {
         callback(null, fakeJob, FAKE_RESPONSE);
-      };
-
-      const finalCallback = (err: Error | null, rows: {}, resp: {}) => {
-        assert.ifError(err);
-        assert.strictEqual(rows, FAKE_ROWS);
-        assert.strictEqual(resp, FAKE_RESPONSE);
-        done();
       };
 
       const fakeTable = {
@@ -1834,7 +1826,7 @@ describe('BigQuery', () => {
       };
 
       bq.query(QUERY_STRING, done);
-      fakeJob.emit('complete', metadata);
+      fakeJob.emit('complete', METADATA);
     });
 
     it('should call job#getQueryResults for model query', done => {
@@ -1869,6 +1861,21 @@ describe('BigQuery', () => {
         assert.strictEqual(resp, FAKE_RESPONSE);
         done();
       });
+    });
+
+    it('should return any errors from job', done => {
+      const fakeJob = new EventEmitter();
+      const error = new Error('err');
+
+      bq.createQueryJob = ({}, callback: Function) => {
+        callback(null, fakeJob, error);
+      };
+
+      bq.query(QUERY_STRING, (err: Error) => {
+        assert.strictEqual(err, error);
+        done();
+      });
+      fakeJob.emit('error', error);
     });
   });
 
