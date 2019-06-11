@@ -148,7 +148,7 @@ Apache Version 2.0
 
 See [LICENSE](https://github.com/googleapis/nodejs-bigquery/blob/master/LICENSE)
 
-[client-docs]: https://cloud.google.com/nodejs/docs/reference/bigquery/latest/
+[client-docs]: https://googleapis.dev/nodejs/bigquery/latest
 [product-docs]: https://cloud.google.com/bigquery
 [shell_img]: https://gstatic.com/cloudssh/images/open-btn.png
 [projects]: https://console.cloud.google.com/project
