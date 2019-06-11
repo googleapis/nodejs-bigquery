@@ -1,5 +1,5 @@
 {
-  "name": "@google-cloud/bigquery",
+  "name": "bigquery",
   "name_pretty": "Google Cloud Bigquery",
   "product_documentation": "https://cloud.google.com/bigquery",
   "client_documentation": "https://cloud.google.com/nodejs/docs/reference/bigquery/latest/",
