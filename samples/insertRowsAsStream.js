@@ -31,8 +31,9 @@ function main(
     /**
      * TODO(developer): Uncomment the following lines before running the sample.
      */
-    // const datasetId = "my_dataset";
-    // const tableId = "my_table";
+    // const datasetId = 'my_dataset';
+    // const tableId = 'my_table';
+    // const rows = [{name: 'Tom', age: 30}, {name: 'Jane', age: 32}];
 
     // Create a client
     const bigqueryClient = new BigQuery();
