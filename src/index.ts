@@ -1591,25 +1591,21 @@ export class BigQuery extends common.Service {
       options = extend({job}, options);
 
       // table#getRows uses listTableData endpoint, which is a faster method
-      // to read rows of the results. However, it won't work for model queries,
-      // so use the original job#getQueryResults for model queries.
-      const modelQueryRegex = new RegExp('\\b((create|replace) model)\\b', 'i');
-      if (typeof query === 'string' && query.match(modelQueryRegex)) {
-        job!.getQueryResults(options, callback as QueryRowsCallback);
-        return;
-      }
+      // to read rows of results.
 
-      job!
-        .on('error', err => callback!(err))
-        .on('complete', () => {
-          const datasetId = job!.metadata.configuration.query.destinationTable
+      job!.getQueryResults(options, (err, rows) => {
+        if (!err) {
+          if (rows!.length !== 0) {
+            const datasetId = job!.metadata.configuration.query.destinationTable
             .datasetId;
-          const tableId = job!.metadata.configuration.query.destinationTable
-            .tableId;
-          const dataset = this.dataset(datasetId);
-          const table = dataset.table(tableId);
-          table.getRows(options, callback as RowsCallback);
-        });
+            const tableId = job!.metadata.configuration.query.destinationTable
+              .tableId;
+            const dataset = this.dataset(datasetId);
+            const table = dataset.table(tableId);
+            table.getRows(options, callback as RowsCallback);
+          }
+        }
+      });
     });
   }
 

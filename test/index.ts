@@ -1798,7 +1798,12 @@ describe('BigQuery', () => {
     });
 
     it('should call table#getRows', done => {
-      const fakeJob = new EventEmitter();
+      // const fakeJob = new EventEmitter();
+      const fakeJob = {
+        getQueryResults: (options: {}, callback: Function) => {
+          callback(null, FAKE_ROWS, FAKE_RESPONSE);
+        },
+      };
       // tslint:disable-next-line: no-any
       (fakeJob as any).metadata = METADATA;
 
@@ -1826,7 +1831,7 @@ describe('BigQuery', () => {
       };
 
       bq.query(QUERY_STRING, done);
-      fakeJob.emit('complete', METADATA);
+      // fakeJob.emit('complete', METADATA);
     });
 
     it('should call job#getQueryResults for model query', done => {
@@ -1864,8 +1869,13 @@ describe('BigQuery', () => {
     });
 
     it('should return any errors from job', done => {
-      const fakeJob = new EventEmitter();
-      const error = new Error('err');
+      const fakeJob = {
+        getQueryResults: (options: {}, callback: Function) => {
+          callback(null, FAKE_ROWS, FAKE_RESPONSE);
+        },
+      };
+
+      const error = new Error('Error.');
 
       bq.createQueryJob = ({}, callback: Function) => {
         callback(null, fakeJob, error);
@@ -1875,7 +1885,6 @@ describe('BigQuery', () => {
         assert.strictEqual(err, error);
         done();
       });
-      fakeJob.emit('error', error);
     });
   });
 
