@@ -17,10 +17,14 @@
   * [Create Dataset](#create-dataset)
   * [Create Table](#create-table)
   * [Delete Dataset](#delete-dataset)
+  * [BigQuery Delete Model](#bigquery-delete-model)
   * [Delete Table](#delete-table)
   * [Extract Table To GCS](#extract-table-to-gcs)
+  * [BigQuery Get Model](#bigquery-get-model)
   * [Insert Rows As Stream](#insert-rows-as-stream)
   * [List Datasets](#list-datasets)
+  * [BigQuery List Models](#bigquery-list-models)
+  * [BigQuery List Models Streaming](#bigquery-list-models-streaming)
   * [List Tables](#list-tables)
   * [Load CSV From GCS](#load-csv-from-gcs)
   * [Load CSV From GCS Autodetect](#load-csv-from-gcs-autodetect)
@@ -42,6 +46,7 @@
   * [Query Params Timestamps](#query-params-timestamps)
   * [Query Stack Overflow](#query-stack-overflow)
   * [Quickstart](#quickstart)
+  * [BigQuery Update Model](#bigquery-update-model)
 
 ## Before you begin
 
@@ -137,6 +142,25 @@ __Usage:__
 
 
 
+### BigQuery Delete Model
+
+Deletes a model.
+
+View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/deleteModel.js).
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/deleteModel.js,samples/README.md)
+
+__Usage:__
+
+
+`node deleteModel.js <DATASET_ID> <MODEL_ID>`
+
+
+-----
+
+
+
+
 ### Delete Table
 
 View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/deleteTable.js).
@@ -171,6 +195,25 @@ __Usage:__
 
 
 
+### BigQuery Get Model
+
+Retrieves an existing model from a dataset.
+
+View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/getModel.js).
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/getModel.js,samples/README.md)
+
+__Usage:__
+
+
+`node getModel.js <DATASET_ID> <MODEL_ID>`
+
+
+-----
+
+
+
+
 ### Insert Rows As Stream
 
 View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/insertRowsAsStream.js).
@@ -198,6 +241,44 @@ __Usage:__
 
 
 `node listDatasets.js`
+
+
+-----
+
+
+
+
+### BigQuery List Models
+
+Lists all existing models in the dataset.
+
+View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/listModels.js).
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/listModels.js,samples/README.md)
+
+__Usage:__
+
+
+`node listModels.js <DATASET_ID>`
+
+
+-----
+
+
+
+
+### BigQuery List Models Streaming
+
+Lists all existing models in the dataset using streaming method.
+
+View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/listModelsStreaming.js).
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/listModelsStreaming.js,samples/README.md)
+
+__Usage:__
+
+
+`node listModelsStreaming.js <DATASET_ID>`
 
 
 -----
@@ -555,6 +636,25 @@ __Usage:__
 
 
 `node quickstart.js`
+
+
+-----
+
+
+
+
+### BigQuery Update Model
+
+Updates a model's metadata.
+
+View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/updateModel.js).
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/updateModel.js,samples/README.md)
+
+__Usage:__
+
+
+`node updateModel.js <DATASET_ID> <MODEL_ID>`
 
 
 
