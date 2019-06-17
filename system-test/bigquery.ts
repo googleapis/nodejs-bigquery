@@ -347,9 +347,10 @@ describe('BigQuery', () => {
         query,
         dryRun: true,
       },
-      (err, rows, resp) => {
+      (err, rows, nextQuery, resp) => {
         assert.ifError(err);
         assert.deepStrictEqual(rows, []);
+        assert.strictEqual(nextQuery, null);
         // tslint:disable-next-line no-any
         assert((resp as any).statistics.query);
         done();

@@ -32,8 +32,8 @@ import {
   Job,
   Dataset,
   Query,
-  SimpleQueryRowsResponse,
-  SimpleQueryRowsCallback,
+  QueryRowsResponse,
+  QueryRowsCallback,
   ResourceCallback,
   RequestCallback,
   PagedResponse,
@@ -95,7 +95,9 @@ export type TableRow = bigquery.ITableRow;
 export type TableRowField = bigquery.ITableCell;
 export type TableRowValue = string | TableRow;
 
-export type GetRowsOptions = PagedRequest<bigquery.tabledata.IListParams>;
+export type GetRowsOptions = {table?: Table} & PagedRequest<
+  bigquery.tabledata.IListParams
+>;
 
 export type JobLoadMetadata = JobRequest<bigquery.IJobConfigurationLoad> & {
   format?: string;
@@ -2057,8 +2059,8 @@ class Table extends common.ServiceObject {
     });
   }
 
-  query(query: Query): Promise<SimpleQueryRowsResponse>;
-  query(query: Query, callback: SimpleQueryRowsCallback): void;
+  query(query: Query | string): Promise<QueryRowsResponse>;
+  query(query: Query | string, callback: QueryRowsCallback): void;
   /**
    * Run a query scoped to your dataset.
    *
@@ -2068,9 +2070,9 @@ class Table extends common.ServiceObject {
    * @returns {Promise}
    */
   query(
-    query: Query,
-    callback?: SimpleQueryRowsCallback
-  ): void | Promise<SimpleQueryRowsResponse> {
+    query: Query | string,
+    callback?: QueryRowsCallback
+  ): void | Promise<QueryRowsResponse> {
     this.dataset.query(query, callback!);
   }
 

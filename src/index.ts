@@ -75,12 +75,12 @@ export type PagedRequest<P> = P & {
 export type QueryRowsResponse = PagedResponse<
   RowMetadata,
   Query,
-  bigquery.ITableDataList
+  bigquery.IJob | bigquery.IGetQueryResultsResponse | bigquery.ITableDataList
 >;
 export type QueryRowsCallback = PagedCallback<
   RowMetadata,
   Query,
-  bigquery.ITableDataList
+  bigquery.IJob | bigquery.IGetQueryResultsResponse | bigquery.ITableDataList
 >;
 
 export type SimpleQueryRowsResponse = [RowMetadata[], bigquery.IJob];
@@ -96,6 +96,7 @@ export type Query = JobRequest<bigquery.IJobConfigurationQuery> & {
   dryRun?: boolean;
   defaultDataset?: Dataset;
   job?: Job;
+  table?: Table;
   maxResults?: number;
   timeoutMs?: number;
   pageToken?: string;
@@ -295,7 +296,7 @@ export class BigQuery extends common.Service {
      *     this.end();
      *   });
      */
-    this.createQueryStream = paginator.streamify<RowMetadata>('queryAsStream_');
+    this.createQueryStream = paginator.streamify<RowMetadata>('query');
 
     /**
      * List all or some of the {@link Dataset} objects in your project as
@@ -1463,20 +1464,16 @@ export class BigQuery extends common.Service {
     return new Job(this, id, options);
   }
 
-  query(query: string, options?: QueryOptions): Promise<QueryRowsResponse>;
-  query(query: Query, options?: QueryOptions): Promise<SimpleQueryRowsResponse>;
   query(
-    query: string,
+    query: Query | string,
+    options?: QueryOptions
+  ): Promise<QueryRowsResponse>;
+  query(
+    query: Query | string,
     options: QueryOptions,
     callback?: QueryRowsCallback
   ): void;
-  query(
-    query: Query,
-    options: QueryOptions,
-    callback?: SimpleQueryRowsCallback
-  ): void;
-  query(query: string, callback?: QueryRowsCallback): void;
-  query(query: Query, callback?: SimpleQueryRowsCallback): void;
+  query(query: Query | string, callback?: QueryRowsCallback): void;
   /**
    * Run a query scoped to your project. For manual pagination please refer to
    * {@link BigQuery#createQueryJob}.
@@ -1568,44 +1565,61 @@ export class BigQuery extends common.Service {
    */
   query(
     query: string | Query,
-    optionsOrCallback?:
-      | QueryOptions
-      | SimpleQueryRowsCallback
-      | QueryRowsCallback,
-    cb?: SimpleQueryRowsCallback | QueryRowsCallback
-  ): void | Promise<SimpleQueryRowsResponse> | Promise<QueryRowsResponse> {
-    let options =
+    optionsOrCallback?: QueryOptions | QueryRowsCallback,
+    cb?: QueryRowsCallback
+  ): void | Promise<QueryRowsResponse> {
+    const options =
       typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
     const callback =
       typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
-    this.createQueryJob(query, (err, job, resp) => {
-      if (err) {
-        (callback as SimpleQueryRowsCallback)(err, null, resp);
-        return;
-      }
-      if (typeof query === 'object' && query.dryRun) {
-        (callback as SimpleQueryRowsCallback)(null, [], resp);
-        return;
-      }
-      // The Job is important for the `queryAsStream_` method, so a new query
-      // isn't created each time results are polled for.
-      options = extend({job}, options);
-      job!.getQueryResults(options, callback as QueryRowsCallback);
-    });
+
+    query = typeof query === 'string' ? {query} : query;
+
+    if (query.table) {
+      query.table.getRows(options, callback!);
+      return;
+    }
+
+    this.runQuery_(query, options).then(
+      ([rows, nextQuery, resp]) => callback!(null, rows, nextQuery, resp),
+      callback!
+    );
   }
 
   /**
-   * This method will be called by `createQueryStream()`. It is required to
-   * properly set the `autoPaginate` option value.
-   *
    * @private
    */
-  queryAsStream_(query: Query, callback?: SimpleQueryRowsCallback) {
-    if (query.job) {
-      query.job.getQueryResults(query, callback as QueryRowsCallback);
-      return;
+  async runQuery_(query: Query, options: QueryOptions): Promise<RowsResponse> {
+    const [job, resp] = await this.createQueryJob(query);
+
+    if (query.dryRun) {
+      return [[], null, resp];
     }
-    this.query(query, {autoPaginate: false}, callback);
+
+    const queryOptions = Object.assign({}, options, {autoPaginate: false});
+    let rows, nextQuery, results;
+
+    do {
+      [rows, nextQuery, results] = await job.getQueryResults(queryOptions);
+    } while (!results!.jobComplete);
+
+    if (!rows.length) {
+      return [rows, null, results!];
+    }
+
+    const {datasetId, tableId} = resp.configuration!.query!.destinationTable!;
+    const table = this.dataset(datasetId!).table(tableId!);
+
+    table.metadata = {schema: results!.schema};
+
+    const tableData = await table.getRows(options);
+
+    // cache table in next query object to prevent creating a new job/etc.
+    if (tableData[1]) {
+      tableData[1].table = table;
+    }
+
+    return tableData;
   }
 }
 

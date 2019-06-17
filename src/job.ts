@@ -31,7 +31,9 @@ import * as extend from 'extend';
 import {
   BigQuery,
   JobRequest,
+  PagedCallback,
   PagedRequest,
+  PagedResponse,
   QueryRowsCallback,
   QueryRowsResponse,
   RequestCallback,
@@ -47,6 +49,17 @@ export type CancelResponse = [bigquery.IJobCancelResponse];
 
 export type QueryResultsOptions = {job?: Job} & PagedRequest<
   bigquery.jobs.IGetQueryResultsParams
+>;
+
+export type GetQueryResultsResponse = PagedResponse<
+  RowMetadata,
+  QueryResultsOptions,
+  bigquery.IGetQueryResultsResponse
+>;
+export type GetQueryResultsCallback = PagedCallback<
+  RowMetadata,
+  QueryResultsOptions,
+  bigquery.IGetQueryResultsResponse
 >;
 
 /**
@@ -314,12 +327,14 @@ class Job extends Operation {
     );
   }
 
-  getQueryResults(options?: QueryResultsOptions): Promise<QueryRowsResponse>;
+  getQueryResults(
+    options?: QueryResultsOptions
+  ): Promise<GetQueryResultsResponse>;
   getQueryResults(
     options: QueryResultsOptions,
-    callback: QueryRowsCallback
+    callback: GetQueryResultsCallback
   ): void;
-  getQueryResults(callback: QueryRowsCallback): void;
+  getQueryResults(callback: GetQueryResultsCallback): void;
   /**
    * Get the results of a job.
    *
@@ -388,9 +403,9 @@ class Job extends Operation {
    * });
    */
   getQueryResults(
-    optionsOrCallback?: QueryResultsOptions | QueryRowsCallback,
-    cb?: QueryRowsCallback
-  ): void | Promise<QueryRowsResponse> {
+    optionsOrCallback?: QueryResultsOptions | GetQueryResultsCallback,
+    cb?: GetQueryResultsCallback
+  ): void | Promise<GetQueryResultsResponse> {
     const options =
       typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
     const callback =
