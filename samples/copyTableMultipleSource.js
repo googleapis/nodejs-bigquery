@@ -16,38 +16,37 @@
 
 'use strict';
 
-// sample-metadata:
-//   title: BigQuery Update Model
-//   description: Updates a model's metadata.
-//   usage: node updateModel.js <DATASET_ID> <MODEL_ID>
-
-function main(datasetId) {
-  // [START bigquery_update_dataset_description]
+function main(datasetId, sourceTable, destinationTable) {
+  // [START bigquery_copy_table_multiple_source]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
 
-  async function updateDatasetDescription(
-    datasetId = 'my_dataset' // Existing dataset
+  async function copyTableMultipleSource(
+    datasetId = 'my_dataset', // Existing dataset
+    sourceTable = 'my_table', // Existing table to copy from
+    destinationTable = 'testing' // Existing table to copy to
   ) {
-    // Updates a dataset's description.
+    // Copy multiple source tables to a given destination.
 
     // Create a client
     const bigqueryClient = new BigQuery();
-
-    // Retreive current dataset metadata
     const dataset = bigqueryClient.dataset(datasetId);
-    const [metadata] = await dataset.getMetadata();
 
-    // Set new dataset description
-    const description = 'New dataset description.';
-    metadata.description = description;
+    const metadata = {
+      createDisposition: 'CREATE_NEVER',
+      writeDisposition: 'WRITE_TRUNCATE',
+    };
 
-    const [apiResponse] = await dataset.setMetadata(metadata);
-    const newDescription = apiResponse.description;
+    // Create table references
+    const table = dataset.table(sourceTable);
+    const yourTable = dataset.table(destinationTable);
 
-    console.log(`${datasetId} description: ${newDescription}`);
+    // Copy table
+    const [apiResponse] = await table.copy(yourTable, metadata);
+    console.log(apiResponse.configuration.copy);
   }
-  // [END bigquery_update_dataset_description]
-  updateDatasetDescription(datasetId);
+  // [END bigquery_copy_table_multiple_source]
+  copyTableMultipleSource(datasetId, sourceTable, destinationTable);
 }
+
 main(...process.argv.slice(2));

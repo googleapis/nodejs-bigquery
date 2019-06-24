@@ -16,38 +16,34 @@
 
 'use strict';
 
-// sample-metadata:
-//   title: BigQuery Update Model
-//   description: Updates a model's metadata.
-//   usage: node updateModel.js <DATASET_ID> <MODEL_ID>
-
-function main(datasetId) {
-  // [START bigquery_update_dataset_description]
+function main(datasetId, tableId) {
+  // [START bigquery_label_table]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
 
-  async function updateDatasetDescription(
-    datasetId = 'my_dataset' // Existing dataset
+  async function labelTable(
+    datasetId = 'my_dataset', // Existing dataset
+    tableId = 'my_table' // Existing table
   ) {
-    // Updates a dataset's description.
+    // Adds a label to an existing table.
 
     // Create a client
     const bigqueryClient = new BigQuery();
 
-    // Retreive current dataset metadata
     const dataset = bigqueryClient.dataset(datasetId);
-    const [metadata] = await dataset.getMetadata();
+    const [table] = await dataset.table(tableId).get();
 
-    // Set new dataset description
-    const description = 'New dataset description.';
-    metadata.description = description;
+    // Retrieve current table metadata
+    const [metadata] = await table.getMetadata();
 
-    const [apiResponse] = await dataset.setMetadata(metadata);
-    const newDescription = apiResponse.description;
+    // Add label to table metadata
+    metadata.labels = {color: 'green'};
+    const [apiResponse] = await table.setMetadata(metadata);
 
-    console.log(`${datasetId} description: ${newDescription}`);
+    console.log(`${tableId} labels:`);
+    console.log(apiResponse.labels);
   }
-  // [END bigquery_update_dataset_description]
-  updateDatasetDescription(datasetId);
+  // [END bigquery_label_table]
+  labelTable(datasetId, tableId);
 }
 main(...process.argv.slice(2));

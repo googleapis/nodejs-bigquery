@@ -90,10 +90,42 @@ describe('Tables', () => {
     assert.ok(exists);
   });
 
+  it(`should retrieve a table if it exists`, async () => {
+    const output = execSync(`node getTable.js ${datasetId} ${tableId}`);
+    assert.include(output, 'Table:');
+    assert.include(output, datasetId && tableId);
+  });
+
   it(`should list tables`, async () => {
     const output = execSync(`node listTables.js ${datasetId}`);
     assert.match(output, /Tables:/);
     assert.match(output, new RegExp(tableId));
+  });
+
+  it(`should update table's description`, async () => {
+    const output = execSync(
+      `node updateTableDescription.js ${datasetId} ${tableId}`
+    );
+    assert.include(output, `${tableId} description: New table description.`);
+  });
+
+  it(`should update table's expiration`, async () => {
+    const currentTime = Date.now();
+    const expirationTime = currentTime + 1000 * 60 * 60 * 24 * 5;
+    const output = execSync(
+      `node updateTableExpiration.js ${datasetId} ${tableId} ${expirationTime}`
+    );
+    assert.include(output, `${tableId} expiration: ${expirationTime}`);
+  });
+
+  it(`should add label to a table`, async () => {
+    const output = execSync(`node labelTable.js ${datasetId} ${tableId}`);
+    assert.include(output, `${tableId} labels:` && "{ color: 'green' }");
+  });
+
+  it(`should delete a label from a table`, async () => {
+    const output = execSync(`node deleteLabelTable.js ${datasetId} ${tableId}`);
+    assert.include(output, `${tableId} labels:` && 'undefined');
   });
 
   it(`should load a local CSV file`, async () => {
@@ -270,6 +302,20 @@ describe('Tables', () => {
       `node insertRowsAsStream.js ${datasetId} ${tableId}`
     );
     assert.match(output, /Inserted 2 rows/);
+  });
+
+  it(`copy multiple source tables to a given destination`, async () => {
+    execSync(`node createTable.js ${datasetId} destinationTable "${schema}"`);
+    const output = execSync(
+      `node copyTableMultipleSource.js ${datasetId} ${tableId} destinationTable`
+    );
+    assert.include(
+      output,
+      'sourceTable' &&
+        'destinationTable' &&
+        'createDisposition' &&
+        'writeDisposition'
+    );
   });
 
   it(`should delete a table`, async () => {

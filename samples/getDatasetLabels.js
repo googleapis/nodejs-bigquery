@@ -22,32 +22,29 @@
 //   usage: node updateModel.js <DATASET_ID> <MODEL_ID>
 
 function main(datasetId) {
-  // [START bigquery_update_dataset_description]
+  // [START bigquery_get_dataset_labels]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
 
-  async function updateDatasetDescription(
+  async function getDatasetLabels(
     datasetId = 'my_dataset' // Existing dataset
   ) {
-    // Updates a dataset's description.
+    // Gets labels on a dataset.
 
     // Create a client
     const bigqueryClient = new BigQuery();
 
-    // Retreive current dataset metadata
+    // Retrieve current dataset metadata.
     const dataset = bigqueryClient.dataset(datasetId);
     const [metadata] = await dataset.getMetadata();
+    const labels = metadata.labels;
 
-    // Set new dataset description
-    const description = 'New dataset description.';
-    metadata.description = description;
-
-    const [apiResponse] = await dataset.setMetadata(metadata);
-    const newDescription = apiResponse.description;
-
-    console.log(`${datasetId} description: ${newDescription}`);
+    console.log(`${datasetId} Labels:`);
+    for (const [key, value] of Object.entries(labels)) {
+      console.log(`${key}: ${value}`);
+    }
   }
-  // [END bigquery_update_dataset_description]
-  updateDatasetDescription(datasetId);
+  // [END bigquery_get_dataset_labels]
+  getDatasetLabels(datasetId);
 }
 main(...process.argv.slice(2));
