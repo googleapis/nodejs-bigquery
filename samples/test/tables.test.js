@@ -340,7 +340,7 @@ describe('Tables', () => {
   describe(`Delete Table`, () => {
     const datasetId = `gcloud_tests_${uuid.v4()}`.replace(/-/gi, '_');
     const tableId = `gcloud_tests_${uuid.v4()}`.replace(/-/gi, '_');
-  
+
     before(async () => {
       const datasetOptions = {
         location: 'US',
@@ -348,21 +348,19 @@ describe('Tables', () => {
       const tableOptions = {
         location: 'US',
       };
-  
+
       await bigquery.createDataset(datasetId, datasetOptions);
       // Create a new table in the dataset
-      await bigquery
-            .dataset(datasetId)
-            .createTable(tableId, tableOptions);
+      await bigquery.dataset(datasetId).createTable(tableId, tableOptions);
     });
-  
+
     after(async () => {
       await bigquery
         .dataset(datasetId)
         .delete({force: true})
         .catch(console.warn);
     });
-  
+
     it(`should delete a table`, async () => {
       const output = execSync(`node deleteTable.js ${datasetId} ${tableId}`);
       assert.include(output, `Table ${tableId} deleted.`);
@@ -373,5 +371,4 @@ describe('Tables', () => {
       assert.strictEqual(exists, false);
     });
   });
-  
 });
