@@ -17,10 +17,29 @@
 
 const {assert} = require('chai');
 const cp = require('child_process');
+const uuid = require('uuid');
+
+const {BigQuery} = require('@google-cloud/bigquery');
 
 const execSync = cmd => cp.execSync(cmd, {encoding: 'utf-8'});
 
+const datasetId = `gcloud_tests_${uuid.v4()}`.replace(/-/gi, '_');
+const tableId = `gcloud_tests_${uuid.v4()}`.replace(/-/gi, '_');
+
+const bigquery = new BigQuery();
+
 describe(`Queries`, () => {
+  before(async () => {
+    await bigquery.createDataset(datasetId);
+    await bigquery.dataset(datasetId).createTable(tableId);
+  })
+  after(async () => {
+    await bigquery
+      .dataset(datasetId)
+      .delete({force: true})
+      .catch(console.warn);
+  });
+
   it(`should query stackoverflow`, async () => {
     const output = execSync(`node queryStackOverflow.js`);
     assert.match(output, /Query Results:/);
@@ -67,5 +86,10 @@ describe(`Queries`, () => {
     const output = execSync(`node queryParamsTimestamps.js`);
     assert.match(output, /Rows:/);
     assert.match(output, /BigQueryTimestamp/);
+  });
+
+  it(`should run a query with a destination table`, async () => {
+    const output = execSync(`node queryDestinationTable.js ${datasetId} ${tableId}`);
+    assert.include(output, `Query results loaded to table ${tableId}`);
   });
 });

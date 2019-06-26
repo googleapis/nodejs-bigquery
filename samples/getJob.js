@@ -16,36 +16,28 @@
 
 'use strict';
 
-function main(datasetId, tableId) {
-  // [START bigquery_create_table]
+function main(jobId) {
+  // [START bigquery_get_job]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
 
-  async function createTable(
-    datasetId = "my_new_dataset",
-    tableId = "my_new_table"
+  async function getJob(
+      jobId = '80390a60-e2b4-4104-a2ff-236cac5057bf'
   ) {
-    // Creates a new table named "my_table" in "my_dataset".
-
-    const schema = "Name:string, Age:integer, Weight:float, IsMagic:boolean";
+    // Get job properties.
 
     // Create a client
     const bigqueryClient = new BigQuery();
 
-    // For all options, see https://cloud.google.com/bigquery/docs/reference/v2/tables#resource
-    const options = {
-      schema: schema,
-      location: 'US',
-    };
+    // Create a job reference
+    const job = bigqueryClient.job(jobId);
 
-    // Create a new table in the dataset
-    const [table] = await bigqueryClient
-      .dataset(datasetId)
-      .createTable(tableId, options);
-
-    console.log(`Table ${table.id} created.`);
+    // Retrieve job
+    const [jobResult] = await job.get()
+    
+    console.log(jobResult.metadata.jobReference);
   }
-  // [END bigquery_create_table]
-  createTable(datasetId, tableId);
+  getJob(jobId);
+  // [END bigquery_get_job]
 }
 main(...process.argv.slice(2));

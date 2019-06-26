@@ -16,36 +16,26 @@
 
 'use strict';
 
-function main(datasetId, tableId) {
-  // [START bigquery_create_table]
+function main() {
+  // [START bigquery_list_jobs]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
 
-  async function createTable(
-    datasetId = "my_new_dataset",
-    tableId = "my_new_table"
-  ) {
-    // Creates a new table named "my_table" in "my_dataset".
-
-    const schema = "Name:string, Age:integer, Weight:float, IsMagic:boolean";
+  async function listJobs() {
+    // Lists all jobs in current GCP project.
 
     // Create a client
     const bigqueryClient = new BigQuery();
 
-    // For all options, see https://cloud.google.com/bigquery/docs/reference/v2/tables#resource
-    const options = {
-      schema: schema,
-      location: 'US',
-    };
+    // List the 10 most recent jobs in reverse chronological order.
+    //  Omit the max_results parameter to list jobs from the past 6 months.
+    const options = {maxResults: 10};
+    const [jobs] = await bigqueryClient.getJobs(options);
 
-    // Create a new table in the dataset
-    const [table] = await bigqueryClient
-      .dataset(datasetId)
-      .createTable(tableId, options);
-
-    console.log(`Table ${table.id} created.`);
+    console.log('Jobs:');
+    jobs.forEach(job => console.log(job.id));
   }
-  // [END bigquery_create_table]
-  createTable(datasetId, tableId);
+  listJobs();
+  // [END bigquery_list_jobs]
 }
 main(...process.argv.slice(2));

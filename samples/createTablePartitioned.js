@@ -17,17 +17,17 @@
 'use strict';
 
 function main(datasetId, tableId) {
-  // [START bigquery_create_table]
+  // [START bigquery_create_table_partitioned]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
 
-  async function createTable(
-    datasetId = "my_new_dataset",
-    tableId = "my_new_table"
+  async function createTablePartitioned(
+      datasetId = 'funtimes123',
+      tableId = 'my_table11'
   ) {
-    // Creates a new table named "my_table" in "my_dataset".
+    // Creates a new partitioned table named "my_table" in "my_dataset".
 
-    const schema = "Name:string, Age:integer, Weight:float, IsMagic:boolean";
+    const schema = "Name:string, Post_Abbr:string, Date:date";
 
     // Create a client
     const bigqueryClient = new BigQuery();
@@ -36,16 +36,21 @@ function main(datasetId, tableId) {
     const options = {
       schema: schema,
       location: 'US',
+      timePartitioning: {
+          type: 'DAY',
+          expirationMS: '7776000000',
+          field: 'date'
+      }
     };
 
     // Create a new table in the dataset
     const [table] = await bigqueryClient
       .dataset(datasetId)
       .createTable(tableId, options);
-
-    console.log(`Table ${table.id} created.`);
+    console.log(`Table ${table.id} created with partitioning: `);
+    console.log(table.metadata.timePartitioning);
   }
-  // [END bigquery_create_table]
-  createTable(datasetId, tableId);
+  // [END bigquery_create_table_partitioned]
+  createTablePartitioned(datasetId, tableId);
 }
 main(...process.argv.slice(2));

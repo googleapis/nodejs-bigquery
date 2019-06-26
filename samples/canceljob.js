@@ -16,36 +16,28 @@
 
 'use strict';
 
-function main(datasetId, tableId) {
-  // [START bigquery_create_table]
+function main(jobId) {
+  // [START bigquery_cancel_job]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
 
-  async function createTable(
-    datasetId = "my_new_dataset",
-    tableId = "my_new_table"
+  async function cancelJob(
+      jobId = 'existing-job-id'
   ) {
-    // Creates a new table named "my_table" in "my_dataset".
-
-    const schema = "Name:string, Age:integer, Weight:float, IsMagic:boolean";
+    // Attempt to cancel a job.
 
     // Create a client
     const bigqueryClient = new BigQuery();
 
-    // For all options, see https://cloud.google.com/bigquery/docs/reference/v2/tables#resource
-    const options = {
-      schema: schema,
-      location: 'US',
-    };
+    // Create a job reference
+    const job = bigqueryClient.job(jobId);
 
-    // Create a new table in the dataset
-    const [table] = await bigqueryClient
-      .dataset(datasetId)
-      .createTable(tableId, options);
-
-    console.log(`Table ${table.id} created.`);
+    // Attempt to cancel job
+    const [apiResult] = await job.cancel()
+    
+    console.log(apiResult.job.status);
   }
-  // [END bigquery_create_table]
-  createTable(datasetId, tableId);
+  cancelJob(jobId);
+  // [END bigquery_cancel_job]
 }
 main(...process.argv.slice(2));

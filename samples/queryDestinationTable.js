@@ -16,41 +16,45 @@
 
 'use strict';
 
-function main() {
-  // [START bigquery_query]
+function main(datasetId, tableId) {
+  // [START bigquery_query_destination_table]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
 
-  async function query() {
-    // Queries the U.S. given names dataset for the state of Texas.
+  async function query(
+      datasetId = 'my_existing_dataset', 
+      tableId = 'my_existing_table'
+      ) {
+    // Queries the U.S. given names dataset for the state of Texas
+    // and saves results to permanent table.
 
     // Create a client
     const bigqueryClient = new BigQuery();
+
+    // Create destination table reference
+    const dataset = bigqueryClient.dataset(datasetId);
+    const destinationTable = dataset.table(tableId);
 
     const query = `SELECT name
       FROM \`bigquery-public-data.usa_names.usa_1910_2013\`
       WHERE state = 'TX'
       LIMIT 100`;
-
-    // For all options, see https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs/query
+      
+    // For all options, see https://cloud.google.com/bigquery/docs/reference/v2/tables#resource
     const options = {
       query: query,
       // Location must match that of the dataset(s) referenced in the query.
       location: 'US',
+      destination: destinationTable
     };
 
     // Run the query as a job
     const [job] = await bigqueryClient.createQueryJob(options);
+
     console.log(`Job ${job.id} started.`);
-
-    // Wait for the query to finish
-    const [rows] = await job.getQueryResults();
-
-    // Print the results
-    console.log('Rows:');
-    rows.forEach(row => console.log(row));
+    console.log(`Query results loaded to table ${destinationTable.id}`)
   }
-  query();
-  // [END bigquery_query]
+  // [END bigquery_query_destination_table]
+  query(datasetId, tableId);
 }
 main(...process.argv.slice(2));

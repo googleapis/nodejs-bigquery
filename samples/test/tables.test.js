@@ -31,6 +31,7 @@ const datasetId = generateUuid();
 const srcDatasetId = datasetId;
 const destDatasetId = generateUuid();
 const tableId = generateUuid();
+const partitionedTableId = generateUuid();
 const srcTableId = tableId;
 const destTableId = generateUuid();
 const schema = `Name:string, Age:integer, Weight:float, IsMagic:boolean`;
@@ -80,12 +81,25 @@ describe('Tables', () => {
 
   it(`should create a table`, async () => {
     const output = execSync(
-      `node createTable.js ${datasetId} ${tableId} "${schema}"`
+      `node createTable.js ${datasetId} ${tableId}`
     );
     assert.include(output, `Table ${tableId} created.`);
     const [exists] = await bigquery
       .dataset(datasetId)
       .table(tableId)
+      .exists();
+    assert.ok(exists);
+  });
+
+  it(`should create a partitioned table`, async () => {
+    const output = execSync(
+      `node createTablePartitioned.js ${datasetId} ${partitionedTableId}`
+    );
+    assert.include(output, `Table ${partitionedTableId} created with partitioning:`);
+    assert.include(output, `{ type: 'DAY', field: 'date' }`);
+    const [exists] = await bigquery
+      .dataset(datasetId)
+      .table(partitionedTableId)
       .exists();
     assert.ok(exists);
   });
