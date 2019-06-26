@@ -61,6 +61,10 @@ describe('Tables', () => {
       .dataset(destDatasetId)
       .delete({force: true})
       .catch(console.warn);
+    await bigquery
+      .dataset(datasetId)
+      .delete({force: true})
+      .catch(console.warn);
     await storage
       .bucket(bucketName)
       .deleteFiles({force: true})
@@ -333,13 +337,41 @@ describe('Tables', () => {
     );
   });
 
-  it(`should delete a table`, async () => {
-    const output = execSync(`node deleteTable.js ${datasetId} ${tableId}`);
-    assert.include(output, `Table ${tableId} deleted.`);
-    const [exists] = await bigquery
-      .dataset(datasetId)
-      .table(tableId)
-      .exists();
-    assert.strictEqual(exists, false);
+  describe(`Delete Table`, () => {
+    const datasetId = `gcloud_tests_${uuid.v4()}`.replace(/-/gi, '_');
+    const tableId = `gcloud_tests_${uuid.v4()}`.replace(/-/gi, '_');
+  
+    before(async () => {
+      const datasetOptions = {
+        location: 'US',
+      };
+      const tableOptions = {
+        location: 'US',
+      };
+  
+      await bigquery.createDataset(datasetId, datasetOptions);
+      // Create a new table in the dataset
+      await bigquery
+            .dataset(datasetId)
+            .createTable(tableId, tableOptions);
+    });
+  
+    after(async () => {
+      await bigquery
+        .dataset(datasetId)
+        .delete({force: true})
+        .catch(console.warn);
+    });
+  
+    it(`should delete a table`, async () => {
+      const output = execSync(`node deleteTable.js ${datasetId} ${tableId}`);
+      assert.include(output, `Table ${tableId} deleted.`);
+      const [exists] = await bigquery
+        .dataset(datasetId)
+        .table(tableId)
+        .exists();
+      assert.strictEqual(exists, false);
+    });
   });
+  
 });

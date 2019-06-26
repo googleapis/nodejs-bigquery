@@ -22,7 +22,7 @@ function main(jobId) {
   const {BigQuery} = require('@google-cloud/bigquery');
 
   async function cancelJob(jobId = 'existing-job-id') {
-    // Attempt to cancel a job.
+    // Attempts to cancel a job.
 
     // Create a client
     const bigqueryClient = new BigQuery();
