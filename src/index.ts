@@ -1596,14 +1596,18 @@ export class BigQuery extends common.Service {
       return [[], null, resp];
     }
 
-    const queryOptions = Object.assign({}, options, {autoPaginate: false});
+    const queryOptions = Object.assign({}, options, {
+      autoPaginate: false,
+      maxResults: 0,
+    });
+
     let rows, nextQuery, results;
 
     do {
       [rows, nextQuery, results] = await job.getQueryResults(queryOptions);
     } while (!results!.jobComplete);
 
-    if (!rows.length) {
+    if (!Number(results!.totalRows)) {
       return [rows, null, results!];
     }
 
