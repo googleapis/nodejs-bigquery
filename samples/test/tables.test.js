@@ -112,7 +112,8 @@ describe('Tables', () => {
   it(`should retrieve a table if it exists`, async () => {
     const output = execSync(`node getTable.js ${datasetId} ${tableId}`);
     assert.include(output, 'Table:');
-    assert.include(output, datasetId && tableId);
+    assert.include(output, datasetId);
+    assert.include(output, tableId);
   });
 
   it(`should list tables`, async () => {
@@ -134,17 +135,20 @@ describe('Tables', () => {
     const output = execSync(
       `node updateTableExpiration.js ${datasetId} ${tableId} ${expirationTime}`
     );
-    assert.include(output, `${tableId} expiration: ${expirationTime}`);
+    assert.include(output, `${tableId}`);
+    assert.include(output, `expiration: ${expirationTime}`);
   });
 
   it(`should add label to a table`, async () => {
     const output = execSync(`node labelTable.js ${datasetId} ${tableId}`);
-    assert.include(output, `${tableId} labels:` && "{ color: 'green' }");
+    assert.include(output, `${tableId} labels:`);
+    assert.include(output, "{ color: 'green' }");
   });
 
   it(`should delete a label from a table`, async () => {
     const output = execSync(`node deleteLabelTable.js ${datasetId} ${tableId}`);
-    assert.include(output, `${tableId} labels:` && 'undefined');
+    assert.include(output, `${tableId} labels:`);
+    assert.include(output, 'undefined');
   });
 
   it(`should load a local CSV file`, async () => {
@@ -328,13 +332,10 @@ describe('Tables', () => {
     const output = execSync(
       `node copyTableMultipleSource.js ${datasetId} ${tableId} destinationTable`
     );
-    assert.include(
-      output,
-      'sourceTable' &&
-        'destinationTable' &&
-        'createDisposition' &&
-        'writeDisposition'
-    );
+    assert.include(output, 'sourceTable');
+    assert.include(output, 'destinationTable');
+    assert.include(output, 'createDisposition');
+    assert.include(output, 'writeDisposition');
   });
 
   describe(`Delete Table`, () => {
