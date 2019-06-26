@@ -80,9 +80,7 @@ describe('Tables', () => {
   });
 
   it(`should create a table`, async () => {
-    const output = execSync(
-      `node createTable.js ${datasetId} ${tableId}`
-    );
+    const output = execSync(`node createTable.js ${datasetId} ${tableId}`);
     assert.include(output, `Table ${tableId} created.`);
     const [exists] = await bigquery
       .dataset(datasetId)
@@ -95,7 +93,10 @@ describe('Tables', () => {
     const output = execSync(
       `node createTablePartitioned.js ${datasetId} ${partitionedTableId}`
     );
-    assert.include(output, `Table ${partitionedTableId} created with partitioning:`);
+    assert.include(
+      output,
+      `Table ${partitionedTableId} created with partitioning:`
+    );
     assert.include(output, `{ type: 'DAY', field: 'date' }`);
     const [exists] = await bigquery
       .dataset(datasetId)

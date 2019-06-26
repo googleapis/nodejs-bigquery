@@ -21,9 +21,7 @@ function main(jobId) {
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
 
-  async function getJob(
-      jobId = '80390a60-e2b4-4104-a2ff-236cac5057bf'
-  ) {
+  async function getJob(jobId = 'existing-job-id') {
     // Get job properties.
 
     // Create a client
@@ -33,11 +31,11 @@ function main(jobId) {
     const job = bigqueryClient.job(jobId);
 
     // Retrieve job
-    const [jobResult] = await job.get()
-    
+    const [jobResult] = await job.get();
+
     console.log(jobResult.metadata.jobReference);
   }
-  getJob(jobId);
   // [END bigquery_get_job]
+  getJob(jobId);
 }
 main(...process.argv.slice(2));

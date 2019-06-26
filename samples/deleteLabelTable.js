@@ -22,8 +22,8 @@ function main(datasetId, tableId) {
   const {BigQuery} = require('@google-cloud/bigquery');
 
   async function deleteLabelTable(
-    datasetId = 'funtimes123', // Existing dataset
-    tableId = 'testing' // Existing table
+    datasetId = 'my_dataset', // Existing dataset
+    tableId = 'my_table' // Existing table
   ) {
     // Deletes a label from an existing table.
     // This example dataset starts with existing label { color: 'green' }

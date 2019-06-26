@@ -22,12 +22,12 @@ function main(datasetId, tableId) {
   const {BigQuery} = require('@google-cloud/bigquery');
 
   async function createTable(
-    datasetId = "my_new_dataset",
-    tableId = "my_new_table"
+    datasetId = 'my_dataset', // Existing dataset
+    tableId = 'my_new_table' // Table to be created
   ) {
     // Creates a new table named "my_table" in "my_dataset".
 
-    const schema = "Name:string, Age:integer, Weight:float, IsMagic:boolean";
+    const schema = 'Name:string, Age:integer, Weight:float, IsMagic:boolean';
 
     // Create a client
     const bigqueryClient = new BigQuery();

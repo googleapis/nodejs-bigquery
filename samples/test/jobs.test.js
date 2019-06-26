@@ -18,7 +18,6 @@
 const {BigQuery} = require('@google-cloud/bigquery');
 const {assert} = require('chai');
 const cp = require('child_process');
-const uuid = require('uuid');
 
 const execSync = cmd => cp.execSync(cmd, {encoding: 'utf-8'});
 
@@ -27,19 +26,19 @@ const bigquery = new BigQuery();
 let jobId;
 
 describe(`Jobs`, () => {
-    before(async () => {
-        const query = `SELECT name
+  before(async () => {
+    const query = `SELECT name
         FROM \`bigquery-public-data.usa_names.usa_1910_2013\`
         WHERE state = 'TX'
         LIMIT 100`;
-    
-        const queryOptions = {
-          query: query,
-        };
 
-        const [job] = await bigquery.createQueryJob(queryOptions);
-        jobId = job.metadata.jobReference.jobId
-    });
+    const queryOptions = {
+      query: query,
+    };
+
+    const [job] = await bigquery.createQueryJob(queryOptions);
+    jobId = job.metadata.jobReference.jobId;
+  });
 
   it(`should list jobs`, async () => {
     const output = execSync(`node listJobs.js`);
@@ -49,7 +48,7 @@ describe(`Jobs`, () => {
 
   it(`should retrieve a job`, async () => {
     const output = execSync(`node getJob.js ${jobId}`);
-    assert.include(output, `jobId: \'${jobId}\'`);
+    assert.include(output, `jobId: '${jobId}'`);
   });
 
   it(`should attempt to cancel a job`, async () => {

@@ -29,7 +29,7 @@ function main(datasetId) {
   async function deleteLabelDataset(
     datasetId = 'my_dataset' // Existing dataset
   ) {
-    // Delete a label on a dataset.
+    // Deletes a label on a dataset.
     // This example dataset starts with existing label { color: 'green' }
 
     // Create a client

@@ -21,10 +21,10 @@ function main(datasetId, tableId) {
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
 
-  async function query(
-      datasetId = 'my_existing_dataset', 
-      tableId = 'my_existing_table'
-      ) {
+  async function queryDestinationTable(
+    datasetId = 'my_existing_dataset',
+    tableId = 'my_existing_table'
+  ) {
     // Queries the U.S. given names dataset for the state of Texas
     // and saves results to permanent table.
 
@@ -39,22 +39,22 @@ function main(datasetId, tableId) {
       FROM \`bigquery-public-data.usa_names.usa_1910_2013\`
       WHERE state = 'TX'
       LIMIT 100`;
-      
+
     // For all options, see https://cloud.google.com/bigquery/docs/reference/v2/tables#resource
     const options = {
       query: query,
       // Location must match that of the dataset(s) referenced in the query.
       location: 'US',
-      destination: destinationTable
+      destination: destinationTable,
     };
 
     // Run the query as a job
     const [job] = await bigqueryClient.createQueryJob(options);
 
     console.log(`Job ${job.id} started.`);
-    console.log(`Query results loaded to table ${destinationTable.id}`)
+    console.log(`Query results loaded to table ${destinationTable.id}`);
   }
   // [END bigquery_query_destination_table]
-  query(datasetId, tableId);
+  queryDestinationTable(datasetId, tableId);
 }
 main(...process.argv.slice(2));

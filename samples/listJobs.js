@@ -35,7 +35,7 @@ function main() {
     console.log('Jobs:');
     jobs.forEach(job => console.log(job.id));
   }
-  listJobs();
   // [END bigquery_list_jobs]
+  listJobs();
 }
 main(...process.argv.slice(2));

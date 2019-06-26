@@ -21,9 +21,7 @@ function main(jobId) {
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
 
-  async function cancelJob(
-      jobId = 'existing-job-id'
-  ) {
+  async function cancelJob(jobId = 'existing-job-id') {
     // Attempt to cancel a job.
 
     // Create a client
@@ -33,11 +31,11 @@ function main(jobId) {
     const job = bigqueryClient.job(jobId);
 
     // Attempt to cancel job
-    const [apiResult] = await job.cancel()
-    
+    const [apiResult] = await job.cancel();
+
     console.log(apiResult.job.status);
   }
-  cancelJob(jobId);
   // [END bigquery_cancel_job]
+  cancelJob(jobId);
 }
 main(...process.argv.slice(2));

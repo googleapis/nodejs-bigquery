@@ -32,7 +32,7 @@ describe(`Queries`, () => {
   before(async () => {
     await bigquery.createDataset(datasetId);
     await bigquery.dataset(datasetId).createTable(tableId);
-  })
+  });
   after(async () => {
     await bigquery
       .dataset(datasetId)
@@ -89,7 +89,9 @@ describe(`Queries`, () => {
   });
 
   it(`should run a query with a destination table`, async () => {
-    const output = execSync(`node queryDestinationTable.js ${datasetId} ${tableId}`);
+    const output = execSync(
+      `node queryDestinationTable.js ${datasetId} ${tableId}`
+    );
     assert.include(output, `Query results loaded to table ${tableId}`);
   });
 });

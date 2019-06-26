@@ -22,12 +22,12 @@ function main(datasetId, tableId) {
   const {BigQuery} = require('@google-cloud/bigquery');
 
   async function createTablePartitioned(
-      datasetId = 'funtimes123',
-      tableId = 'my_table11'
+    datasetId = 'my_dataset', // Existing dataset
+    tableId = 'my_table' // Existing table
   ) {
     // Creates a new partitioned table named "my_table" in "my_dataset".
 
-    const schema = "Name:string, Post_Abbr:string, Date:date";
+    const schema = 'Name:string, Post_Abbr:string, Date:date';
 
     // Create a client
     const bigqueryClient = new BigQuery();
@@ -37,10 +37,10 @@ function main(datasetId, tableId) {
       schema: schema,
       location: 'US',
       timePartitioning: {
-          type: 'DAY',
-          expirationMS: '7776000000',
-          field: 'date'
-      }
+        type: 'DAY',
+        expirationMS: '7776000000',
+        field: 'date',
+      },
     };
 
     // Create a new table in the dataset
