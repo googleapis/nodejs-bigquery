@@ -1587,9 +1587,21 @@ export class BigQuery extends common.Service {
   }
 
   /**
+   * It is faster to use the `listTableData` rpc instead of `getQueryResults`,
+   * so when we run a query, we perform the following steps
+   *
+   *   1. create the query job
+   *   2. poll `getQueryResults` with `maxResults` set to 0 to check for job
+   *      completion
+   *   3. if we have a positive row count, call `listTableData` on the
+   *      destination table created by query job
+   *
    * @private
    */
-  async runQuery_(query: Query, options: QueryOptions): Promise<RowsResponse> {
+  async runQuery_(
+    query: Query,
+    options: QueryOptions
+  ): Promise<QueryRowsResponse> {
     const [job, resp] = await this.createQueryJob(query);
 
     if (query.dryRun) {
@@ -1614,11 +1626,15 @@ export class BigQuery extends common.Service {
     const {datasetId, tableId} = resp.configuration!.query!.destinationTable!;
     const table = this.dataset(datasetId!).table(tableId!);
 
+    // if the metadata/schema is not present on a table, calling `getRows` will
+    // make an additional call to fetch the schema, however we can prevent that
+    // from happening by just using the schema provided by `getQueryResults`
     table.metadata = {schema: results!.schema};
 
     const tableData = await table.getRows(options);
 
     // cache table in next query object to prevent creating a new job/etc.
+    // when using either the streaming version or autoPaginate = false
     if (tableData[1]) {
       tableData[1].table = table;
     }

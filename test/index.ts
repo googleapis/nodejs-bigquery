@@ -30,7 +30,16 @@ import * as proxyquire from 'proxyquire';
 import * as sinon from 'sinon';
 import * as uuid from 'uuid';
 
-import {BigQueryDate, Dataset, Job, Table} from '../src';
+import {
+  BigQueryDate,
+  Dataset,
+  Job,
+  Table,
+  QueryOptions,
+  QueryRowsCallback,
+  QueryRowsResponse,
+  RowMetadata,
+} from '../src';
 import {JobOptions} from '../src/job';
 import {TableField} from '../src/table';
 
@@ -71,6 +80,11 @@ class FakeDataset {
   constructor() {
     this.calledWith_ = arguments;
   }
+  table(id: string): FakeTable {
+    return new FakeTable((this as {}) as Dataset, id);
+  }
+  createTable() {}
+  request() {}
 }
 
 class FakeTable extends Table {
@@ -83,6 +97,9 @@ class FakeJob {
   calledWith_: IArguments;
   constructor() {
     this.calledWith_ = arguments;
+  }
+  async getQueryResults(options?: QueryOptions): Promise<QueryRowsResponse> {
+    return [[], null, {}];
   }
 }
 
@@ -163,7 +180,7 @@ describe('BigQuery', () => {
     it('should streamify the correct methods', () => {
       assert.strictEqual(bq.getDatasetsStream, 'getDatasets');
       assert.strictEqual(bq.getJobsStream, 'getJobs');
-      assert.strictEqual(bq.createQueryStream, 'queryAsStream_');
+      assert.strictEqual(bq.createQueryStream, 'query');
     });
 
     it('should promisify all the things', () => {
@@ -1755,105 +1772,275 @@ describe('BigQuery', () => {
   });
 
   describe('query', () => {
-    const FAKE_ROWS = [{}, {}, {}];
-    const FAKE_RESPONSE = {};
-    const QUERY_STRING = 'SELECT * FROM [dataset.table]';
+    const fakeSql = 'SELECT * FROM table';
+    const fakeQuery = {query: fakeSql};
 
-    it('should return any errors from createQueryJob', done => {
-      const error = new Error('err');
-
-      bq.createQueryJob = (query: {}, callback: Function) => {
-        callback(error, null, FAKE_RESPONSE);
-      };
-
-      bq.query(QUERY_STRING, (err: Error, rows: {}, resp: {}) => {
-        assert.strictEqual(err, error);
-        assert.strictEqual(rows, null);
-        assert.strictEqual(resp, FAKE_RESPONSE);
-        done();
+    it('should accept only a query string', done => {
+      sandbox.stub(bq, 'runQuery_').callsFake(query => {
+        assert.deepStrictEqual(query, fakeQuery);
+        setImmediate(done);
+        return new Promise(() => {});
       });
+
+      bq.query(fakeSql, assert.ifError);
     });
 
-    it('should exit early if dryRun is set', done => {
-      const options = {
-        query: QUERY_STRING,
-        dryRun: true,
-      };
-
-      bq.createQueryJob = (query: {}, callback: Function) => {
-        assert.strictEqual(query, options);
-        callback(null, null, FAKE_RESPONSE);
-      };
-
-      bq.query(options, (err: Error, rows: {}, resp: {}) => {
-        assert.ifError(err);
-        assert.deepStrictEqual(rows, []);
-        assert.strictEqual(resp, FAKE_RESPONSE);
-        done();
-      });
-    });
-
-    it('should call job#getQueryResults', done => {
-      const fakeJob = {
-        getQueryResults: (options: {}, callback: Function) => {
-          callback(null, FAKE_ROWS, FAKE_RESPONSE);
-        },
-      };
-
-      bq.createQueryJob = (query: {}, callback: Function) => {
-        callback(null, fakeJob, FAKE_RESPONSE);
-      };
-
-      bq.query(QUERY_STRING, (err: Error, rows: {}, resp: {}) => {
-        assert.ifError(err);
-        assert.strictEqual(rows, FAKE_ROWS);
-        assert.strictEqual(resp, FAKE_RESPONSE);
-        done();
-      });
-    });
-
-    it('should assign Job on the options', done => {
-      const fakeJob = {
-        getQueryResults: (options: {}, callback: Function) => {
-          assert.deepStrictEqual(options, {job: fakeJob});
-          done();
-        },
-      };
-
-      bq.createQueryJob = (query: {}, callback: Function) => {
-        callback(null, fakeJob, FAKE_RESPONSE);
-      };
-
-      bq.query(QUERY_STRING, assert.ifError);
-    });
-
-    it('should optionally accept options', done => {
+    it('should accept an options object', done => {
       const fakeOptions = {};
-      const fakeJob = {
-        getQueryResults: (options: {}) => {
-          assert.notStrictEqual(options, fakeOptions);
-          assert.deepStrictEqual(options, {job: fakeJob});
-          done();
-        },
+
+      sandbox.stub(bq, 'runQuery_').callsFake((q, opts) => {
+        assert.strictEqual(opts, fakeOptions);
+        setImmediate(done);
+        return new Promise(() => {});
+      });
+
+      bq.query(fakeSql, fakeOptions, assert.ifError);
+    });
+
+    it('should call through to runQuery_', done => {
+      const fakeRows: RowMetadata[] = [];
+      const fakeNextQuery = null;
+      const fakeResponse = {};
+
+      sandbox
+        .stub(bq, 'runQuery_')
+        .resolves([fakeRows, fakeNextQuery, fakeResponse]);
+
+      const callback: QueryRowsCallback = (err, rows, nextQuery, resp) => {
+        assert.ifError(err);
+        assert.strictEqual(rows, fakeRows);
+        assert.strictEqual(nextQuery, fakeNextQuery);
+        assert.strictEqual(resp, fakeResponse);
+        done();
       };
 
-      bq.createQueryJob = (query: {}, callback: Function) => {
-        callback(null, fakeJob, FAKE_RESPONSE);
+      bq.query(fakeSql, callback);
+    });
+
+    it('should return any errors from runQuery_', done => {
+      const fakeError = new Error('err');
+
+      sandbox.stub(bq, 'runQuery_').rejects(fakeError);
+
+      const callback: QueryRowsCallback = err => {
+        assert.strictEqual(err, fakeError);
+        done();
       };
 
-      bq.query(QUERY_STRING, fakeOptions, assert.ifError);
+      bq.query(fakeSql, callback);
+    });
+
+    it('should query from a cached table if found', () => {
+      const fakeDataset = (new FakeDataset() as {}) as Dataset;
+      const fakeTable = {getRows(options: {}, callback: Function) {}} as Table;
+      const query = Object.assign({table: fakeTable}, fakeQuery);
+
+      const fakeOptions = {};
+      const callback = sandbox.spy();
+      const stub = sandbox.stub(fakeTable, 'getRows');
+
+      bq.query(query, fakeOptions, callback);
+      assert.strictEqual(stub.callCount, 1);
     });
   });
 
-  describe('queryAsStream_', () => {
-    it('should call query correctly', done => {
-      const query = 'SELECT';
-      bq.query = (query_: {}, options: {}, callback: Function) => {
-        assert.strictEqual(query_, query);
-        assert.deepStrictEqual(options, {autoPaginate: false});
-        callback(); // done()
-      };
-      bq.queryAsStream_(query, done);
+  describe('runQuery_', () => {
+    let fakeDataset: Dataset;
+    let fakeJob: FakeJob;
+    let fakeTable: FakeTable;
+
+    const datasetId = 'my-dataset';
+    const tableId = 'my-table';
+
+    const fakeJobResponse = {
+      configuration: {
+        query: {
+          destinationTable: {
+            datasetId,
+            tableId,
+          },
+        },
+      },
+    };
+
+    const fakeQueryResponse = {
+      jobComplete: true,
+      totalRows: '100',
+      schema: {},
+    };
+
+    beforeEach(() => {
+      fakeDataset = (new FakeDataset() as {}) as Dataset;
+      fakeJob = new FakeJob();
+      fakeTable = new FakeTable(fakeDataset, tableId);
+    });
+
+    it('should create a query job', done => {
+      const fakeQuery = {};
+
+      sandbox.stub(bq, 'createQueryJob').callsFake(query => {
+        assert.strictEqual(query, fakeQuery);
+        setImmediate(done);
+        return new Promise(() => {});
+      });
+
+      bq.runQuery_(fakeQuery).catch(done);
+    });
+
+    it('should return any errors from createQueryJob', async () => {
+      const fakeError = new Error('err');
+
+      sandbox.stub(bq, 'createQueryJob').rejects(fakeError);
+
+      try {
+        await bq.runQuery_({});
+        throw new Error('Should not make it here.');
+      } catch (e) {
+        assert.strictEqual(e, fakeError);
+      }
+    });
+
+    it('should return early if dryRun is enabled', async () => {
+      sandbox.stub(bq, 'createQueryJob').resolves([{}, fakeJobResponse]);
+
+      const [rows, nextQuery, resp] = await bq.runQuery_({dryRun: true});
+
+      assert.deepStrictEqual(rows, []);
+      assert.strictEqual(nextQuery, null);
+      assert.strictEqual(resp, fakeJobResponse);
+    });
+
+    it('should poll getQueryResults', done => {
+      const stub = sandbox.stub(fakeJob, 'getQueryResults');
+
+      sandbox.stub(bq, 'createQueryJob').resolves([fakeJob, fakeJobResponse]);
+      stub.onCall(0).resolves([[], null, {jobComplete: false}]);
+      stub.onCall(1).callsFake(() => {
+        setImmediate(done);
+        return new Promise(() => {});
+      });
+
+      bq.runQuery_({}).catch(done);
+    });
+
+    it('should return any errors from getQueryResults', async () => {
+      const fakeError = new Error('err');
+
+      sandbox.stub(bq, 'createQueryJob').resolves([fakeJob, fakeJobResponse]);
+      sandbox.stub(fakeJob, 'getQueryResults').rejects(fakeError);
+
+      try {
+        await bq.runQuery_({});
+        throw new Error('Should not have made it here.');
+      } catch (e) {
+        assert.strictEqual(e, fakeError);
+      }
+    });
+
+    it('should return early if the total row count is 0', async () => {
+      const fakeRows: RowMetadata[] = [];
+      const fakeResults = {jobComplete: true, totalRows: '0'};
+
+      sandbox.stub(bq, 'createQueryJob').resolves([fakeJob, fakeJobResponse]);
+      sandbox
+        .stub(fakeJob, 'getQueryResults')
+        .resolves([fakeRows, null, fakeResults]);
+
+      const [rows, nextQuery, results] = await bq.runQuery_({});
+
+      assert.strictEqual(rows, fakeRows);
+      assert.strictEqual(nextQuery, null);
+      assert.strictEqual(results, fakeResults);
+    });
+
+    it('should cache the table schema', async () => {
+      sandbox.stub(bq, 'createQueryJob').resolves([fakeJob, fakeJobResponse]);
+      sandbox
+        .stub(fakeJob, 'getQueryResults')
+        .resolves([[], null, fakeQueryResponse]);
+      sandbox
+        .stub(bq, 'dataset')
+        .withArgs(datasetId)
+        .returns(fakeDataset);
+      sandbox
+        .stub(fakeDataset, 'table')
+        .withArgs(tableId)
+        .returns(fakeTable);
+      sandbox.stub(fakeTable, 'getRows').resolves([[]]);
+
+      await bq.runQuery_({});
+
+      assert.strictEqual(fakeTable.metadata.schema, fakeQueryResponse.schema);
+    });
+
+    it('should call getRows', async () => {
+      const fakeRows: RowMetadata[] = [];
+
+      sandbox.stub(bq, 'createQueryJob').resolves([fakeJob, fakeJobResponse]);
+      sandbox
+        .stub(fakeJob, 'getQueryResults')
+        .resolves([[], null, fakeQueryResponse]);
+      sandbox
+        .stub(bq, 'dataset')
+        .withArgs(datasetId)
+        .returns(fakeDataset);
+      sandbox
+        .stub(fakeDataset, 'table')
+        .withArgs(tableId)
+        .returns(fakeTable);
+      sandbox.stub(fakeTable, 'getRows').resolves([fakeRows]);
+
+      const [rows] = await bq.runQuery_({});
+
+      assert.strictEqual(rows, fakeRows);
+    });
+
+    it('should return any errors from getRows', async () => {
+      const fakeError = new Error('err');
+
+      sandbox.stub(bq, 'createQueryJob').resolves([fakeJob, fakeJobResponse]);
+      sandbox
+        .stub(fakeJob, 'getQueryResults')
+        .resolves([[], null, fakeQueryResponse]);
+      sandbox
+        .stub(bq, 'dataset')
+        .withArgs(datasetId)
+        .returns(fakeDataset);
+      sandbox
+        .stub(fakeDataset, 'table')
+        .withArgs(tableId)
+        .returns(fakeTable);
+      sandbox.stub(fakeTable, 'getRows').rejects(fakeError);
+
+      try {
+        await bq.runQuery_({});
+        throw new Error('Should not have made it here.');
+      } catch (e) {
+        assert.strictEqual(e, fakeError);
+      }
+    });
+
+    it('should cache the table for the nextQuery', async () => {
+      const fakeNextQuery = {};
+
+      sandbox.stub(bq, 'createQueryJob').resolves([fakeJob, fakeJobResponse]);
+      sandbox
+        .stub(fakeJob, 'getQueryResults')
+        .resolves([[], null, fakeQueryResponse]);
+      sandbox
+        .stub(bq, 'dataset')
+        .withArgs(datasetId)
+        .returns(fakeDataset);
+      sandbox
+        .stub(fakeDataset, 'table')
+        .withArgs(tableId)
+        .returns(fakeTable);
+      sandbox.stub(fakeTable, 'getRows').resolves([[], fakeNextQuery]);
+
+      const [_, nextQuery] = await bq.runQuery_({});
+
+      assert.strictEqual(nextQuery, fakeNextQuery);
+      assert.strictEqual(nextQuery.table, fakeTable);
     });
   });
 });
