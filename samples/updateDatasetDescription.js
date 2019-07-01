@@ -16,21 +16,17 @@
 
 'use strict';
 
-function main(datasetId) {
+function main(datasetId = 'my_dataset') {
   // [START bigquery_update_dataset_description]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
+  const bigquery = new BigQuery();
 
-  async function updateDatasetDescription(
-    datasetId = 'my_dataset' // Existing dataset
-  ) {
+  async function updateDatasetDescription() {
     // Updates a dataset's description.
 
-    // Create a client
-    const bigqueryClient = new BigQuery();
-
     // Retreive current dataset metadata
-    const dataset = bigqueryClient.dataset(datasetId);
+    const dataset = bigquery.dataset(datasetId);
     const [metadata] = await dataset.getMetadata();
 
     // Set new dataset description
@@ -43,6 +39,6 @@ function main(datasetId) {
     console.log(`${datasetId} description: ${newDescription}`);
   }
   // [END bigquery_update_dataset_description]
-  updateDatasetDescription(datasetId);
+  updateDatasetDescription();
 }
 main(...process.argv.slice(2));

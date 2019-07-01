@@ -20,12 +20,10 @@ function main() {
   // [START bigquery_query]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
+  const bigquery = new BigQuery();
 
   async function query() {
     // Queries the U.S. given names dataset for the state of Texas.
-
-    // Create a client
-    const bigqueryClient = new BigQuery();
 
     const query = `SELECT name
       FROM \`bigquery-public-data.usa_names.usa_1910_2013\`
@@ -40,7 +38,7 @@ function main() {
     };
 
     // Run the query as a job
-    const [job] = await bigqueryClient.createQueryJob(options);
+    const [job] = await bigquery.createQueryJob(options);
     console.log(`Job ${job.id} started.`);
 
     // Wait for the query to finish
@@ -50,7 +48,7 @@ function main() {
     console.log('Rows:');
     rows.forEach(row => console.log(row));
   }
-  query();
   // [END bigquery_query]
+  query();
 }
 main(...process.argv.slice(2));

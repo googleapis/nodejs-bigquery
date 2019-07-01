@@ -16,26 +16,28 @@
 
 'use strict';
 
-function main(datasetId, tableId, filename) {
+function main(
+  datasetId = 'my_dataset',
+  tableId = 'my_table',
+  filename = '/path/to/file.csv'
+) {
   // [START bigquery_load_from_file]
   // Imports the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
-
-  /**
-   * TODO(developer): Uncomment the following lines before running the sample.
-   */
-  // const filename = "/path/to/file.csv";
-  // const datasetId = "my_dataset";
-  // const tableId = "my_table";
+  const bigquery = new BigQuery();
 
   async function loadLocalFile() {
     // Imports a local file into a table.
 
-    // Create a client
-    const bigqueryClient = new BigQuery();
+    /**
+     * TODO(developer): Uncomment the following lines before running the sample.
+     */
+    // const filename = '/path/to/file.csv';
+    // const datasetId = 'my_dataset';
+    // const tableId = 'my_table';
 
     // Load data from a local file into the table
-    const [job] = await bigqueryClient
+    const [job] = await bigquery
       .dataset(datasetId)
       .table(tableId)
       .load(filename);
@@ -48,8 +50,8 @@ function main(datasetId, tableId, filename) {
       throw errors;
     }
   }
-  loadLocalFile();
   // [END bigquery_load_from_file]
+  loadLocalFile();
 }
 
 main(...process.argv.slice(2));

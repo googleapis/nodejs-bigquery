@@ -21,21 +21,22 @@
 //   description: Updates a model's metadata.
 //   usage: node updateModel.js <DATASET_ID> <MODEL_ID>
 
-function main(datasetId) {
+function main(datasetId = 'my_dataset') {
   // [START bigquery_label_dataset]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
+  const bigquery = new BigQuery();
 
-  async function labelDataset(
-    datasetId = 'my_dataset' // Existing dataset
-  ) {
+  async function labelDataset() {
     // Updates a label on a dataset.
 
-    // Create a client
-    const bigqueryClient = new BigQuery();
+    /**
+     * TODO(developer): Uncomment the following lines before running the sample
+     */
+    // const datasetId = "my_dataset";
 
     // Retrieve current dataset metadata.
-    const dataset = bigqueryClient.dataset(datasetId);
+    const dataset = bigquery.dataset(datasetId);
     const [metadata] = await dataset.getMetadata();
 
     // Add label to dataset metadata
@@ -46,6 +47,6 @@ function main(datasetId) {
     console.log(apiResponse.labels);
   }
   // [END bigquery_label_dataset]
-  labelDataset(datasetId);
+  labelDataset();
 }
 main(...process.argv.slice(2));

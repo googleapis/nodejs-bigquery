@@ -24,15 +24,20 @@ function main(
   // [START bigquery_update_table_expiration]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
+  const bigquery = new BigQuery();
 
   async function updateTableExpiration() {
     // Updates a table's expiration.
 
-    // Create a client
-    const bigqueryClient = new BigQuery();
+    /**
+     * TODO(developer): Uncomment the following lines before running the sample.
+     */
+    // const datasetId = 'my_dataset', // Existing dataset
+    // const tableId = 'my_table', // Existing table
+    // const expirationTime = Date.now() + 1000 * 60 * 60 * 24 * 5 // 5 days from current time in ms
 
     // Retreive current table metadata
-    const table = bigqueryClient.dataset(datasetId).table(tableId);
+    const table = bigquery.dataset(datasetId).table(tableId);
     const [metadata] = await table.getMetadata();
 
     // Set new table expiration to 5 days from current time
@@ -43,6 +48,6 @@ function main(
     console.log(`${tableId} expiration: ${newExpirationTime}`);
   }
   // [END bigquery_update_table_expiration]
-  updateTableExpiration(datasetId, tableId, expirationTime);
+  updateTableExpiration();
 }
 main(...process.argv.slice(2));

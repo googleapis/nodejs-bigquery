@@ -16,10 +16,11 @@
 
 'use strict';
 
-function main(datasetId) {
+function main(datasetId = 'my_dataset') {
   // [START bigquery_delete_dataset]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
+  const bigquery = new BigQuery();
 
   async function deleteDataset() {
     // Deletes a dataset named "my_dataset".
@@ -27,20 +28,17 @@ function main(datasetId) {
     /**
      * TODO(developer): Uncomment the following lines before running the sample.
      */
-    // const datasetId = "my_new_dataset";
-
-    // Create a client
-    const bigqueryClient = new BigQuery();
+    // const datasetId = 'my_dataset';
 
     // Create a reference to the existing dataset
-    const dataset = bigqueryClient.dataset(datasetId);
+    const dataset = bigquery.dataset(datasetId);
 
     // Delete the dataset and its contents
     await dataset.delete({force: true});
     console.log(`Dataset ${dataset.id} deleted.`);
   }
-  deleteDataset();
   // [END bigquery_delete_dataset]
+  deleteDataset();
 }
 
 main(...process.argv.slice(2));

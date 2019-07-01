@@ -16,19 +16,22 @@
 
 'use strict';
 
-function main(jobId) {
+function main(jobId = 'existing-job-id') {
   // [START bigquery_get_job]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
+  const bigquery = new BigQuery();
 
-  async function getJob(jobId = 'existing-job-id') {
+  async function getJob() {
     // Get job properties.
 
-    // Create a client
-    const bigqueryClient = new BigQuery();
+    /**
+     * TODO(developer): Uncomment the following lines before running the sample.
+     */
+    // const jobId = "existing-job-id";
 
     // Create a job reference
-    const job = bigqueryClient.job(jobId);
+    const job = bigquery.job(jobId);
 
     // Retrieve job
     const [jobResult] = await job.get();
@@ -36,6 +39,6 @@ function main(jobId) {
     console.log(jobResult.metadata.jobReference);
   }
   // [END bigquery_get_job]
-  getJob(jobId);
+  getJob();
 }
 main(...process.argv.slice(2));

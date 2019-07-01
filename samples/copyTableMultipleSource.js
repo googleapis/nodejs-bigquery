@@ -16,21 +16,28 @@
 
 'use strict';
 
-function main(datasetId, sourceTable, destinationTable) {
+function main(
+  datasetId = 'my_dataset', // Existing dataset
+  sourceTable = 'my_table', // Existing table to copy from
+  destinationTable = 'testing' // Existing table to copy to
+) {
   // [START bigquery_copy_table_multiple_source]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
+  const bigquery = new BigQuery();
 
-  async function copyTableMultipleSource(
-    datasetId = 'my_dataset', // Existing dataset
-    sourceTable = 'my_table', // Existing table to copy from
-    destinationTable = 'testing' // Existing table to copy to
-  ) {
+  async function copyTableMultipleSource() {
     // Copy multiple source tables to a given destination.
 
+    /**
+     * TODO(developer): Uncomment the following lines before running the sample.
+     */
+    // const datasetId = "my_dataset";
+    // sourceTable = 'my_table';
+    // destinationTable = 'testing';
+
     // Create a client
-    const bigqueryClient = new BigQuery();
-    const dataset = bigqueryClient.dataset(datasetId);
+    const dataset = bigquery.dataset(datasetId);
 
     const metadata = {
       createDisposition: 'CREATE_NEVER',
@@ -46,7 +53,7 @@ function main(datasetId, sourceTable, destinationTable) {
     console.log(apiResponse.configuration.copy);
   }
   // [END bigquery_copy_table_multiple_source]
-  copyTableMultipleSource(datasetId, sourceTable, destinationTable);
+  copyTableMultipleSource();
 }
 
 main(...process.argv.slice(2));

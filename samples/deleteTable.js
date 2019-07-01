@@ -16,10 +16,11 @@
 
 'use strict';
 
-function main(datasetId, tableId) {
+function main(datasetId = 'my_dataset', tableId = 'my_table') {
   // [START bigquery_delete_table]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
+  const bigquery = new BigQuery();
 
   async function deleteTable() {
     // Deletes "my_table" from "my_dataset".
@@ -30,19 +31,16 @@ function main(datasetId, tableId) {
     // const datasetId = "my_dataset";
     // const tableId = "my_table";
 
-    // Create a client
-    const bigqueryClient = new BigQuery();
-
     // Delete the table
-    await bigqueryClient
+    await bigquery
       .dataset(datasetId)
       .table(tableId)
       .delete();
 
     console.log(`Table ${tableId} deleted.`);
   }
-  deleteTable();
   // [END bigquery_delete_table]
+  deleteTable();
 }
 
 main(...process.argv.slice(2));

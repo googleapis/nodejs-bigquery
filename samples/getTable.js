@@ -21,28 +21,29 @@
 //   description: Retrieves an existing model from a dataset.
 //   usage: node getModel.js <DATASET_ID> <MODEL_ID>
 
-function main(datasetId, tableId) {
+function main(datasetId = 'my_dataset', tableId = 'my_table') {
   // [START bigquery_get_table]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
+  const bigquery = new BigQuery();
 
-  async function getTable(
-    datasetId = 'my_dataset', // Existing dataset
-    tableId = 'my_table' // Existing table
-  ) {
+  async function getTable() {
     // Retrieves table named "my_table" in "my_dataset".
 
-    // Create a client
-    const bigqueryClient = new BigQuery();
+    /**
+     * TODO(developer): Uncomment the following lines before running the sample
+     */
+    // const datasetId = "my_dataset";
+    // const tableId = "my_table";
 
     // Retrieve table reference
-    const dataset = bigqueryClient.dataset(datasetId);
+    const dataset = bigquery.dataset(datasetId);
     const [table] = await dataset.table(tableId).get();
 
     console.log('Table:');
     console.log(table.metadata.tableReference);
   }
+  getTable();
   // [END bigquery_get_table]
-  getTable(datasetId, tableId);
 }
 main(...process.argv.slice(2));

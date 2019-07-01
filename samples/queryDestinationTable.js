@@ -16,23 +16,24 @@
 
 'use strict';
 
-function main(datasetId, tableId) {
+function main(datasetId = 'my_dataset', tableId = 'my_table') {
   // [START bigquery_query_destination_table]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
+  const bigquery = new BigQuery();
 
-  async function queryDestinationTable(
-    datasetId = 'my_existing_dataset',
-    tableId = 'my_existing_table'
-  ) {
+  async function queryDestinationTable() {
     // Queries the U.S. given names dataset for the state of Texas
     // and saves results to permanent table.
 
-    // Create a client
-    const bigqueryClient = new BigQuery();
+    /**
+     * TODO(developer): Uncomment the following lines before running the sample.
+     */
+    // const datasetId = 'my_dataset';
+    // const tableId = 'my_table';
 
     // Create destination table reference
-    const dataset = bigqueryClient.dataset(datasetId);
+    const dataset = bigquery.dataset(datasetId);
     const destinationTable = dataset.table(tableId);
 
     const query = `SELECT name
@@ -49,7 +50,7 @@ function main(datasetId, tableId) {
     };
 
     // Run the query as a job
-    const [job] = await bigqueryClient.createQueryJob(options);
+    const [job] = await bigquery.createQueryJob(options);
 
     console.log(`Job ${job.id} started.`);
     console.log(`Query results loaded to table ${destinationTable.id}`);

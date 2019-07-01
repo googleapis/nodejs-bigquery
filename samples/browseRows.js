@@ -16,26 +16,24 @@
 
 'use strict';
 
-function main(datasetId, tableId) {
+function main(datasetId = 'my_dataset', tableId = 'my_table') {
   // [START bigquery_browse_table]
 
-  // Import the Google Cloud client library
+  // Import the Google Cloud client library and create a client
   const {BigQuery} = require('@google-cloud/bigquery');
-
-  /**
-   * TODO(developer): Uncomment the following lines before running the sample.
-   */
-  // const datasetId = "my_dataset";
-  // const tableId = "my_table";
+  const bigquery = new BigQuery();
 
   async function browseRows() {
     // Displays rows from "my_table" in "my_dataset".
 
-    // Create a client
-    const bigqueryClient = new BigQuery();
+    /**
+     * TODO(developer): Uncomment the following lines before running the sample.
+     */
+    // const datasetId = "my_dataset";
+    // const tableId = "my_table";
 
     // List rows in the table
-    const [rows] = await bigqueryClient
+    const [rows] = await bigquery
       .dataset(datasetId)
       .table(tableId)
       .getRows();
@@ -43,9 +41,8 @@ function main(datasetId, tableId) {
     console.log('Rows:');
     rows.forEach(row => console.log(row));
   }
-
-  browseRows();
   // [END bigquery_browse_table]
+  browseRows();
 }
 
 main(...process.argv.slice(2));

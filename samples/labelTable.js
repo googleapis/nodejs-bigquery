@@ -16,21 +16,22 @@
 
 'use strict';
 
-function main(datasetId, tableId) {
+function main(datasetId = 'my_dataset', tableId = 'table_id') {
   // [START bigquery_label_table]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
+  const bigquery = new BigQuery();
 
-  async function labelTable(
-    datasetId = 'my_dataset', // Existing dataset
-    tableId = 'my_table' // Existing table
-  ) {
+  async function labelTable() {
     // Adds a label to an existing table.
 
-    // Create a client
-    const bigqueryClient = new BigQuery();
+    /**
+     * TODO(developer): Uncomment the following lines before running the sample.
+     */
+    // const datasetId = 'my_dataset';
+    // const tableId = 'my_table';
 
-    const dataset = bigqueryClient.dataset(datasetId);
+    const dataset = bigquery.dataset(datasetId);
     const [table] = await dataset.table(tableId).get();
 
     // Retrieve current table metadata
@@ -44,6 +45,6 @@ function main(datasetId, tableId) {
     console.log(apiResponse.labels);
   }
   // [END bigquery_label_table]
-  labelTable(datasetId, tableId);
+  labelTable();
 }
 main(...process.argv.slice(2));

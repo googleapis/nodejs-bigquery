@@ -16,15 +16,19 @@
 
 'use strict';
 
-function main(datasetId) {
+function main(datasetId = 'my_dataset') {
   // [START bigquery_update_dataset_access]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
+  const bigquery = new BigQuery();
 
-  async function updateDatasetAccess(
-    datasetId = 'my_dataset' // Existing dataset
-  ) {
+  async function updateDatasetAccess() {
     // Updates a datasets's access controls.
+
+    /**
+     * TODO(developer): Uncomment the following lines before running the sample.
+     */
+    // const datasetId = "my_dataset";
 
     // Create new role metadata
     const newRole = {
@@ -33,11 +37,8 @@ function main(datasetId) {
       userByEmail: 'sample.bigquery.dev@gmail.com',
     };
 
-    // Create a client
-    const bigqueryClient = new BigQuery();
-
     // Retreive current dataset metadata
-    const dataset = bigqueryClient.dataset(datasetId);
+    const dataset = bigquery.dataset(datasetId);
     const [metadata] = await dataset.getMetadata();
 
     // Add new role to role acess array
@@ -47,6 +48,6 @@ function main(datasetId) {
     newAccessRoles.forEach(role => console.log(role));
   }
   // [END bigquery_update_dataset_access]
-  updateDatasetAccess(datasetId);
+  updateDatasetAccess();
 }
 main(...process.argv.slice(2));

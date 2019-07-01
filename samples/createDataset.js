@@ -16,10 +16,11 @@
 
 'use strict';
 
-function main(datasetId) {
+function main(datasetId = 'my_new_dataset') {
   // [START bigquery_create_dataset]
-  // Import the Google Cloud client library
+  // Import the Google Cloud client library and create a client
   const {BigQuery} = require('@google-cloud/bigquery');
+  const bigquery = new BigQuery();
 
   async function createDataset() {
     // Creates a new dataset named "my_dataset".
@@ -29,19 +30,15 @@ function main(datasetId) {
      */
     // const datasetId = "my_new_dataset";
 
-    // Create a client
-    const bigqueryClient = new BigQuery();
-
     // Specify the geographic location where the dataset should reside
     const options = {
       location: 'US',
     };
 
     // Create a new dataset
-    const [dataset] = await bigqueryClient.createDataset(datasetId, options);
+    const [dataset] = await bigquery.createDataset(datasetId, options);
     console.log(`Dataset ${dataset.id} created.`);
   }
-
   createDataset();
   // [END bigquery_create_dataset]
 }

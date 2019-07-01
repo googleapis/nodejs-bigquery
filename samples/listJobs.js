@@ -20,17 +20,15 @@ function main() {
   // [START bigquery_list_jobs]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
+  const bigquery = new BigQuery();
 
   async function listJobs() {
     // Lists all jobs in current GCP project.
 
-    // Create a client
-    const bigqueryClient = new BigQuery();
-
     // List the 10 most recent jobs in reverse chronological order.
     //  Omit the max_results parameter to list jobs from the past 6 months.
     const options = {maxResults: 10};
-    const [jobs] = await bigqueryClient.getJobs(options);
+    const [jobs] = await bigquery.getJobs(options);
 
     console.log('Jobs:');
     jobs.forEach(job => console.log(job.id));

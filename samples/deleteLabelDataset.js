@@ -21,22 +21,25 @@
 //   description: Updates a model's metadata.
 //   usage: node updateModel.js <DATASET_ID> <MODEL_ID>
 
-function main(datasetId) {
+function main(
+  datasetId = 'my_dataset' // Existing dataset
+) {
   // [START bigquery_delete_label_dataset]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
+  const bigquery = new BigQuery();
 
-  async function deleteLabelDataset(
-    datasetId = 'my_dataset' // Existing dataset
-  ) {
+  async function deleteLabelDataset() {
     // Deletes a label on a dataset.
     // This example dataset starts with existing label { color: 'green' }
 
-    // Create a client
-    const bigqueryClient = new BigQuery();
+    /**
+     * TODO(developer): Uncomment the following lines before running the sample.
+     */
+    // const datasetId = 'my_dataset';
 
     // Retrieve current dataset metadata.
-    const dataset = bigqueryClient.dataset(datasetId);
+    const dataset = bigquery.dataset(datasetId);
     const [metadata] = await dataset.getMetadata();
 
     // Add label to dataset metadata
@@ -47,6 +50,6 @@ function main(datasetId) {
     console.log(apiResponse.labels);
   }
   // [END bigquery_delete_label_dataset]
-  deleteLabelDataset(datasetId);
+  deleteLabelDataset();
 }
 main(...process.argv.slice(2));

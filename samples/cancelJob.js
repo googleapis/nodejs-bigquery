@@ -16,19 +16,22 @@
 
 'use strict';
 
-function main(jobId) {
+function main(jobId = 'existing-job-id') {
   // [START bigquery_cancel_job]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
+  const bigquery = new BigQuery();
 
-  async function cancelJob(jobId = 'existing-job-id') {
+  async function cancelJob() {
     // Attempts to cancel a job.
 
-    // Create a client
-    const bigqueryClient = new BigQuery();
+    /**
+     * TODO(developer): Uncomment the following lines before running the sample.
+     */
+    // const jobId = "existing-job-id";
 
     // Create a job reference
-    const job = bigqueryClient.job(jobId);
+    const job = bigquery.job(jobId);
 
     // Attempt to cancel job
     const [apiResult] = await job.cancel();
@@ -36,6 +39,6 @@ function main(jobId) {
     console.log(apiResult.job.status);
   }
   // [END bigquery_cancel_job]
-  cancelJob(jobId);
+  cancelJob();
 }
 main(...process.argv.slice(2));

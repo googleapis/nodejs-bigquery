@@ -16,21 +16,22 @@
 
 'use strict';
 
-function main(datasetId) {
+function main(datasetId = 'my_dataset') {
   // [START bigquery_update_dataset_expiration]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
+  const bigquery = new BigQuery();
 
-  async function updateDatasetExpiration(
-    datasetId = 'my_dataset' // Existing dataset
-  ) {
+  async function updateDatasetExpiration() {
     // Updates the lifetime of all tables in the dataset, in milliseconds.
 
-    // Create a client
-    const bigqueryClient = new BigQuery();
+    /**
+     * TODO(developer): Uncomment the following lines before running the sample.
+     */
+    // const datasetId = "my_dataset";
 
     // Retreive current dataset metadata
-    const dataset = bigqueryClient.dataset(datasetId);
+    const dataset = bigquery.dataset(datasetId);
     const [metadata] = await dataset.getMetadata();
 
     // Set new dataset metadata
@@ -43,6 +44,6 @@ function main(datasetId) {
     console.log(`${datasetId} expiration: ${newExpirationTime}`);
   }
   // [END bigquery_update_dataset_expiration]
-  updateDatasetExpiration(datasetId);
+  updateDatasetExpiration();
 }
 main(...process.argv.slice(2));

@@ -16,21 +16,21 @@
 
 'use strict';
 
-function main(datasetId, tableId) {
+function main(datasetId = 'my_dataset', tableId = 'my_table') {
   // [START bigquery_create_table_partitioned]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
+  const bigquery = new BigQuery();
 
-  async function createTablePartitioned(
-    datasetId = 'my_dataset', // Existing dataset
-    tableId = 'my_table' // Existing table
-  ) {
+  async function createTablePartitioned() {
     // Creates a new partitioned table named "my_table" in "my_dataset".
 
+    /**
+     * TODO(developer): Uncomment the following lines before running the sample.
+     */
+    // const datasetId = "my_dataset";
+    // const tableId = "my_table";
     const schema = 'Name:string, Post_Abbr:string, Date:date';
-
-    // Create a client
-    const bigqueryClient = new BigQuery();
 
     // For all options, see https://cloud.google.com/bigquery/docs/reference/v2/tables#resource
     const options = {
@@ -44,7 +44,7 @@ function main(datasetId, tableId) {
     };
 
     // Create a new table in the dataset
-    const [table] = await bigqueryClient
+    const [table] = await bigquery
       .dataset(datasetId)
       .createTable(tableId, options);
     console.log(`Table ${table.id} created with partitioning: `);

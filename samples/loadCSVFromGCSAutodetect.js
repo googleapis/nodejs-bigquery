@@ -16,11 +16,15 @@
 
 'use strict';
 
-function main(datasetId, tableId) {
+function main(datasetId = 'my_dataset', tableId = 'my_table') {
   // [START bigquery_load_table_gcs_csv_autodetect]
   // Import the Google Cloud client libraries
   const {BigQuery} = require('@google-cloud/bigquery');
   const {Storage} = require('@google-cloud/storage');
+
+  // Instantiate clients
+  const bigquery = new BigQuery();
+  const storage = new Storage();
 
   /**
    * TODO(developer): Uncomment the following lines before running the sample
@@ -40,10 +44,6 @@ function main(datasetId, tableId) {
   async function loadCSVFromGCSAutodetect() {
     // Imports a GCS file into a table with autodetected schema.
 
-    // Instantiate clients
-    const bigqueryClient = new BigQuery();
-    const storageClient = new Storage();
-
     // Configure the load job. For full list of options, see:
     // https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs#configuration.load
     const metadata = {
@@ -54,10 +54,10 @@ function main(datasetId, tableId) {
     };
 
     // Load data from a Google Cloud Storage file into the table
-    const [job] = await bigqueryClient
+    const [job] = await bigquery
       .dataset(datasetId)
       .table(tableId)
-      .load(storageClient.bucket(bucketName).file(filename), metadata);
+      .load(storage.bucket(bucketName).file(filename), metadata);
     // load() waits for the job to finish
     console.log(`Job ${job.id} completed.`);
 
@@ -67,7 +67,7 @@ function main(datasetId, tableId) {
       throw errors;
     }
   }
-  loadCSVFromGCSAutodetect();
   // [END bigquery_load_table_gcs_csv_autodetect]
+  loadCSVFromGCSAutodetect();
 }
 main(...process.argv.slice(2));

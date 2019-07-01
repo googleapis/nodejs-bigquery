@@ -16,22 +16,23 @@
 
 'use strict';
 
-function main(datasetId, tableId) {
+function main(datasetId = 'my_dataset', tableId = 'my_table') {
   // [START bigquery_delete_label_table]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
+  const bigquery = new BigQuery();
 
-  async function deleteLabelTable(
-    datasetId = 'my_dataset', // Existing dataset
-    tableId = 'my_table' // Existing table
-  ) {
+  async function deleteLabelTable() {
     // Deletes a label from an existing table.
     // This example dataset starts with existing label { color: 'green' }
 
-    // Create a client
-    const bigqueryClient = new BigQuery();
+    /**
+     * TODO(developer): Uncomment the following lines before running the sample.
+     */
+    // const datasetId = "my_dataset";
+    // const tableId = "my_table";
 
-    const dataset = bigqueryClient.dataset(datasetId);
+    const dataset = bigquery.dataset(datasetId);
     const [table] = await dataset.table(tableId).get();
 
     // Retrieve current table metadata
@@ -45,6 +46,6 @@ function main(datasetId, tableId) {
     console.log(apiResponse.labels);
   }
   // [END bigquery_delete_label_table]
-  deleteLabelTable(datasetId, tableId);
+  deleteLabelTable();
 }
 main(...process.argv.slice(2));
