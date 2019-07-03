@@ -4,6 +4,13 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+### [4.1.4](https://www.github.com/googleapis/nodejs-bigquery/compare/v4.1.3...v4.1.4) (2019-07-02)
+
+
+### Bug Fixes
+
+* **docs:** link to reference docs section on googleapis.dev ([#486](https://www.github.com/googleapis/nodejs-bigquery/issues/486)) ([a76cc5b](https://www.github.com/googleapis/nodejs-bigquery/commit/a76cc5b))
+
 ### [4.1.3](https://www.github.com/googleapis/nodejs-bigquery/compare/v4.1.2...v4.1.3) (2019-06-17)
 
 
