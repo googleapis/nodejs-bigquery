@@ -2452,6 +2452,33 @@ declare namespace bigquery {
     etag?: string;
   };
 
+  type IProject = {
+    /**
+     * [Optional] Reference describing the unique-per-user name of the job.
+     */
+    projectReference?: IProjectReference;
+    /**
+     * [Output-only] Opaque ID field of the job
+     */
+    id?: string;
+     /**
+     * [Output-only]
+     */
+    friendlyName?: string;
+     /**
+     * [Output-only] 
+     */
+    numericId?: string;
+    /**
+     * [Output-only] The type of the resource.
+     */
+    kind?: string;
+    /**
+     * [Output-only] A hash of this resource.
+     */
+    etag?: string;
+  };
+
   type IBigtableOptions = {
     /**
      * [Optional] If field is true, then the rowkey column families will be read and converted to string. Otherwise they are read with BYTES type values and users need to manually cast them with CAST if necessary. The default value is false.

@@ -120,6 +120,8 @@ export type DatasetsCallback = PagedCallback<
 export type DatasetResponse = [Dataset, bigquery.IDataset];
 export type DatasetCallback = ResourceCallback<Dataset, bigquery.IDataset>;
 
+export type GetProjectsOptions = PagedRequest<bigquery.projects.IListParams>;
+
 export type GetJobsOptions = PagedRequest<bigquery.jobs.IListParams>;
 export type GetJobsResponse = PagedResponse<
   Job,
@@ -128,6 +130,12 @@ export type GetJobsResponse = PagedResponse<
 >;
 export type GetJobsCallback = PagedCallback<
   Job,
+  GetJobsOptions,
+  bigquery.IJobList
+>;
+ 
+export type GetProjectsCallback = PagedCallback<
+  Job, // PROJECT???
   GetJobsOptions,
   bigquery.IJobList
 >;
@@ -1440,6 +1448,72 @@ export class BigQuery extends common.Service {
       }
     );
   }
+
+
+
+  listProjects(options?: GetProjectsOptions): Promise<GetJobsResponse>;
+  listProjects(options: GetJobsOptions, callback: GetJobsCallback): void;
+  listProjects(callback: GetJobsCallback): void;
+
+  listProjects(
+    optionsOrCallback?: GetJobsOptions | GetJobsCallback,
+    cb?: GetProjectsCallback
+  ): void | Promise<GetJobsResponse> {
+    const that = this;
+    const options =
+      typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
+    const callback =
+      typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
+    this.request(
+      {
+        uri: '../../projects',
+        qs: options,
+        useQuerystring: true,
+      },
+      (err, resp) => {
+        if (err) {
+          callback!(err, null, null, resp);
+          return;
+        }
+
+        let nextQuery: {} | null = null;
+
+        if (resp.nextPageToken) {
+          nextQuery = extend({}, options, {
+            pageToken: resp.nextPageToken,
+          });
+        }
+
+        // tslint:disable-next-line no-any
+        const projects = (resp.projects || []).map((projectObject: bigquery.IProject) => {
+          const project = {
+            project: projectObject.projectReference!.projectId!,
+          };
+          return project;
+        });
+  
+        callback!(null, projects, nextQuery, resp);
+      }
+    );
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   /**
    * Create a reference to an existing job.
