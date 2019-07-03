@@ -16,30 +16,33 @@
 
 'use strict';
 
-function main(srcDatasetId, srcTableId, destDatasetId, destTableId) {
+function main(
+  srcDatasetId = 'my_src_dataset',
+  srcTableId = 'my_src_table',
+  destDatasetId = 'my_dest_dataset',
+  destTableId = 'my_dest_table'
+) {
   // [START bigquery_copy_table]
-  // Import the Google Cloud client library
+  // Import the Google Cloud client library and create a client
   const {BigQuery} = require('@google-cloud/bigquery');
-
-  /**
-   * TODO(developer): Uncomment the following lines before running the sample
-   */
-  // const srcDatasetId = "my_src_dataset";
-  // const srcTableId = "my_src_table";
-  // const destDatasetId = "my_dest_dataset";
-  // const destTableId = "my_dest_table";
-
-  // Create a client
-  const bigqueryClient = new BigQuery();
+  const bigquery = new BigQuery();
 
   async function copyTable() {
     // Copies src_dataset:src_table to dest_dataset:dest_table.
 
+    /**
+     * TODO(developer): Uncomment the following lines before running the sample
+     */
+    // const srcDatasetId = "my_src_dataset";
+    // const srcTableId = "my_src_table";
+    // const destDatasetId = "my_dest_dataset";
+    // const destTableId = "my_dest_table";
+
     // Copy the table contents into another table
-    const [job] = await bigqueryClient
+    const [job] = await bigquery
       .dataset(srcDatasetId)
       .table(srcTableId)
-      .copy(bigqueryClient.dataset(destDatasetId).table(destTableId));
+      .copy(bigquery.dataset(destDatasetId).table(destTableId));
 
     console.log(`Job ${job.id} completed.`);
 
@@ -49,8 +52,7 @@ function main(srcDatasetId, srcTableId, destDatasetId, destTableId) {
       throw errors;
     }
   }
-
-  copyTable();
   // [END bigquery_copy_table]
+  copyTable();
 }
 main(...process.argv.slice(2));

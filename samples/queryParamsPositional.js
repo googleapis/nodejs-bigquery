@@ -22,11 +22,9 @@ function main() {
 
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
+  const bigquery = new BigQuery();
 
   async function queryParamsPositional() {
-    // Create a client
-    const bigqueryClient = new BigQuery();
-
     // The SQL query to run
     const sqlQuery = `SELECT word, word_count
           FROM \`bigquery-public-data.samples.shakespeare\`
@@ -42,12 +40,12 @@ function main() {
     };
 
     // Run the query
-    const [rows] = await bigqueryClient.query(options);
+    const [rows] = await bigquery.query(options);
 
     console.log('Rows:');
     rows.forEach(row => console.log(row));
   }
-  queryParamsPositional();
   // [END bigquery_query_params_positional]
+  queryParamsPositional();
 }
 main(...process.argv.slice(2));

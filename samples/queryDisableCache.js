@@ -25,7 +25,7 @@ function main() {
     // Queries the Shakespeare dataset with the cache disabled.
 
     // Create a client
-    const bigqueryClient = new BigQuery();
+    const bigquery = new BigQuery();
 
     const query = `SELECT corpus
       FROM \`bigquery-public-data.samples.shakespeare\`
@@ -38,7 +38,7 @@ function main() {
     };
 
     // Run the query as a job
-    const [job] = await bigqueryClient.createQueryJob(options);
+    const [job] = await bigquery.createQueryJob(options);
     console.log(`Job ${job.id} started.`);
 
     // Wait for the query to finish
@@ -48,7 +48,7 @@ function main() {
     console.log('Rows:');
     rows.forEach(row => console.log(row));
   }
-  queryDisableCache();
   // [END bigquery_query_no_cache]
+  queryDisableCache();
 }
 main(...process.argv.slice(2));

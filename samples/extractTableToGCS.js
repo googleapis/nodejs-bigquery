@@ -16,11 +16,19 @@
 
 'use strict';
 
-function main(datasetId, tableId, bucketName, filename) {
+function main(
+  datasetId = 'my_dataset',
+  tableId = 'my_table',
+  bucketName = 'my-bucket',
+  filename = 'file.csv'
+) {
   // [START bigquery_extract_table]
   // Import the Google Cloud client libraries
   const {BigQuery} = require('@google-cloud/bigquery');
   const {Storage} = require('@google-cloud/storage');
+
+  const bigquery = new BigQuery();
+  const storage = new Storage();
 
   async function extractTableToGCS() {
     // Exports my_dataset:my_table to gcs://my-bucket/my-file as raw CSV.
@@ -33,20 +41,16 @@ function main(datasetId, tableId, bucketName, filename) {
     // const bucketName = "my-bucket";
     // const filename = "file.csv";
 
-    // Instantiate clients
-    const bigqueryClient = new BigQuery();
-    const storageClient = new Storage();
-
     // Location must match that of the source table.
     const options = {
       location: 'US',
     };
 
     // Export data from the table into a Google Cloud Storage file
-    const [job] = await bigqueryClient
+    const [job] = await bigquery
       .dataset(datasetId)
       .table(tableId)
-      .extract(storageClient.bucket(bucketName).file(filename), options);
+      .extract(storage.bucket(bucketName).file(filename), options);
     // load() waits for the job to finish
     console.log(`Job ${job.id} completed.`);
 
@@ -56,7 +60,7 @@ function main(datasetId, tableId, bucketName, filename) {
       throw errors;
     }
   }
-  extractTableToGCS();
   // [END bigquery_extract_table]
+  extractTableToGCS();
 }
 main(...process.argv.slice(2));
