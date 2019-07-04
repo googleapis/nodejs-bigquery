@@ -1463,7 +1463,7 @@ export class BigQuery extends common.Service {
   ): void;
   listProjects(callback: GetProjectsCallback): void;
   /**
-   * Lists projects to which you have at least READ access.
+   * Lists projects to which the user has been granted any project role.
    *
    * @see [Projects: list API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/projects}
    *

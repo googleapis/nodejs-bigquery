@@ -1956,15 +1956,16 @@ describe('BigQuery', () => {
 
     it('should return token if more results exist', done => {
       const token = 'token';
+      const resp = {nextPageToken: token};
 
       bq.request = (reqOpts: DecorateRequestOptions, callback: Function) => {
-        callback(null, {nextPageToken: token});
+        callback(null, resp);
       };
 
       bq.listProjects((err: Error, projects: FakeProject[], nextQuery: {}) => {
         assert.ifError(err);
         assert.deepStrictEqual(nextQuery, {
-          pageToken: token,
+          pageToken: resp.nextPageToken,
         });
         done();
       });

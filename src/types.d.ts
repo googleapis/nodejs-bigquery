@@ -2454,19 +2454,19 @@ declare namespace bigquery {
 
   type IProject = {
     /**
-     * [Optional] Reference describing the unique-per-user name of the job.
+     * [Required] ID of the project. Can be either the numeric ID or the assigned ID of the project.
      */
-    projectReference?: IProjectReference;
+    projectReference: IProjectReference;
     /**
-     * [Output-only] Opaque ID field of the job
+     * [Output-only] Opaque ID field of the job.
      */
     id?: string;
      /**
-     * [Output-only]
+     * [Output-only] A descriptive name for this project. 
      */
-    friendlyName?: string;
+    friendlyName?: string; 
      /**
-     * [Output-only] 
+     * [Output-only] The numeric ID of this project.
      */
     numericId?: string;
     /**
