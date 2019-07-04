@@ -33,6 +33,7 @@ import * as uuid from 'uuid';
 import {BigQueryDate, Dataset, Job, Table} from '../src';
 import {JobOptions} from '../src/job';
 import {TableField} from '../src/table';
+import bigquery from '../src/types';
 
 const fakeUuid = extend(true, {}, uuid);
 
@@ -86,6 +87,18 @@ class FakeJob {
   }
 }
 
+interface FakeProjectId {
+  projectId: string;
+}
+
+interface FakeProject {
+  kind: string;
+  id: string;
+  numericId: string;
+  projectReference: FakeProjectId;
+  friendlyName: string;
+}
+
 let extended = false;
 const fakePaginator = {
   paginator: {
@@ -119,6 +132,8 @@ describe('BigQuery', () => {
   const JOB_ID = 'JOB_ID';
   const PROJECT_ID = 'test-project';
   const LOCATION = 'asia-northeast1';
+  const NUMERIC_ID = '123456789012';
+  const FRIENDLY_NAME = 'test-project';
 
   // tslint:disable-next-line no-any variable-name
   let BigQueryCached: any;
@@ -1854,6 +1869,105 @@ describe('BigQuery', () => {
         callback(); // done()
       };
       bq.queryAsStream_(query, done);
+    });
+  });
+
+  describe('listProjects', () => {
+    it('should get projects from the api', done => {
+      bq.request = (reqOpts: DecorateRequestOptions) => {
+        assert.strictEqual(reqOpts.uri, '../../projects');
+        assert.deepStrictEqual(reqOpts.qs, {});
+        assert.deepStrictEqual(reqOpts.useQuerystring, true);
+        done();
+      };
+
+      bq.listProjects(assert.ifError);
+    });
+
+    it('should return error to callback', done => {
+      const error = new Error('Error.');
+
+      bq.request = (reqOpts: DecorateRequestOptions, callback: Function) => {
+        callback(error);
+      };
+
+      bq.listProjects((err: Error) => {
+        assert.strictEqual(err, error);
+        done();
+      });
+    });
+
+    it('should return Project objects', done => {
+      bq.request = (reqOpts: DecorateRequestOptions, callback: Function) => {
+        callback(null, {
+          projects: [
+            {
+              kind: JOB_ID,
+              id: PROJECT_ID,
+              numericId: NUMERIC_ID,
+              projectReference: {
+                projectId: PROJECT_ID,
+              },
+              friendlyName: FRIENDLY_NAME,
+            },
+          ],
+        });
+      };
+
+      bq.listProjects((err: Error, projects: FakeProject[]) => {
+        assert.ifError(err);
+
+        const project = projects[0];
+        assert.strictEqual(project.kind, JOB_ID);
+        assert.strictEqual(project.id, PROJECT_ID);
+        assert.strictEqual(project.numericId, NUMERIC_ID);
+        assert(typeof project.projectReference === 'object');
+        done();
+      });
+    });
+
+    it('should return apiResponse', done => {
+      const resp = {
+        projects: [
+          {
+            kind: JOB_ID,
+            id: PROJECT_ID,
+            numericId: NUMERIC_ID,
+            projectReference: {
+              projectId: PROJECT_ID,
+            },
+            friendlyName: FRIENDLY_NAME,
+          },
+        ],
+      };
+
+      bq.request = (reqOpts: DecorateRequestOptions, callback: Function) => {
+        callback(null, resp);
+      };
+
+      bq.listProjects(
+        (err: Error, jobs: Job[], nextQuery: {}, apiResponse: {}) => {
+          assert.ifError(err);
+          assert.strictEqual(resp, apiResponse);
+          done();
+        }
+      );
+    });
+
+    it('should return token if more results exist', done => {
+      const token = 'token';
+
+      bq.request = (reqOpts: DecorateRequestOptions, callback: Function) => {
+        callback(null, {nextPageToken: token});
+      };
+
+      bq.listProjects((err: Error, projects: FakeProject[], nextQuery: {}) => {
+        assert.ifError(err);
+        assert.deepStrictEqual(nextQuery, {
+          pageToken: token,
+        });
+        done();
+      });
     });
   });
 });

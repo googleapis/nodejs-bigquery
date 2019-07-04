@@ -128,16 +128,23 @@ export type GetJobsResponse = PagedResponse<
   GetJobsOptions,
   bigquery.IJobList
 >;
+
+export type GetProjectsResponse = PagedResponse<
+  bigquery.IProject,
+  GetProjectsOptions,
+  bigquery.IProjectList
+>;
+
 export type GetJobsCallback = PagedCallback<
   Job,
   GetJobsOptions,
   bigquery.IJobList
 >;
- 
+
 export type GetProjectsCallback = PagedCallback<
-  Job, // PROJECT???
-  GetJobsOptions,
-  bigquery.IJobList
+  bigquery.IProject,
+  GetProjectsOptions,
+  bigquery.IProjectList
 >;
 
 export interface BigQueryTimeOptions {
@@ -1449,16 +1456,47 @@ export class BigQuery extends common.Service {
     );
   }
 
-
-
-  listProjects(options?: GetProjectsOptions): Promise<GetJobsResponse>;
-  listProjects(options: GetJobsOptions, callback: GetJobsCallback): void;
-  listProjects(callback: GetJobsCallback): void;
-
+  listProjects(options?: GetProjectsOptions): Promise<GetProjectsResponse>;
   listProjects(
-    optionsOrCallback?: GetJobsOptions | GetJobsCallback,
+    options: GetProjectsOptions,
+    callback: GetProjectsCallback
+  ): void;
+  listProjects(callback: GetProjectsCallback): void;
+  /**
+   * Lists projects to which you have at least READ access.
+   *
+   * @see [Projects: list API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/projects}
+   *
+   * @param {object} [options] Configuration object.
+   * @param {number} [options.maxResults] Maximum number of results to return.
+   * @param {string} [options.pageToken] Token returned from a previous call, to
+   *     request the next page of results.
+   * @param {function} [callback] The callback function.
+   * @param {?error} callback.err An error returned while making this request
+   * @param {Project[]} callback.projects The list of projects to which you have at least READ access.
+   * @returns {Promise}
+   *
+   * @example
+   * const {BigQuery} = require('@google-cloud/bigquery');
+   * const bigquery = new BigQuery();
+   *
+   * bigquery.listProjects(function(err, projects) {
+   *   if (!err) {
+   *     // projects is an array of Project objects.
+   *   }
+   * });
+   *
+   * //-
+   * // If the callback is omitted, we'll return a Promise.
+   * //-
+   * bigquery.listProjects().then(function(data) {
+   *   const projects = data[0];
+   * });
+   */
+  listProjects(
+    optionsOrCallback?: GetProjectsOptions | GetProjectsCallback,
     cb?: GetProjectsCallback
-  ): void | Promise<GetJobsResponse> {
+  ): void | Promise<GetProjectsResponse> {
     const that = this;
     const options =
       typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
@@ -1484,36 +1522,11 @@ export class BigQuery extends common.Service {
           });
         }
 
-        // tslint:disable-next-line no-any
-        const projects = (resp.projects || []).map((projectObject: bigquery.IProject) => {
-          const project = {
-            project: projectObject.projectReference!.projectId!,
-          };
-          return project;
-        });
-  
+        const projects = resp.projects;
         callback!(null, projects, nextQuery, resp);
       }
     );
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   /**
    * Create a reference to an existing job.
