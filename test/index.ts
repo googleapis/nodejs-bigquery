@@ -1884,6 +1884,28 @@ describe('BigQuery', () => {
       bq.listProjects(assert.ifError);
     });
 
+    it('should accept query', done => {
+      const queryObject = {
+        maxResults: 8,
+        pageToken: 'token',
+      };
+
+      bq.request = (reqOpts: DecorateRequestOptions) => {
+        assert.deepStrictEqual(reqOpts.qs, queryObject);
+        done();
+      };
+
+      bq.listProjects(queryObject, assert.ifError);
+    });
+
+    it('should default the query to an object', done => {
+      bq.request = (reqOpts: DecorateRequestOptions) => {
+        assert.deepStrictEqual(reqOpts.qs, {});
+        done();
+      };
+      bq.listProjects(assert.ifError);
+    });
+
     it('should return error to callback', done => {
       const error = new Error('Error.');
 
