@@ -16,31 +16,34 @@
 
 'use strict';
 
+// sample-metadata:
+//   title: BigQuery Get Model
+//   description: Retrieves an existing model from a dataset.
+//   usage: node getModel.js <DATASET_ID> <MODEL_ID>
+
 function main(datasetId = 'my_dataset', tableId = 'my_table') {
-  // [START bigquery_delete_table]
+  // [START bigquery_get_table]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
   const bigquery = new BigQuery();
 
-  async function deleteTable() {
-    // Deletes "my_table" from "my_dataset".
+  async function getTable() {
+    // Retrieves table named "my_table" in "my_dataset".
 
     /**
-     * TODO(developer): Uncomment the following lines before running the sample.
+     * TODO(developer): Uncomment the following lines before running the sample
      */
     // const datasetId = "my_dataset";
     // const tableId = "my_table";
 
-    // Delete the table
-    await bigquery
-      .dataset(datasetId)
-      .table(tableId)
-      .delete();
+    // Retrieve table reference
+    const dataset = bigquery.dataset(datasetId);
+    const [table] = await dataset.table(tableId).get();
 
-    console.log(`Table ${tableId} deleted.`);
+    console.log('Table:');
+    console.log(table.metadata.tableReference);
   }
-  // [END bigquery_delete_table]
-  deleteTable();
+  getTable();
+  // [END bigquery_get_table]
 }
-
 main(...process.argv.slice(2));

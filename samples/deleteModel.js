@@ -16,15 +16,11 @@
 
 'use strict';
 
-// sample-metadata:
-//   title: BigQuery Delete Model
-//   description: Deletes a model.
-//   usage: node deleteModel.js <DATASET_ID> <MODEL_ID>
-
-function main(datasetId, modelId) {
+function main(datasetId = 'my_dataset', modelId = 'my_model') {
   // [START bigquery_delete_model]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
+  const bigquery = new BigQuery();
 
   async function deleteModel() {
     // Deletes a model named "my_model" from "my_dataset".
@@ -35,16 +31,13 @@ function main(datasetId, modelId) {
     // const datasetId = "my_dataset";
     // const modelId = "my_model";
 
-    // Create a client
-    const bigqueryClient = new BigQuery();
-
-    const dataset = bigqueryClient.dataset(datasetId);
+    const dataset = bigquery.dataset(datasetId);
     const model = dataset.model(modelId);
     await model.delete();
 
     console.log(`Model ${modelId} deleted.`);
   }
-  deleteModel();
   // [END bigquery_delete_model]
+  deleteModel();
 }
 main(...process.argv.slice(2));

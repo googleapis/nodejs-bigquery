@@ -16,30 +16,28 @@
 
 'use strict';
 
-function main(datasetId) {
+function main(datasetId = 'my_dataset') {
   // [START bigquery_list_tables]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
-
-  /**
-   * TODO(developer): Uncomment the following lines before running the sample.
-   */
-  // const datasetId = "my_dataset";
-
-  // Create a client
-  const bigqueryClient = new BigQuery();
+  const bigquery = new BigQuery();
 
   async function listTables() {
-    // Lists tables in "my_dataset".
+    // Lists tables in 'my_dataset'.
+
+    /**
+     * TODO(developer): Uncomment the following lines before running the sample.
+     */
+    // const datasetId = 'my_dataset';
 
     // List all tables in the dataset
-    const [tables] = await bigqueryClient.dataset(datasetId).getTables();
+    const [tables] = await bigquery.dataset(datasetId).getTables();
 
     console.log('Tables:');
     tables.forEach(table => console.log(table.id));
   }
-  listTables();
   // [END bigquery_list_tables]
+  listTables();
 }
 
 main(...process.argv.slice(2));

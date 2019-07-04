@@ -16,31 +16,24 @@
 
 'use strict';
 
-function main(datasetId = 'my_dataset', tableId = 'my_table') {
-  // [START bigquery_delete_table]
+function main() {
+  // [START bigquery_list_jobs]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
   const bigquery = new BigQuery();
 
-  async function deleteTable() {
-    // Deletes "my_table" from "my_dataset".
+  async function listJobs() {
+    // Lists all jobs in current GCP project.
 
-    /**
-     * TODO(developer): Uncomment the following lines before running the sample.
-     */
-    // const datasetId = "my_dataset";
-    // const tableId = "my_table";
+    // List the 10 most recent jobs in reverse chronological order.
+    //  Omit the max_results parameter to list jobs from the past 6 months.
+    const options = {maxResults: 10};
+    const [jobs] = await bigquery.getJobs(options);
 
-    // Delete the table
-    await bigquery
-      .dataset(datasetId)
-      .table(tableId)
-      .delete();
-
-    console.log(`Table ${tableId} deleted.`);
+    console.log('Jobs:');
+    jobs.forEach(job => console.log(job.id));
   }
-  // [END bigquery_delete_table]
-  deleteTable();
+  // [END bigquery_list_jobs]
+  listJobs();
 }
-
 main(...process.argv.slice(2));

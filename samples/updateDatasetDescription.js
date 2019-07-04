@@ -16,31 +16,29 @@
 
 'use strict';
 
-function main(datasetId = 'my_dataset', tableId = 'my_table') {
-  // [START bigquery_delete_table]
+function main(datasetId = 'my_dataset') {
+  // [START bigquery_update_dataset_description]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
   const bigquery = new BigQuery();
 
-  async function deleteTable() {
-    // Deletes "my_table" from "my_dataset".
+  async function updateDatasetDescription() {
+    // Updates a dataset's description.
 
-    /**
-     * TODO(developer): Uncomment the following lines before running the sample.
-     */
-    // const datasetId = "my_dataset";
-    // const tableId = "my_table";
+    // Retreive current dataset metadata
+    const dataset = bigquery.dataset(datasetId);
+    const [metadata] = await dataset.getMetadata();
 
-    // Delete the table
-    await bigquery
-      .dataset(datasetId)
-      .table(tableId)
-      .delete();
+    // Set new dataset description
+    const description = 'New dataset description.';
+    metadata.description = description;
 
-    console.log(`Table ${tableId} deleted.`);
+    const [apiResponse] = await dataset.setMetadata(metadata);
+    const newDescription = apiResponse.description;
+
+    console.log(`${datasetId} description: ${newDescription}`);
   }
-  // [END bigquery_delete_table]
-  deleteTable();
+  // [END bigquery_update_dataset_description]
+  updateDatasetDescription();
 }
-
 main(...process.argv.slice(2));

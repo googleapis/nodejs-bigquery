@@ -16,31 +16,34 @@
 
 'use strict';
 
-function main(datasetId = 'my_dataset', tableId = 'my_table') {
-  // [START bigquery_delete_table]
+function main(datasetId = 'my_dataset') {
+  // [START bigquery_update_dataset_expiration]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
   const bigquery = new BigQuery();
 
-  async function deleteTable() {
-    // Deletes "my_table" from "my_dataset".
+  async function updateDatasetExpiration() {
+    // Updates the lifetime of all tables in the dataset, in milliseconds.
 
     /**
      * TODO(developer): Uncomment the following lines before running the sample.
      */
     // const datasetId = "my_dataset";
-    // const tableId = "my_table";
 
-    // Delete the table
-    await bigquery
-      .dataset(datasetId)
-      .table(tableId)
-      .delete();
+    // Retreive current dataset metadata
+    const dataset = bigquery.dataset(datasetId);
+    const [metadata] = await dataset.getMetadata();
 
-    console.log(`Table ${tableId} deleted.`);
+    // Set new dataset metadata
+    const expirationTime = 24 * 60 * 60 * 1000;
+    metadata.defaultTableExpirationMs = expirationTime.toString();
+
+    const [apiResponse] = await dataset.setMetadata(metadata);
+    const newExpirationTime = apiResponse.defaultTableExpirationMs;
+
+    console.log(`${datasetId} expiration: ${newExpirationTime}`);
   }
-  // [END bigquery_delete_table]
-  deleteTable();
+  // [END bigquery_update_dataset_expiration]
+  updateDatasetExpiration();
 }
-
 main(...process.argv.slice(2));

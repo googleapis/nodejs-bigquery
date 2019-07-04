@@ -17,30 +17,40 @@
 'use strict';
 
 function main(datasetId = 'my_dataset', tableId = 'my_table') {
-  // [START bigquery_delete_table]
+  // [START bigquery_create_table_partitioned]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
   const bigquery = new BigQuery();
 
-  async function deleteTable() {
-    // Deletes "my_table" from "my_dataset".
+  async function createTablePartitioned() {
+    // Creates a new partitioned table named "my_table" in "my_dataset".
 
     /**
      * TODO(developer): Uncomment the following lines before running the sample.
      */
     // const datasetId = "my_dataset";
     // const tableId = "my_table";
+    const schema = 'Name:string, Post_Abbr:string, Date:date';
 
-    // Delete the table
-    await bigquery
+    // For all options, see https://cloud.google.com/bigquery/docs/reference/v2/tables#resource
+    const options = {
+      schema: schema,
+      location: 'US',
+      timePartitioning: {
+        type: 'DAY',
+        expirationMS: '7776000000',
+        field: 'date',
+      },
+    };
+
+    // Create a new table in the dataset
+    const [table] = await bigquery
       .dataset(datasetId)
-      .table(tableId)
-      .delete();
-
-    console.log(`Table ${tableId} deleted.`);
+      .createTable(tableId, options);
+    console.log(`Table ${table.id} created with partitioning: `);
+    console.log(table.metadata.timePartitioning);
   }
-  // [END bigquery_delete_table]
-  deleteTable();
+  // [END bigquery_create_table_partitioned]
+  createTablePartitioned(datasetId, tableId);
 }
-
 main(...process.argv.slice(2));
