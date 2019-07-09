@@ -1872,7 +1872,7 @@ describe('BigQuery', () => {
     });
   });
 
-  describe('listProjects', () => {
+  describe('getProjects', () => {
     it('should get projects from the api', done => {
       bq.request = (reqOpts: DecorateRequestOptions) => {
         assert.strictEqual(reqOpts.uri, '../../projects');
@@ -1881,7 +1881,7 @@ describe('BigQuery', () => {
         done();
       };
 
-      bq.listProjects(assert.ifError);
+      bq.getProjects(assert.ifError);
     });
 
     it('should accept query', done => {
@@ -1895,7 +1895,7 @@ describe('BigQuery', () => {
         done();
       };
 
-      bq.listProjects(queryObject, assert.ifError);
+      bq.getProjects(queryObject, assert.ifError);
     });
 
     it('should default the query to an object', done => {
@@ -1903,7 +1903,7 @@ describe('BigQuery', () => {
         assert.deepStrictEqual(reqOpts.qs, {});
         done();
       };
-      bq.listProjects(assert.ifError);
+      bq.getProjects(assert.ifError);
     });
 
     it('should return error to callback', done => {
@@ -1913,7 +1913,7 @@ describe('BigQuery', () => {
         callback(error);
       };
 
-      bq.listProjects((err: Error) => {
+      bq.getProjects((err: Error) => {
         assert.strictEqual(err, error);
         done();
       });
@@ -1936,7 +1936,7 @@ describe('BigQuery', () => {
         });
       };
 
-      bq.listProjects((err: Error, projects: FakeProject[]) => {
+      bq.getProjects((err: Error, projects: FakeProject[]) => {
         assert.ifError(err);
 
         const project = projects[0];
@@ -1967,7 +1967,7 @@ describe('BigQuery', () => {
         callback(null, resp);
       };
 
-      bq.listProjects(
+      bq.getProjects(
         (err: Error, jobs: Job[], nextQuery: {}, apiResponse: {}) => {
           assert.ifError(err);
           assert.strictEqual(resp, apiResponse);
@@ -1984,7 +1984,7 @@ describe('BigQuery', () => {
         callback(null, resp);
       };
 
-      bq.listProjects((err: Error, projects: FakeProject[], nextQuery: {}) => {
+      bq.getProjects((err: Error, projects: FakeProject[], nextQuery: {}) => {
         assert.ifError(err);
         assert.deepStrictEqual(nextQuery, {
           pageToken: resp.nextPageToken,

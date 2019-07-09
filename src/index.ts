@@ -1456,12 +1456,9 @@ export class BigQuery extends common.Service {
     );
   }
 
-  listProjects(options?: GetProjectsOptions): Promise<GetProjectsResponse>;
-  listProjects(
-    options: GetProjectsOptions,
-    callback: GetProjectsCallback
-  ): void;
-  listProjects(callback: GetProjectsCallback): void;
+  getProjects(options?: GetProjectsOptions): Promise<GetProjectsResponse>;
+  getProjects(options: GetProjectsOptions, callback: GetProjectsCallback): void;
+  getProjects(callback: GetProjectsCallback): void;
   /**
    * Lists projects to which the user has been granted any project role.
    *
@@ -1480,7 +1477,7 @@ export class BigQuery extends common.Service {
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    *
-   * bigquery.listProjects(function(err, projects) {
+   * bigquery.getProjects(function(err, projects) {
    *   if (!err) {
    *     // projects is an array of Project objects.
    *   }
@@ -1489,11 +1486,11 @@ export class BigQuery extends common.Service {
    * //-
    * // If the callback is omitted, we'll return a Promise.
    * //-
-   * bigquery.listProjects().then(function(data) {
+   * bigquery.getProjects().then(function(data) {
    *   const projects = data[0];
    * });
    */
-  listProjects(
+  getProjects(
     optionsOrCallback?: GetProjectsOptions | GetProjectsCallback,
     cb?: GetProjectsCallback
   ): void | Promise<GetProjectsResponse> {
