@@ -363,6 +363,17 @@ export class BigQuery extends common.Service {
   }
 
   /**
+   * Convert a row entry from native types to their encoded types that the API
+   * expects.
+   *
+   * @param {*} value The value to be converted.
+   * @returns {*} The converted value.
+   */
+  static encode(value?: {} | null): {} | null {
+    return Table.encodeValue_(value);
+  }
+
+  /**
    * Merge a rowset returned from the API with a table schema.
    *
    * @private

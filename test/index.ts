@@ -1137,6 +1137,101 @@ describe('BigQuery', () => {
     });
   });
 
+  describe('encode', () => {
+    it('should return null if null, undefined or string', () => {
+      assert.strictEqual(BigQuery.encode('test'), 'test');
+      assert.strictEqual(BigQuery.encode(null), null);
+      assert.strictEqual(BigQuery.encode(undefined), null);
+    });
+
+    it('should properly encode values', () => {
+      const buffer = Buffer.from('test');
+      assert.strictEqual(BigQuery.encode(buffer), buffer.toString('base64'));
+
+      const date = new Date();
+      assert.strictEqual(BigQuery.encode(date), date.toJSON());
+    });
+
+    it('should properly encode custom types', () => {
+      class BigQueryDate {
+        value: {};
+        constructor(value: {}) {
+          this.value = value;
+        }
+      }
+      class BigQueryDatetime {
+        value: {};
+        constructor(value: {}) {
+          this.value = value;
+        }
+      }
+      class BigQueryTime {
+        value: {};
+        constructor(value: {}) {
+          this.value = value;
+        }
+      }
+      class BigQueryTimestamp {
+        value: {};
+        constructor(value: {}) {
+          this.value = value;
+        }
+      }
+
+      const date = new BigQueryDate('date');
+      const datetime = new BigQueryDatetime('datetime');
+      const time = new BigQueryTime('time');
+      const timestamp = new BigQueryTimestamp('timestamp');
+
+      assert.strictEqual(BigQuery.encode(date), 'date');
+      assert.strictEqual(BigQuery.encode(datetime), 'datetime');
+      assert.strictEqual(BigQuery.encode(time), 'time');
+      assert.strictEqual(BigQuery.encode(timestamp), 'timestamp');
+    });
+
+    it('should properly encode arrays', () => {
+      const buffer = Buffer.from('test');
+      const date = new Date();
+
+      const array = [buffer, date];
+
+      assert.deepStrictEqual(BigQuery.encode(array), [
+        buffer.toString('base64'),
+        date.toJSON(),
+      ]);
+    });
+
+    it('should properly encode objects', () => {
+      const buffer = Buffer.from('test');
+      const date = new Date();
+
+      const object = {
+        nested: {
+          array: [buffer, date],
+        },
+      };
+
+      assert.deepStrictEqual(BigQuery.encode(object), {
+        nested: {
+          array: [buffer.toString('base64'), date.toJSON()],
+        },
+      });
+    });
+
+    it('should properly encode numerics', () => {
+      assert.strictEqual(BigQuery.encode(new Big('123.456')), '123.456');
+      assert.strictEqual(BigQuery.encode(new Big('-123.456')), '-123.456');
+      assert.strictEqual(
+        BigQuery.encode(new Big('99999999999999999999999999999.999999999')),
+        '99999999999999999999999999999.999999999'
+      );
+      assert.strictEqual(
+        BigQuery.encode(new Big('-99999999999999999999999999999.999999999')),
+        '-99999999999999999999999999999.999999999'
+      );
+    });
+  });
+
   describe('createQueryJob', () => {
     const QUERY_STRING = 'SELECT * FROM [dataset.table]';
 
