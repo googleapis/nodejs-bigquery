@@ -34,7 +34,7 @@ function main(datasetId = 'my_dataset', tableId = 'my_new_table') {
    */
   const bucketName = 'cloud-samples-data';
   const filename = 'bigquery/us-states/us-states-by-date.csv';
-  
+
   async function loadTablePartitioned() {
     // Load data into a table that uses column-based time partitioning.
 
@@ -48,9 +48,9 @@ function main(datasetId = 'my_dataset', tableId = 'my_new_table') {
     // https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationLoad
     const partitionConfig = {
       type: 'DAY',
-      expirationMs: "7776000000", // 90 days
+      expirationMs: '7776000000', // 90 days
       field: 'date',
-    }
+    };
     const metadata = {
       sourceFormat: 'CSV',
       skipLeadingRows: 1,

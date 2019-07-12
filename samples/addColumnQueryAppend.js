@@ -34,10 +34,13 @@ function main(datasetId = 'my_dataset', tableId = 'my_table') {
     // const tableId = 'my_table';
 
     // Retrieve destination table reference
-    const [table] = await bigquery.dataset(datasetId).table(tableId).get();
-    const destinationTableRef = table.metadata.tableReference
-   
-    // In this example, the existing table contains only the 'name' column. 
+    const [table] = await bigquery
+      .dataset(datasetId)
+      .table(tableId)
+      .get();
+    const destinationTableRef = table.metadata.tableReference;
+
+    // In this example, the existing table contains only the 'name' column.
     // 'REQUIRED' fields cannot  be added to an existing schema,
     // so the additional column must be 'NULLABLE'.
     const query = `SELECT name, year
@@ -47,17 +50,17 @@ function main(datasetId = 'my_dataset', tableId = 'my_table') {
 
     // Set load job options
     const options = {
-        query: query,
-        schemaUpdateOptions: ['ALLOW_FIELD_ADDITION'],
-        writeDisposition: 'WRITE_APPEND',
-        destinationTable: destinationTableRef,
-        // Location must match that of the dataset(s) referenced in the query.
-        location: 'US',
+      query: query,
+      schemaUpdateOptions: ['ALLOW_FIELD_ADDITION'],
+      writeDisposition: 'WRITE_APPEND',
+      destinationTable: destinationTableRef,
+      // Location must match that of the dataset(s) referenced in the query.
+      location: 'US',
     };
 
     const [job] = await bigquery.createQueryJob(options);
     console.log(`Job ${job.id} started.`);
- 
+
     // Wait for the query to finish
     const [rows] = await job.getQueryResults();
     console.log(`Job ${job.id} completed.`);

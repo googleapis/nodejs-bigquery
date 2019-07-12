@@ -16,7 +16,11 @@
 
 'use strict';
 
-function main(datasetId = 'my_dataset', tableId = 'my_table', fileName = '/path/to/file.csv') {
+function main(
+  datasetId = 'my_dataset',
+  tableId = 'my_table',
+  fileName = '/path/to/file.csv'
+) {
   // [START bigquery_relax_column_load_append]
   // Import the Google Cloud client libraries
   const {BigQuery} = require('@google-cloud/bigquery');
@@ -39,15 +43,18 @@ function main(datasetId = 'my_dataset', tableId = 'my_table', fileName = '/path/
     const schema = 'Age:INTEGER, Weight:FLOAT, IsMagic:BOOLEAN';
 
     // Retrieve destination table reference
-    const [table] = await bigquery.dataset(datasetId).table(tableId).get();
-    const destinationTableRef = table.metadata.tableReference
-   
+    const [table] = await bigquery
+      .dataset(datasetId)
+      .table(tableId)
+      .get();
+    const destinationTableRef = table.metadata.tableReference;
+
     // Set load job options
     const options = {
-        schema: schema,
-        schemaUpdateOptions: ['ALLOW_FIELD_RELAXATION'],
-        writeDisposition: 'WRITE_APPEND',
-        destinationTable: destinationTableRef,
+      schema: schema,
+      schemaUpdateOptions: ['ALLOW_FIELD_RELAXATION'],
+      writeDisposition: 'WRITE_APPEND',
+      destinationTable: destinationTableRef,
     };
 
     // Load data from a local file into the table

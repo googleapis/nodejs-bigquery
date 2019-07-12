@@ -18,10 +18,11 @@
 
 function main() {
   // [START bigquery_query]
-  // Import the Google Cloud client library
+  // [START bigquery_client_default_credentials]
+  // Import the Google Cloud client library using default credentials
   const {BigQuery} = require('@google-cloud/bigquery');
   const bigquery = new BigQuery();
-
+  // [END bigquery_client_default_credentials]
   async function query() {
     // Queries the U.S. given names dataset for the state of Texas.
 

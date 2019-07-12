@@ -24,10 +24,10 @@ function main() {
 
   async function listDatasetsByLabel() {
     // Lists all datasets in current GCP project, filtering by label color:green.
-    
+
     const options = {
-     filter: "labels.color:green"
-    }
+      filter: 'labels.color:green',
+    };
     // Lists all datasets in the specified project
     const [datasets] = await bigquery.getDatasets(options);
 

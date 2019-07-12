@@ -40,7 +40,7 @@ function main(
   const bigquery = new BigQuery();
 
   async function nestedRepeatedSchema() {
-    // Creates a new table named "my_table" in "my_dataset" 
+    // Creates a new table named "my_table" in "my_dataset"
     // with nested and repeated columns in schema.
 
     /**

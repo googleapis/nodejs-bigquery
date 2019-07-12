@@ -26,7 +26,7 @@ const generateUuid = () => `gcloud-tests-${uuid.v4()}`.replace(/-/gi, '_');
 const datasetId = generateUuid();
 const tableId = generateUuid();
 const destTableId = generateUuid();
-let projectId
+let projectId;
 
 const bigquery = new BigQuery();
 
@@ -108,9 +108,7 @@ describe(`Queries`, () => {
   });
 
   it(`should run a query with legacy SQL`, async () => {
-    const output = execSync(
-      `node queryLegacy.js`
-    );
+    const output = execSync(`node queryLegacy.js`);
     assert.match(output, /Rows:/);
     assert.match(output, /word/);
   });
@@ -127,7 +125,9 @@ describe(`Queries`, () => {
   it(`should add a new column via a query job`, async () => {
     const destTableId = generateUuid();
     execSync(`node createTable.js ${datasetId} ${destTableId} 'name:STRING'`);
-    const output = execSync(`node addColumnQueryAppend.js ${datasetId} ${destTableId}`);
+    const output = execSync(
+      `node addColumnQueryAppend.js ${datasetId} ${destTableId}`
+    );
     assert.match(output, /completed\./);
     const [rows] = await bigquery
       .dataset(datasetId)

@@ -35,18 +35,16 @@ const nestedTableId = generateUuid();
 const partitionedTableId = generateUuid();
 const srcTableId = tableId;
 const destTableId = generateUuid();
-const schema = [
-  {name: 'Name', type: 'STRING', mode: 'REQUIRED'},
-  {name: 'Age', type: 'INTEGER'},
-  {name: 'Weight', type: 'FLOAT'},
-];
 const bucketName = generateUuid();
 const exportCSVFileName = `data.json`;
 const exportJSONFileName = `data.json`;
 const importFileName = `data.avro`;
-const partialDataFileName = `partialdata.csv`
+const partialDataFileName = `partialdata.csv`;
 const localFilePath = path.join(__dirname, `../resources/${importFileName}`);
-const partialDataFilePath = path.join(__dirname, `../resources/${partialDataFileName}`);
+const partialDataFilePath = path.join(
+  __dirname,
+  `../resources/${partialDataFileName}`
+);
 const bigquery = new BigQuery();
 
 describe('Tables', () => {
@@ -117,7 +115,9 @@ describe('Tables', () => {
   });
 
   it(`should create a table with nested schema`, async () => {
-    const output = execSync(`node nestedRepeatedSchema.js ${datasetId} ${nestedTableId}`);
+    const output = execSync(
+      `node nestedRepeatedSchema.js ${datasetId} ${nestedTableId}`
+    );
     assert.include(output, `Table ${nestedTableId} created.`);
     const [exists] = await bigquery
       .dataset(datasetId)
@@ -275,7 +275,9 @@ describe('Tables', () => {
 
   it(`should load a GCS CSV file to partitioned table`, async () => {
     const tableId = generateUuid();
-    const output = execSync(`node loadTablePartitioned.js ${datasetId} ${tableId}`);
+    const output = execSync(
+      `node loadTablePartitioned.js ${datasetId} ${tableId}`
+    );
     assert.match(output, /completed\./);
     const [rows] = await bigquery
       .dataset(datasetId)
@@ -286,8 +288,12 @@ describe('Tables', () => {
 
   it(`should add a new column via a GCS file load job`, async () => {
     const destTableId = generateUuid();
-    execSync(`node createTable.js ${datasetId} ${destTableId} 'Name:STRING, Age:INTEGER, Weight:FLOAT'`);
-    const output = execSync(`node addColumnLoadAppend.js ${datasetId} ${destTableId} ${localFilePath}`);
+    execSync(
+      `node createTable.js ${datasetId} ${destTableId} 'Name:STRING, Age:INTEGER, Weight:FLOAT'`
+    );
+    const output = execSync(
+      `node addColumnLoadAppend.js ${datasetId} ${destTableId} ${localFilePath}`
+    );
     assert.match(output, /completed\./);
     const [rows] = await bigquery
       .dataset(datasetId)
@@ -299,7 +305,9 @@ describe('Tables', () => {
   it(`should relax a column via a GCS file load job`, async () => {
     const destTableId = generateUuid();
     execSync(`node createTable.js ${datasetId} ${destTableId}`);
-    const output = execSync(`node relaxColumnLoadAppend.js ${datasetId} ${destTableId} ${partialDataFilePath}`);
+    const output = execSync(
+      `node relaxColumnLoadAppend.js ${datasetId} ${destTableId} ${partialDataFilePath}`
+    );
     assert.match(output, /completed\./);
     const [rows] = await bigquery
       .dataset(datasetId)
@@ -432,7 +440,7 @@ describe('Tables', () => {
   it(`should get labels on a table`, async () => {
     execSync(`node labelTable.js ${datasetId} ${tableId}`);
     const output = execSync(`node getTableLabels.js ${datasetId} ${tableId}`);
-    assert.include(output, `${tableId} Labels:`)
+    assert.include(output, `${tableId} Labels:`);
     assert.include(output, 'color: green');
   });
 

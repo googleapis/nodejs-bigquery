@@ -17,9 +17,9 @@
 'use strict';
 
 function main(
-    datasetId = 'my_dataset', 
-    tableId = 'my_table', 
-    projectId = 'my_project'
+  datasetId = 'my_dataset',
+  tableId = 'my_table',
+  projectId = 'my_project'
 ) {
   // [START bigquery_query_legacy_large_results]
   // Import the Google Cloud client library
@@ -40,14 +40,14 @@ function main(
     // For all options, see https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs/query
     const options = {
       query: query,
-        // Location must match that of the dataset(s) referenced
-        // in the query and of the destination table.
+      // Location must match that of the dataset(s) referenced
+      // in the query and of the destination table.
       useLegacySql: true,
       allowLargeResult: true,
       destinationTable: {
-        "projectId": projectId,
-        "datasetId": datasetId,
-        "tableId": tableId,
+        projectId: projectId,
+        datasetId: datasetId,
+        tableId: tableId,
       },
     };
 

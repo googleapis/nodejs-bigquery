@@ -85,7 +85,7 @@ describe(`Datasets`, () => {
 
   it(`should update dataset's access`, async () => {
     const output = execSync(`node updateDatasetAccess.js ${datasetId}`);
-    assert.include(output,`role: 'READER'`);
+    assert.include(output, `role: 'READER'`);
     assert.include(output, `userByEmail: 'sample.bigquery.dev@gmail.com'`);
   });
 
