@@ -16,14 +16,24 @@
 
 'use strict';
 
-function main(datasetId = 'my_dataset', tableId = 'my_table') {
-  // [START bigquery_label_table]
-  // Import the Google Cloud client library
+function main(
+  datasetId = 'my_dataset', // Existing dataset
+  tableId = 'my_new_table' // Table to be created
+) {
+  // [START bigquery_relax_column]
+  // Import the Google Cloud client library and create a client
   const {BigQuery} = require('@google-cloud/bigquery');
   const bigquery = new BigQuery();
 
-  async function labelTable() {
-    // Adds a label to an existing table.
+  async function relaxColumn() {
+    /**
+     * Changes columns from required to nullable.
+     * Assumes existing table with the following schema:
+     * [{name: 'Name', type: 'STRING', mode: 'REQUIRED'},
+     * {name: 'Age', type: 'INTEGER'},
+     * {name: 'Weight', type: 'FLOAT'},
+     * {name: 'IsMagic', type: 'BOOLEAN'}];
+     */
 
     /**
      * TODO(developer): Uncomment the following lines before running the sample.
@@ -31,20 +41,24 @@ function main(datasetId = 'my_dataset', tableId = 'my_table') {
     // const datasetId = 'my_dataset';
     // const tableId = 'my_table';
 
-    const dataset = bigquery.dataset(datasetId);
-    const [table] = await dataset.table(tableId).get();
+    const newSchema = [
+      {name: 'Name', type: 'STRING', mode: 'NULLABLE'},
+      {name: 'Age', type: 'INTEGER'},
+      {name: 'Weight', type: 'FLOAT'},
+      {name: 'IsMagic', type: 'BOOLEAN'},
+    ];
 
     // Retrieve current table metadata
+    const table = bigquery.dataset(datasetId).table(tableId);
     const [metadata] = await table.getMetadata();
 
-    // Add label to table metadata
-    metadata.labels = {color: 'green'};
+    // Update schema
+    metadata.schema = newSchema;
     const [apiResponse] = await table.setMetadata(metadata);
 
-    console.log(`${tableId} labels:`);
-    console.log(apiResponse.labels);
+    console.log(apiResponse.schema.fields);
   }
-  // [END bigquery_label_table]
-  labelTable();
+  // [END bigquery_relax_column]
+  relaxColumn();
 }
 main(...process.argv.slice(2));

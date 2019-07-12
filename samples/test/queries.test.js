@@ -22,16 +22,20 @@ const uuid = require('uuid');
 const {BigQuery} = require('@google-cloud/bigquery');
 
 const execSync = cmd => cp.execSync(cmd, {encoding: 'utf-8'});
-
-const datasetId = `gcloud_tests_${uuid.v4()}`.replace(/-/gi, '_');
-const tableId = `gcloud_tests_${uuid.v4()}`.replace(/-/gi, '_');
+const generateUuid = () => `gcloud-tests-${uuid.v4()}`.replace(/-/gi, '_');
+const datasetId = generateUuid();
+const tableId = generateUuid();
+const destTableId = generateUuid();
+let projectId
 
 const bigquery = new BigQuery();
 
 describe(`Queries`, () => {
   before(async () => {
     await bigquery.createDataset(datasetId);
-    await bigquery.dataset(datasetId).createTable(tableId);
+    await bigquery.dataset(datasetId).createTable(destTableId);
+    const [tableData] = await bigquery.dataset(datasetId).createTable(tableId);
+    projectId = tableData.metadata.tableReference.projectId;
   });
   after(async () => {
     await bigquery
@@ -50,6 +54,14 @@ describe(`Queries`, () => {
     const output = execSync(`node query.js`);
     assert.match(output, /Rows:/);
     assert.match(output, /name/);
+  });
+
+  it(`should run a query as a dry run`, async () => {
+    const output = execSync(`node queryDryRun.js`);
+    assert.match(output, /Status:/);
+    assert.include(output, '\nJob Statistics:');
+    assert.include(output, 'DONE');
+    assert.include(output, 'totalBytesProcessed:');
   });
 
   it(`should run a query with the cache disabled`, async () => {
@@ -93,5 +105,34 @@ describe(`Queries`, () => {
       `node queryDestinationTable.js ${datasetId} ${tableId}`
     );
     assert.include(output, `Query results loaded to table ${tableId}`);
+  });
+
+  it(`should run a query with legacy SQL`, async () => {
+    const output = execSync(
+      `node queryLegacy.js`
+    );
+    assert.match(output, /Rows:/);
+    assert.match(output, /word/);
+  });
+
+  it(`should run a query with legacy SQL and large results`, async () => {
+    const destTableId = generateUuid();
+    const output = execSync(
+      `node queryLegacyLargeResults.js ${datasetId} ${destTableId} ${projectId}`
+    );
+    assert.match(output, /Rows:/);
+    assert.match(output, /word/);
+  });
+
+  it(`should add a new column via a query job`, async () => {
+    const destTableId = generateUuid();
+    execSync(`node createTable.js ${datasetId} ${destTableId} 'name:STRING'`);
+    const output = execSync(`node addColumnQueryAppend.js ${datasetId} ${destTableId}`);
+    assert.match(output, /completed\./);
+    const [rows] = await bigquery
+      .dataset(datasetId)
+      .table(tableId)
+      .getRows();
+    assert.ok(rows.length > 0);
   });
 });

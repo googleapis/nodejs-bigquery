@@ -16,48 +16,46 @@
 
 'use strict';
 
-function main(datasetId = 'my_dataset', tableId = 'my_table') {
-  // [START bigquery_load_table_gcs_parquet]
+function main(datasetId = 'my_dataset', tableId = 'my_table', fileName = '/path/to/file.csv') {
+  // [START bigquery_relax_column_load_append]
   // Import the Google Cloud client libraries
   const {BigQuery} = require('@google-cloud/bigquery');
-  const {Storage} = require('@google-cloud/storage');
 
-  // Instantiate clients
+  // Instantiate client
   const bigquery = new BigQuery();
-  const storage = new Storage();
 
-  /**
-   * This sample loads the Parquet file at
-   * https://storage.googleapis.com/cloud-samples-data/bigquery/us-states/us-states.parquet
-   *
-   * TODO(developer): Replace the following lines with the path to your file.
-   */
-  const bucketName = 'cloud-samples-data';
-  const filename = 'bigquery/us-states/us-states.parquet';
-
-  async function loadTableGCSParquet() {
-    // Imports a GCS file into a table with Parquet source format.
+  async function relaxColumnLoadAppend() {
+    // Changes required column to nullable in load append job.
 
     /**
      * TODO(developer): Uncomment the following lines before running the sample.
      */
+    // const fileName = '/path/to/file.csv';
     // const datasetId = 'my_dataset';
     // const tableId = 'my_table';
 
-    // Configure the load job. For full list of options, see:
-    // https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationLoad
-    const metadata = {
-      sourceFormat: 'PARQUET',
-      location: 'US',
+    // In this example, the existing table contains the 'Name'
+    // column as a 'REQUIRED' field.
+    const schema = 'Age:INTEGER, Weight:FLOAT, IsMagic:BOOLEAN';
+
+    // Retrieve destination table reference
+    const [table] = await bigquery.dataset(datasetId).table(tableId).get();
+    const destinationTableRef = table.metadata.tableReference
+   
+    // Set load job options
+    const options = {
+        schema: schema,
+        schemaUpdateOptions: ['ALLOW_FIELD_RELAXATION'],
+        writeDisposition: 'WRITE_APPEND',
+        destinationTable: destinationTableRef,
     };
 
-    // Load data from a Google Cloud Storage file into the table
+    // Load data from a local file into the table
     const [job] = await bigquery
       .dataset(datasetId)
       .table(tableId)
-      .load(storage.bucket(bucketName).file(filename), metadata);
+      .load(fileName, options);
 
-    // load() waits for the job to finish
     console.log(`Job ${job.id} completed.`);
 
     // Check the job's status for errors
@@ -66,7 +64,7 @@ function main(datasetId = 'my_dataset', tableId = 'my_table') {
       throw errors;
     }
   }
-  // [END bigquery_load_table_gcs_parquet]
-  loadTableGCSParquet();
+  // [END bigquery_relax_column_load_append]
+  relaxColumnLoadAppend();
 }
 main(...process.argv.slice(2));

@@ -46,6 +46,12 @@ describe(`Datasets`, () => {
     assert.match(output, new RegExp(datasetId));
   });
 
+  it(`should retrieve a dataset if it exists`, async () => {
+    const output = execSync(`node getDataset.js ${datasetId}`);
+    assert.include(output, 'Dataset:');
+    assert.include(output, datasetId);
+  });
+
   it(`should update dataset's description`, async () => {
     const output = execSync(`node updateDatasetDescription.js ${datasetId}`);
     assert.include(
@@ -61,25 +67,33 @@ describe(`Datasets`, () => {
 
   it(`should add label to a dataset`, async () => {
     const output = execSync(`node labelDataset.js ${datasetId}`);
-    assert.include(output, `${datasetId} labels:` && "{ color: 'green' }");
+    assert.include(output, `${datasetId} labels:`);
+    assert.include(output, "{ color: 'green' }");
   });
 
   it(`should list a dataset's labels`, async () => {
     const output = execSync(`node getDatasetLabels.js ${datasetId}`);
-    assert.include(output, `${datasetId} Labels:` && 'color: green');
+    assert.include(output, `${datasetId} Labels:`);
+    assert.include(output, 'color: green');
   });
 
   it(`should delete a label from a dataset`, async () => {
     const output = execSync(`node deleteLabelDataset.js ${datasetId}`);
-    assert.include(output, `${datasetId} labels:` && 'undefined');
+    assert.include(output, `${datasetId} labels:`);
+    assert.include(output, 'undefined');
   });
 
   it(`should update dataset's access`, async () => {
     const output = execSync(`node updateDatasetAccess.js ${datasetId}`);
-    assert.include(
-      output,
-      `role: 'READER'` && `userByEmail: 'sample.bigquery.dev@gmail.com'`
-    );
+    assert.include(output,`role: 'READER'`);
+    assert.include(output, `userByEmail: 'sample.bigquery.dev@gmail.com'`);
+  });
+
+  it(`should filter datasets by label`, async () => {
+    execSync(`node labelDataset.js ${datasetId}`);
+    const output = execSync(`node listDatasetsByLabel.js`);
+    assert.match(output, /Datasets:/);
+    assert.match(output, new RegExp(datasetId));
   });
 
   it(`should delete a dataset`, async () => {

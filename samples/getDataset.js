@@ -16,35 +16,27 @@
 
 'use strict';
 
-function main(datasetId = 'my_dataset', tableId = 'my_table') {
-  // [START bigquery_label_table]
+function main(datasetId = 'my_dataset') {
+  // [START bigquery_get_dataset]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
   const bigquery = new BigQuery();
 
-  async function labelTable() {
-    // Adds a label to an existing table.
+  async function getDataset() {
+    // Retrieves dataset named "my_dataset".
 
     /**
-     * TODO(developer): Uncomment the following lines before running the sample.
+     * TODO(developer): Uncomment the following lines before running the sample
      */
-    // const datasetId = 'my_dataset';
-    // const tableId = 'my_table';
+    // const datasetId = "my_dataset";
 
-    const dataset = bigquery.dataset(datasetId);
-    const [table] = await dataset.table(tableId).get();
+    // Retrieve dataset reference
+    const [dataset] = await bigquery.dataset(datasetId).get();
 
-    // Retrieve current table metadata
-    const [metadata] = await table.getMetadata();
-
-    // Add label to table metadata
-    metadata.labels = {color: 'green'};
-    const [apiResponse] = await table.setMetadata(metadata);
-
-    console.log(`${tableId} labels:`);
-    console.log(apiResponse.labels);
+    console.log('Dataset:');
+    console.log(dataset.metadata.datasetReference);
   }
-  // [END bigquery_label_table]
-  labelTable();
+  getDataset();
+  // [END bigquery_get_dataset]
 }
 main(...process.argv.slice(2));
