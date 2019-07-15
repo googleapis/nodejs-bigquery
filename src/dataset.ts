@@ -657,6 +657,9 @@ class Dataset extends ServiceObject {
     );
   }
 
+  getTables(options?: GetTablesOptions): Promise<GetTablesResponse>;
+  getTables(options: GetTablesOptions, callback: GetTablesCallback): void;
+  getTables(callback: GetTablesCallback): void;
   /**
    * Get a list of tables.
    *
@@ -705,9 +708,6 @@ class Dataset extends ServiceObject {
    *   const tables = data[0];
    * });
    */
-  getTables(options?: GetTablesOptions): Promise<GetTablesResponse>;
-  getTables(options: GetTablesOptions, callback: GetTablesCallback): void;
-  getTables(callback: GetTablesCallback): void;
   getTables(
     optionsOrCallback?: GetTablesOptions | GetTablesCallback,
     cb?: GetTablesCallback
