@@ -31,15 +31,20 @@ const datasetId = generateUuid();
 const srcDatasetId = datasetId;
 const destDatasetId = generateUuid();
 const tableId = generateUuid();
+const nestedTableId = generateUuid();
 const partitionedTableId = generateUuid();
 const srcTableId = tableId;
 const destTableId = generateUuid();
-const schema = `Name:string, Age:integer, Weight:float, IsMagic:boolean`;
 const bucketName = generateUuid();
-const exportFileName = `data.json`;
+const exportCSVFileName = `data.json`;
+const exportJSONFileName = `data.json`;
 const importFileName = `data.avro`;
+const partialDataFileName = `partialdata.csv`;
 const localFilePath = path.join(__dirname, `../resources/${importFileName}`);
-
+const partialDataFilePath = path.join(
+  __dirname,
+  `../resources/${partialDataFileName}`
+);
 const bigquery = new BigQuery();
 
 describe('Tables', () => {
@@ -109,6 +114,18 @@ describe('Tables', () => {
     assert.ok(exists);
   });
 
+  it(`should create a table with nested schema`, async () => {
+    const output = execSync(
+      `node nestedRepeatedSchema.js ${datasetId} ${nestedTableId}`
+    );
+    assert.include(output, `Table ${nestedTableId} created.`);
+    const [exists] = await bigquery
+      .dataset(datasetId)
+      .table(nestedTableId)
+      .exists();
+    assert.ok(exists);
+  });
+
   it(`should retrieve a table if it exists`, async () => {
     const output = execSync(`node getTable.js ${datasetId} ${tableId}`);
     assert.include(output, 'Table:');
@@ -171,15 +188,41 @@ describe('Tables', () => {
     );
   });
 
-  it(`should extract a table to GCS`, async () => {
+  it(`should extract a table to GCS CSV file`, async () => {
     const output = execSync(
-      `node extractTableToGCS.js ${datasetId} ${tableId} ${bucketName} ${exportFileName}`
+      `node extractTableToGCS.js ${datasetId} ${tableId} ${bucketName} ${exportCSVFileName}`
     );
 
     assert.match(output, /completed\./);
     const [exists] = await storage
       .bucket(bucketName)
-      .file(exportFileName)
+      .file(exportCSVFileName)
+      .exists();
+    assert.ok(exists);
+  });
+
+  it(`should extract a table to GCS JSON file`, async () => {
+    const output = execSync(
+      `node extractTableJSON.js ${datasetId} ${tableId} ${bucketName} ${exportJSONFileName}`
+    );
+
+    assert.match(output, /completed\./);
+    const [exists] = await storage
+      .bucket(bucketName)
+      .file(exportJSONFileName)
+      .exists();
+    assert.ok(exists);
+  });
+
+  it(`should extract a table to GCS compressed file`, async () => {
+    const output = execSync(
+      `node extractTableCompressed.js ${datasetId} ${tableId} ${bucketName} ${exportCSVFileName}`
+    );
+
+    assert.match(output, /completed\./);
+    const [exists] = await storage
+      .bucket(bucketName)
+      .file(exportCSVFileName)
       .exists();
     assert.ok(exists);
   });
@@ -222,6 +265,49 @@ describe('Tables', () => {
   it(`should load a GCS JSON file with explicit schema`, async () => {
     const tableId = generateUuid();
     const output = execSync(`node loadJSONFromGCS.js ${datasetId} ${tableId}`);
+    assert.match(output, /completed\./);
+    const [rows] = await bigquery
+      .dataset(datasetId)
+      .table(tableId)
+      .getRows();
+    assert.ok(rows.length > 0);
+  });
+
+  it(`should load a GCS CSV file to partitioned table`, async () => {
+    const tableId = generateUuid();
+    const output = execSync(
+      `node loadTablePartitioned.js ${datasetId} ${tableId}`
+    );
+    assert.match(output, /completed\./);
+    const [rows] = await bigquery
+      .dataset(datasetId)
+      .table(tableId)
+      .getRows();
+    assert.ok(rows.length > 0);
+  });
+
+  it(`should add a new column via a GCS file load job`, async () => {
+    const destTableId = generateUuid();
+    execSync(
+      `node createTable.js ${datasetId} ${destTableId} 'Name:STRING, Age:INTEGER, Weight:FLOAT'`
+    );
+    const output = execSync(
+      `node addColumnLoadAppend.js ${datasetId} ${destTableId} ${localFilePath}`
+    );
+    assert.match(output, /completed\./);
+    const [rows] = await bigquery
+      .dataset(datasetId)
+      .table(tableId)
+      .getRows();
+    assert.ok(rows.length > 0);
+  });
+
+  it(`should relax a column via a GCS file load job`, async () => {
+    const destTableId = generateUuid();
+    execSync(`node createTable.js ${datasetId} ${destTableId}`);
+    const output = execSync(
+      `node relaxColumnLoadAppend.js ${datasetId} ${destTableId} ${partialDataFilePath}`
+    );
     assert.match(output, /completed\./);
     const [rows] = await bigquery
       .dataset(datasetId)
@@ -328,7 +414,7 @@ describe('Tables', () => {
   });
 
   it(`copy multiple source tables to a given destination`, async () => {
-    execSync(`node createTable.js ${datasetId} destinationTable "${schema}"`);
+    execSync(`node createTable.js ${datasetId} destinationTable`);
     const output = execSync(
       `node copyTableMultipleSource.js ${datasetId} ${tableId} destinationTable`
     );
@@ -336,6 +422,26 @@ describe('Tables', () => {
     assert.include(output, 'destinationTable');
     assert.include(output, 'createDisposition');
     assert.include(output, 'writeDisposition');
+  });
+
+  it(`should add a column to the schema`, async () => {
+    const column = `name: 'size', type: 'STRING'`;
+    const output = execSync(`node addEmptyColumn.js ${datasetId} ${tableId}`);
+    assert.include(output, column);
+  });
+
+  it(`should update a column from 'REQUIRED' TO 'NULLABLE'`, async () => {
+    const column = `name: 'Name', type: 'STRING', mode: 'NULLABLE'`;
+    execSync(`node createTable.js ${datasetId} newTable`);
+    const output = execSync(`node relaxColumn.js ${datasetId} newTable`);
+    assert.include(output, column);
+  });
+
+  it(`should get labels on a table`, async () => {
+    execSync(`node labelTable.js ${datasetId} ${tableId}`);
+    const output = execSync(`node getTableLabels.js ${datasetId} ${tableId}`);
+    assert.include(output, `${tableId} Labels:`);
+    assert.include(output, 'color: green');
   });
 
   describe(`Delete Table`, () => {

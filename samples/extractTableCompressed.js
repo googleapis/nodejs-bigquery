@@ -16,56 +16,42 @@
 
 'use strict';
 
-function main(datasetId = 'my_dataset', tableId = 'my_table') {
-  // [START bigquery_load_table_gcs_json_truncate]
+function main(
+  datasetId = 'my_dataset',
+  tableId = 'my_table',
+  bucketName = 'my-bucket',
+  filename = 'file.csv'
+) {
+  // [START bigquery_extract_table_compressed]
   // Import the Google Cloud client libraries
   const {BigQuery} = require('@google-cloud/bigquery');
   const {Storage} = require('@google-cloud/storage');
 
-  // Instantiate clients
   const bigquery = new BigQuery();
   const storage = new Storage();
 
-  /**
-   * This sample loads the JSON file at
-   * https://storage.googleapis.com/cloud-samples-data/bigquery/us-states/us-states.json
-   *
-   * TODO(developer): Replace the following lines with the path to your file.
-   */
-  const bucketName = 'cloud-samples-data';
-  const filename = 'bigquery/us-states/us-states.json';
-
-  async function loadJSONFromGCSTruncate() {
-    /**
-     * Imports a GCS file into a table and overwrites
-     * table data if table already exists.
-     */
+  async function extractTableCompressed() {
+    // Exports my_dataset:my_table to gcs://my-bucket/my-file as a compressed file.
 
     /**
      * TODO(developer): Uncomment the following lines before running the sample.
      */
     // const datasetId = "my_dataset";
     // const tableId = "my_table";
+    // const bucketName = "my-bucket";
+    // const filename = "file.csv";
 
-    // Configure the load job. For full list of options, see:
-    // https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationLoad
-    const metadata = {
-      sourceFormat: 'NEWLINE_DELIMITED_JSON',
-      schema: {
-        fields: [
-          {name: 'name', type: 'STRING'},
-          {name: 'post_abbr', type: 'STRING'},
-        ],
-      },
-      // Set the write disposition to overwrite existing table data.
-      writeDisposition: 'WRITE_TRUNCATE',
+    // Location must match that of the source table.
+    const options = {
+      location: 'US',
+      gzip: true,
     };
 
-    // Load data from a Google Cloud Storage file into the table
+    // Export data from the table into a Google Cloud Storage file
     const [job] = await bigquery
       .dataset(datasetId)
       .table(tableId)
-      .load(storage.bucket(bucketName).file(filename), metadata);
+      .extract(storage.bucket(bucketName).file(filename), options);
     // load() waits for the job to finish
     console.log(`Job ${job.id} completed.`);
 
@@ -75,7 +61,7 @@ function main(datasetId = 'my_dataset', tableId = 'my_table') {
       throw errors;
     }
   }
-  // [END bigquery_load_table_gcs_json_truncate]
-  loadJSONFromGCSTruncate();
+  // [END bigquery_extract_table_compressed]
+  extractTableCompressed();
 }
 main(...process.argv.slice(2));

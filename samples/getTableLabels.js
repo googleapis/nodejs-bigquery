@@ -16,35 +16,37 @@
 
 'use strict';
 
+// sample-metadata:
+//   title: BigQuery Update Model
+//   description: Updates a model's metadata.
+//   usage: node updateModel.js <DATASET_ID> <MODEL_ID>
+
 function main(datasetId = 'my_dataset', tableId = 'my_table') {
-  // [START bigquery_label_table]
+  // [START bigquery_get_table_labels]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
   const bigquery = new BigQuery();
 
-  async function labelTable() {
-    // Adds a label to an existing table.
+  async function getTableLabels() {
+    // Gets labels on a dataset.
 
     /**
      * TODO(developer): Uncomment the following lines before running the sample.
      */
-    // const datasetId = 'my_dataset';
-    // const tableId = 'my_table';
+    // const datasetId = "my_dataset";
+    // const tableId = "my_table";
 
-    const dataset = bigquery.dataset(datasetId);
-    const [table] = await dataset.table(tableId).get();
-
-    // Retrieve current table metadata
+    // Retrieve current dataset metadata.
+    const table = bigquery.dataset(datasetId).table(tableId);
     const [metadata] = await table.getMetadata();
+    const labels = metadata.labels;
 
-    // Add label to table metadata
-    metadata.labels = {color: 'green'};
-    const [apiResponse] = await table.setMetadata(metadata);
-
-    console.log(`${tableId} labels:`);
-    console.log(apiResponse.labels);
+    console.log(`${tableId} Labels:`);
+    for (const [key, value] of Object.entries(labels)) {
+      console.log(`${key}: ${value}`);
+    }
   }
-  // [END bigquery_label_table]
-  labelTable();
+  getTableLabels();
+  // [END bigquery_get_table_labels]
 }
 main(...process.argv.slice(2));

@@ -21,25 +21,47 @@ function main(
   tableId = 'my_new_table', // Table to be created
   schema = [
     {name: 'Name', type: 'STRING', mode: 'REQUIRED'},
-    {name: 'Age', type: 'INTEGER'},
-    {name: 'Weight', type: 'FLOAT'},
-    {name: 'IsMagic', type: 'BOOLEAN'},
+    {
+      name: 'Addresses',
+      type: 'RECORD',
+      mode: 'REPEATED',
+      fields: [
+        {name: 'Address', type: 'STRING'},
+        {name: 'City', type: 'STRING'},
+        {name: 'State', type: 'STRING'},
+        {name: 'Zip', type: 'STRING'},
+      ],
+    },
   ]
 ) {
-  // [START bigquery_create_table]
+  // [START bigquery_nested_repeated_schema]
   // Import the Google Cloud client library and create a client
   const {BigQuery} = require('@google-cloud/bigquery');
   const bigquery = new BigQuery();
 
-  async function createTable() {
-    // Creates a new table named "my_table" in "my_dataset".
+  async function nestedRepeatedSchema() {
+    // Creates a new table named "my_table" in "my_dataset"
+    // with nested and repeated columns in schema.
 
     /**
      * TODO(developer): Uncomment the following lines before running the sample.
      */
     // const datasetId = "my_dataset";
     // const tableId = "my_table";
-    // const schema = 'Name:string, Age:integer, Weight:float, IsMagic:boolean';
+    // const schema = [
+    //   {name: 'Name', type: 'STRING', mode: 'REQUIRED'},
+    //   {
+    //     name: 'Addresses',
+    //     type: 'RECORD',
+    //     mode: 'REPEATED',
+    //     fields: [
+    //       {name: 'Address', type: 'STRING'},
+    //       {name: 'City', type: 'STRING'},
+    //       {name: 'State', type: 'STRING'},
+    //       {name: 'Zip', type: 'STRING'},
+    //     ],
+    //   },
+    // ];
 
     // For all options, see https://cloud.google.com/bigquery/docs/reference/v2/tables#resource
     const options = {
@@ -54,7 +76,7 @@ function main(
 
     console.log(`Table ${table.id} created.`);
   }
-  // [END bigquery_create_table]
-  createTable();
+  // [END bigquery_nested_repeated_schema]
+  nestedRepeatedSchema();
 }
 main(...process.argv.slice(2));

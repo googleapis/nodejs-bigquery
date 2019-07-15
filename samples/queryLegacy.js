@@ -17,25 +17,22 @@
 'use strict';
 
 function main() {
-  // [START bigquery_query]
-  // [START bigquery_client_default_credentials]
-  // Import the Google Cloud client library using default credentials
+  // [START bigquery_query_legacy]
+  // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
   const bigquery = new BigQuery();
-  // [END bigquery_client_default_credentials]
-  async function query() {
-    // Queries the U.S. given names dataset for the state of Texas.
 
-    const query = `SELECT name
-      FROM \`bigquery-public-data.usa_names.usa_1910_2013\`
-      WHERE state = 'TX'
-      LIMIT 100`;
+  async function queryLegacy() {
+    // Queries the U.S. given names dataset for the state of Texas using legacy SQL.
+
+    const query = `SELECT word FROM [bigquery-public-data:samples.shakespeare] LIMIT 10;`;
 
     // For all options, see https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs/query
     const options = {
       query: query,
       // Location must match that of the dataset(s) referenced in the query.
       location: 'US',
+      useLegacySql: true,
     };
 
     // Run the query as a job
@@ -49,7 +46,7 @@ function main() {
     console.log('Rows:');
     rows.forEach(row => console.log(row));
   }
-  // [END bigquery_query]
-  query();
+  // [END bigquery_query_legacy]
+  queryLegacy();
 }
 main(...process.argv.slice(2));
