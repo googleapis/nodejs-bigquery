@@ -16,29 +16,41 @@
 
 'use strict';
 
-function main() {
-  // [START bigquery_query]
-  // [START bigquery_client_default_credentials]
-  // Import the Google Cloud client library using default credentials
+function main(
+  datasetId = 'my_dataset',
+  tableId = 'my_table',
+  projectId = 'my_project'
+) {
+  // [START bigquery_query_legacy_large_results]
+  // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
   const bigquery = new BigQuery();
-  // [END bigquery_client_default_credentials]
-  async function query() {
-    // Queries the U.S. given names dataset for the state of Texas.
 
-    const query = `SELECT name
-      FROM \`bigquery-public-data.usa_names.usa_1910_2013\`
-      WHERE state = 'TX'
-      LIMIT 100`;
+  async function queryLegacyLargeResults() {
+    // Query enables large result sets.
+
+    /**
+     * TODO(developer): Uncomment the following lines before running the sample
+     */
+    // const projectId = "google.com:bq-rampup"
+    // const datasetId = "123fun";
+    // const tableId = "test5";
+    const query = `SELECT word FROM [bigquery-public-data:samples.shakespeare] LIMIT 10;`;
 
     // For all options, see https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs/query
     const options = {
       query: query,
-      // Location must match that of the dataset(s) referenced in the query.
-      location: 'US',
+      // Location must match that of the dataset(s) referenced
+      // in the query and of the destination table.
+      useLegacySql: true,
+      allowLargeResult: true,
+      destinationTable: {
+        projectId: projectId,
+        datasetId: datasetId,
+        tableId: tableId,
+      },
     };
 
-    // Run the query as a job
     const [job] = await bigquery.createQueryJob(options);
     console.log(`Job ${job.id} started.`);
 
@@ -49,7 +61,7 @@ function main() {
     console.log('Rows:');
     rows.forEach(row => console.log(row));
   }
-  // [END bigquery_query]
-  query();
+  // [END bigquery_query_legacy_large_results]
+  queryLegacyLargeResults();
 }
 main(...process.argv.slice(2));

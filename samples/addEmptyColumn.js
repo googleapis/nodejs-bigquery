@@ -17,34 +17,37 @@
 'use strict';
 
 function main(datasetId = 'my_dataset', tableId = 'my_table') {
-  // [START bigquery_label_table]
-  // Import the Google Cloud client library
+  // [START bigquery_add_empty_column]
+
+  // Import the Google Cloud client library and create a client
   const {BigQuery} = require('@google-cloud/bigquery');
   const bigquery = new BigQuery();
 
-  async function labelTable() {
-    // Adds a label to an existing table.
+  async function addEmptyColumn() {
+    // Adds an empty column to the schema.
 
     /**
      * TODO(developer): Uncomment the following lines before running the sample.
      */
     // const datasetId = 'my_dataset';
     // const tableId = 'my_table';
-
-    const dataset = bigquery.dataset(datasetId);
-    const [table] = await dataset.table(tableId).get();
+    const column = {name: 'size', type: 'STRING'};
 
     // Retrieve current table metadata
+    const table = bigquery.dataset(datasetId).table(tableId);
     const [metadata] = await table.getMetadata();
 
-    // Add label to table metadata
-    metadata.labels = {color: 'green'};
-    const [apiResponse] = await table.setMetadata(metadata);
+    // Update table schema
+    const schema = metadata.schema;
+    const new_schema = schema;
+    new_schema.fields.push(column);
+    metadata.schema = new_schema;
 
-    console.log(`${tableId} labels:`);
-    console.log(apiResponse.labels);
+    const [result] = await table.setMetadata(metadata);
+    console.log(result.schema.fields);
   }
-  // [END bigquery_label_table]
-  labelTable();
+  // [END bigquery_add_empty_column]
+  addEmptyColumn();
 }
+
 main(...process.argv.slice(2));
