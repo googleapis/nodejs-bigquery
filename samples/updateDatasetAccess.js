@@ -16,31 +16,38 @@
 
 'use strict';
 
-function main(datasetId = 'my_dataset', tableId = 'my_table') {
-  // [START bigquery_delete_table]
+function main(datasetId = 'my_dataset') {
+  // [START bigquery_update_dataset_access]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
   const bigquery = new BigQuery();
 
-  async function deleteTable() {
-    // Deletes "my_table" from "my_dataset".
+  async function updateDatasetAccess() {
+    // Updates a datasets's access controls.
 
     /**
      * TODO(developer): Uncomment the following lines before running the sample.
      */
     // const datasetId = "my_dataset";
-    // const tableId = "my_table";
 
-    // Delete the table
-    await bigquery
-      .dataset(datasetId)
-      .table(tableId)
-      .delete();
+    // Create new role metadata
+    const newRole = {
+      role: 'READER',
+      entity_type: 'userByEmail',
+      userByEmail: 'sample.bigquery.dev@gmail.com',
+    };
 
-    console.log(`Table ${tableId} deleted.`);
+    // Retreive current dataset metadata
+    const dataset = bigquery.dataset(datasetId);
+    const [metadata] = await dataset.getMetadata();
+
+    // Add new role to role acess array
+    metadata.access.push(newRole);
+    const [apiResponse] = await dataset.setMetadata(metadata);
+    const newAccessRoles = apiResponse.access;
+    newAccessRoles.forEach(role => console.log(role));
   }
-  // [END bigquery_delete_table]
-  deleteTable();
+  // [END bigquery_update_dataset_access]
+  updateDatasetAccess();
 }
-
 main(...process.argv.slice(2));

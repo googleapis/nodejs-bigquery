@@ -46,6 +46,42 @@ describe(`Datasets`, () => {
     assert.match(output, new RegExp(datasetId));
   });
 
+  it(`should update dataset's description`, async () => {
+    const output = execSync(`node updateDatasetDescription.js ${datasetId}`);
+    assert.include(
+      output,
+      `${datasetId} description: New dataset description.`
+    );
+  });
+
+  it(`should update dataset's expiration`, async () => {
+    const output = execSync(`node updateDatasetExpiration.js ${datasetId}`);
+    assert.include(output, `${datasetId} expiration: 86400000`);
+  });
+
+  it(`should add label to a dataset`, async () => {
+    const output = execSync(`node labelDataset.js ${datasetId}`);
+    assert.include(output, `${datasetId} labels:` && "{ color: 'green' }");
+  });
+
+  it(`should list a dataset's labels`, async () => {
+    const output = execSync(`node getDatasetLabels.js ${datasetId}`);
+    assert.include(output, `${datasetId} Labels:` && 'color: green');
+  });
+
+  it(`should delete a label from a dataset`, async () => {
+    const output = execSync(`node deleteLabelDataset.js ${datasetId}`);
+    assert.include(output, `${datasetId} labels:` && 'undefined');
+  });
+
+  it(`should update dataset's access`, async () => {
+    const output = execSync(`node updateDatasetAccess.js ${datasetId}`);
+    assert.include(
+      output,
+      `role: 'READER'` && `userByEmail: 'sample.bigquery.dev@gmail.com'`
+    );
+  });
+
   it(`should delete a dataset`, async () => {
     const output = execSync(`node deleteDataset.js ${datasetId}`);
     assert.include(output, `Dataset ${datasetId} deleted.`);

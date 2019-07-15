@@ -16,31 +16,36 @@
 
 'use strict';
 
-function main(datasetId = 'my_dataset', tableId = 'my_table') {
-  // [START bigquery_delete_table]
+// sample-metadata:
+//   title: BigQuery Update Model
+//   description: Updates a model's metadata.
+//   usage: node updateModel.js <DATASET_ID> <MODEL_ID>
+
+function main(datasetId = 'my_dataset') {
+  // [START bigquery_get_dataset_labels]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
   const bigquery = new BigQuery();
 
-  async function deleteTable() {
-    // Deletes "my_table" from "my_dataset".
+  async function getDatasetLabels() {
+    // Gets labels on a dataset.
 
     /**
      * TODO(developer): Uncomment the following lines before running the sample.
      */
     // const datasetId = "my_dataset";
-    // const tableId = "my_table";
 
-    // Delete the table
-    await bigquery
-      .dataset(datasetId)
-      .table(tableId)
-      .delete();
+    // Retrieve current dataset metadata.
+    const dataset = bigquery.dataset(datasetId);
+    const [metadata] = await dataset.getMetadata();
+    const labels = metadata.labels;
 
-    console.log(`Table ${tableId} deleted.`);
+    console.log(`${datasetId} Labels:`);
+    for (const [key, value] of Object.entries(labels)) {
+      console.log(`${key}: ${value}`);
+    }
   }
-  // [END bigquery_delete_table]
-  deleteTable();
+  getDatasetLabels();
+  // [END bigquery_get_dataset_labels]
 }
-
 main(...process.argv.slice(2));

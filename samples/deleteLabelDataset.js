@@ -16,31 +16,40 @@
 
 'use strict';
 
-function main(datasetId = 'my_dataset', tableId = 'my_table') {
-  // [START bigquery_delete_table]
+// sample-metadata:
+//   title: BigQuery Update Model
+//   description: Updates a model's metadata.
+//   usage: node updateModel.js <DATASET_ID> <MODEL_ID>
+
+function main(
+  datasetId = 'my_dataset' // Existing dataset
+) {
+  // [START bigquery_delete_label_dataset]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
   const bigquery = new BigQuery();
 
-  async function deleteTable() {
-    // Deletes "my_table" from "my_dataset".
+  async function deleteLabelDataset() {
+    // Deletes a label on a dataset.
+    // This example dataset starts with existing label { color: 'green' }
 
     /**
      * TODO(developer): Uncomment the following lines before running the sample.
      */
-    // const datasetId = "my_dataset";
-    // const tableId = "my_table";
+    // const datasetId = 'my_dataset';
 
-    // Delete the table
-    await bigquery
-      .dataset(datasetId)
-      .table(tableId)
-      .delete();
+    // Retrieve current dataset metadata.
+    const dataset = bigquery.dataset(datasetId);
+    const [metadata] = await dataset.getMetadata();
 
-    console.log(`Table ${tableId} deleted.`);
+    // Add label to dataset metadata
+    metadata.labels = {color: null};
+    const [apiResponse] = await dataset.setMetadata(metadata);
+
+    console.log(`${datasetId} labels:`);
+    console.log(apiResponse.labels);
   }
-  // [END bigquery_delete_table]
-  deleteTable();
+  // [END bigquery_delete_label_dataset]
+  deleteLabelDataset();
 }
-
 main(...process.argv.slice(2));

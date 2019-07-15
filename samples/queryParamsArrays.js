@@ -22,11 +22,9 @@ function main() {
 
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
+  const bigquery = new BigQuery();
 
   async function queryParamsArrays() {
-    // Create a client
-    const bigqueryClient = new BigQuery();
-
     // The SQL query to run
     const sqlQuery = `SELECT name, sum(number) as count
     FROM \`bigquery-public-data.usa_names.usa_1910_2013\`
@@ -44,12 +42,12 @@ function main() {
     };
 
     // Run the query
-    const [rows] = await bigqueryClient.query(options);
+    const [rows] = await bigquery.query(options);
 
     console.log('Rows:');
     rows.forEach(row => console.log(row));
   }
-  queryParamsArrays();
   // [END bigquery_query_params_arrays]
+  queryParamsArrays();
 }
 main(...process.argv.slice(2));

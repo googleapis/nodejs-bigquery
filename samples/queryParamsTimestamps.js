@@ -22,11 +22,9 @@ function main() {
 
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
+  const bigquery = new BigQuery();
 
   async function queryParamsTimestamps() {
-    // Create a client
-    const bigqueryClient = new BigQuery();
-
     // The SQL query to run
     const sqlQuery = `SELECT TIMESTAMP_ADD(@ts_value, INTERVAL 1 HOUR);`;
 
@@ -38,12 +36,12 @@ function main() {
     };
 
     // Run the query
-    const [rows] = await bigqueryClient.query(options);
+    const [rows] = await bigquery.query(options);
 
     console.log('Rows:');
     rows.forEach(row => console.log(row.f0_));
   }
-  queryParamsTimestamps();
   // [END bigquery_query_params_timestamps]
+  queryParamsTimestamps();
 }
 main(...process.argv.slice(2));

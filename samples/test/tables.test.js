@@ -31,6 +31,7 @@ const datasetId = generateUuid();
 const srcDatasetId = datasetId;
 const destDatasetId = generateUuid();
 const tableId = generateUuid();
+const partitionedTableId = generateUuid();
 const srcTableId = tableId;
 const destTableId = generateUuid();
 const schema = `Name:string, Age:integer, Weight:float, IsMagic:boolean`;
@@ -60,6 +61,10 @@ describe('Tables', () => {
       .dataset(destDatasetId)
       .delete({force: true})
       .catch(console.warn);
+    await bigquery
+      .dataset(datasetId)
+      .delete({force: true})
+      .catch(console.warn);
     await storage
       .bucket(bucketName)
       .deleteFiles({force: true})
@@ -79,9 +84,7 @@ describe('Tables', () => {
   });
 
   it(`should create a table`, async () => {
-    const output = execSync(
-      `node createTable.js ${datasetId} ${tableId} "${schema}"`
-    );
+    const output = execSync(`node createTable.js ${datasetId} ${tableId}`);
     assert.include(output, `Table ${tableId} created.`);
     const [exists] = await bigquery
       .dataset(datasetId)
@@ -90,10 +93,62 @@ describe('Tables', () => {
     assert.ok(exists);
   });
 
+  it(`should create a partitioned table`, async () => {
+    const output = execSync(
+      `node createTablePartitioned.js ${datasetId} ${partitionedTableId}`
+    );
+    assert.include(
+      output,
+      `Table ${partitionedTableId} created with partitioning:`
+    );
+    assert.include(output, `{ type: 'DAY', field: 'date' }`);
+    const [exists] = await bigquery
+      .dataset(datasetId)
+      .table(partitionedTableId)
+      .exists();
+    assert.ok(exists);
+  });
+
+  it(`should retrieve a table if it exists`, async () => {
+    const output = execSync(`node getTable.js ${datasetId} ${tableId}`);
+    assert.include(output, 'Table:');
+    assert.include(output, datasetId);
+    assert.include(output, tableId);
+  });
+
   it(`should list tables`, async () => {
     const output = execSync(`node listTables.js ${datasetId}`);
     assert.match(output, /Tables:/);
     assert.match(output, new RegExp(tableId));
+  });
+
+  it(`should update table's description`, async () => {
+    const output = execSync(
+      `node updateTableDescription.js ${datasetId} ${tableId}`
+    );
+    assert.include(output, `${tableId} description: New table description.`);
+  });
+
+  it(`should update table's expiration`, async () => {
+    const currentTime = Date.now();
+    const expirationTime = currentTime + 1000 * 60 * 60 * 24 * 5;
+    const output = execSync(
+      `node updateTableExpiration.js ${datasetId} ${tableId} ${expirationTime}`
+    );
+    assert.include(output, `${tableId}`);
+    assert.include(output, `expiration: ${expirationTime}`);
+  });
+
+  it(`should add label to a table`, async () => {
+    const output = execSync(`node labelTable.js ${datasetId} ${tableId}`);
+    assert.include(output, `${tableId} labels:`);
+    assert.include(output, "{ color: 'green' }");
+  });
+
+  it(`should delete a label from a table`, async () => {
+    const output = execSync(`node deleteLabelTable.js ${datasetId} ${tableId}`);
+    assert.include(output, `${tableId} labels:`);
+    assert.include(output, 'undefined');
   });
 
   it(`should load a local CSV file`, async () => {
@@ -272,13 +327,49 @@ describe('Tables', () => {
     assert.match(output, /Inserted 2 rows/);
   });
 
-  it(`should delete a table`, async () => {
-    const output = execSync(`node deleteTable.js ${datasetId} ${tableId}`);
-    assert.include(output, `Table ${tableId} deleted.`);
-    const [exists] = await bigquery
-      .dataset(datasetId)
-      .table(tableId)
-      .exists();
-    assert.strictEqual(exists, false);
+  it(`copy multiple source tables to a given destination`, async () => {
+    execSync(`node createTable.js ${datasetId} destinationTable "${schema}"`);
+    const output = execSync(
+      `node copyTableMultipleSource.js ${datasetId} ${tableId} destinationTable`
+    );
+    assert.include(output, 'sourceTable');
+    assert.include(output, 'destinationTable');
+    assert.include(output, 'createDisposition');
+    assert.include(output, 'writeDisposition');
+  });
+
+  describe(`Delete Table`, () => {
+    const datasetId = `gcloud_tests_${uuid.v4()}`.replace(/-/gi, '_');
+    const tableId = `gcloud_tests_${uuid.v4()}`.replace(/-/gi, '_');
+
+    before(async () => {
+      const datasetOptions = {
+        location: 'US',
+      };
+      const tableOptions = {
+        location: 'US',
+      };
+
+      await bigquery.createDataset(datasetId, datasetOptions);
+      // Create a new table in the dataset
+      await bigquery.dataset(datasetId).createTable(tableId, tableOptions);
+    });
+
+    after(async () => {
+      await bigquery
+        .dataset(datasetId)
+        .delete({force: true})
+        .catch(console.warn);
+    });
+
+    it(`should delete a table`, async () => {
+      const output = execSync(`node deleteTable.js ${datasetId} ${tableId}`);
+      assert.include(output, `Table ${tableId} deleted.`);
+      const [exists] = await bigquery
+        .dataset(datasetId)
+        .table(tableId)
+        .exists();
+      assert.strictEqual(exists, false);
+    });
   });
 });

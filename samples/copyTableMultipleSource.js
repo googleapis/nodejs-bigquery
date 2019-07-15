@@ -16,40 +16,44 @@
 
 'use strict';
 
-// sample-metadata:
-//   title: BigQuery List Models Streaming
-//   description: Lists all existing models in the dataset using streaming method.
-//   usage: node listModelsStreaming.js <DATASET_ID>
-
-function main(datasetId = 'my_dataset') {
-  // [START bigquery_list_models_streaming]
-
+function main(
+  datasetId = 'my_dataset', // Existing dataset
+  sourceTable = 'my_table', // Existing table to copy from
+  destinationTable = 'testing' // Existing table to copy to
+) {
+  // [START bigquery_copy_table_multiple_source]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
   const bigquery = new BigQuery();
 
-  async function listModels() {
-    // Lists all existing models in the dataset using streaming method.
+  async function copyTableMultipleSource() {
+    // Copy multiple source tables to a given destination.
 
     /**
      * TODO(developer): Uncomment the following lines before running the sample.
      */
     // const datasetId = "my_dataset";
+    // sourceTable = 'my_table';
+    // destinationTable = 'testing';
 
+    // Create a client
     const dataset = bigquery.dataset(datasetId);
 
-    dataset
-      .getModelsStream()
-      .on('error', console.error)
-      .on('data', model => {
-        console.log(model.metadata);
-      })
-      .on('end', () => {
-        console.log('All models have been retrieved.');
-      });
+    const metadata = {
+      createDisposition: 'CREATE_NEVER',
+      writeDisposition: 'WRITE_TRUNCATE',
+    };
+
+    // Create table references
+    const table = dataset.table(sourceTable);
+    const yourTable = dataset.table(destinationTable);
+
+    // Copy table
+    const [apiResponse] = await table.copy(yourTable, metadata);
+    console.log(apiResponse.configuration.copy);
   }
-  // [END bigquery_list_models_streaming]
-  listModels();
+  // [END bigquery_copy_table_multiple_source]
+  copyTableMultipleSource();
 }
 
 main(...process.argv.slice(2));

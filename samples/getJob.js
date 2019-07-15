@@ -16,31 +16,29 @@
 
 'use strict';
 
-function main(datasetId = 'my_dataset', tableId = 'my_table') {
-  // [START bigquery_delete_table]
+function main(jobId = 'existing-job-id') {
+  // [START bigquery_get_job]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
   const bigquery = new BigQuery();
 
-  async function deleteTable() {
-    // Deletes "my_table" from "my_dataset".
+  async function getJob() {
+    // Get job properties.
 
     /**
      * TODO(developer): Uncomment the following lines before running the sample.
      */
-    // const datasetId = "my_dataset";
-    // const tableId = "my_table";
+    // const jobId = "existing-job-id";
 
-    // Delete the table
-    await bigquery
-      .dataset(datasetId)
-      .table(tableId)
-      .delete();
+    // Create a job reference
+    const job = bigquery.job(jobId);
 
-    console.log(`Table ${tableId} deleted.`);
+    // Retrieve job
+    const [jobResult] = await job.get();
+
+    console.log(jobResult.metadata.jobReference);
   }
-  // [END bigquery_delete_table]
-  deleteTable();
+  // [END bigquery_get_job]
+  getJob();
 }
-
 main(...process.argv.slice(2));
