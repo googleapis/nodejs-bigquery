@@ -48,7 +48,7 @@ function main(datasetId = 'my_dataset', tableId = 'my_table') {
     // const tableId = "my_table";
 
     // Configure the load job. For full list of options, see:
-    // https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs#configuration.load
+    // https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationLoad
     const metadata = {
       sourceFormat: 'ORC',
       // Set the write disposition to overwrite existing table data.

@@ -16,40 +16,60 @@
 
 'use strict';
 
-function main() {
-  // [START bigquery_query]
-  // [START bigquery_client_default_credentials]
-  // Import the Google Cloud client library using default credentials
+function main(datasetId = 'my_dataset', tableId = 'my_table') {
+  // [START bigquery_add_column_query_append]
+  // Import the Google Cloud client libraries
   const {BigQuery} = require('@google-cloud/bigquery');
-  const bigquery = new BigQuery();
-  // [END bigquery_client_default_credentials]
-  async function query() {
-    // Queries the U.S. given names dataset for the state of Texas.
 
-    const query = `SELECT name
+  // Instantiate client
+  const bigquery = new BigQuery();
+
+  async function addColumnQueryAppend() {
+    // Adds a new column to a BigQuery table while appending rows via a query job.
+
+    /**
+     * TODO(developer): Uncomment the following lines before running the sample.
+     */
+    // const datasetId = 'my_dataset';
+    // const tableId = 'my_table';
+
+    // Retrieve destination table reference
+    const [table] = await bigquery
+      .dataset(datasetId)
+      .table(tableId)
+      .get();
+    const destinationTableRef = table.metadata.tableReference;
+
+    // In this example, the existing table contains only the 'name' column.
+    // 'REQUIRED' fields cannot  be added to an existing schema,
+    // so the additional column must be 'NULLABLE'.
+    const query = `SELECT name, year
       FROM \`bigquery-public-data.usa_names.usa_1910_2013\`
       WHERE state = 'TX'
-      LIMIT 100`;
+      LIMIT 10`;
 
-    // For all options, see https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs/query
+    // Set load job options
     const options = {
       query: query,
+      schemaUpdateOptions: ['ALLOW_FIELD_ADDITION'],
+      writeDisposition: 'WRITE_APPEND',
+      destinationTable: destinationTableRef,
       // Location must match that of the dataset(s) referenced in the query.
       location: 'US',
     };
 
-    // Run the query as a job
     const [job] = await bigquery.createQueryJob(options);
     console.log(`Job ${job.id} started.`);
 
     // Wait for the query to finish
     const [rows] = await job.getQueryResults();
+    console.log(`Job ${job.id} completed.`);
 
     // Print the results
     console.log('Rows:');
     rows.forEach(row => console.log(row));
   }
-  // [END bigquery_query]
-  query();
+  // [END bigquery_add_column_query_append]
+  addColumnQueryAppend();
 }
 main(...process.argv.slice(2));

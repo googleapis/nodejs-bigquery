@@ -16,8 +16,8 @@
 
 'use strict';
 
-function main(datasetId = 'my_dataset', tableId = 'my_table') {
-  // [START bigquery_load_table_gcs_json_truncate]
+function main(datasetId = 'my_dataset', tableId = 'my_new_table') {
+  // [START bigquery_load_table_partitioned]
   // Import the Google Cloud client libraries
   const {BigQuery} = require('@google-cloud/bigquery');
   const {Storage} = require('@google-cloud/storage');
@@ -27,38 +27,42 @@ function main(datasetId = 'my_dataset', tableId = 'my_table') {
   const storage = new Storage();
 
   /**
-   * This sample loads the JSON file at
-   * https://storage.googleapis.com/cloud-samples-data/bigquery/us-states/us-states.json
+   * This sample loads the CSV file at
+   * https://storage.googleapis.com/cloud-samples-data/bigquery/us-states/us-states.csv
    *
    * TODO(developer): Replace the following lines with the path to your file.
    */
   const bucketName = 'cloud-samples-data';
-  const filename = 'bigquery/us-states/us-states.json';
+  const filename = 'bigquery/us-states/us-states-by-date.csv';
 
-  async function loadJSONFromGCSTruncate() {
-    /**
-     * Imports a GCS file into a table and overwrites
-     * table data if table already exists.
-     */
+  async function loadTablePartitioned() {
+    // Load data into a table that uses column-based time partitioning.
 
     /**
      * TODO(developer): Uncomment the following lines before running the sample.
      */
-    // const datasetId = "my_dataset";
-    // const tableId = "my_table";
+    // const datasetId = 'my_dataset';
+    // const tableId = 'my_new_table';
 
     // Configure the load job. For full list of options, see:
     // https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationLoad
+    const partitionConfig = {
+      type: 'DAY',
+      expirationMs: '7776000000', // 90 days
+      field: 'date',
+    };
     const metadata = {
-      sourceFormat: 'NEWLINE_DELIMITED_JSON',
+      sourceFormat: 'CSV',
+      skipLeadingRows: 1,
       schema: {
         fields: [
           {name: 'name', type: 'STRING'},
           {name: 'post_abbr', type: 'STRING'},
+          {name: 'date', type: 'DATE'},
         ],
       },
-      // Set the write disposition to overwrite existing table data.
-      writeDisposition: 'WRITE_TRUNCATE',
+      location: 'US',
+      timePartitioning: partitionConfig,
     };
 
     // Load data from a Google Cloud Storage file into the table
@@ -66,6 +70,7 @@ function main(datasetId = 'my_dataset', tableId = 'my_table') {
       .dataset(datasetId)
       .table(tableId)
       .load(storage.bucket(bucketName).file(filename), metadata);
+
     // load() waits for the job to finish
     console.log(`Job ${job.id} completed.`);
 
@@ -75,7 +80,7 @@ function main(datasetId = 'my_dataset', tableId = 'my_table') {
       throw errors;
     }
   }
-  // [END bigquery_load_table_gcs_json_truncate]
-  loadJSONFromGCSTruncate();
+  // [END bigquery_load_table_partitioned]
+  loadTablePartitioned();
 }
 main(...process.argv.slice(2));

@@ -17,14 +17,13 @@
 'use strict';
 
 function main() {
-  // [START bigquery_query]
-  // [START bigquery_client_default_credentials]
-  // Import the Google Cloud client library using default credentials
+  // [START bigquery_query_dry_run]
+  // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
   const bigquery = new BigQuery();
-  // [END bigquery_client_default_credentials]
-  async function query() {
-    // Queries the U.S. given names dataset for the state of Texas.
+
+  async function queryDryRun() {
+    // Runs a dry query of the U.S. given names dataset for the state of Texas.
 
     const query = `SELECT name
       FROM \`bigquery-public-data.usa_names.usa_1910_2013\`
@@ -36,20 +35,19 @@ function main() {
       query: query,
       // Location must match that of the dataset(s) referenced in the query.
       location: 'US',
+      dryRun: true,
     };
 
     // Run the query as a job
     const [job] = await bigquery.createQueryJob(options);
-    console.log(`Job ${job.id} started.`);
 
-    // Wait for the query to finish
-    const [rows] = await job.getQueryResults();
-
-    // Print the results
-    console.log('Rows:');
-    rows.forEach(row => console.log(row));
+    // Print the status and statistics
+    console.log('Status:');
+    console.log(job.metadata.status);
+    console.log('\nJob Statistics:');
+    console.log(job.metadata.statistics);
   }
-  // [END bigquery_query]
-  query();
+  // [END bigquery_query_dry_run]
+  queryDryRun();
 }
 main(...process.argv.slice(2));
