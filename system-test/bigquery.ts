@@ -41,6 +41,7 @@ const storage = new Storage();
 describe('BigQuery', () => {
   const minCreationTime = Date.now().toString();
   const GCLOUD_TESTS_PREFIX = 'nodejs_bq_test';
+  const minCreationTime = Date.now().toString();
 
   const dataset = bigquery.dataset(generateName('dataset'));
   const table = dataset.table(generateName('table'));
@@ -371,7 +372,7 @@ describe('BigQuery', () => {
     let jobEmitted = false;
 
     bigquery
-      .getJobsStream()
+      .getJobsStream({minCreationTime})
       .on('error', done)
       .on('data', job => {
         jobEmitted = job instanceof Job;
