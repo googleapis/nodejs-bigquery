@@ -39,7 +39,6 @@ const bigquery = new BigQuery();
 const storage = new Storage();
 
 describe('BigQuery', () => {
-  const minCreationTime = Date.now().toString();
   const GCLOUD_TESTS_PREFIX = 'nodejs_bq_test';
   const minCreationTime = Date.now().toString();
 
