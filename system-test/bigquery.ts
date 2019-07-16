@@ -370,7 +370,7 @@ describe('BigQuery', () => {
     let jobEmitted = false;
 
     bigquery
-      .getJobsStream()
+      .getJobsStream({minCreationTime})
       .on('error', done)
       .on('data', job => {
         jobEmitted = job instanceof Job;
