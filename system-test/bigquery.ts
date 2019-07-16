@@ -40,6 +40,7 @@ const storage = new Storage();
 
 describe('BigQuery', () => {
   const GCLOUD_TESTS_PREFIX = 'nodejs_bq_test';
+  const minCreationTime = Date.now().toString();
 
   const dataset = bigquery.dataset(generateName('dataset'));
   const table = dataset.table(generateName('table'));
@@ -358,7 +359,7 @@ describe('BigQuery', () => {
   });
 
   it('should get a list of jobs', done => {
-    bigquery.getJobs((err, jobs) => {
+    bigquery.getJobs({minCreationTime}, (err, jobs) => {
       assert.ifError(err);
       assert(jobs![0] instanceof Job);
       done();
