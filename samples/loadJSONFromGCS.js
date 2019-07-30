@@ -54,7 +54,7 @@ function main(datasetId = 'my_dataset', tableId = 'my_table') {
           {name: 'post_abbr', type: 'STRING'},
         ],
       },
-      loation: 'US',
+      location: 'US',
     };
 
     // Load data from a Google Cloud Storage file into the table

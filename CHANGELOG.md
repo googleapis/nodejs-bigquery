@@ -4,6 +4,20 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+### [4.1.6](https://www.github.com/googleapis/nodejs-bigquery/compare/v4.1.5...v4.1.6) (2019-07-29)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @google-cloud/storage to v3 ([#508](https://www.github.com/googleapis/nodejs-bigquery/issues/508)) ([bdca2ea](https://www.github.com/googleapis/nodejs-bigquery/commit/bdca2ea))
+
+### [4.1.5](https://www.github.com/googleapis/nodejs-bigquery/compare/v4.1.4...v4.1.5) (2019-07-17)
+
+
+### Performance Improvements
+
+* pull in paginator refactor ([#499](https://www.github.com/googleapis/nodejs-bigquery/issues/499)) ([8daafcc](https://www.github.com/googleapis/nodejs-bigquery/commit/8daafcc))
+
 ### [4.1.4](https://www.github.com/googleapis/nodejs-bigquery/compare/v4.1.3...v4.1.4) (2019-07-02)
 
 
