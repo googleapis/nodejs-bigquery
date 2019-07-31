@@ -1395,7 +1395,9 @@ class Table extends common.ServiceObject {
           } as {},
           request: {
             uri: format('{base}/{projectId}/jobs', {
-              base: `https://${this.bigQuery.apiEndpoint}/upload/bigquery/v2/projects`,
+              base: `https://${
+                this.bigQuery.apiEndpoint
+              }/upload/bigquery/v2/projects`,
               projectId: this.bigQuery.projectId,
             }),
           },
@@ -1786,9 +1788,7 @@ class Table extends common.ServiceObject {
    * table.insert(rows, insertHandler);
    *
    * //-
-   * // Insert a row as according to the <a
-   * href="https://cloud.google.com/bigquery/docs/reference/v2/tabledata/insertAll">
-   * // specification</a>.
+   * // Insert a row as according to the <a href="https://cloud.google.com/bigquery/docs/reference/v2/tabledata/insertAll">specification</a>.
    * //-
    * const row = {
    *   insertId: '1',
@@ -1806,9 +1806,7 @@ class Table extends common.ServiceObject {
    * table.insert(row, options, insertHandler);
    *
    * //-
-   * // Handling the response. See <a
-   * href="https://developers.google.com/bigquery/troubleshooting-errors">
-   * // Troubleshooting Errors</a> for best practices on how to handle errors.
+   * // Handling the response. See <a href="https://developers.google.com/bigquery/troubleshooting-errors">Troubleshooting Errors</a> for best practices on how to handle errors.
    * //-
    * function insertHandler(err, apiResponse) {
    *   if (err) {
