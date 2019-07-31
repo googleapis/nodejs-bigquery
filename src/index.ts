@@ -206,7 +206,7 @@ export interface BigQueryOptions extends common.GoogleAuthOptions {
 /**
  * In the following examples from this page and the other modules (`Dataset`,
  * `Table`, etc.), we are going to be using a dataset from
- * [data.gov](http://goo.gl/f2SXcb) of higher education institutions.
+ * [data.gov](https://inventory.data.gov/dataset/032e19b4-5a90-41dc-83ff-6e4cd234f565/resource/38625c3d-5388-4c16-a30f-d105432553a4) of higher education institutions.
  *
  * We will create a table with the correct schema, import the public CSV file
  * into that table, and query it for data.
