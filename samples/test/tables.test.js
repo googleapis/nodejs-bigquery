@@ -57,6 +57,9 @@ describe('Tables', () => {
     ]);
   });
 
+  // to avoid getting rate limited
+  beforeEach(done => setTimeout(done, 500));
+
   after(async () => {
     await bigquery
       .dataset(srcDatasetId)

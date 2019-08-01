@@ -17,9 +17,9 @@
 'use strict';
 
 // sample-metadata:
-//   title: BigQuery Get Model
-//   description: Retrieves an existing model from a dataset.
-//   usage: node getModel.js <DATASET_ID> <MODEL_ID>
+//   title: BigQuery Get Table
+//   description: Retrieves an existing table from a dataset.
+//   usage: node getTable.js <DATASET_ID> <TABLE_ID>
 
 function main(datasetId = 'my_dataset', tableId = 'my_table') {
   // [START bigquery_get_table]

@@ -158,6 +158,17 @@ export interface BigQueryDatetimeOptions {
 
 export type QueryParameter = bigquery.IQueryParameter;
 
+export interface BigQueryOptions extends common.GoogleAuthOptions {
+  autoRetry?: boolean;
+  maxRetries?: number;
+  location?: string;
+  /**
+   * The API endpoint of the service used to make requests.
+   * Defaults to `www.googleapis.com`.
+   */
+  apiEndpoint?: string;
+}
+
 /**
  * @typedef {object} BigQueryOptions
  * @property {string} [projectId] The project ID from the Google Developer's
@@ -190,17 +201,8 @@ export type QueryParameter = bigquery.IQueryParameter;
  * @property {string[]} [scopes] Additional OAuth scopes to use in requests. For
  *     example, to access an external data source, you may need the
  *     `https://www.googleapis.com/auth/drive.readonly` scope.
+ * @property {string=} apiEndpoint The API endpoint of the service used to make requests. Defaults to `www.googleapis.com`.
  */
-export interface BigQueryOptions extends common.GoogleAuthOptions {
-  autoRetry?: boolean;
-  maxRetries?: number;
-  location?: string;
-  /**
-   * The API endpoint of the service used to make requests.
-   * Defaults to `www.googleapis.com`.
-   */
-  apiEndpoint?: string;
-}
 
 /**
  * In the following examples from this page and the other modules (`Dataset`,
@@ -216,21 +218,19 @@ export interface BigQueryOptions extends common.GoogleAuthOptions {
  *
  * @param {BigQueryOptions} options Constructor options.
  *
- * @example <caption>Install the client library with <a
- * href="https://www.npmjs.com/">npm</a>:</caption> npm install --save
- * @google-cloud/bigquery
+ * @example <caption>Install the client library with <a href="https://www.npmjs.com/">npm</a>:</caption>
+ * npm install @google-cloud/bigquery
  *
  * @example <caption>Import the client library</caption>
  * const {BigQuery} = require('@google-cloud/bigquery');
  *
- * @example <caption>Create a client that uses <a
- * href="https://cloud.google.com/docs/authentication/production#providing_credentials_to_your_application">Application
- * Default Credentials (ADC)</a>:</caption> const bigquery = new BigQuery();
+ * @example <caption>Create a client that uses <a href="https://cloud.google.com/docs/authentication/production#providing_credentials_to_your_application">Application Default Credentials (ADC)</a>:</caption>
+ * const bigquery = new BigQuery();
  *
- * @example <caption>Create a client with <a
- * href="https://cloud.google.com/docs/authentication/production#obtaining_and_providing_service_account_credentials_manually">explicit
- * credentials</a>:</caption> const bigquery = new BigQuery({ projectId:
- * 'your-project-id', keyFilename: '/path/to/keyfile.json'
+ * @example <caption>Create a client with <a href="https://cloud.google.com/docs/authentication/production#obtaining_and_providing_service_account_credentials_manually">explicit credentials</a>:</caption>
+ * const bigquery = new BigQuery({
+ *   projectId: 'your-project-id',
+ *   keyFilename: '/path/to/keyfile.json'
  * });
  *
  * @example <caption>include:samples/quickstart.js</caption>
@@ -1787,21 +1787,19 @@ export {Table};
  * @module {object} @google-cloud/bigquery
  * @alias nodejs-bigquery
  *
- * @example <caption>Install the client library with <a
- * href="https://www.npmjs.com/">npm</a>:</caption> npm install --save
- * @google-cloud/bigquery
+ * @example <caption>Install the client library with <a href="https://www.npmjs.com/">npm</a>:</caption>
+ * npm install @google-cloud/bigquery
  *
  * @example <caption>Import the client library</caption>
  * const {BigQuery} = require('@google-cloud/bigquery');
  *
- * @example <caption>Create a client that uses <a
- * href="https://cloud.google.com/docs/authentication/production#providing_credentials_to_your_application">Application
- * Default Credentials (ADC)</a>:</caption> const bigquery = new BigQuery();
+ * @example <caption>Create a client that uses <a href="https://cloud.google.com/docs/authentication/production#providing_credentials_to_your_application">Application Default Credentials (ADC)</a>:</caption>
+ * const bigquery = new BigQuery();
  *
- * @example <caption>Create a client with <a
- * href="https://cloud.google.com/docs/authentication/production#obtaining_and_providing_service_account_credentials_manually">explicit
- * credentials</a>:</caption> const bigquery = new BigQuery({ projectId:
- * 'your-project-id', keyFilename: '/path/to/keyfile.json'
+ * @example <caption>Create a client with <a href="https://cloud.google.com/docs/authentication/production#obtaining_and_providing_service_account_credentials_manually">explicit credentials</a>:</caption>
+ * const bigquery = new BigQuery({
+ *   projectId: 'your-project-id',
+ *   keyFilename: '/path/to/keyfile.json'
  * });
  *
  * @example <caption>include:samples/quickstart.js</caption>

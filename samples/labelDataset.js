@@ -17,9 +17,9 @@
 'use strict';
 
 // sample-metadata:
-//   title: BigQuery Update Model
-//   description: Updates a model's metadata.
-//   usage: node updateModel.js <DATASET_ID> <MODEL_ID>
+//   title: BigQuery Label Dataset
+//   description: Updates a label on a dataset.
+//   usage: node labelDataset.js <DATASET_ID>
 
 function main(datasetId = 'my_dataset') {
   // [START bigquery_label_dataset]
