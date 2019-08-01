@@ -55,8 +55,7 @@ class Model extends common.ServiceObject {
        *
        * model.delete((err, apiResponse) => {});
        *
-       * @example <caption>If the callback is omitted we'll return a Promise.
-       * </caption>
+       * @example <caption>If the callback is omitted we'll return a Promise.</caption>
        * const [apiResponse] = await model.delete();
        */
       delete: true,
@@ -79,8 +78,7 @@ class Model extends common.ServiceObject {
        *
        * model.exists((err, exists) => {});
        *
-       * @example <caption>If the callback is omitted we'll return a Promise.
-       * </caption>
+       * @example <caption>If the callback is omitted we'll return a Promise.</caption>
        * const [exists] = await model.exists();
        */
       exists: true,
@@ -110,8 +108,7 @@ class Model extends common.ServiceObject {
        *   }
        * });
        *
-       * @example <caption>If the callback is omitted we'll return a Promise.
-       * </caption>
+       * @example <caption>If the callback is omitted we'll return a Promise.</caption>
        * await model.get();
        */
       get: true,
@@ -137,8 +134,7 @@ class Model extends common.ServiceObject {
        *
        * model.getMetadata((err, metadata, apiResponse) => {});
        *
-       * @example <caption>If the callback is omitted we'll return a Promise.
-       * </caption>
+       * @example <caption>If the callback is omitted we'll return a Promise.</caption>
        * const [metadata, apiResponse] = await model.getMetadata();
        */
       getMetadata: true,
@@ -167,8 +163,7 @@ class Model extends common.ServiceObject {
        *
        * model.setMetadata(metadata, (err, metadata, apiResponse) => {});
        *
-       * @example <caption>If the callback is omitted we'll return a Promise.
-       * </caption>
+       * @example <caption>If the callback is omitted we'll return a Promise.</caption>
        * const [metadata, apiResponse] = await model.setMetadata(metadata);
        */
       setMetadata: true,
