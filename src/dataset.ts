@@ -322,8 +322,7 @@ class Dataset extends ServiceObject {
      *     // All models have been retrieved
      *   });
      *
-     * @example <caption>If you anticipate many results, you can end a stream
-     * early to prevent unnecessary processing and API requests.</caption>
+     * @example <caption>If you anticipate many results, you can end a stream early to prevent unnecessary processing and API requests.</caption>
      * dataset.getModelsStream()
      *   .on('data', function(model) {
      *     this.end();
@@ -602,8 +601,7 @@ class Dataset extends ServiceObject {
    *   // models is an array of `Model` objects.
    * });
    *
-   * @example <caption>To control how many API requests are made and page
-   * through the results manually, set `autoPaginate` to `false`.</caption>
+   * @example <caption>To control how many API requests are made and page through the results manually, set `autoPaginate` to `false`.</caption>
    * function manualPaginationCallback(err, models, nextQuery, apiResponse) {
    *   if (nextQuery) {
    *     // More results exist.
@@ -615,8 +613,7 @@ class Dataset extends ServiceObject {
    *   autoPaginate: false
    * }, manualPaginationCallback);
    *
-   * @example <caption>If the callback is omitted, we'll return a Promise.
-   * </caption>
+   * @example <caption>If the callback is omitted, we'll return a Promise.</caption>
    * dataset.getModels().then((data) => {
    *   const models = data[0];
    * });
