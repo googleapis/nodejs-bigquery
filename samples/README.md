@@ -24,7 +24,7 @@
   * [Create Table](#create-table)
   * [Create Table Partitioned](#create-table-partitioned)
   * [Delete Dataset](#delete-dataset)
-  * [BigQuery Update Model](#bigquery-update-model)
+  * [Delete Label Dataset](#delete-label-dataset)
   * [Delete Label Table](#delete-label-table)
   * [Delete Model](#delete-model)
   * [Delete Table](#delete-table)
@@ -32,13 +32,13 @@
   * [Extract Table JSON](#extract-table-json)
   * [Extract Table To GCS](#extract-table-to-gcs)
   * [Get Dataset](#get-dataset)
-  * [BigQuery Update Model](#bigquery-update-model)
+  * [Get Dataset Labels](#get-dataset-labels)
   * [Get Job](#get-job)
   * [BigQuery Get Model](#bigquery-get-model)
-  * [BigQuery Get Model](#bigquery-get-model)
-  * [BigQuery Update Model](#bigquery-update-model)
+  * [BigQuery Get Table](#bigquery-get-table)
+  * [Get Table Labels](#get-table-labels)
   * [Insert Rows As Stream](#insert-rows-as-stream)
-  * [BigQuery Update Model](#bigquery-update-model)
+  * [BigQuery Label Dataset](#bigquery-label-dataset)
   * [Label Table](#label-table)
   * [List Datasets](#list-datasets)
   * [List Datasets By Label](#list-datasets-by-label)
@@ -294,9 +294,9 @@ __Usage:__
 
 
 
-### BigQuery Update Model
+### Delete Label Dataset
 
-Updates a model's metadata.
+Deletes a label on a dataset.
 
 View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/deleteLabelDataset.js).
 
@@ -305,7 +305,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node updateModel.js <DATASET_ID> <MODEL_ID>`
+`node deleteLabelDataset.js <DATASET_ID>`
 
 
 -----
@@ -432,9 +432,9 @@ __Usage:__
 
 
 
-### BigQuery Update Model
+### Get Dataset Labels
 
-Updates a model's metadata.
+Gets labels on a dataset.
 
 View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/getDatasetLabels.js).
 
@@ -443,7 +443,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node updateModel.js <DATASET_ID> <MODEL_ID>`
+`node getDatasetLabels.js <DATASET_ID>`
 
 
 -----
@@ -487,9 +487,9 @@ __Usage:__
 
 
 
-### BigQuery Get Model
+### BigQuery Get Table
 
-Retrieves an existing model from a dataset.
+Retrieves an existing table from a dataset.
 
 View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/getTable.js).
 
@@ -498,7 +498,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node getModel.js <DATASET_ID> <MODEL_ID>`
+`node getTable.js <DATASET_ID> <TABLE_ID>`
 
 
 -----
@@ -506,9 +506,9 @@ __Usage:__
 
 
 
-### BigQuery Update Model
+### Get Table Labels
 
-Updates a model's metadata.
+Gets labels on a dataset.
 
 View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/getTableLabels.js).
 
@@ -517,7 +517,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node updateModel.js <DATASET_ID> <MODEL_ID>`
+`node getTableLabels.js <DATASET_ID> <TABLE_ID>`
 
 
 -----
@@ -542,9 +542,9 @@ __Usage:__
 
 
 
-### BigQuery Update Model
+### BigQuery Label Dataset
 
-Updates a model's metadata.
+Updates a label on a dataset.
 
 View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/labelDataset.js).
 
@@ -553,7 +553,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node updateModel.js <DATASET_ID> <MODEL_ID>`
+`node labelDataset.js <DATASET_ID>`
 
 
 -----
