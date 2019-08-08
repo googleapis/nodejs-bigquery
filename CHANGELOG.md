@@ -4,6 +4,21 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+### [4.1.8](https://www.github.com/googleapis/nodejs-bigquery/compare/v4.1.7...v4.1.8) (2019-08-02)
+
+
+### Bug Fixes
+
+* allow calls with no request, add JSON proto ([885a98a](https://www.github.com/googleapis/nodejs-bigquery/commit/885a98a))
+
+### [4.1.7](https://www.github.com/googleapis/nodejs-bigquery/compare/v4.1.6...v4.1.7) (2019-08-01)
+
+
+### Bug Fixes
+
+* **docs:** duplicate readme sample names ([#512](https://www.github.com/googleapis/nodejs-bigquery/issues/512)) ([56040f5](https://www.github.com/googleapis/nodejs-bigquery/commit/56040f5))
+* **docs:** fix formatting of the docs ([#513](https://www.github.com/googleapis/nodejs-bigquery/issues/513)) ([d823014](https://www.github.com/googleapis/nodejs-bigquery/commit/d823014))
+
 ### [4.1.6](https://www.github.com/googleapis/nodejs-bigquery/compare/v4.1.5...v4.1.6) (2019-07-29)
 
 
