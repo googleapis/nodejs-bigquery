@@ -4,6 +4,14 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+### [4.1.9](https://www.github.com/googleapis/nodejs-bigquery/compare/v4.1.8...v4.1.9) (2019-09-03)
+
+
+### Bug Fixes
+
+* **deps:** update dependency yargs to v14 ([#520](https://www.github.com/googleapis/nodejs-bigquery/issues/520)) ([9dd59a6](https://www.github.com/googleapis/nodejs-bigquery/commit/9dd59a6))
+* **types:** update to the latest discovery types ([#518](https://www.github.com/googleapis/nodejs-bigquery/issues/518)) ([dccf2cf](https://www.github.com/googleapis/nodejs-bigquery/commit/dccf2cf))
+
 ### [4.1.8](https://www.github.com/googleapis/nodejs-bigquery/compare/v4.1.7...v4.1.8) (2019-08-02)
 
 
