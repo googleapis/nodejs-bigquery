@@ -175,7 +175,7 @@ describe('BigQuery', () => {
 
       const calledWith = bq.calledWith_[0];
 
-      const baseUrl = 'https://www.googleapis.com/bigquery/v2';
+      const baseUrl = 'https://bigquery.googleapis.com/bigquery/v2';
       assert.strictEqual(calledWith.baseUrl, baseUrl);
       assert.deepStrictEqual(calledWith.scopes, [
         'https://www.googleapis.com/auth/bigquery',
