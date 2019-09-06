@@ -163,7 +163,7 @@ export interface BigQueryOptions extends common.GoogleAuthOptions {
   location?: string;
   /**
    * The API endpoint of the service used to make requests.
-   * Defaults to `www.googleapis.com`.
+   * Defaults to `bigquery.googleapis.com`.
    */
   apiEndpoint?: string;
 }
@@ -200,7 +200,7 @@ export interface BigQueryOptions extends common.GoogleAuthOptions {
  * @property {string[]} [scopes] Additional OAuth scopes to use in requests. For
  *     example, to access an external data source, you may need the
  *     `https://www.googleapis.com/auth/drive.readonly` scope.
- * @property {string=} apiEndpoint The API endpoint of the service used to make requests. Defaults to `www.googleapis.com`.
+ * @property {string=} apiEndpoint The API endpoint of the service used to make requests. Defaults to `bigquery.googleapis.com`.
  */
 
 /**
@@ -244,7 +244,7 @@ export class BigQuery extends common.Service {
   getJobsStream: (options?: GetJobsOptions) => ResourceStream<Job>;
 
   constructor(options: BigQueryOptions = {}) {
-    options.apiEndpoint = options.apiEndpoint || 'www.googleapis.com';
+    options.apiEndpoint = options.apiEndpoint || 'bigquery.googleapis.com';
     const config = {
       apiEndpoint: options.apiEndpoint,
       baseUrl: `https://${options.apiEndpoint}/bigquery/v2`,
