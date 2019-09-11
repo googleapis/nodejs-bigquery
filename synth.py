@@ -1,6 +1,7 @@
 import synthtool as s
 import synthtool.gcp as gcp
 import logging
+import subprocess
 
 logging.basicConfig(level=logging.DEBUG)
 common_templates = gcp.CommonTemplates()
