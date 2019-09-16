@@ -4,6 +4,13 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+### [4.2.1](https://www.github.com/googleapis/nodejs-bigquery/compare/v4.2.0...v4.2.1) (2019-09-16)
+
+
+### Bug Fixes
+
+* **deps:** update dependency discovery-tsd to ^0.2.0 ([#540](https://www.github.com/googleapis/nodejs-bigquery/issues/540)) ([651e870](https://www.github.com/googleapis/nodejs-bigquery/commit/651e870))
+
 ## [4.2.0](https://www.github.com/googleapis/nodejs-bigquery/compare/v4.1.8...v4.2.0) (2019-09-07)
 
 
