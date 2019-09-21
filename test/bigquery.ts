@@ -30,7 +30,7 @@ import * as proxyquire from 'proxyquire';
 import * as sinon from 'sinon';
 import * as uuid from 'uuid';
 
-import {BigQueryDate, Dataset, Job, Table} from '../src';
+import {BigQueryDate, Dataset, Job, Table} from '../src/bigquery';
 import {JobOptions} from '../src/job';
 import {TableField} from '../src/table';
 
@@ -128,7 +128,7 @@ describe('BigQuery', () => {
   let bq: any;
 
   before(() => {
-    BigQuery = proxyquire('../src', {
+    BigQuery = proxyquire('../src/bigquery', {
       uuid: fakeUuid,
       './dataset': {
         Dataset: FakeDataset,
@@ -175,7 +175,7 @@ describe('BigQuery', () => {
 
       const calledWith = bq.calledWith_[0];
 
-      const baseUrl = 'https://www.googleapis.com/bigquery/v2';
+      const baseUrl = 'https://bigquery.googleapis.com/bigquery/v2';
       assert.strictEqual(calledWith.baseUrl, baseUrl);
       assert.deepStrictEqual(calledWith.scopes, [
         'https://www.googleapis.com/auth/bigquery',

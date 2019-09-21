@@ -15,7 +15,7 @@
  */
 
 import * as fs from 'fs';
-import {BigQuery} from '../src';
+import {BigQuery} from '../src/bigquery';
 
 if (process.argv.length < 3) {
   throw new Error(

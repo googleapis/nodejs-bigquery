@@ -22,7 +22,7 @@ import * as extend from 'extend';
 import * as proxyquire from 'proxyquire';
 import * as sinon from 'sinon';
 
-import {BigQuery} from '../src';
+import {BigQuery} from '../src/bigquery';
 import {QueryResultsOptions} from '../src/job';
 
 class FakeOperation {

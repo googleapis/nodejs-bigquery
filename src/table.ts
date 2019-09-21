@@ -40,7 +40,7 @@ import {
   PagedCallback,
   JobRequest,
   PagedRequest,
-} from '../src';
+} from '../src/bigquery';
 import {GoogleErrorBody} from '@google-cloud/common/build/src/util';
 import {Duplex, Writable} from 'stream';
 import {JobMetadata} from './job';
