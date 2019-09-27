@@ -1419,6 +1419,10 @@ declare namespace bigquery {
      */
     reservation_id?: string;
     /**
+     * [Output-only] Statistics for a child job of a script.
+     */
+    scriptStatistics?: IScriptStatistics;
+    /**
      * [Output-only] Start time of this job, in milliseconds since the epoch. This field will be present when the job transitions from the PENDING state to either RUNNING or DONE.
      */
     startTime?: string;
@@ -2167,6 +2171,44 @@ declare namespace bigquery {
      * Info describing predicted label distribution.
      */
     entries?: Array<IEntry>;
+  };
+
+  type IScriptStackFrame = {
+    /**
+     * [Output-only] One-based end column.
+     */
+    endColumn?: number;
+    /**
+     * [Output-only] One-based end line.
+     */
+    endLine?: number;
+    /**
+     * [Output-only] Name of the active procedure, empty if in a top-level script.
+     */
+    procedureId?: string;
+    /**
+     * [Output-only] One-based start column.
+     */
+    startColumn?: number;
+    /**
+     * [Output-only] One-based start line.
+     */
+    startLine?: number;
+    /**
+     * [Output-only] Text of the current statement/expression.
+     */
+    text?: string;
+  };
+
+  type IScriptStatistics = {
+    /**
+     * [Output-only] Whether this child job was a statement or expression.
+     */
+    evaluationKind?: string;
+    /**
+     * Stack trace showing the line/column/procedure name of each frame on the stack at the point where the current evaluation happened. The leaf frame is first, the primary script is last. Never empty.
+     */
+    stackFrames?: Array<IScriptStackFrame>;
   };
 
   /**
