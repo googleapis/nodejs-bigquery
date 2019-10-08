@@ -73,6 +73,103 @@ declare namespace bigquery {
     name?: string;
   };
 
+  /**
+   * Arima coefficients.
+   */
+  type IArimaCoefficients = {
+    /**
+     * Auto-regressive coefficients, an array of double.
+     */
+    autoRegressiveCoefficients?: Array<number>;
+    /**
+     * Intercept coefficient, just a double not an array.
+     */
+    interceptCoefficient?: number;
+    /**
+     * Moving-average coefficients, an array of double.
+     */
+    movingAverageCoefficients?: Array<number>;
+  };
+
+  /**
+   * ARIMA model fitting metrics.
+   */
+  type IArimaFittingMetrics = {
+    /**
+     * AIC
+     */
+    aic?: number;
+    /**
+     * log-likelihood
+     */
+    logLikelihood?: number;
+    /**
+     * variance.
+     */
+    variance?: number;
+  };
+
+  /**
+   * Arima model information.
+   */
+  type IArimaModelInfo = {
+    /**
+     * Arima coefficients.
+     */
+    arimaCoefficients?: IArimaCoefficients;
+    /**
+     * Arima fitting metrics.
+     */
+    arimaFittingMetrics?: IArimaFittingMetrics;
+    /**
+     * Non-seasonal order.
+     */
+    nonSeasonalOrder?: IArimaOrder;
+  };
+
+  /**
+   * Arima order, can be used for both non-seasonal and seasonal parts.
+   */
+  type IArimaOrder = {
+    /**
+     * Order of the differencing part.
+     */
+    d?: string;
+    /**
+     * Order of the autoregressive part.
+     */
+    p?: string;
+    /**
+     * Order of the moving-average part.
+     */
+    q?: string;
+  };
+
+  /**
+   * (Auto-)arima fitting result. Wrap everything in ArimaResult for easier
+   * refactoring if we want to use model-specific iteration results.
+   */
+  type IArimaResult = {
+    /**
+     * This message is repeated because there are multiple arima models
+     * fitted in auto-arima. For non-auto-arima model, its size is one.
+     */
+    arimaModelInfo?: Array<IArimaModelInfo>;
+    /**
+     * Seasonal periods. Repeated because multiple periods are supported for
+     * one time series.
+     */
+    seasonalPeriods?: Array<
+      | 'SEASONAL_PERIOD_TYPE_UNSPECIFIED'
+      | 'NO_SEASONALITY'
+      | 'DAILY'
+      | 'WEEKLY'
+      | 'MONTHLY'
+      | 'QUARTERLY'
+      | 'YEARLY'
+    >;
+  };
+
   type IBigQueryModelTraining = {
     /**
      * [Output-only, Beta] Index of current ML training iteration. Updated during create model query job to show job progress.
@@ -910,6 +1007,7 @@ declare namespace bigquery {
    * Information about a single iteration of the training run.
    */
   type IIterationResult = {
+    arimaResult?: IArimaResult;
     /**
      * Information about top clusters for clustering models.
      */
