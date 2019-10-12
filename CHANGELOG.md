@@ -4,6 +4,13 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## [4.3.0](https://www.github.com/googleapis/nodejs-bigquery/compare/v4.2.1...v4.3.0) (2019-10-09)
+
+
+### Features
+
+* **TypeScript:** introduce IArimaResult interface ([4cd3a71](https://www.github.com/googleapis/nodejs-bigquery/commit/4cd3a71))
+
 ### [4.2.1](https://www.github.com/googleapis/nodejs-bigquery/compare/v4.2.0...v4.2.1) (2019-09-16)
 
 
