@@ -35,7 +35,7 @@ import {
   QueryRowsCallback,
   QueryRowsResponse,
   RequestCallback,
-} from '../src/bigquery';
+} from './bigquery';
 import {RowMetadata} from './table';
 import bigquery from './types';
 

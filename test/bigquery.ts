@@ -30,9 +30,17 @@ import * as proxyquire from 'proxyquire';
 import * as sinon from 'sinon';
 import * as uuid from 'uuid';
 
-import {BigQueryDate, Dataset, Job, Table} from '../src/bigquery';
-import {JobOptions} from '../src/job';
-import {TableField} from '../src/table';
+import {
+  BigQueryDate,
+  Dataset,
+  Job,
+  Table,
+  JobOptions,
+  TableField,
+} from '../src';
+// import {Dataset} from '../src/dataset';
+// import {JobOptions, Job} from '../src/job';
+// import {TableField, Table} from '../src/table';
 
 const fakeUuid = extend(true, {}, uuid);
 

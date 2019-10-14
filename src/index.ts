@@ -23,7 +23,6 @@ export {
   BigQueryTime,
   BigQueryTimeOptions,
   BigQueryTimestamp,
-  Dataset,
   DatasetCallback,
   DatasetResource,
   DatasetResponse,
@@ -35,7 +34,6 @@ export {
   GetJobsOptions,
   GetJobsResponse,
   JobRequest,
-  Model,
   PagedCallback,
   PagedRequest,
   PagedResponse,
@@ -53,6 +51,7 @@ export {
 
 export {
   CreateDatasetOptions,
+  Dataset,
   DatasetDeleteOptions,
   DatasetOptions,
   GetModelsCallback,
@@ -103,3 +102,5 @@ export {
   TableSchema,
   ViewDefinition,
 } from './table';
+
+export {Model} from './model';

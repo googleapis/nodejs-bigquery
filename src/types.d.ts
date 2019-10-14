@@ -73,6 +73,103 @@ declare namespace bigquery {
     name?: string;
   };
 
+  /**
+   * Arima coefficients.
+   */
+  type IArimaCoefficients = {
+    /**
+     * Auto-regressive coefficients, an array of double.
+     */
+    autoRegressiveCoefficients?: Array<number>;
+    /**
+     * Intercept coefficient, just a double not an array.
+     */
+    interceptCoefficient?: number;
+    /**
+     * Moving-average coefficients, an array of double.
+     */
+    movingAverageCoefficients?: Array<number>;
+  };
+
+  /**
+   * ARIMA model fitting metrics.
+   */
+  type IArimaFittingMetrics = {
+    /**
+     * AIC
+     */
+    aic?: number;
+    /**
+     * log-likelihood
+     */
+    logLikelihood?: number;
+    /**
+     * variance.
+     */
+    variance?: number;
+  };
+
+  /**
+   * Arima model information.
+   */
+  type IArimaModelInfo = {
+    /**
+     * Arima coefficients.
+     */
+    arimaCoefficients?: IArimaCoefficients;
+    /**
+     * Arima fitting metrics.
+     */
+    arimaFittingMetrics?: IArimaFittingMetrics;
+    /**
+     * Non-seasonal order.
+     */
+    nonSeasonalOrder?: IArimaOrder;
+  };
+
+  /**
+   * Arima order, can be used for both non-seasonal and seasonal parts.
+   */
+  type IArimaOrder = {
+    /**
+     * Order of the differencing part.
+     */
+    d?: string;
+    /**
+     * Order of the autoregressive part.
+     */
+    p?: string;
+    /**
+     * Order of the moving-average part.
+     */
+    q?: string;
+  };
+
+  /**
+   * (Auto-)arima fitting result. Wrap everything in ArimaResult for easier
+   * refactoring if we want to use model-specific iteration results.
+   */
+  type IArimaResult = {
+    /**
+     * This message is repeated because there are multiple arima models
+     * fitted in auto-arima. For non-auto-arima model, its size is one.
+     */
+    arimaModelInfo?: Array<IArimaModelInfo>;
+    /**
+     * Seasonal periods. Repeated because multiple periods are supported for
+     * one time series.
+     */
+    seasonalPeriods?: Array<
+      | 'SEASONAL_PERIOD_TYPE_UNSPECIFIED'
+      | 'NO_SEASONALITY'
+      | 'DAILY'
+      | 'WEEKLY'
+      | 'MONTHLY'
+      | 'QUARTERLY'
+      | 'YEARLY'
+    >;
+  };
+
   type IBigQueryModelTraining = {
     /**
      * [Output-only, Beta] Index of current ML training iteration. Updated during create model query job to show job progress.
@@ -774,7 +871,7 @@ declare namespace bigquery {
      */
     googleSheetsOptions?: IGoogleSheetsOptions;
     /**
-     * [Optional, Trusted Tester] If hive partitioning is enabled, which mode to use. Two modes are supported: - AUTO: automatically infer partition key name(s) and type(s). - STRINGS: automatic infer partition key name(s). All types are strings. Not all storage formats support hive partitioning -- requesting hive partitioning on an unsupported format will lead to an error. Note: this setting is in the process of being deprecated in favor of hivePartitioningOptions.
+     * [Optional, Trusted Tester] Deprecated, do not use. Please set hivePartitioningOptions instead.
      */
     hivePartitioningMode?: string;
     /**
@@ -910,6 +1007,7 @@ declare namespace bigquery {
    * Information about a single iteration of the training run.
    */
   type IIterationResult = {
+    arimaResult?: IArimaResult;
     /**
      * Information about top clusters for clustering models.
      */
@@ -1102,7 +1200,7 @@ declare namespace bigquery {
      */
     fieldDelimiter?: string;
     /**
-     * [Optional, Trusted Tester] If hive partitioning is enabled, which mode to use. Two modes are supported: - AUTO: automatically infer partition key name(s) and type(s). - STRINGS: automatic infer partition key name(s). All types are strings. Not all storage formats support hive partitioning -- requesting hive partitioning on an unsupported format will lead to an error.
+     * [Optional, Trusted Tester] Deprecated, do not use. Please set hivePartitioningOptions instead.
      */
     hivePartitioningMode?: string;
     /**
@@ -1419,6 +1517,10 @@ declare namespace bigquery {
      */
     reservation_id?: string;
     /**
+     * [Output-only] Statistics for a child job of a script.
+     */
+    scriptStatistics?: IScriptStatistics;
+    /**
      * [Output-only] Start time of this job, in milliseconds since the epoch. This field will be present when the job transitions from the PENDING state to either RUNNING or DONE.
      */
     startTime?: string;
@@ -1503,7 +1605,7 @@ declare namespace bigquery {
      */
     schema?: ITableSchema;
     /**
-     * The type of query statement, if valid. Possible values (new values might be added in the future): "SELECT": SELECT query. "INSERT": INSERT query; see https://cloud.google.com/bigquery/docs/reference/standard-sql/data-manipulation-language. "UPDATE": UPDATE query; see https://cloud.google.com/bigquery/docs/reference/standard-sql/data-manipulation-language. "DELETE": DELETE query; see https://cloud.google.com/bigquery/docs/reference/standard-sql/data-manipulation-language. "MERGE": MERGE query; see https://cloud.google.com/bigquery/docs/reference/standard-sql/data-manipulation-language. "ALTER_TABLE": ALTER TABLE query. "ALTER_VIEW": ALTER VIEW query. "CREATE_FUNCTION": CREATE FUNCTION query. "CREATE_MODEL": CREATE [OR REPLACE] MODEL ... AS SELECT ... . "CREATE_PROCEDURE": CREATE PROCEDURE query. "CREATE_TABLE": CREATE [OR REPLACE] TABLE without AS SELECT. "CREATE_TABLE_AS_SELECT": CREATE [OR REPLACE] TABLE ... AS SELECT ... . "CREATE_VIEW": CREATE [OR REPLACE] VIEW ... AS SELECT ... . "DROP_FUNCTION" : DROP FUNCTION query. "DROP_PROCEDURE": DROP PROCEDURE query. "DROP_TABLE": DROP TABLE query. "DROP_VIEW": DROP VIEW query.
+     * The type of query statement, if valid. Possible values (new values might be added in the future): "SELECT": SELECT query. "INSERT": INSERT query; see https://cloud.google.com/bigquery/docs/reference/standard-sql/data-manipulation-language. "UPDATE": UPDATE query; see https://cloud.google.com/bigquery/docs/reference/standard-sql/data-manipulation-language. "DELETE": DELETE query; see https://cloud.google.com/bigquery/docs/reference/standard-sql/data-manipulation-language. "MERGE": MERGE query; see https://cloud.google.com/bigquery/docs/reference/standard-sql/data-manipulation-language. "ALTER_TABLE": ALTER TABLE query. "ALTER_VIEW": ALTER VIEW query. "ASSERT": ASSERT condition AS 'description'. "CREATE_FUNCTION": CREATE FUNCTION query. "CREATE_MODEL": CREATE [OR REPLACE] MODEL ... AS SELECT ... . "CREATE_PROCEDURE": CREATE PROCEDURE query. "CREATE_TABLE": CREATE [OR REPLACE] TABLE without AS SELECT. "CREATE_TABLE_AS_SELECT": CREATE [OR REPLACE] TABLE ... AS SELECT ... . "CREATE_VIEW": CREATE [OR REPLACE] VIEW ... AS SELECT ... . "DROP_FUNCTION" : DROP FUNCTION query. "DROP_PROCEDURE": DROP PROCEDURE query. "DROP_TABLE": DROP TABLE query. "DROP_VIEW": DROP VIEW query.
      */
     statementType?: string;
     /**
@@ -2167,6 +2269,44 @@ declare namespace bigquery {
      * Info describing predicted label distribution.
      */
     entries?: Array<IEntry>;
+  };
+
+  type IScriptStackFrame = {
+    /**
+     * [Output-only] One-based end column.
+     */
+    endColumn?: number;
+    /**
+     * [Output-only] One-based end line.
+     */
+    endLine?: number;
+    /**
+     * [Output-only] Name of the active procedure, empty if in a top-level script.
+     */
+    procedureId?: string;
+    /**
+     * [Output-only] One-based start column.
+     */
+    startColumn?: number;
+    /**
+     * [Output-only] One-based start line.
+     */
+    startLine?: number;
+    /**
+     * [Output-only] Text of the current statement/expression.
+     */
+    text?: string;
+  };
+
+  type IScriptStatistics = {
+    /**
+     * [Output-only] Whether this child job was a statement or expression.
+     */
+    evaluationKind?: string;
+    /**
+     * Stack trace showing the line/column/procedure name of each frame on the stack at the point where the current evaluation happened. The leaf frame is first, the primary script is last. Never empty.
+     */
+    stackFrames?: Array<IScriptStackFrame>;
   };
 
   /**
