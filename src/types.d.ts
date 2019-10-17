@@ -2654,6 +2654,10 @@ declare namespace bigquery {
        */
       labels?: { [key: string]: string };
       /**
+       * The range partitioning specification for this table, if configured.
+       */
+      rangePartitioning?: IRangePartitioning;
+      /**
        * A reference uniquely identifying the table.
        */
       tableReference?: ITableReference;
