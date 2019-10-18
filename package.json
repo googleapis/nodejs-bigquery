@@ -61,7 +61,7 @@
     "uuid": "^3.3.2"
   },
   "devDependencies": {
-    "@google-cloud/storage": "^3.0.0",
+    "@google-cloud/storage": "^4.0.0",
     "@types/big.js": "^4.0.5",
     "@types/execa": "^0.9.0",
     "@types/extend": "^3.0.1",
