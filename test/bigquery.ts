@@ -38,9 +38,6 @@ import {
   JobOptions,
   TableField,
 } from '../src';
-// import {Dataset} from '../src/dataset';
-// import {JobOptions, Job} from '../src/job';
-// import {TableField, Table} from '../src/table';
 
 const fakeUuid = extend(true, {}, uuid);
 
