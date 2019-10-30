@@ -35,7 +35,7 @@ import {
   QueryRowsResponse,
   ResourceCallback,
   SimpleQueryRowsCallback,
-} from '.';
+} from './bigquery';
 import {
   JobCallback,
   JobResponse,

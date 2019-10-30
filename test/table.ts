@@ -33,7 +33,7 @@ import * as sinon from 'sinon';
 import * as stream from 'stream';
 import * as uuid from 'uuid';
 
-import {BigQuery, Query} from '../src';
+import {BigQuery, Query} from '../src/bigquery';
 import {Job, JobOptions} from '../src/job';
 import {
   CopyTableMetadata,
