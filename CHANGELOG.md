@@ -4,6 +4,34 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## [4.3.0](https://www.github.com/googleapis/nodejs-bigquery/compare/v4.2.1...v4.3.0) (2019-10-09)
+
+
+### Features
+
+* **TypeScript:** introduce IArimaResult interface ([4cd3a71](https://www.github.com/googleapis/nodejs-bigquery/commit/4cd3a71))
+
+### [4.2.1](https://www.github.com/googleapis/nodejs-bigquery/compare/v4.2.0...v4.2.1) (2019-09-16)
+
+
+### Bug Fixes
+
+* **deps:** update dependency discovery-tsd to ^0.2.0 ([#540](https://www.github.com/googleapis/nodejs-bigquery/issues/540)) ([651e870](https://www.github.com/googleapis/nodejs-bigquery/commit/651e870))
+
+## [4.2.0](https://www.github.com/googleapis/nodejs-bigquery/compare/v4.1.8...v4.2.0) (2019-09-07)
+
+
+### Bug Fixes
+
+* **deps:** update dependency yargs to v14 ([#520](https://www.github.com/googleapis/nodejs-bigquery/issues/520)) ([9dd59a6](https://www.github.com/googleapis/nodejs-bigquery/commit/9dd59a6))
+* **types:** update to the latest discovery types ([#518](https://www.github.com/googleapis/nodejs-bigquery/issues/518)) ([dccf2cf](https://www.github.com/googleapis/nodejs-bigquery/commit/dccf2cf))
+* update root url to `bigquery.googleapis.com` ([#531](https://www.github.com/googleapis/nodejs-bigquery/issues/531)) ([277940f](https://www.github.com/googleapis/nodejs-bigquery/commit/277940f))
+
+
+### Features
+
+* **typescript:** generate latest request/response types ([#528](https://www.github.com/googleapis/nodejs-bigquery/issues/528)) ([f8d2f4d](https://www.github.com/googleapis/nodejs-bigquery/commit/f8d2f4d))
+
 ### [4.1.8](https://www.github.com/googleapis/nodejs-bigquery/compare/v4.1.7...v4.1.8) (2019-08-02)
 
 

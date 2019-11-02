@@ -33,7 +33,7 @@ import * as sinon from 'sinon';
 import * as stream from 'stream';
 import * as uuid from 'uuid';
 
-import {BigQuery, Query} from '../src';
+import {BigQuery, Query} from '../src/bigquery';
 import {Job, JobOptions} from '../src/job';
 import {
   CopyTableMetadata,
@@ -112,7 +112,7 @@ describe('BigQuery/Table', () => {
       job: (id: string) => {
         return {id};
       },
-      apiEndpoint: 'www.googleapis.com',
+      apiEndpoint: 'bigquery.googleapis.com',
       request: util.noop,
     },
   };
@@ -1555,7 +1555,7 @@ describe('BigQuery/Table', () => {
           options: MakeWritableStreamOptions
         ) => {
           const uri =
-            'https://www.googleapis.com/upload/bigquery/v2/projects/' +
+            'https://bigquery.googleapis.com/upload/bigquery/v2/projects/' +
             table.bigQuery.projectId +
             '/jobs';
           assert.strictEqual(options.request.uri, uri);

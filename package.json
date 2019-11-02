@@ -1,7 +1,7 @@
 {
   "name": "@google-cloud/bigquery",
   "description": "Google BigQuery Client Library for Node.js",
-  "version": "4.1.8",
+  "version": "4.3.0",
   "license": "Apache-2.0",
   "author": "Google LLC",
   "engines": {
@@ -61,7 +61,7 @@
     "uuid": "^3.3.2"
   },
   "devDependencies": {
-    "@google-cloud/storage": "^3.0.0",
+    "@google-cloud/storage": "^4.0.0",
     "@types/big.js": "^4.0.5",
     "@types/execa": "^0.9.0",
     "@types/extend": "^3.0.1",
@@ -74,7 +74,7 @@
     "@types/tmp": "0.1.0",
     "@types/uuid": "^3.4.4",
     "codecov": "^3.5.0",
-    "discovery-tsd": "^0.1.0",
+    "discovery-tsd": "^0.2.0",
     "eslint": "^6.0.0",
     "eslint-config-prettier": "^6.0.0",
     "eslint-plugin-node": "^10.0.0",

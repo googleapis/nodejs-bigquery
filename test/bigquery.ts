@@ -1,5 +1,5 @@
 /**
- * Copyright 2014 Google Inc. All Rights Reserved.
+ * Copyright 2019 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,9 +30,14 @@ import * as proxyquire from 'proxyquire';
 import * as sinon from 'sinon';
 import * as uuid from 'uuid';
 
-import {BigQueryDate, Dataset, Job, Table} from '../src';
-import {JobOptions} from '../src/job';
-import {TableField} from '../src/table';
+import {
+  BigQueryDate,
+  Dataset,
+  Job,
+  Table,
+  JobOptions,
+  TableField,
+} from '../src';
 
 const fakeUuid = extend(true, {}, uuid);
 
@@ -128,7 +133,7 @@ describe('BigQuery', () => {
   let bq: any;
 
   before(() => {
-    BigQuery = proxyquire('../src', {
+    BigQuery = proxyquire('../src/bigquery', {
       uuid: fakeUuid,
       './dataset': {
         Dataset: FakeDataset,
@@ -175,7 +180,7 @@ describe('BigQuery', () => {
 
       const calledWith = bq.calledWith_[0];
 
-      const baseUrl = 'https://www.googleapis.com/bigquery/v2';
+      const baseUrl = 'https://bigquery.googleapis.com/bigquery/v2';
       assert.strictEqual(calledWith.baseUrl, baseUrl);
       assert.deepStrictEqual(calledWith.scopes, [
         'https://www.googleapis.com/auth/bigquery',
