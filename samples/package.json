@@ -17,6 +17,7 @@
   "dependencies": {
     "@google-cloud/bigquery": "^4.2.1",
     "@google-cloud/storage": "^4.0.0",
+    "google-auth-library": "^5.5.1",
     "yargs": "^14.0.0"
   },
   "devDependencies": {
