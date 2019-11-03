@@ -18,14 +18,13 @@
 
 function main(projectId, clientId, clientSecret, refreshToken) {
   // [START bigquery_auth_user_flow]
-
   /**
    * TODO(developer): Uncomment the following lines before running the sample.
    */
+  // const projectId = 'PROJECT ID'
   // const clientId = 'CLIENT ID'
   // const clientSecret = 'CLIENT SECRET'
   // const refreshToken = 'REFRESH TOKEN'
-  // const projectId = 'PROJECT ID'
 
   const credentials = {
     type: 'authorized_user',
