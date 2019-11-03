@@ -18,7 +18,6 @@
 
 function main(projectId, clientId, clientSecret, refreshToken) {
   // [START bigquery_auth_user_flow]
-  const {UserRefreshClient} = require('google-auth-library');
 
   /**
    * TODO(developer): Uncomment the following lines before running the sample.
@@ -27,28 +26,24 @@ function main(projectId, clientId, clientSecret, refreshToken) {
   // const clientSecret = 'CLIENT SECRET'
   // const refreshToken = 'REFRESH TOKEN'
   // const projectId = 'PROJECT ID'
+
   const credentials = {
     type: 'authorized_user',
     client_id: clientId,
     client_secret: clientSecret,
     refresh_token: refreshToken,
   };
-
-  const refreshClient = new UserRefreshClient();
-  refreshClient.fromJSON(credentials);
   // [END bigquery_auth_user_flow]
   // [START bigquery_auth_user_query]
   async function query() {
     const {BigQuery} = require('@google-cloud/bigquery');
 
     const bigquery = new BigQuery({
-      projectId: projectId,
+      projectId,
+      credentials,
     });
 
-    bigquery.authClient.cachedCredential = refreshClient;
-
     // Queries the U.S. given names dataset for the state of Texas.
-
     const query = `SELECT name
             FROM \`bigquery-public-data.usa_names.usa_1910_2013\`
             WHERE state = 'TX'
