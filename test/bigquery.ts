@@ -118,7 +118,10 @@ class FakeService extends Service {
 }
 
 const sandbox = sinon.createSandbox();
-afterEach(() => sandbox.restore());
+afterEach(() => {
+  delete process.env.BIGQUERY_EMULATOR_HOST;
+  sandbox.restore();
+});
 
 describe('BigQuery', () => {
   const JOB_ID = 'JOB_ID';
@@ -201,6 +204,12 @@ describe('BigQuery', () => {
         calledWith.baseUrl,
         `https://${apiEndpoint}/bigquery/v2`
       );
+    });
+
+    it('should allow overriding the apiEndpoint using environment variables', () => {
+      process.env.BIGQUERY_EMULATOR_HOST = 'http://no.real.host.com';
+      const bq = new BigQuery();
+      assert.strictEqual(bq.baseUrl, 'http://no.real.host.com');
     });
 
     it('should capture any user specified location', () => {

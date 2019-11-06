@@ -245,9 +245,12 @@ export class BigQuery extends common.Service {
 
   constructor(options: BigQueryOptions = {}) {
     options.apiEndpoint = options.apiEndpoint || 'bigquery.googleapis.com';
+    const url =
+      process.env.BIGQUERY_EMULATOR_HOST ||
+      `https://${options.apiEndpoint}/bigquery/v2`;
     const config = {
       apiEndpoint: options.apiEndpoint,
-      baseUrl: `https://${options.apiEndpoint}/bigquery/v2`,
+      baseUrl: url,
       scopes: ['https://www.googleapis.com/auth/bigquery'],
       packageJson: require('../../package.json'),
     };
