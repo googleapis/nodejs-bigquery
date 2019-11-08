@@ -4,6 +4,19 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## [4.4.0](https://www.github.com/googleapis/nodejs-bigquery/compare/v4.3.0...v4.4.0) (2019-11-08)
+
+
+### Features
+
+* **table:** typescript support for range partitioning ([#559](https://www.github.com/googleapis/nodejs-bigquery/issues/559)) ([a77c28a](https://www.github.com/googleapis/nodejs-bigquery/commit/a77c28a3e8b84760d67c4381008424103dcd1db7))
+* typescript support for data split result ([#570](https://www.github.com/googleapis/nodejs-bigquery/issues/570)) ([2236545](https://www.github.com/googleapis/nodejs-bigquery/commit/223654555ed9113683781883c65ffa7ee2f1ea5b))
+
+
+### Bug Fixes
+
+* **deps:** update dependency @google-cloud/storage to v4 ([#561](https://www.github.com/googleapis/nodejs-bigquery/issues/561)) ([0ec07f9](https://www.github.com/googleapis/nodejs-bigquery/commit/0ec07f994e0e9567025d1c96ad65f9a057a65344))
+
 ## [4.3.0](https://www.github.com/googleapis/nodejs-bigquery/compare/v4.2.1...v4.3.0) (2019-10-09)
 
 
