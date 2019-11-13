@@ -873,7 +873,7 @@ describe('BigQuery', () => {
           assert.deepStrictEqual(err.errors![0], {
             errors: [
               {
-                message: 'Conversion from bool to string is unsupported.',
+                message: 'Conversion from bool to std::string is unsupported.',
                 reason: 'invalid',
               },
             ],
