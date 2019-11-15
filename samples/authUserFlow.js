@@ -19,22 +19,23 @@
 // const projectId = 'google.com:bq-rampup'
 
 // [START bigquery_auth_user_flow]
-function authFlow(keyPath = './oauth2.keys.json') {
-  /**
-   * TODO(developer): Uncomment the following lines before running the sample.
-   */
-  const projectId = 'google.com:bq-rampup';
-  const keys = require(keyPath);
+function authFlow(keyPath = './oauth2.keys.json', projectId = 'projectId') {
   /**
    * TODO(developer):
+   * Save Project ID as environment variable PROJECT_ID="project_id"
+   *
+   *
    * Obtain a refresh token by following instructions at
    * https://github.com/googleapis/google-auth-library-nodejs
    *
    * Once a refresh token is obtained,
    * save as environment variable REFRESH_TOKEN='my_refresh_token'
    *
-   * Uncomment the following lines before running the sample.
+   * Uncomment the following line before running the sample.
    */
+  // const projectId = process.env.PROJECT_ID;
+  const keys = require(keyPath);
+
   const credentials = {
     type: 'authorized_user',
     client_id: keys.installed.client_id,

@@ -29,10 +29,11 @@ describe('authUserFlow()', function() {
     sinon.stub(authUserFlow.main, 'authFlow').returns(credentials);
   });
   after(async () => {
-    await bigquery
-      .dataset(datasetId)
-      .delete({force: true})
-      .catch(console.warn);
+    try {
+      await bigquery.dataset(datasetId).delete({force: true});
+    } catch(err) {
+      console.warn(err);
+    }
   });
 
   it('should run a query', async function() {
