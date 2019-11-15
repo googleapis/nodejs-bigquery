@@ -1,4 +1,4 @@
-6/**
+/**
  * Copyright 2019 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,14 +16,15 @@
 
 'use strict';
 
+// const projectId = 'google.com:bq-rampup'
 
 // [START bigquery_auth_user_flow]
 function authFlow(keyPath = './oauth2.keys.json') {
   /**
    * TODO(developer): Uncomment the following lines before running the sample.
    */
-  // const projectId = projectId
-  // const keys = require(keyPath);
+  const projectId = 'google.com:bq-rampup';
+  const keys = require(keyPath);
   /**
    * TODO(developer):
    * Obtain a refresh token by following instructions at
@@ -38,27 +39,25 @@ function authFlow(keyPath = './oauth2.keys.json') {
     type: 'authorized_user',
     client_id: keys.installed.client_id,
     client_secret: keys.installed.client_secret,
-    refresh_token: process.env.REFRESH_TOKEN
-  }
+    refresh_token: process.env.REFRESH_TOKEN,
+  };
 
-  return credentials
+  return {
+    projectId,
+    credentials,
+  };
 }
 // [END bigquery_auth_user_flow]
-
-async function query(projectId) {
-  const credentials = authFlow()
 // [START bigquery_auth_user_query]
-const {BigQuery} = require('@google-cloud/bigquery');
-
-const bigquery = new BigQuery({
-  projectId,
-  credentials
-});
+async function query() {
+  const {BigQuery} = require('@google-cloud/bigquery');
+  const credentials = main.authFlow();
+  const bigquery = new BigQuery(credentials);
   // Queries the U.S. given names dataset for the state of Texas.
-  const query = `SELECT name
-          FROM \`bigquery-public-data.usa_names.usa_1910_2013\`
-          WHERE state = 'TX'
-          LIMIT 100`;
+  const query = ` SELECT name, SUM(number) as total
+  FROM \`bigquery-public-data.usa_names.usa_1910_current\`
+  WHERE name = 'William'
+  GROUP BY name;`;
 
   // For all options, see https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs/query
   const options = {
@@ -75,10 +74,14 @@ const bigquery = new BigQuery({
   // Print the results
   console.log('Rows:');
   rows.forEach(row => console.log(row));
+
+  return rows;
 }
-// [END bigquery_auth_user_query]
-// query(projectId);
-module.exports = {
+const main = {
   query,
-  authFlow
+  authFlow,
 };
+module.exports = {
+  main,
+};
+// [END bigquery_auth_user_query]
