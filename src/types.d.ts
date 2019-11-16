@@ -493,6 +493,21 @@ declare namespace bigquery {
     skipLeadingRows?: string;
   };
 
+  /**
+   * Data split result. This contains references to the training and evaluation
+   * data tables that were used to train the model.
+   */
+  type IDataSplitResult = {
+    /**
+     * Table reference of the evaluation data after split.
+     */
+    evaluationTable?: ITableReference;
+    /**
+     * Table reference of the training data after split.
+     */
+    trainingTable?: ITableReference;
+  };
+
   type IDataset = {
     /**
      * [Optional] An array of objects that define dataset access for one or more entities. You can set this property when inserting or updating a dataset in order to control who is allowed to access the data. If unspecified at dataset creation time, BigQuery adds default dataset access for the following entities: access.specialGroup: projectReaders; access.role: READER; access.specialGroup: projectWriters; access.role: WRITER; access.specialGroup: projectOwners; access.role: OWNER; access.userByEmail: [dataset creator email]; access.role: OWNER;
@@ -2791,7 +2806,8 @@ declare namespace bigquery {
     kmeansInitializationMethod?:
       | 'KMEANS_INITIALIZATION_METHOD_UNSPECIFIED'
       | 'RANDOM'
-      | 'CUSTOM';
+      | 'CUSTOM'
+      | 'KMEANS_PLUS_PLUS';
     /**
      * L1 regularization coefficient.
      */
@@ -2857,6 +2873,11 @@ declare namespace bigquery {
    * Information about a single training query run for the model.
    */
   type ITrainingRun = {
+    /**
+     * Data split result of the training run. Only set when the input data is
+     * actually split.
+     */
+    dataSplitResult?: IDataSplitResult;
     /**
      * The evaluation metrics over training/eval data that were computed at the
      * end of training.
