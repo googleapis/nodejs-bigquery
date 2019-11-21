@@ -1732,6 +1732,8 @@ class Table extends common.ServiceObject {
    *
    * @param {object|object[]} rows The rows to insert into the table.
    * @param {object} [options] Configuration object.
+   * @param {boolean} [options.createInsertId=true] Automatically insert a
+   *     default row id when one is not provided.
    * @param {boolean} [options.ignoreUnknownValues=false] Accept rows that contain
    *     values that do not match the schema. The unknown values are ignored.
    * @param {boolean} [options.raw] If `true`, the `rows` argument is expected to
