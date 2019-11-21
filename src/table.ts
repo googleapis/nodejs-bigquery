@@ -69,6 +69,7 @@ export type JobMetadataResponse = [JobMetadata];
 export type RowMetadata = any;
 
 export type InsertRowsOptions = bigquery.ITableDataInsertAllRequest & {
+  createInsertId?: boolean;
   raw?: boolean;
   schema?: string | {};
 };
@@ -90,6 +91,11 @@ export type RowsCallback = PagedCallback<
   GetRowsOptions,
   bigquery.ITableDataList | bigquery.ITable
 >;
+
+export interface InsertRow {
+  insertId?: string;
+  json?: bigquery.IJsonObject;
+}
 
 export type TableRow = bigquery.ITableRow;
 export type TableRowField = bigquery.ITableCell;
@@ -1861,16 +1867,19 @@ class Table extends common.ServiceObject {
       throw new Error('You must provide at least 1 row to be inserted.');
     }
 
-    const json = extend(true, {}, options, {
-      rows,
-    });
+    const json = extend(true, {}, options, {rows});
 
     if (!options.raw) {
       json.rows = rows.map((row: RowMetadata) => {
-        return {
-          insertId: uuid.v4(),
-          json: Table.encodeValue_(row),
+        const encoded: InsertRow = {
+          json: Table.encodeValue_(row)!,
         };
+
+        if (options.createInsertId !== false) {
+          encoded.insertId = uuid.v4();
+        }
+
+        return encoded;
       });
     }
 

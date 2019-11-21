@@ -2047,6 +2047,15 @@ describe('BigQuery/Table', () => {
       table.insert([data[0]], done);
     });
 
+    it('should omit the insertId if createInsertId is false', done => {
+      table.request = (reqOpts: DecorateRequestOptions) => {
+        assert.strictEqual(reqOpts.json.rows[0].insertId, undefined);
+        done();
+      };
+
+      table.insert([data[0]], {createInsertId: false}, done);
+    });
+
     it('should execute callback with API response', done => {
       const apiResponse = {insertErrors: []};
 
