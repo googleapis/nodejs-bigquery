@@ -16,9 +16,10 @@
 
 // 'use strict';
 
-// let authUserFlow = require('../authUserFlow.js');
 const mocha = require('mocha');
 const describe = mocha.describe;
+const before = mocha.before;
+const after = mocha.after;
 const it = mocha.it;
 const sinon = require('sinon');
 require('chai').use(require('sinon-chai'));
@@ -49,11 +50,6 @@ describe('authUserFlow()', function() {
 
     generateUrlStub = sinon.stub().returns('https://example.com');
     tokenStub = sinon.stub().returns({tokens: 'tokens'});
-
-    mockClient = sinon.stub().returns({
-      generateAuthUrl: generateUrlStub,
-      getToken: tokenStub,
-    });
 
     authUserFlow = proxyquire('../authUserFlow.js', {
       'google-auth-library': {
