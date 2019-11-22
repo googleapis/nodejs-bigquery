@@ -678,6 +678,18 @@ describe('BigQuery', () => {
   });
 
   describe('BigQuery/Routine', () => {
+    before(() => {
+      const routineId = `${bigquery.projectId}.${dataset.id}.my_ddl_routine`;
+
+      return bigquery.query(`
+        CREATE FUNCTION \`${routineId}\`(
+          arr ARRAY<STRUCT<name STRING, val INT64>>
+        ) AS (
+          (SELECT SUM(IF(elem.name = "foo",elem.val,null)) FROM UNNEST(arr) AS elem)
+        )
+      `);
+    });
+
     after(async () => {
       const [routines] = await dataset.getRoutines();
       return Promise.all(routines.map(routine => routine.delete()));
@@ -701,21 +713,9 @@ describe('BigQuery', () => {
       });
     });
 
-    it('should create a routine via DDL', () => {
-      const routineId = `${bigquery.projectId}.${dataset.id}.my_ddl_routine`;
-
-      return bigquery.query(`
-        CREATE FUNCTION \`${routineId}\`(
-          arr ARRAY<STRUCT<name STRING, val INT64>>
-        ) AS (
-          (SELECT SUM(IF(elem.name = "foo",elem.val,null)) FROM UNNEST(arr) AS elem)
-        )
-      `);
-    });
-
     it('should list all the routines', async () => {
       const [routines] = await dataset.getRoutines();
-      assert.strictEqual(routines.length, 2);
+      assert.ok(routines.length > 0);
       assert.ok(routines[0] instanceof Routine);
     });
 
@@ -729,20 +729,20 @@ describe('BigQuery', () => {
           routines.push(routine);
         })
         .on('end', () => {
-          assert.strictEqual(routines.length, 2);
+          assert.ok(routines.length > 0);
           assert.ok(routines[0] instanceof Routine);
           done();
         });
     });
 
     it('should check to see if a routine exists', async () => {
-      const routine = dataset.routine('my_routine');
+      const routine = dataset.routine('my_ddl_routine');
       const [exists] = await routine.exists();
       assert.ok(exists);
     });
 
     it('should update an existing routine', async () => {
-      const routine = dataset.routine('my_routine');
+      const routine = dataset.routine('my_ddl_routine');
       const description = 'A routine!';
 
       await routine.setMetadata({description});

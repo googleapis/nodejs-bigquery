@@ -275,7 +275,7 @@ class Routine extends common.ServiceObject {
         return;
       }
 
-      const updatedMetadata = extend(true, {}, metadata, fullMetadata);
+      const updatedMetadata = extend(true, {}, fullMetadata, metadata);
       super.setMetadata(updatedMetadata, callback!);
     });
   }

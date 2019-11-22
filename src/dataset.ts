@@ -834,7 +834,7 @@ class Dataset extends ServiceObject {
    * });
    *
    * @example <caption>To control how many API requests are made and page through the results manually, set `autoPaginate` to `false`.</caption>
-   * function manualPaginationCallback(err, tables, nextQuery, apiResponse) {
+   * function manualPaginationCallback(err, routines, nextQuery, apiResponse) {
    *   if (nextQuery) {
    *     // More results exist.
    *     dataset.getRoutines(nextQuery, manualPaginationCallback);
@@ -846,7 +846,7 @@ class Dataset extends ServiceObject {
    * }, manualPaginationCallback);
    *
    * @example <caption>If the callback is omitted a Promise will be returned</caption>
-   *  const [routines] = await dataset.getRoutines();
+   * const [routines] = await dataset.getRoutines();
    */
   getRoutines(
     optsOrCb?: GetRoutinesOptions | GetRoutinesCallback,
