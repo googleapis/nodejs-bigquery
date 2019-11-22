@@ -1885,6 +1885,7 @@ class Table extends common.ServiceObject {
       });
     }
 
+    delete json.createInsertId;
     delete json.raw;
 
     let schema: string | {};

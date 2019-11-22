@@ -2048,8 +2048,9 @@ describe('BigQuery/Table', () => {
     });
 
     it('should omit the insertId if createInsertId is false', done => {
-      table.request = (reqOpts: DecorateRequestOptions) => {
-        assert.strictEqual(reqOpts.json.rows[0].insertId, undefined);
+      table.request = ({json}: DecorateRequestOptions) => {
+        assert.strictEqual(json.rows[0].insertId, undefined);
+        assert.strictEqual(json.createInsertId, undefined);
         done();
       };
 
