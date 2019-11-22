@@ -25,10 +25,6 @@ function startRl() {
     output: process.stdout,
   });
 
-  rl.on('close', function() {
-    process.exit(0);
-  });
-
   return rl;
 }
 
@@ -60,9 +56,8 @@ async function getRedirectUrl() {
     `Please visit this URL to authorize this application: ${authorizeUrl}`
   );
   rl.question('Enter the authorization code: ', function(code) {
-    main.exchangeCode(code).then(function() {
-      rl.close();
-    });
+    rl.close();
+    return main.exchangeCode(code);
   });
 }
 
@@ -85,19 +80,20 @@ async function exchangeCode(code) {
 }
 
 // [START bigquery_auth_user_flow]
-function authFlow(projectId = 'project_id') {
+async function authFlow(projectId = 'project_id') {
   /**
    * TODO(developer):
    * Save Project ID as environment variable PROJECT_ID="project_id"
    * Uncomment the following line before running the sample.
    */
   // const projectId = process.env.PROJECT_ID;
+  const tokens = await main.getRedirectUrl();
 
   const credentials = {
     type: 'authorized_user',
     client_id: keys.installed.client_id,
     client_secret: keys.installed.client_secret,
-    refresh_token: process.env.REFRESH_TOKEN,
+    refresh_token: tokens.refresh_token,
   };
 
   return {
@@ -107,9 +103,8 @@ function authFlow(projectId = 'project_id') {
 }
 // [END bigquery_auth_user_flow]
 // [START bigquery_auth_user_query]
-async function query() {
+async function query(credentials) {
   const {BigQuery} = require('@google-cloud/bigquery');
-  const credentials = main.authFlow();
   const bigquery = new BigQuery(credentials);
   // Queries the U.S. given names dataset for the state of Texas.
   const query = ` SELECT name, SUM(number) as total
@@ -140,8 +135,10 @@ async function query() {
   }
 }
 
-// getRedirectUrl();
-// main.query();
+async function run() {
+  const credentials = await main.authFlow();
+  main.query(credentials);
+}
 
 const main = {
   query,
@@ -153,4 +150,6 @@ const main = {
 module.exports = {
   main,
 };
+
+run()
 // [END bigquery_auth_user_query]
