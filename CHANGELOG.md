@@ -4,6 +4,14 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+### [4.4.1](https://www.github.com/googleapis/nodejs-bigquery/compare/v4.4.0...v4.4.1) (2019-11-25)
+
+
+### Bug Fixes
+
+* **deps:** update dependency yargs to v15 ([#579](https://www.github.com/googleapis/nodejs-bigquery/issues/579)) ([92119e3](https://www.github.com/googleapis/nodejs-bigquery/commit/92119e3b23874263d9529283194a149b358b7c9f))
+* **docs:** snippets are now replaced in jsdoc comments ([#573](https://www.github.com/googleapis/nodejs-bigquery/issues/573)) ([a0d3538](https://www.github.com/googleapis/nodejs-bigquery/commit/a0d3538ad83b356918cabbd2bbfaf405e0a8272d))
+
 ## [4.4.0](https://www.github.com/googleapis/nodejs-bigquery/compare/v4.3.0...v4.4.0) (2019-11-08)
 
 
