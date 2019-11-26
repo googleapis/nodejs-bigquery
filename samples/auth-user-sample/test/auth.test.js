@@ -16,6 +16,7 @@
 
 // 'use strict';
 
+const {assert} = require('chai');
 const sinon = require('sinon');
 const proxyquire = require('proxyquire');
 const mocha = require('mocha');
@@ -36,7 +37,7 @@ describe('authUserFlow()', function() {
 
   it('should call sample client authentication and query', async () => {
     const output = await authUserFlow.run();
-    sinon.assert.match(output[0].name, 'William');
+    assert.strictEqual(output[0].name, 'William');
     sinon.assert.called(authenticateStub);
   });
 });
