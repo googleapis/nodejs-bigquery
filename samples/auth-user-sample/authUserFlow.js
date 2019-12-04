@@ -15,18 +15,15 @@
  */
 
 'use strict';
-
+// [START bigquery_auth_user_query]
+// [START bigquery_auth_user_flow]
 const {OAuth2Client} = require('google-auth-library');
-const readline = require('readline');
+const readline = require('readline-promise').default;
 
 function startRl() {
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
-  });
-
-  rl.on('close', function() {
-    process.exit(0);
   });
 
   return rl;
@@ -59,16 +56,16 @@ async function getRedirectUrl() {
   console.info(
     `Please visit this URL to authorize this application: ${authorizeUrl}`
   );
-  rl.question('Enter the authorization code: ', function(code) {
-    main.exchangeCode(code).then(function() {
-      rl.close();
-    });
-  });
+
+  const code = await rl.questionAsync('Enter the authorization code: ');
+  const tokens = await main.exchangeCode(code);
+  rl.close();
+
+  return tokens;
 }
 
 // Exchange an authorization code for an access token
 async function exchangeCode(code) {
-  // Which should be downloaded from the Google Developers Console.
   const oAuth2Client = new OAuth2Client(
     keys.installed.client_id,
     keys.installed.client_secret,
@@ -84,20 +81,21 @@ async function exchangeCode(code) {
   }
 }
 
-// [START bigquery_auth_user_flow]
-function authFlow(projectId = 'project_id') {
+async function authFlow(projectId = 'project_id') {
   /**
    * TODO(developer):
    * Save Project ID as environment variable PROJECT_ID="project_id"
    * Uncomment the following line before running the sample.
    */
-  // const projectId = process.env.PROJECT_ID;
+  // projectId = process.env.PROJECT_ID;
+
+  const tokens = await main.getRedirectUrl();
 
   const credentials = {
     type: 'authorized_user',
     client_id: keys.installed.client_id,
     client_secret: keys.installed.client_secret,
-    refresh_token: process.env.REFRESH_TOKEN,
+    refresh_token: tokens.refresh_token,
   };
 
   return {
@@ -106,14 +104,13 @@ function authFlow(projectId = 'project_id') {
   };
 }
 // [END bigquery_auth_user_flow]
-// [START bigquery_auth_user_query]
 async function query() {
   const {BigQuery} = require('@google-cloud/bigquery');
-  const credentials = main.authFlow();
-  const bigquery = new BigQuery(credentials);
 
+  const credentials = await main.authFlow();
+  const bigquery = new BigQuery(credentials);
   // Queries the U.S. given names dataset for the state of Texas.
-  const query = `SELECT name, SUM(number) as total
+  const query = ` SELECT name, SUM(number) as total
   FROM \`bigquery-public-data.usa_names.usa_1910_current\`
   WHERE name = 'William'
   GROUP BY name;`;
@@ -124,21 +121,22 @@ async function query() {
   };
 
   // Run the query as a job
-  const [job] = await bigquery.createQueryJob(options);
-  console.log(`Job ${job.id} started.`);
+  try {
+    const [job] = await bigquery.createQueryJob(options);
+    console.log(`Job ${job.id} started.`);
 
-  // Wait for the query to finish
-  const [rows] = await job.getQueryResults();
+    // Wait for the query to finish
+    const [rows] = await job.getQueryResults();
 
-  // Print the results
-  console.log('Rows:');
-  rows.forEach(row => console.log(row));
+    // Print the results
+    console.log('Rows:');
+    rows.forEach(row => console.log(row));
 
-  return rows;
+    return rows;
+  } catch (err) {
+    console.log(err);
+  }
 }
-
-// getRedirectUrl();
-// main.query();
 
 const main = {
   query,
@@ -150,5 +148,10 @@ const main = {
 module.exports = {
   main,
 };
+
+/**
+ * TODO(developer):
+ * Uncomment the following line to run the sample.
+ */
+// query();
 // [END bigquery_auth_user_query]
-// [END bigquery_auth_user_flow]

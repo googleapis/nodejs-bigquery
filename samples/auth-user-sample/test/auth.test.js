@@ -14,30 +14,70 @@
  * limitations under the License.
  */
 
-// 'use strict';
+'use strict';
 
-const {assert} = require('chai');
 const sinon = require('sinon');
+const {assert} = require('chai');
 const proxyquire = require('proxyquire');
-const mocha = require('mocha');
-const describe = mocha.describe;
-const before = mocha.before;
-const it = mocha.it;
 
 describe('authUserFlow()', function() {
-  let authUserFlow, authenticateStub;
+  let readlineMock, generateUrlStub, questionStub, tokenStub, authUserFlow;
 
   before(async () => {
-    authenticateStub = sinon.stub().returns({});
+    questionStub = sinon.stub();
+
+    readlineMock = {
+      questionAsync: questionStub,
+      close: sinon.stub(),
+    };
+
+    generateUrlStub = sinon.stub().returns('https://example.com');
+    tokenStub = sinon.stub().returns({tokens: 'tokens'});
 
     authUserFlow = proxyquire('../authUserFlow.js', {
-      './sampleClient': {authenticate: authenticateStub},
+      'google-auth-library': {
+        OAuth2Client: sinon.stub().callsFake(() => {
+          return {
+            generateAuthUrl: generateUrlStub,
+            getToken: tokenStub,
+          };
+        }),
+      },
     });
   });
 
-  it('should call sample client authentication and query', async () => {
-    const output = await authUserFlow.run();
+  afterEach(function() {
+    sinon.restore();
+  });
+
+  it('should exchange code for tokens', async function() {
+    const output = await authUserFlow.main.exchangeCode('abc123');
+    assert.strictEqual(output, 'tokens');
+    sinon.assert.calledWith(tokenStub, 'abc123');
+  });
+
+  it('should return project id and credentials', async function() {
+    sinon
+      .stub(authUserFlow.main, 'getRedirectUrl')
+      .returns({refresh_token: 'token'});
+    const output = await authUserFlow.main.authFlow('my_project');
+    assert.strictEqual(output.projectId, 'my_project');
+  });
+
+  it('should get redirect url', async function() {
+    const startStub = sinon
+      .stub(authUserFlow.main, 'startRl')
+      .returns(readlineMock);
+    await authUserFlow.main.getRedirectUrl();
+    sinon.assert.called(startStub);
+    sinon.assert.called(questionStub);
+    sinon.assert.called(generateUrlStub);
+  });
+
+  it('should run a query', async function() {
+    const authFlowStub = sinon.stub(authUserFlow.main, 'authFlow').returns({});
+    const output = await authUserFlow.main.query();
     assert.strictEqual(output[0].name, 'William');
-    sinon.assert.called(authenticateStub);
+    sinon.assert.called(authFlowStub);
   });
 });
