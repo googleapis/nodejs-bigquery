@@ -1,20 +1,19 @@
-/**
- * Copyright 2019 Google LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2019 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 'use strict';
+
 // [START bigquery_auth_user_query]
 // [START bigquery_auth_user_flow]
 const {OAuth2Client} = require('google-auth-library');
@@ -72,13 +71,9 @@ async function exchangeCode(code) {
     keys.installed.redirect_uris[0]
   );
 
-  try {
-    const r = await oAuth2Client.getToken(code);
-    console.info(r.tokens);
-    return r.tokens;
-  } catch (err) {
-    console.log(err);
-  }
+  const r = await oAuth2Client.getToken(code);
+  console.info(r.tokens);
+  return r.tokens;
 }
 
 async function authFlow(projectId = 'project_id') {
@@ -109,6 +104,7 @@ async function query() {
 
   const credentials = await main.authFlow();
   const bigquery = new BigQuery(credentials);
+
   // Queries the U.S. given names dataset for the state of Texas.
   const query = ` SELECT name, SUM(number) as total
   FROM \`bigquery-public-data.usa_names.usa_1910_current\`
@@ -149,9 +145,7 @@ module.exports = {
   main,
 };
 
-/**
- * TODO(developer):
- * Uncomment the following line to run the sample.
- */
-// query();
+if (module === require.main) {
+  query().catch(console.error);
+}
 // [END bigquery_auth_user_query]
