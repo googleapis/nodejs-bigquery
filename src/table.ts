@@ -136,6 +136,18 @@ export type FormattedMetadata = bigquery.ITable;
 export type TableSchema = bigquery.ITableSchema;
 export type TableField = bigquery.ITableFieldSchema;
 
+interface PartialFailureError extends Error {
+  errors: PartialFailure[];
+  // tslint:disable-next-line: no-any
+  response: any;
+}
+
+interface PartialFailure {
+  message: string;
+  reason: string;
+  row: RowMetadata;
+}
+
 /**
  * The file formats accepted by BigQuery.
  *
@@ -1870,6 +1882,79 @@ class Table extends common.ServiceObject {
         ? optionsOrCallback
         : (cb as InsertRowsCallback);
 
+    let schema: string | {};
+
+    if (options.schema) {
+      schema = options.schema;
+    }
+
+    const createTableAndRetry = () => {
+      this.create(
+        {
+          schema,
+        },
+        (err, table, resp) => {
+          if (err && err.code !== 409) {
+            callback!(err, resp);
+            return;
+          }
+
+          setTimeout(() => {
+            this.insert(rows, options, callback!);
+          }, 60000);
+        }
+      );
+    };
+
+    this._insertWithRetry(rows, options).then(
+      resp => callback(null, resp),
+      err => {
+        if ((err as common.ApiError).code === 404 && schema) {
+          setTimeout(createTableAndRetry, Math.random() * 60000);
+          return;
+        }
+        callback(err, null);
+      }
+    );
+  }
+
+  /**
+   * @private
+   */
+  async _insertWithRetry(
+    rows: RowMetadata | RowMetadata[],
+    options: InsertRowsOptions
+  ) {
+    const maxRetries = 2;
+    let attempts = 0;
+    let error: Error | null = null;
+
+    while (attempts++ !== maxRetries) {
+      error = null;
+
+      try {
+        return await this._insert(rows, options);
+      } catch (e) {
+        error = e;
+
+        if (!e.errors) {
+          break;
+        }
+
+        rows = (e as PartialFailureError).errors.map(({row}) => row);
+      }
+    }
+
+    throw error;
+  }
+
+  /**
+   * @private
+   */
+  async _insert(
+    rows: RowMetadata | RowMetadata[],
+    options: InsertRowsOptions
+  ): Promise<bigquery.ITableDataInsertAllResponse> {
     rows = arrify(rows) as RowMetadata[];
 
     if (!rows.length) {
@@ -1894,73 +1979,37 @@ class Table extends common.ServiceObject {
 
     delete json.createInsertId;
     delete json.raw;
+    delete json.schema;
 
-    let schema: string | {};
+    const [resp] = await this.request({
+      method: 'POST',
+      uri: '/insertAll',
+      json,
+    });
 
-    if (options.schema) {
-      schema = options.schema;
-      delete json.schema;
-    }
-
-    const createTableAndRetry = () => {
-      this.create(
-        {
-          schema,
-        },
-        (err, table, resp) => {
-          if (err && err.code !== 409) {
-            callback!(err, resp);
-            return;
-          }
-
-          setTimeout(() => {
-            this.insert(rows, options, callback!);
-          }, 60000);
-        }
-      );
-    };
-
-    this.request(
-      {
-        method: 'POST',
-        uri: '/insertAll',
-        json,
-      },
-      (err, resp) => {
-        if (err) {
-          if ((err as common.ApiError).code === 404 && schema) {
-            setTimeout(createTableAndRetry, Math.random() * 60000);
-          } else {
-            callback!(err, resp);
-          }
-          return;
-        }
-
-        const partialFailures = (resp.insertErrors || []).map(
-          (insertError: GoogleErrorBody) => {
+    const partialFailures = (resp.insertErrors || []).map(
+      (insertError: GoogleErrorBody) => {
+        return {
+          errors: insertError.errors!.map(error => {
             return {
-              errors: insertError.errors!.map(error => {
-                return {
-                  message: error.message,
-                  reason: error.reason,
-                };
-              }),
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              row: rows[(insertError as any).index],
+              message: error.message,
+              reason: error.reason,
             };
-          }
-        );
-
-        if (partialFailures.length > 0) {
-          err = new common.util.PartialFailureError({
-            errors: partialFailures,
-            response: resp,
-          } as GoogleErrorBody);
-        }
-
-        callback!(err, resp);
+          }),
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          row: rows[(insertError as any).index],
+        };
       }
     );
+
+    if (partialFailures.length > 0) {
+      throw new common.util.PartialFailureError({
+        errors: partialFailures,
+        response: resp,
+      } as GoogleErrorBody);
+    }
+
+    return resp;
   }
 
   load(
