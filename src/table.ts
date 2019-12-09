@@ -73,6 +73,7 @@ export type RowMetadata = any;
 
 export type InsertRowsOptions = bigquery.ITableDataInsertAllRequest & {
   createInsertId?: boolean;
+  maxAttempts?: number;
   raw?: boolean;
   schema?: string | {};
 };
@@ -136,13 +137,7 @@ export type FormattedMetadata = bigquery.ITable;
 export type TableSchema = bigquery.ITableSchema;
 export type TableField = bigquery.ITableFieldSchema;
 
-interface PartialFailureError extends Error {
-  errors: PartialFailure[];
-  // tslint:disable-next-line: no-any
-  response: any;
-}
-
-interface PartialFailure {
+export interface PartialInsertFailure {
   message: string;
   reason: string;
   row: RowMetadata;
@@ -1755,6 +1750,8 @@ class Table extends common.ServiceObject {
    *     default row id when one is not provided.
    * @param {boolean} [options.ignoreUnknownValues=false] Accept rows that contain
    *     values that do not match the schema. The unknown values are ignored.
+   * @param {number} [options.maxAttempts=2] Number of times partial errors
+   *     should retry for failed rows until giving up.
    * @param {boolean} [options.raw] If `true`, the `rows` argument is expected to
    *     be formatted as according to the
    *     [specification](https://cloud.google.com/bigquery/docs/reference/v2/tabledata/insertAll).
@@ -1882,76 +1879,92 @@ class Table extends common.ServiceObject {
         ? optionsOrCallback
         : (cb as InsertRowsCallback);
 
-    let schema: string | {};
-
-    if (options.schema) {
-      schema = options.schema;
-    }
-
-    const createTableAndRetry = () => {
-      this.create(
-        {
-          schema,
-        },
-        (err, table, resp) => {
-          if (err && err.code !== 409) {
-            callback!(err, resp);
-            return;
-          }
-
-          setTimeout(() => {
-            this.insert(rows, options, callback!);
-          }, 60000);
+    this._insertWithRetry(rows, options)
+      .catch(err => {
+        if ((err as common.ApiError).code === 404 && options.schema) {
+          return this._createTableAndInsert(rows, options);
         }
+        throw err;
+      })
+      .then(
+        resp => callback(null, resp),
+        err => callback(err, null)
       );
-    };
-
-    this._insertWithRetry(rows, options).then(
-      resp => callback(null, resp),
-      err => {
-        if ((err as common.ApiError).code === 404 && schema) {
-          setTimeout(createTableAndRetry, Math.random() * 60000);
-          return;
-        }
-        callback(err, null);
-      }
-    );
   }
 
   /**
+   * Attempts to create the table before inserting the rows.
+   *
    * @private
+   *
+   * @param {object|object[]} rows The rows to insert.
+   * @param {object} options Insert options.
+   * @returns {Promise}
    */
-  async _insertWithRetry(
+  private async _createTableAndInsert(
     rows: RowMetadata | RowMetadata[],
     options: InsertRowsOptions
   ) {
-    const maxRetries = 2;
-    let attempts = 0;
-    let error: Error | null = null;
+    const {schema} = options;
+    const delay = 60000;
 
-    while (attempts++ !== maxRetries) {
-      error = null;
+    try {
+      await this.create({schema});
+    } catch (e) {
+      if (e && e.code !== 409) {
+        throw e;
+      }
+    }
 
+    await new Promise(resolve => setTimeout(resolve, delay));
+    return (await this.insert(rows, options))[0];
+  }
+
+  /**
+   * This method will attempt to insert rows while retrying any partial failures
+   * that occur along the way. Because partial insert failures are returned
+   * differently, we can't depend on our usual retry strategy.
+   *
+   * @private
+   *
+   * @param {object|object[]} rows The rows to insert.
+   * @param {object} options Insert options.
+   * @returns {Promise}
+   */
+  private async _insertWithRetry(
+    rows: RowMetadata | RowMetadata[],
+    options: InsertRowsOptions
+  ) {
+    const maxAttempts = options.maxAttempts || 2;
+    let error: Error;
+
+    for (let attempts = 0; attempts <= maxAttempts; attempts++) {
       try {
         return await this._insert(rows, options);
       } catch (e) {
         error = e;
+        rows = ((e.errors || []) as PartialInsertFailure[])
+          .filter(err => !!err.row)
+          .map(err => err.row);
 
-        if (!e.errors) {
-          break;
-        }
-
-        rows = (e as PartialFailureError).errors.map(({row}) => row);
+        if (!rows.length) break;
       }
     }
 
-    throw error;
+    throw error!;
   }
 
   /**
+   * This method does the bulk of the work for processing options and making the
+   * network request.
+   *
    * @private
+   *
+   * @param {object|object[]} rows The rows to insert.
+   * @param {object} options Insert options.
+   * @returns {Promise}
    */
-  async _insert(
+  private async _insert(
     rows: RowMetadata | RowMetadata[],
     options: InsertRowsOptions
   ): Promise<bigquery.ITableDataInsertAllResponse> {
@@ -1978,6 +1991,7 @@ class Table extends common.ServiceObject {
     }
 
     delete json.createInsertId;
+    delete json.maxAttempts;
     delete json.raw;
     delete json.schema;
 
