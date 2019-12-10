@@ -1750,8 +1750,8 @@ class Table extends common.ServiceObject {
    *     default row id when one is not provided.
    * @param {boolean} [options.ignoreUnknownValues=false] Accept rows that contain
    *     values that do not match the schema. The unknown values are ignored.
-   * @param {number} [options.maxAttempts=2] Number of times partial errors
-   *     should retry for failed rows until giving up.
+   * @param {number} [options.maxAttempts=3] Number of attempts to try and
+   *     insert rows.
    * @param {boolean} [options.raw] If `true`, the `rows` argument is expected to
    *     be formatted as according to the
    *     [specification](https://cloud.google.com/bigquery/docs/reference/v2/tabledata/insertAll).
@@ -1911,7 +1911,7 @@ class Table extends common.ServiceObject {
     try {
       await this.create({schema});
     } catch (e) {
-      if (e && e.code !== 409) {
+      if (e.code !== 409) {
         throw e;
       }
     }
@@ -1935,10 +1935,10 @@ class Table extends common.ServiceObject {
     rows: RowMetadata | RowMetadata[],
     options: InsertRowsOptions
   ) {
-    const maxAttempts = options.maxAttempts || 2;
+    const maxAttempts = options.maxAttempts || 3;
     let error: Error;
 
-    for (let attempts = 0; attempts <= maxAttempts; attempts++) {
+    for (let attempts = 0; attempts < maxAttempts; attempts++) {
       try {
         return await this._insert(rows, options);
       } catch (e) {
