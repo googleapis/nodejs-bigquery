@@ -28,7 +28,11 @@ function startRl() {
   return rl;
 }
 
-// Download your OAuth2 configuration from the Google
+/**
+ * Download your OAuth2 configuration from the Google 
+ * Developers Console API Credentials page.
+ * https://console.cloud.google.com/apis/credentials
+ */
 const keys = require('./oauth2.keys.json');
 
 /**
