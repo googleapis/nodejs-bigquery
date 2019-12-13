@@ -29,7 +29,7 @@ function startRl() {
 }
 
 /**
- * Download your OAuth2 configuration from the Google 
+ * Download your OAuth2 configuration from the Google
  * Developers Console API Credentials page.
  * https://console.cloud.google.com/apis/credentials
  */
