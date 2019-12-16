@@ -110,7 +110,7 @@ async function query() {
   const bigquery = new BigQuery(credentials);
 
   // Queries the U.S. given names dataset for the state of Texas.
-  const query = ` SELECT name, SUM(number) as total
+  const query = `SELECT name, SUM(number) as total
   FROM \`bigquery-public-data.usa_names.usa_1910_current\`
   WHERE name = 'William'
   GROUP BY name;`;
@@ -121,21 +121,17 @@ async function query() {
   };
 
   // Run the query as a job
-  try {
-    const [job] = await bigquery.createQueryJob(options);
-    console.log(`Job ${job.id} started.`);
+  const [job] = await bigquery.createQueryJob(options);
+  console.log(`Job ${job.id} started.`);
 
-    // Wait for the query to finish
-    const [rows] = await job.getQueryResults();
+  // Wait for the query to finish
+  const [rows] = await job.getQueryResults();
 
-    // Print the results
-    console.log('Rows:');
-    rows.forEach(row => console.log(row));
+  // Print the results
+  console.log('Rows:');
+  rows.forEach(row => console.log(row));
 
-    return rows;
-  } catch (err) {
-    console.log(err);
-  }
+  return rows;
 }
 
 const main = {

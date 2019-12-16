@@ -18,7 +18,7 @@ const sinon = require('sinon');
 const {assert} = require('chai');
 const proxyquire = require('proxyquire');
 
-describe('authUserFlow()', function() {
+describe('authUserFlow()', () => {
   let readlineMock, generateUrlStub, questionStub, tokenStub, authUserFlow;
 
   before(async () => {
@@ -48,13 +48,13 @@ describe('authUserFlow()', function() {
     sinon.restore();
   });
 
-  it('should exchange code for tokens', async function() {
+  it('should exchange code for tokens', async () => {
     const output = await authUserFlow.main.exchangeCode('abc123');
     assert.strictEqual(output, 'tokens');
     sinon.assert.calledWith(tokenStub, 'abc123');
   });
 
-  it('should return project id and credentials', async function() {
+  it('should return project id and credentials', async () => {
     sinon
       .stub(authUserFlow.main, 'getRedirectUrl')
       .returns({refresh_token: 'token'});
@@ -62,7 +62,7 @@ describe('authUserFlow()', function() {
     assert.strictEqual(output.projectId, 'my_project');
   });
 
-  it('should get redirect url', async function() {
+  it('should get redirect url', async () => {
     const startStub = sinon
       .stub(authUserFlow.main, 'startRl')
       .returns(readlineMock);
@@ -72,7 +72,7 @@ describe('authUserFlow()', function() {
     sinon.assert.called(generateUrlStub);
   });
 
-  it('should run a query', async function() {
+  it('should run a query', async () => {
     const authFlowStub = sinon.stub(authUserFlow.main, 'authFlow').returns({});
     const output = await authUserFlow.main.query();
     assert.strictEqual(output[0].name, 'William');
