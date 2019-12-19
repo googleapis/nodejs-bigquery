@@ -808,6 +808,10 @@ declare namespace bigquery {
      */
     shuffleOutputBytesSpilled?: string;
     /**
+     * Slot-milliseconds used by the stage.
+     */
+    slotMs?: string;
+    /**
      * Stage start time represented as milliseconds since epoch.
      */
     startMs?: string;
@@ -3097,10 +3101,28 @@ declare namespace bigquery {
 
   namespace routines {
     /**
+     * Gets the specified routine resource by routine ID.
+     */
+    type IGetParams = {
+      /**
+       * If set, only the Routine fields in the field mask are returned in the
+       * response. If unset, all Routine fields are returned.
+       */
+      readMask?: string;
+    };
+
+    /**
      * Lists all routines in the specified dataset. Requires the READER dataset
      * role.
      */
     type IListParams = {
+      /**
+       * If set, then only the Routines matching this filter are returned.
+       * The current supported form is either "routine_type:<RoutineType>" or
+       * "routineType:<RoutineType>", where <RoutineType> is a RoutineType enum.
+       * Example: "routineType:SCALAR_FUNCTION".
+       */
+      filter?: string;
       /**
        * The maximum number of results to return in a single response page.
        * Leverage the page tokens to iterate through the entire collection.
@@ -3111,6 +3133,14 @@ declare namespace bigquery {
        * results
        */
       pageToken?: string;
+      /**
+       * If set, then only the Routine fields in the field mask, as well as
+       * project_id, dataset_id and routine_id, are returned in the response.
+       * If unset, then the following Routine fields are returned:
+       * etag, project_id, dataset_id, routine_id, routine_type, creation_time,
+       * last_modified_time, and language.
+       */
+      readMask?: string;
     };
   }
 
