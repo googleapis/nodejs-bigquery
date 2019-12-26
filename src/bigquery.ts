@@ -729,6 +729,55 @@ export class BigQuery extends common.Service {
     return BigQuery.geography(value);
   }
 
+
+  /**
+   * Return a value's provided type.
+   *
+   * @private
+   *
+   * @throws {error} If the type could not be detected.
+   *
+   * @see [Data Type]{@link https://cloud.google.com/bigquery/data-types}
+   *
+   * @param {*} value The value.
+   * @returns {string} The type detected from the value.
+   */
+  // tslint:disable-next-line no-any
+  static getProvidedType_(providedType: any): ValueType {
+    const validTypes = ['DATE', 'DATETIME', 'TIME', 'TIMESTAMP', 'BYTES', 'NUMERIC', 'ARRAY', 'BOOL', 'INT64', 'FLOAT64', 'STRUCT', 'STRING', 'GEOGRAPHY']
+    // let typeName;
+
+    if (is.array(providedType)) { 
+      return {
+        type: 'ARRAY',
+        arrayType: BigQuery.getProvidedType_(providedType[0]),
+      };
+    } else if (is.object(providedType)) {
+      return {
+        type: 'STRUCT',
+        structTypes: Object.keys(providedType).map(prop => {
+          return {
+            name: prop,
+            type: BigQuery.getProvidedType_(providedType[prop]),
+          };
+        }),
+      };
+    }
+    // what to do if the value is null, for example {key: null, type: [string]}
+    if (!validTypes.includes(providedType.toUpperCase())) {
+      throw new Error('INVALID TYPE PROVIDED')
+    } 
+    // else if (is.array(value)) {
+    //     return {
+    //       type: 'ARRAY',
+    //       arrayType: {type: 'ARRAY'},
+    //     };
+    //   }
+    else {
+      return { type: providedType };
+    }                                                                              
+  }
+
   /**
    * Detect a value's type.
    *
@@ -742,8 +791,12 @@ export class BigQuery extends common.Service {
    * @returns {string} The type detected from the value.
    */
   // tslint:disable-next-line no-any
-  static getType_(value: any): ValueType {
+  static getType_(value: any, providedType?: any): ValueType {
     let typeName;
+
+    if (providedType) {
+      return this.getProvidedType_(providedType)
+    }
 
     if (value instanceof BigQueryDate) {
       typeName = 'DATE';
@@ -758,11 +811,35 @@ export class BigQuery extends common.Service {
     } else if (value instanceof Big) {
       typeName = 'NUMERIC';
     } else if (is.array(value)) {
-      return {
-        type: 'ARRAY',
-        arrayType: BigQuery.getType_(value[0]),
-      };
-    } else if (is.boolean(value)) {
+      if (value.length === 0 || value[0] === null) {
+        console.log(value)
+        console.log(providedType)
+        console.log('****')
+        if (!providedType || providedType.length === 0) {
+          throw new Error('Type must be provided.');
+          // Type must be provided for empty array or null values
+        }
+        return {
+          type: 'ARRAY',
+          // here this makes an object recursively for arrayTypes so {arrayType: {type: array, arrayType: {typeName: string}}}
+          arrayType: BigQuery.getProvidedType_(providedType[0]),
+        };
+      } else {
+        console.log('found an array')
+        return {
+          type: 'ARRAY',
+          // here this makes an object recursively for arrayTypes so {arrayType: {type: array, arrayType: {typeName: string}}}
+          arrayType: BigQuery.getType_(value[0], providedType),
+        };
+      }
+    } else if (value === null) {
+      if (!providedType || providedType.length === 0) {
+        throw new Error('null Type must be provided.');
+        // Type must be provided for empty array or null values
+      }
+      return BigQuery.getProvidedType_(providedType)
+    }
+      else if (is.boolean(value)) {
       typeName = 'BOOL';
     } else if (is.number(value)) {
       typeName = (value as number) % 1 === 0 ? 'INT64' : 'FLOAT64';
@@ -805,12 +882,15 @@ export class BigQuery extends common.Service {
    * @returns {object} A properly-formed `queryParameter` object.
    */
   // tslint:disable-next-line no-any
-  static valueToQueryParameter_(value: any) {
+  static valueToQueryParameter_(value: any, providedType?: any ) {
     if (is.date(value)) {
       value = BigQuery.timestamp(value as Date);
     }
-
-    const parameterType = BigQuery.getType_(value);
+    // if no type is provided, set the provided type to null
+    if (!providedType) { const providedType = null }
+    console.log(providedType)
+    console.log('------')
+    const parameterType = BigQuery.getType_(value, providedType);
     const queryParameter: QueryParameter = {parameterType, parameterValue: {}};
 
     const typeName = queryParameter!.parameterType!.type!;
@@ -820,7 +900,11 @@ export class BigQuery extends common.Service {
         itemValue => {
           const value = getValue(itemValue, parameterType.arrayType!);
           if (is.object(value) || is.array(value)) {
+            if (is.array(providedType)) {
+              return BigQuery.valueToQueryParameter_(value, providedType[0]).parameterValue!
+            } else {
             return BigQuery.valueToQueryParameter_(value).parameterValue!;
+            }
           }
           return {value} as bigquery.IQueryParameterValue;
         }
@@ -1053,10 +1137,25 @@ export class BigQuery extends common.Service {
         query.queryParameters = [];
 
         // tslint:disable-next-line forin
-        for (const namedParamater in query.params) {
-          const value = query.params[namedParamater];
-          const queryParameter = BigQuery.valueToQueryParameter_(value);
-          queryParameter.name = namedParamater;
+        for (const namedParameter in query.params) {
+          const value = query.params[namedParameter];
+          let queryParameter;
+
+          // if there are types, give them to the valueToQuery Parameter
+          // do i need to check if the format of the types is an object
+          if (query.types && is.object(query.types)) {
+            console.log('types were provided')
+            queryParameter = BigQuery.valueToQueryParameter_(value, query.types[namedParameter]);
+            console.log('made queryParameter')
+            console.log(queryParameter.parameterType!.arrayType)
+            console.log(queryParameter.parameterValue!.arrayValues)
+          } else {
+            console.log('no types')
+            queryParameter = BigQuery.valueToQueryParameter_(value);
+            console.log(queryParameter)
+          }
+
+          queryParameter.name = namedParameter;
           query.queryParameters.push(queryParameter);
         }
       } else {
