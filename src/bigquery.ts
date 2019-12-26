@@ -735,17 +735,16 @@ export class BigQuery extends common.Service {
    *
    * @private
    *
-   * @throws {error} If the type could not be detected.
+   * @throws {error} If the type provided is invalid.
    *
    * @see [Data Type]{@link https://cloud.google.com/bigquery/data-types}
    *
-   * @param {*} value The value.
-   * @returns {string} The type detected from the value.
+   * @param {*} providedType The type.
+   * @returns {string} The valid type provided.
    */
   // tslint:disable-next-line no-any
   static getProvidedType_(providedType: any): ValueType {
-    const validTypes = ['DATE', 'DATETIME', 'TIME', 'TIMESTAMP', 'BYTES', 'NUMERIC', 'ARRAY', 'BOOL', 'INT64', 'FLOAT64', 'STRUCT', 'STRING', 'GEOGRAPHY']
-    // let typeName;
+    const validTypes = ['DATE', 'DATETIME', 'TIME', 'TIMESTAMP', 'BYTES', 'NUMERIC', 'BOOL', 'INT64', 'FLOAT64', 'STRING', 'GEOGRAPHY']
 
     if (is.array(providedType)) { 
       return {
@@ -763,16 +762,10 @@ export class BigQuery extends common.Service {
         }),
       };
     }
-    // what to do if the value is null, for example {key: null, type: [string]}
+
     if (!validTypes.includes(providedType.toUpperCase())) {
-      throw new Error('INVALID TYPE PROVIDED')
+      throw new Error('Invalid type provided.')
     } 
-    // else if (is.array(value)) {
-    //     return {
-    //       type: 'ARRAY',
-    //       arrayType: {type: 'ARRAY'},
-    //     };
-    //   }
     else {
       return { type: providedType };
     }                                                                              
@@ -795,6 +788,7 @@ export class BigQuery extends common.Service {
     let typeName;
 
     if (providedType) {
+      console.log('using provided type block')
       return this.getProvidedType_(providedType)
     }
 
@@ -812,30 +806,18 @@ export class BigQuery extends common.Service {
       typeName = 'NUMERIC';
     } else if (is.array(value)) {
       if (value.length === 0 || value[0] === null) {
-        console.log(value)
-        console.log(providedType)
-        console.log('****')
         if (!providedType || providedType.length === 0) {
-          throw new Error('Type must be provided.');
-          // Type must be provided for empty array or null values
+          throw new Error('Type must be provided for empty array or null array values.');
         }
-        return {
-          type: 'ARRAY',
-          // here this makes an object recursively for arrayTypes so {arrayType: {type: array, arrayType: {typeName: string}}}
-          arrayType: BigQuery.getProvidedType_(providedType[0]),
-        };
       } else {
-        console.log('found an array')
         return {
           type: 'ARRAY',
-          // here this makes an object recursively for arrayTypes so {arrayType: {type: array, arrayType: {typeName: string}}}
           arrayType: BigQuery.getType_(value[0], providedType),
         };
       }
     } else if (value === null) {
       if (!providedType || providedType.length === 0) {
-        throw new Error('null Type must be provided.');
-        // Type must be provided for empty array or null values
+        throw new Error('Type must be provided for null values.');
       }
       return BigQuery.getProvidedType_(providedType)
     }
