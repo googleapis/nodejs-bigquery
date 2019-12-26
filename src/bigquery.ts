@@ -42,7 +42,7 @@ import {
 } from './table';
 import {GoogleErrorBody} from '@google-cloud/common/build/src/util';
 import bigquery from './types';
-import { type } from 'os';
+import {type} from 'os';
 
 export interface RequestCallback<T> {
   (err: Error | null, response?: T | null): void;
@@ -776,7 +776,7 @@ export class BigQuery extends common.Service {
         }),
       };
     } else if (is.boolean(providedType)) {
-      return {type: providedType}
+      return {type: providedType};
     }
 
     if (!validTypes.includes(providedType.toUpperCase())) {
@@ -820,9 +820,9 @@ export class BigQuery extends common.Service {
       typeName = 'NUMERIC';
     } else if (is.array(value)) {
       if (value.length === 0 || value[0] === null) {
-          throw new Error(
-            'Type must be provided for empty array or null array values.'
-          );
+        throw new Error(
+          'Type must be provided for empty array or null array values.'
+        );
       } else {
         return {
           type: 'ARRAY',
@@ -1140,7 +1140,9 @@ export class BigQuery extends common.Service {
 
           if (query.types) {
             if (!is.object(query.types)) {
-              throw new Error('Provided types must match the value type passed to `params`')
+              throw new Error(
+                'Provided types must match the value type passed to `params`'
+              );
             }
             queryParameter = BigQuery.valueToQueryParameter_(
               value,
@@ -1156,16 +1158,21 @@ export class BigQuery extends common.Service {
       } else {
         if (query.types) {
           if (!is.array(query.types)) {
-            throw new Error('Provided types must match the value type passed to `params`')
+            throw new Error(
+              'Provided types must match the value type passed to `params`'
+            );
           }
 
           query.queryParameters = [];
 
           // tslint:disable-next-line: no-any
           query.params.forEach((value: any, i: number) => {
-            const queryParameter = BigQuery.valueToQueryParameter_(value, query.types[i]);
+            const queryParameter = BigQuery.valueToQueryParameter_(
+              value,
+              query.types[i]
+            );
             query.queryParameters.push(queryParameter);
-          })
+          });
         } else {
           query.queryParameters = query.params.map(
             BigQuery.valueToQueryParameter_

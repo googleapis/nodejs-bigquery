@@ -1163,7 +1163,6 @@ describe('BigQuery', () => {
               }
             );
           });
-          
         });
 
         describe('named', () => {
@@ -1293,7 +1292,7 @@ describe('BigQuery', () => {
                 params: {
                   nums: [],
                 },
-                types: {nums: ['INT64']}
+                types: {nums: ['INT64']},
               },
               (err, rows) => {
                 assert.ifError(err);

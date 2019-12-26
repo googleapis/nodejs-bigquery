@@ -1218,10 +1218,10 @@ describe('BigQuery', () => {
         key: 'value',
       };
       const POSITIONAL_PARAMS = ['value'];
-  
+
       const NAMED_TYPES = {key: 'STRING'};
 
-      const POSITIONAL_TYPES = ['STRING']
+      const POSITIONAL_TYPES = ['STRING'];
 
       it('should delete the params option', done => {
         bq.createJob = (reqOpts: JobOptions) => {
@@ -1239,7 +1239,6 @@ describe('BigQuery', () => {
         );
       });
 
- 
       describe('named', () => {
         it('should set the correct parameter mode', done => {
           bq.createJob = (reqOpts: JobOptions) => {
@@ -1305,7 +1304,7 @@ describe('BigQuery', () => {
             done();
           };
 
-          const INVALID_TYPES = {key: 'invalid'}
+          const INVALID_TYPES = {key: 'invalid'};
 
           assert.throws(() => {
             bq.createQueryJob({
@@ -1313,8 +1312,8 @@ describe('BigQuery', () => {
               params: NAMED_PARAMS,
               types: INVALID_TYPES,
             });
-          }, /Invalid type provided./)
-        })
+          }, /Invalid type provided./);
+        });
       });
 
       // tslint:disable-next-line: ban
@@ -1382,7 +1381,7 @@ describe('BigQuery', () => {
             done();
           };
 
-          const INVALID_TYPES = ['invalid']
+          const INVALID_TYPES = ['invalid'];
 
           assert.throws(() => {
             bq.createQueryJob({
@@ -1390,10 +1389,10 @@ describe('BigQuery', () => {
               params: POSITIONAL_PARAMS,
               types: INVALID_TYPES,
             });
-          }, /Invalid type provided./)
-        })
+          }, /Invalid type provided./);
+        });
       });
-    })
+    });
 
     it('should accept the dryRun options', done => {
       const options = {
