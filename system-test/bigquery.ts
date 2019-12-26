@@ -924,7 +924,8 @@ describe('BigQuery', () => {
           });
       });
 
-      describe('SQL parameters', () => {
+      // tslint:disable-next-line: ban
+      describe.only('SQL parameters', () => {
         describe('positional', () => {
           it('should work with strings', done => {
             bigquery.query(
@@ -1029,6 +1030,21 @@ describe('BigQuery', () => {
               (err, rows) => {
                 assert.ifError(err);
                 assert.strictEqual(rows!.length, 5);
+                done();
+              }
+            );
+          });
+
+          it('should work with empty arrays', done => {
+            bigquery.query(
+              {
+                query: 'SELECT * FROM UNNEST (?)',
+                params: [[]],
+                types: [['INT64']],
+              },
+              (err, rows) => {
+                assert.ifError(err);
+                assert.strictEqual(rows!.length, 0);
                 done();
               }
             );
@@ -1147,6 +1163,7 @@ describe('BigQuery', () => {
               }
             );
           });
+          
         });
 
         describe('named', () => {
@@ -1264,6 +1281,23 @@ describe('BigQuery', () => {
               (err, rows) => {
                 assert.ifError(err);
                 assert.strictEqual(rows!.length, 5);
+                done();
+              }
+            );
+          });
+
+          it('should work with empty arrays', done => {
+            bigquery.query(
+              {
+                query: 'SELECT * FROM UNNEST (@nums)',
+                params: {
+                  nums: [],
+                },
+                types: {nums: ['INT64']}
+              },
+              (err, rows) => {
+                assert.ifError(err);
+                assert.strictEqual(rows!.length, 0);
                 done();
               }
             );

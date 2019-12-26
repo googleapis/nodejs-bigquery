@@ -1217,8 +1217,11 @@ describe('BigQuery', () => {
       const NAMED_PARAMS = {
         key: 'value',
       };
-
       const POSITIONAL_PARAMS = ['value'];
+  
+      const NAMED_TYPES = {key: 'STRING'};
+
+      const POSITIONAL_TYPES = ['STRING']
 
       it('should delete the params option', done => {
         bq.createJob = (reqOpts: JobOptions) => {
@@ -1236,6 +1239,7 @@ describe('BigQuery', () => {
         );
       });
 
+ 
       describe('named', () => {
         it('should set the correct parameter mode', done => {
           bq.createJob = (reqOpts: JobOptions) => {
@@ -1276,8 +1280,44 @@ describe('BigQuery', () => {
             assert.ifError
           );
         });
+
+        it('should allow for optional parameter types', done => {
+          bq.createJob = (reqOpts: JobOptions) => {
+            // tslint:disable-next-line no-any
+            assert.strictEqual((reqOpts as any).params, undefined);
+            done();
+          };
+
+          bq.createQueryJob(
+            {
+              query: QUERY_STRING,
+              params: NAMED_PARAMS,
+              types: NAMED_TYPES,
+            },
+            assert.ifError
+          );
+        });
+
+        it('should throw for invalid provided types', done => {
+          bq.createJob = (reqOpts: JobOptions) => {
+            // tslint:disable-next-line no-any
+            assert.strictEqual((reqOpts as any).params, undefined);
+            done();
+          };
+
+          const INVALID_TYPES = {key: 'invalid'}
+
+          assert.throws(() => {
+            bq.createQueryJob({
+              query: QUERY_STRING,
+              params: NAMED_PARAMS,
+              types: INVALID_TYPES,
+            });
+          }, /Invalid type provided./)
+        })
       });
 
+      // tslint:disable-next-line: ban
       describe('positional', () => {
         it('should set the correct parameter mode', done => {
           bq.createJob = (reqOpts: JobOptions) => {
@@ -1295,7 +1335,7 @@ describe('BigQuery', () => {
           );
         });
 
-        it('should get set the correct query parameters', done => {
+        it('should set the correct query parameters', done => {
           const queryParameter = {};
 
           BigQuery.valueToQueryParameter_ = (value: {}) => {
@@ -1317,8 +1357,43 @@ describe('BigQuery', () => {
             assert.ifError
           );
         });
+
+        it('should allow for optional parameter types', done => {
+          bq.createJob = (reqOpts: JobOptions) => {
+            // tslint:disable-next-line no-any
+            assert.strictEqual((reqOpts as any).params, undefined);
+            done();
+          };
+
+          bq.createQueryJob(
+            {
+              query: QUERY_STRING,
+              params: POSITIONAL_PARAMS,
+              types: POSITIONAL_TYPES,
+            },
+            assert.ifError
+          );
+        });
+
+        it('should throw for invalid provided types', done => {
+          bq.createJob = (reqOpts: JobOptions) => {
+            // tslint:disable-next-line no-any
+            assert.strictEqual((reqOpts as any).params, undefined);
+            done();
+          };
+
+          const INVALID_TYPES = ['invalid']
+
+          assert.throws(() => {
+            bq.createQueryJob({
+              query: QUERY_STRING,
+              params: POSITIONAL_PARAMS,
+              types: INVALID_TYPES,
+            });
+          }, /Invalid type provided./)
+        })
       });
-    });
+    })
 
     it('should accept the dryRun options', done => {
       const options = {
