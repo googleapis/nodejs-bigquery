@@ -1256,7 +1256,7 @@ describe('BigQuery', () => {
           );
         });
 
-        it('should get set the correct query parameters', done => {
+        it('should set the correct query parameters', done => {
           const queryParameter = {};
 
           BigQuery.valueToQueryParameter_ = (value: {}) => {

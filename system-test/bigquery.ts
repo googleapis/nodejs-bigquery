@@ -925,7 +925,7 @@ describe('BigQuery', () => {
       });
 
       // tslint:disable-next-line: ban
-      describe.only('SQL parameters', () => {
+      describe('SQL parameters', () => {
         describe('positional', () => {
           it('should work with strings', done => {
             bigquery.query(
@@ -1144,6 +1144,7 @@ describe('BigQuery', () => {
             );
           });
 
+          // tslint:disable-next-line: ban
           it('should work with multiple types', done => {
             bigquery.query(
               {

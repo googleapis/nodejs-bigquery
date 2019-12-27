@@ -746,7 +746,7 @@ export class BigQuery extends common.Service {
    */
   // tslint:disable-next-line no-any
   static getProvidedType_(providedType: any): ValueType {
-    const validTypes = [
+    const VALID_TYPES = [
       'DATE',
       'DATETIME',
       'TIME',
@@ -779,7 +779,7 @@ export class BigQuery extends common.Service {
       return {type: providedType};
     }
 
-    if (!validTypes.includes(providedType.toUpperCase())) {
+    if (!VALID_TYPES.includes(providedType.toUpperCase())) {
       throw new Error('Invalid type provided.');
     } else {
       return {type: providedType};
@@ -877,15 +877,11 @@ export class BigQuery extends common.Service {
    * @returns {object} A properly-formed `queryParameter` object.
    */
   // tslint:disable-next-line no-any
-  static valueToQueryParameter_(value: any, providedType?: any) {
+  static valueToQueryParameter_(value: any, providedType: any = undefined) {
     if (is.date(value)) {
       value = BigQuery.timestamp(value as Date);
     }
 
-    // if no type is provided, set the provided type to null
-    if (!providedType) {
-      const providedType = undefined;
-    }
     const parameterType = BigQuery.getType_(value, providedType);
     const queryParameter: QueryParameter = {parameterType, parameterValue: {}};
 
@@ -1156,15 +1152,14 @@ export class BigQuery extends common.Service {
           query.queryParameters.push(queryParameter);
         }
       } else {
+        query.queryParameters = [];
+
         if (query.types) {
           if (!is.array(query.types)) {
             throw new Error(
               'Provided types must match the value type passed to `params`'
             );
           }
-
-          query.queryParameters = [];
-
           // tslint:disable-next-line: no-any
           query.params.forEach((value: any, i: number) => {
             const queryParameter = BigQuery.valueToQueryParameter_(
@@ -1174,12 +1169,13 @@ export class BigQuery extends common.Service {
             query.queryParameters.push(queryParameter);
           });
         } else {
-          query.queryParameters = query.params.map(
-            BigQuery.valueToQueryParameter_
-          );
+          // tslint:disable-next-line: no-any
+          query.params.forEach((value: any) => {
+            const queryParameter = BigQuery.valueToQueryParameter_(value);
+            query.queryParameters.push(queryParameter);
+          });
         }
       }
-
       delete query.params;
     }
 
