@@ -1316,7 +1316,6 @@ describe('BigQuery', () => {
         });
       });
 
-      // tslint:disable-next-line: ban
       describe('positional', () => {
         it('should set the correct parameter mode', done => {
           bq.createJob = (reqOpts: JobOptions) => {
