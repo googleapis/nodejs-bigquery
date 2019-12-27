@@ -826,14 +826,11 @@ export class BigQuery extends common.Service {
       } else {
         return {
           type: 'ARRAY',
-          arrayType: BigQuery.getType_(value[0], providedType),
+          arrayType: BigQuery.getType_(value[0]),
         };
       }
     } else if (value === null) {
-      if (!providedType || providedType.length === 0) {
-        throw new Error('Type must be provided for null values.');
-      }
-      return BigQuery.getProvidedType_(providedType);
+      throw new Error('Type must be provided for null values.');
     } else if (is.boolean(value)) {
       typeName = 'BOOL';
     } else if (is.number(value)) {
