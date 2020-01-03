@@ -1299,8 +1299,6 @@ describe('BigQuery', () => {
 
         it('should throw for invalid provided types', done => {
           bq.createJob = (reqOpts: JobOptions) => {
-            // tslint:disable-next-line no-any
-            assert.strictEqual((reqOpts as any).params, undefined);
             done();
           };
 
@@ -1313,6 +1311,20 @@ describe('BigQuery', () => {
               types: INVALID_TYPES,
             });
           }, /Invalid type provided./);
+        });
+
+        it('should throw for invalid type structure provided', done => {
+          bq.createJob = (reqOpts: JobOptions) => {
+            done();
+          };
+
+          assert.throws(() => {
+            bq.createQueryJob({
+              query: QUERY_STRING,
+              params: POSITIONAL_PARAMS,
+              types: NAMED_TYPES,
+            });
+          }, /Provided types must match the value type passed to `params`/);
         });
       });
 
@@ -1375,8 +1387,6 @@ describe('BigQuery', () => {
 
         it('should throw for invalid provided types', done => {
           bq.createJob = (reqOpts: JobOptions) => {
-            // tslint:disable-next-line no-any
-            assert.strictEqual((reqOpts as any).params, undefined);
             done();
           };
 
@@ -1389,6 +1399,46 @@ describe('BigQuery', () => {
               types: INVALID_TYPES,
             });
           }, /Invalid type provided./);
+        });
+
+        it('should throw for invalid type structure provided', done => {
+          bq.createJob = (reqOpts: JobOptions) => {
+            done();
+          };
+
+          assert.throws(() => {
+            bq.createQueryJob({
+              query: QUERY_STRING,
+              params: POSITIONAL_PARAMS,
+              types: NAMED_TYPES,
+            });
+          }, /Provided types must match the value type passed to `params`/);
+        });
+
+        it('should throw for empty array without provided types', done => {
+          bq.createJob = (reqOpts: JobOptions) => {
+            done();
+          };
+
+          assert.throws(() => {
+            bq.createQueryJob({
+              query: QUERY_STRING,
+              params: [],
+            });
+          }, /Type must be provided for empty array./);
+        });
+
+        it('should throw for null value without provided types', done => {
+          bq.createJob = (reqOpts: JobOptions) => {
+            done();
+          };
+
+          assert.throws(() => {
+            bq.createQueryJob({
+              query: QUERY_STRING,
+              params: null,
+            });
+          }, /Type must be provided for null values./);
         });
       });
     });

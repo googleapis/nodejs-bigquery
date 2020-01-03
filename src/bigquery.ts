@@ -819,9 +819,9 @@ export class BigQuery extends common.Service {
     } else if (value instanceof Big) {
       typeName = 'NUMERIC';
     } else if (is.array(value)) {
-      if (value.length === 0 || value[0] === null) {
+      if (value.length === 0) {
         throw new Error(
-          'Type must be provided for empty array or null array values.'
+          'Type must be provided for empty array.'
         );
       } else {
         return {
