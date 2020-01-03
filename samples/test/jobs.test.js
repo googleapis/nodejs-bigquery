@@ -16,6 +16,7 @@
 
 const {BigQuery} = require('@google-cloud/bigquery');
 const {assert} = require('chai');
+const {describe, it, before} = require('mocha');
 const cp = require('child_process');
 
 const execSync = cmd => cp.execSync(cmd, {encoding: 'utf-8'});
