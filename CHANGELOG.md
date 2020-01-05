@@ -4,6 +4,13 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## [4.6.0](https://www.github.com/googleapis/nodejs-bigquery/compare/v4.5.0...v4.6.0) (2020-01-05)
+
+
+### Features
+
+* types to support slot ms and read masks ([#592](https://www.github.com/googleapis/nodejs-bigquery/issues/592)) ([84d1c82](https://www.github.com/googleapis/nodejs-bigquery/commit/84d1c82981a2f3444836dde5d8fd00a23ee1cf94))
+
 ## [4.5.0](https://www.github.com/googleapis/nodejs-bigquery/compare/v4.4.0...v4.5.0) (2019-12-05)
 
 
