@@ -23,6 +23,7 @@ import * as pfy from '@google-cloud/promisify';
 import {File} from '@google-cloud/storage';
 import arrify = require('arrify');
 import * as assert from 'assert';
+import {describe, it} from 'mocha';
 import Big from 'big.js';
 import {EventEmitter} from 'events';
 import * as extend from 'extend';
