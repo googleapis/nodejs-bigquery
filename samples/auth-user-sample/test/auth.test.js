@@ -17,6 +17,7 @@
 const sinon = require('sinon');
 const {assert} = require('chai');
 const proxyquire = require('proxyquire');
+const {describe, it, before, afterEach} = require('mocha');
 
 describe('authUserFlow()', () => {
   let readlineMock, generateUrlStub, questionStub, tokenStub, authUserFlow;
@@ -44,7 +45,7 @@ describe('authUserFlow()', () => {
     });
   });
 
-  afterEach(function() {
+  afterEach(() => {
     sinon.restore();
   });
 
