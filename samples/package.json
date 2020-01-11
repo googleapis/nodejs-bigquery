@@ -2,7 +2,8 @@
   "name": "nodejs-docs-samples-bigquery",
   "files": [
     "*.js",
-    "resources/"
+    "resources/",
+    "auth-user-sample/oauth2.keys.json"
   ],
   "private": true,
   "license": "Apache-2.0",
@@ -17,12 +18,14 @@
   "dependencies": {
     "@google-cloud/bigquery": "^4.5.0",
     "@google-cloud/storage": "^4.0.0",
+    "google-auth-library": "^5.8.0",
     "readline-promise": "^1.0.4",
     "yargs": "^15.0.0"
   },
   "devDependencies": {
     "chai": "^4.2.0",
     "mocha": "^6.0.0",
+    "sinon": "^8.0.4",
     "uuid": "^3.3.0"
   }
 }
