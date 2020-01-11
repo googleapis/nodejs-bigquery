@@ -16,6 +16,7 @@
 
 const {BigQuery} = require('@google-cloud/bigquery');
 const {assert} = require('chai');
+const {describe, it, before, after} = require('mocha');
 const cp = require('child_process');
 const uuid = require('uuid');
 
