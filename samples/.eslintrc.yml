@@ -1,4 +1,3 @@
 ---
 rules:
   no-console: off
-  no-missing-require: off
