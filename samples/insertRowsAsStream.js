@@ -28,7 +28,10 @@ function main(datasetId = 'my_dataset', tableId = 'my_table') {
      */
     // const datasetId = 'my_dataset';
     // const tableId = 'my_table';
-    const rows = [{name: 'Tom', age: 30}, {name: 'Jane', age: 32}];
+    const rows = [
+      {name: 'Tom', age: 30},
+      {name: 'Jane', age: 32},
+    ];
 
     // Insert data into a table
     await bigquery
