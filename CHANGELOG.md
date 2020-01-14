@@ -4,6 +4,13 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+### [4.6.1](https://www.github.com/googleapis/nodejs-bigquery/compare/v4.6.0...v4.6.1) (2020-01-13)
+
+
+### Bug Fixes
+
+* don't modify the constructor options ([#607](https://www.github.com/googleapis/nodejs-bigquery/issues/607)) ([7df0799](https://www.github.com/googleapis/nodejs-bigquery/commit/7df0799e09e2a3a44f9ac4a04d157b7c85816fbe))
+
 ## [4.6.0](https://www.github.com/googleapis/nodejs-bigquery/compare/v4.5.0...v4.6.0) (2020-01-05)
 
 
