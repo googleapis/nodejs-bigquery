@@ -14,7 +14,6 @@
 
 'use strict';
 
-// [START bigquery_auth_user_query]
 // [START bigquery_auth_user_flow]
 const {OAuth2Client} = require('google-auth-library');
 const readline = require('readline-promise').default;
@@ -103,6 +102,7 @@ async function authFlow(projectId = 'project_id') {
   };
 }
 // [END bigquery_auth_user_flow]
+// [START bigquery_auth_user_query]
 async function query() {
   const {BigQuery} = require('@google-cloud/bigquery');
 
