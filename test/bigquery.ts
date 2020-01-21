@@ -22,6 +22,7 @@ import {
 import * as pfy from '@google-cloud/promisify';
 import arrify = require('arrify');
 import * as assert from 'assert';
+import {describe, it} from 'mocha';
 import Big from 'big.js';
 import * as extend from 'extend';
 import * as proxyquire from 'proxyquire';
@@ -221,6 +222,20 @@ describe('BigQuery', () => {
 
       const calledWith = bq.calledWith_[0];
       assert.deepStrictEqual(calledWith.scopes, expectedScopes);
+    });
+
+    it('should not modify options argument', () => {
+      const options = {
+        projectId: PROJECT_ID,
+      };
+      const expectedCalledWith = Object.assign({}, options, {
+        apiEndpoint: 'bigquery.googleapis.com',
+      });
+      const bigquery = new BigQuery(options);
+      const calledWith = bigquery.calledWith_[1];
+      assert.notStrictEqual(calledWith, options);
+      assert.notDeepStrictEqual(calledWith, options);
+      assert.deepStrictEqual(calledWith, expectedCalledWith);
     });
   });
 

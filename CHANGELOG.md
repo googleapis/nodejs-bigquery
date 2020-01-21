@@ -4,6 +4,20 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+### [4.6.1](https://www.github.com/googleapis/nodejs-bigquery/compare/v4.6.0...v4.6.1) (2020-01-13)
+
+
+### Bug Fixes
+
+* don't modify the constructor options ([#607](https://www.github.com/googleapis/nodejs-bigquery/issues/607)) ([7df0799](https://www.github.com/googleapis/nodejs-bigquery/commit/7df0799e09e2a3a44f9ac4a04d157b7c85816fbe))
+
+## [4.6.0](https://www.github.com/googleapis/nodejs-bigquery/compare/v4.5.0...v4.6.0) (2020-01-05)
+
+
+### Features
+
+* types to support slot ms and read masks ([#592](https://www.github.com/googleapis/nodejs-bigquery/issues/592)) ([84d1c82](https://www.github.com/googleapis/nodejs-bigquery/commit/84d1c82981a2f3444836dde5d8fd00a23ee1cf94))
+
 ## [4.5.0](https://www.github.com/googleapis/nodejs-bigquery/compare/v4.4.0...v4.5.0) (2019-12-05)
 
 

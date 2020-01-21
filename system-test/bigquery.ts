@@ -19,6 +19,7 @@ import {
 } from '@google-cloud/common/build/src/util';
 import {Storage} from '@google-cloud/storage';
 import * as assert from 'assert';
+import {describe, it} from 'mocha';
 import Big from 'big.js';
 import * as fs from 'fs';
 import * as uuid from 'uuid';

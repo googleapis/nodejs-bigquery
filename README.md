@@ -2,7 +2,7 @@
 [//]: # "To regenerate it, use `python -m synthtool`."
 <img src="https://avatars2.githubusercontent.com/u/2810941?v=3&s=96" alt="Google Cloud Platform logo" title="Google Cloud Platform" align="right" height="96" width="96"/>
 
-# [Google Cloud Bigquery: Node.js Client](https://github.com/googleapis/nodejs-bigquery)
+# [Google Cloud BigQuery: Node.js Client](https://github.com/googleapis/nodejs-bigquery)
 
 [![release level](https://img.shields.io/badge/release%20level-general%20availability%20%28GA%29-brightgreen.svg?style=flat)](https://cloud.google.com/terms/launch-stages)
 [![npm version](https://img.shields.io/npm/v/@google-cloud/bigquery.svg)](https://www.npmjs.org/package/@google-cloud/bigquery)
@@ -14,8 +14,8 @@
 Google BigQuery Client Library for Node.js
 
 
-* [Google Cloud Bigquery Node.js Client API Reference][client-docs]
-* [Google Cloud Bigquery Documentation][product-docs]
+* [Google Cloud BigQuery Node.js Client API Reference][client-docs]
+* [Google Cloud BigQuery Documentation][product-docs]
 * [github.com/googleapis/nodejs-bigquery](https://github.com/googleapis/nodejs-bigquery)
 
 Read more about the client libraries for Cloud APIs, including the older
@@ -40,7 +40,7 @@ Google APIs Client Libraries, in [Client Libraries Explained][explained].
 ### Before you begin
 
 1.  [Select or create a Cloud Platform project][projects].
-1.  [Enable the Google Cloud Bigquery API][enable_api].
+1.  [Enable the Google Cloud BigQuery API][enable_api].
 1.  [Set up authentication with a service account][auth] so you can access the
     API from your local workstation.
 
@@ -149,7 +149,7 @@ has instructions for running the samples.
 
 
 
-The [Google Cloud Bigquery Node.js Client API Reference][client-docs] documentation
+The [Google Cloud BigQuery Node.js Client API Reference][client-docs] documentation
 also contains samples.
 
 ## Versioning

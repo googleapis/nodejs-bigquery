@@ -2,7 +2,7 @@
 [//]: # "To regenerate it, use `python -m synthtool`."
 <img src="https://avatars2.githubusercontent.com/u/2810941?v=3&s=96" alt="Google Cloud Platform logo" title="Google Cloud Platform" align="right" height="96" width="96"/>
 
-# [Google Cloud Bigquery: Node.js Samples](https://github.com/googleapis/nodejs-bigquery)
+# [Google Cloud BigQuery: Node.js Samples](https://github.com/googleapis/nodejs-bigquery)
 
 [![Open in Cloud Shell][shell_img]][shell_link]
 
@@ -86,6 +86,12 @@
 Before running the samples, make sure you've followed the steps outlined in
 [Using the client library](https://github.com/googleapis/nodejs-bigquery#using-the-client-library).
 
+`cd samples`
+
+`npm install`
+
+`cd ..`
+
 ## Samples
 
 
@@ -99,7 +105,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node addColumnLoadAppend.js`
+`node samples/addColumnLoadAppend.js`
 
 
 -----
@@ -116,7 +122,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node addColumnQueryAppend.js`
+`node samples/addColumnQueryAppend.js`
 
 
 -----
@@ -133,7 +139,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node addEmptyColumn.js`
+`node samples/addEmptyColumn.js`
 
 
 -----
@@ -150,7 +156,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node browseRows.js`
+`node samples/browseRows.js`
 
 
 -----
@@ -167,7 +173,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node cancelJob.js`
+`node samples/cancelJob.js`
 
 
 -----
@@ -184,7 +190,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node clientJSONCredentials.js`
+`node samples/clientJSONCredentials.js`
 
 
 -----
@@ -201,7 +207,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node copyTable.js`
+`node samples/copyTable.js`
 
 
 -----
@@ -218,7 +224,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node copyTableMultipleSource.js`
+`node samples/copyTableMultipleSource.js`
 
 
 -----
@@ -235,7 +241,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node createDataset.js`
+`node samples/createDataset.js`
 
 
 -----
@@ -252,7 +258,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node createTable.js`
+`node samples/createTable.js`
 
 
 -----
@@ -269,7 +275,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node createTablePartitioned.js`
+`node samples/createTablePartitioned.js`
 
 
 -----
@@ -286,7 +292,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node deleteDataset.js`
+`node samples/deleteDataset.js`
 
 
 -----
@@ -322,7 +328,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node deleteLabelTable.js`
+`node samples/deleteLabelTable.js`
 
 
 -----
@@ -339,7 +345,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node deleteModel.js`
+`node samples/deleteModel.js`
 
 
 -----
@@ -356,7 +362,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node deleteTable.js`
+`node samples/deleteTable.js`
 
 
 -----
@@ -373,7 +379,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node extractTableCompressed.js`
+`node samples/extractTableCompressed.js`
 
 
 -----
@@ -390,7 +396,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node extractTableJSON.js`
+`node samples/extractTableJSON.js`
 
 
 -----
@@ -407,7 +413,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node extractTableToGCS.js`
+`node samples/extractTableToGCS.js`
 
 
 -----
@@ -424,7 +430,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node getDataset.js`
+`node samples/getDataset.js`
 
 
 -----
@@ -460,7 +466,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node getJob.js`
+`node samples/getJob.js`
 
 
 -----
@@ -534,7 +540,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node insertRowsAsStream.js`
+`node samples/insertRowsAsStream.js`
 
 
 -----
@@ -570,7 +576,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node labelTable.js`
+`node samples/labelTable.js`
 
 
 -----
@@ -587,7 +593,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node listDatasets.js`
+`node samples/listDatasets.js`
 
 
 -----
@@ -604,7 +610,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node listDatasetsByLabel.js`
+`node samples/listDatasetsByLabel.js`
 
 
 -----
@@ -621,7 +627,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node listJobs.js`
+`node samples/listJobs.js`
 
 
 -----
@@ -676,7 +682,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node listTables.js`
+`node samples/listTables.js`
 
 
 -----
@@ -693,7 +699,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node loadCSVFromGCS.js`
+`node samples/loadCSVFromGCS.js`
 
 
 -----
@@ -710,7 +716,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node loadCSVFromGCSAutodetect.js`
+`node samples/loadCSVFromGCSAutodetect.js`
 
 
 -----
@@ -727,7 +733,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node loadCSVFromGCSTruncate.js`
+`node samples/loadCSVFromGCSTruncate.js`
 
 
 -----
@@ -744,7 +750,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node loadJSONFromGCS.js`
+`node samples/loadJSONFromGCS.js`
 
 
 -----
@@ -761,7 +767,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node loadJSONFromGCSAutodetect.js`
+`node samples/loadJSONFromGCSAutodetect.js`
 
 
 -----
@@ -778,7 +784,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node loadJSONFromGCSTruncate.js`
+`node samples/loadJSONFromGCSTruncate.js`
 
 
 -----
@@ -795,7 +801,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node loadLocalFile.js`
+`node samples/loadLocalFile.js`
 
 
 -----
@@ -812,7 +818,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node loadOrcFromGCSTruncate.js`
+`node samples/loadOrcFromGCSTruncate.js`
 
 
 -----
@@ -829,7 +835,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node loadParquetFromGCSTruncate.js`
+`node samples/loadParquetFromGCSTruncate.js`
 
 
 -----
@@ -846,7 +852,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node loadTableGCSORC.js`
+`node samples/loadTableGCSORC.js`
 
 
 -----
@@ -863,7 +869,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node loadTableGCSParquet.js`
+`node samples/loadTableGCSParquet.js`
 
 
 -----
@@ -880,7 +886,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node loadTablePartitioned.js`
+`node samples/loadTablePartitioned.js`
 
 
 -----
@@ -897,7 +903,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node nestedRepeatedSchema.js`
+`node samples/nestedRepeatedSchema.js`
 
 
 -----
@@ -914,7 +920,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node query.js`
+`node samples/query.js`
 
 
 -----
@@ -931,7 +937,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node queryDestinationTable.js`
+`node samples/queryDestinationTable.js`
 
 
 -----
@@ -948,7 +954,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node queryDisableCache.js`
+`node samples/queryDisableCache.js`
 
 
 -----
@@ -965,7 +971,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node queryDryRun.js`
+`node samples/queryDryRun.js`
 
 
 -----
@@ -982,7 +988,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node queryLegacy.js`
+`node samples/queryLegacy.js`
 
 
 -----
@@ -999,7 +1005,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node queryLegacyLargeResults.js`
+`node samples/queryLegacyLargeResults.js`
 
 
 -----
@@ -1016,7 +1022,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node queryParamsArrays.js`
+`node samples/queryParamsArrays.js`
 
 
 -----
@@ -1033,7 +1039,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node queryParamsNamed.js`
+`node samples/queryParamsNamed.js`
 
 
 -----
@@ -1050,7 +1056,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node queryParamsPositional.js`
+`node samples/queryParamsPositional.js`
 
 
 -----
@@ -1067,7 +1073,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node queryParamsStructs.js`
+`node samples/queryParamsStructs.js`
 
 
 -----
@@ -1084,7 +1090,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node queryParamsTimestamps.js`
+`node samples/queryParamsTimestamps.js`
 
 
 -----
@@ -1101,7 +1107,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node queryStackOverflow.js`
+`node samples/queryStackOverflow.js`
 
 
 -----
@@ -1118,7 +1124,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node quickstart.js`
+`node samples/quickstart.js`
 
 
 -----
@@ -1135,7 +1141,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node relaxColumn.js`
+`node samples/relaxColumn.js`
 
 
 -----
@@ -1152,7 +1158,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node relaxColumnLoadAppend.js`
+`node samples/relaxColumnLoadAppend.js`
 
 
 -----
@@ -1169,7 +1175,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node updateDatasetAccess.js`
+`node samples/updateDatasetAccess.js`
 
 
 -----
@@ -1186,7 +1192,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node updateDatasetDescription.js`
+`node samples/updateDatasetDescription.js`
 
 
 -----
@@ -1203,7 +1209,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node updateDatasetExpiration.js`
+`node samples/updateDatasetExpiration.js`
 
 
 -----
@@ -1239,7 +1245,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node updateTableDescription.js`
+`node samples/updateTableDescription.js`
 
 
 -----
@@ -1256,7 +1262,7 @@ View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master
 __Usage:__
 
 
-`node updateTableExpiration.js`
+`node samples/updateTableExpiration.js`
 
 
 
