@@ -42,7 +42,6 @@ import {
 } from './table';
 import {GoogleErrorBody} from '@google-cloud/common/build/src/util';
 import bigquery from './types';
-import {type} from 'os';
 
 export interface RequestCallback<T> {
   (err: Error | null, response?: T | null): void;
@@ -95,8 +94,7 @@ export type Query = JobRequest<bigquery.IJobConfigurationQuery> & {
   // tslint:disable-next-line no-any
   params?: any[] | {[param: string]: any};
   dryRun?: boolean;
-  // tslint:disable-next-line: no-any
-  types?: any[] | {[type: string]: any};
+  types?: string[] | string[][] | {[type: string]: string[]};
   defaultDataset?: Dataset;
   job?: Job;
   maxResults?: number;
@@ -745,7 +743,8 @@ export class BigQuery extends common.Service {
    * @returns {string} The valid type provided.
    */
   // tslint:disable-next-line no-any
-  static getProvidedType_(providedType: any): ValueType {
+  static getTypeDescriptorFromProvidedType_(providedType: any): ValueType {
+    // The list of types can be found in src/types.d.ts
     const VALID_TYPES = [
       'DATE',
       'DATETIME',
@@ -758,12 +757,14 @@ export class BigQuery extends common.Service {
       'FLOAT64',
       'STRING',
       'GEOGRAPHY',
+      'ARRAY',
+      'STRUCT',
     ];
 
     if (is.array(providedType)) {
       return {
         type: 'ARRAY',
-        arrayType: BigQuery.getProvidedType_(providedType[0]),
+        arrayType: BigQuery.getTypeDescriptorFromProvidedType_(providedType[0]),
       };
     } else if (is.object(providedType)) {
       return {
@@ -771,7 +772,9 @@ export class BigQuery extends common.Service {
         structTypes: Object.keys(providedType).map(prop => {
           return {
             name: prop,
-            type: BigQuery.getProvidedType_(providedType[prop]),
+            type: BigQuery.getTypeDescriptorFromProvidedType_(
+              providedType[prop]
+            ),
           };
         }),
       };
@@ -780,9 +783,9 @@ export class BigQuery extends common.Service {
     }
 
     if (!VALID_TYPES.includes(providedType.toUpperCase())) {
-      throw new Error('Invalid type provided.');
+      throw new Error(`Invalid type provided: "${providedType}"`);
     } else {
-      return {type: providedType};
+      return {type: providedType.toUpperCase()};
     }
   }
 
@@ -798,13 +801,11 @@ export class BigQuery extends common.Service {
    * @param {*} value The value.
    * @returns {string} The type detected from the value.
    */
-  // tslint:disable-next-line no-any
-  static getType_(value: any, providedType?: any): ValueType {
+  static getTypeDescriptorFromValue_(
+    // tslint:disable-next-line: no-any
+    value: any
+  ): ValueType {
     let typeName;
-
-    if (providedType) {
-      return this.getProvidedType_(providedType);
-    }
 
     if (value instanceof BigQueryDate) {
       typeName = 'DATE';
@@ -820,13 +821,11 @@ export class BigQuery extends common.Service {
       typeName = 'NUMERIC';
     } else if (is.array(value)) {
       if (value.length === 0) {
-        throw new Error(
-          'Type must be provided for empty array.'
-        );
+        throw new Error('Type must be provided for empty array.');
       } else {
         return {
           type: 'ARRAY',
-          arrayType: BigQuery.getType_(value[0]),
+          arrayType: BigQuery.getTypeDescriptorFromValue_(value[0]),
         };
       }
     } else if (value === null) {
@@ -841,7 +840,7 @@ export class BigQuery extends common.Service {
         structTypes: Object.keys(value).map(prop => {
           return {
             name: prop,
-            type: BigQuery.getType_(value[prop]),
+            type: BigQuery.getTypeDescriptorFromValue_(value[prop]),
           };
         }),
       };
@@ -879,7 +878,13 @@ export class BigQuery extends common.Service {
       value = BigQuery.timestamp(value as Date);
     }
 
-    const parameterType = BigQuery.getType_(value, providedType);
+    let parameterType: bigquery.IQueryParameterType;
+
+    if (providedType) {
+      parameterType = BigQuery.getTypeDescriptorFromProvidedType_(providedType);
+    } else {
+      parameterType = BigQuery.getTypeDescriptorFromValue_(value);
+    }
     const queryParameter: QueryParameter = {parameterType, parameterValue: {}};
 
     const typeName = queryParameter!.parameterType!.type!;
@@ -1137,10 +1142,17 @@ export class BigQuery extends common.Service {
                 'Provided types must match the value type passed to `params`'
               );
             }
-            queryParameter = BigQuery.valueToQueryParameter_(
-              value,
-              query.types[namedParameter]
-            );
+
+            if (query.types[namedParameter]) {
+              queryParameter = BigQuery.valueToQueryParameter_(
+                value,
+                query.types[namedParameter]
+              );
+            } else {
+              throw new Error(
+                `Type not provided for parameter: ${namedParameter}`
+              );
+            }
           } else {
             queryParameter = BigQuery.valueToQueryParameter_(value);
           }
@@ -1156,6 +1168,10 @@ export class BigQuery extends common.Service {
             throw new Error(
               'Provided types must match the value type passed to `params`'
             );
+          }
+
+          if (query.params.length !== query.types.length) {
+            throw new Error('Incorrect number of parameter types provided.');
           }
           // tslint:disable-next-line: no-any
           query.params.forEach((value: any, i: number) => {

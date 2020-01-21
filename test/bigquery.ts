@@ -643,22 +643,49 @@ describe('BigQuery', () => {
     });
   });
 
-  describe('getType_', () => {
+  describe('getTypeDescriptorFromValue_', () => {
     it('should return correct types', () => {
-      assert.strictEqual(BigQuery.getType_(bq.date()).type, 'DATE');
-      assert.strictEqual(BigQuery.getType_(bq.datetime('')).type, 'DATETIME');
-      assert.strictEqual(BigQuery.getType_(bq.time()).type, 'TIME');
-      assert.strictEqual(BigQuery.getType_(bq.timestamp(0)).type, 'TIMESTAMP');
-      assert.strictEqual(BigQuery.getType_(Buffer.alloc(2)).type, 'BYTES');
-      assert.strictEqual(BigQuery.getType_(true).type, 'BOOL');
-      assert.strictEqual(BigQuery.getType_(8).type, 'INT64');
-      assert.strictEqual(BigQuery.getType_(8.1).type, 'FLOAT64');
-      assert.strictEqual(BigQuery.getType_('hi').type, 'STRING');
-      assert.strictEqual(BigQuery.getType_(new Big('1.1')).type, 'NUMERIC');
+      assert.strictEqual(
+        BigQuery.getTypeDescriptorFromValue_(bq.date()).type,
+        'DATE'
+      );
+      assert.strictEqual(
+        BigQuery.getTypeDescriptorFromValue_(bq.datetime('')).type,
+        'DATETIME'
+      );
+      assert.strictEqual(
+        BigQuery.getTypeDescriptorFromValue_(bq.time()).type,
+        'TIME'
+      );
+      assert.strictEqual(
+        BigQuery.getTypeDescriptorFromValue_(bq.timestamp(0)).type,
+        'TIMESTAMP'
+      );
+      assert.strictEqual(
+        BigQuery.getTypeDescriptorFromValue_(Buffer.alloc(2)).type,
+        'BYTES'
+      );
+      assert.strictEqual(
+        BigQuery.getTypeDescriptorFromValue_(true).type,
+        'BOOL'
+      );
+      assert.strictEqual(BigQuery.getTypeDescriptorFromValue_(8).type, 'INT64');
+      assert.strictEqual(
+        BigQuery.getTypeDescriptorFromValue_(8.1).type,
+        'FLOAT64'
+      );
+      assert.strictEqual(
+        BigQuery.getTypeDescriptorFromValue_('hi').type,
+        'STRING'
+      );
+      assert.strictEqual(
+        BigQuery.getTypeDescriptorFromValue_(new Big('1.1')).type,
+        'NUMERIC'
+      );
     });
 
     it('should return correct type for an array', () => {
-      const type = BigQuery.getType_([1]);
+      const type = BigQuery.getTypeDescriptorFromValue_([1]);
 
       assert.deepStrictEqual(type, {
         type: 'ARRAY',
@@ -669,7 +696,7 @@ describe('BigQuery', () => {
     });
 
     it('should return correct type for a struct', () => {
-      const type = BigQuery.getType_({prop: 1});
+      const type = BigQuery.getTypeDescriptorFromValue_({prop: 1});
 
       assert.deepStrictEqual(type, {
         type: 'STRUCT',
@@ -693,7 +720,7 @@ describe('BigQuery', () => {
       );
 
       assert.throws(() => {
-        BigQuery.getType_(undefined);
+        BigQuery.getTypeDescriptorFromValue_(undefined);
       }, expectedError);
     });
   });
@@ -702,13 +729,15 @@ describe('BigQuery', () => {
     it('should get the type', done => {
       const value = {};
 
-      sandbox.stub(BigQuery, 'getType_').callsFake(value_ => {
-        assert.strictEqual(value_, value);
-        setImmediate(done);
-        return {
-          type: '',
-        };
-      });
+      sandbox
+        .stub(BigQuery, 'getTypeDescriptorFromValue_')
+        .callsFake(value_ => {
+          assert.strictEqual(value_, value);
+          setImmediate(done);
+          return {
+            type: '',
+          };
+        });
 
       BigQuery.valueToQueryParameter_(value);
     });
@@ -724,7 +753,7 @@ describe('BigQuery', () => {
         };
       });
 
-      sandbox.stub(BigQuery, 'getType_').returns({
+      sandbox.stub(BigQuery, 'getTypeDescriptorFromValue_').returns({
         type: 'TIMESTAMP',
       });
 
@@ -737,7 +766,7 @@ describe('BigQuery', () => {
         value: 'value',
       };
 
-      sandbox.stub(BigQuery, 'getType_').returns({
+      sandbox.stub(BigQuery, 'getTypeDescriptorFromValue_').returns({
         type: 'DATETIME',
       });
 
@@ -752,7 +781,7 @@ describe('BigQuery', () => {
         },
       ];
 
-      sandbox.stub(BigQuery, 'getType_').returns({
+      sandbox.stub(BigQuery, 'getTypeDescriptorFromValue_').returns({
         type: 'ARRAY',
         arrayType: {type: 'DATETIME'},
       });
@@ -766,7 +795,7 @@ describe('BigQuery', () => {
         value: 'value',
       };
 
-      sandbox.stub(BigQuery, 'getType_').returns({
+      sandbox.stub(BigQuery, 'getTypeDescriptorFromValue_').returns({
         type: 'TIME',
       });
 
@@ -781,7 +810,7 @@ describe('BigQuery', () => {
         },
       ];
 
-      sandbox.stub(BigQuery, 'getType_').returns({
+      sandbox.stub(BigQuery, 'getTypeDescriptorFromValue_').returns({
         type: 'ARRAY',
         arrayType: {type: 'TIME'},
       });
@@ -793,7 +822,7 @@ describe('BigQuery', () => {
     it('should format an array', () => {
       const array = [1];
 
-      sandbox.stub(BigQuery, 'getType_').returns({
+      sandbox.stub(BigQuery, 'getTypeDescriptorFromValue_').returns({
         type: 'ARRAY',
         arrayType: {type: 'INT64'},
       });
@@ -814,7 +843,7 @@ describe('BigQuery', () => {
 
       const expectedParameterValue = {};
 
-      sandbox.stub(BigQuery, 'getType_').callsFake(() => {
+      sandbox.stub(BigQuery, 'getTypeDescriptorFromValue_').callsFake(() => {
         sandbox.stub(BigQuery, 'valueToQueryParameter_').callsFake(value => {
           assert.strictEqual(value, struct.key);
           return {
@@ -860,7 +889,7 @@ describe('BigQuery', () => {
 
     it('should format all other types', () => {
       const typeName = 'ANY-TYPE';
-      sandbox.stub(BigQuery, 'getType_').returns({
+      sandbox.stub(BigQuery, 'getTypeDescriptorFromValue_').returns({
         type: typeName,
       });
       assert.deepStrictEqual(BigQuery.valueToQueryParameter_(8), {
