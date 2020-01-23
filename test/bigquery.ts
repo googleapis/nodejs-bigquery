@@ -738,6 +738,168 @@ describe('BigQuery', () => {
         BigQuery.getTypeDescriptorFromValue_(undefined);
       }, expectedError);
     });
+
+    it('should throw with an empty array', () => {
+      const expectedError = new RegExp(
+        'Type must be provided for empty array.'
+      );
+
+      assert.throws(() => {
+        BigQuery.getTypeDescriptorFromValue_([]);
+      }, expectedError);
+    });
+
+    it('should throw with an null value', () => {
+      const expectedError = new RegExp(
+        'Type must be provided for null values.'
+      );
+
+      assert.throws(() => {
+        BigQuery.getTypeDescriptorFromValue_(null);
+      }, expectedError);
+    });
+  });
+
+  describe('getTypeDescriptorFromProvidedType_', () => {
+    const QUERY_STRING = 'SELECT * FROM [dataset.table]';
+    const NAMED_PARAMS = {
+      key: 'value',
+    };
+    const POSITIONAL_PARAMS = ['value'];
+
+    const NAMED_TYPES = {key: 'STRING'};
+
+    const POSITIONAL_TYPES = ['STRING'];
+
+    it('should return correct type for an array', () => {
+      const type = BigQuery.getTypeDescriptorFromProvidedType_(['INT64']);
+
+      assert.deepStrictEqual(type, {
+        type: 'ARRAY',
+        arrayType: {
+          type: 'INT64',
+        },
+      });
+    });
+
+    it('should return correct type for a struct', () => {
+      const type = BigQuery.getTypeDescriptorFromProvidedType_({prop: 'INT64'});
+
+      assert.deepStrictEqual(type, {
+        type: 'STRUCT',
+        structTypes: [
+          {
+            name: 'prop',
+            type: {
+              type: 'INT64',
+            },
+          },
+        ],
+      });
+    });
+
+    it('should throw for invalid provided types with named params', done => {
+      const INVALID_TYPES = {key: 'invalid'};
+
+      assert.throws(() => {
+        bq.createQueryJob({
+          query: QUERY_STRING,
+          params: NAMED_PARAMS,
+          types: INVALID_TYPES,
+        });
+      }, /Invalid type provided./);
+      done();
+    });
+
+    it('should throw if named param not present in provided types', done => {
+      const INVALID_TYPES = {other: 'string'};
+
+      assert.throws(() => {
+        bq.createQueryJob({
+          query: QUERY_STRING,
+          params: NAMED_PARAMS,
+          types: INVALID_TYPES,
+        });
+      }, /Type not provided for parameter: key/);
+      done();
+    });
+
+    it('should throw for invalid type structure provided for named params', done => {
+      assert.throws(() => {
+        bq.createQueryJob({
+          query: QUERY_STRING,
+          params: NAMED_PARAMS,
+          types: POSITIONAL_PARAMS,
+        });
+      }, /Provided types must match the value type passed to `params`/);
+      done();
+    });
+
+    it('should throw for invalid provided types with positional params', done => {
+      const INVALID_TYPES = ['invalid'];
+
+      assert.throws(() => {
+        bq.createQueryJob({
+          query: QUERY_STRING,
+          params: POSITIONAL_PARAMS,
+          types: INVALID_TYPES,
+        });
+      }, /Invalid type provided./);
+      done();
+    });
+
+    it('should throw for invalid type structure provided for positional params', done => {
+      assert.throws(() => {
+        bq.createQueryJob({
+          query: QUERY_STRING,
+          params: POSITIONAL_PARAMS,
+          types: NAMED_TYPES,
+        });
+      }, /Provided types must match the value type passed to `params`/);
+      done();
+    });
+
+    it('should throw for incorrect number of types provided for positional params', done => {
+      const ADDITIONAL_TYPES = ['string', 'string'];
+      assert.throws(() => {
+        bq.createQueryJob({
+          query: QUERY_STRING,
+          params: POSITIONAL_PARAMS,
+          types: ADDITIONAL_TYPES,
+        });
+      }, /Incorrect number of parameter types provided./);
+      done();
+    });
+
+    it('should throw for empty array without provided types', done => {
+      bq.createJob = (reqOpts: JobOptions) => {
+        done();
+      };
+
+      assert.throws(() => {
+        bq.createQueryJob({
+          query: QUERY_STRING,
+          params: [],
+        });
+      }, /Type must be provided for empty array./);
+      done();
+    });
+
+    it('should throw for null value without provided types', done => {
+      bq.createJob = (reqOpts: JobOptions) => {
+        done();
+      };
+
+      assert.throws(() => {
+        bq.createQueryJob({
+          query: QUERY_STRING,
+          params: null,
+        });
+      }, /Type must be provided for null values./);
+      done();
+    });
+
+    it('should return correct types', () => {});
   });
 
   describe('valueToQueryParameter_', () => {
@@ -755,6 +917,23 @@ describe('BigQuery', () => {
         });
 
       BigQuery.valueToQueryParameter_(value);
+    });
+
+    it('should get the provided type', done => {
+      const value = {};
+      const providedType = 'type';
+
+      sandbox
+        .stub(BigQuery, 'getTypeDescriptorFromProvidedType_')
+        .callsFake(providedType_ => {
+          assert.strictEqual(providedType_, providedType);
+          setImmediate(done);
+          return {
+            type: '',
+          };
+        });
+
+      BigQuery.valueToQueryParameter_(value, providedType);
     });
 
     it('should format a Date', () => {
@@ -847,6 +1026,34 @@ describe('BigQuery', () => {
       assert.deepStrictEqual(arrayValues, [
         {
           value: array[0],
+        },
+      ]);
+    });
+
+    it('should format an array with provided type', () => {
+      const array = [[1]];
+      const providedType = [['INT64']];
+
+      sandbox.stub(BigQuery, 'getTypeDescriptorFromProvidedType_').returns({
+        type: 'ARRAY',
+        arrayType: {
+          type: 'ARRAY',
+          arrayType: {type: 'INT64'},
+        },
+      });
+
+      const queryParameter = BigQuery.valueToQueryParameter_(
+        array,
+        providedType
+      );
+      const arrayValues = queryParameter.parameterValue.arrayValues;
+      assert.deepStrictEqual(arrayValues, [
+        {
+          arrayValues: [
+            {
+              value: array[0][0],
+            },
+          ],
         },
       ]);
     });
@@ -1261,6 +1468,7 @@ describe('BigQuery', () => {
       const NAMED_PARAMS = {
         key: 'value',
       };
+
       const POSITIONAL_PARAMS = ['value'];
 
       const NAMED_TYPES = {key: 'STRING'};
@@ -1341,27 +1549,7 @@ describe('BigQuery', () => {
           );
         });
 
-        it('should throw for invalid provided types', done => {
-          bq.createJob = (reqOpts: JobOptions) => {
-            done();
-          };
-
-          const INVALID_TYPES = {key: 'invalid'};
-
-          assert.throws(() => {
-            bq.createQueryJob({
-              query: QUERY_STRING,
-              params: NAMED_PARAMS,
-              types: INVALID_TYPES,
-            });
-          }, /Invalid type provided./);
-        });
-
         it('should throw for invalid type structure provided', done => {
-          bq.createJob = (reqOpts: JobOptions) => {
-            done();
-          };
-
           assert.throws(() => {
             bq.createQueryJob({
               query: QUERY_STRING,
@@ -1369,6 +1557,7 @@ describe('BigQuery', () => {
               types: NAMED_TYPES,
             });
           }, /Provided types must match the value type passed to `params`/);
+          done();
         });
       });
 
@@ -1429,60 +1618,29 @@ describe('BigQuery', () => {
           );
         });
 
-        it('should throw for invalid provided types', done => {
+        it('should convert value and type to query parameter', done => {
+          const fakeQueryParameter = {fake: 'query parameter'};
+
           bq.createJob = (reqOpts: JobOptions) => {
+            const queryParameters = reqOpts.configuration!.query!
+              .queryParameters;
+            assert.deepStrictEqual(queryParameters, [fakeQueryParameter]);
             done();
           };
 
-          const INVALID_TYPES = ['invalid'];
-
-          assert.throws(() => {
-            bq.createQueryJob({
-              query: QUERY_STRING,
-              params: POSITIONAL_PARAMS,
-              types: INVALID_TYPES,
+          sandbox
+            .stub(BigQuery, 'valueToQueryParameter_')
+            .callsFake((value, type) => {
+              assert.strictEqual(value, POSITIONAL_PARAMS[0]);
+              assert.strictEqual(type, POSITIONAL_TYPES[0]);
+              return fakeQueryParameter;
             });
-          }, /Invalid type provided./);
-        });
 
-        it('should throw for invalid type structure provided', done => {
-          bq.createJob = (reqOpts: JobOptions) => {
-            done();
-          };
-
-          assert.throws(() => {
-            bq.createQueryJob({
-              query: QUERY_STRING,
-              params: POSITIONAL_PARAMS,
-              types: NAMED_TYPES,
-            });
-          }, /Provided types must match the value type passed to `params`/);
-        });
-
-        it('should throw for empty array without provided types', done => {
-          bq.createJob = (reqOpts: JobOptions) => {
-            done();
-          };
-
-          assert.throws(() => {
-            bq.createQueryJob({
-              query: QUERY_STRING,
-              params: [],
-            });
-          }, /Type must be provided for empty array./);
-        });
-
-        it('should throw for null value without provided types', done => {
-          bq.createJob = (reqOpts: JobOptions) => {
-            done();
-          };
-
-          assert.throws(() => {
-            bq.createQueryJob({
-              query: QUERY_STRING,
-              params: null,
-            });
-          }, /Type must be provided for null values./);
+          bq.createQueryJob({
+            query: QUERY_STRING,
+            params: POSITIONAL_PARAMS,
+            types: POSITIONAL_TYPES,
+          });
         });
       });
     });

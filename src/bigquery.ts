@@ -780,8 +780,6 @@ export class BigQuery extends common.Service {
           };
         }),
       };
-    } else if (is.boolean(providedType)) {
-      return {type: providedType};
     }
 
     if (!VALID_TYPES.includes(providedType.toUpperCase())) {
