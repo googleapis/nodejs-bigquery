@@ -761,16 +761,6 @@ describe('BigQuery', () => {
   });
 
   describe('getTypeDescriptorFromProvidedType_', () => {
-    const QUERY_STRING = 'SELECT * FROM [dataset.table]';
-    const NAMED_PARAMS = {
-      key: 'value',
-    };
-    const POSITIONAL_PARAMS = ['value'];
-
-    const NAMED_TYPES = {key: 'STRING'};
-
-    const POSITIONAL_TYPES = ['STRING'];
-
     it('should return correct type for an array', () => {
       const type = BigQuery.getTypeDescriptorFromProvidedType_(['INT64']);
 
@@ -798,108 +788,13 @@ describe('BigQuery', () => {
       });
     });
 
-    it('should throw for invalid provided types with named params', done => {
-      const INVALID_TYPES = {key: 'invalid'};
+    it('should throw for invalid provided type', () => {
+      const INVALID_TYPE = 'invalid';
 
       assert.throws(() => {
-        bq.createQueryJob({
-          query: QUERY_STRING,
-          params: NAMED_PARAMS,
-          types: INVALID_TYPES,
-        });
-      }, /Invalid type provided./);
-      done();
+        BigQuery.getTypeDescriptorFromProvidedType_(INVALID_TYPE);
+      }, /Invalid type provided:/);
     });
-
-    it('should throw if named param not present in provided types', done => {
-      const INVALID_TYPES = {other: 'string'};
-
-      assert.throws(() => {
-        bq.createQueryJob({
-          query: QUERY_STRING,
-          params: NAMED_PARAMS,
-          types: INVALID_TYPES,
-        });
-      }, /Type not provided for parameter: key/);
-      done();
-    });
-
-    it('should throw for invalid type structure provided for named params', done => {
-      assert.throws(() => {
-        bq.createQueryJob({
-          query: QUERY_STRING,
-          params: NAMED_PARAMS,
-          types: POSITIONAL_PARAMS,
-        });
-      }, /Provided types must match the value type passed to `params`/);
-      done();
-    });
-
-    it('should throw for invalid provided types with positional params', done => {
-      const INVALID_TYPES = ['invalid'];
-
-      assert.throws(() => {
-        bq.createQueryJob({
-          query: QUERY_STRING,
-          params: POSITIONAL_PARAMS,
-          types: INVALID_TYPES,
-        });
-      }, /Invalid type provided./);
-      done();
-    });
-
-    it('should throw for invalid type structure provided for positional params', done => {
-      assert.throws(() => {
-        bq.createQueryJob({
-          query: QUERY_STRING,
-          params: POSITIONAL_PARAMS,
-          types: NAMED_TYPES,
-        });
-      }, /Provided types must match the value type passed to `params`/);
-      done();
-    });
-
-    it('should throw for incorrect number of types provided for positional params', done => {
-      const ADDITIONAL_TYPES = ['string', 'string'];
-      assert.throws(() => {
-        bq.createQueryJob({
-          query: QUERY_STRING,
-          params: POSITIONAL_PARAMS,
-          types: ADDITIONAL_TYPES,
-        });
-      }, /Incorrect number of parameter types provided./);
-      done();
-    });
-
-    it('should throw for empty array without provided types', done => {
-      bq.createJob = (reqOpts: JobOptions) => {
-        done();
-      };
-
-      assert.throws(() => {
-        bq.createQueryJob({
-          query: QUERY_STRING,
-          params: [],
-        });
-      }, /Type must be provided for empty array./);
-      done();
-    });
-
-    it('should throw for null value without provided types', done => {
-      bq.createJob = (reqOpts: JobOptions) => {
-        done();
-      };
-
-      assert.throws(() => {
-        bq.createQueryJob({
-          query: QUERY_STRING,
-          params: null,
-        });
-      }, /Type must be provided for null values./);
-      done();
-    });
-
-    it('should return correct types', () => {});
   });
 
   describe('valueToQueryParameter_', () => {
@@ -916,12 +811,13 @@ describe('BigQuery', () => {
           };
         });
 
-      BigQuery.valueToQueryParameter_(value);
+      const queryParameter = BigQuery.valueToQueryParameter_(value);
+      assert.strictEqual(queryParameter.parameterValue.value, value);
     });
 
     it('should get the provided type', done => {
       const value = {};
-      const providedType = 'type';
+      const providedType = 'STRUCT';
 
       sandbox
         .stub(BigQuery, 'getTypeDescriptorFromProvidedType_')
@@ -933,7 +829,12 @@ describe('BigQuery', () => {
           };
         });
 
-      BigQuery.valueToQueryParameter_(value, providedType);
+      const queryParameter = BigQuery.valueToQueryParameter_(
+        value,
+        providedType
+      );
+
+      assert.strictEqual(queryParameter.parameterValue.value, value);
     });
 
     it('should format a Date', () => {
@@ -1549,15 +1450,26 @@ describe('BigQuery', () => {
           );
         });
 
-        it('should throw for invalid type structure provided', done => {
+        it('should throw for invalid type structure provided', () => {
           assert.throws(() => {
             bq.createQueryJob({
               query: QUERY_STRING,
-              params: POSITIONAL_PARAMS,
-              types: NAMED_TYPES,
+              params: NAMED_PARAMS,
+              types: POSITIONAL_TYPES,
             });
           }, /Provided types must match the value type passed to `params`/);
-          done();
+        });
+
+        it('should throw if named param not present in provided types', () => {
+          const INVALID_TYPES = {other: 'string'};
+
+          assert.throws(() => {
+            bq.createQueryJob({
+              query: QUERY_STRING,
+              params: NAMED_PARAMS,
+              types: INVALID_TYPES,
+            });
+          }, /Type not provided for parameter: key/);
         });
       });
 
@@ -1601,23 +1513,6 @@ describe('BigQuery', () => {
           );
         });
 
-        it('should allow for optional parameter types', done => {
-          bq.createJob = (reqOpts: JobOptions) => {
-            // tslint:disable-next-line no-any
-            assert.strictEqual((reqOpts as any).params, undefined);
-            done();
-          };
-
-          bq.createQueryJob(
-            {
-              query: QUERY_STRING,
-              params: POSITIONAL_PARAMS,
-              types: POSITIONAL_TYPES,
-            },
-            assert.ifError
-          );
-        });
-
         it('should convert value and type to query parameter', done => {
           const fakeQueryParameter = {fake: 'query parameter'};
 
@@ -1641,6 +1536,43 @@ describe('BigQuery', () => {
             params: POSITIONAL_PARAMS,
             types: POSITIONAL_TYPES,
           });
+        });
+
+        it('should allow for optional parameter types', () => {
+          bq.createJob = (reqOpts: JobOptions) => {
+            // tslint:disable-next-line no-any
+            assert.strictEqual((reqOpts as any).params, undefined);
+          };
+
+          bq.createQueryJob(
+            {
+              query: QUERY_STRING,
+              params: POSITIONAL_PARAMS,
+              types: POSITIONAL_TYPES,
+            },
+            assert.ifError
+          );
+        });
+
+        it('should throw for invalid type structure provided for positional params', () => {
+          assert.throws(() => {
+            bq.createQueryJob({
+              query: QUERY_STRING,
+              params: POSITIONAL_PARAMS,
+              types: NAMED_TYPES,
+            });
+          }, /Provided types must match the value type passed to `params`/);
+        });
+
+        it('should throw for incorrect number of types provided for positional params', () => {
+          const ADDITIONAL_TYPES = ['string', 'string'];
+          assert.throws(() => {
+            bq.createQueryJob({
+              query: QUERY_STRING,
+              params: POSITIONAL_PARAMS,
+              types: ADDITIONAL_TYPES,
+            });
+          }, /Incorrect number of parameter types provided./);
         });
       });
     });
