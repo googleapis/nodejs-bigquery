@@ -1035,19 +1035,13 @@ describe('BigQuery', () => {
             );
           });
 
-          it('should work with empty arrays', done => {
-            bigquery.query(
-              {
-                query: 'SELECT * FROM UNNEST (?)',
-                params: [[]],
-                types: [['INT64']],
-              },
-              (err, rows) => {
-                assert.ifError(err);
-                assert.strictEqual(rows!.length, 0);
-                done();
-              }
-            );
+          it('should work with empty arrays', async () => {
+            const [rows] = await bigquery.query({
+              query: 'SELECT * FROM UNNEST (?)',
+              params: [[]],
+              types: [['INT64']],
+            });
+            assert.strictEqual(rows.length, 0);
           });
 
           it('should work with structs', done => {
@@ -1285,21 +1279,15 @@ describe('BigQuery', () => {
             );
           });
 
-          it('should work with empty arrays', done => {
-            bigquery.query(
-              {
-                query: 'SELECT * FROM UNNEST (@nums)',
-                params: {
-                  nums: [],
-                },
-                types: {nums: ['INT64']},
+          it('should work with empty arrays', async () => {
+            const [rows] = await bigquery.query({
+              query: 'SELECT * FROM UNNEST (@nums)',
+              params: {
+                nums: [],
               },
-              (err, rows) => {
-                assert.ifError(err);
-                assert.strictEqual(rows!.length, 0);
-                done();
-              }
-            );
+              types: {nums: ['INT64']},
+            });
+            assert.strictEqual(rows.length, 0);
           });
 
           it('should work with structs', done => {

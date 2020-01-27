@@ -784,9 +784,9 @@ export class BigQuery extends common.Service {
 
     if (!VALID_TYPES.includes(providedType.toUpperCase())) {
       throw new Error(`Invalid type provided: "${providedType}"`);
-    } else {
-      return {type: providedType.toUpperCase()};
     }
+
+    return {type: providedType.toUpperCase()};
   }
 
   /**
@@ -807,6 +807,10 @@ export class BigQuery extends common.Service {
   ): ValueType {
     let typeName;
 
+    if (value === null) {
+      throw new Error('Type must be provided for null values.');
+    }
+
     if (value instanceof BigQueryDate) {
       typeName = 'DATE';
     } else if (value instanceof BigQueryDatetime) {
@@ -822,14 +826,11 @@ export class BigQuery extends common.Service {
     } else if (is.array(value)) {
       if (value.length === 0) {
         throw new Error('Type must be provided for empty array.');
-      } else {
-        return {
-          type: 'ARRAY',
-          arrayType: BigQuery.getTypeDescriptorFromValue_(value[0]),
-        };
       }
-    } else if (value === null) {
-      throw new Error('Type must be provided for null values.');
+      return {
+        type: 'ARRAY',
+        arrayType: BigQuery.getTypeDescriptorFromValue_(value[0]),
+      };
     } else if (is.boolean(value)) {
       typeName = 'BOOL';
     } else if (is.number(value)) {
@@ -873,7 +874,7 @@ export class BigQuery extends common.Service {
    * @returns {object} A properly-formed `queryParameter` object.
    */
   // tslint:disable-next-line no-any
-  static valueToQueryParameter_(value: any, providedType: any = undefined) {
+  static valueToQueryParameter_(value: any, providedType?: any) {
     if (is.date(value)) {
       value = BigQuery.timestamp(value as Date);
     }
@@ -1173,8 +1174,7 @@ export class BigQuery extends common.Service {
           if (query.params.length !== query.types.length) {
             throw new Error('Incorrect number of parameter types provided.');
           }
-          // tslint:disable-next-line: no-any
-          query.params.forEach((value: any, i: number) => {
+          query.params.forEach((value: {}, i: number) => {
             const queryParameter = BigQuery.valueToQueryParameter_(
               value,
               query.types[i]
@@ -1182,8 +1182,7 @@ export class BigQuery extends common.Service {
             query.queryParameters.push(queryParameter);
           });
         } else {
-          // tslint:disable-next-line: no-any
-          query.params.forEach((value: any) => {
+          query.params.forEach((value: {}) => {
             const queryParameter = BigQuery.valueToQueryParameter_(value);
             query.queryParameters.push(queryParameter);
           });

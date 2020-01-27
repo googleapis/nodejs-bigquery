@@ -740,13 +740,9 @@ describe('BigQuery', () => {
     });
 
     it('should throw with an empty array', () => {
-      const expectedError = new RegExp(
-        'Type must be provided for empty array.'
-      );
-
       assert.throws(() => {
         BigQuery.getTypeDescriptorFromValue_([]);
-      }, expectedError);
+      }, /Type must be provided for empty array./);
     });
 
     it('should throw with an null value', () => {
@@ -1392,7 +1388,8 @@ describe('BigQuery', () => {
         );
       });
 
-      describe('named', () => {
+      // tslint:disable-next-line: ban
+      describe.only('named', () => {
         it('should set the correct parameter mode', done => {
           bq.createJob = (reqOpts: JobOptions) => {
             const query = reqOpts.configuration!.query!;
@@ -1433,11 +1430,10 @@ describe('BigQuery', () => {
           );
         });
 
-        it('should allow for optional parameter types', done => {
+        it('should allow for optional parameter types', () => {
           bq.createJob = (reqOpts: JobOptions) => {
             // tslint:disable-next-line no-any
             assert.strictEqual((reqOpts as any).params, undefined);
-            done();
           };
 
           bq.createQueryJob(
