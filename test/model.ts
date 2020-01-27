@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import * as assert from 'assert';
+import {describe, it} from 'mocha';
 import * as proxyquire from 'proxyquire';
 import * as m from '../src/model';
 import {Dataset} from '../src/dataset';
