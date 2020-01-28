@@ -244,9 +244,11 @@ export class BigQuery extends common.Service {
   getJobsStream: (options?: GetJobsOptions) => ResourceStream<Job>;
 
   constructor(options: BigQueryOptions = {}) {
-    options.apiEndpoint = options.apiEndpoint || 'bigquery.googleapis.com';
+    options = Object.assign({}, options, {
+      apiEndpoint: options.apiEndpoint || 'bigquery.googleapis.com',
+    });
     const config = {
-      apiEndpoint: options.apiEndpoint,
+      apiEndpoint: options.apiEndpoint!,
       baseUrl: `https://${options.apiEndpoint}/bigquery/v2`,
       scopes: ['https://www.googleapis.com/auth/bigquery'],
       packageJson: require('../../package.json'),

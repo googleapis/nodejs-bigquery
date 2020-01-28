@@ -808,6 +808,10 @@ declare namespace bigquery {
      */
     shuffleOutputBytesSpilled?: string;
     /**
+     * Slot-milliseconds used by the stage.
+     */
+    slotMs?: string;
+    /**
      * Stage start time represented as milliseconds since epoch.
      */
     startMs?: string;
@@ -1728,9 +1732,10 @@ declare namespace bigquery {
      */
     nextPageToken?: string;
     /**
-     * Routines in the requested dataset. Only the following fields are populated:
+     * Routines in the requested dataset. Unless read_mask is set in the request,
+     * only the following fields are populated:
      * etag, project_id, dataset_id, routine_id, routine_type, creation_time,
-     * last_modified_time, language.
+     * last_modified_time, and language.
      */
     routines?: Array<IRoutine>;
   };
@@ -1750,6 +1755,10 @@ declare namespace bigquery {
 
   type IMaterializedViewDefinition = {
     /**
+     * [Optional] [TrustedTester] Enable automatic refresh of the materialized view when the base table is updated. The default value is "true".
+     */
+    enableRefresh?: boolean;
+    /**
      * [Output-only] [TrustedTester] The time when this materialized view was last modified, in milliseconds since the epoch.
      */
     lastRefreshTime?: string;
@@ -1757,6 +1766,10 @@ declare namespace bigquery {
      * [Required] A query whose result is persisted.
      */
     query?: string;
+    /**
+     * [Optional] [TrustedTester] The maximum frequency at which this materialized view will be refreshed. The default value is "1800000" (30 minutes).
+     */
+    refreshIntervalMs?: string;
   };
 
   type IModel = {
@@ -1771,7 +1784,8 @@ declare namespace bigquery {
     /**
      * Custom encryption configuration (e.g., Cloud KMS keys). This shows the
      * encryption configuration of the model data while stored in BigQuery
-     * storage.
+     * storage. This field can be used with PatchModel to update encryption key
+     * for an already encrypted model.
      */
     encryptionConfiguration?: IEncryptionConfiguration;
     /**
@@ -2481,7 +2495,7 @@ declare namespace bigquery {
      */
     rangePartitioning?: IRangePartitioning;
     /**
-     * [Beta] [Optional] If set to true, queries over this table require a partition filter that can be used for partition elimination to be specified.
+     * [Optional] If set to true, queries over this table require a partition filter that can be used for partition elimination to be specified.
      */
     requirePartitionFilter?: boolean;
     /**
@@ -2617,6 +2631,12 @@ declare namespace bigquery {
      * [Required] The field name. The name must contain only letters (a-z, A-Z), numbers (0-9), or underscores (_), and must start with a letter or underscore. The maximum length is 128 characters.
      */
     name?: string;
+    policyTags?: {
+      /**
+       * A list of category resource names. For example, "projects/1/location/eu/taxonomies/2/policyTags/3". At most 1 policy tag is allowed.
+       */
+      names?: Array<string>;
+    };
     /**
      * [Required] The field data type. Possible values include STRING, BYTES, INTEGER, INT64 (same as INTEGER), FLOAT, FLOAT64 (same as FLOAT), BOOLEAN, BOOL (same as BOOLEAN), TIMESTAMP, DATE, TIME, DATETIME, RECORD (where RECORD indicates that the field contains a nested schema) or STRUCT (same as RECORD).
      */
@@ -3088,7 +3108,7 @@ declare namespace bigquery {
        * If set, only the Routine fields in the field mask are returned in the
        * response. If unset, all Routine fields are returned.
        */
-      fieldMask?: string;
+      readMask?: string;
     };
 
     /**
@@ -3096,6 +3116,13 @@ declare namespace bigquery {
      * role.
      */
     type IListParams = {
+      /**
+       * If set, then only the Routines matching this filter are returned.
+       * The current supported form is either "routine_type:<RoutineType>" or
+       * "routineType:<RoutineType>", where <RoutineType> is a RoutineType enum.
+       * Example: "routineType:SCALAR_FUNCTION".
+       */
+      filter?: string;
       /**
        * The maximum number of results to return in a single response page.
        * Leverage the page tokens to iterate through the entire collection.
@@ -3106,6 +3133,14 @@ declare namespace bigquery {
        * results
        */
       pageToken?: string;
+      /**
+       * If set, then only the Routine fields in the field mask, as well as
+       * project_id, dataset_id and routine_id, are returned in the response.
+       * If unset, then the following Routine fields are returned:
+       * etag, project_id, dataset_id, routine_id, routine_type, creation_time,
+       * last_modified_time, and language.
+       */
+      readMask?: string;
     };
   }
 

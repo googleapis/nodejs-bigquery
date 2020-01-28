@@ -1,23 +1,22 @@
-/**
- * Copyright 2019 Google LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2019 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 'use strict';
 
 const {BigQuery} = require('@google-cloud/bigquery');
 const {assert} = require('chai');
+const {describe, it, before, after} = require('mocha');
 const cp = require('child_process');
 const uuid = require('uuid');
 
@@ -30,7 +29,7 @@ describe(`Models`, () => {
   const modelId = `gcloud_tests_${uuid.v4()}`.replace(/-/gi, '_');
 
   before(async () => {
-    const query = `CREATE OR REPLACE MODEL \`${datasetId}.${modelId}\` 
+    const query = `CREATE OR REPLACE MODEL \`${datasetId}.${modelId}\`
         OPTIONS(model_type='logistic_reg') AS
         SELECT
           IF(totals.transactions IS NULL, 0, 1) AS label,
@@ -96,7 +95,7 @@ describe(`Delete Model`, () => {
   const modelId = `gcloud_tests_${uuid.v4()}`.replace(/-/gi, '_');
 
   before(async () => {
-    const query = `CREATE OR REPLACE MODEL \`${datasetId}.${modelId}\` 
+    const query = `CREATE OR REPLACE MODEL \`${datasetId}.${modelId}\`
          OPTIONS(model_type='logistic_reg') AS
          SELECT
            IF(totals.transactions IS NULL, 0, 1) AS label,

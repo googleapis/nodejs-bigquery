@@ -4,6 +4,35 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+### [4.6.1](https://www.github.com/googleapis/nodejs-bigquery/compare/v4.6.0...v4.6.1) (2020-01-13)
+
+
+### Bug Fixes
+
+* don't modify the constructor options ([#607](https://www.github.com/googleapis/nodejs-bigquery/issues/607)) ([7df0799](https://www.github.com/googleapis/nodejs-bigquery/commit/7df0799e09e2a3a44f9ac4a04d157b7c85816fbe))
+
+## [4.6.0](https://www.github.com/googleapis/nodejs-bigquery/compare/v4.5.0...v4.6.0) (2020-01-05)
+
+
+### Features
+
+* types to support slot ms and read masks ([#592](https://www.github.com/googleapis/nodejs-bigquery/issues/592)) ([84d1c82](https://www.github.com/googleapis/nodejs-bigquery/commit/84d1c82981a2f3444836dde5d8fd00a23ee1cf94))
+
+## [4.5.0](https://www.github.com/googleapis/nodejs-bigquery/compare/v4.4.0...v4.5.0) (2019-12-05)
+
+
+### Features
+
+* **table:** allow opting out of default insert id ([#582](https://www.github.com/googleapis/nodejs-bigquery/issues/582)) ([6bf2dbd](https://www.github.com/googleapis/nodejs-bigquery/commit/6bf2dbd1ec09689338ee21b1d8666a4e8b2a7367))
+* adds policyTags parameter removes IGetParams Interface ([#576](https://www.github.com/googleapis/nodejs-bigquery/issues/576)) ([8cf8f1d](https://www.github.com/googleapis/nodejs-bigquery/commit/8cf8f1d15cd53406ac911fef512f69132d823873))
+
+
+### Bug Fixes
+
+* **deps:** TypeScript 3.7.0 causes breaking change in typings ([#586](https://www.github.com/googleapis/nodejs-bigquery/issues/586)) ([04f8cba](https://www.github.com/googleapis/nodejs-bigquery/commit/04f8cba7c86675fd7e12bb5ac4235f56745c033f))
+* **deps:** update dependency yargs to v15 ([#579](https://www.github.com/googleapis/nodejs-bigquery/issues/579)) ([92119e3](https://www.github.com/googleapis/nodejs-bigquery/commit/92119e3b23874263d9529283194a149b358b7c9f))
+* **docs:** snippets are now replaced in jsdoc comments ([#573](https://www.github.com/googleapis/nodejs-bigquery/issues/573)) ([a0d3538](https://www.github.com/googleapis/nodejs-bigquery/commit/a0d3538ad83b356918cabbd2bbfaf405e0a8272d))
+
 ## [4.4.0](https://www.github.com/googleapis/nodejs-bigquery/compare/v4.3.0...v4.4.0) (2019-11-08)
 
 

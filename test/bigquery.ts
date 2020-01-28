@@ -1,18 +1,16 @@
-/**
- * Copyright 2019 Google LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2019 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 import {
   DecorateRequestOptions,
@@ -24,6 +22,7 @@ import {
 import * as pfy from '@google-cloud/promisify';
 import arrify = require('arrify');
 import * as assert from 'assert';
+import {describe, it} from 'mocha';
 import Big from 'big.js';
 import * as extend from 'extend';
 import * as proxyquire from 'proxyquire';
@@ -223,6 +222,20 @@ describe('BigQuery', () => {
 
       const calledWith = bq.calledWith_[0];
       assert.deepStrictEqual(calledWith.scopes, expectedScopes);
+    });
+
+    it('should not modify options argument', () => {
+      const options = {
+        projectId: PROJECT_ID,
+      };
+      const expectedCalledWith = Object.assign({}, options, {
+        apiEndpoint: 'bigquery.googleapis.com',
+      });
+      const bigquery = new BigQuery(options);
+      const calledWith = bigquery.calledWith_[1];
+      assert.notStrictEqual(calledWith, options);
+      assert.notDeepStrictEqual(calledWith, options);
+      assert.deepStrictEqual(calledWith, expectedCalledWith);
     });
   });
 
