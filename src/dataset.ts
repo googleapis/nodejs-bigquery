@@ -44,6 +44,7 @@ import {
   TableOptions,
 } from './table';
 import {Model} from './model';
+import {Routine} from './routine';
 import bigquery from './types';
 
 export interface DatasetDeleteOptions {
@@ -68,6 +69,18 @@ export type GetModelsCallback = PagedCallback<
   bigquery.IListModelsResponse
 >;
 
+export type GetRoutinesOptions = PagedRequest<bigquery.routines.IListParams>;
+export type GetRoutinesResponse = PagedResponse<
+  Routine,
+  GetRoutinesOptions,
+  bigquery.IListRoutinesResponse
+>;
+export type GetRoutinesCallback = PagedCallback<
+  Routine,
+  GetRoutinesOptions,
+  bigquery.IListRoutinesResponse
+>;
+
 export type GetTablesOptions = PagedRequest<bigquery.tables.IListParams>;
 export type GetTablesResponse = PagedResponse<
   Table,
@@ -79,6 +92,10 @@ export type GetTablesCallback = PagedCallback<
   GetTablesOptions,
   bigquery.ITableList
 >;
+
+export type RoutineMetadata = bigquery.IRoutine;
+export type RoutineResponse = [Routine, bigquery.IRoutine];
+export type RoutineCallback = ResourceCallback<Routine, bigquery.IRoutine>;
 
 export type TableResponse = [Table, bigquery.ITable];
 export type TableCallback = ResourceCallback<Table, bigquery.ITable>;
@@ -103,6 +120,7 @@ class Dataset extends ServiceObject {
   bigQuery: BigQuery;
   location?: string;
   getModelsStream: (options?: GetModelsOptions) => ResourceStream<Model>;
+  getRoutinesStream: (options?: GetRoutinesOptions) => ResourceStream<Routine>;
   getTablesStream: (options?: GetTablesOptions) => ResourceStream<Table>;
   constructor(bigQuery: BigQuery, id: string, options?: DatasetOptions) {
     const methods = {
@@ -331,6 +349,34 @@ class Dataset extends ServiceObject {
     this.getModelsStream = paginator.streamify<Model>('getModels');
 
     /**
+     * List all or some of the {@link Routine} objects in your project as a
+     * readable object stream.
+     *
+     * @method Dataset#getRoutinesStream
+     * @param {GetRoutinesOptions} [options] Configuration object.
+     * @returns {stream}
+     *
+     * @example
+     * const {BigQuery} = require('@google-cloud/bigquery');
+     * const bigquery = new BigQuery();
+     * const dataset = bigquery.dataset('institutions');
+     *
+     * dataset.getRoutinesStream()
+     *   .on('error', console.error)
+     *   .on('data', (routine) => {})
+     *   .on('end', () => {
+     *     // All routines have been retrieved
+     *   });
+     *
+     * @example <caption>If you anticipate many results, you can end a stream early to prevent unnecessary processing and API requests.</caption>
+     * dataset.getRoutinesStream()
+     *   .on('data', function(routine) {
+     *     this.end();
+     *   });
+     */
+    this.getRoutinesStream = paginator.streamify<Routine>('getRoutines');
+
+    /**
      * List all or some of the {module:bigquery/table} objects in your project
      * as a readable object stream.
      *
@@ -420,6 +466,94 @@ class Dataset extends ServiceObject {
     });
 
     return this.bigQuery.createQueryStream(options);
+  }
+
+  createRoutine(id: string, config: RoutineMetadata): Promise<RoutineResponse>;
+  createRoutine(
+    id: string,
+    config: RoutineMetadata,
+    callback: RoutineCallback
+  ): void;
+  /**
+   * @callback CreateRoutineCallback
+   * @param {?Error} err Request error, if any.
+   * @param {Routine} routine The newly created routine.
+   * @param {object} response The full API response body.
+   */
+  /**
+   * @typedef {array} CreateRoutineResponse
+   * @property {Routine} 0 The newly created routine.
+   * @property {object} 1 The full API response body.
+   */
+  /**
+   * Create a routine.
+   *
+   * @see [Routines: insert API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/rest/v2/routines/insert}
+   *
+   * @param {string} id The routine ID.
+   * @param {object} config A [routine resource]{@link https://cloud.google.com/bigquery/docs/reference/rest/v2/routines#Routine}.
+   * @param {CreateRoutineCallback} [callback] The callback function.
+   * @returns {Promise<CreateRoutineResponse>}
+   *
+   * @example
+   * const {BigQuery} = require('@google-cloud/bigquery');
+   * const bigquery = new BigQuery();
+   * const dataset = bigquery.dataset('my-dataset');
+   *
+   * const id = 'my-routine';
+   * const config = {
+   *   arguments: [{
+   *     name: 'x',
+   *     dataType: {
+   *       typeKind: 'INT64'
+   *     }
+   *   }],
+   *   definitionBody: 'x * 3',
+   *   routineType: 'SCALAR_FUNCTION',
+   *   returnType: {
+   *     typeKind: 'INT64'
+   *   }
+   * };
+   *
+   * dataset.createRoutine(id, config, (err, routine, apiResponse) => {
+   *   if (!err) {
+   *     // The routine was created successfully.
+   *   }
+   * });
+   *
+   * @example <caption>If the callback is omitted a Promise will be returned</caption>
+   * const [routine, apiResponse] = await dataset.createRoutine(id, config);
+   */
+  createRoutine(
+    id: string,
+    config: RoutineMetadata,
+    callback?: RoutineCallback
+  ): void | Promise<RoutineResponse> {
+    const json = Object.assign({}, config, {
+      routineReference: {
+        routineId: id,
+        datasetId: this.id,
+        projectId: this.bigQuery.projectId,
+      },
+    });
+
+    this.request(
+      {
+        method: 'POST',
+        uri: '/routines',
+        json,
+      },
+      (err, resp) => {
+        if (err) {
+          callback!(err, null, resp);
+          return;
+        }
+
+        const routine = this.routine(resp.routineReference.routineId);
+        routine.metadata = resp;
+        callback!(null, routine, resp);
+      }
+    );
   }
 
   createTable(id: string, options: TableMetadata): Promise<TableResponse>;
@@ -654,6 +788,102 @@ class Dataset extends ServiceObject {
     );
   }
 
+  getRoutines(options?: GetRoutinesOptions): Promise<GetRoutinesResponse>;
+  getRoutines(options: GetRoutinesOptions, callback: GetRoutinesCallback): void;
+  getRoutines(callback: GetRoutinesCallback): void;
+  /**
+   * @typedef {object} GetRoutinesOptions
+   * @property {boolean} [autoPaginate=true] Have pagination handled
+   *     automatically.
+   * @property {number} [maxApiCalls] Maximum number of API calls to make.
+   * @property {number} [maxResults] Maximum number of results to return.
+   * @property {string} [pageToken] Token returned from a previous call, to
+   *     request the next page of results.
+   */
+  /**
+   * @callback GetRoutinesCallback
+   * @param {?Error} err Request error, if any.
+   * @param {Routine[]} routines List of routine objects.
+   * @param {GetRoutinesOptions} nextQuery If `autoPaginate` is set to true,
+   *     this will be a prepared query for the next page of results.
+   * @param {object} response The full API response.
+   */
+  /**
+   * @typedef {array} GetRoutinesResponse
+   * @property {Routine[]} 0 List of routine objects.
+   * @property {GetRoutinesOptions} 1 If `autoPaginate` is set to true, this
+   *     will be a prepared query for the next page of results.
+   * @property {object} 2 The full API response.
+   */
+  /**
+   * Get a list of routines.
+   *
+   * @see [Routines: list API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/rest/v2/routines/list}
+   *
+   * @param {GetRoutinesOptions} [options] Request options.
+   * @param {GetRoutinesCallback} [callback] The callback function.
+   * @returns {Promise<GetRoutinesResponse>}
+   *
+   * @example
+   * const {BigQuery} = require('@google-cloud/bigquery');
+   * const bigquery = new BigQuery();
+   * const dataset = bigquery.dataset('institutions');
+   *
+   * dataset.getRoutines((err, routines) => {
+   *   // routines is an array of `Routine` objects.
+   * });
+   *
+   * @example <caption>To control how many API requests are made and page through the results manually, set `autoPaginate` to `false`.</caption>
+   * function manualPaginationCallback(err, routines, nextQuery, apiResponse) {
+   *   if (nextQuery) {
+   *     // More results exist.
+   *     dataset.getRoutines(nextQuery, manualPaginationCallback);
+   *   }
+   * }
+   *
+   * dataset.getRoutines({
+   *   autoPaginate: false
+   * }, manualPaginationCallback);
+   *
+   * @example <caption>If the callback is omitted a Promise will be returned</caption>
+   * const [routines] = await dataset.getRoutines();
+   */
+  getRoutines(
+    optsOrCb?: GetRoutinesOptions | GetRoutinesCallback,
+    cb?: GetRoutinesCallback
+  ): void | Promise<GetRoutinesResponse> {
+    const options = typeof optsOrCb === 'object' ? optsOrCb : {};
+    const callback = typeof optsOrCb === 'function' ? optsOrCb : cb;
+
+    this.request(
+      {
+        uri: '/routines',
+        qs: options,
+      },
+      (err: Error | null, resp: bigquery.IListRoutinesResponse) => {
+        if (err) {
+          callback!(err, null, null, resp);
+          return;
+        }
+
+        let nextQuery: {} | null = null;
+        if (resp.nextPageToken) {
+          nextQuery = extend({}, options, {
+            pageToken: resp.nextPageToken,
+          });
+        }
+
+        const routines = (resp.routines || []).map(metadata => {
+          const routine = this.routine(metadata.routineReference!.routineId!);
+          routine.metadata = metadata;
+          return routine;
+        });
+
+        callback!(null, routines, nextQuery, resp);
+      }
+    );
+  }
+
   getTables(options?: GetTablesOptions): Promise<GetTablesResponse>;
   getTables(options: GetTablesOptions, callback: GetTablesCallback): void;
   getTables(callback: GetTablesCallback): void;
@@ -800,6 +1030,29 @@ class Dataset extends ServiceObject {
   }
 
   /**
+   * Create a Routine object.
+   *
+   * @throws {TypeError} if routine ID is missing.
+   *
+   * @param {string} id The ID of the routine.
+   * @returns {Routine}
+   *
+   * @example
+   * const {BigQuery} = require('@google-cloud/bigquery');
+   * const bigquery = new BigQuery();
+   * const dataset = bigquery.dataset('institutions');
+   *
+   * const routine = dataset.routine('my_routine');
+   */
+  routine(id: string): Routine {
+    if (typeof id !== 'string') {
+      throw new TypeError('A routine ID is required.');
+    }
+
+    return new Routine(this, id);
+  }
+
+  /**
    * Create a Table object.
    *
    * @throws {TypeError} if table ID is missing.
@@ -840,7 +1093,7 @@ class Dataset extends ServiceObject {
  *
  * These methods can be auto-paginated.
  */
-paginator.extend(Dataset, ['getModels', 'getTables']);
+paginator.extend(Dataset, ['getModels', 'getRoutines', 'getTables']);
 
 /*! Developer Documentation
  *
@@ -848,7 +1101,7 @@ paginator.extend(Dataset, ['getModels', 'getTables']);
  * that a callback is omitted.
  */
 promisifyAll(Dataset, {
-  exclude: ['model', 'table'],
+  exclude: ['model', 'routine', 'table'],
 });
 
 /**

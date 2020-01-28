@@ -57,9 +57,15 @@ export {
   GetModelsCallback,
   GetModelsOptions,
   GetModelsResponse,
+  GetRoutinesCallback,
+  GetRoutinesOptions,
+  GetRoutinesResponse,
   GetTablesCallback,
   GetTablesOptions,
   GetTablesResponse,
+  RoutineCallback,
+  RoutineMetadata,
+  RoutineResponse,
   TableCallback,
   TableResponse,
 } from './dataset';
@@ -103,4 +109,5 @@ export {
   ViewDefinition,
 } from './table';
 
+export {Routine} from './routine';
 export {Model} from './model';
