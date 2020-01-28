@@ -1388,8 +1388,7 @@ describe('BigQuery', () => {
         );
       });
 
-      // tslint:disable-next-line: ban
-      describe.only('named', () => {
+      describe('named', () => {
         it('should set the correct parameter mode', done => {
           bq.createJob = (reqOpts: JobOptions) => {
             const query = reqOpts.configuration!.query!;

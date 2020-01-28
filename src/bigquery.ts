@@ -873,8 +873,11 @@ export class BigQuery extends common.Service {
    * @param {*} value The value.
    * @returns {object} A properly-formed `queryParameter` object.
    */
-  // tslint:disable-next-line no-any
-  static valueToQueryParameter_(value: any, providedType?: any) {
+  static valueToQueryParameter_(
+    // tslint:disable-next-line: no-any
+    value: any,
+    providedType?: string | {[key: string]: string} | string[]
+  ) {
     if (is.date(value)) {
       value = BigQuery.timestamp(value as Date);
     }
@@ -896,6 +899,7 @@ export class BigQuery extends common.Service {
           const value = getValue(itemValue, parameterType.arrayType!);
           if (is.object(value) || is.array(value)) {
             if (is.array(providedType)) {
+              providedType = providedType as [];
               return BigQuery.valueToQueryParameter_(value, providedType[0])
                 .parameterValue!;
             } else {
