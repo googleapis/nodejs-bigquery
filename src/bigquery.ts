@@ -750,12 +750,8 @@ export class BigQuery extends common.Service {
    * @param {*} providedType The type.
    * @returns {string} The valid type provided.
    */
-  // tslint:disable-next-line no-any
   static getTypeDescriptorFromProvidedType_(
-    providedType:
-      | string
-      | ProvidedTypeStruct
-      | Array<ProvidedTypeStruct | string | []>
+    providedType: string | ProvidedTypeStruct | ProvidedTypeArray
   ): ValueType {
     // The list of types can be found in src/types.d.ts
     const VALID_TYPES = [
@@ -889,10 +885,7 @@ export class BigQuery extends common.Service {
   static valueToQueryParameter_(
     // tslint:disable-next-line: no-any
     value: any,
-    providedType?:
-      | string
-      | ProvidedTypeStruct
-      | Array<ProvidedTypeStruct | string | []>
+    providedType?: string | ProvidedTypeStruct | ProvidedTypeArray
   ) {
     if (is.date(value)) {
       value = BigQuery.timestamp(value as Date);
