@@ -708,7 +708,7 @@ export class BigQuery extends common.Service {
    *
    * @example
    * const {BigQuery} = require('@google-cloud/bigquery');
-   * const geography = BigQuery.geography('POINT(1, 2)');
+   * const geography = BigQuery.geography('POINT(1 2)');
    */
 
   /**
@@ -721,7 +721,7 @@ export class BigQuery extends common.Service {
    * @example
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
-   * const geography = bigquery.geography('POINT(1, 2)');
+   * const geography = bigquery.geography('POINT(1 2)');
    */
   static geography(value: string) {
     return new Geography(value);
