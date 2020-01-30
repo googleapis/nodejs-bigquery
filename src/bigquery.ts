@@ -156,6 +156,12 @@ export interface BigQueryDatetimeOptions {
   fractional?: string | number;
 }
 
+export type ProvidedTypeArray = Array<ProvidedTypeStruct | string | []>;
+
+export interface ProvidedTypeStruct {
+  [key: string]: string | ProvidedTypeArray | ProvidedTypeStruct;
+}
+
 export type QueryParameter = bigquery.IQueryParameter;
 
 export interface BigQueryOptions extends common.GoogleAuthOptions {
@@ -745,7 +751,12 @@ export class BigQuery extends common.Service {
    * @returns {string} The valid type provided.
    */
   // tslint:disable-next-line no-any
-  static getTypeDescriptorFromProvidedType_(providedType: any): ValueType {
+  static getTypeDescriptorFromProvidedType_(
+    providedType:
+      | string
+      | ProvidedTypeStruct
+      | Array<ProvidedTypeStruct | string | []>
+  ): ValueType {
     // The list of types can be found in src/types.d.ts
     const VALID_TYPES = [
       'DATE',
@@ -764,6 +775,7 @@ export class BigQuery extends common.Service {
     ];
 
     if (is.array(providedType)) {
+      providedType = providedType as Array<ProvidedTypeStruct | string | []>;
       return {
         type: 'ARRAY',
         arrayType: BigQuery.getTypeDescriptorFromProvidedType_(providedType[0]),
@@ -775,14 +787,15 @@ export class BigQuery extends common.Service {
           return {
             name: prop,
             type: BigQuery.getTypeDescriptorFromProvidedType_(
-              providedType[prop]
+              (providedType as ProvidedTypeStruct)[prop]
             ),
           };
         }),
       };
     }
 
-    if (!VALID_TYPES.includes(providedType.toUpperCase())) {
+    providedType = (providedType as string).toUpperCase();
+    if (!VALID_TYPES.includes(providedType)) {
       throw new Error(`Invalid type provided: "${providedType}"`);
     }
 
@@ -876,14 +889,16 @@ export class BigQuery extends common.Service {
   static valueToQueryParameter_(
     // tslint:disable-next-line: no-any
     value: any,
-    providedType?: string | {[key: string]: string} | string[]
+    providedType?:
+      | string
+      | ProvidedTypeStruct
+      | Array<ProvidedTypeStruct | string | []>
   ) {
     if (is.date(value)) {
       value = BigQuery.timestamp(value as Date);
     }
 
     let parameterType: bigquery.IQueryParameterType;
-
     if (providedType) {
       parameterType = BigQuery.getTypeDescriptorFromProvidedType_(providedType);
     } else {
@@ -892,7 +907,6 @@ export class BigQuery extends common.Service {
     const queryParameter: QueryParameter = {parameterType, parameterValue: {}};
 
     const typeName = queryParameter!.parameterType!.type!;
-
     if (typeName === 'ARRAY') {
       queryParameter.parameterValue!.arrayValues = (value as Array<{}>).map(
         itemValue => {
@@ -912,9 +926,15 @@ export class BigQuery extends common.Service {
     } else if (typeName === 'STRUCT') {
       queryParameter.parameterValue!.structValues = Object.keys(value).reduce(
         (structValues, prop) => {
-          const nestedQueryParameter = BigQuery.valueToQueryParameter_(
-            value[prop]
-          );
+          let nestedQueryParameter;
+          if (providedType) {
+            nestedQueryParameter = BigQuery.valueToQueryParameter_(
+              value[prop],
+              (providedType as ProvidedTypeStruct)[prop]
+            );
+          } else {
+            nestedQueryParameter = BigQuery.valueToQueryParameter_(value[prop]);
+          }
           // tslint:disable-next-line no-any
           (structValues as any)[prop] = nestedQueryParameter.parameterValue;
           return structValues;
