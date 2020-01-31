@@ -73,6 +73,7 @@
     "@types/sinon": "^7.0.12",
     "@types/tmp": "0.1.0",
     "@types/uuid": "^3.4.4",
+    "c8": "^7.0.0",
     "codecov": "^3.5.0",
     "discovery-tsd": "^0.2.0",
     "eslint": "^6.0.0",
@@ -89,12 +90,10 @@
     "mocha": "^7.0.0",
     "mv": "^2.1.1",
     "ncp": "^2.0.0",
-    "c8": "^7.0.0",
     "power-assert": "^1.6.1",
     "prettier": "^1.17.1",
     "proxyquire": "^2.1.0",
     "sinon": "^8.0.0",
-    "source-map-support": "^0.5.12",
     "tmp": "0.1.0",
     "typescript": "3.6.4"
   }
