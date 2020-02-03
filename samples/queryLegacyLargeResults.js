@@ -30,9 +30,10 @@ function main(
     /**
      * TODO(developer): Uncomment the following lines before running the sample
      */
-    // const projectId = "google.com:bq-rampup"
-    // const datasetId = "123fun";
-    // const tableId = "test5";
+    // const projectId = "my_project"
+    // const datasetId = "my_dataset";
+    // const tableId = "my_table";
+
     const query = `SELECT word FROM [bigquery-public-data:samples.shakespeare] LIMIT 10;`;
 
     // For all options, see https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs/query

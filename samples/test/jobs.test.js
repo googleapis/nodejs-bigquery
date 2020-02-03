@@ -55,4 +55,9 @@ describe(`Jobs`, () => {
     const output = execSync(`node cancelJob.js ${jobId}`);
     assert.include(output, `state:`);
   });
+
+  it(`should create a job`, async () => {
+    const output = execSync(`node createJob.js`);
+    assert.include(output, `Rows:`);
+  });
 });
