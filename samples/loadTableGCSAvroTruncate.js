@@ -15,7 +15,7 @@
 'use strict';
 
 function main(
-  datasetId = 'my_dataset', // Existing datast ID
+  datasetId = 'my_dataset', // Existing dataset ID
   tableId = 'us_states' // Existing table ID
 ) {
   // [START bigquery_load_table_gcs_avro_truncate]

@@ -15,7 +15,7 @@
 'use strict';
 
 function main(
-  datasetId = 'm_dataset', // Existing dataset ID
+  datasetId = 'my_dataset', // Existing dataset ID
   tableId = 'my_view' // Existing table ID
 ) {
   // [START bigquery_get_view]
