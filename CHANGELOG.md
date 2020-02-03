@@ -4,6 +4,14 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## [4.7.0](https://www.github.com/googleapis/nodejs-bigquery/compare/v4.6.1...v4.7.0) (2020-01-30)
+
+
+### Features
+
+* add support for scripting/routines ([#580](https://www.github.com/googleapis/nodejs-bigquery/issues/580)) ([63d7e24](https://www.github.com/googleapis/nodejs-bigquery/commit/63d7e24bd9347f7b5202127afc1e92be34819a77))
+* **params:** adds optional param types ([#599](https://www.github.com/googleapis/nodejs-bigquery/issues/599)) ([008946a](https://www.github.com/googleapis/nodejs-bigquery/commit/008946a05b8d1d54add31a25cc52aba2a61448a8))
+
 ### [4.6.1](https://www.github.com/googleapis/nodejs-bigquery/compare/v4.6.0...v4.6.1) (2020-01-13)
 
 

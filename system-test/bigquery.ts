@@ -31,6 +31,7 @@ import {
   Job,
   Model,
   RowMetadata,
+  Routine,
   Table,
 } from '../src';
 
@@ -675,6 +676,79 @@ describe('BigQuery', () => {
     });
   });
 
+  describe('BigQuery/Routine', () => {
+    before(() => {
+      const routineId = `${bigquery.projectId}.${dataset.id}.my_ddl_routine`;
+
+      return bigquery.query(`
+        CREATE FUNCTION \`${routineId}\`(
+          arr ARRAY<STRUCT<name STRING, val INT64>>
+        ) AS (
+          (SELECT SUM(IF(elem.name = "foo",elem.val,null)) FROM UNNEST(arr) AS elem)
+        )
+      `);
+    });
+
+    after(async () => {
+      const [routines] = await dataset.getRoutines();
+      return Promise.all(routines.map(routine => routine.delete()));
+    });
+
+    it('should create a routine via insert', () => {
+      return dataset.createRoutine('my_routine', {
+        arguments: [
+          {
+            name: 'x',
+            dataType: {
+              typeKind: 'INT64',
+            },
+          },
+        ],
+        definitionBody: 'x * 3',
+        routineType: 'SCALAR_FUNCTION',
+        returnType: {
+          typeKind: 'INT64',
+        },
+      });
+    });
+
+    it('should list all the routines', async () => {
+      const [routines] = await dataset.getRoutines();
+      assert.ok(routines.length > 0);
+      assert.ok(routines[0] instanceof Routine);
+    });
+
+    it('should get the routines as a stream', done => {
+      const routines: Routine[] = [];
+
+      dataset
+        .getRoutinesStream()
+        .on('error', done)
+        .on('data', routine => {
+          routines.push(routine);
+        })
+        .on('end', () => {
+          assert.ok(routines.length > 0);
+          assert.ok(routines[0] instanceof Routine);
+          done();
+        });
+    });
+
+    it('should check to see if a routine exists', async () => {
+      const routine = dataset.routine('my_ddl_routine');
+      const [exists] = await routine.exists();
+      assert.ok(exists);
+    });
+
+    it('should update an existing routine', async () => {
+      const routine = dataset.routine('my_ddl_routine');
+      const description = 'A routine!';
+
+      await routine.setMetadata({description});
+      assert.strictEqual(routine.metadata.description, description);
+    });
+  });
+
   describe('BigQuery/Table', () => {
     const TEST_DATA_JSON_PATH = require.resolve(
       '../../system-test/data/kitten-test-data.json'
@@ -1035,6 +1109,15 @@ describe('BigQuery', () => {
             );
           });
 
+          it('should work with empty arrays', async () => {
+            const [rows] = await bigquery.query({
+              query: 'SELECT * FROM UNNEST (?)',
+              params: [[]],
+              types: [['INT64']],
+            });
+            assert.strictEqual(rows.length, 0);
+          });
+
           it('should work with structs', done => {
             bigquery.query(
               {
@@ -1268,6 +1351,17 @@ describe('BigQuery', () => {
                 done();
               }
             );
+          });
+
+          it('should work with empty arrays', async () => {
+            const [rows] = await bigquery.query({
+              query: 'SELECT * FROM UNNEST (@nums)',
+              params: {
+                nums: [],
+              },
+              types: {nums: ['INT64']},
+            });
+            assert.strictEqual(rows.length, 0);
           });
 
           it('should work with structs', done => {

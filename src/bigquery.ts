@@ -94,6 +94,7 @@ export type Query = JobRequest<bigquery.IJobConfigurationQuery> & {
   // tslint:disable-next-line no-any
   params?: any[] | {[param: string]: any};
   dryRun?: boolean;
+  types?: string[] | string[][] | {[type: string]: string[]};
   defaultDataset?: Dataset;
   job?: Job;
   maxResults?: number;
@@ -153,6 +154,12 @@ export interface BigQueryDatetimeOptions {
   minutes?: string | number;
   seconds?: string | number;
   fractional?: string | number;
+}
+
+export type ProvidedTypeArray = Array<ProvidedTypeStruct | string | []>;
+
+export interface ProvidedTypeStruct {
+  [key: string]: string | ProvidedTypeArray | ProvidedTypeStruct;
 }
 
 export type QueryParameter = bigquery.IQueryParameter;
@@ -732,6 +739,66 @@ export class BigQuery extends common.Service {
   }
 
   /**
+   * Return a value's provided type.
+   *
+   * @private
+   *
+   * @throws {error} If the type provided is invalid.
+   *
+   * @see [Data Type]{@link https://cloud.google.com/bigquery/data-types}
+   *
+   * @param {*} providedType The type.
+   * @returns {string} The valid type provided.
+   */
+  static getTypeDescriptorFromProvidedType_(
+    providedType: string | ProvidedTypeStruct | ProvidedTypeArray
+  ): ValueType {
+    // The list of types can be found in src/types.d.ts
+    const VALID_TYPES = [
+      'DATE',
+      'DATETIME',
+      'TIME',
+      'TIMESTAMP',
+      'BYTES',
+      'NUMERIC',
+      'BOOL',
+      'INT64',
+      'FLOAT64',
+      'STRING',
+      'GEOGRAPHY',
+      'ARRAY',
+      'STRUCT',
+    ];
+
+    if (is.array(providedType)) {
+      providedType = providedType as Array<ProvidedTypeStruct | string | []>;
+      return {
+        type: 'ARRAY',
+        arrayType: BigQuery.getTypeDescriptorFromProvidedType_(providedType[0]),
+      };
+    } else if (is.object(providedType)) {
+      return {
+        type: 'STRUCT',
+        structTypes: Object.keys(providedType).map(prop => {
+          return {
+            name: prop,
+            type: BigQuery.getTypeDescriptorFromProvidedType_(
+              (providedType as ProvidedTypeStruct)[prop]
+            ),
+          };
+        }),
+      };
+    }
+
+    providedType = (providedType as string).toUpperCase();
+    if (!VALID_TYPES.includes(providedType)) {
+      throw new Error(`Invalid type provided: "${providedType}"`);
+    }
+
+    return {type: providedType.toUpperCase()};
+  }
+
+  /**
    * Detect a value's type.
    *
    * @private
@@ -743,9 +810,15 @@ export class BigQuery extends common.Service {
    * @param {*} value The value.
    * @returns {string} The type detected from the value.
    */
-  // tslint:disable-next-line no-any
-  static getType_(value: any): ValueType {
+  static getTypeDescriptorFromValue_(
+    // tslint:disable-next-line: no-any
+    value: any
+  ): ValueType {
     let typeName;
+
+    if (value === null) {
+      throw new Error('Type must be provided for null values.');
+    }
 
     if (value instanceof BigQueryDate) {
       typeName = 'DATE';
@@ -760,9 +833,12 @@ export class BigQuery extends common.Service {
     } else if (value instanceof Big) {
       typeName = 'NUMERIC';
     } else if (is.array(value)) {
+      if (value.length === 0) {
+        throw new Error('Type must be provided for empty array.');
+      }
       return {
         type: 'ARRAY',
-        arrayType: BigQuery.getType_(value[0]),
+        arrayType: BigQuery.getTypeDescriptorFromValue_(value[0]),
       };
     } else if (is.boolean(value)) {
       typeName = 'BOOL';
@@ -774,7 +850,7 @@ export class BigQuery extends common.Service {
         structTypes: Object.keys(value).map(prop => {
           return {
             name: prop,
-            type: BigQuery.getType_(value[prop]),
+            type: BigQuery.getTypeDescriptorFromValue_(value[prop]),
           };
         }),
       };
@@ -806,23 +882,36 @@ export class BigQuery extends common.Service {
    * @param {*} value The value.
    * @returns {object} A properly-formed `queryParameter` object.
    */
-  // tslint:disable-next-line no-any
-  static valueToQueryParameter_(value: any) {
+  static valueToQueryParameter_(
+    // tslint:disable-next-line: no-any
+    value: any,
+    providedType?: string | ProvidedTypeStruct | ProvidedTypeArray
+  ) {
     if (is.date(value)) {
       value = BigQuery.timestamp(value as Date);
     }
 
-    const parameterType = BigQuery.getType_(value);
+    let parameterType: bigquery.IQueryParameterType;
+    if (providedType) {
+      parameterType = BigQuery.getTypeDescriptorFromProvidedType_(providedType);
+    } else {
+      parameterType = BigQuery.getTypeDescriptorFromValue_(value);
+    }
     const queryParameter: QueryParameter = {parameterType, parameterValue: {}};
 
     const typeName = queryParameter!.parameterType!.type!;
-
     if (typeName === 'ARRAY') {
       queryParameter.parameterValue!.arrayValues = (value as Array<{}>).map(
         itemValue => {
           const value = getValue(itemValue, parameterType.arrayType!);
           if (is.object(value) || is.array(value)) {
-            return BigQuery.valueToQueryParameter_(value).parameterValue!;
+            if (is.array(providedType)) {
+              providedType = providedType as [];
+              return BigQuery.valueToQueryParameter_(value, providedType[0])
+                .parameterValue!;
+            } else {
+              return BigQuery.valueToQueryParameter_(value).parameterValue!;
+            }
           }
           return {value} as bigquery.IQueryParameterValue;
         }
@@ -830,9 +919,15 @@ export class BigQuery extends common.Service {
     } else if (typeName === 'STRUCT') {
       queryParameter.parameterValue!.structValues = Object.keys(value).reduce(
         (structValues, prop) => {
-          const nestedQueryParameter = BigQuery.valueToQueryParameter_(
-            value[prop]
-          );
+          let nestedQueryParameter;
+          if (providedType) {
+            nestedQueryParameter = BigQuery.valueToQueryParameter_(
+              value[prop],
+              (providedType as ProvidedTypeStruct)[prop]
+            );
+          } else {
+            nestedQueryParameter = BigQuery.valueToQueryParameter_(value[prop]);
+          }
           // tslint:disable-next-line no-any
           (structValues as any)[prop] = nestedQueryParameter.parameterValue;
           return structValues;
@@ -1055,18 +1150,61 @@ export class BigQuery extends common.Service {
         query.queryParameters = [];
 
         // tslint:disable-next-line forin
-        for (const namedParamater in query.params) {
-          const value = query.params[namedParamater];
-          const queryParameter = BigQuery.valueToQueryParameter_(value);
-          queryParameter.name = namedParamater;
+        for (const namedParameter in query.params) {
+          const value = query.params[namedParameter];
+          let queryParameter;
+
+          if (query.types) {
+            if (!is.object(query.types)) {
+              throw new Error(
+                'Provided types must match the value type passed to `params`'
+              );
+            }
+
+            if (query.types[namedParameter]) {
+              queryParameter = BigQuery.valueToQueryParameter_(
+                value,
+                query.types[namedParameter]
+              );
+            } else {
+              throw new Error(
+                `Type not provided for parameter: ${namedParameter}`
+              );
+            }
+          } else {
+            queryParameter = BigQuery.valueToQueryParameter_(value);
+          }
+
+          queryParameter.name = namedParameter;
           query.queryParameters.push(queryParameter);
         }
       } else {
-        query.queryParameters = query.params.map(
-          BigQuery.valueToQueryParameter_
-        );
-      }
+        query.queryParameters = [];
 
+        if (query.types) {
+          if (!is.array(query.types)) {
+            throw new Error(
+              'Provided types must match the value type passed to `params`'
+            );
+          }
+
+          if (query.params.length !== query.types.length) {
+            throw new Error('Incorrect number of parameter types provided.');
+          }
+          query.params.forEach((value: {}, i: number) => {
+            const queryParameter = BigQuery.valueToQueryParameter_(
+              value,
+              query.types[i]
+            );
+            query.queryParameters.push(queryParameter);
+          });
+        } else {
+          query.params.forEach((value: {}) => {
+            const queryParameter = BigQuery.valueToQueryParameter_(value);
+            query.queryParameters.push(queryParameter);
+          });
+        }
+      }
       delete query.params;
     }
 
