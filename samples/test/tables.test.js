@@ -412,7 +412,7 @@ describe.only('Tables', () => {
   it(`should load a GCS Avro file truncate table`, async () => {
     const tableId = generateUuid();
     const output = execSync(
-      `node loadTablegcsAvroTruncate.js ${datasetId} ${tableId}`
+      `node loadTableGCSAvroTruncate.js ${datasetId} ${tableId}`
     );
     assert.match(output, /completed\./);
     const [rows] = await bigquery
