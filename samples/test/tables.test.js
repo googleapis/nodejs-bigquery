@@ -35,6 +35,7 @@ const nestedTableId = generateUuid();
 const partitionedTableId = generateUuid();
 const srcTableId = tableId;
 const destTableId = generateUuid();
+const viewId = generateUuid();
 const bucketName = generateUuid();
 const exportCSVFileName = `data.json`;
 const exportJSONFileName = `data.json`;
@@ -47,7 +48,7 @@ const partialDataFilePath = path.join(
 );
 const bigquery = new BigQuery();
 
-describe('Tables', () => {
+describe.only('Tables', () => {
   before(async () => {
     const [bucket] = await storage.createBucket(bucketName);
     await Promise.all([
@@ -254,6 +255,17 @@ describe('Tables', () => {
     assert.ok(rows.length > 0);
   });
 
+  it(`should load a GCS Avro file`, async () => {
+    const tableId = generateUuid();
+    const output = execSync(`node loadTableGCSAvro.js ${datasetId} ${tableId}`);
+    assert.match(output, /completed\./);
+    const [rows] = await bigquery
+      .dataset(datasetId)
+      .table(tableId)
+      .getRows();
+    assert.ok(rows.length > 0);
+  });
+
   it(`should load a GCS CSV file with explicit schema`, async () => {
     const tableId = generateUuid();
     const output = execSync(`node loadCSVFromGCS.js ${datasetId} ${tableId}`);
@@ -397,6 +409,19 @@ describe('Tables', () => {
     assert.ok(rows.length > 0);
   });
 
+  it(`should load a GCS Avro file truncate table`, async () => {
+    const tableId = generateUuid();
+    const output = execSync(
+      `node loadTableGCSAvroTruncate.js ${datasetId} ${tableId}`
+    );
+    assert.match(output, /completed\./);
+    const [rows] = await bigquery
+      .dataset(datasetId)
+      .table(tableId)
+      .getRows();
+    assert.ok(rows.length > 0);
+  });
+
   it(`should copy a table`, async () => {
     const output = execSync(
       `node copyTable.js ${srcDatasetId} ${srcTableId} ${destDatasetId} ${destTableId}`
@@ -447,6 +472,31 @@ describe('Tables', () => {
     assert.include(output, 'color: green');
   });
 
+  describe(`Views`, () => {
+    it(`should create a view`, async () => {
+      const output = execSync(`node createView.js ${datasetId} ${viewId}`);
+      assert.include(output, `View ${viewId} created.`);
+      const [exists] = await bigquery
+        .dataset(datasetId)
+        .table(viewId)
+        .exists();
+      assert.ok(exists);
+    });
+
+    it(`should get a view`, async () => {
+      const viewId = generateUuid();
+      execSync(`node createView.js ${datasetId} ${viewId}`);
+      const output = execSync(`node getView.js ${datasetId} ${viewId}`);
+      assert.match(output, /View at/);
+      assert.match(output, /View query:/);
+    });
+
+    it(`should update a view`, async () => {
+      const output = execSync(`node updateViewQuery.js ${datasetId} ${viewId}`);
+      assert.include(output, `View ${viewId} updated.`);
+    });
+  });
+
   describe(`Delete Table`, () => {
     const datasetId = `gcloud_tests_${uuid.v4()}`.replace(/-/gi, '_');
     const tableId = `gcloud_tests_${uuid.v4()}`.replace(/-/gi, '_');
@@ -479,6 +529,24 @@ describe('Tables', () => {
         .table(tableId)
         .exists();
       assert.strictEqual(exists, false);
+    });
+
+    it(`should undelete a table`, async () => {
+      const tableId = generateUuid();
+      const recoveredTableId = generateUuid();
+
+      execSync(`node createTable.js ${datasetId} ${tableId}`);
+      const output = execSync(
+        `node undeleteTable.js ${datasetId} ${tableId} ${recoveredTableId}`
+      );
+
+      assert.include(output, `Table ${tableId} deleted.`);
+      assert.match(output, /Copied data from deleted table/);
+      const [exists] = await bigquery
+        .dataset(datasetId)
+        .table(recoveredTableId)
+        .exists();
+      assert.strictEqual(exists, true);
     });
   });
 });
