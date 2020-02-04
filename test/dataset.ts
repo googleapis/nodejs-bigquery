@@ -36,7 +36,7 @@ const fakePfy = extend({}, pfy, {
       return;
     }
     promisified = true;
-    assert.deepStrictEqual(options.exclude, ['model', 'table']);
+    assert.deepStrictEqual(options.exclude, ['model', 'routine', 'table']);
   },
 });
 
@@ -49,7 +49,11 @@ const fakePaginator = {
       }
       methods = arrify(methods);
       assert.strictEqual(c.name, 'Dataset');
-      assert.deepStrictEqual(methods, ['getModels', 'getTables']);
+      assert.deepStrictEqual(methods, [
+        'getModels',
+        'getRoutines',
+        'getTables',
+      ]);
       extended = true;
     },
     streamify: (methodName: string) => {

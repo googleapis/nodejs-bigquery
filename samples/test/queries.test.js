@@ -32,9 +32,15 @@ const bigquery = new BigQuery();
 
 describe(`Queries`, () => {
   before(async () => {
+    const schema = [{name: 'age', type: 'STRING', mode: 'REQUIRED'}];
+    const options = {
+      schema: schema,
+    };
     await bigquery.createDataset(datasetId);
     await bigquery.dataset(datasetId).createTable(destTableId);
-    const [tableData] = await bigquery.dataset(datasetId).createTable(tableId);
+    const [tableData] = await bigquery
+      .dataset(datasetId)
+      .createTable(tableId, options);
     projectId = tableData.metadata.tableReference.projectId;
   });
   after(async () => {
@@ -131,8 +137,28 @@ describe(`Queries`, () => {
     assert.match(output, /completed\./);
     const [rows] = await bigquery
       .dataset(datasetId)
-      .table(tableId)
+      .table(destTableId)
       .getRows();
     assert.ok(rows.length > 0);
+  });
+
+  it(`should relax columns via a query job`, async () => {
+    const output = execSync(
+      `node relaxColumnQueryAppend.js ${projectId} ${datasetId} ${tableId}`
+    );
+
+    assert.match(output, /1 fields in the schema are required\./);
+    assert.match(output, /0 fields in the schema are now required\./);
+  });
+
+  it(`should run a query at batch priority`, async () => {
+    const output = execSync(`node queryBatch.js`);
+    assert.match(output, /Job/);
+    assert.match(output, /is currently in state/);
+  });
+
+  it(`should create a view via DDL query`, async () => {
+    const output = execSync(`node ddlCreateView.js ${projectId} ${datasetId}`);
+    assert.match(output, /Created new view/);
   });
 });
