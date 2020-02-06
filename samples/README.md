@@ -21,8 +21,11 @@
   * [Copy Table](#copy-table)
   * [Copy Table Multiple Source](#copy-table-multiple-source)
   * [Create Dataset](#create-dataset)
+  * [Create Job](#create-job)
   * [Create Table](#create-table)
   * [Create Table Partitioned](#create-table-partitioned)
+  * [Create View](#create-view)
+  * [Ddl Create View](#ddl-create-view)
   * [Delete Dataset](#delete-dataset)
   * [Delete Label Dataset](#delete-label-dataset)
   * [Delete Label Table](#delete-label-table)
@@ -37,6 +40,7 @@
   * [BigQuery Get Model](#bigquery-get-model)
   * [BigQuery Get Table](#bigquery-get-table)
   * [Get Table Labels](#get-table-labels)
+  * [Get View](#get-view)
   * [Insert Rows As Stream](#insert-rows-as-stream)
   * [BigQuery Label Dataset](#bigquery-label-dataset)
   * [Label Table](#label-table)
@@ -55,11 +59,14 @@
   * [Load Local File](#load-local-file)
   * [Load Orc From GCS Truncate](#load-orc-from-gcs-truncate)
   * [Load Parquet From GCS Truncate](#load-parquet-from-gcs-truncate)
+  * [Load Table GCS Avro](#load-table-gcs-avro)
+  * [Load Table GCS Avro Truncate](#load-table-gcs-avro-truncate)
   * [Load Table GCSORC](#load-table-gcsorc)
   * [Load Table GCS Parquet](#load-table-gcs-parquet)
   * [Load Table Partitioned](#load-table-partitioned)
   * [Nested Repeated Schema](#nested-repeated-schema)
   * [Query](#query)
+  * [Query Batch](#query-batch)
   * [Query Destination Table](#query-destination-table)
   * [Query Disable Cache](#query-disable-cache)
   * [Query Dry Run](#query-dry-run)
@@ -74,12 +81,15 @@
   * [Quickstart](#quickstart)
   * [Relax Column](#relax-column)
   * [Relax Column Load Append](#relax-column-load-append)
+  * [Relax Column Query Append](#relax-column-query-append)
+  * [Undelete Table](#undelete-table)
   * [Update Dataset Access](#update-dataset-access)
   * [Update Dataset Description](#update-dataset-description)
   * [Update Dataset Expiration](#update-dataset-expiration)
   * [BigQuery Update Model](#bigquery-update-model)
   * [Update Table Description](#update-table-description)
   * [Update Table Expiration](#update-table-expiration)
+  * [Update View Query](#update-view-query)
 
 ## Before you begin
 
@@ -249,6 +259,23 @@ __Usage:__
 
 
 
+### Create Job
+
+View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/createJob.js).
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/createJob.js,samples/README.md)
+
+__Usage:__
+
+
+`node samples/createJob.js`
+
+
+-----
+
+
+
+
 ### Create Table
 
 View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/createTable.js).
@@ -276,6 +303,40 @@ __Usage:__
 
 
 `node samples/createTablePartitioned.js`
+
+
+-----
+
+
+
+
+### Create View
+
+View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/createView.js).
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/createView.js,samples/README.md)
+
+__Usage:__
+
+
+`node samples/createView.js`
+
+
+-----
+
+
+
+
+### Ddl Create View
+
+View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/ddlCreateView.js).
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/ddlCreateView.js,samples/README.md)
+
+__Usage:__
+
+
+`node samples/ddlCreateView.js`
 
 
 -----
@@ -524,6 +585,23 @@ __Usage:__
 
 
 `node getTableLabels.js <DATASET_ID> <TABLE_ID>`
+
+
+-----
+
+
+
+
+### Get View
+
+View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/getView.js).
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/getView.js,samples/README.md)
+
+__Usage:__
+
+
+`node samples/getView.js`
 
 
 -----
@@ -843,6 +921,40 @@ __Usage:__
 
 
 
+### Load Table GCS Avro
+
+View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/loadTableGCSAvro.js).
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/loadTableGCSAvro.js,samples/README.md)
+
+__Usage:__
+
+
+`node samples/loadTableGCSAvro.js`
+
+
+-----
+
+
+
+
+### Load Table GCS Avro Truncate
+
+View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/loadTableGCSAvroTruncate.js).
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/loadTableGCSAvroTruncate.js,samples/README.md)
+
+__Usage:__
+
+
+`node samples/loadTableGCSAvroTruncate.js`
+
+
+-----
+
+
+
+
 ### Load Table GCSORC
 
 View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/loadTableGCSORC.js).
@@ -921,6 +1033,23 @@ __Usage:__
 
 
 `node samples/query.js`
+
+
+-----
+
+
+
+
+### Query Batch
+
+View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/queryBatch.js).
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/queryBatch.js,samples/README.md)
+
+__Usage:__
+
+
+`node samples/queryBatch.js`
 
 
 -----
@@ -1166,6 +1295,40 @@ __Usage:__
 
 
 
+### Relax Column Query Append
+
+View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/relaxColumnQueryAppend.js).
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/relaxColumnQueryAppend.js,samples/README.md)
+
+__Usage:__
+
+
+`node samples/relaxColumnQueryAppend.js`
+
+
+-----
+
+
+
+
+### Undelete Table
+
+View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/undeleteTable.js).
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/undeleteTable.js,samples/README.md)
+
+__Usage:__
+
+
+`node samples/undeleteTable.js`
+
+
+-----
+
+
+
+
 ### Update Dataset Access
 
 View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/updateDatasetAccess.js).
@@ -1263,6 +1426,23 @@ __Usage:__
 
 
 `node samples/updateTableExpiration.js`
+
+
+-----
+
+
+
+
+### Update View Query
+
+View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/updateViewQuery.js).
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/updateViewQuery.js,samples/README.md)
+
+__Usage:__
+
+
+`node samples/updateViewQuery.js`
 
 
 
