@@ -45,7 +45,8 @@
     "posttest": "npm run check",
     "docs-test": "linkinator docs",
     "predocs-test": "npm run docs",
-    "types": "dtsd bigquery v2 > ./src/types.d.ts"
+    "types": "dtsd bigquery v2 > ./src/types.d.ts",
+    "prelint": "cd samples; npm link ../"
   },
   "dependencies": {
     "@google-cloud/common": "^2.0.0",
