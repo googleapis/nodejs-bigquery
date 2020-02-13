@@ -1,6 +1,20 @@
 {
-  "updateTime": "2020-02-07T12:10:34.719531Z",
+  "updateTime": "2020-02-13T12:12:45.901702Z",
   "sources": [
+    {
+      "git": {
+        "name": ".",
+        "remote": "https://github.com/googleapis/nodejs-bigquery.git",
+        "sha": "15ebb98c1cab94c5898bb5c8b699924d0e29768f"
+      }
+    },
+    {
+      "git": {
+        "name": "synthtool",
+        "remote": "rpc://devrel/cloud/libraries/tools/autosynth",
+        "sha": "dd7cd93888cbeb1d4c56a1ca814491c7813160e8"
+      }
+    },
     {
       "template": {
         "name": "node_library",
