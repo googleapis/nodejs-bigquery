@@ -197,7 +197,7 @@ describe.only('Tables', () => {
       `node extractTableToGCS.js ${datasetId} ${tableId} ${bucketName} ${exportCSVFileName}`
     );
 
-    assert.match(output, /completed\./);
+    assert.match(output, /created\./);
     const [exists] = await storage
       .bucket(bucketName)
       .file(exportCSVFileName)
@@ -210,7 +210,7 @@ describe.only('Tables', () => {
       `node extractTableJSON.js ${datasetId} ${tableId} ${bucketName} ${exportJSONFileName}`
     );
 
-    assert.match(output, /completed\./);
+    assert.match(output, /created\./);
     const [exists] = await storage
       .bucket(bucketName)
       .file(exportJSONFileName)
@@ -223,7 +223,7 @@ describe.only('Tables', () => {
       `node extractTableCompressed.js ${datasetId} ${tableId} ${bucketName} ${exportCSVFileName}`
     );
 
-    assert.match(output, /completed\./);
+    assert.match(output, /created\./);
     const [exists] = await storage
       .bucket(bucketName)
       .file(exportCSVFileName)
