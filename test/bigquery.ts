@@ -1361,6 +1361,24 @@ describe('BigQuery', () => {
       });
     });
 
+    describe('createSyncQueryJob', () => {
+      const QUERY_STRING = 'SELECT * FROM [dataset.table]';
+
+      it('should throw if a query is not provided', () => {
+        assert.throws(() => {
+          bq.createSyncQueryJob();
+        }, /SQL query string is required/);
+
+        assert.throws(() => {
+          bq.createSyncQueryJob({noQuery: 'here'});
+        }, /SQL query string is required/);
+
+        assert.doesNotThrow(() => {
+          bq.createSyncQueryJob({query: QUERY_STRING}, util.noop);
+        });
+      });
+    });
+
     describe('SQL parameters', () => {
       const NAMED_PARAMS = {
         key: 'value',
