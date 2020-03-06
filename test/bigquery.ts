@@ -1362,19 +1362,17 @@ describe('BigQuery', () => {
     });
 
     describe('createSyncQueryJob', () => {
-      const QUERY_STRING = 'SELECT * FROM [dataset.table]';
-
-      it('should throw if a query is not provided', () => {
+      it('should throw if neither a query or a pageToken is provided', () => {
         assert.throws(() => {
-          bq.createSyncQueryJob();
+          bq.createQueryJob();
         }, /SQL query string is required/);
 
         assert.throws(() => {
-          bq.createSyncQueryJob({noQuery: 'here'});
+          bq.createQueryJob({noQuery: 'here'});
         }, /SQL query string is required/);
 
         assert.doesNotThrow(() => {
-          bq.createSyncQueryJob({query: QUERY_STRING}, util.noop);
+          bq.createQueryJob({pageToken: 'NEXT_PAGE_TOKEN'}, util.noop);
         });
       });
     });

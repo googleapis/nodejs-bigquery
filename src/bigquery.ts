@@ -105,10 +105,12 @@ export type Query = JobRequest<bigquery.IJobConfigurationQuery> & {
 export type SyncQueryOptions = bigquery.IQueryRequest & {
   // tslint:disable-next-line no-any
   params?: any[] | {[param: string]: any};
+  pageToken?: string;
 };
 export type SyncQueryResponse = bigquery.IQueryResponse;
-export type SyncQueryCallback = ResourceCallback<
+export type SyncQueryCallback = PagedCallback<
   RowMetadata,
+  Query,
   bigquery.IQueryResponse
 >;
 
@@ -980,70 +982,68 @@ export class BigQuery extends common.Service {
     parameterMode: string,
     providedTypes?: string | ProvidedTypeStruct | ProvidedTypeArray
   ) {
-      const queryParameters = []
+    const queryParameters = [];
 
-      if (parameterMode === 'named') {
-
-        // tslint:disable-next-line forin
-        for (const namedParameter in params) {
-          const value = params[namedParameter];
-          let queryParameter;
-
-          if (providedTypes) {
-            if (!is.object(providedTypes)) {
-              throw new Error(
-                'Provided types must match the value type passed to `params`'
-              );
-            }
-
-            providedTypes = providedTypes as ProvidedTypeStruct
-            if (providedTypes[namedParameter]) {
-              queryParameter = BigQuery.valueToQueryParameter_(
-                value,
-                providedTypes[namedParameter]
-              );
-            } else {
-              throw new Error(
-                `Type not provided for parameter: ${namedParameter}`
-              );
-            }
-          } else {
-            queryParameter = BigQuery.valueToQueryParameter_(value);
-          }
-
-          queryParameter.name = namedParameter;
-          queryParameters.push(queryParameter);
-        }
-      } else {
+    if (parameterMode === 'named') {
+      // tslint:disable-next-line forin
+      for (const namedParameter in params) {
+        const value = params[namedParameter];
+        let queryParameter;
 
         if (providedTypes) {
-          if (!is.array(providedTypes)) {
+          if (!is.object(providedTypes)) {
             throw new Error(
               'Provided types must match the value type passed to `params`'
             );
           }
 
-          if (params.length !== providedTypes.length) {
-            throw new Error('Incorrect number of parameter types provided.');
-          }
-
-          const arrayTypes = providedTypes as ProvidedTypeArray
-
-          params.forEach((value: {}, i: number) => {
-            const queryParameter = BigQuery.valueToQueryParameter_(
+          providedTypes = providedTypes as ProvidedTypeStruct;
+          if (providedTypes[namedParameter]) {
+            queryParameter = BigQuery.valueToQueryParameter_(
               value,
-              arrayTypes[i]
+              providedTypes[namedParameter]
             );
-            queryParameters.push(queryParameter);
-          });
+          } else {
+            throw new Error(
+              `Type not provided for parameter: ${namedParameter}`
+            );
+          }
         } else {
-          params.forEach((value: {}) => {
-            const queryParameter = BigQuery.valueToQueryParameter_(value);
-            queryParameters.push(queryParameter);
-          });
+          queryParameter = BigQuery.valueToQueryParameter_(value);
         }
+
+        queryParameter.name = namedParameter;
+        queryParameters.push(queryParameter);
       }
-      return queryParameters;
+    } else {
+      if (providedTypes) {
+        if (!is.array(providedTypes)) {
+          throw new Error(
+            'Provided types must match the value type passed to `params`'
+          );
+        }
+
+        if (params.length !== providedTypes.length) {
+          throw new Error('Incorrect number of parameter types provided.');
+        }
+
+        const arrayTypes = providedTypes as ProvidedTypeArray;
+
+        params.forEach((value: {}, i: number) => {
+          const queryParameter = BigQuery.valueToQueryParameter_(
+            value,
+            arrayTypes[i]
+          );
+          queryParameters.push(queryParameter);
+        });
+      } else {
+        params.forEach((value: {}) => {
+          const queryParameter = BigQuery.valueToQueryParameter_(value);
+          queryParameters.push(queryParameter);
+        });
+      }
+    }
+    return queryParameters;
   }
 
   createDataset(
@@ -1240,11 +1240,14 @@ export class BigQuery extends common.Service {
     }
 
     if (query.params) {
-      
       const parameterMode = is.array(query.params) ? 'positional' : 'named';
-      query.parameterMode = parameterMode
+      query.parameterMode = parameterMode;
 
-      query.queryParameters = BigQuery.getQueryParameters_(query.params, parameterMode, query.types)
+      query.queryParameters = BigQuery.getQueryParameters_(
+        query.params,
+        parameterMode,
+        query.types
+      );
       delete query.params;
     }
 
@@ -1276,6 +1279,140 @@ export class BigQuery extends common.Service {
     }
 
     this.createJob(reqOpts, callback!);
+  }
+
+  createSyncQueryJob(options: Query | string): Promise<bigquery.IQueryResponse>;
+  createSyncQueryJob(
+    options: Query | string,
+    callback: SyncQueryCallback
+  ): void;
+  /**
+   * Runs a query and returns query results if the query completes within
+   * a specified timeout.
+   *
+   * @see [Jobs: query API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/query}
+   *
+   * @param {object|string} options The configuration object. This must be in
+   *     the format of the [`QueryRequest`](http://goo.gl/wRpHvR).
+   *      If a string is provided, this is used as the query string, and all other
+   *      options are defaulted.
+   * @param {string} [options.kind] The resource type of the request.
+   * @param {boolean} [options.dryRun] If set, don't actually run this job. A
+   *     valid query will update the job with processing statistics. These can
+   * be accessed via `job.metadata`.
+   * @param {number} [options.maxResults] Maximum number of results to return.
+   * @param {string} [options.location] The geographic location of the job.
+   *     Required except for US and EU.
+   * @param {object} [options.defaultDataset] Specifies the default datasetId
+   *     and projectId
+   *     to assume for any unqualified table names in the query.
+   * @param {number} [options.timeoutMs] How long to wait for the query to
+   *     complete, in milliseconds, before the request times out and returns.
+   * @param {string} [options.useQueryCache] Whether to look for the result
+   *     in the query cache.
+   * @param {string} options.query A query string, following the BigQuery query
+   *     syntax, of the query to execute.
+   * @param {boolean} [options.useLegacySql=false] Option to use legacy sql syntax.
+   * @param {string} [options.parameterMode] Standard SQL only.
+   * @param {object} [options.queryParameters] jobs.query parameters for
+   *     Standard SQL queries.
+   * @param {function} [callback] The callback function.
+   * @param {?error} callback.err An error returned while making this request.
+   * @param {array} callback.rows The list of results from your query.
+   * @param {object} callback.apiResponse The full API response.
+   * @returns {Promise}
+   *
+   * @throws {Error} If a query or a pageToken is not specified.
+   *
+   * @example
+   * const {BigQuery} = require('@google-cloud/bigquery');
+   * const bigquery = new BigQuery();
+   *
+   * const query = 'SELECT url FROM `publicdata.samples.github_nested` LIMIT
+   * 100';
+   *
+   * //-
+   * // You may pass only a query string, having a new table created to store
+   * the
+   * // results of the query.
+   * //-
+   * bigquery.createSyncQueryJob(query, function(err, rows) {});
+   *
+   * //-
+   * // If the callback is omitted, we'll return a Promise.
+   * //-
+   * bigquery.createSyncQueryJob(query).then(function(data) {
+   *   const rows = data[0];
+   *   const apiResponse = data[2];
+   * });
+   */
+  createSyncQueryJob(
+    opts: SyncQueryOptions | string,
+    callback?: SyncQueryCallback
+  ): void | Promise<bigquery.IQueryResponse> {
+    const options = typeof opts === 'object' ? opts : {query: opts};
+    if ((!options || !options.query) && !options.pageToken) {
+      throw new Error('A SQL query string is required.');
+    }
+
+    // tslint:disable-next-line no-any
+    const query: any = extend(
+      true,
+      {
+        useLegacySql: false,
+      },
+      options
+    );
+
+    if (query.params) {
+      const parameterMode = is.array(query.params) ? 'positional' : 'named';
+      query.parameterMode = parameterMode;
+
+      query.queryParameters = BigQuery.getQueryParameters_(
+        query.params,
+        parameterMode,
+        query.types
+      );
+      delete query.params;
+    }
+
+    // tslint:disable-next-line no-any
+    const reqOpts: any = extend({}, query);
+
+    this.request(
+      {
+        method: 'POST',
+        uri: '/queries',
+        json: reqOpts,
+      },
+      (err, resp) => {
+        if (err) {
+          callback!(err, null, null, resp);
+          return;
+        }
+
+        // tslint:disable-next-line no-any
+        let rows: any = [];
+
+        if (resp.schema && resp.rows) {
+          rows = BigQuery.mergeSchemaWithRows_(resp.schema, resp.rows);
+        }
+
+        let nextQuery: {} | null = null;
+
+        if (resp.jobComplete === false) {
+          // Query is still running.
+          nextQuery = extend({}, options);
+        } else if (resp.pageToken) {
+          // More results exist.
+          nextQuery = extend({}, options, {
+            pageToken: resp.pageToken,
+          });
+        }
+
+        callback!(null, rows, nextQuery, resp);
+      }
+    );
   }
 
   createJob(options: JobOptions): Promise<JobResponse>;
@@ -1391,61 +1528,6 @@ export class BigQuery extends common.Service {
 
         job.metadata = resp;
         callback!(err, job, resp);
-      }
-    );
-  }
-
-  createSyncQueryJob(
-    opts: SyncQueryOptions | string,
-    callback?: SyncQueryCallback
-  ): void | Promise<bigquery.IQueryResponse> {
-    const options = typeof opts === 'object' ? opts : {query: opts};
-    if (!options || !options.query) {
-      throw new Error('A SQL query string is required.');
-    }
-
-    // tslint:disable-next-line no-any
-    const query: any = extend(
-      true,
-      {
-        useLegacySql: false,
-      },
-      options
-    );
-
-    if (query.params) {
-      
-      const parameterMode = is.array(query.params) ? 'positional' : 'named';
-      query.parameterMode = parameterMode
-
-      query.queryParameters = BigQuery.getQueryParameters_(query.params, parameterMode, query.types)
-      delete query.params;
-    }
-
-
-    // tslint:disable-next-line no-any
-    const reqOpts: any = extend({}, query);
-
-    this.request(
-      {
-        method: 'POST',
-        uri: '/queries',
-        json: reqOpts,
-      },
-      (err, resp) => {
-        if (err) {
-          callback!(err, null, resp);
-          return;
-        }
-
-        // tslint:disable-next-line no-any
-        let rows: any = [];
-
-        if (resp.schema && resp.rows) {
-          rows = BigQuery.mergeSchemaWithRows_(resp.schema, resp.rows);
-        }
-
-        callback!(null, rows, resp);
       }
     );
   }

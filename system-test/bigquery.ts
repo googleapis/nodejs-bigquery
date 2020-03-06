@@ -224,15 +224,6 @@ describe('BigQuery', () => {
     });
   });
 
-  it('should run a synchronous query job', done => {
-    bigquery.createSyncQueryJob(query, (err, rows) => {
-      assert.ifError(err);
-      assert.strictEqual(rows!.length, 100);
-      assert.strictEqual(typeof rows![0].url, 'string');
-      done();
-    });
-  });
-
   it('should run a query job as a promise', () => {
     let job: Job;
 
@@ -265,6 +256,15 @@ describe('BigQuery', () => {
           assert.strictEqual(typeof rowsEmitted[0].url, 'string');
           done();
         });
+    });
+  });
+
+  it('should run a synchronous query job', done => {
+    bigquery.createSyncQueryJob(query, (err, rows) => {
+      assert.ifError(err);
+      assert.strictEqual(rows!.length, 100);
+      assert.strictEqual(typeof rows![0].url, 'string');
+      done();
     });
   });
 
