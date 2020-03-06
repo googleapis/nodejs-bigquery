@@ -102,11 +102,6 @@ export type Query = JobRequest<bigquery.IJobConfigurationQuery> & {
   pageToken?: string;
 };
 
-export type SyncQueryOptions = bigquery.IQueryRequest & {
-  // tslint:disable-next-line no-any
-  params?: any[] | {[param: string]: any};
-  pageToken?: string;
-};
 export type SyncQueryResponse = bigquery.IQueryResponse;
 export type SyncQueryCallback = PagedCallback<
   RowMetadata,
@@ -1284,7 +1279,7 @@ export class BigQuery extends common.Service {
     this.createJob(reqOpts, callback!);
   }
 
-  createSyncQueryJob(options: Query | string): Promise<bigquery.IQueryResponse>;
+  createSyncQueryJob(options: Query | string): Promise<SyncQueryResponse>;
   createSyncQueryJob(
     options: Query | string,
     callback: SyncQueryCallback
@@ -1336,8 +1331,7 @@ export class BigQuery extends common.Service {
    *
    * //-
    * // You may pass only a query string, having a new table created to store
-   * the
-   * // results of the query.
+   * // the results of the query.
    * //-
    * bigquery.createSyncQueryJob(query, function(err, rows) {});
    *
@@ -1350,7 +1344,7 @@ export class BigQuery extends common.Service {
    * });
    */
   createSyncQueryJob(
-    opts: SyncQueryOptions | string,
+    opts: Query | string,
     callback?: SyncQueryCallback
   ): void | Promise<bigquery.IQueryResponse> {
     const options = typeof opts === 'object' ? opts : {query: opts};
