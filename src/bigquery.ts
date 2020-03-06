@@ -967,13 +967,16 @@ export class BigQuery extends common.Service {
   }
 
   /**
-   * Convert a value into a `queryParameter` object.
+   * Convert a value into array of `queryParameter` objects.
    *
    * @private
    *
    * @see [Jobs.query API Reference Docs (see `queryParameters`)]{@link https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs/query#request-body}
    *
-   * @param {*} value The value.
+   * @param {*} params The value.
+   * @param {string} paramenterMode 'Named' or 'Positional' params
+   * @param {string | ProvidedTypeStruct | ProvidedTypeArray} providedTypes 
+   *    Optional parameter types.
    * @returns {object} A properly-formed `queryParameter` object.
    */
   static getQueryParameters_(
@@ -1287,7 +1290,7 @@ export class BigQuery extends common.Service {
     callback: SyncQueryCallback
   ): void;
   /**
-   * Runs a query and returns query results if the query completes within
+   * Runs a query and returns query results if the query completes within 
    * a specified timeout.
    *
    * @see [Jobs: query API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/query}
@@ -1303,18 +1306,18 @@ export class BigQuery extends common.Service {
    * @param {number} [options.maxResults] Maximum number of results to return.
    * @param {string} [options.location] The geographic location of the job.
    *     Required except for US and EU.
-   * @param {object} [options.defaultDataset] Specifies the default datasetId
-   *     and projectId
+   * @param {object} [options.defaultDataset] Specifies the default datasetId 
+   *     and projectId 
    *     to assume for any unqualified table names in the query.
-   * @param {number} [options.timeoutMs] How long to wait for the query to
+   * @param {number} [options.timeoutMs] How long to wait for the query to 
    *     complete, in milliseconds, before the request times out and returns.
-   * @param {string} [options.useQueryCache] Whether to look for the result
+   * @param {string} [options.useQueryCache] Whether to look for the result 
    *     in the query cache.
    * @param {string} options.query A query string, following the BigQuery query
    *     syntax, of the query to execute.
    * @param {boolean} [options.useLegacySql=false] Option to use legacy sql syntax.
    * @param {string} [options.parameterMode] Standard SQL only.
-   * @param {object} [options.queryParameters] jobs.query parameters for
+   * @param {object} [options.queryParameters] jobs.query parameters for 
    *     Standard SQL queries.
    * @param {function} [callback] The callback function.
    * @param {?error} callback.err An error returned while making this request.
