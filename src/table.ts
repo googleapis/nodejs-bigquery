@@ -1740,6 +1740,11 @@ class Table extends common.ServiceObject {
    * If you need to create an entire table from a file, consider using
    * {@link Table#load} instead.
    *
+   * Note, if a table was recently created, inserts may fail until the table
+   * is consistent within BigQuery. If a `schema` is supplied, this method will
+   * automatically retry those failed inserts, and it will even create the
+   * table with the provided schema if it does not exist.
+   *
    * @see [Tabledata: insertAll API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/tabledata/insertAll}
    * @see [Streaming Insert Limits]{@link https://cloud.google.com/bigquery/quotas#streaming_inserts}
    * @see [Troubleshooting Errors]{@link https://developers.google.com/bigquery/troubleshooting-errors}
@@ -1755,9 +1760,10 @@ class Table extends common.ServiceObject {
    * @param {boolean} [options.raw] If `true`, the `rows` argument is expected to
    *     be formatted as according to the
    *     [specification](https://cloud.google.com/bigquery/docs/reference/v2/tabledata/insertAll).
-   * @param {string|object} [options.schema] If provided will atomatically create
-   *     a table if it doesn't already exist. Note that this can take longer
-   *     than 2 minutes to complete. A comma-separated list of name:type pairs.
+   * @param {string|object} [options.schema] If provided will automatically
+   *     create a table if it doesn't already exist. Note that this can take
+   *     longer than 2 minutes to complete. A comma-separated list of
+   *     name:type pairs.
    *     Valid types are "string", "integer", "float", "boolean", and
    *     "timestamp". If the type is omitted, it is assumed to be "string".
    *     Example: "name:string, age:integer". Schemas can also be specified as a
@@ -1879,45 +1885,48 @@ class Table extends common.ServiceObject {
         ? optionsOrCallback
         : (cb as InsertRowsCallback);
 
-    this._insertWithRetry(rows, options)
-      .catch(err => {
-        if ((err as common.ApiError).code === 404 && options.schema) {
-          return this._createTableAndInsert(rows, options);
-        }
-        throw err;
-      })
-      .then(
-        resp => callback(null, resp),
-        err => callback(err, null)
-      );
+    this._insertAndCreateTable(rows, options).then(
+      resp => callback(null, resp),
+      err => callback(err, null)
+    );
   }
 
   /**
-   * Attempts to create the table before inserting the rows.
+   * Insert rows with retries, but will create the table if not exists.
    *
+   * @param {RowMetadata | RowMetadata[]} rows
+   * @param {InsertRowsOptions} options
+   * @returns {Promise<bigquery.ITableDataInsertAllResponse | bigquery.ITable>}
    * @private
-   *
-   * @param {object|object[]} rows The rows to insert.
-   * @param {object} options Insert options.
-   * @returns {Promise}
    */
-  private async _createTableAndInsert(
+  private async _insertAndCreateTable(
     rows: RowMetadata | RowMetadata[],
     options: InsertRowsOptions
-  ) {
+  ): Promise<bigquery.ITableDataInsertAllResponse | bigquery.ITable> {
     const {schema} = options;
     const delay = 60000;
 
     try {
-      await this.create({schema});
-    } catch (e) {
-      if (e.code !== 409) {
-        throw e;
+      return await this._insertWithRetry(rows, options);
+    } catch (err) {
+      if ((err as common.ApiError).code !== 404 || !schema) {
+        throw err;
       }
     }
 
+    try {
+      await this.create({schema});
+    } catch (err) {
+      if ((err as common.ApiError).code !== 409) {
+        throw err;
+      }
+    }
+
+    // table creation after failed access is subject to failure caching and
+    // eventual consistency, see:
+    // https://github.com/googleapis/google-cloud-python/issues/4553#issuecomment-350110292
     await new Promise(resolve => setTimeout(resolve, delay));
-    return (await this.insert(rows, options))[0];
+    return this._insertAndCreateTable(rows, options);
   }
 
   /**
@@ -1927,14 +1936,14 @@ class Table extends common.ServiceObject {
    *
    * @private
    *
-   * @param {object|object[]} rows The rows to insert.
-   * @param {object} options Insert options.
-   * @returns {Promise}
+   * @param {RowMetadata|RowMetadata[]} rows The rows to insert.
+   * @param {InsertRowsOptions} options Insert options.
+   * @returns {Promise<bigquery.ITableDataInsertAllResponse>}
    */
   private async _insertWithRetry(
     rows: RowMetadata | RowMetadata[],
     options: InsertRowsOptions
-  ) {
+  ): Promise<bigquery.ITableDataInsertAllResponse> {
     const maxAttempts = options.maxAttempts || 3;
     let error: Error;
 
@@ -1960,9 +1969,9 @@ class Table extends common.ServiceObject {
    *
    * @private
    *
-   * @param {object|object[]} rows The rows to insert.
-   * @param {object} options Insert options.
-   * @returns {Promise}
+   * @param {RowMetadata|RowMetadata[]} rows The rows to insert.
+   * @param {InsertRowsOptions} options Insert options.
+   * @returns {Promise<bigquery.ITableDataInsertAllResponse>}
    */
   private async _insert(
     rows: RowMetadata | RowMetadata[],

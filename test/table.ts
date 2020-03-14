@@ -2060,14 +2060,12 @@ describe('BigQuery/Table', () => {
     async function reflectAfterTimer<FnReturn>(
       fn: () => Promise<FnReturn>
     ): Promise<pReflect.PromiseResult<FnReturn>> {
-      /*
-        When `fn` rejects/throws, we need to capture this and test
-        for it as needed. Using reflection avoids try/catch's potential for
-        false-positives.
+      // When `fn` rejects/throws, we need to capture this and test
+      // for it as needed. Using reflection avoids try/catch's potential for
+      // false-positives.
+      // Also, defer capturing the settled promise until _after_ the
+      // internal timer (delay) has been completed.
 
-        Also, defer capturing the settled promise until _after_ the
-        internal timer (delay) has been completed.
-       */
       const fnPromise: Promise<FnReturn> = fn();
       const reflectedPromise: Promise<pReflect.PromiseResult<
         FnReturn
@@ -2216,7 +2214,7 @@ describe('BigQuery/Table', () => {
       let insertSpy: sinon.SinonSpy;
 
       beforeEach(() => {
-        insertSpy = sinon.spy(table, 'insert');
+        insertSpy = sinon.spy(table, '_insertAndCreateTable');
         createStub = sinon.stub(table, 'create').resolves([{}]);
         requestStub.onFirstCall().rejects({code: 404});
       });
