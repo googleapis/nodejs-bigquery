@@ -57,6 +57,7 @@
     "duplexify": "^4.0.0",
     "extend": "^3.0.2",
     "is": "^3.3.0",
+    "p-event": "^4.1.0",
     "stream-events": "^1.0.5",
     "string-format-obj": "^1.1.1",
     "uuid": "^7.0.0"

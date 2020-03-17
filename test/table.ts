@@ -60,6 +60,7 @@ const fakePfy = extend({}, pfy, {
     if (c.name === 'Table') {
       promisified = true;
     }
+    pfy.promisifyAll(c);
   },
 });
 
@@ -652,18 +653,21 @@ describe('BigQuery/Table', () => {
       DEST_TABLE = new Table(DATASET, 'destination-table');
     });
 
-    it('should throw if a destination is not a Table', () => {
-      assert.throws(() => {
-        table.createCopyJob();
-      }, /Destination must be a Table/);
+    it('should throw if a destination is not a Table', async () => {
+      await assert.rejects(
+        async () => table.createCopyJob(),
+        /Destination must be a Table/
+      );
 
-      assert.throws(() => {
-        table.createCopyJob({});
-      }, /Destination must be a Table/);
+      await assert.rejects(
+        async () => table.createCopyJob({}),
+        /Destination must be a Table/
+      );
 
-      assert.throws(() => {
-        table.createCopyJob(() => {});
-      }, /Destination must be a Table/);
+      await assert.rejects(
+        async () => table.createCopyJob(() => {}),
+        /Destination must be a Table/
+      );
     });
 
     it('should send correct request to the API', done => {
@@ -765,22 +769,26 @@ describe('BigQuery/Table', () => {
       SOURCE_TABLE = new Table(DATASET, 'source-table');
     });
 
-    it('should throw if a source is not a Table', () => {
-      assert.throws(() => {
-        table.createCopyFromJob(['table']);
-      }, /Source must be a Table/);
+    it('should throw if a source is not a Table', async () => {
+      await assert.rejects(
+        async () => table.createCopyFromJob(['table']),
+        /Source must be a Table/
+      );
 
-      assert.throws(() => {
-        table.createCopyFromJob([SOURCE_TABLE, 'table']);
-      }, /Source must be a Table/);
+      await assert.rejects(
+        async () => table.createCopyFromJob([SOURCE_TABLE, 'table']),
+        /Source must be a Table/
+      );
 
-      assert.throws(() => {
-        table.createCopyFromJob({});
-      }, /Source must be a Table/);
+      await assert.rejects(
+        async () => table.createCopyFromJob({}),
+        /Source must be a Table/
+      );
 
-      assert.throws(() => {
-        table.createCopyFromJob(() => {});
-      }, /Source must be a Table/);
+      await assert.rejects(
+        async () => table.createCopyFromJob(() => {}),
+        /Source must be a Table/
+      );
     });
 
     it('should send correct request to the API', done => {
@@ -1154,10 +1162,17 @@ describe('BigQuery/Table', () => {
       metadata: {},
     };
 
+    let bqCreateJobStub: sinon.SinonStub;
+
     beforeEach(() => {
+      bqCreateJobStub = sinon.stub(table.bigQuery, 'createJob').resolves([JOB, JOB.metadata]);
       isCustomTypeOverride = () => {
         return true;
       };
+    });
+
+    afterEach(() => {
+      bqCreateJobStub.restore();
     });
 
     it('should accept just a File and a callback', done => {
@@ -1241,14 +1256,14 @@ describe('BigQuery/Table', () => {
       table.createLoadJob(FILE, assert.ifError);
     });
 
-    it('should throw if a File object is not provided', () => {
+    it('should throw if a File object is not provided', async () => {
       isCustomTypeOverride = () => {
         return false;
       };
-
-      assert.throws(() => {
-        table.createLoadJob({});
-      }, /Source must be a File object/);
+      await assert.rejects(
+        async () => table.createLoadJob({}),
+        /Source must be a File object/
+      );
     });
 
     it('should convert File objects to gs:// urls', done => {
@@ -1290,22 +1305,14 @@ describe('BigQuery/Table', () => {
       );
     });
 
-    it('should pass the callback to createJob', done => {
-      table.bigQuery.createJob = (reqOpts: JobOptions, callback: Function) => {
-        assert.strictEqual(done, callback);
-        callback(); // the done fn
-      };
-
-      table.createLoadJob(FILE, {}, done);
+    it('should use bigQuery.createJob', async () => {
+      await table.createLoadJob(FILE, {});
+      assert(bqCreateJobStub.calledOnce);
     });
 
-    it('should optionally accept options', done => {
-      table.bigQuery.createJob = (reqOpts: JobOptions, callback: Function) => {
-        assert.strictEqual(done, callback);
-        callback(); // the done fn
-      };
-
-      table.createLoadJob(FILE, done);
+    it('should optionally accept options', async () => {
+      await table.createLoadJob(FILE);
+      assert(bqCreateJobStub.calledOnce);
     });
 
     it('should set the job prefix', done => {
@@ -1330,15 +1337,10 @@ describe('BigQuery/Table', () => {
       );
     });
 
-    it('should use the default location', done => {
+    it('should use the default location', async () => {
       const table = new Table(DATASET, TABLE_ID, {location: LOCATION});
-
-      table.bigQuery.createJob = (reqOpts: JobOptions, callback: Function) => {
-        assert.strictEqual(reqOpts.location, LOCATION);
-        callback(); // the done fn
-      };
-
-      table.createLoadJob(FILE, done);
+      await table.createLoadJob(FILE);
+      assert(bqCreateJobStub.calledWithMatch({location: LOCATION}));
     });
 
     it('should accept a job id', done => {
@@ -2020,10 +2022,11 @@ describe('BigQuery/Table', () => {
       };
     });
 
-    it('should throw an error if rows is empty', () => {
-      assert.throws(() => {
-        table.insert([]);
-      }, /You must provide at least 1 row to be inserted\./);
+    it('should throw an error if rows is empty', async () => {
+      await assert.rejects(
+        async () => table.insert([]),
+        /You must provide at least 1 row to be inserted/
+      );
     });
 
     it('should save data', done => {
