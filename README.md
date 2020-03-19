@@ -54,18 +54,18 @@ npm install @google-cloud/bigquery
 ### Using the client library
 
 ```javascript
-  // Imports the Google Cloud client library
-  const {BigQuery} = require('@google-cloud/bigquery');
+// Imports the Google Cloud client library
+const {BigQuery} = require('@google-cloud/bigquery');
 
-  async function createDataset() {
-    // Creates a client
-    const bigqueryClient = new BigQuery();
+async function createDataset() {
+  // Creates a client
+  const bigqueryClient = new BigQuery();
 
-    // Create the dataset
-    const [dataset] = await bigqueryClient.createDataset(datasetName);
-    console.log(`Dataset ${dataset.id} created.`);
-  }
-  createDataset();
+  // Create the dataset
+  const [dataset] = await bigqueryClient.createDataset(datasetName);
+  console.log(`Dataset ${dataset.id} created.`);
+}
+createDataset();
 
 ```
 
@@ -185,11 +185,13 @@ More Information: [Google Cloud Platform Launch Stages][launch_stages]
 
 Contributions welcome! See the [Contributing Guide](https://github.com/googleapis/nodejs-bigquery/blob/master/CONTRIBUTING.md).
 
-Please note that this `README.md`, the `samples/README.md`,
+Please note that this [README.md](README.md), the [samples/README.md](samples/README.md),
 and a variety of configuration files in this repository (including `.nycrc` and `tsconfig.json`)
-are generated from a central template. To edit one of these files, make an edit
-to its template in this
-[directory](https://github.com/googleapis/synthtool/tree/master/synthtool/gcp/templates/node_library).
+are generated from a central template.
+
+If you would like to make edits to one of those files
+(or if you aren't certain if the file you're changing is one, check in the template repository before making changes),
+look for the file in the [template](https://github.com/googleapis/synthtool/tree/master/synthtool/gcp/templates/node_library).
 
 ## License
 
