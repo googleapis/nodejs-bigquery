@@ -54,18 +54,18 @@ npm install @google-cloud/bigquery
 ### Using the client library
 
 ```javascript
-  // Imports the Google Cloud client library
-  const {BigQuery} = require('@google-cloud/bigquery');
+// Imports the Google Cloud client library
+const {BigQuery} = require('@google-cloud/bigquery');
 
-  async function createDataset() {
-    // Creates a client
-    const bigqueryClient = new BigQuery();
+async function createDataset() {
+  // Creates a client
+  const bigqueryClient = new BigQuery();
 
-    // Create the dataset
-    const [dataset] = await bigqueryClient.createDataset(datasetName);
-    console.log(`Dataset ${dataset.id} created.`);
-  }
-  createDataset();
+  // Create the dataset
+  const [dataset] = await bigqueryClient.createDataset(datasetName);
+  console.log(`Dataset ${dataset.id} created.`);
+}
+createDataset();
 
 ```
 
