@@ -1207,13 +1207,11 @@ class Table extends common.ServiceObject {
     const metadata =
       typeof metadataOrCallback === 'object' ? metadataOrCallback : {};
     const callback =
-      typeof metadataOrCallback === 'function'
-        ? metadataOrCallback
-        : cb || common.util.noop;
+      typeof metadataOrCallback === 'function' ? metadataOrCallback : cb;
 
     this._createLoadJob(source, metadata).then(
-      ([resp]) => callback(null, resp, resp.metadata),
-      err => callback(err)
+      ([resp]) => callback!(null, resp, resp.metadata),
+      err => callback!(err)
     );
   }
 
