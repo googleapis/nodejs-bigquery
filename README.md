@@ -54,18 +54,18 @@ npm install @google-cloud/bigquery
 ### Using the client library
 
 ```javascript
-  // Imports the Google Cloud client library
-  const {BigQuery} = require('@google-cloud/bigquery');
+// Imports the Google Cloud client library
+const {BigQuery} = require('@google-cloud/bigquery');
 
-  async function createDataset() {
-    // Creates a client
-    const bigqueryClient = new BigQuery();
+async function createDataset() {
+  // Creates a client
+  const bigqueryClient = new BigQuery();
 
-    // Create the dataset
-    const [dataset] = await bigqueryClient.createDataset(datasetName);
-    console.log(`Dataset ${dataset.id} created.`);
-  }
-  createDataset();
+  // Create the dataset
+  const [dataset] = await bigqueryClient.createDataset(datasetName);
+  console.log(`Dataset ${dataset.id} created.`);
+}
+createDataset();
 
 ```
 
@@ -184,6 +184,12 @@ More Information: [Google Cloud Platform Launch Stages][launch_stages]
 ## Contributing
 
 Contributions welcome! See the [Contributing Guide](https://github.com/googleapis/nodejs-bigquery/blob/master/CONTRIBUTING.md).
+
+Please note that this `README.md`, the `samples/README.md`,
+and a variety of configuration files in this repository (including `.nycrc` and `tsconfig.json`)
+are generated from a central template. To edit one of these files, make an edit
+to its template in this
+[directory](https://github.com/googleapis/synthtool/tree/master/synthtool/gcp/templates/node_library).
 
 ## License
 
