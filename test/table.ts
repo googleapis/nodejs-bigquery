@@ -1165,7 +1165,9 @@ describe('BigQuery/Table', () => {
     let bqCreateJobStub: sinon.SinonStub;
 
     beforeEach(() => {
-      bqCreateJobStub = sinon.stub(table.bigQuery, 'createJob').resolves([JOB, JOB.metadata]);
+      bqCreateJobStub = sinon
+        .stub(table.bigQuery, 'createJob')
+        .resolves([JOB, JOB.metadata]);
       isCustomTypeOverride = () => {
         return true;
       };
@@ -1191,11 +1193,6 @@ describe('BigQuery/Table', () => {
         assert.strictEqual(resp, JOB.metadata);
         done();
       });
-    });
-
-    it('should return a stream when a string is given', () => {
-      sandbox.stub(table, 'createWriteStream_').returns(new stream.Writable());
-      assert(table.createLoadJob(FILEPATH) instanceof stream.Stream);
     });
 
     it('should infer the file format from the given filepath', done => {
@@ -1266,42 +1263,45 @@ describe('BigQuery/Table', () => {
       );
     });
 
-    it('should convert File objects to gs:// urls', done => {
-      table.bigQuery.createJob = (reqOpts: JobOptions) => {
-        const sourceUri = reqOpts.configuration!.load!.sourceUris![0];
-        assert.strictEqual(
-          sourceUri,
-          'gs://' + FILE.bucket.name + '/' + FILE.name
-        );
-        done();
-      };
-
-      table.createLoadJob(FILE, assert.ifError);
+    it('should convert File objects to gs:// urls', async () => {
+      await table.createLoadJob(FILE);
+      assert(bqCreateJobStub.calledOnce);
+      assert(
+        bqCreateJobStub.calledWithMatch({
+          configuration: {
+            load: {
+              sourceUris: ['gs://' + FILE.bucket.name + '/' + FILE.name],
+            },
+          },
+        })
+      );
     });
 
-    it('should infer the file format from a File object', done => {
-      table.bigQuery.createJob = (reqOpts: JobOptions) => {
-        const sourceFormat = reqOpts.configuration!.load!.sourceFormat;
-        assert.strictEqual(sourceFormat, 'NEWLINE_DELIMITED_JSON');
-        done();
-      };
-
-      table.createLoadJob(FILE, assert.ifError);
+    it('should infer the file format from a File object', async () => {
+      await table.createLoadJob(FILE);
+      assert(bqCreateJobStub.calledOnce);
+      assert(
+        bqCreateJobStub.calledWithMatch({
+          configuration: {
+            load: {
+              sourceFormat: 'NEWLINE_DELIMITED_JSON',
+            },
+          },
+        })
+      );
     });
 
-    it('should not override a provided format with a File', done => {
-      table.bigQuery.createJob = (reqOpts: JobOptions) => {
-        const sourceFormat = reqOpts.configuration!.load!.sourceFormat;
-        assert.strictEqual(sourceFormat, 'NEWLINE_DELIMITED_JSON');
-        done();
-      };
-
-      table.createLoadJob(
-        FILE,
-        {
-          sourceFormat: 'NEWLINE_DELIMITED_JSON',
-        },
-        assert.ifError
+    it('should not override a provided format with a File', async () => {
+      await table.createLoadJob(FILE, {sourceFormat: 'AVRO'});
+      assert(bqCreateJobStub.calledOnce);
+      assert(
+        bqCreateJobStub.calledWithMatch({
+          configuration: {
+            load: {
+              sourceFormat: 'AVRO',
+            },
+          },
+        })
       );
     });
 
@@ -1315,25 +1315,19 @@ describe('BigQuery/Table', () => {
       assert(bqCreateJobStub.calledOnce);
     });
 
-    it('should set the job prefix', done => {
-      const fakeJobPrefix = 'abc';
-
-      table.bigQuery.createJob = (reqOpts: JobOptions) => {
-        assert.strictEqual(reqOpts.jobPrefix, fakeJobPrefix);
-        assert.strictEqual(
-          // tslint:disable-next-line no-any
-          (reqOpts.configuration!.load as any).jobPrefix,
-          undefined
-        );
-        done();
-      };
-
-      table.createLoadJob(
-        FILE,
-        {
-          jobPrefix: fakeJobPrefix,
-        },
-        assert.ifError
+    it('should set the job prefix', async () => {
+      const jobPrefix = 'abc';
+      await table.createLoadJob(FILE, {jobPrefix});
+      assert(bqCreateJobStub.calledOnce);
+      assert(
+        bqCreateJobStub.calledWithMatch({
+          jobPrefix,
+          configuration: {
+            load: {
+              jobPrefix: undefined,
+            },
+          },
+        })
       );
     });
 
@@ -1343,52 +1337,63 @@ describe('BigQuery/Table', () => {
       assert(bqCreateJobStub.calledWithMatch({location: LOCATION}));
     });
 
-    it('should accept a job id', done => {
+    it('should accept a job id', async () => {
       const jobId = 'job-id';
-      const options = {jobId};
-
-      table.bigQuery.createJob = (reqOpts: JobOptions) => {
-        assert.strictEqual(reqOpts.jobId, jobId);
-        assert.strictEqual(
-          // tslint:disable-next-line no-any
-          (reqOpts.configuration!.load as any).jobId,
-          undefined
-        );
-        done();
-      };
-
-      table.createLoadJob(FILE, options, assert.ifError);
+      await table.createLoadJob(FILE, {jobId});
+      assert(bqCreateJobStub.calledOnce);
+      assert(
+        bqCreateJobStub.calledWithMatch({
+          jobId,
+          configuration: {
+            load: {
+              jobId: undefined,
+            },
+          },
+        })
+      );
     });
 
     describe('formats', () => {
-      it('should accept csv', done => {
-        table.bigQuery.createJob = (reqOpts: JobOptions) => {
-          const load = reqOpts.configuration!.load!;
-          assert.strictEqual(load.sourceFormat, 'CSV');
-          done();
-        };
-
-        table.createLoadJob(FILE, {format: 'csv'}, assert.ifError);
+      it('should accept csv', async () => {
+        await table.createLoadJob(FILE, {format: 'csv'});
+        assert(bqCreateJobStub.calledOnce);
+        assert(
+          bqCreateJobStub.calledWithMatch({
+            configuration: {
+              load: {
+                sourceFormat: 'CSV',
+              },
+            },
+          })
+        );
       });
 
-      it('should accept json', done => {
-        table.bigQuery.createJob = (reqOpts: JobOptions) => {
-          const load = reqOpts.configuration!.load!;
-          assert.strictEqual(load.sourceFormat, 'NEWLINE_DELIMITED_JSON');
-          done();
-        };
-
-        table.createLoadJob(FILE, {format: 'json'}, assert.ifError);
+      it('should accept json', async () => {
+        await table.createLoadJob(FILE, {format: 'json'});
+        assert(bqCreateJobStub.calledOnce);
+        assert(
+          bqCreateJobStub.calledWithMatch({
+            configuration: {
+              load: {
+                sourceFormat: 'NEWLINE_DELIMITED_JSON',
+              },
+            },
+          })
+        );
       });
 
-      it('should accept avro', done => {
-        table.bigQuery.createJob = (reqOpts: JobOptions) => {
-          const load = reqOpts.configuration!.load!;
-          assert.strictEqual(load.sourceFormat, 'AVRO');
-          done();
-        };
-
-        table.createLoadJob(FILE, {format: 'avro'}, assert.ifError);
+      it('should accept avro', async () => {
+        await table.createLoadJob(FILE, {format: 'avro'});
+        assert(bqCreateJobStub.calledOnce);
+        assert(
+          bqCreateJobStub.calledWithMatch({
+            configuration: {
+              load: {
+                sourceFormat: 'AVRO',
+              },
+            },
+          })
+        );
       });
     });
   });
