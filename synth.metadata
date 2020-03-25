@@ -1,11 +1,11 @@
 {
-  "updateTime": "2020-02-07T12:10:34.719531Z",
+  "updateTime": "2020-03-22T11:14:28.558157Z",
   "sources": [
     {
-      "template": {
-        "name": "node_library",
-        "origin": "synthtool.gcp",
-        "version": "2020.2.4"
+      "git": {
+        "name": "synthtool",
+        "remote": "https://github.com/googleapis/synthtool.git",
+        "sha": "7e98e1609c91082f4eeb63b530c6468aefd18cfd"
       }
     }
   ]
