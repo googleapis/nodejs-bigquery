@@ -60,6 +60,7 @@ const fakePfy = extend({}, pfy, {
     if (c.name === 'Table') {
       promisified = true;
     }
+    pfy.promisifyAll(c);
   },
 });
 
@@ -652,18 +653,21 @@ describe('BigQuery/Table', () => {
       DEST_TABLE = new Table(DATASET, 'destination-table');
     });
 
-    it('should throw if a destination is not a Table', () => {
-      assert.throws(() => {
-        table.createCopyJob();
-      }, /Destination must be a Table/);
+    it('should throw if a destination is not a Table', async () => {
+      await assert.rejects(
+        async () => table.createCopyJob(),
+        /Destination must be a Table/
+      );
 
-      assert.throws(() => {
-        table.createCopyJob({});
-      }, /Destination must be a Table/);
+      await assert.rejects(
+        async () => table.createCopyJob({}),
+        /Destination must be a Table/
+      );
 
-      assert.throws(() => {
-        table.createCopyJob(() => {});
-      }, /Destination must be a Table/);
+      await assert.rejects(
+        async () => table.createCopyJob(() => {}),
+        /Destination must be a Table/
+      );
     });
 
     it('should send correct request to the API', done => {
@@ -765,22 +769,26 @@ describe('BigQuery/Table', () => {
       SOURCE_TABLE = new Table(DATASET, 'source-table');
     });
 
-    it('should throw if a source is not a Table', () => {
-      assert.throws(() => {
-        table.createCopyFromJob(['table']);
-      }, /Source must be a Table/);
+    it('should throw if a source is not a Table', async () => {
+      await assert.rejects(
+        async () => table.createCopyFromJob(['table']),
+        /Source must be a Table/
+      );
 
-      assert.throws(() => {
-        table.createCopyFromJob([SOURCE_TABLE, 'table']);
-      }, /Source must be a Table/);
+      await assert.rejects(
+        async () => table.createCopyFromJob([SOURCE_TABLE, 'table']),
+        /Source must be a Table/
+      );
 
-      assert.throws(() => {
-        table.createCopyFromJob({});
-      }, /Source must be a Table/);
+      await assert.rejects(
+        async () => table.createCopyFromJob({}),
+        /Source must be a Table/
+      );
 
-      assert.throws(() => {
-        table.createCopyFromJob(() => {});
-      }, /Source must be a Table/);
+      await assert.rejects(
+        async () => table.createCopyFromJob(() => {}),
+        /Source must be a Table/
+      );
     });
 
     it('should send correct request to the API', done => {
@@ -1154,10 +1162,19 @@ describe('BigQuery/Table', () => {
       metadata: {},
     };
 
+    let bqCreateJobStub: sinon.SinonStub;
+
     beforeEach(() => {
+      bqCreateJobStub = sinon
+        .stub(table.bigQuery, 'createJob')
+        .resolves([JOB, JOB.metadata]);
       isCustomTypeOverride = () => {
         return true;
       };
+    });
+
+    afterEach(() => {
+      bqCreateJobStub.restore();
     });
 
     it('should accept just a File and a callback', done => {
@@ -1176,11 +1193,6 @@ describe('BigQuery/Table', () => {
         assert.strictEqual(resp, JOB.metadata);
         done();
       });
-    });
-
-    it('should return a stream when a string is given', () => {
-      sandbox.stub(table, 'createWriteStream_').returns(new stream.Writable());
-      assert(table.createLoadJob(FILEPATH) instanceof stream.Stream);
     });
 
     it('should infer the file format from the given filepath', done => {
@@ -1241,152 +1253,147 @@ describe('BigQuery/Table', () => {
       table.createLoadJob(FILE, assert.ifError);
     });
 
-    it('should throw if a File object is not provided', () => {
+    it('should throw if a File object is not provided', async () => {
       isCustomTypeOverride = () => {
         return false;
       };
-
-      assert.throws(() => {
-        table.createLoadJob({});
-      }, /Source must be a File object/);
-    });
-
-    it('should convert File objects to gs:// urls', done => {
-      table.bigQuery.createJob = (reqOpts: JobOptions) => {
-        const sourceUri = reqOpts.configuration!.load!.sourceUris![0];
-        assert.strictEqual(
-          sourceUri,
-          'gs://' + FILE.bucket.name + '/' + FILE.name
-        );
-        done();
-      };
-
-      table.createLoadJob(FILE, assert.ifError);
-    });
-
-    it('should infer the file format from a File object', done => {
-      table.bigQuery.createJob = (reqOpts: JobOptions) => {
-        const sourceFormat = reqOpts.configuration!.load!.sourceFormat;
-        assert.strictEqual(sourceFormat, 'NEWLINE_DELIMITED_JSON');
-        done();
-      };
-
-      table.createLoadJob(FILE, assert.ifError);
-    });
-
-    it('should not override a provided format with a File', done => {
-      table.bigQuery.createJob = (reqOpts: JobOptions) => {
-        const sourceFormat = reqOpts.configuration!.load!.sourceFormat;
-        assert.strictEqual(sourceFormat, 'NEWLINE_DELIMITED_JSON');
-        done();
-      };
-
-      table.createLoadJob(
-        FILE,
-        {
-          sourceFormat: 'NEWLINE_DELIMITED_JSON',
-        },
-        assert.ifError
+      await assert.rejects(
+        async () => table.createLoadJob({}),
+        /Source must be a File object/
       );
     });
 
-    it('should pass the callback to createJob', done => {
-      table.bigQuery.createJob = (reqOpts: JobOptions, callback: Function) => {
-        assert.strictEqual(done, callback);
-        callback(); // the done fn
-      };
-
-      table.createLoadJob(FILE, {}, done);
-    });
-
-    it('should optionally accept options', done => {
-      table.bigQuery.createJob = (reqOpts: JobOptions, callback: Function) => {
-        assert.strictEqual(done, callback);
-        callback(); // the done fn
-      };
-
-      table.createLoadJob(FILE, done);
-    });
-
-    it('should set the job prefix', done => {
-      const fakeJobPrefix = 'abc';
-
-      table.bigQuery.createJob = (reqOpts: JobOptions) => {
-        assert.strictEqual(reqOpts.jobPrefix, fakeJobPrefix);
-        assert.strictEqual(
-          // tslint:disable-next-line no-any
-          (reqOpts.configuration!.load as any).jobPrefix,
-          undefined
-        );
-        done();
-      };
-
-      table.createLoadJob(
-        FILE,
-        {
-          jobPrefix: fakeJobPrefix,
-        },
-        assert.ifError
+    it('should convert File objects to gs:// urls', async () => {
+      await table.createLoadJob(FILE);
+      assert(bqCreateJobStub.calledOnce);
+      assert(
+        bqCreateJobStub.calledWithMatch({
+          configuration: {
+            load: {
+              sourceUris: ['gs://' + FILE.bucket.name + '/' + FILE.name],
+            },
+          },
+        })
       );
     });
 
-    it('should use the default location', done => {
+    it('should infer the file format from a File object', async () => {
+      await table.createLoadJob(FILE);
+      assert(bqCreateJobStub.calledOnce);
+      assert(
+        bqCreateJobStub.calledWithMatch({
+          configuration: {
+            load: {
+              sourceFormat: 'NEWLINE_DELIMITED_JSON',
+            },
+          },
+        })
+      );
+    });
+
+    it('should not override a provided format with a File', async () => {
+      await table.createLoadJob(FILE, {sourceFormat: 'AVRO'});
+      assert(bqCreateJobStub.calledOnce);
+      assert(
+        bqCreateJobStub.calledWithMatch({
+          configuration: {
+            load: {
+              sourceFormat: 'AVRO',
+            },
+          },
+        })
+      );
+    });
+
+    it('should use bigQuery.createJob', async () => {
+      await table.createLoadJob(FILE, {});
+      assert(bqCreateJobStub.calledOnce);
+    });
+
+    it('should optionally accept options', async () => {
+      await table.createLoadJob(FILE);
+      assert(bqCreateJobStub.calledOnce);
+    });
+
+    it('should set the job prefix', async () => {
+      const jobPrefix = 'abc';
+      await table.createLoadJob(FILE, {jobPrefix});
+      assert(bqCreateJobStub.calledOnce);
+      assert(
+        bqCreateJobStub.calledWithMatch({
+          jobPrefix,
+          configuration: {
+            load: {
+              jobPrefix: undefined,
+            },
+          },
+        })
+      );
+    });
+
+    it('should use the default location', async () => {
       const table = new Table(DATASET, TABLE_ID, {location: LOCATION});
-
-      table.bigQuery.createJob = (reqOpts: JobOptions, callback: Function) => {
-        assert.strictEqual(reqOpts.location, LOCATION);
-        callback(); // the done fn
-      };
-
-      table.createLoadJob(FILE, done);
+      await table.createLoadJob(FILE);
+      assert(bqCreateJobStub.calledWithMatch({location: LOCATION}));
     });
 
-    it('should accept a job id', done => {
+    it('should accept a job id', async () => {
       const jobId = 'job-id';
-      const options = {jobId};
-
-      table.bigQuery.createJob = (reqOpts: JobOptions) => {
-        assert.strictEqual(reqOpts.jobId, jobId);
-        assert.strictEqual(
-          // tslint:disable-next-line no-any
-          (reqOpts.configuration!.load as any).jobId,
-          undefined
-        );
-        done();
-      };
-
-      table.createLoadJob(FILE, options, assert.ifError);
+      await table.createLoadJob(FILE, {jobId});
+      assert(bqCreateJobStub.calledOnce);
+      assert(
+        bqCreateJobStub.calledWithMatch({
+          jobId,
+          configuration: {
+            load: {
+              jobId: undefined,
+            },
+          },
+        })
+      );
     });
 
     describe('formats', () => {
-      it('should accept csv', done => {
-        table.bigQuery.createJob = (reqOpts: JobOptions) => {
-          const load = reqOpts.configuration!.load!;
-          assert.strictEqual(load.sourceFormat, 'CSV');
-          done();
-        };
-
-        table.createLoadJob(FILE, {format: 'csv'}, assert.ifError);
+      it('should accept csv', async () => {
+        await table.createLoadJob(FILE, {format: 'csv'});
+        assert(bqCreateJobStub.calledOnce);
+        assert(
+          bqCreateJobStub.calledWithMatch({
+            configuration: {
+              load: {
+                sourceFormat: 'CSV',
+              },
+            },
+          })
+        );
       });
 
-      it('should accept json', done => {
-        table.bigQuery.createJob = (reqOpts: JobOptions) => {
-          const load = reqOpts.configuration!.load!;
-          assert.strictEqual(load.sourceFormat, 'NEWLINE_DELIMITED_JSON');
-          done();
-        };
-
-        table.createLoadJob(FILE, {format: 'json'}, assert.ifError);
+      it('should accept json', async () => {
+        await table.createLoadJob(FILE, {format: 'json'});
+        assert(bqCreateJobStub.calledOnce);
+        assert(
+          bqCreateJobStub.calledWithMatch({
+            configuration: {
+              load: {
+                sourceFormat: 'NEWLINE_DELIMITED_JSON',
+              },
+            },
+          })
+        );
       });
 
-      it('should accept avro', done => {
-        table.bigQuery.createJob = (reqOpts: JobOptions) => {
-          const load = reqOpts.configuration!.load!;
-          assert.strictEqual(load.sourceFormat, 'AVRO');
-          done();
-        };
-
-        table.createLoadJob(FILE, {format: 'avro'}, assert.ifError);
+      it('should accept avro', async () => {
+        await table.createLoadJob(FILE, {format: 'avro'});
+        assert(bqCreateJobStub.calledOnce);
+        assert(
+          bqCreateJobStub.calledWithMatch({
+            configuration: {
+              load: {
+                sourceFormat: 'AVRO',
+              },
+            },
+          })
+        );
       });
     });
   });
@@ -2020,10 +2027,11 @@ describe('BigQuery/Table', () => {
       };
     });
 
-    it('should throw an error if rows is empty', () => {
-      assert.throws(() => {
-        table.insert([]);
-      }, /You must provide at least 1 row to be inserted\./);
+    it('should throw an error if rows is empty', async () => {
+      await assert.rejects(
+        async () => table.insert([]),
+        /You must provide at least 1 row to be inserted/
+      );
     });
 
     it('should save data', done => {
