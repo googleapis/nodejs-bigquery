@@ -37,6 +37,7 @@ import {
   JobOptions,
   TableField,
 } from '../src';
+import {SinonStub} from 'sinon';
 
 const fakeUuid = extend(true, {}, uuid);
 
@@ -979,6 +980,39 @@ describe('BigQuery', () => {
       const structValues = queryParameter.parameterValue.structValues;
 
       assert.strictEqual(structValues.key, expectedParameterValue);
+    });
+
+    it('should format a struct with provided type', () => {
+      const struct = {a: 1};
+      const providedType = {a: 'INT64'};
+
+      const getTypeStub = sandbox.stub(
+        BigQuery,
+        'getTypeDescriptorFromProvidedType_'
+      );
+      getTypeStub.onFirstCall().returns({
+        type: 'STRUCT',
+        structTypes: [
+          {
+            name: 'a',
+            type: {
+              type: 'INT64',
+            },
+          },
+        ],
+      });
+      getTypeStub.onSecondCall().returns({type: 'INT64'});
+
+      const queryParameter = BigQuery.valueToQueryParameter_(
+        struct,
+        providedType
+      );
+      const structValues = queryParameter.parameterValue.structValues;
+      assert.deepStrictEqual(structValues, {
+        a: {
+          value: 1,
+        },
+      });
     });
 
     it('should format an array of structs', () => {
@@ -2101,14 +2135,34 @@ describe('BigQuery', () => {
   });
 
   describe('queryAsStream_', () => {
+    let queryStub: SinonStub;
+
+    beforeEach(() => {
+      queryStub = sandbox.stub(bq, 'query').callsArgAsync(2);
+    });
+
     it('should call query correctly', done => {
       const query = 'SELECT';
-      bq.query = (query_: {}, options: {}, callback: Function) => {
-        assert.strictEqual(query_, query);
-        assert.deepStrictEqual(options, {autoPaginate: false});
-        callback(); // done()
+      bq.queryAsStream_(query, done);
+      assert(
+        queryStub.calledOnceWithExactly(
+          query,
+          {autoPaginate: false},
+          sinon.match.func
+        )
+      );
+    });
+
+    it('should query as job if supplied', done => {
+      const cbStub = sinon.stub().callsArgAsync(1);
+      const query = {
+        job: {
+          getQueryResults: cbStub,
+        },
       };
       bq.queryAsStream_(query, done);
+      assert(cbStub.calledOnceWithExactly(query, sinon.match.func));
+      assert(queryStub.notCalled);
     });
   });
 });
