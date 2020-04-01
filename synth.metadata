@@ -1,11 +1,12 @@
 {
-  "updateTime": "2020-04-01T11:26:57.414131Z",
+  "updateTime": "2020-04-01T11:28:15.208868Z",
   "sources": [
     {
       "git": {
         "name": "synthtool",
         "remote": "https://github.com/googleapis/synthtool.git",
-        "sha": "7e98e1609c91082f4eeb63b530c6468aefd18cfd"
+        "sha": "6a17abc7652e2fe563e1288c6e8c23fc260dda97",
+        "log": "6a17abc7652e2fe563e1288c6e8c23fc260dda97\ndocs: document the release schedule we follow (#454)\n\n\n"
       }
     }
   ]
