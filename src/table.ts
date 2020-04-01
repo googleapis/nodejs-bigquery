@@ -20,7 +20,6 @@ import {promisifyAll} from '@google-cloud/promisify';
 import arrify = require('arrify');
 import Big from 'big.js';
 import * as extend from 'extend';
-import pEvent from 'p-event';
 
 const format = require('string-format-obj');
 import * as fs from 'fs';
@@ -1103,16 +1102,20 @@ class Table extends common.ServiceObject {
     this.bigQuery.createJob(body, callback!);
   }
 
+  createLoadJob(source: string, metadata?: JobLoadMetadata): Writable;
+  createLoadJob(source: File, metadata?: JobLoadMetadata): Promise<JobResponse>;
   createLoadJob(
-    source: string | File,
-    metadata?: JobLoadMetadata
-  ): Promise<JobResponse>;
+    source: string,
+    metadata: JobLoadMetadata,
+    callback: JobCallback
+  ): Writable;
   createLoadJob(
-    source: string | File,
+    source: File,
     metadata: JobLoadMetadata,
     callback: JobCallback
   ): void;
-  createLoadJob(source: string | File, callback: JobCallback): void;
+  createLoadJob(source: string, callback: JobCallback): Writable;
+  createLoadJob(source: File, callback: JobCallback): void;
   /**
    * Load data from a local file or Storage {@link
    * https://cloud.google.com/nodejs/docs/reference/storage/latest/File File}.
@@ -1126,10 +1129,10 @@ class Table extends common.ServiceObject {
    *
    * @see [Jobs: insert API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert}
    *
-   * @param {string|File|File[]} source The source file to load. A string (path)
-   * to a local file, or one or more {@link
+   * @param {string|File} source The source file to load. A string or a
+   *     {@link
    * https://cloud.google.com/nodejs/docs/reference/storage/latest/File File}
-   * objects.
+   * object.
    * @param {object} [metadata] Metadata to set with the load operation. The
    *     metadata object should be in the format of the
    *     [`configuration.load`](http://goo.gl/BVcXk4) property of a Jobs
@@ -1200,31 +1203,17 @@ class Table extends common.ServiceObject {
    * });
    */
   createLoadJob(
-    source: string | File | File[],
+    source: string | File,
     metadataOrCallback?: JobLoadMetadata | JobCallback,
     cb?: JobCallback
-  ): void | Promise<JobResponse> {
+  ): void | Promise<JobResponse> | Writable {
     const metadata =
       typeof metadataOrCallback === 'object' ? metadataOrCallback : {};
     const callback =
-      typeof metadataOrCallback === 'function' ? metadataOrCallback : cb;
+      typeof metadataOrCallback === 'function'
+        ? metadataOrCallback
+        : cb || common.util.noop;
 
-    this._createLoadJob(source, metadata).then(
-      ([resp]) => callback!(null, resp, resp.metadata),
-      err => callback!(err)
-    );
-  }
-
-  /**
-   * @param {string | File | File[]} source
-   * @param {JobLoadMetadata} metadata
-   * @returns {Promise<JobResponse>}
-   * @private
-   */
-  async _createLoadJob(
-    source: string | File | File[],
-    metadata: JobLoadMetadata
-  ): Promise<JobResponse> {
     if (metadata.format) {
       metadata.sourceFormat = FORMATS[metadata.format.toLowerCase()];
       delete metadata.format;
@@ -1249,11 +1238,13 @@ class Table extends common.ServiceObject {
       }
 
       // Read the file into a new write stream.
-      const jobWritable = fs
+      return fs
         .createReadStream(source)
-        .pipe(this.createWriteStream_(metadata));
-      const jobResponse = (await pEvent(jobWritable, 'job')) as Job;
-      return [jobResponse, jobResponse.metadata];
+        .pipe(this.createWriteStream_(metadata))
+        .on('error', callback)
+        .on('job', job => {
+          callback(null, job, job.metadata);
+        });
     }
 
     // tslint:disable-next-line no-any
@@ -1307,7 +1298,7 @@ class Table extends common.ServiceObject {
       }),
     });
 
-    return this.bigQuery.createJob(body);
+    this.bigQuery.createJob(body, callback);
   }
 
   createQueryJob(options: Query): Promise<JobResponse>;

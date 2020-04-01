@@ -5,7 +5,7 @@
   "license": "Apache-2.0",
   "author": "Google LLC",
   "engines": {
-    "node": ">=10"
+    "node": ">=8.10.0"
   },
   "repository": "googleapis/nodejs-bigquery",
   "main": "./build/src/index.js",
@@ -49,15 +49,14 @@
     "prelint": "cd samples; npm link ../; npm i"
   },
   "dependencies": {
-    "@google-cloud/common": "^3.0.0",
-    "@google-cloud/paginator": "^3.0.0",
-    "@google-cloud/promisify": "^2.0.0",
+    "@google-cloud/common": "^2.0.0",
+    "@google-cloud/paginator": "^2.0.0",
+    "@google-cloud/promisify": "^1.0.0",
     "arrify": "^2.0.1",
     "big.js": "^5.2.2",
     "duplexify": "^4.0.0",
     "extend": "^3.0.2",
     "is": "^3.3.0",
-    "p-event": "^4.1.0",
     "stream-events": "^1.0.5",
     "string-format-obj": "^1.1.1",
     "uuid": "^7.0.0"
