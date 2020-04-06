@@ -2025,18 +2025,12 @@ describe('BigQuery/Table', () => {
       schema: SCHEMA_STRING,
     };
 
-    // HACK @types/sinon is missing the timer async methods
-    interface SinonFakeTimersShim extends sinon.SinonFakeTimers {
-      runAllAsync(): Promise<number>;
-      tickAsync(ms: number | string): Promise<number>;
-    }
-
-    let clock: SinonFakeTimersShim;
+    let clock: sinon.SinonFakeTimers;
     let insertSpy: sinon.SinonSpy;
     let requestStub: sinon.SinonStub;
 
     before(() => {
-      clock = sinon.useFakeTimers() as SinonFakeTimersShim;
+      clock = sinon.useFakeTimers() as sinon.SinonFakeTimers;
     });
 
     beforeEach(() => {
