@@ -2021,6 +2021,10 @@ describe('BigQuery/Table', () => {
       }),
     };
 
+    const OPTIONS = {
+      schema: SCHEMA_STRING,
+    };
+
     // HACK @types/sinon is missing the timer async methods
     interface SinonFakeTimersShim extends sinon.SinonFakeTimers {
       runAllAsync(): Promise<number>;
@@ -2028,6 +2032,7 @@ describe('BigQuery/Table', () => {
     }
 
     let clock: SinonFakeTimersShim;
+    let insertSpy: sinon.SinonSpy;
     let requestStub: sinon.SinonStub;
 
     before(() => {
@@ -2035,6 +2040,7 @@ describe('BigQuery/Table', () => {
     });
 
     beforeEach(() => {
+      insertSpy = sinon.spy(table, '_insert');
       requestStub = sinon.stub(table, 'request').resolves([{}]);
       fakeUuid.v4 = () => {
         return fakeInsertId;
@@ -2043,6 +2049,7 @@ describe('BigQuery/Table', () => {
 
     afterEach(() => {
       clock.reset();
+      insertSpy.restore();
     });
 
     after(() => {
@@ -2109,7 +2116,7 @@ describe('BigQuery/Table', () => {
         requestStub.calledWithMatch(
           ({json}: DecorateRequestOptions) =>
             json.rows[0].insertId === undefined &&
-            json.createdInsertId === undefined
+            json.createInsertId === undefined
         )
       );
     });
@@ -2169,6 +2176,160 @@ describe('BigQuery/Table', () => {
       ]);
     });
 
+    it('should retry partials default max 3', async () => {
+      const rowError = {message: 'Error.', reason: 'try again plz'};
+      requestStub.resetBehavior();
+      requestStub.resolves([
+        {
+          insertErrors: [
+            {index: 0, errors: [rowError]},
+            {index: 1, errors: [rowError]},
+            {index: 2, errors: [rowError]},
+            {index: 3, errors: [rowError]},
+          ],
+        },
+      ]);
+
+      const reflection = await reflectAfterTimer(() =>
+        table.insert(data, OPTIONS)
+      );
+      assert(reflection.isRejected);
+      assert.strictEqual(insertSpy.callCount, 4);
+    });
+
+    it('should retry partials with optional max', async () => {
+      const partialRetries = 6;
+      const rowError = {message: 'Error.', reason: 'try again plz'};
+      requestStub.resetBehavior();
+      requestStub.resolves([
+        {
+          insertErrors: [
+            {index: 0, errors: [rowError]},
+            {index: 1, errors: [rowError]},
+            {index: 2, errors: [rowError]},
+            {index: 3, errors: [rowError]},
+          ],
+        },
+      ]);
+
+      const reflection = await reflectAfterTimer(() =>
+        table.insert(data, {...OPTIONS, partialRetries})
+      );
+      assert(reflection.isRejected);
+      assert.strictEqual(insertSpy.callCount, partialRetries + 1);
+    });
+
+    it('should allow 0 partial retries, but still do it once', async () => {
+      const rowError = {message: 'Error.', reason: 'try again plz'};
+      requestStub.resetBehavior();
+      requestStub.resolves([
+        {
+          insertErrors: [
+            {index: 0, errors: [rowError]},
+            {index: 1, errors: [rowError]},
+            {index: 2, errors: [rowError]},
+            {index: 3, errors: [rowError]},
+          ],
+        },
+      ]);
+
+      const reflection = await reflectAfterTimer(() =>
+        table.insert(data, {...OPTIONS, partialRetries: 0})
+      );
+      assert(reflection.isRejected);
+      assert.strictEqual(insertSpy.callCount, 1);
+    });
+
+    it('should keep partial retries option non-negative', async () => {
+      const rowError = {message: 'Error.', reason: 'try again plz'};
+      requestStub.resetBehavior();
+      requestStub.resolves([
+        {
+          insertErrors: [
+            {index: 0, errors: [rowError]},
+            {index: 1, errors: [rowError]},
+            {index: 2, errors: [rowError]},
+            {index: 3, errors: [rowError]},
+          ],
+        },
+      ]);
+
+      const reflection = await reflectAfterTimer(() =>
+        table.insert(data, {...OPTIONS, partialRetries: -1})
+      );
+      assert(reflection.isRejected);
+      assert.strictEqual(insertSpy.callCount, 1);
+    });
+
+    it('should retry partial inserts deltas', async () => {
+      const rowError = {message: 'Error.', reason: 'try again plz'};
+      requestStub.resetBehavior();
+      requestStub.onCall(0).resolves([
+        {
+          insertErrors: [
+            {index: 0, errors: [rowError]},
+            {index: 1, errors: [rowError]},
+            {index: 2, errors: [rowError]},
+            {index: 3, errors: [rowError]},
+          ],
+        },
+      ]);
+
+      requestStub.onCall(1).resolves([
+        {
+          insertErrors: [
+            {index: 0, errors: [rowError]},
+            {index: 1, errors: [rowError]},
+            {index: 2, errors: [rowError]},
+          ],
+        },
+      ]);
+
+      requestStub.onCall(2).resolves([
+        {
+          insertErrors: [
+            {index: 1, errors: [rowError]},
+            {index: 2, errors: [rowError]},
+          ],
+        },
+      ]);
+
+      const goodResponse = [{foo: 'bar'}];
+      requestStub.onCall(3).resolves(goodResponse);
+
+      const reflection = await reflectAfterTimer(() =>
+        table.insert(data, OPTIONS)
+      );
+      assert(reflection.isFulfilled);
+
+      assert.deepStrictEqual(
+        requestStub.getCall(0).args[0].json,
+        dataApiFormat,
+        'first call: try all 5'
+      );
+      assert.deepStrictEqual(
+        requestStub.getCall(1).args[0].json,
+        {rows: dataApiFormat.rows.slice(0, 4)},
+        'second call: previous failures were 4/5'
+      );
+      assert.deepStrictEqual(
+        requestStub.getCall(2).args[0].json,
+        {rows: dataApiFormat.rows.slice(0, 3)},
+        'third call: previous failures were 3/5'
+      );
+      assert.deepStrictEqual(
+        requestStub.getCall(3).args[0].json,
+        {rows: dataApiFormat.rows.slice(1, 3)},
+        'fourth call: previous failures were 2/5'
+      );
+      assert(!requestStub.getCall(4), 'fifth call: should not have happened');
+
+      const {value} = reflection as pReflect.PromiseFulfilledResult<
+        InsertRowsResponse
+      >;
+      assert(value);
+    });
+
     it('should insert raw data', async () => {
       const opts = {raw: true};
       await table.insert(rawData, opts);
@@ -2206,21 +2367,17 @@ describe('BigQuery/Table', () => {
     });
 
     describe('create table and retry', () => {
-      const OPTIONS = {
-        schema: SCHEMA_STRING,
-      };
-
       let createStub: sinon.SinonStub;
-      let insertSpy: sinon.SinonSpy;
+      let insertCreateSpy: sinon.SinonSpy;
 
       beforeEach(() => {
-        insertSpy = sinon.spy(table, '_insertAndCreateTable');
+        insertCreateSpy = sinon.spy(table, '_insertAndCreateTable');
         createStub = sinon.stub(table, 'create').resolves([{}]);
         requestStub.onFirstCall().rejects({code: 404});
       });
 
       afterEach(() => {
-        insertSpy.restore();
+        insertCreateSpy.restore();
         createStub.restore();
       });
 
@@ -2253,19 +2410,22 @@ describe('BigQuery/Table', () => {
         const remainingCheckDelay = expectedDelay - firstCheckDelay;
 
         pReflect(table.insert(data, OPTIONS)); // gracefully handle async errors
-        assert(insertSpy.calledOnce); // just called `insert`, that's 1 so far
+        assert(insertCreateSpy.calledOnce); // just called `insert`, that's 1 so far
 
         await clock.tickAsync(firstCheckDelay); // first 50s
-        assert(insertSpy.calledOnce);
+        assert(insertCreateSpy.calledOnce);
         assert(createStub.calledOnce, 'must create table before inserting');
 
         await clock.tickAsync(remainingCheckDelay); // first 50s + 10s = 60s
-        assert(insertSpy.calledTwice);
-        assert.strictEqual(insertSpy.secondCall.args[0], data);
-        assert.strictEqual(insertSpy.secondCall.args[1], OPTIONS);
+        assert(insertCreateSpy.calledTwice);
+        assert.strictEqual(insertCreateSpy.secondCall.args[0], data);
+        assert.strictEqual(insertCreateSpy.secondCall.args[1], OPTIONS);
 
         await clock.runAllAsync(); // for good measure
-        assert(insertSpy.calledTwice, 'should not have called insert again');
+        assert(
+          insertCreateSpy.calledTwice,
+          'should not have called insert again'
+        );
       });
 
       it('should reject on table creation errors', async () => {
@@ -2289,9 +2449,9 @@ describe('BigQuery/Table', () => {
         );
         assert(reflection.isFulfilled);
         assert(createStub.calledOnce);
-        assert(insertSpy.calledTwice);
-        assert.strictEqual(insertSpy.secondCall.args[0], data);
-        assert.strictEqual(insertSpy.secondCall.args[1], OPTIONS);
+        assert(insertCreateSpy.calledTwice);
+        assert.strictEqual(insertCreateSpy.secondCall.args[0], data);
+        assert.strictEqual(insertCreateSpy.secondCall.args[1], OPTIONS);
       });
 
       it('should retry the insert', async () => {

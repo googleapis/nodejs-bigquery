@@ -73,7 +73,7 @@ export type RowMetadata = any;
 
 export type InsertRowsOptions = bigquery.ITableDataInsertAllRequest & {
   createInsertId?: boolean;
-  maxAttempts?: number;
+  partialRetries?: number;
   raw?: boolean;
   schema?: string | {};
 };
@@ -1755,8 +1755,8 @@ class Table extends common.ServiceObject {
    *     default row id when one is not provided.
    * @param {boolean} [options.ignoreUnknownValues=false] Accept rows that contain
    *     values that do not match the schema. The unknown values are ignored.
-   * @param {number} [options.maxAttempts=3] Number of attempts to try and
-   *     insert rows.
+   * @param {number} [options.partialRetries=3] Number of times to retry
+   *     inserting rows for cases of partial failures.
    * @param {boolean} [options.raw] If `true`, the `rows` argument is expected to
    *     be formatted as according to the
    *     [specification](https://cloud.google.com/bigquery/docs/reference/v2/tabledata/insertAll).
@@ -1944,8 +1944,10 @@ class Table extends common.ServiceObject {
     rows: RowMetadata | RowMetadata[],
     options: InsertRowsOptions
   ): Promise<bigquery.ITableDataInsertAllResponse> {
-    const maxAttempts = options.maxAttempts || 3;
+    const {partialRetries = 3} = options;
     let error: Error;
+
+    const maxAttempts = Math.max(partialRetries, 0) + 1;
 
     for (let attempts = 0; attempts < maxAttempts; attempts++) {
       try {
@@ -1956,7 +1958,9 @@ class Table extends common.ServiceObject {
           .filter(err => !!err.row)
           .map(err => err.row);
 
-        if (!rows.length) break;
+        if (!rows.length) {
+          break;
+        }
       }
     }
 
@@ -2000,7 +2004,7 @@ class Table extends common.ServiceObject {
     }
 
     delete json.createInsertId;
-    delete json.maxAttempts;
+    delete json.partialRetries;
     delete json.raw;
     delete json.schema;
 
