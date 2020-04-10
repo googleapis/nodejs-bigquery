@@ -205,7 +205,7 @@ export interface BigQueryOptions extends common.GoogleAuthOptions {
  *     native Promises.
  * @property {string} [location] The geographic location of all datasets and
  *     jobs referenced and created through the client.
- * @property {string} [userAgent] The value to be prepended to the User-Agent 
+ * @property {string} [userAgent] The value to be prepended to the User-Agent
  *     header in API requests.
  * @property {string[]} [scopes] Additional OAuth scopes to use in requests. For
  *     example, to access an external data source, you may need the
