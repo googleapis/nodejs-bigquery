@@ -48,7 +48,7 @@ const partialDataFilePath = path.join(
 );
 const bigquery = new BigQuery();
 
-describe.only('Tables', () => {
+describe('Tables', () => {
   before(async () => {
     const [bucket] = await storage.createBucket(bucketName);
     await Promise.all([
@@ -114,6 +114,26 @@ describe.only('Tables', () => {
     const [exists] = await bigquery
       .dataset(datasetId)
       .table(partitionedTableId)
+      .exists();
+    assert.ok(exists);
+  });
+
+  it(`should create an integer range partitioned table`, async () => {
+    const rangePartTableId = generateUuid();
+    const output = execSync(
+      `node createTableRangePartitioned.js ${datasetId} ${rangePartTableId}`
+    );
+    assert.include(
+      output,
+      `Table ${rangePartTableId} created with integer range partitioning:`
+    );
+    assert.include(
+      output,
+      `{ field: 'Score', range: { start: '1', end: '100', interval: '10' } }`
+    );
+    const [exists] = await bigquery
+      .dataset(datasetId)
+      .table(rangePartTableId)
       .exists();
     assert.ok(exists);
   });

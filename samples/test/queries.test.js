@@ -161,4 +161,13 @@ describe(`Queries`, () => {
     const output = execSync(`node ddlCreateView.js ${projectId} ${datasetId}`);
     assert.match(output, /Created new view/);
   });
+
+  it(`should query an external data source`, async () => {
+    const permTableId = generateUuid();
+    const output = execSync(
+      `node queryExternalGCSPerm.js ${datasetId} ${permTableId}`
+    );
+    assert.match(output, /Rows:/);
+    assert.match(output, /post_abbr/);
+  });
 });
