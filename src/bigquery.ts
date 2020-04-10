@@ -168,6 +168,7 @@ export interface BigQueryOptions extends common.GoogleAuthOptions {
   autoRetry?: boolean;
   maxRetries?: number;
   location?: string;
+  userAgent?: string;
   /**
    * The API endpoint of the service used to make requests.
    * Defaults to `bigquery.googleapis.com`.
@@ -204,6 +205,8 @@ export interface BigQueryOptions extends common.GoogleAuthOptions {
  *     native Promises.
  * @property {string} [location] The geographic location of all datasets and
  *     jobs referenced and created through the client.
+ * @property {string} [userAgent] The value to be prepended to the User-Agent 
+ *     header in API requests.
  * @property {string[]} [scopes] Additional OAuth scopes to use in requests. For
  *     example, to access an external data source, you may need the
  *     `https://www.googleapis.com/auth/drive.readonly` scope.
