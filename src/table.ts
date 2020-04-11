@@ -22,6 +22,7 @@ import Big from 'big.js';
 import * as extend from 'extend';
 import pEvent from 'p-event';
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const format = require('string-format-obj');
 import * as fs from 'fs';
 import * as is from 'is';
@@ -47,6 +48,7 @@ import {Duplex, Writable} from 'stream';
 import {JobMetadata} from './job';
 import bigquery from './types';
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const duplexify = require('duplexify');
 
 // This is supposed to be a @google-cloud/storage `File` type. The storage npm
@@ -55,7 +57,7 @@ const duplexify = require('duplexify');
 // included.  The storage module is fairly large, and only really needed for
 // types.  We need to figure out how to include these types properly.
 export interface File {
-  // tslint:disable-next-line no-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   bucket: any;
   kmsKeyName?: string;
   userProject?: string;
@@ -66,7 +68,7 @@ export interface File {
 export type JobMetadataCallback = RequestCallback<JobMetadata>;
 export type JobMetadataResponse = [JobMetadata];
 
-// tslint:disable-next-line no-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type RowMetadata = any;
 
 export type InsertRowsOptions = bigquery.ITableDataInsertAllRequest & {
@@ -779,7 +781,7 @@ class Table extends common.ServiceObject {
     const callback =
       typeof metadataOrCallback === 'function' ? metadataOrCallback : cb;
 
-    // tslint:disable-next-line no-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const body: any = {
       configuration: {
         copy: extend(true, metadata, {
@@ -900,7 +902,7 @@ class Table extends common.ServiceObject {
     const callback =
       typeof metadataOrCallback === 'function' ? metadataOrCallback : cb;
 
-    // tslint:disable-next-line no-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const body: any = {
       configuration: {
         copy: extend(true, metadata, {
@@ -1073,7 +1075,7 @@ class Table extends common.ServiceObject {
       delete options.gzip;
     }
 
-    // tslint:disable-next-line no-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const body: any = {
       configuration: {
         extract: extend(true, options, {
@@ -1256,7 +1258,7 @@ class Table extends common.ServiceObject {
       return [jobResponse, jobResponse.metadata];
     }
 
-    // tslint:disable-next-line no-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const body: any = {
       configuration: {
         load: {
@@ -1358,10 +1360,6 @@ class Table extends common.ServiceObject {
    */
   createWriteStream_(metadata: JobLoadMetadata | string): Writable {
     metadata = metadata || {};
-    const fileTypes = Object.keys(FORMATS).map(key => {
-      return FORMATS[key];
-    });
-
     if (typeof metadata === 'string') {
       metadata = {
         sourceFormat: FORMATS[metadata.toLowerCase()],
@@ -1415,7 +1413,7 @@ class Table extends common.ServiceObject {
             }),
           },
         },
-        // tslint:disable-next-line no-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (data: any) => {
           const job = this.bigQuery.job(data.jobReference.jobId, {
             location: data.jobReference.location,
@@ -1947,7 +1945,7 @@ class Table extends common.ServiceObject {
                   reason: error.reason,
                 };
               }),
-              // tslint:disable-next-line: no-any
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               row: rows[(insertError as any).index],
             };
           }

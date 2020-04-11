@@ -63,7 +63,7 @@ function main(
       .load(fileName, options);
 
     console.log(`Job ${job.id} completed.`);
-    console.log(`New Schema:`);
+    console.log('New Schema:');
     console.log(job.configuration.load.schema.fields);
 
     // Check the job's status for errors

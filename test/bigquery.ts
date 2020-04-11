@@ -22,7 +22,7 @@ import {
 import * as pfy from '@google-cloud/promisify';
 import arrify = require('arrify');
 import * as assert from 'assert';
-import {describe, it} from 'mocha';
+import {describe, it, afterEach, before, beforeEach} from 'mocha';
 import Big from 'big.js';
 import * as extend from 'extend';
 import * as proxyquire from 'proxyquire';
@@ -42,9 +42,9 @@ import {SinonStub} from 'sinon';
 const fakeUuid = extend(true, {}, uuid);
 
 class FakeApiError {
-  calledWith_: IArguments;
-  constructor() {
-    this.calledWith_ = arguments;
+  calledWith_: Array<{}>;
+  constructor(...args: Array<{}>) {
+    this.calledWith_ = args;
   }
 }
 
@@ -72,9 +72,9 @@ const fakeUtil = extend({}, util, {
 const originalFakeUtil = extend(true, {}, fakeUtil);
 
 class FakeDataset {
-  calledWith_: IArguments;
-  constructor() {
-    this.calledWith_ = arguments;
+  calledWith_: Array<{}>;
+  constructor(...args: Array<{}>) {
+    this.calledWith_ = args;
   }
 }
 
@@ -85,9 +85,9 @@ class FakeTable extends Table {
 }
 
 class FakeJob {
-  calledWith_: IArguments;
-  constructor() {
-    this.calledWith_ = arguments;
+  calledWith_: Array<{}>;
+  constructor(...args: Array<{}>) {
+    this.calledWith_ = args;
   }
 }
 
@@ -113,6 +113,7 @@ class FakeService extends Service {
   calledWith_: IArguments;
   constructor(config: ServiceConfig, options: ServiceOptions) {
     super(config, options);
+    // eslint-disable-next-line prefer-rest-params
     this.calledWith_ = arguments;
   }
 }
@@ -125,11 +126,11 @@ describe('BigQuery', () => {
   const PROJECT_ID = 'test-project';
   const LOCATION = 'asia-northeast1';
 
-  // tslint:disable-next-line no-any variable-name
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let BigQueryCached: any;
-  // tslint:disable-next-line no-any variable-name
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let BigQuery: any;
-  // tslint:disable-next-line no-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let bq: any;
 
   before(() => {
@@ -187,6 +188,7 @@ describe('BigQuery', () => {
       ]);
       assert.deepStrictEqual(
         calledWith.packageJson,
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
         require('../../package.json')
       );
     });
@@ -1176,7 +1178,7 @@ describe('BigQuery', () => {
     beforeEach(() => {
       fakeJobId = uuid.v4();
 
-      // tslint:disable-next-line no-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (fakeUuid as any).v4 = () => {
         return fakeJobId;
       };
@@ -1291,8 +1293,8 @@ describe('BigQuery', () => {
 
       bq.createJob({}, (err: FakeApiError) => {
         assert(err instanceof FakeApiError);
-
-        const errorOpts = err.calledWith_[0];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const errorOpts: any = err.calledWith_[0];
         assert.deepStrictEqual(errorOpts.errors, errors);
         assert.strictEqual(errorOpts.response, response);
         done();
@@ -1340,7 +1342,7 @@ describe('BigQuery', () => {
     });
 
     describe('with destination', () => {
-      // tslint:disable-next-line no-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let dataset: any;
       const TABLE_ID = 'table-id';
 
@@ -1408,7 +1410,7 @@ describe('BigQuery', () => {
 
       it('should delete the params option', done => {
         bq.createJob = (reqOpts: JobOptions) => {
-          // tslint:disable-next-line no-any
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           assert.strictEqual((reqOpts as any).params, undefined);
           done();
         };
@@ -1465,7 +1467,7 @@ describe('BigQuery', () => {
 
         it('should allow for optional parameter types', () => {
           bq.createJob = (reqOpts: JobOptions) => {
-            // tslint:disable-next-line no-any
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             assert.strictEqual((reqOpts as any).params, undefined);
           };
 
@@ -1569,7 +1571,7 @@ describe('BigQuery', () => {
 
         it('should allow for optional parameter types', () => {
           bq.createJob = (reqOpts: JobOptions) => {
-            // tslint:disable-next-line no-any
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             assert.strictEqual((reqOpts as any).params, undefined);
           };
 
@@ -1614,7 +1616,7 @@ describe('BigQuery', () => {
 
       bq.createJob = (reqOpts: JobOptions) => {
         assert.strictEqual(
-          // tslint:disable-next-line no-any
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (reqOpts.configuration!.query as any).dryRun,
           undefined
         );
@@ -1633,7 +1635,7 @@ describe('BigQuery', () => {
 
       bq.createJob = (reqOpts: JobOptions) => {
         assert.strictEqual(
-          // tslint:disable-next-line no-any
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (reqOpts.configuration!.query as any).jobPrefix,
           undefined
         );
@@ -1652,7 +1654,7 @@ describe('BigQuery', () => {
 
       bq.createJob = (reqOpts: JobOptions) => {
         assert.strictEqual(
-          // tslint:disable-next-line no-any
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (reqOpts.configuration!.query as any).location,
           undefined
         );
@@ -1671,7 +1673,7 @@ describe('BigQuery', () => {
 
       bq.createJob = (reqOpts: JobOptions) => {
         assert.strictEqual(
-          // tslint:disable-next-line no-any
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (reqOpts.configuration!.query as any).jobId,
           undefined
         );
@@ -2103,7 +2105,7 @@ describe('BigQuery', () => {
 
     it('should assign Job on the options', done => {
       const fakeJob = {
-        getQueryResults: (options: {}, callback: Function) => {
+        getQueryResults: (options: {}) => {
           assert.deepStrictEqual(options, {job: fakeJob});
           done();
         },

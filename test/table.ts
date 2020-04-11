@@ -23,7 +23,7 @@ import * as pfy from '@google-cloud/promisify';
 import {File} from '@google-cloud/storage';
 import arrify = require('arrify');
 import * as assert from 'assert';
-import {describe, it} from 'mocha';
+import {describe, it, afterEach, beforeEach, before, after} from 'mocha';
 import Big from 'big.js';
 import {EventEmitter} from 'events';
 import * as extend from 'extend';
@@ -37,6 +37,7 @@ import {Job, JobOptions} from '../src/job';
 import {
   CopyTableMetadata,
   JobLoadMetadata,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   Table,
   TableMetadata,
   ViewDefinition,
@@ -48,10 +49,10 @@ let makeWritableStreamOverride: Function | null;
 let isCustomTypeOverride: Function | null;
 const fakeUtil = extend({}, util, {
   isCustomType: (...args: Array<{}>) => {
-    return (isCustomTypeOverride || util.isCustomType).apply(null, args);
+    return (isCustomTypeOverride || util.isCustomType)(...args);
   },
   makeWritableStream: (...args: Array<{}>) => {
-    (makeWritableStreamOverride || util.makeWritableStream).apply(null, args);
+    (makeWritableStreamOverride || util.makeWritableStream)(...args);
   },
   noop: () => {},
 });
@@ -83,13 +84,14 @@ const fakePaginator = {
   },
 };
 
-// tslint:disable-next-line no-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let fakeUuid: any = extend(true, {}, uuid);
 
 class FakeServiceObject extends ServiceObject {
   calledWith_: IArguments;
   constructor(config: ServiceObjectConfig) {
     super(config);
+    // eslint-disable-next-line prefer-rest-params
     this.calledWith_ = arguments;
   }
 }
@@ -99,11 +101,52 @@ interface MakeWritableStreamOptions {
   request: {uri: string};
 }
 
-let sandbox: sinon.SinonSandbox;
-beforeEach(() => (sandbox = sinon.createSandbox()));
-afterEach(() => sandbox.restore());
+const sandbox = sinon.createSandbox();
 
 describe('BigQuery/Table', () => {
+  before(() => {
+    Table = proxyquire('../src/table.js', {
+      uuid: fakeUuid,
+      '@google-cloud/common': {
+        ServiceObject: FakeServiceObject,
+        util: fakeUtil,
+      },
+      '@google-cloud/paginator': fakePaginator,
+      '@google-cloud/promisify': fakePfy,
+    }).Table;
+
+    const tableCached = extend(true, {}, Table);
+
+    // Override all util methods, allowing them to be mocked. Overrides are
+    // removed before each test.
+    Object.keys(Table).forEach(tableMethod => {
+      if (typeof Table[tableMethod] !== 'function') {
+        return;
+      }
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      Table[tableMethod] = (...args: any[]) => {
+        const method = tableOverrides[tableMethod] || tableCached[tableMethod];
+        return method(...args);
+      };
+    });
+  });
+
+  beforeEach(() => {
+    fakeUuid = extend(fakeUuid, uuid);
+    isCustomTypeOverride = null;
+    makeWritableStreamOverride = null;
+    tableOverrides = {};
+    table = new Table(DATASET, TABLE_ID);
+    table.bigQuery.request = util.noop;
+    table.bigQuery.createJob = util.noop;
+    sandbox.stub(BigQuery, 'mergeSchemaWithRows_').callsFake((schema, rows) => {
+      return rows;
+    });
+  });
+
+  afterEach(() => sandbox.restore());
+
   const DATASET = {
     id: 'dataset-id',
     createTable: util.noop,
@@ -139,54 +182,13 @@ describe('BigQuery/Table', () => {
 
   const LOCATION = 'asia-northeast1';
 
-  // tslint:disable-next-line no-any variable-name
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let Table: any;
   const TABLE_ID = 'kittens';
-  // tslint:disable-next-line no-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let table: any;
-  // tslint:disable-next-line no-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let tableOverrides: any = {};
-
-  before(() => {
-    Table = proxyquire('../src/table.js', {
-      uuid: fakeUuid,
-      '@google-cloud/common': {
-        ServiceObject: FakeServiceObject,
-        util: fakeUtil,
-      },
-      '@google-cloud/paginator': fakePaginator,
-      '@google-cloud/promisify': fakePfy,
-    }).Table;
-
-    const tableCached = extend(true, {}, Table);
-
-    // Override all util methods, allowing them to be mocked. Overrides are
-    // removed before each test.
-    Object.keys(Table).forEach(tableMethod => {
-      if (typeof Table[tableMethod] !== 'function') {
-        return;
-      }
-
-      // tslint:disable-next-line no-any
-      Table[tableMethod] = (...args: any[]) => {
-        const method = tableOverrides[tableMethod] || tableCached[tableMethod];
-        return method(...args);
-      };
-    });
-  });
-
-  beforeEach(() => {
-    fakeUuid = extend(fakeUuid, uuid);
-    isCustomTypeOverride = null;
-    makeWritableStreamOverride = null;
-    tableOverrides = {};
-    table = new Table(DATASET, TABLE_ID);
-    table.bigQuery.request = util.noop;
-    table.bigQuery.createJob = util.noop;
-    sandbox.stub(BigQuery, 'mergeSchemaWithRows_').callsFake((schema, rows) => {
-      return rows;
-    });
-  });
 
   describe('instantiation', () => {
     it('should extend the correct methods', () => {
@@ -484,7 +486,7 @@ describe('BigQuery/Table', () => {
   });
 
   describe('copy', () => {
-    // tslint:disable-next-line no-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let fakeJob: any;
 
     beforeEach(() => {
@@ -567,7 +569,7 @@ describe('BigQuery/Table', () => {
   });
 
   describe('copyFrom', () => {
-    // tslint:disable-next-line no-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let fakeJob: any;
 
     beforeEach(() => {
@@ -706,7 +708,7 @@ describe('BigQuery/Table', () => {
       table.bigQuery.createJob = (reqOpts: JobOptions, callback: Function) => {
         assert.strictEqual(reqOpts.jobPrefix, fakeJobPrefix);
         assert.strictEqual(
-          // tslint:disable-next-line no-any
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (reqOpts.configuration!.copy as any).jobPrefix,
           undefined
         );
@@ -733,7 +735,7 @@ describe('BigQuery/Table', () => {
       table.bigQuery.createJob = (reqOpts: JobOptions, callback: Function) => {
         assert.strictEqual(reqOpts.jobId, jobId);
         assert.strictEqual(
-          // tslint:disable-next-line no-any
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (reqOpts.configuration!.copy as any).jobId,
           undefined
         );
@@ -850,7 +852,7 @@ describe('BigQuery/Table', () => {
       table.bigQuery.createJob = (reqOpts: JobOptions, callback: Function) => {
         assert.strictEqual(reqOpts.jobPrefix, fakeJobPrefix);
         assert.strictEqual(
-          // tslint:disable-next-line no-any
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (reqOpts.configuration!.copy as any).jobPrefix,
           undefined
         );
@@ -877,7 +879,7 @@ describe('BigQuery/Table', () => {
       table.bigQuery.createJob = (reqOpts: JobOptions, callback: Function) => {
         assert.strictEqual(reqOpts.jobId, jobId);
         assert.strictEqual(
-          // tslint:disable-next-line no-any
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (reqOpts.configuration!.copy as any).jobId,
           undefined
         );
@@ -1054,7 +1056,7 @@ describe('BigQuery/Table', () => {
       table.bigQuery.createJob = (reqOpts: JobOptions) => {
         const extract = reqOpts.configuration!.extract!;
         assert.strictEqual(extract.destinationFormat, 'CSV');
-        // tslint:disable-next-line no-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         assert.strictEqual((extract as any).format, undefined);
         done();
       };
@@ -1072,7 +1074,7 @@ describe('BigQuery/Table', () => {
       table.bigQuery.createJob = (reqOpts: JobOptions) => {
         assert.strictEqual(reqOpts.configuration!.extract!.compression, 'GZIP');
         assert.strictEqual(
-          // tslint:disable-next-line no-any
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (reqOpts.configuration!.extract as any).gzip,
           undefined
         );
@@ -1091,7 +1093,7 @@ describe('BigQuery/Table', () => {
       table.bigQuery.createJob = (reqOpts: JobOptions, callback: Function) => {
         assert.strictEqual(reqOpts.jobPrefix, fakeJobPrefix);
         assert.strictEqual(
-          // tslint:disable-next-line no-any
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (reqOpts.configuration!.extract as any).jobPrefix,
           undefined
         );
@@ -1119,7 +1121,7 @@ describe('BigQuery/Table', () => {
       table.bigQuery.createJob = (reqOpts: JobOptions, callback: Function) => {
         assert.strictEqual(reqOpts.jobId, jobId);
         assert.strictEqual(
-          // tslint:disable-next-line no-any
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (reqOpts.configuration!.extract as any).jobId,
           undefined
         );
@@ -1405,7 +1407,7 @@ describe('BigQuery/Table', () => {
 
       table.dataset.createQueryJob = (options: Query, callback: Function) => {
         assert.strictEqual(options, fakeOptions);
-        // tslint:disable-next-line
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         setImmediate(callback as any);
         return fakeReturnValue;
       };
@@ -1501,7 +1503,7 @@ describe('BigQuery/Table', () => {
     });
 
     describe('writable stream', () => {
-      // tslint:disable-next-line no-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let fakeJob: any;
       let fakeJobId: string;
 
@@ -1515,14 +1517,11 @@ describe('BigQuery/Table', () => {
       });
 
       it('should make a writable stream when written to', done => {
-        let stream: stream.Writable;
-
         makeWritableStreamOverride = (s: {}) => {
           assert.strictEqual(s, stream);
           done();
         };
-
-        stream = table.createWriteStream_();
+        const stream = table.createWriteStream_();
         stream.emit('writing');
       });
 
@@ -1582,7 +1581,7 @@ describe('BigQuery/Table', () => {
           const jobId = options.metadata.jobReference!.jobId;
           assert.strictEqual(jobId, expectedJobId);
 
-          // tslint:disable-next-line no-any
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const config = options.metadata.configuration!.load as any;
           assert.strictEqual(config.jobPrefix, undefined);
 
@@ -1619,7 +1618,7 @@ describe('BigQuery/Table', () => {
           const jobReference = options.metadata.jobReference!;
           assert.strictEqual(jobReference.jobId, jobId);
 
-          // tslint:disable-next-line no-any
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const config = options.metadata.configuration!.load as any;
           assert.strictEqual(config.jobId, undefined);
 
@@ -1669,7 +1668,7 @@ describe('BigQuery/Table', () => {
 
   describe('createWriteStream', () => {
     let fakeJob: EventEmitter;
-    // tslint:disable-next-line no-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let fakeStream: any;
 
     beforeEach(() => {
@@ -1738,7 +1737,7 @@ describe('BigQuery/Table', () => {
   });
 
   describe('extract', () => {
-    // tslint:disable-next-line no-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let fakeJob: any;
 
     beforeEach(() => {
@@ -1862,7 +1861,7 @@ describe('BigQuery/Table', () => {
       const mergedRows = [{name: 'stephen'}];
 
       beforeEach(() => {
-        // tslint:disable-next-line no-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         table.request = (reqOpts: DecorateRequestOptions, callback: any) => {
           // Respond with a row, so it grabs the schema.
           // Use setImmediate to let our getMetadata overwrite process.
@@ -2167,9 +2166,9 @@ describe('BigQuery/Table', () => {
         schema: SCHEMA_STRING,
       };
 
-      // tslint:disable-next-line no-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let _setTimeout: any;
-      // tslint:disable-next-line no-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let _random: any;
 
       before(() => {
@@ -2294,7 +2293,7 @@ describe('BigQuery/Table', () => {
   });
 
   describe('load', () => {
-    // tslint:disable-next-line no-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let fakeJob: any;
 
     beforeEach(() => {
@@ -2386,8 +2385,7 @@ describe('BigQuery/Table', () => {
         assert.strictEqual(data, fakeMetadata);
         return formattedMetadata;
       };
-
-      // tslint:disable-next-line:no-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (FakeServiceObject.prototype as any).setMetadata = function(
         metadata: {},
         callback: Function
