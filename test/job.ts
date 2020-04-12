@@ -16,7 +16,7 @@ import {DecorateRequestOptions, util} from '@google-cloud/common';
 import * as pfy from '@google-cloud/promisify';
 import arrify = require('arrify');
 import * as assert from 'assert';
-import {describe, it} from 'mocha';
+import {describe, it, beforeEach, afterEach, before} from 'mocha';
 import * as extend from 'extend';
 import * as proxyquire from 'proxyquire';
 import * as sinon from 'sinon';
@@ -25,13 +25,14 @@ import {BigQuery} from '../src/bigquery';
 import {QueryResultsOptions} from '../src/job';
 
 class FakeOperation {
-  calledWith_: IArguments;
+  calledWith_: Array<{}>;
   interceptors: Array<{}>;
   id: {};
-  constructor() {
-    this.calledWith_ = arguments;
+  constructor(...args: Array<{}>) {
+    this.calledWith_ = args;
     this.interceptors = [];
-    this.id = this.calledWith_[0].id;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    this.id = (this.calledWith_[0] as any).id;
   }
 }
 
@@ -62,12 +63,10 @@ const fakePaginator = {
   },
 };
 
-let sandbox: sinon.SinonSandbox;
-beforeEach(() => (sandbox = sinon.createSandbox()));
-afterEach(() => sandbox.restore());
+const sandbox = sinon.createSandbox();
 
 describe('BigQuery/Job', () => {
-  // tslint:disable-next-line no-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const BIGQUERY: any = {
     projectId: 'my-project',
     Promise,
@@ -75,9 +74,9 @@ describe('BigQuery/Job', () => {
   const JOB_ID = 'job_XYrk_3z';
   const LOCATION = 'asia-northeast1';
 
-  // tslint:disable-next-line no-any variable-name
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let Job: any;
-  // tslint:disable-next-line no-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let job: any;
 
   before(() => {
@@ -91,6 +90,8 @@ describe('BigQuery/Job', () => {
   beforeEach(() => {
     job = new Job(BIGQUERY, JOB_ID);
   });
+
+  afterEach(() => sandbox.restore());
 
   describe('initialization', () => {
     it('should paginate all the things', () => {

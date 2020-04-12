@@ -21,7 +21,7 @@ import {
 import * as pfy from '@google-cloud/promisify';
 import arrify = require('arrify');
 import * as assert from 'assert';
-import {describe, it} from 'mocha';
+import {describe, it, before, beforeEach} from 'mocha';
 import * as extend from 'extend';
 import * as proxyquire from 'proxyquire';
 
@@ -66,6 +66,7 @@ class FakeServiceObject extends ServiceObject {
   calledWith_: IArguments;
   constructor(config: ServiceObjectConfig) {
     super(config);
+    // eslint-disable-next-line prefer-rest-params
     this.calledWith_ = arguments;
   }
 }
@@ -82,7 +83,7 @@ describe('BigQuery/Dataset', () => {
   let Dataset: typeof _root.Dataset;
   // tslint:disable-next-line variable-name
   let Table: typeof _root.Table;
-  // tslint:disable-next-line no-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let ds: any;
 
   before(() => {
@@ -139,11 +140,11 @@ describe('BigQuery/Dataset', () => {
     });
 
     describe('createMethod', () => {
-      // tslint:disable-next-line no-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let bq: any;
-      // tslint:disable-next-line no-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let ds: any;
-      // tslint:disable-next-line no-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let config: any;
 
       beforeEach(() => {
@@ -322,7 +323,7 @@ describe('BigQuery/Dataset', () => {
     });
 
     it('should pass along options', done => {
-      // tslint:disable-next-line no-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ds.bigQuery.createQueryStream = (opts: any) => {
         assert.strictEqual(opts.a, options.a);
         assert.strictEqual(opts.c, options.c);
@@ -909,7 +910,7 @@ describe('BigQuery/Dataset', () => {
     });
 
     it('should pass along options', done => {
-      // tslint:disable-next-line no-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ds.bigQuery.query = (opts: any) => {
         assert.strictEqual(opts.a, options.a);
         assert.strictEqual(opts.c, options.c);

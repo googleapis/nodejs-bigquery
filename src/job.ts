@@ -416,7 +416,7 @@ class Job extends Operation {
           return;
         }
 
-        // tslint:disable-next-line no-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         let rows: any = [];
 
         if (resp.schema && resp.rows) {
