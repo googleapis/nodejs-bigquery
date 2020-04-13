@@ -19,7 +19,7 @@ import {
 } from '@google-cloud/common/build/src/util';
 import {Storage} from '@google-cloud/storage';
 import * as assert from 'assert';
-import {describe, it} from 'mocha';
+import {describe, it, before, after} from 'mocha';
 import Big from 'big.js';
 import * as fs from 'fs';
 import * as uuid from 'uuid';
@@ -27,7 +27,6 @@ import * as uuid from 'uuid';
 import {
   BigQuery,
   Dataset,
-  GetDatasetsOptions,
   Job,
   Model,
   RowMetadata,
@@ -141,7 +140,7 @@ describe('BigQuery', () => {
     let numRequestsMade = 0;
     const bigquery = new BigQuery();
 
-    // tslint:disable-next-line no-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (bigquery as any).interceptors.push({
       request: (reqOpts: DecorateRequestOptions) => {
         numRequestsMade++;
@@ -169,7 +168,7 @@ describe('BigQuery', () => {
     let numRequestsMade = 0;
     const bigquery = new BigQuery();
 
-    // tslint:disable-next-line no-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (bigquery as any).interceptors.push({
       request: (reqOpts: DecorateRequestOptions) => {
         numRequestsMade++;
@@ -187,7 +186,7 @@ describe('BigQuery', () => {
   });
 
   it('should allow for manual pagination in promise mode', async () => {
-    const [datasets, nextQuery, apiResponse] = await bigquery.getDatasets({
+    const [datasets, , apiResponse] = await bigquery.getDatasets({
       autoPaginate: false,
       filter: `labels.${GCLOUD_TESTS_PREFIX}`,
     });
@@ -351,7 +350,7 @@ describe('BigQuery', () => {
       (err, rows, resp) => {
         assert.ifError(err);
         assert.deepStrictEqual(rows, []);
-        // tslint:disable-next-line no-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         assert((resp as any).statistics.query);
         done();
       }
@@ -486,6 +485,7 @@ describe('BigQuery', () => {
       let job: Job;
 
       const QUERY = `SELECT * FROM \`${table.id}\``;
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
       const SCHEMA = require('../../system-test/data/schema.json');
       const TEST_DATA_FILE = require.resolve(
         '../../system-test/data/location-test-data.json'
@@ -496,7 +496,7 @@ describe('BigQuery', () => {
         // to any jobs created through it
         await dataset.create();
         await table.create({schema: SCHEMA});
-        // tslint:disable-next-line no-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         job = ((await table.createLoadJob(TEST_DATA_FILE)) as any)[0];
         await job.promise();
       });
@@ -940,7 +940,7 @@ describe('BigQuery', () => {
 
         table.insert([data, improperData], e => {
           const err = (e as {}) as GoogleErrorBody;
-          // tslint:disable-next-line no-any
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           assert.strictEqual((err as any).name, 'PartialFailureError');
 
           assert.deepStrictEqual(err.errors![0], {
@@ -1554,7 +1554,9 @@ describe('BigQuery', () => {
 
   describe('Provided Tests', () => {
     const table = dataset.table(generateName('table'));
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const schema = require('../../system-test/data/schema.json');
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const testData = require('../../system-test/data/schema-test-data.json');
 
     const EXPECTED_ROWS = {
