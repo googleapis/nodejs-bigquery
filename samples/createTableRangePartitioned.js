@@ -29,14 +29,20 @@ function main(datasetId = 'my_dataset', tableId = 'my_table') {
      */
     // const datasetId = "my_dataset";
     // const tableId = "my_table";
-    const schema = 'Name:string, Score:integer';
+    
+    const schema = [
+      {name: 'fullName', type: 'STRING',
+      name: 'city', type: 'STRING',
+      name: 'zipcode', type: 'INTEGER'
+    }]
 
-    // Configure partition field and range
+    // To use integer range partitioning, select a top-level REQUIRED /
+    // NULLABLE column with INTEGER / INT64 data type.
     const rangePartition = {
-      field: 'Score',
+      field: 'zipcode',
       range: {
-        start: 1,
-        end: 100,
+        start: 0,
+        end: 100000,
         interval: 10,
       },
     };

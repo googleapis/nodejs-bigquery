@@ -129,7 +129,7 @@ describe('Tables', () => {
     );
     assert.include(
       output,
-      `{ field: 'Score', range: { start: '1', end: '100', interval: '10' } }`
+      `range: { start: '0', end: '100000', interval: '10' }`
     );
     const [exists] = await bigquery
       .dataset(datasetId)
