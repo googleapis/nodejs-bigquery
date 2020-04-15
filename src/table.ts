@@ -1141,8 +1141,8 @@ class Table extends common.ServiceObject {
    * objects.
    * @param {object} [metadata] Metadata to set with the load operation. The
    *     metadata object should be in the format of the
-   *     [`configuration.load`](http://goo.gl/BVcXk4) property of a Jobs
-   * resource.
+   *     [`configuration.load`](https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationLoad)
+   * property of a Jobs resource.
    * @param {string} [metadata.format] The format the data being loaded is in.
    *     Allowed options are "AVRO", "CSV", "JSON", "ORC", or "PARQUET".
    * @param {string} [metadata.jobId] Custom job id.
@@ -1174,7 +1174,8 @@ class Table extends common.ServiceObject {
    *
    * //-
    * // You may also pass in metadata in the format of a Jobs resource. See
-   * // (http://goo.gl/BVcXk4) for a full list of supported values.
+   * // (https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationLoad)
+   * // for a full list of supported values.
    * //-
    * const metadata = {
    *   encoding: 'ISO-8859-1',
@@ -1359,8 +1360,9 @@ class Table extends common.ServiceObject {
    *
    * @param {string|object} [metadata] Metadata to set with the load operation.
    *     The metadata object should be in the format of the
-   *     [`configuration.load`](http://goo.gl/BVcXk4) property of a Jobs
-   * resource. If a string is given, it will be used as the filetype.
+   *     [`configuration.load`](https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationLoad)
+   * property of a Jobs resource. If a string is given, it will be used
+   * as the filetype.
    * @param {string} [metadata.jobId] Custom job id.
    * @param {string} [metadata.jobPrefix] Prefix to apply to the job id.
    * @returns {WritableStream}
@@ -1441,8 +1443,9 @@ class Table extends common.ServiceObject {
    *
    * @param {string|object} [metadata] Metadata to set with the load operation.
    *     The metadata object should be in the format of the
-   *     [`configuration.load`](http://goo.gl/BVcXk4) property of a Jobs
-   * resource. If a string is given, it will be used as the filetype.
+   *     [`configuration.load`](https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationLoad)
+   * property of a Jobs resource. If a string is given,
+   * it will be used as the filetype.
    * @param {string} [metadata.jobId] Custom job id.
    * @param {string} [metadata.jobPrefix] Prefix to apply to the job id.
    * @returns {WritableStream}
@@ -2066,8 +2069,8 @@ class Table extends common.ServiceObject {
    * object.
    * @param {object} [metadata] Metadata to set with the load operation. The
    *     metadata object should be in the format of the
-   *     [`configuration.load`](http://goo.gl/BVcXk4) property of a Jobs
-   * resource.
+   *     [`configuration.load`](https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationLoad)
+   * property of a Jobs resource.
    * @param {string} [metadata.format] The format the data being loaded is in.
    *     Allowed options are "AVRO", "CSV", "JSON", "ORC", or "PARQUET".
    * @param {string} [metadata.jobId] Custom id for the underlying job.
@@ -2093,7 +2096,8 @@ class Table extends common.ServiceObject {
    *
    * //-
    * // You may also pass in metadata in the format of a Jobs resource. See
-   * // (http://goo.gl/BVcXk4) for a full list of supported values.
+   * // (https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationLoad)
+   * // for a full list of supported values.
    * //-
    * const metadata = {
    *   encoding: 'ISO-8859-1',
