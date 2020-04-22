@@ -162,7 +162,7 @@ describe('Queries', () => {
     assert.match(output, /Created new view/);
   });
 
-  it(`should query an external data source`, async () => {
+  it('should query an external data source', async () => {
     const permTableId = generateUuid();
     const output = execSync(
       `node queryExternalGCSPerm.js ${datasetId} ${permTableId}`

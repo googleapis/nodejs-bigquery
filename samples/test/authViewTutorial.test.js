@@ -33,7 +33,7 @@ const sharedViewId = generateUuid();
 
 const bigquery = new BigQuery();
 
-describe(`Authorized View Tutorial`, () => {
+describe('Authorized View Tutorial', () => {
   after(async () => {
     await bigquery
       .dataset(datasetId)
@@ -55,7 +55,7 @@ describe(`Authorized View Tutorial`, () => {
     projectId = tableData.metadata.tableReference.projectId;
   });
 
-  it(`should create an authorized view`, async () => {
+  it('should create an authorized view', async () => {
     const output = execSync(
       `node authViewTutorial.js ${projectId} ${sourceDatasetId} ${sourceTableId} ${sharedDatasetId} ${sharedViewId}`
     );

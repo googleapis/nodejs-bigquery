@@ -118,7 +118,7 @@ describe('Tables', () => {
     assert.ok(exists);
   });
 
-  it(`should create an integer range partitioned table`, async () => {
+  it('should create an integer range partitioned table', async () => {
     const rangePartTableId = generateUuid();
     const output = execSync(
       `node createTableRangePartitioned.js ${datasetId} ${rangePartTableId}`
@@ -129,7 +129,7 @@ describe('Tables', () => {
     );
     assert.include(
       output,
-      `range: { start: '0', end: '100000', interval: '10' }`
+      "range: { start: '0', end: '100000', interval: '10' }"
     );
     const [exists] = await bigquery
       .dataset(datasetId)
@@ -138,7 +138,7 @@ describe('Tables', () => {
     assert.ok(exists);
   });
 
-  it(`should create a table with nested schema`, async () => {
+  it('should create a table with nested schema', async () => {
     const output = execSync(
       `node nestedRepeatedSchema.js ${datasetId} ${nestedTableId}`
     );

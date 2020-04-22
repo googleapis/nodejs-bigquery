@@ -29,12 +29,12 @@ function main(datasetId = 'my_dataset', tableId = 'my_table') {
      */
     // const datasetId = "my_dataset";
     // const tableId = "my_table";
-    
+
     const schema = [
-      {name: 'fullName', type: 'STRING',
-      name: 'city', type: 'STRING',
-      name: 'zipcode', type: 'INTEGER'
-    }]
+      {name: 'fullName', type: 'STRING'},
+      {name: 'city', type: 'STRING'},
+      {name: 'zipcode', type: 'INTEGER'},
+    ];
 
     // To use integer range partitioning, select a top-level REQUIRED /
     // NULLABLE column with INTEGER / INT64 data type.
