@@ -96,15 +96,15 @@ declare namespace bigquery {
    */
   type IArimaFittingMetrics = {
     /**
-     * AIC
+     * AIC.
      */
     aic?: number;
     /**
-     * log-likelihood
+     * Log-likelihood.
      */
     logLikelihood?: number;
     /**
-     * variance.
+     * Variance.
      */
     variance?: number;
   };
@@ -122,9 +122,31 @@ declare namespace bigquery {
      */
     arimaFittingMetrics?: IArimaFittingMetrics;
     /**
+     * Whether Arima model fitted with drift or not. It is always false
+     * when d is not 1.
+     */
+    hasDrift?: boolean;
+    /**
      * Non-seasonal order.
      */
     nonSeasonalOrder?: IArimaOrder;
+    /**
+     * Seasonal periods. Repeated because multiple periods are supported
+     * for one time series.
+     */
+    seasonalPeriods?: Array<
+      | 'SEASONAL_PERIOD_TYPE_UNSPECIFIED'
+      | 'NO_SEASONALITY'
+      | 'DAILY'
+      | 'WEEKLY'
+      | 'MONTHLY'
+      | 'QUARTERLY'
+      | 'YEARLY'
+    >;
+    /**
+     * The id to indicate different time series.
+     */
+    timeSeriesId?: string;
   };
 
   /**
@@ -464,6 +486,17 @@ declare namespace bigquery {
      * One row per actual label.
      */
     rows?: Array<IRow>;
+  };
+
+  type IConnectionProperty = {
+    /**
+     * [Required] Name of the connection property to set.
+     */
+    key?: string;
+    /**
+     * [Required] Value of the connection property.
+     */
+    value?: string;
   };
 
   type ICsvOptions = {
@@ -895,10 +928,6 @@ declare namespace bigquery {
      */
     googleSheetsOptions?: IGoogleSheetsOptions;
     /**
-     * [Optional, Trusted Tester] Deprecated, do not use. Please set hivePartitioningOptions instead.
-     */
-    hivePartitioningMode?: string;
-    /**
      * [Optional, Trusted Tester] Options to configure hive partitioning support.
      */
     hivePartitioningOptions?: IHivePartitioningOptions;
@@ -1224,10 +1253,6 @@ declare namespace bigquery {
      */
     fieldDelimiter?: string;
     /**
-     * [Optional, Trusted Tester] Deprecated, do not use. Please set hivePartitioningOptions instead.
-     */
-    hivePartitioningMode?: string;
-    /**
      * [Optional, Trusted Tester] Options to configure hive partitioning support.
      */
     hivePartitioningOptions?: IHivePartitioningOptions;
@@ -1309,7 +1334,7 @@ declare namespace bigquery {
     /**
      * Connection properties.
      */
-    connectionProperties?: Array<any>;
+    connectionProperties?: Array<IConnectionProperty>;
     /**
      * [Optional] Specifies whether the job is allowed to create new tables. The following values are supported: CREATE_IF_NEEDED: If the table does not exist, BigQuery creates the table. CREATE_NEVER: The table must already exist. If it does not, a 'notFound' error is returned in the job result. The default value is CREATE_IF_NEEDED. Creation, truncation and append actions occur as one atomic update upon job completion.
      */
@@ -2035,7 +2060,7 @@ declare namespace bigquery {
     /**
      * Connection properties.
      */
-    connectionProperties?: Array<any>;
+    connectionProperties?: Array<IConnectionProperty>;
     /**
      * [Optional] Specifies the default datasetId and projectId to assume for any unqualified table names in the query. If not set, all table names in the query string must be qualified in the format 'datasetId.tableId'.
      */
