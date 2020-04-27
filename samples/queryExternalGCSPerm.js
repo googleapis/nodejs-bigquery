@@ -40,13 +40,13 @@ function main(
     const dataConfig = {
       sourceFormat: 'CSV',
       sourceUris: ['gs://cloud-samples-data/bigquery/us-states/us-states.csv'],
+      // Optionally skip header row
       csvOptions: {skipLeadingRows: 1},
     };
 
     // For all options, see https://cloud.google.com/bigquery/docs/reference/v2/tables#resource
     const options = {
       schema: schema,
-      // Optionally skip header row
       externalDataConfiguration: dataConfig,
     };
 

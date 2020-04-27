@@ -21,8 +21,8 @@ function main(datasetId = 'my_dataset', tableId = 'my_table') {
   const bigquery = new BigQuery();
 
   async function createTableRangePartitioned() {
-    // Creates a new integer range partitioned table
-    // named "my_table" in "my_dataset".
+    // Creates a new integer range partitioned table named "my_table"
+    // in "my_dataset".
 
     /**
      * TODO(developer): Uncomment the following lines before running the sample.
@@ -36,7 +36,7 @@ function main(datasetId = 'my_dataset', tableId = 'my_table') {
       {name: 'zipcode', type: 'INTEGER'},
     ];
 
-    // To use integer range partitioning, select a top-level REQUIRED /
+    // To use integer range partitioning, select a top-level REQUIRED or
     // NULLABLE column with INTEGER / INT64 data type.
     const rangePartition = {
       field: 'zipcode',
@@ -57,6 +57,7 @@ function main(datasetId = 'my_dataset', tableId = 'my_table') {
     const [table] = await bigquery
       .dataset(datasetId)
       .createTable(tableId, options);
+
     console.log(`Table ${table.id} created with integer range partitioning: `);
     console.log(table.metadata.rangePartitioning);
   }

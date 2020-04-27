@@ -113,7 +113,7 @@ function main(datasetId = 'my_dataset', tableId = 'my_table') {
     const rows = [
       {
         name: 'Tom',
-        age: 30,
+        age: '30',
         location: bqGeography,
         school: schoolBuffer,
         measurements: [50.05, 100.5],
