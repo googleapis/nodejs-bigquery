@@ -975,7 +975,6 @@ describe('BigQuery', () => {
         };
 
         const options = {
-          autoCreate: true,
           schema: SCHEMA,
         };
 
