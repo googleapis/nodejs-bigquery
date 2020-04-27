@@ -461,6 +461,14 @@ describe('Tables', () => {
     assert.match(output, /Inserted 2 rows/);
   });
 
+  it('should insert rows with supported data types', async () => {
+    const typesTableId = generateUuid();
+    const output = execSync(
+      `node insertingDataTypes.js ${datasetId} ${typesTableId}`
+    );
+    assert.match(output, /Inserted 1 rows/);
+  });
+
   it('copy multiple source tables to a given destination', async () => {
     execSync(`node createTable.js ${datasetId} destinationTable`);
     const output = execSync(
