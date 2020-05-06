@@ -36,6 +36,15 @@ class FakeOperation {
   }
 }
 
+interface CalledWithJob extends FakeOperation {
+  calledWith_: Array<{
+    parent: {};
+    baseUrl: string;
+    id: string;
+    methods: string[];
+  }>;
+}
+
 let promisified = false;
 const fakePfy = extend({}, pfy, {
   promisifyAll: (c: Function) => {
@@ -109,7 +118,7 @@ describe('BigQuery/Job', () => {
     it('should inherit from Operation', () => {
       assert(job instanceof FakeOperation);
 
-      const calledWith = job.calledWith_[0];
+      const calledWith = (job as CalledWithJob).calledWith_[0];
 
       assert.strictEqual(calledWith.parent, BIGQUERY);
       assert.strictEqual(calledWith.baseUrl, '/jobs');

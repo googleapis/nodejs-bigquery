@@ -29,6 +29,15 @@ import * as _root from '../src';
 import {DatasetOptions} from '../src/dataset';
 import {FormattedMetadata, TableOptions} from '../src/table';
 
+interface CalledWithDataset extends ServiceObject {
+  calledWith_: Array<{
+    parent: {};
+    baseUrl: string;
+    id: string;
+    methods: string[];
+  }>;
+}
+
 let promisified = false;
 const fakePfy = extend({}, pfy, {
   promisifyAll: (c: Function, options: pfy.PromisifyAllOptions) => {
@@ -118,7 +127,7 @@ describe('BigQuery/Dataset', () => {
     it('should inherit from ServiceObject', () => {
       assert(ds instanceof ServiceObject);
 
-      const calledWith = ds.calledWith_[0];
+      const calledWith = (ds as CalledWithDataset).calledWith_[0];
 
       assert.strictEqual(calledWith.parent, BIGQUERY);
       assert.strictEqual(calledWith.baseUrl, '/datasets');

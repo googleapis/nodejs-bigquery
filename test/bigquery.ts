@@ -48,6 +48,14 @@ class FakeApiError {
   }
 }
 
+interface CalledWithService extends Service {
+  calledWith_: Array<{
+    baseUrl: string;
+    scopes: string[];
+    packageJson: {};
+  }>;
+}
+
 let promisified = false;
 const fakePfy = extend({}, pfy, {
   promisifyAll: (c: Function, options: pfy.PromisifyAllOptions) => {
@@ -179,7 +187,7 @@ describe('BigQuery', () => {
     it('should inherit from Service', () => {
       assert(bq instanceof Service);
 
-      const calledWith = bq.calledWith_[0];
+      const calledWith = (bq as CalledWithService).calledWith_[0];
 
       const baseUrl = 'https://bigquery.googleapis.com/bigquery/v2';
       assert.strictEqual(calledWith.baseUrl, baseUrl);
