@@ -45,6 +45,15 @@ import {
 } from '../src/table';
 import bigquery from '../src/types';
 
+interface CalledWithTable extends ServiceObject {
+  calledWith_: Array<{
+    parent: {};
+    baseUrl: string;
+    id: string;
+    methods: string[];
+  }>;
+}
+
 let promisified = false;
 let makeWritableStreamOverride: Function | null;
 let isCustomTypeOverride: Function | null;
@@ -217,7 +226,7 @@ describe('BigQuery/Table', () => {
       const table = new Table(datasetInstance, TABLE_ID);
       assert(table instanceof ServiceObject);
 
-      const calledWith = table.calledWith_[0];
+      const calledWith = (table as CalledWithTable).calledWith_[0];
 
       assert.strictEqual(calledWith.parent, datasetInstance);
       assert.strictEqual(calledWith.baseUrl, '/tables');
@@ -2333,7 +2342,6 @@ describe('BigQuery/Table', () => {
       assert.strictEqual(reqOpts.method, 'POST');
       assert.strictEqual(reqOpts.uri, '/insertAll');
       assert.deepStrictEqual(reqOpts.json, {rows: rawData});
-      assert.strictEqual(reqOpts.json.raw, undefined);
     });
 
     it('should accept options', async () => {
