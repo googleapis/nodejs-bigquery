@@ -124,6 +124,11 @@ function main(datasetId = 'my_dataset', tableId = 'my_table') {
           thirdTime: bqTimestamp,
         },
       },
+      {
+        name: 'Ada',
+        age: '35',
+        measurements: [30.08, 121.7],
+      },
     ];
 
     // Insert data into table

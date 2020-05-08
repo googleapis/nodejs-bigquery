@@ -37,7 +37,9 @@ function main(datasetId = 'my_dataset', tableId = 'my_table') {
     ];
 
     // To use integer range partitioning, select a top-level REQUIRED or
-    // NULLABLE column with INTEGER / INT64 data type.
+    // NULLABLE column with INTEGER / INT64 data type. Values that are
+    // outside of the range of the table will go into the UNPARTITIONED
+    // partition. Null values will be in the NULL partition.
     const rangePartition = {
       field: 'zipcode',
       range: {

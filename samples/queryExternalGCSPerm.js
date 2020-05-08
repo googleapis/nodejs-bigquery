@@ -50,7 +50,7 @@ function main(
       externalDataConfiguration: dataConfig,
     };
 
-    // Create a permanent table linked to the GCS file
+    // Create an external table linked to the GCS file
     const [table] = await bigquery
       .dataset(datasetId)
       .createTable(tableId, options);

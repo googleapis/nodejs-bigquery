@@ -466,7 +466,7 @@ describe('Tables', () => {
     const output = execSync(
       `node insertingDataTypes.js ${datasetId} ${typesTableId}`
     );
-    assert.match(output, /Inserted 1 rows/);
+    assert.match(output, /Inserted 2 rows/);
   });
 
   it('copy multiple source tables to a given destination', async () => {
