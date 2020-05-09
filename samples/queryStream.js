@@ -15,7 +15,7 @@
 'use strict';
 
 function main() {
-  // [START bigquery_query]
+  // [START bigquery_query_stream]
   // [START bigquery_client_default_credentials]
   // Import the Google Cloud client library using default credentials
   const {BigQuery} = require('@google-cloud/bigquery');
@@ -34,17 +34,18 @@ function main() {
     };
 
     // Run the query
-    bigquery.createQueryStream(options)
-    .on('error', error => {
-      console.log('Error', error);
-    })
-    .on('data', row => {
-      console.log('Row:', row);
-    })
-    .on('end', () => {
-      console.log('End');
-    });
+    bigquery
+      .createQueryStream(options)
+      .on('error', console.error)
+      .on('data', row => {
+        console.log('Row:', row);
+      })
+      .on('end', () => {
+        console.log('End');
+      });
   }
+  // [END bigquery_query_stream]
   query();
 }
+
 main(...process.argv.slice(2));
