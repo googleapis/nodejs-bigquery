@@ -161,4 +161,9 @@ describe('Queries', () => {
     const output = execSync(`node ddlCreateView.js ${projectId} ${datasetId}`);
     assert.match(output, /Created new view/);
   });
+
+  it('should run a query stream', async () => {
+    const output = execSync('node queryStream.js');
+    assert.match(output, /End/);
+  });
 });
