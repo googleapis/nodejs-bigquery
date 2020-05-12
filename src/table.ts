@@ -21,9 +21,6 @@ import arrify = require('arrify');
 import Big from 'big.js';
 import * as extend from 'extend';
 import pEvent from 'p-event';
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const format = require('string-format-obj');
 import * as fs from 'fs';
 import * as is from 'is';
 import * as path from 'path';
@@ -1416,10 +1413,7 @@ class Table extends common.ServiceObject {
             },
           } as {},
           request: {
-            uri: format('{base}/{projectId}/jobs', {
-              base: `https://${this.bigQuery.apiEndpoint}/upload/bigquery/v2/projects`,
-              projectId: this.bigQuery.projectId,
-            }),
+            uri: `https://${this.bigQuery.apiEndpoint}/upload/bigquery/v2/projects/${this.bigQuery.projectId}/jobs`,
           },
         },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
