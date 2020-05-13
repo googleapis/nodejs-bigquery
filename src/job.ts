@@ -426,10 +426,10 @@ class Job extends Operation {
         let nextQuery: {} | null = null;
         if (resp.jobComplete === false) {
           // Query is still running.
-          nextQuery = extend({}, options);
+          nextQuery = Object.assign({}, options);
         } else if (resp.pageToken) {
           // More results exist.
-          nextQuery = extend({}, options, {
+          nextQuery = Object.assign({}, options, {
             pageToken: resp.pageToken,
           });
         }

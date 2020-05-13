@@ -772,7 +772,7 @@ class Dataset extends ServiceObject {
 
         let nextQuery: {} | null = null;
         if (resp.nextPageToken) {
-          nextQuery = extend({}, options, {
+          nextQuery = Object.assign({}, options, {
             pageToken: resp.nextPageToken,
           });
         }
@@ -868,7 +868,7 @@ class Dataset extends ServiceObject {
 
         let nextQuery: {} | null = null;
         if (resp.nextPageToken) {
-          nextQuery = extend({}, options, {
+          nextQuery = Object.assign({}, options, {
             pageToken: resp.nextPageToken,
           });
         }
@@ -957,7 +957,7 @@ class Dataset extends ServiceObject {
 
         let nextQuery: {} | null = null;
         if (resp.nextPageToken) {
-          nextQuery = extend({}, options, {
+          nextQuery = Object.assign({}, options, {
             pageToken: resp.nextPageToken,
           });
         }
