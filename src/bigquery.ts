@@ -1295,8 +1295,7 @@ export class BigQuery extends common.Service {
     options: JobOptions,
     callback?: JobCallback
   ): void | Promise<JobResponse> {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const reqOpts: any = extend({}, options);
+    const reqOpts = Object.assign({}, options);
     let jobId = reqOpts.jobId || uuid.v4();
 
     if (reqOpts.jobId) {
@@ -1447,7 +1446,7 @@ export class BigQuery extends common.Service {
         let nextQuery: GetDatasetsOptions | null = null;
 
         if (resp.nextPageToken) {
-          nextQuery = extend({}, options, {
+          nextQuery = Object.assign({}, options, {
             pageToken: resp.nextPageToken,
           });
         }
@@ -1551,7 +1550,7 @@ export class BigQuery extends common.Service {
         }
         let nextQuery: {} | null = null;
         if (resp.nextPageToken) {
-          nextQuery = extend({}, options, {
+          nextQuery = Object.assign({}, options, {
             pageToken: resp.nextPageToken,
           });
         }

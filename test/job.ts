@@ -17,7 +17,6 @@ import * as pfy from '@google-cloud/promisify';
 import arrify = require('arrify');
 import * as assert from 'assert';
 import {describe, it, beforeEach, afterEach, before} from 'mocha';
-import * as extend from 'extend';
 import * as proxyquire from 'proxyquire';
 import * as sinon from 'sinon';
 
@@ -46,7 +45,7 @@ interface CalledWithJob extends FakeOperation {
 }
 
 let promisified = false;
-const fakePfy = extend({}, pfy, {
+const fakePfy = Object.assign({}, pfy, {
   promisifyAll: (c: Function) => {
     if (c.name === 'Job') {
       promisified = true;
@@ -213,7 +212,7 @@ describe('BigQuery/Job', () => {
 
     it('should optionally accept options', done => {
       const options = {a: 'b'};
-      const expectedOptions = extend({location: undefined}, options);
+      const expectedOptions = Object.assign({location: undefined}, options);
 
       BIGQUERY.request = (reqOpts: DecorateRequestOptions) => {
         assert.deepStrictEqual(reqOpts.qs, expectedOptions);

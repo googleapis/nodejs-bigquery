@@ -1693,7 +1693,7 @@ class Table extends common.ServiceObject {
         }
         let nextQuery: GetRowsOptions | null = null;
         if (resp.pageToken) {
-          nextQuery = extend({}, options, {
+          nextQuery = Object.assign({}, options, {
             pageToken: resp.pageToken,
           });
         }
