@@ -36,7 +36,7 @@ function main(datasetId = 'my_dataset', tableId = 'my_table') {
       location: 'US',
       timePartitioning: {
         type: 'DAY',
-        expirationMS: '7776000000',
+        expirationMs: '7776000000',
         field: 'date',
       },
     };
