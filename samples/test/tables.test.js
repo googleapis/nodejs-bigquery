@@ -110,7 +110,8 @@ describe('Tables', () => {
       output,
       `Table ${partitionedTableId} created with partitioning:`
     );
-    assert.include(output, "{ type: 'DAY', field: 'date' }");
+    assert.include(output, "type: 'DAY'");
+    assert.include(output, "field: 'date'");
     const [exists] = await bigquery
       .dataset(datasetId)
       .table(partitionedTableId)
