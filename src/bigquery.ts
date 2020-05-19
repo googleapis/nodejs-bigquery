@@ -377,8 +377,15 @@ export class BigQuery extends common.Service {
    */
   static mergeSchemaWithRows_(
     schema: TableSchema | TableField,
-    rows: TableRow[]
+    rows: TableRow[], selectedFields?: string
   ) {
+    
+    if (selectedFields) {
+      let formmatedField = getSelectedFields(selectedFields!);
+      schema.fields = schema.fields?.filter(field => formmatedField.map(c => c.name.toLowerCase()).indexOf(field.name!.toLowerCase()) >= 0);
+      selectedFields = formmatedField.map(c => c.fields).join(',');
+    }
+
     return arrify(rows)
       .map(mergeSchema)
       .map(flattenRows);
@@ -388,10 +395,10 @@ export class BigQuery extends common.Service {
         let value = field.v;
         if (schemaField.mode === 'REPEATED') {
           value = (value as TableRowField[]).map(val => {
-            return convert(schemaField, val.v);
+            return convert(schemaField, val.v, selectedFields);
           });
         } else {
-          value = convert(schemaField, value);
+          value = convert(schemaField, value, selectedFields);
         }
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const fieldObject: any = {};
@@ -401,7 +408,7 @@ export class BigQuery extends common.Service {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    function convert(schemaField: TableField, value: any) {
+    function convert(schemaField: TableField, value: any, selectedFields?: string) {
       if (is.null(value)) {
         return value;
       }
@@ -431,7 +438,7 @@ export class BigQuery extends common.Service {
           break;
         }
         case 'RECORD': {
-          value = BigQuery.mergeSchemaWithRows_(schemaField, value).pop();
+          value = BigQuery.mergeSchemaWithRows_(schemaField, value, selectedFields).pop();
           break;
         }
         case 'DATE': {
@@ -468,6 +475,28 @@ export class BigQuery extends common.Service {
         acc[key] = row[key];
         return acc;
       }, {});
+    }
+
+    function getSelectedFields(selectedFields: string) {
+      let result: any[] = [];
+      let fields = selectedFields.split(',');
+      fields.forEach(field => {
+        if (field.indexOf('.') >= 0) {
+          var fields = field.split('.');
+          var parentFieldName = fields[0];
+          fields.shift();
+          var chieldFieldName = fields.join('.')
+          result.push({
+            name: parentFieldName,
+            fields: chieldFieldName
+          })
+        } else {
+          result.push({
+            name: field
+          })
+        }
+      });
+      return result;
     }
   }
 
