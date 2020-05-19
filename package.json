@@ -58,11 +58,10 @@
     "is": "^3.3.0",
     "p-event": "^4.1.0",
     "stream-events": "^1.0.5",
-    "string-format-obj": "^1.1.1",
     "uuid": "^8.0.0"
   },
   "devDependencies": {
-    "@google-cloud/storage": "^4.0.0",
+    "@google-cloud/storage": "^5.0.0",
     "@types/big.js": "^4.0.5",
     "@types/execa": "^0.9.0",
     "@types/extend": "^3.0.1",

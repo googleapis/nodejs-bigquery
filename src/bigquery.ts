@@ -20,9 +20,6 @@ import {promisifyAll} from '@google-cloud/promisify';
 import arrify = require('arrify');
 import {Big} from 'big.js';
 import * as extend from 'extend';
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const format = require('string-format-obj');
 import * as is from 'is';
 import * as uuid from 'uuid';
 
@@ -1298,8 +1295,7 @@ export class BigQuery extends common.Service {
     options: JobOptions,
     callback?: JobCallback
   ): void | Promise<JobResponse> {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const reqOpts: any = extend({}, options);
+    const reqOpts = Object.assign({}, options);
     let jobId = reqOpts.jobId || uuid.v4();
 
     if (reqOpts.jobId) {
@@ -1450,7 +1446,7 @@ export class BigQuery extends common.Service {
         let nextQuery: GetDatasetsOptions | null = null;
 
         if (resp.nextPageToken) {
-          nextQuery = extend({}, options, {
+          nextQuery = Object.assign({}, options, {
             pageToken: resp.nextPageToken,
           });
         }
@@ -1554,7 +1550,7 @@ export class BigQuery extends common.Service {
         }
         let nextQuery: {} | null = null;
         if (resp.nextPageToken) {
-          nextQuery = extend({}, options, {
+          nextQuery = Object.assign({}, options, {
             pageToken: resp.nextPageToken,
           });
         }
@@ -1805,12 +1801,11 @@ export class BigQueryDatetime {
       if (value.hours) {
         time = BigQuery.time(value).value;
       }
-      value = format('{y}-{m}-{d}{time}', {
-        y: value.year,
-        m: value.month,
-        d: value.day,
-        time: time ? ' ' + time : '',
-      });
+      const y = value.year;
+      const m = value.month;
+      const d = value.day;
+      time = time ? ' ' + time : '';
+      value = `${y}-${m}-${d}${time}`;
     } else {
       value = value.replace(/^(.*)T(.*)Z$/, '$1 $2');
     }
@@ -1825,12 +1820,11 @@ export class BigQueryTime {
   value: string;
   constructor(value: BigQueryTimeOptions | string) {
     if (typeof value === 'object') {
-      value = format('{h}:{m}:{s}{f}', {
-        h: value.hours,
-        m: value.minutes || 0,
-        s: value.seconds || 0,
-        f: is.defined(value.fractional) ? '.' + value.fractional : '',
-      });
+      const h = value.hours;
+      const m = value.minutes || 0;
+      const s = value.seconds || 0;
+      const f = is.defined(value.fractional) ? '.' + value.fractional : '';
+      value = `${h}:${m}:${s}${f}`;
     }
     this.value = value as string;
   }
