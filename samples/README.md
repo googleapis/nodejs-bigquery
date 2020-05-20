@@ -15,6 +15,7 @@
   * [Add Column Load Append](#add-column-load-append)
   * [Add Column Query Append](#add-column-query-append)
   * [Add Empty Column](#add-empty-column)
+  * [Auth View Tutorial](#auth-view-tutorial)
   * [Browse Rows](#browse-rows)
   * [Cancel Job](#cancel-job)
   * [Client JSON Credentials](#client-json-credentials)
@@ -24,6 +25,7 @@
   * [Create Job](#create-job)
   * [Create Table](#create-table)
   * [Create Table Partitioned](#create-table-partitioned)
+  * [Create Table Range Partitioned](#create-table-range-partitioned)
   * [Create View](#create-view)
   * [Ddl Create View](#ddl-create-view)
   * [Delete Dataset](#delete-dataset)
@@ -42,6 +44,7 @@
   * [Get Table Labels](#get-table-labels)
   * [Get View](#get-view)
   * [Insert Rows As Stream](#insert-rows-as-stream)
+  * [Inserting Data Types](#inserting-data-types)
   * [BigQuery Label Dataset](#bigquery-label-dataset)
   * [Label Table](#label-table)
   * [List Datasets](#list-datasets)
@@ -70,6 +73,7 @@
   * [Query Destination Table](#query-destination-table)
   * [Query Disable Cache](#query-disable-cache)
   * [Query Dry Run](#query-dry-run)
+  * [Query External GCS Perm](#query-external-gcs-perm)
   * [Query Legacy](#query-legacy)
   * [Query Legacy Large Results](#query-legacy-large-results)
   * [Query Params Arrays](#query-params-arrays)
@@ -150,6 +154,23 @@ __Usage:__
 
 
 `node samples/addEmptyColumn.js`
+
+
+-----
+
+
+
+
+### Auth View Tutorial
+
+View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/authViewTutorial.js).
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/authViewTutorial.js,samples/README.md)
+
+__Usage:__
+
+
+`node samples/authViewTutorial.js`
 
 
 -----
@@ -303,6 +324,23 @@ __Usage:__
 
 
 `node samples/createTablePartitioned.js`
+
+
+-----
+
+
+
+
+### Create Table Range Partitioned
+
+View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/createTableRangePartitioned.js).
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/createTableRangePartitioned.js,samples/README.md)
+
+__Usage:__
+
+
+`node samples/createTableRangePartitioned.js`
 
 
 -----
@@ -619,6 +657,23 @@ __Usage:__
 
 
 `node samples/insertRowsAsStream.js`
+
+
+-----
+
+
+
+
+### Inserting Data Types
+
+View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/insertingDataTypes.js).
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/insertingDataTypes.js,samples/README.md)
+
+__Usage:__
+
+
+`node samples/insertingDataTypes.js`
 
 
 -----
@@ -1101,6 +1156,23 @@ __Usage:__
 
 
 `node samples/queryDryRun.js`
+
+
+-----
+
+
+
+
+### Query External GCS Perm
+
+View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/queryExternalGCSPerm.js).
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/queryExternalGCSPerm.js,samples/README.md)
+
+__Usage:__
+
+
+`node samples/queryExternalGCSPerm.js`
 
 
 -----
