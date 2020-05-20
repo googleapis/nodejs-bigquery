@@ -377,12 +377,17 @@ export class BigQuery extends common.Service {
    */
   static mergeSchemaWithRows_(
     schema: TableSchema | TableField,
-    rows: TableRow[], selectedFields?: string
+    rows: TableRow[],
+    selectedFields?: string
   ) {
-    
     if (selectedFields) {
-      let formmatedField = getSelectedFields(selectedFields!);
-      schema.fields = schema.fields?.filter(field => formmatedField.map(c => c.name.toLowerCase()).indexOf(field.name!.toLowerCase()) >= 0);
+      const formmatedField = getSelectedFields(selectedFields!);
+      schema.fields = schema.fields?.filter(
+        field =>
+          formmatedField
+            .map(c => c.name.toLowerCase())
+            .indexOf(field.name!.toLowerCase()) >= 0
+      );
       selectedFields = formmatedField.map(c => c.fields).join(',');
     }
 
@@ -408,7 +413,11 @@ export class BigQuery extends common.Service {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    function convert(schemaField: TableField, value: any, selectedFields?: string) {
+    function convert(
+      schemaField: TableField,
+      value: any,
+      selectedFields?: string
+    ) {
       if (is.null(value)) {
         return value;
       }
@@ -438,7 +447,11 @@ export class BigQuery extends common.Service {
           break;
         }
         case 'RECORD': {
-          value = BigQuery.mergeSchemaWithRows_(schemaField, value, selectedFields).pop();
+          value = BigQuery.mergeSchemaWithRows_(
+            schemaField,
+            value,
+            selectedFields
+          ).pop();
           break;
         }
         case 'DATE': {
@@ -478,22 +491,22 @@ export class BigQuery extends common.Service {
     }
 
     function getSelectedFields(selectedFields: string) {
-      let result: any[] = [];
-      let fields = selectedFields.split(',');
+      const result: any[] = [];
+      const fields = selectedFields.split(',');
       fields.forEach(field => {
         if (field.indexOf('.') >= 0) {
-          var fields = field.split('.');
-          var parentFieldName = fields[0];
+          const fields = field.split('.');
+          const parentFieldName = fields[0];
           fields.shift();
-          var chieldFieldName = fields.join('.')
+          const chieldFieldName = fields.join('.');
           result.push({
             name: parentFieldName,
-            fields: chieldFieldName
-          })
+            fields: chieldFieldName,
+          });
         } else {
           result.push({
-            name: field
-          })
+            name: field,
+          });
         }
       });
       return result;

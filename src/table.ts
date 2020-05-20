@@ -1677,7 +1677,11 @@ class Table extends common.ServiceObject {
         callback!(err, null, null, resp);
         return;
       }
-      rows = BigQuery.mergeSchemaWithRows_(this.metadata.schema, rows || [], options.selectedFields);
+      rows = BigQuery.mergeSchemaWithRows_(
+        this.metadata.schema,
+        rows || [],
+        options.selectedFields
+      );
       callback!(null, rows, nextQuery, resp);
     };
 
