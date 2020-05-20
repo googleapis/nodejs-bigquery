@@ -381,14 +381,22 @@ export class BigQuery extends common.Service {
     selectedFields?: string
   ) {
     if (selectedFields) {
-      const formmatedField = getSelectedFields(selectedFields!);
+      const selectedFieldsArray = selectedFields.split(',').map(c => {
+        return c.split('.');
+      });
+
+      const currentFields = selectedFieldsArray.map(c => c.shift());
+      //filter schema fields based on selected fields.
       schema.fields = schema.fields?.filter(
         field =>
-          formmatedField
-            .map(c => c.name.toLowerCase())
+          currentFields
+            .map(c => c!.toLowerCase())
             .indexOf(field.name!.toLowerCase()) >= 0
       );
-      selectedFields = formmatedField.map(c => c.fields).join(',');
+      selectedFields = selectedFieldsArray
+        .filter(c => c.length > 0)
+        .map(c => c.join('.'))
+        .join(',');
     }
 
     return arrify(rows)
@@ -412,9 +420,9 @@ export class BigQuery extends common.Service {
       });
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     function convert(
       schemaField: TableField,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       value: any,
       selectedFields?: string
     ) {
@@ -488,28 +496,6 @@ export class BigQuery extends common.Service {
         acc[key] = row[key];
         return acc;
       }, {});
-    }
-
-    function getSelectedFields(selectedFields: string) {
-      const result: any[] = [];
-      const fields = selectedFields.split(',');
-      fields.forEach(field => {
-        if (field.indexOf('.') >= 0) {
-          const fields = field.split('.');
-          const parentFieldName = fields[0];
-          fields.shift();
-          const chieldFieldName = fields.join('.');
-          result.push({
-            name: parentFieldName,
-            fields: chieldFieldName,
-          });
-        } else {
-          result.push({
-            name: field,
-          });
-        }
-      });
-      return result;
     }
   }
 
