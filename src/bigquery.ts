@@ -373,6 +373,8 @@ export class BigQuery extends common.Service {
    *
    * @param {object} schema
    * @param {array} rows
+   * @param {string} selectedFields List of fields to return (comma-separated).
+   * If unspecified, all fields are returned.
    * @returns {array} Fields using their matching names from the table's schema.
    */
   static mergeSchemaWithRows_(
