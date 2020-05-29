@@ -561,8 +561,8 @@ class Table extends common.ServiceObject {
    * @param {Table} destination The destination table.
    * @param {object} [metadata] Metadata to set with the copy operation. The
    *     metadata object should be in the format of the
-   *     [`configuration.copy`](http://goo.gl/dKWIyS) property of a Jobs
-   * resource.
+   *     [`configuration.copy`](https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationTableCopy)
+   * property of a Jobs resource.
    * @param {string} [metadata.jobId] Custom id for the underlying job.
    * @param {string} [metadata.jobPrefix] Prefix to apply to the underlying job
    *     id.
@@ -584,9 +584,8 @@ class Table extends common.ServiceObject {
    * table.copy(yourTable, (err, apiResponse) => {});
    *
    * //-
-   * // See the <a href="http://goo.gl/dKWIyS">`configuration.copy`</a> object
-   * for
-   * // all available options.
+   * // See the https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationTableCopy
+   * // for all available options.
    * //-
    * const metadata = {
    *   createDisposition: 'CREATE_NEVER',
@@ -644,8 +643,8 @@ class Table extends common.ServiceObject {
    *     source table(s) to copy data from.
    * @param {object=} metadata Metadata to set with the copy operation. The
    *     metadata object should be in the format of the
-   *     [`configuration.copy`](http://goo.gl/dKWIyS) property of a Jobs
-   * resource.
+   *     [`configuration.copy`](https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationTableCopy)
+   * property of a Jobs resource.
    * @param {string} [metadata.jobId] Custom id for the underlying job.
    * @param {string} [metadata.jobPrefix] Prefix to apply to the underlying job
    *     id.
@@ -670,9 +669,8 @@ class Table extends common.ServiceObject {
    * table.copyFrom(sourceTables, (err, apiResponse) => {});
    *
    * //-
-   * // See the <a href="http://goo.gl/dKWIyS">`configuration.copy`</a> object
-   * for
-   * // all available options.
+   * // See the https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationTableCopy
+   * // for all available options.
    * //-
    * const metadata = {
    *   createDisposition: 'CREATE_NEVER',
@@ -726,8 +724,8 @@ class Table extends common.ServiceObject {
    * @param {Table} destination The destination table.
    * @param {object} [metadata] Metadata to set with the copy operation. The
    *     metadata object should be in the format of the
-   *     [`configuration.copy`](http://goo.gl/dKWIyS) property of a Jobs
-   * resource.
+   *     [`configuration.copy`](https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationTableCopy)
+   * property of a Jobs resource.
    * @param {string} [metadata.jobId] Custom job id.
    * @param {string} [metadata.jobPrefix] Prefix to apply to the job id.
    * @param {function} [callback] The callback function.
@@ -751,9 +749,8 @@ class Table extends common.ServiceObject {
    * });
    *
    * //-
-   * // See the <a href="http://goo.gl/dKWIyS">`configuration.copy`</a> object
-   * for
-   * // all available options.
+   * // See the https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationTableCopy
+   * // for all available options.
    * //-
    * const metadata = {
    *   createDisposition: 'CREATE_NEVER',
@@ -839,8 +836,8 @@ class Table extends common.ServiceObject {
    *     source table(s) to copy data from.
    * @param {object} [metadata] Metadata to set with the copy operation. The
    *     metadata object should be in the format of the
-   *     [`configuration.copy`](http://goo.gl/dKWIyS) property of a Jobs
-   * resource.
+   *     [`configuration.copy`](https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationTableCopy)
+   * property of a Jobs resource.
    * @param {string} [metadata.jobId] Custom job id.
    * @param {string} [metadata.jobPrefix] Prefix to apply to the job id.
    * @param {function} [callback] The callback function.
@@ -870,9 +867,8 @@ class Table extends common.ServiceObject {
    * table.createCopyFromJob(sourceTables, callback);
    *
    * //-
-   * // See the <a href="http://goo.gl/dKWIyS">`configuration.copy`</a> object
-   * for
-   * // all available options.
+   * // See the https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationTableCopy
+   * // for all available options.
    * //-
    * const metadata = {
    *   createDisposition: 'CREATE_NEVER',
