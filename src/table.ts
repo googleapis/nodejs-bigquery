@@ -645,7 +645,7 @@ class Table extends common.ServiceObject {
    * @param {object=} metadata Metadata to set with the copy operation. The
    *     metadata object should be in the format of a
    *     [`JobConfigurationTableCopy`](https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationTableCopy)
-   * object.
+   *     object.
    * @param {string} [metadata.jobId] Custom id for the underlying job.
    * @param {string} [metadata.jobPrefix] Prefix to apply to the underlying job
    *     id.
