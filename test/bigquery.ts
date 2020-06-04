@@ -129,7 +129,7 @@ class FakeService extends Service {
 const sandbox = sinon.createSandbox();
 afterEach(() => sandbox.restore());
 
-describe.only('BigQuery', () => {
+describe('BigQuery', () => {
   const JOB_ID = 'JOB_ID';
   const PROJECT_ID = 'test-project';
   const LOCATION = 'asia-northeast1';
