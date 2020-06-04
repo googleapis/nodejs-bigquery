@@ -24,7 +24,7 @@ function main() {
 
   async function queryParamsStructs() {
     // The SQL query to run
-    const sqlQuery = `SELECT @struct_value AS struct_obj;`;
+    const sqlQuery = 'SELECT @struct_value AS struct_obj;';
 
     const options = {
       query: sqlQuery,

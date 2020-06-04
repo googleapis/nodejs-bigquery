@@ -20,14 +20,11 @@ import {promisifyAll} from '@google-cloud/promisify';
 import arrify = require('arrify');
 import {Big} from 'big.js';
 import * as extend from 'extend';
-
-const format = require('string-format-obj');
 import * as is from 'is';
 import * as uuid from 'uuid';
 
 import {Dataset, DatasetOptions} from './dataset';
 import {Job, JobOptions, QueryResultsOptions} from './job';
-import {Model} from './model';
 import {
   Table,
   TableField,
@@ -36,8 +33,6 @@ import {
   TableRowField,
   JobCallback,
   JobResponse,
-  RowsCallback,
-  RowsResponse,
   RowMetadata,
 } from './table';
 import {GoogleErrorBody} from '@google-cloud/common/build/src/util';
@@ -91,7 +86,7 @@ export type SimpleQueryRowsCallback = ResourceCallback<
 
 export type Query = JobRequest<bigquery.IJobConfigurationQuery> & {
   destination?: Table;
-  // tslint:disable-next-line no-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   params?: any[] | {[param: string]: any};
   dryRun?: boolean;
   types?: string[] | string[][] | {[type: string]: string[]};
@@ -398,14 +393,14 @@ export class BigQuery extends common.Service {
         } else {
           value = convert(schemaField, value);
         }
-        // tslint:disable-next-line no-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const fieldObject: any = {};
         fieldObject[schemaField.name!] = value;
         return fieldObject;
       });
     }
 
-    // tslint:disable-next-line no-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     function convert(schemaField: TableField, value: any) {
       if (is.null(value)) {
         return value;
@@ -466,7 +461,7 @@ export class BigQuery extends common.Service {
       return value;
     }
 
-    // tslint:disable-next-line no-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     function flattenRows(rows: any[]) {
       return rows.reduce((acc, row) => {
         const key = Object.keys(row)[0];
@@ -810,10 +805,7 @@ export class BigQuery extends common.Service {
    * @param {*} value The value.
    * @returns {string} The type detected from the value.
    */
-  static getTypeDescriptorFromValue_(
-    // tslint:disable-next-line: no-any
-    value: any
-  ): ValueType {
+  static getTypeDescriptorFromValue_(value: unknown): ValueType {
     let typeName;
 
     if (value === null) {
@@ -832,7 +824,7 @@ export class BigQuery extends common.Service {
       typeName = 'BYTES';
     } else if (value instanceof Big) {
       typeName = 'NUMERIC';
-    } else if (is.array(value)) {
+    } else if (Array.isArray(value)) {
       if (value.length === 0) {
         throw new Error('Type must be provided for empty array.');
       }
@@ -847,10 +839,11 @@ export class BigQuery extends common.Service {
     } else if (is.object(value)) {
       return {
         type: 'STRUCT',
-        structTypes: Object.keys(value).map(prop => {
+        structTypes: Object.keys(value as object).map(prop => {
           return {
             name: prop,
-            type: BigQuery.getTypeDescriptorFromValue_(value[prop]),
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            type: BigQuery.getTypeDescriptorFromValue_((value as any)[prop]),
           };
         }),
       };
@@ -883,7 +876,7 @@ export class BigQuery extends common.Service {
    * @returns {object} A properly-formed `queryParameter` object.
    */
   static valueToQueryParameter_(
-    // tslint:disable-next-line: no-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     value: any,
     providedType?: string | ProvidedTypeStruct | ProvidedTypeArray
   ) {
@@ -928,7 +921,7 @@ export class BigQuery extends common.Service {
           } else {
             nestedQueryParameter = BigQuery.valueToQueryParameter_(value[prop]);
           }
-          // tslint:disable-next-line no-any
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (structValues as any)[prop] = nestedQueryParameter.parameterValue;
           return structValues;
         },
@@ -940,7 +933,7 @@ export class BigQuery extends common.Service {
 
     return queryParameter;
 
-    // tslint:disable-next-line no-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     function getValue(value: any, type: ValueType): any {
       return isCustomType(type) ? value.value : value;
     }
@@ -1120,7 +1113,7 @@ export class BigQuery extends common.Service {
       throw new Error('A SQL query string is required.');
     }
 
-    // tslint:disable-next-line no-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const query: any = extend(
       true,
       {
@@ -1208,7 +1201,7 @@ export class BigQuery extends common.Service {
       delete query.params;
     }
 
-    // tslint:disable-next-line no-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const reqOpts: any = {
       configuration: {
         query,
@@ -1302,8 +1295,7 @@ export class BigQuery extends common.Service {
     options: JobOptions,
     callback?: JobCallback
   ): void | Promise<JobResponse> {
-    // tslint:disable-next-line no-any
-    const reqOpts: any = extend({}, options);
+    const reqOpts = Object.assign({}, options);
     let jobId = reqOpts.jobId || uuid.v4();
 
     if (reqOpts.jobId) {
@@ -1454,12 +1446,12 @@ export class BigQuery extends common.Service {
         let nextQuery: GetDatasetsOptions | null = null;
 
         if (resp.nextPageToken) {
-          nextQuery = extend({}, options, {
+          nextQuery = Object.assign({}, options, {
             pageToken: resp.nextPageToken,
           });
         }
 
-        // tslint:disable-next-line no-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const datasets = (resp.datasets || []).map(
           (dataset: bigquery.IDataset) => {
             const ds = this.dataset(dataset.datasetReference!.datasetId!, {
@@ -1541,7 +1533,6 @@ export class BigQuery extends common.Service {
     optionsOrCallback?: GetJobsOptions | GetJobsCallback,
     cb?: GetJobsCallback
   ): void | Promise<GetJobsResponse> {
-    const that = this;
     const options =
       typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
     const callback =
@@ -1557,25 +1548,19 @@ export class BigQuery extends common.Service {
           callback!(err, null, null, resp);
           return;
         }
-
         let nextQuery: {} | null = null;
-
         if (resp.nextPageToken) {
-          nextQuery = extend({}, options, {
+          nextQuery = Object.assign({}, options, {
             pageToken: resp.nextPageToken,
           });
         }
-
-        // tslint:disable-next-line no-any
         const jobs = (resp.jobs || []).map((jobObject: bigquery.IJob) => {
-          const job = that.job(jobObject.jobReference!.jobId!, {
+          const job = this.job(jobObject.jobReference!.jobId!, {
             location: jobObject.jobReference!.location!,
           });
-
           job.metadata = jobObject!;
           return job;
         });
-
         callback!(null, jobs, nextQuery, resp);
       }
     );
@@ -1816,12 +1801,11 @@ export class BigQueryDatetime {
       if (value.hours) {
         time = BigQuery.time(value).value;
       }
-      value = format('{y}-{m}-{d}{time}', {
-        y: value.year,
-        m: value.month,
-        d: value.day,
-        time: time ? ' ' + time : '',
-      });
+      const y = value.year;
+      const m = value.month;
+      const d = value.day;
+      time = time ? ' ' + time : '';
+      value = `${y}-${m}-${d}${time}`;
     } else {
       value = value.replace(/^(.*)T(.*)Z$/, '$1 $2');
     }
@@ -1836,12 +1820,11 @@ export class BigQueryTime {
   value: string;
   constructor(value: BigQueryTimeOptions | string) {
     if (typeof value === 'object') {
-      value = format('{h}:{m}:{s}{f}', {
-        h: value.hours,
-        m: value.minutes || 0,
-        s: value.seconds || 0,
-        f: is.defined(value.fractional) ? '.' + value.fractional : '',
-      });
+      const h = value.hours;
+      const m = value.minutes || 0;
+      const s = value.seconds || 0;
+      const f = is.defined(value.fractional) ? '.' + value.fractional : '';
+      value = `${h}:${m}:${s}${f}`;
     }
     this.value = value as string;
   }

@@ -37,10 +37,10 @@ const srcTableId = tableId;
 const destTableId = generateUuid();
 const viewId = generateUuid();
 const bucketName = generateUuid();
-const exportCSVFileName = `data.json`;
-const exportJSONFileName = `data.json`;
-const importFileName = `data.avro`;
-const partialDataFileName = `partialdata.csv`;
+const exportCSVFileName = 'data.json';
+const exportJSONFileName = 'data.json';
+const importFileName = 'data.avro';
+const partialDataFileName = 'partialdata.csv';
 const localFilePath = path.join(__dirname, `../resources/${importFileName}`);
 const partialDataFilePath = path.join(
   __dirname,
@@ -48,7 +48,7 @@ const partialDataFilePath = path.join(
 );
 const bigquery = new BigQuery();
 
-describe.only('Tables', () => {
+describe('Tables', () => {
   before(async () => {
     const [bucket] = await storage.createBucket(bucketName);
     await Promise.all([
@@ -92,7 +92,7 @@ describe.only('Tables', () => {
       .catch(console.warn);
   });
 
-  it(`should create a table`, async () => {
+  it('should create a table', async () => {
     const output = execSync(`node createTable.js ${datasetId} ${tableId}`);
     assert.include(output, `Table ${tableId} created.`);
     const [exists] = await bigquery
@@ -102,7 +102,7 @@ describe.only('Tables', () => {
     assert.ok(exists);
   });
 
-  it(`should create a partitioned table`, async () => {
+  it('should create a partitioned table', async () => {
     const output = execSync(
       `node createTablePartitioned.js ${datasetId} ${partitionedTableId}`
     );
@@ -110,7 +110,8 @@ describe.only('Tables', () => {
       output,
       `Table ${partitionedTableId} created with partitioning:`
     );
-    assert.include(output, `{ type: 'DAY', field: 'date' }`);
+    assert.include(output, "type: 'DAY'");
+    assert.include(output, "field: 'date'");
     const [exists] = await bigquery
       .dataset(datasetId)
       .table(partitionedTableId)
@@ -118,7 +119,27 @@ describe.only('Tables', () => {
     assert.ok(exists);
   });
 
-  it(`should create a table with nested schema`, async () => {
+  it('should create an integer range partitioned table', async () => {
+    const rangePartTableId = generateUuid();
+    const output = execSync(
+      `node createTableRangePartitioned.js ${datasetId} ${rangePartTableId}`
+    );
+    assert.include(
+      output,
+      `Table ${rangePartTableId} created with integer range partitioning:`
+    );
+    assert.include(
+      output,
+      "range: { start: '0', end: '100000', interval: '10' }"
+    );
+    const [exists] = await bigquery
+      .dataset(datasetId)
+      .table(rangePartTableId)
+      .exists();
+    assert.ok(exists);
+  });
+
+  it('should create a table with nested schema', async () => {
     const output = execSync(
       `node nestedRepeatedSchema.js ${datasetId} ${nestedTableId}`
     );
@@ -130,27 +151,27 @@ describe.only('Tables', () => {
     assert.ok(exists);
   });
 
-  it(`should retrieve a table if it exists`, async () => {
+  it('should retrieve a table if it exists', async () => {
     const output = execSync(`node getTable.js ${datasetId} ${tableId}`);
     assert.include(output, 'Table:');
     assert.include(output, datasetId);
     assert.include(output, tableId);
   });
 
-  it(`should list tables`, async () => {
+  it('should list tables', async () => {
     const output = execSync(`node listTables.js ${datasetId}`);
     assert.match(output, /Tables:/);
     assert.match(output, new RegExp(tableId));
   });
 
-  it(`should update table's description`, async () => {
+  it("should update table's description", async () => {
     const output = execSync(
       `node updateTableDescription.js ${datasetId} ${tableId}`
     );
     assert.include(output, `${tableId} description: New table description.`);
   });
 
-  it(`should update table's expiration`, async () => {
+  it("should update table's expiration", async () => {
     const currentTime = Date.now();
     const expirationTime = currentTime + 1000 * 60 * 60 * 24 * 5;
     const output = execSync(
@@ -160,19 +181,19 @@ describe.only('Tables', () => {
     assert.include(output, `expiration: ${expirationTime}`);
   });
 
-  it(`should add label to a table`, async () => {
+  it('should add label to a table', async () => {
     const output = execSync(`node labelTable.js ${datasetId} ${tableId}`);
     assert.include(output, `${tableId} labels:`);
     assert.include(output, "{ color: 'green' }");
   });
 
-  it(`should delete a label from a table`, async () => {
+  it('should delete a label from a table', async () => {
     const output = execSync(`node deleteLabelTable.js ${datasetId} ${tableId}`);
     assert.include(output, `${tableId} labels:`);
     assert.include(output, 'undefined');
   });
 
-  it(`should load a local CSV file`, async () => {
+  it('should load a local CSV file', async () => {
     const output = execSync(
       `node loadLocalFile.js ${datasetId} ${tableId} ${localFilePath}`
     );
@@ -184,20 +205,20 @@ describe.only('Tables', () => {
     assert.strictEqual(rows.length, 1);
   });
 
-  it(`should browse table rows`, async () => {
+  it('should browse table rows', async () => {
     const output = execSync(`node browseRows.js ${datasetId} ${tableId}`);
     assert.include(
       output,
-      `Rows:\n{ Name: 'Gandalf', Age: 2000, Weight: 140, IsMagic: true }`
+      "Rows:\n{ Name: 'Gandalf', Age: 2000, Weight: 140, IsMagic: true }"
     );
   });
 
-  it(`should extract a table to GCS CSV file`, async () => {
+  it('should extract a table to GCS CSV file', async () => {
     const output = execSync(
       `node extractTableToGCS.js ${datasetId} ${tableId} ${bucketName} ${exportCSVFileName}`
     );
 
-    assert.match(output, /completed\./);
+    assert.match(output, /created\./);
     const [exists] = await storage
       .bucket(bucketName)
       .file(exportCSVFileName)
@@ -205,12 +226,12 @@ describe.only('Tables', () => {
     assert.ok(exists);
   });
 
-  it(`should extract a table to GCS JSON file`, async () => {
+  it('should extract a table to GCS JSON file', async () => {
     const output = execSync(
       `node extractTableJSON.js ${datasetId} ${tableId} ${bucketName} ${exportJSONFileName}`
     );
 
-    assert.match(output, /completed\./);
+    assert.match(output, /created\./);
     const [exists] = await storage
       .bucket(bucketName)
       .file(exportJSONFileName)
@@ -218,12 +239,12 @@ describe.only('Tables', () => {
     assert.ok(exists);
   });
 
-  it(`should extract a table to GCS compressed file`, async () => {
+  it('should extract a table to GCS compressed file', async () => {
     const output = execSync(
       `node extractTableCompressed.js ${datasetId} ${tableId} ${bucketName} ${exportCSVFileName}`
     );
 
-    assert.match(output, /completed\./);
+    assert.match(output, /created\./);
     const [exists] = await storage
       .bucket(bucketName)
       .file(exportCSVFileName)
@@ -231,7 +252,7 @@ describe.only('Tables', () => {
     assert.ok(exists);
   });
 
-  it(`should load a GCS ORC file`, async () => {
+  it('should load a GCS ORC file', async () => {
     const tableId = generateUuid();
     const output = execSync(`node loadTableGCSORC.js ${datasetId} ${tableId}`);
     assert.match(output, /completed\./);
@@ -242,7 +263,7 @@ describe.only('Tables', () => {
     assert.ok(rows.length > 0);
   });
 
-  it(`should load a GCS Parquet file`, async () => {
+  it('should load a GCS Parquet file', async () => {
     const tableId = generateUuid();
     const output = execSync(
       `node loadTableGCSParquet.js ${datasetId} ${tableId}`
@@ -255,7 +276,7 @@ describe.only('Tables', () => {
     assert.ok(rows.length > 0);
   });
 
-  it(`should load a GCS Avro file`, async () => {
+  it('should load a GCS Avro file', async () => {
     const tableId = generateUuid();
     const output = execSync(`node loadTableGCSAvro.js ${datasetId} ${tableId}`);
     assert.match(output, /completed\./);
@@ -266,7 +287,7 @@ describe.only('Tables', () => {
     assert.ok(rows.length > 0);
   });
 
-  it(`should load a GCS CSV file with explicit schema`, async () => {
+  it('should load a GCS CSV file with explicit schema', async () => {
     const tableId = generateUuid();
     const output = execSync(`node loadCSVFromGCS.js ${datasetId} ${tableId}`);
     assert.match(output, /completed\./);
@@ -277,7 +298,7 @@ describe.only('Tables', () => {
     assert.ok(rows.length > 0);
   });
 
-  it(`should load a GCS JSON file with explicit schema`, async () => {
+  it('should load a GCS JSON file with explicit schema', async () => {
     const tableId = generateUuid();
     const output = execSync(`node loadJSONFromGCS.js ${datasetId} ${tableId}`);
     assert.match(output, /completed\./);
@@ -288,7 +309,7 @@ describe.only('Tables', () => {
     assert.ok(rows.length > 0);
   });
 
-  it(`should load a GCS CSV file to partitioned table`, async () => {
+  it('should load a GCS CSV file to partitioned table', async () => {
     const tableId = generateUuid();
     const output = execSync(
       `node loadTablePartitioned.js ${datasetId} ${tableId}`
@@ -301,7 +322,7 @@ describe.only('Tables', () => {
     assert.ok(rows.length > 0);
   });
 
-  it(`should add a new column via a GCS file load job`, async () => {
+  it('should add a new column via a GCS file load job', async () => {
     const destTableId = generateUuid();
     execSync(
       `node createTable.js ${datasetId} ${destTableId} 'Name:STRING, Age:INTEGER, Weight:FLOAT'`
@@ -317,7 +338,7 @@ describe.only('Tables', () => {
     assert.ok(rows.length > 0);
   });
 
-  it(`should relax a column via a GCS file load job`, async () => {
+  it('should relax a column via a GCS file load job', async () => {
     const destTableId = generateUuid();
     execSync(`node createTable.js ${datasetId} ${destTableId}`);
     const output = execSync(
@@ -331,7 +352,7 @@ describe.only('Tables', () => {
     assert.ok(rows.length > 0);
   });
 
-  it(`should load a GCS CSV file with autodetected schema`, async () => {
+  it('should load a GCS CSV file with autodetected schema', async () => {
     const tableId = generateUuid();
     const output = execSync(
       `node loadCSVFromGCSAutodetect.js ${datasetId} ${tableId}`
@@ -344,7 +365,7 @@ describe.only('Tables', () => {
     assert.ok(rows.length > 0);
   });
 
-  it(`should load a GCS JSON file with autodetected schema`, async () => {
+  it('should load a GCS JSON file with autodetected schema', async () => {
     const tableId = generateUuid();
     const output = execSync(
       `node loadJSONFromGCSAutodetect.js ${datasetId} ${tableId}`
@@ -357,7 +378,7 @@ describe.only('Tables', () => {
     assert.ok(rows.length > 0);
   });
 
-  it(`should load a GCS CSV file truncate table`, async () => {
+  it('should load a GCS CSV file truncate table', async () => {
     const tableId = generateUuid();
     const output = execSync(
       `node loadCSVFromGCSTruncate.js ${datasetId} ${tableId}`
@@ -370,7 +391,7 @@ describe.only('Tables', () => {
     assert.ok(rows.length > 0);
   });
 
-  it(`should load a GCS JSON file truncate table`, async () => {
+  it('should load a GCS JSON file truncate table', async () => {
     const tableId = generateUuid();
     const output = execSync(
       `node loadJSONFromGCSTruncate.js ${datasetId} ${tableId}`
@@ -383,7 +404,7 @@ describe.only('Tables', () => {
     assert.ok(rows.length > 0);
   });
 
-  it(`should load a GCS parquet file truncate table`, async () => {
+  it('should load a GCS parquet file truncate table', async () => {
     const tableId = generateUuid();
     const output = execSync(
       `node loadParquetFromGCSTruncate.js ${datasetId} ${tableId}`
@@ -396,7 +417,7 @@ describe.only('Tables', () => {
     assert.ok(rows.length > 0);
   });
 
-  it(`should load a GCS ORC file truncate table`, async () => {
+  it('should load a GCS ORC file truncate table', async () => {
     const tableId = generateUuid();
     const output = execSync(
       `node loadOrcFromGCSTruncate.js ${datasetId} ${tableId}`
@@ -409,7 +430,7 @@ describe.only('Tables', () => {
     assert.ok(rows.length > 0);
   });
 
-  it(`should load a GCS Avro file truncate table`, async () => {
+  it('should load a GCS Avro file truncate table', async () => {
     const tableId = generateUuid();
     const output = execSync(
       `node loadTableGCSAvroTruncate.js ${datasetId} ${tableId}`
@@ -422,7 +443,7 @@ describe.only('Tables', () => {
     assert.ok(rows.length > 0);
   });
 
-  it(`should copy a table`, async () => {
+  it('should copy a table', async () => {
     const output = execSync(
       `node copyTable.js ${srcDatasetId} ${srcTableId} ${destDatasetId} ${destTableId}`
     );
@@ -434,14 +455,22 @@ describe.only('Tables', () => {
     assert.ok(rows.length > 0);
   });
 
-  it(`should insert rows`, async () => {
+  it('should insert rows', async () => {
     const output = execSync(
       `node insertRowsAsStream.js ${datasetId} ${tableId}`
     );
     assert.match(output, /Inserted 2 rows/);
   });
 
-  it(`copy multiple source tables to a given destination`, async () => {
+  it('should insert rows with supported data types', async () => {
+    const typesTableId = generateUuid();
+    const output = execSync(
+      `node insertingDataTypes.js ${datasetId} ${typesTableId}`
+    );
+    assert.match(output, /Inserted 2 rows/);
+  });
+
+  it('copy multiple source tables to a given destination', async () => {
     execSync(`node createTable.js ${datasetId} destinationTable`);
     const output = execSync(
       `node copyTableMultipleSource.js ${datasetId} ${tableId} destinationTable`
@@ -452,28 +481,28 @@ describe.only('Tables', () => {
     assert.include(output, 'writeDisposition');
   });
 
-  it(`should add a column to the schema`, async () => {
-    const column = `name: 'size', type: 'STRING'`;
+  it('should add a column to the schema', async () => {
+    const column = "name: 'size', type: 'STRING'";
     const output = execSync(`node addEmptyColumn.js ${datasetId} ${tableId}`);
     assert.include(output, column);
   });
 
-  it(`should update a column from 'REQUIRED' TO 'NULLABLE'`, async () => {
-    const column = `name: 'Name', type: 'STRING', mode: 'NULLABLE'`;
+  it("should update a column from 'REQUIRED' TO 'NULLABLE'", async () => {
+    const column = "name: 'Name', type: 'STRING', mode: 'NULLABLE'";
     execSync(`node createTable.js ${datasetId} newTable`);
     const output = execSync(`node relaxColumn.js ${datasetId} newTable`);
     assert.include(output, column);
   });
 
-  it(`should get labels on a table`, async () => {
+  it('should get labels on a table', async () => {
     execSync(`node labelTable.js ${datasetId} ${tableId}`);
     const output = execSync(`node getTableLabels.js ${datasetId} ${tableId}`);
     assert.include(output, `${tableId} Labels:`);
     assert.include(output, 'color: green');
   });
 
-  describe(`Views`, () => {
-    it(`should create a view`, async () => {
+  describe('Views', () => {
+    it('should create a view', async () => {
       const output = execSync(`node createView.js ${datasetId} ${viewId}`);
       assert.include(output, `View ${viewId} created.`);
       const [exists] = await bigquery
@@ -483,7 +512,7 @@ describe.only('Tables', () => {
       assert.ok(exists);
     });
 
-    it(`should get a view`, async () => {
+    it('should get a view', async () => {
       const viewId = generateUuid();
       execSync(`node createView.js ${datasetId} ${viewId}`);
       const output = execSync(`node getView.js ${datasetId} ${viewId}`);
@@ -491,13 +520,13 @@ describe.only('Tables', () => {
       assert.match(output, /View query:/);
     });
 
-    it(`should update a view`, async () => {
+    it('should update a view', async () => {
       const output = execSync(`node updateViewQuery.js ${datasetId} ${viewId}`);
       assert.include(output, `View ${viewId} updated.`);
     });
   });
 
-  describe(`Delete Table`, () => {
+  describe('Delete Table', () => {
     const datasetId = `gcloud_tests_${uuid.v4()}`.replace(/-/gi, '_');
     const tableId = `gcloud_tests_${uuid.v4()}`.replace(/-/gi, '_');
 
@@ -521,7 +550,7 @@ describe.only('Tables', () => {
         .catch(console.warn);
     });
 
-    it(`should delete a table`, async () => {
+    it('should delete a table', async () => {
       const output = execSync(`node deleteTable.js ${datasetId} ${tableId}`);
       assert.include(output, `Table ${tableId} deleted.`);
       const [exists] = await bigquery
@@ -531,7 +560,7 @@ describe.only('Tables', () => {
       assert.strictEqual(exists, false);
     });
 
-    it(`should undelete a table`, async () => {
+    it('should undelete a table', async () => {
       const tableId = generateUuid();
       const recoveredTableId = generateUuid();
 

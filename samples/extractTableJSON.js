@@ -50,8 +50,8 @@ function main(
       .dataset(datasetId)
       .table(tableId)
       .extract(storage.bucket(bucketName).file(filename), options);
-    // load() waits for the job to finish
-    console.log(`Job ${job.id} completed.`);
+
+    console.log(`Job ${job.id} created.`);
 
     // Check the job's status for errors
     const errors = job.status.errors;

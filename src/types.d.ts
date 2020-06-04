@@ -96,15 +96,15 @@ declare namespace bigquery {
    */
   type IArimaFittingMetrics = {
     /**
-     * AIC
+     * AIC.
      */
     aic?: number;
     /**
-     * log-likelihood
+     * Log-likelihood.
      */
     logLikelihood?: number;
     /**
-     * variance.
+     * Variance.
      */
     variance?: number;
   };
@@ -122,9 +122,31 @@ declare namespace bigquery {
      */
     arimaFittingMetrics?: IArimaFittingMetrics;
     /**
+     * Whether Arima model fitted with drift or not. It is always false
+     * when d is not 1.
+     */
+    hasDrift?: boolean;
+    /**
      * Non-seasonal order.
      */
     nonSeasonalOrder?: IArimaOrder;
+    /**
+     * Seasonal periods. Repeated because multiple periods are supported
+     * for one time series.
+     */
+    seasonalPeriods?: Array<
+      | 'SEASONAL_PERIOD_TYPE_UNSPECIFIED'
+      | 'NO_SEASONALITY'
+      | 'DAILY'
+      | 'WEEKLY'
+      | 'MONTHLY'
+      | 'QUARTERLY'
+      | 'YEARLY'
+    >;
+    /**
+     * The id to indicate different time series.
+     */
+    timeSeriesId?: string;
   };
 
   /**
@@ -466,6 +488,17 @@ declare namespace bigquery {
     rows?: Array<IRow>;
   };
 
+  type IConnectionProperty = {
+    /**
+     * [Required] Name of the connection property to set.
+     */
+    key?: string;
+    /**
+     * [Required] Value of the connection property.
+     */
+    value?: string;
+  };
+
   type ICsvOptions = {
     /**
      * [Optional] Indicates if BigQuery should accept rows that are missing trailing optional columns. If true, BigQuery treats missing trailing columns as null values. If false, records with missing trailing columns are treated as bad records, and if there are too many bad records, an invalid error is returned in the job result. The default value is false.
@@ -582,7 +615,7 @@ declare namespace bigquery {
     /**
      * The labels associated with this dataset. You can use these to organize and group your datasets. You can set this property when inserting or updating a dataset. See Creating and Updating Dataset Labels for more information.
      */
-    labels?: { [key: string]: string };
+    labels?: {[key: string]: string};
     /**
      * [Output-only] The date when this dataset or any of its tables was last modified, in milliseconds since the epoch.
      */
@@ -621,7 +654,7 @@ declare namespace bigquery {
       /**
        * The labels associated with this dataset. You can use these to organize and group your datasets.
        */
-      labels?: { [key: string]: string };
+      labels?: {[key: string]: string};
       /**
        * The geographic location where the data resides.
        */
@@ -664,7 +697,7 @@ declare namespace bigquery {
     /**
      * [Optional] The labels associated with this table. You can use these to organize and group your tables. This will only be used if the destination table is newly created. If the table already exists and labels are different than the current labels are provided, the job will fail.
      */
-    labels?: { [key: string]: string };
+    labels?: {[key: string]: string};
   };
 
   type IEncryptionConfiguration = {
@@ -727,6 +760,11 @@ declare namespace bigquery {
      * Populated for multi-class classification/classifier models.
      */
     multiClassClassificationMetrics?: IMultiClassClassificationMetrics;
+    /**
+     * [Alpha] Populated for implicit feedback type matrix factorization
+     * models.
+     */
+    rankingMetrics?: IRankingMetrics;
     /**
      * Populated for regression models and explicit feedback type matrix
      * factorization models.
@@ -889,10 +927,6 @@ declare namespace bigquery {
      * [Optional] Additional options if sourceFormat is set to GOOGLE_SHEETS.
      */
     googleSheetsOptions?: IGoogleSheetsOptions;
-    /**
-     * [Optional, Trusted Tester] Deprecated, do not use. Please set hivePartitioningOptions instead.
-     */
-    hivePartitioningMode?: string;
     /**
      * [Optional, Trusted Tester] Options to configure hive partitioning support.
      */
@@ -1127,7 +1161,7 @@ declare namespace bigquery {
     /**
      * The labels associated with this job. You can use these to organize and group your jobs. Label keys and values can be no longer than 63 characters, can only contain lowercase letters, numeric characters, underscores and dashes. International characters are allowed. Label values are optional. Label keys must start with a letter and each label in the list must have a different key.
      */
-    labels?: { [key: string]: string };
+    labels?: {[key: string]: string};
     /**
      * [Pick one] Configures a load job.
      */
@@ -1140,11 +1174,11 @@ declare namespace bigquery {
 
   type IJobConfigurationExtract = {
     /**
-     * [Optional] The compression type to use for exported files. Possible values include GZIP, DEFLATE, SNAPPY, and NONE. The default value is NONE. DEFLATE and SNAPPY are only supported for Avro.
+     * [Optional] The compression type to use for exported files. Possible values include GZIP, DEFLATE, SNAPPY, and NONE. The default value is NONE. DEFLATE and SNAPPY are only supported for Avro. Not applicable when extracting models.
      */
     compression?: string;
     /**
-     * [Optional] The exported file format. Possible values include CSV, NEWLINE_DELIMITED_JSON and AVRO. The default value is CSV. Tables with nested or repeated fields cannot be exported as CSV.
+     * [Optional] The exported file format. Possible values include CSV, NEWLINE_DELIMITED_JSON or AVRO for tables and ML_TF_SAVED_MODEL or ML_XGBOOST_BOOSTER for models. The default value for tables is CSV. Tables with nested or repeated fields cannot be exported as CSV. The default value for models is ML_TF_SAVED_MODEL.
      */
     destinationFormat?: string;
     /**
@@ -1156,11 +1190,11 @@ declare namespace bigquery {
      */
     destinationUris?: Array<string>;
     /**
-     * [Optional] Delimiter to use between fields in the exported data. Default is ','
+     * [Optional] Delimiter to use between fields in the exported data. Default is ','. Not applicable when extracting models.
      */
     fieldDelimiter?: string;
     /**
-     * [Optional] Whether to print out a header row in the results. Default is true.
+     * [Optional] Whether to print out a header row in the results. Default is true. Not applicable when extracting models.
      */
     printHeader?: boolean;
     /**
@@ -1172,7 +1206,7 @@ declare namespace bigquery {
      */
     sourceTable?: ITableReference;
     /**
-     * [Optional] If destinationFormat is set to "AVRO", this flag indicates whether to enable extracting applicable column types (such as TIMESTAMP) to their corresponding AVRO logical types (timestamp-micros), instead of only using their raw types (avro-long).
+     * [Optional] If destinationFormat is set to "AVRO", this flag indicates whether to enable extracting applicable column types (such as TIMESTAMP) to their corresponding AVRO logical types (timestamp-micros), instead of only using their raw types (avro-long). Not applicable when extracting models.
      */
     useAvroLogicalTypes?: boolean;
   };
@@ -1218,10 +1252,6 @@ declare namespace bigquery {
      * [Optional] The separator for fields in a CSV file. The separator can be any ISO-8859-1 single-byte character. To use a character in the range 128-255, you must encode the character as UTF8. BigQuery converts the string to ISO-8859-1 encoding, and then uses the first byte of the encoded string to split the data in its raw, binary state. BigQuery also supports the escape sequence "\t" to specify a tab separator. The default value is a comma (',').
      */
     fieldDelimiter?: string;
-    /**
-     * [Optional, Trusted Tester] Deprecated, do not use. Please set hivePartitioningOptions instead.
-     */
-    hivePartitioningMode?: string;
     /**
      * [Optional, Trusted Tester] Options to configure hive partitioning support.
      */
@@ -1302,6 +1332,10 @@ declare namespace bigquery {
      */
     clustering?: IClustering;
     /**
+     * Connection properties.
+     */
+    connectionProperties?: Array<IConnectionProperty>;
+    /**
      * [Optional] Specifies whether the job is allowed to create new tables. The following values are supported: CREATE_IF_NEEDED: If the table does not exist, BigQuery creates the table. CREATE_NEVER: The table must already exist. If it does not, a 'notFound' error is returned in the job result. The default value is CREATE_IF_NEEDED. Creation, truncation and append actions occur as one atomic update upon job completion.
      */
     createDisposition?: string;
@@ -1360,7 +1394,7 @@ declare namespace bigquery {
     /**
      * [Optional] If querying an external data source outside of BigQuery, describes the data format, location and other properties of the data source. By defining these properties, the data source can then be queried as if it were a standard BigQuery table.
      */
-    tableDefinitions?: { [key: string]: IExternalDataConfiguration };
+    tableDefinitions?: {[key: string]: IExternalDataConfiguration};
     /**
      * Time-based partitioning specification for the destination table. Only one of timePartitioning and rangePartitioning should be specified.
      */
@@ -1536,6 +1570,10 @@ declare namespace bigquery {
      */
     reservation_id?: string;
     /**
+     * [Output-only] [Preview] Statistics for row-level security. Present only for query and extract jobs.
+     */
+    rowLevelSecurityStatistics?: IRowLevelSecurityStatistics;
+    /**
      * [Output-only] Statistics for a child job of a script.
      */
     scriptStatistics?: IScriptStatistics;
@@ -1563,6 +1601,10 @@ declare namespace bigquery {
      */
     cacheHit?: boolean;
     /**
+     * [Output-only] [Preview] The number of row access policies affected by a DDL statement. Present only for DROP ALL ROW ACCESS POLICIES queries.
+     */
+    ddlAffectedRowAccessPolicyCount?: string;
+    /**
      * The DDL operation performed, possibly dependent on the pre-existence of the DDL target. Possible values (new values might be added in the future): "CREATE": The query created the DDL target. "SKIP": No-op. Example cases: the query is CREATE TABLE IF NOT EXISTS while the table already exists, or the query is DROP TABLE IF EXISTS while the table does not exist. "REPLACE": The query replaced the DDL target. Example case: the query is CREATE OR REPLACE TABLE, and the table already exists. "DROP": The query deleted the DDL target.
      */
     ddlOperationPerformed?: string;
@@ -1571,7 +1613,11 @@ declare namespace bigquery {
      */
     ddlTargetRoutine?: IRoutineReference;
     /**
-     * The DDL target table. Present only for CREATE/DROP TABLE/VIEW queries.
+     * [Output-only] [Preview] The DDL target row access policy. Present only for CREATE/DROP ROW ACCESS POLICY queries.
+     */
+    ddlTargetRowAccessPolicy?: IRowAccessPolicyReference;
+    /**
+     * [Output-only] The DDL target table. Present only for CREATE/DROP TABLE/VIEW and DROP ALL ROW ACCESS POLICIES queries.
      */
     ddlTargetTable?: ITableReference;
     /**
@@ -1709,7 +1755,7 @@ declare namespace bigquery {
   /**
    * Represents a single JSON object.
    */
-  type IJsonObject = { [key: string]: IJsonValue };
+  type IJsonObject = {[key: string]: IJsonValue};
 
   type IJsonValue = any;
 
@@ -1821,7 +1867,7 @@ declare namespace bigquery {
      * Label values are optional. Label keys must start with a letter and each
      * label in the list must have a different key.
      */
-    labels?: { [key: string]: string };
+    labels?: {[key: string]: string};
     /**
      * Output only. The time when this model was last modified, in millisecs since the epoch.
      */
@@ -1843,7 +1889,14 @@ declare namespace bigquery {
       | 'LINEAR_REGRESSION'
       | 'LOGISTIC_REGRESSION'
       | 'KMEANS'
-      | 'TENSORFLOW';
+      | 'MATRIX_FACTORIZATION'
+      | 'DNN_CLASSIFIER'
+      | 'TENSORFLOW'
+      | 'DNN_REGRESSOR'
+      | 'BOOSTED_TREE_REGRESSOR'
+      | 'BOOSTED_TREE_CLASSIFIER'
+      | 'AUTOML_REGRESSOR'
+      | 'AUTOML_CLASSIFIER';
     /**
      * Output only. Information for all training runs in increasing order of start_time.
      */
@@ -1996,7 +2049,7 @@ declare namespace bigquery {
     /**
      * [Optional] The struct field values, in order of the struct type's declaration.
      */
-    structValues?: { [key: string]: IQueryParameterValue };
+    structValues?: {[key: string]: IQueryParameterValue};
     /**
      * [Optional] The value of this value, if a simple scalar type.
      */
@@ -2004,6 +2057,10 @@ declare namespace bigquery {
   };
 
   type IQueryRequest = {
+    /**
+     * Connection properties.
+     */
+    connectionProperties?: Array<IConnectionProperty>;
     /**
      * [Optional] Specifies the default datasetId and projectId to assume for any unqualified table names in the query. If not set, all table names in the query string must be qualified in the format 'datasetId.tableId'.
      */
@@ -2146,6 +2203,36 @@ declare namespace bigquery {
        */
       start?: string;
     };
+  };
+
+  /**
+   * Evaluation metrics used by weighted-ALS models specified by
+   * feedback_type=implicit.
+   */
+  type IRankingMetrics = {
+    /**
+     * Determines the goodness of a ranking by computing the percentile rank
+     * from the predicted confidence and dividing it by the original rank.
+     */
+    averageRank?: number;
+    /**
+     * Calculates a precision per user for all the items by ranking them and
+     * then averages all the precisions across all the users.
+     */
+    meanAveragePrecision?: number;
+    /**
+     * Similar to the mean squared error computed in regression and explicit
+     * recommendation models except instead of computing the rating directly,
+     * the output from evaluate is computed against a preference which is 1 or 0
+     * depending on if the rating exists or not.
+     */
+    meanSquaredError?: number;
+    /**
+     * A metric to determine the goodness of a ranking calculated from the
+     * predicted confidence by comparing it to an ideal rank measured by the
+     * original ratings.
+     */
+    normalizedDiscountedCumulativeGain?: number;
   };
 
   /**
@@ -2300,6 +2387,32 @@ declare namespace bigquery {
     entries?: Array<IEntry>;
   };
 
+  type IRowAccessPolicyReference = {
+    /**
+     * [Required] The ID of the dataset containing this row access policy.
+     */
+    datasetId?: string;
+    /**
+     * [Required] The ID of the row access policy. The ID must contain only letters (a-z, A-Z), numbers (0-9), or underscores (_). The maximum length is 256 characters.
+     */
+    policyId?: string;
+    /**
+     * [Required] The ID of the project containing this row access policy.
+     */
+    projectId?: string;
+    /**
+     * [Required] The ID of the table containing this row access policy.
+     */
+    tableId?: string;
+  };
+
+  type IRowLevelSecurityStatistics = {
+    /**
+     * [Output-only] [Preview] Whether any accessed data was protected by row access policies.
+     */
+    rowLevelSecurityApplied?: boolean;
+  };
+
   type IScriptStackFrame = {
     /**
      * [Output-only] One-based end column.
@@ -2396,7 +2509,7 @@ declare namespace bigquery {
     type?: IStandardSqlDataType;
   };
 
-  type IStandardSqlStructType = { fields?: Array<IStandardSqlField> };
+  type IStandardSqlStructType = {fields?: Array<IStandardSqlField>};
 
   type IStreamingbuffer = {
     /**
@@ -2457,7 +2570,7 @@ declare namespace bigquery {
     /**
      * The labels associated with this table. You can use these to organize and group your tables. Label keys and values can be no longer than 63 characters, can only contain lowercase letters, numeric characters, underscores and dashes. International characters are allowed. Label values are optional. Label keys must start with a letter and each label in the list must have a different key.
      */
-    labels?: { [key: string]: string };
+    labels?: {[key: string]: string};
     /**
      * [Output-only] The time when this table was last modified, in milliseconds since the epoch.
      */
@@ -2528,7 +2641,7 @@ declare namespace bigquery {
     view?: IViewDefinition;
   };
 
-  type ITableCell = { v?: any };
+  type ITableCell = {v?: any};
 
   type ITableDataInsertAllRequest = {
     /**
@@ -2687,7 +2800,7 @@ declare namespace bigquery {
       /**
        * The labels associated with this table. You can use these to organize and group your tables.
        */
-      labels?: { [key: string]: string };
+      labels?: {[key: string]: string};
       /**
        * The range partitioning specification for this table, if configured.
        */
@@ -2767,6 +2880,10 @@ declare namespace bigquery {
 
   type ITrainingOptions = {
     /**
+     * Batch size for dnn models.
+     */
+    batchSize?: string;
+    /**
      * The column to split data with. This column won't be used as a
      * feature.
      * 1. When data_split_method is CUSTOM, the corresponding column should
@@ -2801,11 +2918,24 @@ declare namespace bigquery {
      */
     distanceType?: 'DISTANCE_TYPE_UNSPECIFIED' | 'EUCLIDEAN' | 'COSINE';
     /**
+     * Dropout probability for dnn models.
+     */
+    dropout?: number;
+    /**
      * Whether to stop early when the loss doesn't improve significantly
      * any more (compared to min_relative_progress). Used only for iterative
      * training algorithms.
      */
     earlyStop?: boolean;
+    /**
+     * Feedback type that specifies which algorithm to run for matrix
+     * factorization.
+     */
+    feedbackType?: 'FEEDBACK_TYPE_UNSPECIFIED' | 'IMPLICIT' | 'EXPLICIT';
+    /**
+     * Hidden units for dnn models.
+     */
+    hiddenUnits?: Array<string>;
     /**
      * Specifies the initial learning rate for the line search learn rate
      * strategy.
@@ -2815,6 +2945,10 @@ declare namespace bigquery {
      * Name of input label columns in training data.
      */
     inputLabelColumns?: Array<string>;
+    /**
+     * Item column specified for matrix factorization models.
+     */
+    itemColumn?: string;
     /**
      * The column used to provide the initial centroids for kmeans algorithm
      * when kmeans_initialization_method is CUSTOM.
@@ -2840,7 +2974,7 @@ declare namespace bigquery {
      * Weights associated with each label class, for rebalancing the
      * training data. Only applicable for classification models.
      */
-    labelClassWeights?: { [key: string]: number };
+    labelClassWeights?: {[key: string]: number};
     /**
      * Learning rate in training. Used only for iterative training algorithms.
      */
@@ -2862,11 +2996,19 @@ declare namespace bigquery {
      */
     maxIterations?: string;
     /**
+     * Maximum depth of a tree for boosted tree models.
+     */
+    maxTreeDepth?: string;
+    /**
      * When early_stop is true, stops training when accuracy improvement is
      * less than 'min_relative_progress'. Used only for iterative training
      * algorithms.
      */
     minRelativeProgress?: number;
+    /**
+     * Minimum split loss for boosted tree models.
+     */
+    minSplitLoss?: number;
     /**
      * [Beta] Google Cloud Storage URI from which the model was imported. Only
      * applicable for imported models.
@@ -2877,12 +3019,30 @@ declare namespace bigquery {
      */
     numClusters?: string;
     /**
+     * Num factors specified for matrix factorization models.
+     */
+    numFactors?: string;
+    /**
      * Optimization strategy for training linear regression models.
      */
     optimizationStrategy?:
       | 'OPTIMIZATION_STRATEGY_UNSPECIFIED'
       | 'BATCH_GRADIENT_DESCENT'
       | 'NORMAL_EQUATION';
+    /**
+     * Subsample fraction of the training data to grow tree to prevent
+     * overfitting for boosted tree models.
+     */
+    subsample?: number;
+    /**
+     * User column specified for matrix factorization models.
+     */
+    userColumn?: string;
+    /**
+     * Hyperparameter for matrix factoration when implicit feedback type is
+     * specified.
+     */
+    walsAlpha?: number;
     /**
      * Whether to train a model from the last checkpoint.
      */
@@ -3196,4 +3356,3 @@ declare namespace bigquery {
 }
 
 export default bigquery;
-
