@@ -809,7 +809,9 @@ export class BigQuery extends common.Service {
     let typeName;
 
     if (value === null) {
-      throw new Error('Type must be provided for null values.');
+      throw new Error(
+        "Parameter types must be provided for null values via the 'types' field in query options."
+      );
     }
 
     if (value instanceof BigQueryDate) {
@@ -826,7 +828,9 @@ export class BigQuery extends common.Service {
       typeName = 'NUMERIC';
     } else if (Array.isArray(value)) {
       if (value.length === 0) {
-        throw new Error('Type must be provided for empty array.');
+        throw new Error(
+          "Parameter types must be provided for empty arrays via the 'types' field in query options."
+        );
       }
       return {
         type: 'ARRAY',
@@ -1624,6 +1628,10 @@ export class BigQuery extends common.Service {
    *     objects, Strings, Booleans, and Objects.
    * @param {string} query.query A query string, following the BigQuery query
    *     syntax, of the query to execute.
+   * @param {object|Array<*>} query.types Provided types for query parameters.
+   *     For positional SQL parameters, provide an array of types. For named
+   *     SQL parameters, provide an object which maps each named parameter to
+   *     its type.
    * @param {boolean} [query.useLegacySql=false] Option to use legacy sql syntax.
    * @param {object} [options] Configuration object for query results.
    * @param {number} [options.maxResults] Maximum number of results to read.
@@ -1676,6 +1684,23 @@ export class BigQuery extends common.Service {
    *   params: {
    *     owner: 'google'
    *   }
+   * }, function(err, rows) {});
+   *
+   * //-
+   * // Providing types for SQL parameters is supported.
+   * //-
+   * bigquery.query({
+   *   query: [
+   *     'SELECT url',
+   *     'FROM `publicdata.samples.github_nested`',
+   *     'WHERE repository.owner = ?'
+   *   ].join(' '),
+   *
+   *   params: [
+   *     null
+   *   ],
+   *
+   *   types: ['string']
    * }, function(err, rows) {});
    *
    * //-
