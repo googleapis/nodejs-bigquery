@@ -129,7 +129,7 @@ class FakeService extends Service {
 const sandbox = sinon.createSandbox();
 afterEach(() => sandbox.restore());
 
-describe('BigQuery', () => {
+describe.only('BigQuery', () => {
   const JOB_ID = 'JOB_ID';
   const PROJECT_ID = 'test-project';
   const LOCATION = 'asia-northeast1';
@@ -753,12 +753,12 @@ describe('BigQuery', () => {
     it('should throw with an empty array', () => {
       assert.throws(() => {
         BigQuery.getTypeDescriptorFromValue_([]);
-      }, /Type must be provided for empty array./);
+      }, /Parameter types must be provided for empty arrays via the 'types' field in query options./);
     });
 
-    it('should throw with an null value', () => {
+    it('should throw with a null value', () => {
       const expectedError = new RegExp(
-        'Type must be provided for null values.'
+        "Parameter types must be provided for null values via the 'types' field in query options."
       );
 
       assert.throws(() => {
