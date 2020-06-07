@@ -57,7 +57,7 @@ interface CalledWithService extends Service {
 }
 
 let promisified = false;
-const fakePfy = extend({}, pfy, {
+const fakePfy = Object.assign({}, pfy, {
   promisifyAll: (c: Function, options: pfy.PromisifyAllOptions) => {
     if (c.name !== 'BigQuery') {
       return;
@@ -74,7 +74,7 @@ const fakePfy = extend({}, pfy, {
     ]);
   },
 });
-const fakeUtil = extend({}, util, {
+const fakeUtil = Object.assign({}, util, {
   ApiError: FakeApiError,
 });
 const originalFakeUtil = extend(true, {}, fakeUtil);
@@ -160,12 +160,12 @@ describe('BigQuery', () => {
       '@google-cloud/paginator': fakePaginator,
       '@google-cloud/promisify': fakePfy,
     }).BigQuery;
-    BigQueryCached = extend({}, BigQuery);
+    BigQueryCached = Object.assign({}, BigQuery);
   });
 
   beforeEach(() => {
-    extend(fakeUtil, originalFakeUtil);
-    BigQuery = extend(BigQuery, BigQueryCached);
+    Object.assign(fakeUtil, originalFakeUtil);
+    BigQuery = Object.assign(BigQuery, BigQueryCached);
     bq = new BigQuery({projectId: PROJECT_ID});
   });
 
@@ -603,7 +603,7 @@ describe('BigQuery', () => {
     });
 
     it('should not include fractional digits if not provided', () => {
-      const input = extend({}, INPUT_OBJ);
+      const input = Object.assign({}, INPUT_OBJ);
       delete input.fractional;
 
       const time = bq.time(input);
@@ -753,12 +753,12 @@ describe('BigQuery', () => {
     it('should throw with an empty array', () => {
       assert.throws(() => {
         BigQuery.getTypeDescriptorFromValue_([]);
-      }, /Type must be provided for empty array./);
+      }, /Parameter types must be provided for empty arrays via the 'types' field in query options./);
     });
 
-    it('should throw with an null value', () => {
+    it('should throw with a null value', () => {
       const expectedError = new RegExp(
-        'Type must be provided for null values.'
+        "Parameter types must be provided for null values via the 'types' field in query options."
       );
 
       assert.throws(() => {
@@ -1103,7 +1103,7 @@ describe('BigQuery', () => {
         c: 'd',
       };
 
-      const originalOptions = extend({}, options);
+      const originalOptions = Object.assign({}, options);
 
       bq.request = (reqOpts: DecorateRequestOptions) => {
         assert.notStrictEqual(reqOpts.json, options);
@@ -1197,7 +1197,7 @@ describe('BigQuery', () => {
         a: 'b',
       };
 
-      const expectedOptions = extend({}, fakeOptions, {
+      const expectedOptions = Object.assign({}, fakeOptions, {
         jobReference: {
           projectId: bq.projectId,
           jobId: fakeJobId,
@@ -1737,7 +1737,7 @@ describe('BigQuery', () => {
       });
 
       const options = {a: 'b'};
-      const expectedOptions = extend({location: LOCATION}, options);
+      const expectedOptions = Object.assign({location: LOCATION}, options);
 
       const ds = bq.dataset(DATASET_ID, options);
       const args = ds.calledWith_;
@@ -2043,7 +2043,7 @@ describe('BigQuery', () => {
       });
 
       const options = {a: 'b'};
-      const expectedOptions = extend({location: LOCATION}, options);
+      const expectedOptions = Object.assign({location: LOCATION}, options);
 
       const job = bq.job(JOB_ID, options);
       const args = job.calledWith_;

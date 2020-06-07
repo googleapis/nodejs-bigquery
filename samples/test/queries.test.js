@@ -14,14 +14,14 @@
 
 'use strict';
 
-const {assert} = require('chai');
-const {describe, it, before, after} = require('mocha');
+const { assert } = require('chai');
+const { describe, it, before, after } = require('mocha');
 const cp = require('child_process');
 const uuid = require('uuid');
 
-const {BigQuery} = require('@google-cloud/bigquery');
+const { BigQuery } = require('@google-cloud/bigquery');
 
-const execSync = cmd => cp.execSync(cmd, {encoding: 'utf-8'});
+const execSync = cmd => cp.execSync(cmd, { encoding: 'utf-8' });
 const generateUuid = () => `gcloud-tests-${uuid.v4()}`.replace(/-/gi, '_');
 const datasetId = generateUuid();
 const tableId = generateUuid();
@@ -32,7 +32,7 @@ const bigquery = new BigQuery();
 
 describe('Queries', () => {
   before(async () => {
-    const schema = [{name: 'age', type: 'STRING', mode: 'REQUIRED'}];
+    const schema = [{ name: 'age', type: 'STRING', mode: 'REQUIRED' }];
     const options = {
       schema: schema,
     };
@@ -46,7 +46,7 @@ describe('Queries', () => {
   after(async () => {
     await bigquery
       .dataset(datasetId)
-      .delete({force: true})
+      .delete({ force: true })
       .catch(console.warn);
   });
 
@@ -165,5 +165,14 @@ describe('Queries', () => {
   it('should run a query stream', async () => {
     const output = execSync('node queryStream.js');
     assert.match(output, /End/);
+  });
+
+  it('should query an external data source', async () => {
+    const permTableId = generateUuid();
+    const output = execSync(
+      `node queryExternalGCSPerm.js ${datasetId} ${permTableId}`
+    );
+    assert.match(output, /Rows:/);
+    assert.match(output, /post_abbr/);
   });
 });

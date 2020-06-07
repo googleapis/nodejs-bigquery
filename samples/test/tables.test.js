@@ -110,10 +110,31 @@ describe('Tables', () => {
       output,
       `Table ${partitionedTableId} created with partitioning:`
     );
-    assert.include(output, "{ type: 'DAY', field: 'date' }");
+    assert.include(output, "type: 'DAY'");
+    assert.include(output, "field: 'date'");
     const [exists] = await bigquery
       .dataset(datasetId)
       .table(partitionedTableId)
+      .exists();
+    assert.ok(exists);
+  });
+
+  it('should create an integer range partitioned table', async () => {
+    const rangePartTableId = generateUuid();
+    const output = execSync(
+      `node createTableRangePartitioned.js ${datasetId} ${rangePartTableId}`
+    );
+    assert.include(
+      output,
+      `Table ${rangePartTableId} created with integer range partitioning:`
+    );
+    assert.include(
+      output,
+      "range: { start: '0', end: '100000', interval: '10' }"
+    );
+    const [exists] = await bigquery
+      .dataset(datasetId)
+      .table(rangePartTableId)
       .exists();
     assert.ok(exists);
   });
@@ -437,6 +458,14 @@ describe('Tables', () => {
   it('should insert rows', async () => {
     const output = execSync(
       `node insertRowsAsStream.js ${datasetId} ${tableId}`
+    );
+    assert.match(output, /Inserted 2 rows/);
+  });
+
+  it('should insert rows with supported data types', async () => {
+    const typesTableId = generateUuid();
+    const output = execSync(
+      `node insertingDataTypes.js ${datasetId} ${typesTableId}`
     );
     assert.match(output, /Inserted 2 rows/);
   });

@@ -20,9 +20,6 @@ import {promisifyAll} from '@google-cloud/promisify';
 import arrify = require('arrify');
 import {Big} from 'big.js';
 import * as extend from 'extend';
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const format = require('string-format-obj');
 import * as is from 'is';
 import * as uuid from 'uuid';
 
@@ -812,7 +809,9 @@ export class BigQuery extends common.Service {
     let typeName;
 
     if (value === null) {
-      throw new Error('Type must be provided for null values.');
+      throw new Error(
+        "Parameter types must be provided for null values via the 'types' field in query options."
+      );
     }
 
     if (value instanceof BigQueryDate) {
@@ -829,7 +828,9 @@ export class BigQuery extends common.Service {
       typeName = 'NUMERIC';
     } else if (Array.isArray(value)) {
       if (value.length === 0) {
-        throw new Error('Type must be provided for empty array.');
+        throw new Error(
+          "Parameter types must be provided for empty arrays via the 'types' field in query options."
+        );
       }
       return {
         type: 'ARRAY',
@@ -1298,8 +1299,7 @@ export class BigQuery extends common.Service {
     options: JobOptions,
     callback?: JobCallback
   ): void | Promise<JobResponse> {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const reqOpts: any = extend({}, options);
+    const reqOpts = Object.assign({}, options);
     let jobId = reqOpts.jobId || uuid.v4();
 
     if (reqOpts.jobId) {
@@ -1450,7 +1450,7 @@ export class BigQuery extends common.Service {
         let nextQuery: GetDatasetsOptions | null = null;
 
         if (resp.nextPageToken) {
-          nextQuery = extend({}, options, {
+          nextQuery = Object.assign({}, options, {
             pageToken: resp.nextPageToken,
           });
         }
@@ -1554,7 +1554,7 @@ export class BigQuery extends common.Service {
         }
         let nextQuery: {} | null = null;
         if (resp.nextPageToken) {
-          nextQuery = extend({}, options, {
+          nextQuery = Object.assign({}, options, {
             pageToken: resp.nextPageToken,
           });
         }
@@ -1628,6 +1628,10 @@ export class BigQuery extends common.Service {
    *     objects, Strings, Booleans, and Objects.
    * @param {string} query.query A query string, following the BigQuery query
    *     syntax, of the query to execute.
+   * @param {object|Array<*>} query.types Provided types for query parameters.
+   *     For positional SQL parameters, provide an array of types. For named
+   *     SQL parameters, provide an object which maps each named parameter to
+   *     its type.
    * @param {boolean} [query.useLegacySql=false] Option to use legacy sql syntax.
    * @param {object} [options] Configuration object for query results.
    * @param {number} [options.maxResults] Maximum number of results to read.
@@ -1680,6 +1684,23 @@ export class BigQuery extends common.Service {
    *   params: {
    *     owner: 'google'
    *   }
+   * }, function(err, rows) {});
+   *
+   * //-
+   * // Providing types for SQL parameters is supported.
+   * //-
+   * bigquery.query({
+   *   query: [
+   *     'SELECT url',
+   *     'FROM `publicdata.samples.github_nested`',
+   *     'WHERE repository.owner = ?'
+   *   ].join(' '),
+   *
+   *   params: [
+   *     null
+   *   ],
+   *
+   *   types: ['string']
    * }, function(err, rows) {});
    *
    * //-
@@ -1805,12 +1826,11 @@ export class BigQueryDatetime {
       if (value.hours) {
         time = BigQuery.time(value).value;
       }
-      value = format('{y}-{m}-{d}{time}', {
-        y: value.year,
-        m: value.month,
-        d: value.day,
-        time: time ? ' ' + time : '',
-      });
+      const y = value.year;
+      const m = value.month;
+      const d = value.day;
+      time = time ? ' ' + time : '';
+      value = `${y}-${m}-${d}${time}`;
     } else {
       value = value.replace(/^(.*)T(.*)Z$/, '$1 $2');
     }
@@ -1825,12 +1845,11 @@ export class BigQueryTime {
   value: string;
   constructor(value: BigQueryTimeOptions | string) {
     if (typeof value === 'object') {
-      value = format('{h}:{m}:{s}{f}', {
-        h: value.hours,
-        m: value.minutes || 0,
-        s: value.seconds || 0,
-        f: is.defined(value.fractional) ? '.' + value.fractional : '',
-      });
+      const h = value.hours;
+      const m = value.minutes || 0;
+      const s = value.seconds || 0;
+      const f = is.defined(value.fractional) ? '.' + value.fractional : '';
+      value = `${h}:${m}:${s}${f}`;
     }
     this.value = value as string;
   }
