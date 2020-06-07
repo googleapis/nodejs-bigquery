@@ -16,16 +16,15 @@
 
 function main() {
   // [START bigquery_query_stream]
-  // [START bigquery_client_default_credentials]
-  // Import the Google Cloud client library using default credentials
+  // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
-  const bigquery = new BigQuery();
-  // [END bigquery_client_default_credentials]
+
   async function query() {
-    // Queries the U.S. given names dataset for the state of Texas.
+    // Create a client
+    const bigquery = new BigQuery();
 
     const query = `SELECT name
-      FROM \`bigquery-public-data.usa_names.usa_1910_2013\``;
+      FROM \`bigquery-public-data.usa_names.usa_1910_2013\` LIMIT 100`;
 
     const options = {
       query: query,
