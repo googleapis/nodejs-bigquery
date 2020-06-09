@@ -22,7 +22,7 @@ const uuid = require('uuid');
 const {BigQuery} = require('@google-cloud/bigquery');
 
 const execSync = cmd => cp.execSync(cmd, {encoding: 'utf-8'});
-const generateUuid = () => `gcloud-tests-${uuid.v4()}`.replace(/-/gi, '_');
+const generateUuid = () => `nodejs_samples_tests_queries_${uuid.v4()}`.replace(/-/gi, '_');
 const datasetId = generateUuid();
 const tableId = generateUuid();
 const destTableId = generateUuid();

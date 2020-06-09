@@ -25,7 +25,7 @@ const {BigQuery} = require('@google-cloud/bigquery');
 const execSync = cmd => cp.execSync(cmd, {encoding: 'utf-8'});
 
 const storage = new Storage();
-const generateUuid = () => `gcloud-tests-${uuid.v4()}`.replace(/-/gi, '_');
+const generateUuid = () => `nodejs_samples_tests_${uuid.v4()}`.replace(/-/gi, '_');
 
 const datasetId = generateUuid();
 const srcDatasetId = datasetId;
