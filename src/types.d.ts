@@ -96,15 +96,15 @@ declare namespace bigquery {
    */
   type IArimaFittingMetrics = {
     /**
-     * AIC
+     * AIC.
      */
     aic?: number;
     /**
-     * log-likelihood
+     * Log-likelihood.
      */
     logLikelihood?: number;
     /**
-     * variance.
+     * Variance.
      */
     variance?: number;
   };
@@ -122,9 +122,31 @@ declare namespace bigquery {
      */
     arimaFittingMetrics?: IArimaFittingMetrics;
     /**
+     * Whether Arima model fitted with drift or not. It is always false
+     * when d is not 1.
+     */
+    hasDrift?: boolean;
+    /**
      * Non-seasonal order.
      */
     nonSeasonalOrder?: IArimaOrder;
+    /**
+     * Seasonal periods. Repeated because multiple periods are supported
+     * for one time series.
+     */
+    seasonalPeriods?: Array<
+      | 'SEASONAL_PERIOD_TYPE_UNSPECIFIED'
+      | 'NO_SEASONALITY'
+      | 'DAILY'
+      | 'WEEKLY'
+      | 'MONTHLY'
+      | 'QUARTERLY'
+      | 'YEARLY'
+    >;
+    /**
+     * The id to indicate different time series.
+     */
+    timeSeriesId?: string;
   };
 
   /**
@@ -466,6 +488,17 @@ declare namespace bigquery {
     rows?: Array<IRow>;
   };
 
+  type IConnectionProperty = {
+    /**
+     * [Required] Name of the connection property to set.
+     */
+    key?: string;
+    /**
+     * [Required] Value of the connection property.
+     */
+    value?: string;
+  };
+
   type ICsvOptions = {
     /**
      * [Optional] Indicates if BigQuery should accept rows that are missing trailing optional columns. If true, BigQuery treats missing trailing columns as null values. If false, records with missing trailing columns are treated as bad records, and if there are too many bad records, an invalid error is returned in the job result. The default value is false.
@@ -582,7 +615,7 @@ declare namespace bigquery {
     /**
      * The labels associated with this dataset. You can use these to organize and group your datasets. You can set this property when inserting or updating a dataset. See Creating and Updating Dataset Labels for more information.
      */
-    labels?: { [key: string]: string };
+    labels?: {[key: string]: string};
     /**
      * [Output-only] The date when this dataset or any of its tables was last modified, in milliseconds since the epoch.
      */
@@ -621,7 +654,7 @@ declare namespace bigquery {
       /**
        * The labels associated with this dataset. You can use these to organize and group your datasets.
        */
-      labels?: { [key: string]: string };
+      labels?: {[key: string]: string};
       /**
        * The geographic location where the data resides.
        */
@@ -664,7 +697,7 @@ declare namespace bigquery {
     /**
      * [Optional] The labels associated with this table. You can use these to organize and group your tables. This will only be used if the destination table is newly created. If the table already exists and labels are different than the current labels are provided, the job will fail.
      */
-    labels?: { [key: string]: string };
+    labels?: {[key: string]: string};
   };
 
   type IEncryptionConfiguration = {
@@ -894,10 +927,6 @@ declare namespace bigquery {
      * [Optional] Additional options if sourceFormat is set to GOOGLE_SHEETS.
      */
     googleSheetsOptions?: IGoogleSheetsOptions;
-    /**
-     * [Optional, Trusted Tester] Deprecated, do not use. Please set hivePartitioningOptions instead.
-     */
-    hivePartitioningMode?: string;
     /**
      * [Optional, Trusted Tester] Options to configure hive partitioning support.
      */
@@ -1132,7 +1161,7 @@ declare namespace bigquery {
     /**
      * The labels associated with this job. You can use these to organize and group your jobs. Label keys and values can be no longer than 63 characters, can only contain lowercase letters, numeric characters, underscores and dashes. International characters are allowed. Label values are optional. Label keys must start with a letter and each label in the list must have a different key.
      */
-    labels?: { [key: string]: string };
+    labels?: {[key: string]: string};
     /**
      * [Pick one] Configures a load job.
      */
@@ -1224,10 +1253,6 @@ declare namespace bigquery {
      */
     fieldDelimiter?: string;
     /**
-     * [Optional, Trusted Tester] Deprecated, do not use. Please set hivePartitioningOptions instead.
-     */
-    hivePartitioningMode?: string;
-    /**
      * [Optional, Trusted Tester] Options to configure hive partitioning support.
      */
     hivePartitioningOptions?: IHivePartitioningOptions;
@@ -1309,7 +1334,7 @@ declare namespace bigquery {
     /**
      * Connection properties.
      */
-    connectionProperties?: Array<any>;
+    connectionProperties?: Array<IConnectionProperty>;
     /**
      * [Optional] Specifies whether the job is allowed to create new tables. The following values are supported: CREATE_IF_NEEDED: If the table does not exist, BigQuery creates the table. CREATE_NEVER: The table must already exist. If it does not, a 'notFound' error is returned in the job result. The default value is CREATE_IF_NEEDED. Creation, truncation and append actions occur as one atomic update upon job completion.
      */
@@ -1369,7 +1394,7 @@ declare namespace bigquery {
     /**
      * [Optional] If querying an external data source outside of BigQuery, describes the data format, location and other properties of the data source. By defining these properties, the data source can then be queried as if it were a standard BigQuery table.
      */
-    tableDefinitions?: { [key: string]: IExternalDataConfiguration };
+    tableDefinitions?: {[key: string]: IExternalDataConfiguration};
     /**
      * Time-based partitioning specification for the destination table. Only one of timePartitioning and rangePartitioning should be specified.
      */
@@ -1730,7 +1755,7 @@ declare namespace bigquery {
   /**
    * Represents a single JSON object.
    */
-  type IJsonObject = { [key: string]: IJsonValue };
+  type IJsonObject = {[key: string]: IJsonValue};
 
   type IJsonValue = any;
 
@@ -1842,7 +1867,7 @@ declare namespace bigquery {
      * Label values are optional. Label keys must start with a letter and each
      * label in the list must have a different key.
      */
-    labels?: { [key: string]: string };
+    labels?: {[key: string]: string};
     /**
      * Output only. The time when this model was last modified, in millisecs since the epoch.
      */
@@ -2024,7 +2049,7 @@ declare namespace bigquery {
     /**
      * [Optional] The struct field values, in order of the struct type's declaration.
      */
-    structValues?: { [key: string]: IQueryParameterValue };
+    structValues?: {[key: string]: IQueryParameterValue};
     /**
      * [Optional] The value of this value, if a simple scalar type.
      */
@@ -2035,7 +2060,7 @@ declare namespace bigquery {
     /**
      * Connection properties.
      */
-    connectionProperties?: Array<any>;
+    connectionProperties?: Array<IConnectionProperty>;
     /**
      * [Optional] Specifies the default datasetId and projectId to assume for any unqualified table names in the query. If not set, all table names in the query string must be qualified in the format 'datasetId.tableId'.
      */
@@ -2484,7 +2509,7 @@ declare namespace bigquery {
     type?: IStandardSqlDataType;
   };
 
-  type IStandardSqlStructType = { fields?: Array<IStandardSqlField> };
+  type IStandardSqlStructType = {fields?: Array<IStandardSqlField>};
 
   type IStreamingbuffer = {
     /**
@@ -2545,7 +2570,7 @@ declare namespace bigquery {
     /**
      * The labels associated with this table. You can use these to organize and group your tables. Label keys and values can be no longer than 63 characters, can only contain lowercase letters, numeric characters, underscores and dashes. International characters are allowed. Label values are optional. Label keys must start with a letter and each label in the list must have a different key.
      */
-    labels?: { [key: string]: string };
+    labels?: {[key: string]: string};
     /**
      * [Output-only] The time when this table was last modified, in milliseconds since the epoch.
      */
@@ -2616,7 +2641,7 @@ declare namespace bigquery {
     view?: IViewDefinition;
   };
 
-  type ITableCell = { v?: any };
+  type ITableCell = {v?: any};
 
   type ITableDataInsertAllRequest = {
     /**
@@ -2775,7 +2800,7 @@ declare namespace bigquery {
       /**
        * The labels associated with this table. You can use these to organize and group your tables.
        */
-      labels?: { [key: string]: string };
+      labels?: {[key: string]: string};
       /**
        * The range partitioning specification for this table, if configured.
        */
@@ -2949,7 +2974,7 @@ declare namespace bigquery {
      * Weights associated with each label class, for rebalancing the
      * training data. Only applicable for classification models.
      */
-    labelClassWeights?: { [key: string]: number };
+    labelClassWeights?: {[key: string]: number};
     /**
      * Learning rate in training. Used only for iterative training algorithms.
      */
@@ -3331,4 +3356,3 @@ declare namespace bigquery {
 }
 
 export default bigquery;
-

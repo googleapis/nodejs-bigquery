@@ -24,7 +24,7 @@ const execSync = cmd => cp.execSync(cmd, {encoding: 'utf-8'});
 
 const bigquery = new BigQuery();
 
-describe(`Models`, () => {
+describe('Models', () => {
   const datasetId = `gcloud_tests_${uuid.v4()}`.replace(/-/gi, '_');
   const modelId = `gcloud_tests_${uuid.v4()}`.replace(/-/gi, '_');
 
@@ -67,30 +67,30 @@ describe(`Models`, () => {
       .catch(console.warn);
   });
 
-  it(`should retrieve a model if it exists`, async () => {
+  it('should retrieve a model if it exists', async () => {
     const output = execSync(`node getModel.js ${datasetId} ${modelId}`);
     assert.include(output, 'Model:');
     assert.include(output, datasetId && modelId);
   });
 
-  it(`should list models`, async () => {
+  it('should list models', async () => {
     const output = execSync(`node listModels.js ${datasetId}`);
     assert.include(output, 'Models:');
     assert.include(output, datasetId);
   });
 
-  it(`should list models streaming`, async () => {
+  it('should list models streaming', async () => {
     const output = execSync(`node getModel.js ${datasetId} ${modelId}`);
     assert.include(output, modelId);
   });
 
-  it(`should update model's metadata`, async () => {
+  it("should update model's metadata", async () => {
     const output = execSync(`node updateModel.js ${datasetId} ${modelId}`);
     assert.include(output, `${modelId} description: A really great model.`);
   });
 });
 
-describe(`Delete Model`, () => {
+describe('Delete Model', () => {
   const datasetId = `gcloud_tests_${uuid.v4()}`.replace(/-/gi, '_');
   const modelId = `gcloud_tests_${uuid.v4()}`.replace(/-/gi, '_');
 
@@ -133,7 +133,7 @@ describe(`Delete Model`, () => {
       .catch(console.warn);
   });
 
-  it(`should delete a model`, async () => {
+  it('should delete a model', async () => {
     const output = execSync(`node deleteModel.js ${datasetId} ${modelId}`);
     assert.include(output, `Model ${modelId} deleted.`);
     const [exists] = await bigquery

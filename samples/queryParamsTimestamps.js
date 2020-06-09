@@ -24,7 +24,7 @@ function main() {
 
   async function queryParamsTimestamps() {
     // The SQL query to run
-    const sqlQuery = `SELECT TIMESTAMP_ADD(@ts_value, INTERVAL 1 HOUR);`;
+    const sqlQuery = 'SELECT TIMESTAMP_ADD(@ts_value, INTERVAL 1 HOUR);';
 
     const options = {
       query: sqlQuery,

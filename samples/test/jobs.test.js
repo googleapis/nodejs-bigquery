@@ -25,7 +25,7 @@ const execSync = cmd => cp.execSync(cmd, {encoding: 'utf-8'});
 const bigquery = new BigQuery();
 let jobId;
 
-describe(`Jobs`, () => {
+describe('Jobs', () => {
   before(async () => {
     const query = `SELECT name
         FROM \`bigquery-public-data.usa_names.usa_1910_2013\`
@@ -40,24 +40,24 @@ describe(`Jobs`, () => {
     jobId = job.metadata.jobReference.jobId;
   });
 
-  it(`should list jobs`, async () => {
-    const output = execSync(`node listJobs.js`);
+  it('should list jobs', async () => {
+    const output = execSync('node listJobs.js');
     assert.match(output, /Jobs:/);
     assert.include(output, jobId);
   });
 
-  it(`should retrieve a job`, async () => {
+  it('should retrieve a job', async () => {
     const output = execSync(`node getJob.js ${jobId}`);
     assert.include(output, `jobId: '${jobId}'`);
   });
 
-  it(`should attempt to cancel a job`, async () => {
+  it('should attempt to cancel a job', async () => {
     const output = execSync(`node cancelJob.js ${jobId}`);
-    assert.include(output, `state:`);
+    assert.include(output, 'state:');
   });
 
-  it(`should create a job`, async () => {
-    const output = execSync(`node createJob.js`);
-    assert.include(output, `Rows:`);
+  it('should create a job', async () => {
+    const output = execSync('node createJob.js');
+    assert.include(output, 'Rows:');
   });
 });

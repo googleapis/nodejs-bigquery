@@ -13,15 +13,15 @@
 // limitations under the License.
 
 import * as assert from 'assert';
-import {describe, it} from 'mocha';
+import {describe, it, before, beforeEach} from 'mocha';
 import * as proxyquire from 'proxyquire';
 import * as m from '../src/model';
 import {Dataset} from '../src/dataset';
 
 class FakeServiceObject {
-  _calledWith: IArguments;
-  constructor() {
-    this._calledWith = arguments;
+  _calledWith: Array<unknown>;
+  constructor(...args: Array<unknown>) {
+    this._calledWith = args;
   }
 }
 
@@ -29,7 +29,6 @@ describe('BigQuery/Model', () => {
   const MODEL_ID = 'my_model';
   const DATASET = {id: 'my_dataset'} as Dataset;
 
-  // tslint:disable-next-line variable-name
   let Model: typeof m.Model;
   let model: m.Model;
 
@@ -48,9 +47,8 @@ describe('BigQuery/Model', () => {
   describe('instantiation', () => {
     it('should inherit from ServiceObject', () => {
       assert(model instanceof FakeServiceObject);
-
-      const [config] = ((model as {}) as FakeServiceObject)._calledWith;
-
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const [config] = (model as any)._calledWith;
       assert.strictEqual(config.parent, DATASET);
       assert.strictEqual(config.baseUrl, '/models');
       assert.strictEqual(config.id, MODEL_ID);

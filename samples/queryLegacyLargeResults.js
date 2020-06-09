@@ -34,7 +34,8 @@ function main(
     // const datasetId = "my_dataset";
     // const tableId = "my_table";
 
-    const query = `SELECT word FROM [bigquery-public-data:samples.shakespeare] LIMIT 10;`;
+    const query =
+      'SELECT word FROM [bigquery-public-data:samples.shakespeare] LIMIT 10;';
 
     // For all options, see https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs/query
     const options = {

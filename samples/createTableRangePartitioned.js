@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2020 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,40 +15,55 @@
 'use strict';
 
 function main(datasetId = 'my_dataset', tableId = 'my_table') {
-  // [START bigquery_create_table_partitioned]
+  // [START bigquery_create_table_range_partitioned]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
   const bigquery = new BigQuery();
 
-  async function createTablePartitioned() {
-    // Creates a new partitioned table named "my_table" in "my_dataset".
+  async function createTableRangePartitioned() {
+    // Creates a new integer range partitioned table named "my_table"
+    // in "my_dataset".
 
     /**
      * TODO(developer): Uncomment the following lines before running the sample.
      */
     // const datasetId = "my_dataset";
     // const tableId = "my_table";
-    const schema = 'Name:string, Post_Abbr:string, Date:date';
+
+    const schema = [
+      {name: 'fullName', type: 'STRING'},
+      {name: 'city', type: 'STRING'},
+      {name: 'zipcode', type: 'INTEGER'},
+    ];
+
+    // To use integer range partitioning, select a top-level REQUIRED or
+    // NULLABLE column with INTEGER / INT64 data type. Values that are
+    // outside of the range of the table will go into the UNPARTITIONED
+    // partition. Null values will be in the NULL partition.
+    const rangePartition = {
+      field: 'zipcode',
+      range: {
+        start: 0,
+        end: 100000,
+        interval: 10,
+      },
+    };
 
     // For all options, see https://cloud.google.com/bigquery/docs/reference/v2/tables#resource
     const options = {
       schema: schema,
-      location: 'US',
-      timePartitioning: {
-        type: 'DAY',
-        expirationMs: '7776000000',
-        field: 'date',
-      },
+      rangePartitioning: rangePartition,
     };
 
     // Create a new table in the dataset
     const [table] = await bigquery
       .dataset(datasetId)
       .createTable(tableId, options);
-    console.log(`Table ${table.id} created with partitioning: `);
-    console.log(table.metadata.timePartitioning);
+
+    console.log(`Table ${table.id} created with integer range partitioning: `);
+    console.log(table.metadata.rangePartitioning);
   }
-  // [END bigquery_create_table_partitioned]
-  createTablePartitioned(datasetId, tableId);
+  // [END bigquery_create_table_range_partitioned]
+  createTableRangePartitioned(datasetId, tableId);
 }
 main(...process.argv.slice(2));

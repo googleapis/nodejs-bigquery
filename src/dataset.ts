@@ -616,7 +616,7 @@ class Dataset extends ServiceObject {
     const callback =
       typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
     const body = Table.formatMetadata_(options as TableMetadata);
-    // tslint:disable-next-line no-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (body as any).tableReference = {
       datasetId: this.id,
       projectId: this.bigQuery.projectId,
@@ -772,7 +772,7 @@ class Dataset extends ServiceObject {
 
         let nextQuery: {} | null = null;
         if (resp.nextPageToken) {
-          nextQuery = extend({}, options, {
+          nextQuery = Object.assign({}, options, {
             pageToken: resp.nextPageToken,
           });
         }
@@ -868,7 +868,7 @@ class Dataset extends ServiceObject {
 
         let nextQuery: {} | null = null;
         if (resp.nextPageToken) {
-          nextQuery = extend({}, options, {
+          nextQuery = Object.assign({}, options, {
             pageToken: resp.nextPageToken,
           });
         }
@@ -957,12 +957,12 @@ class Dataset extends ServiceObject {
 
         let nextQuery: {} | null = null;
         if (resp.nextPageToken) {
-          nextQuery = extend({}, options, {
+          nextQuery = Object.assign({}, options, {
             pageToken: resp.nextPageToken,
           });
         }
 
-        // tslint:disable-next-line no-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const tables = (resp.tables || []).map((tableObject: any) => {
           const table = this.table(tableObject.tableReference.tableId, {
             location: tableObject.location,

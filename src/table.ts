@@ -21,8 +21,6 @@ import arrify = require('arrify');
 import Big from 'big.js';
 import * as extend from 'extend';
 import pEvent from 'p-event';
-
-const format = require('string-format-obj');
 import * as fs from 'fs';
 import * as is from 'is';
 import * as path from 'path';
@@ -47,6 +45,7 @@ import {Duplex, Writable} from 'stream';
 import {JobMetadata} from './job';
 import bigquery from './types';
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const duplexify = require('duplexify');
 
 // This is supposed to be a @google-cloud/storage `File` type. The storage npm
@@ -55,7 +54,7 @@ const duplexify = require('duplexify');
 // included.  The storage module is fairly large, and only really needed for
 // types.  We need to figure out how to include these types properly.
 export interface File {
-  // tslint:disable-next-line no-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   bucket: any;
   kmsKeyName?: string;
   userProject?: string;
@@ -66,11 +65,12 @@ export interface File {
 export type JobMetadataCallback = RequestCallback<JobMetadata>;
 export type JobMetadataResponse = [JobMetadata];
 
-// tslint:disable-next-line no-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type RowMetadata = any;
 
 export type InsertRowsOptions = bigquery.ITableDataInsertAllRequest & {
   createInsertId?: boolean;
+  partialRetries?: number;
   raw?: boolean;
   schema?: string | {};
 };
@@ -133,6 +133,12 @@ export type ViewDefinition = bigquery.IViewDefinition;
 export type FormattedMetadata = bigquery.ITable;
 export type TableSchema = bigquery.ITableSchema;
 export type TableField = bigquery.ITableFieldSchema;
+
+export interface PartialInsertFailure {
+  message: string;
+  reason: string;
+  row: RowMetadata;
+}
 
 /**
  * The file formats accepted by BigQuery.
@@ -554,9 +560,10 @@ class Table extends common.ServiceObject {
    *
    * @param {Table} destination The destination table.
    * @param {object} [metadata] Metadata to set with the copy operation. The
-   *     metadata object should be in the format of the
-   *     [`configuration.copy`](http://goo.gl/dKWIyS) property of a Jobs
-   * resource.
+   *     metadata object should be in the format of a
+   *     [`JobConfigurationTableCopy`](https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationTableCopy)
+   * object.
+   *     object.
    * @param {string} [metadata.jobId] Custom id for the underlying job.
    * @param {string} [metadata.jobPrefix] Prefix to apply to the underlying job
    *     id.
@@ -578,9 +585,8 @@ class Table extends common.ServiceObject {
    * table.copy(yourTable, (err, apiResponse) => {});
    *
    * //-
-   * // See the <a href="http://goo.gl/dKWIyS">`configuration.copy`</a> object
-   * for
-   * // all available options.
+   * // See https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationTableCopy
+   * // for all available options.
    * //-
    * const metadata = {
    *   createDisposition: 'CREATE_NEVER',
@@ -637,9 +643,9 @@ class Table extends common.ServiceObject {
    * @param {Table|Table[]} sourceTables The
    *     source table(s) to copy data from.
    * @param {object=} metadata Metadata to set with the copy operation. The
-   *     metadata object should be in the format of the
-   *     [`configuration.copy`](http://goo.gl/dKWIyS) property of a Jobs
-   * resource.
+   *     metadata object should be in the format of a
+   *     [`JobConfigurationTableCopy`](https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationTableCopy)
+   *     object.
    * @param {string} [metadata.jobId] Custom id for the underlying job.
    * @param {string} [metadata.jobPrefix] Prefix to apply to the underlying job
    *     id.
@@ -664,9 +670,8 @@ class Table extends common.ServiceObject {
    * table.copyFrom(sourceTables, (err, apiResponse) => {});
    *
    * //-
-   * // See the <a href="http://goo.gl/dKWIyS">`configuration.copy`</a> object
-   * for
-   * // all available options.
+   * // See https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationTableCopy
+   * // for all available options.
    * //-
    * const metadata = {
    *   createDisposition: 'CREATE_NEVER',
@@ -719,9 +724,9 @@ class Table extends common.ServiceObject {
    *
    * @param {Table} destination The destination table.
    * @param {object} [metadata] Metadata to set with the copy operation. The
-   *     metadata object should be in the format of the
-   *     [`configuration.copy`](http://goo.gl/dKWIyS) property of a Jobs
-   * resource.
+   *     metadata object should be in the format of a
+   *     [`JobConfigurationTableCopy`](https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationTableCopy)
+   *     object.
    * @param {string} [metadata.jobId] Custom job id.
    * @param {string} [metadata.jobPrefix] Prefix to apply to the job id.
    * @param {function} [callback] The callback function.
@@ -745,9 +750,8 @@ class Table extends common.ServiceObject {
    * });
    *
    * //-
-   * // See the <a href="http://goo.gl/dKWIyS">`configuration.copy`</a> object
-   * for
-   * // all available options.
+   * // See https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationTableCopy
+   * // for all available options.
    * //-
    * const metadata = {
    *   createDisposition: 'CREATE_NEVER',
@@ -779,7 +783,7 @@ class Table extends common.ServiceObject {
     const callback =
       typeof metadataOrCallback === 'function' ? metadataOrCallback : cb;
 
-    // tslint:disable-next-line no-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const body: any = {
       configuration: {
         copy: extend(true, metadata, {
@@ -832,9 +836,9 @@ class Table extends common.ServiceObject {
    * @param {Table|Table[]} sourceTables The
    *     source table(s) to copy data from.
    * @param {object} [metadata] Metadata to set with the copy operation. The
-   *     metadata object should be in the format of the
-   *     [`configuration.copy`](http://goo.gl/dKWIyS) property of a Jobs
-   * resource.
+   *     metadata object should be in the format of a
+   *     [`JobConfigurationTableCopy`](https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationTableCopy)
+   *     object.
    * @param {string} [metadata.jobId] Custom job id.
    * @param {string} [metadata.jobPrefix] Prefix to apply to the job id.
    * @param {function} [callback] The callback function.
@@ -864,9 +868,8 @@ class Table extends common.ServiceObject {
    * table.createCopyFromJob(sourceTables, callback);
    *
    * //-
-   * // See the <a href="http://goo.gl/dKWIyS">`configuration.copy`</a> object
-   * for
-   * // all available options.
+   * // See https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationTableCopy
+   * // for all available options.
    * //-
    * const metadata = {
    *   createDisposition: 'CREATE_NEVER',
@@ -900,7 +903,7 @@ class Table extends common.ServiceObject {
     const callback =
       typeof metadataOrCallback === 'function' ? metadataOrCallback : cb;
 
-    // tslint:disable-next-line no-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const body: any = {
       configuration: {
         copy: extend(true, metadata, {
@@ -1073,7 +1076,7 @@ class Table extends common.ServiceObject {
       delete options.gzip;
     }
 
-    // tslint:disable-next-line no-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const body: any = {
       configuration: {
         extract: extend(true, options, {
@@ -1132,8 +1135,8 @@ class Table extends common.ServiceObject {
    * objects.
    * @param {object} [metadata] Metadata to set with the load operation. The
    *     metadata object should be in the format of the
-   *     [`configuration.load`](http://goo.gl/BVcXk4) property of a Jobs
-   * resource.
+   *     [`configuration.load`](https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationLoad)
+   * property of a Jobs resource.
    * @param {string} [metadata.format] The format the data being loaded is in.
    *     Allowed options are "AVRO", "CSV", "JSON", "ORC", or "PARQUET".
    * @param {string} [metadata.jobId] Custom job id.
@@ -1165,7 +1168,8 @@ class Table extends common.ServiceObject {
    *
    * //-
    * // You may also pass in metadata in the format of a Jobs resource. See
-   * // (http://goo.gl/BVcXk4) for a full list of supported values.
+   * // (https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationLoad)
+   * // for a full list of supported values.
    * //-
    * const metadata = {
    *   encoding: 'ISO-8859-1',
@@ -1256,7 +1260,7 @@ class Table extends common.ServiceObject {
       return [jobResponse, jobResponse.metadata];
     }
 
-    // tslint:disable-next-line no-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const body: any = {
       configuration: {
         load: {
@@ -1350,18 +1354,15 @@ class Table extends common.ServiceObject {
    *
    * @param {string|object} [metadata] Metadata to set with the load operation.
    *     The metadata object should be in the format of the
-   *     [`configuration.load`](http://goo.gl/BVcXk4) property of a Jobs
-   * resource. If a string is given, it will be used as the filetype.
+   *     [`configuration.load`](https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationLoad)
+   * property of a Jobs resource. If a string is given, it will be used
+   * as the filetype.
    * @param {string} [metadata.jobId] Custom job id.
    * @param {string} [metadata.jobPrefix] Prefix to apply to the job id.
    * @returns {WritableStream}
    */
   createWriteStream_(metadata: JobLoadMetadata | string): Writable {
     metadata = metadata || {};
-    const fileTypes = Object.keys(FORMATS).map(key => {
-      return FORMATS[key];
-    });
-
     if (typeof metadata === 'string') {
       metadata = {
         sourceFormat: FORMATS[metadata.toLowerCase()],
@@ -1409,13 +1410,10 @@ class Table extends common.ServiceObject {
             },
           } as {},
           request: {
-            uri: format('{base}/{projectId}/jobs', {
-              base: `https://${this.bigQuery.apiEndpoint}/upload/bigquery/v2/projects`,
-              projectId: this.bigQuery.projectId,
-            }),
+            uri: `https://${this.bigQuery.apiEndpoint}/upload/bigquery/v2/projects/${this.bigQuery.projectId}/jobs`,
           },
         },
-        // tslint:disable-next-line no-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (data: any) => {
           const job = this.bigQuery.job(data.jobReference.jobId, {
             location: data.jobReference.location,
@@ -1436,8 +1434,9 @@ class Table extends common.ServiceObject {
    *
    * @param {string|object} [metadata] Metadata to set with the load operation.
    *     The metadata object should be in the format of the
-   *     [`configuration.load`](http://goo.gl/BVcXk4) property of a Jobs
-   * resource. If a string is given, it will be used as the filetype.
+   *     [`configuration.load`](https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationLoad)
+   * property of a Jobs resource. If a string is given,
+   * it will be used as the filetype.
    * @param {string} [metadata.jobId] Custom job id.
    * @param {string} [metadata.jobPrefix] Prefix to apply to the job id.
    * @returns {WritableStream}
@@ -1691,7 +1690,7 @@ class Table extends common.ServiceObject {
         }
         let nextQuery: GetRowsOptions | null = null;
         if (resp.pageToken) {
-          nextQuery = extend({}, options, {
+          nextQuery = Object.assign({}, options, {
             pageToken: resp.pageToken,
           });
         }
@@ -1735,6 +1734,11 @@ class Table extends common.ServiceObject {
    * If you need to create an entire table from a file, consider using
    * {@link Table#load} instead.
    *
+   * Note, if a table was recently created, inserts may fail until the table
+   * is consistent within BigQuery. If a `schema` is supplied, this method will
+   * automatically retry those failed inserts, and it will even create the
+   * table with the provided schema if it does not exist.
+   *
    * @see [Tabledata: insertAll API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/tabledata/insertAll}
    * @see [Streaming Insert Limits]{@link https://cloud.google.com/bigquery/quotas#streaming_inserts}
    * @see [Troubleshooting Errors]{@link https://developers.google.com/bigquery/troubleshooting-errors}
@@ -1745,12 +1749,15 @@ class Table extends common.ServiceObject {
    *     default row id when one is not provided.
    * @param {boolean} [options.ignoreUnknownValues=false] Accept rows that contain
    *     values that do not match the schema. The unknown values are ignored.
+   * @param {number} [options.partialRetries=3] Number of times to retry
+   *     inserting rows for cases of partial failures.
    * @param {boolean} [options.raw] If `true`, the `rows` argument is expected to
    *     be formatted as according to the
    *     [specification](https://cloud.google.com/bigquery/docs/reference/v2/tabledata/insertAll).
-   * @param {string|object} [options.schema] If provided will atomatically create
-   *     a table if it doesn't already exist. Note that this can take longer
-   *     than 2 minutes to complete. A comma-separated list of name:type pairs.
+   * @param {string|object} [options.schema] If provided will automatically
+   *     create a table if it doesn't already exist. Note that this can take
+   *     longer than 2 minutes to complete. A comma-separated list of
+   *     name:type pairs.
    *     Valid types are "string", "integer", "float", "boolean", and
    *     "timestamp". If the type is omitted, it is assumed to be "string".
    *     Example: "name:string, age:integer". Schemas can also be specified as a
@@ -1872,6 +1879,102 @@ class Table extends common.ServiceObject {
         ? optionsOrCallback
         : (cb as InsertRowsCallback);
 
+    this._insertAndCreateTable(rows, options).then(
+      resp => callback(null, resp),
+      err => callback(err, null)
+    );
+  }
+
+  /**
+   * Insert rows with retries, but will create the table if not exists.
+   *
+   * @param {RowMetadata | RowMetadata[]} rows
+   * @param {InsertRowsOptions} options
+   * @returns {Promise<bigquery.ITableDataInsertAllResponse | bigquery.ITable>}
+   * @private
+   */
+  private async _insertAndCreateTable(
+    rows: RowMetadata | RowMetadata[],
+    options: InsertRowsOptions
+  ): Promise<bigquery.ITableDataInsertAllResponse | bigquery.ITable> {
+    const {schema} = options;
+    const delay = 60000;
+
+    try {
+      return await this._insertWithRetry(rows, options);
+    } catch (err) {
+      if ((err as common.ApiError).code !== 404 || !schema) {
+        throw err;
+      }
+    }
+
+    try {
+      await this.create({schema});
+    } catch (err) {
+      if ((err as common.ApiError).code !== 409) {
+        throw err;
+      }
+    }
+
+    // table creation after failed access is subject to failure caching and
+    // eventual consistency, see:
+    // https://github.com/googleapis/google-cloud-python/issues/4553#issuecomment-350110292
+    await new Promise(resolve => setTimeout(resolve, delay));
+    return this._insertAndCreateTable(rows, options);
+  }
+
+  /**
+   * This method will attempt to insert rows while retrying any partial failures
+   * that occur along the way. Because partial insert failures are returned
+   * differently, we can't depend on our usual retry strategy.
+   *
+   * @private
+   *
+   * @param {RowMetadata|RowMetadata[]} rows The rows to insert.
+   * @param {InsertRowsOptions} options Insert options.
+   * @returns {Promise<bigquery.ITableDataInsertAllResponse>}
+   */
+  private async _insertWithRetry(
+    rows: RowMetadata | RowMetadata[],
+    options: InsertRowsOptions
+  ): Promise<bigquery.ITableDataInsertAllResponse> {
+    const {partialRetries = 3} = options;
+    let error: Error;
+
+    const maxAttempts = Math.max(partialRetries, 0) + 1;
+
+    for (let attempts = 0; attempts < maxAttempts; attempts++) {
+      try {
+        return await this._insert(rows, options);
+      } catch (e) {
+        error = e;
+        rows = ((e.errors || []) as PartialInsertFailure[])
+          .filter(err => !!err.row)
+          .map(err => err.row);
+
+        if (!rows.length) {
+          break;
+        }
+      }
+    }
+
+    throw error!;
+  }
+
+  /**
+   * This method does the bulk of the work for processing options and making the
+   * network request.
+   *
+   * @private
+   *
+   * @param {RowMetadata|RowMetadata[]} rows The rows to insert.
+   * @param {InsertRowsOptions} options Insert options.
+   * @returns {Promise<bigquery.ITableDataInsertAllResponse>}
+   */
+  private async _insert(
+    rows: RowMetadata | RowMetadata[],
+    options: InsertRowsOptions
+  ): Promise<bigquery.ITableDataInsertAllResponse> {
     rows = arrify(rows) as RowMetadata[];
 
     if (!rows.length) {
@@ -1895,74 +1998,39 @@ class Table extends common.ServiceObject {
     }
 
     delete json.createInsertId;
+    delete json.partialRetries;
     delete json.raw;
+    delete json.schema;
 
-    let schema: string | {};
+    const [resp] = await this.request({
+      method: 'POST',
+      uri: '/insertAll',
+      json,
+    });
 
-    if (options.schema) {
-      schema = options.schema;
-      delete json.schema;
-    }
-
-    const createTableAndRetry = () => {
-      this.create(
-        {
-          schema,
-        },
-        (err, table, resp) => {
-          if (err && err.code !== 409) {
-            callback!(err, resp);
-            return;
-          }
-
-          setTimeout(() => {
-            this.insert(rows, options, callback!);
-          }, 60000);
-        }
-      );
-    };
-
-    this.request(
-      {
-        method: 'POST',
-        uri: '/insertAll',
-        json,
-      },
-      (err, resp) => {
-        if (err) {
-          if ((err as common.ApiError).code === 404 && schema) {
-            setTimeout(createTableAndRetry, Math.random() * 60000);
-          } else {
-            callback!(err, resp);
-          }
-          return;
-        }
-
-        const partialFailures = (resp.insertErrors || []).map(
-          (insertError: GoogleErrorBody) => {
+    const partialFailures = (resp.insertErrors || []).map(
+      (insertError: GoogleErrorBody) => {
+        return {
+          errors: insertError.errors!.map(error => {
             return {
-              errors: insertError.errors!.map(error => {
-                return {
-                  message: error.message,
-                  reason: error.reason,
-                };
-              }),
-              // tslint:disable-next-line: no-any
-              row: rows[(insertError as any).index],
+              message: error.message,
+              reason: error.reason,
             };
-          }
-        );
-
-        if (partialFailures.length > 0) {
-          err = new common.util.PartialFailureError({
-            errors: partialFailures,
-            response: resp,
-          } as GoogleErrorBody);
-        }
-
-        callback!(err, resp);
+          }),
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          row: rows[(insertError as any).index],
+        };
       }
     );
+
+    if (partialFailures.length > 0) {
+      throw new common.util.PartialFailureError({
+        errors: partialFailures,
+        response: resp,
+      } as GoogleErrorBody);
+    }
+
+    return resp;
   }
 
   load(
@@ -1992,8 +2060,8 @@ class Table extends common.ServiceObject {
    * object.
    * @param {object} [metadata] Metadata to set with the load operation. The
    *     metadata object should be in the format of the
-   *     [`configuration.load`](http://goo.gl/BVcXk4) property of a Jobs
-   * resource.
+   *     [`configuration.load`](https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationLoad)
+   * property of a Jobs resource.
    * @param {string} [metadata.format] The format the data being loaded is in.
    *     Allowed options are "AVRO", "CSV", "JSON", "ORC", or "PARQUET".
    * @param {string} [metadata.jobId] Custom id for the underlying job.
@@ -2019,7 +2087,8 @@ class Table extends common.ServiceObject {
    *
    * //-
    * // You may also pass in metadata in the format of a Jobs resource. See
-   * // (http://goo.gl/BVcXk4) for a full list of supported values.
+   * // (https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationLoad)
+   * // for a full list of supported values.
    * //-
    * const metadata = {
    *   encoding: 'ISO-8859-1',
