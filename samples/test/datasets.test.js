@@ -22,7 +22,10 @@ const uuid = require('uuid');
 
 const execSync = cmd => cp.execSync(cmd, {encoding: 'utf-8'});
 
-const datasetId = `nodejs_samples_tests_datasets_${uuid.v4()}`.replace(/-/gi, '_');
+const datasetId = `nodejs_samples_tests_datasets_${uuid.v4()}`.replace(
+  /-/gi,
+  '_'
+);
 const bigquery = new BigQuery();
 
 describe('Datasets', () => {
