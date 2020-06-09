@@ -192,6 +192,110 @@ declare namespace bigquery {
     >;
   };
 
+  /**
+   * Specifies the audit configuration for a service.
+   * The configuration determines which permission types are logged, and what
+   * identities, if any, are exempted from logging.
+   * An AuditConfig must have one or more AuditLogConfigs.
+   *
+   * If there are AuditConfigs for both `allServices` and a specific service,
+   * the union of the two AuditConfigs is used for that service: the log_types
+   * specified in each AuditConfig are enabled, and the exempted_members in each
+   * AuditLogConfig are exempted.
+   *
+   * Example Policy with multiple AuditConfigs:
+   *
+   *     {
+   *       "audit_configs": [
+   *         {
+   *           "service": "allServices"
+   *           "audit_log_configs": [
+   *             {
+   *               "log_type": "DATA_READ",
+   *               "exempted_members": [
+   *                 "user:jose@example.com"
+   *               ]
+   *             },
+   *             {
+   *               "log_type": "DATA_WRITE",
+   *             },
+   *             {
+   *               "log_type": "ADMIN_READ",
+   *             }
+   *           ]
+   *         },
+   *         {
+   *           "service": "sampleservice.googleapis.com"
+   *           "audit_log_configs": [
+   *             {
+   *               "log_type": "DATA_READ",
+   *             },
+   *             {
+   *               "log_type": "DATA_WRITE",
+   *               "exempted_members": [
+   *                 "user:aliya@example.com"
+   *               ]
+   *             }
+   *           ]
+   *         }
+   *       ]
+   *     }
+   *
+   * For sampleservice, this policy enables DATA_READ, DATA_WRITE and ADMIN_READ
+   * logging. It also exempts jose@example.com from DATA_READ logging, and
+   * aliya@example.com from DATA_WRITE logging.
+   */
+  type IAuditConfig = {
+    /**
+     * The configuration for logging of each type of permission.
+     */
+    auditLogConfigs?: Array<IAuditLogConfig>;
+    /**
+     * Specifies a service that will be enabled for audit logging.
+     * For example, `storage.googleapis.com`, `cloudsql.googleapis.com`.
+     * `allServices` is a special value that covers all services.
+     */
+    service?: string;
+  };
+
+  /**
+   * Provides the configuration for logging a type of permissions.
+   * Example:
+   *
+   *     {
+   *       "audit_log_configs": [
+   *         {
+   *           "log_type": "DATA_READ",
+   *           "exempted_members": [
+   *             "user:jose@example.com"
+   *           ]
+   *         },
+   *         {
+   *           "log_type": "DATA_WRITE",
+   *         }
+   *       ]
+   *     }
+   *
+   * This enables 'DATA_READ' and 'DATA_WRITE' logging, while exempting
+   * jose@example.com from DATA_READ logging.
+   */
+  type IAuditLogConfig = {
+    /**
+     * Specifies the identities that do not cause logging for this type of
+     * permission.
+     * Follows the same format of Binding.members.
+     */
+    exemptedMembers?: Array<string>;
+    /**
+     * The log type that this config enables.
+     */
+    logType?:
+      | 'LOG_TYPE_UNSPECIFIED'
+      | 'ADMIN_READ'
+      | 'DATA_WRITE'
+      | 'DATA_READ';
+  };
+
   type IBigQueryModelTraining = {
     /**
      * [Output-only, Beta] Index of current ML training iteration. Updated during create model query job to show job progress.
@@ -329,6 +433,79 @@ declare namespace bigquery {
      * Number of true samples predicted as true.
      */
     truePositives?: string;
+  };
+
+  /**
+   * Associates `members` with a `role`.
+   */
+  type IBinding = {
+    /**
+     * The condition that is associated with this binding.
+     *
+     * If the condition evaluates to `true`, then this binding applies to the
+     * current request.
+     *
+     * If the condition evaluates to `false`, then this binding does not apply to
+     * the current request. However, a different role binding might grant the same
+     * role to one or more of the members in this binding.
+     *
+     * To learn which resources support conditions in their IAM policies, see the
+     * [IAM
+     * documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
+     */
+    condition?: IExpr;
+    /**
+     * Specifies the identities requesting access for a Cloud Platform resource.
+     * `members` can have the following values:
+     *
+     * * `allUsers`: A special identifier that represents anyone who is
+     *    on the internet; with or without a Google account.
+     *
+     * * `allAuthenticatedUsers`: A special identifier that represents anyone
+     *    who is authenticated with a Google account or a service account.
+     *
+     * * `user:{emailid}`: An email address that represents a specific Google
+     *    account. For example, `alice@example.com` .
+     *
+     *
+     * * `serviceAccount:{emailid}`: An email address that represents a service
+     *    account. For example, `my-other-app@appspot.gserviceaccount.com`.
+     *
+     * * `group:{emailid}`: An email address that represents a Google group.
+     *    For example, `admins@example.com`.
+     *
+     * * `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
+     *    identifier) representing a user that has been recently deleted. For
+     *    example, `alice@example.com?uid=123456789012345678901`. If the user is
+     *    recovered, this value reverts to `user:{emailid}` and the recovered user
+     *    retains the role in the binding.
+     *
+     * * `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus
+     *    unique identifier) representing a service account that has been recently
+     *    deleted. For example,
+     *    `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`.
+     *    If the service account is undeleted, this value reverts to
+     *    `serviceAccount:{emailid}` and the undeleted service account retains the
+     *    role in the binding.
+     *
+     * * `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique
+     *    identifier) representing a Google group that has been recently
+     *    deleted. For example, `admins@example.com?uid=123456789012345678901`. If
+     *    the group is recovered, this value reverts to `group:{emailid}` and the
+     *    recovered group retains the role in the binding.
+     *
+     *
+     * * `domain:{domain}`: The G Suite domain (primary) that represents all the
+     *    users of that domain. For example, `google.com` or `example.com`.
+     *
+     *
+     */
+    members?: Array<string>;
+    /**
+     * Role that is assigned to `members`.
+     * For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
+     */
+    role?: string;
   };
 
   type IBqmlIterationResult = {
@@ -615,7 +792,7 @@ declare namespace bigquery {
     /**
      * The labels associated with this dataset. You can use these to organize and group your datasets. You can set this property when inserting or updating a dataset. See Creating and Updating Dataset Labels for more information.
      */
-    labels?: {[key: string]: string};
+    labels?: { [key: string]: string };
     /**
      * [Output-only] The date when this dataset or any of its tables was last modified, in milliseconds since the epoch.
      */
@@ -654,7 +831,7 @@ declare namespace bigquery {
       /**
        * The labels associated with this dataset. You can use these to organize and group your datasets.
        */
-      labels?: {[key: string]: string};
+      labels?: { [key: string]: string };
       /**
        * The geographic location where the data resides.
        */
@@ -697,7 +874,7 @@ declare namespace bigquery {
     /**
      * [Optional] The labels associated with this table. You can use these to organize and group your tables. This will only be used if the destination table is newly created. If the table already exists and labels are different than the current labels are provided, the job will fail.
      */
-    labels?: {[key: string]: string};
+    labels?: { [key: string]: string };
   };
 
   type IEncryptionConfiguration = {
@@ -906,6 +1083,63 @@ declare namespace bigquery {
     substeps?: Array<string>;
   };
 
+  /**
+   * Represents a textual expression in the Common Expression Language (CEL)
+   * syntax. CEL is a C-like expression language. The syntax and semantics of CEL
+   * are documented at https://github.com/google/cel-spec.
+   *
+   * Example (Comparison):
+   *
+   *     title: "Summary size limit"
+   *     description: "Determines if a summary is less than 100 chars"
+   *     expression: "document.summary.size() < 100"
+   *
+   * Example (Equality):
+   *
+   *     title: "Requestor is owner"
+   *     description: "Determines if requestor is the document owner"
+   *     expression: "document.owner == request.auth.claims.email"
+   *
+   * Example (Logic):
+   *
+   *     title: "Public documents"
+   *     description: "Determine whether the document should be publicly visible"
+   *     expression: "document.type != 'private' && document.type != 'internal'"
+   *
+   * Example (Data Manipulation):
+   *
+   *     title: "Notification string"
+   *     description: "Create a notification string with a timestamp."
+   *     expression: "'New message received at ' + string(document.create_time)"
+   *
+   * The exact variables and functions that may be referenced within an expression
+   * are determined by the service that evaluates it. See the service
+   * documentation for additional information.
+   */
+  type IExpr = {
+    /**
+     * Optional. Description of the expression. This is a longer text which
+     * describes the expression, e.g. when hovered over it in a UI.
+     */
+    description?: string;
+    /**
+     * Textual representation of an expression in Common Expression Language
+     * syntax.
+     */
+    expression?: string;
+    /**
+     * Optional. String indicating the location of the expression for error
+     * reporting, e.g. a file name and a position in the file.
+     */
+    location?: string;
+    /**
+     * Optional. Title for the expression, i.e. a short string describing
+     * its purpose. This can be used e.g. in UIs which allow to enter the
+     * expression.
+     */
+    title?: string;
+  };
+
   type IExternalDataConfiguration = {
     /**
      * Try to detect schema and format options automatically. Any option specified explicitly will be honored.
@@ -919,6 +1153,10 @@ declare namespace bigquery {
      * [Optional] The compression type of the data source. Possible values include GZIP and NONE. The default value is NONE. This setting is ignored for Google Cloud Bigtable, Google Cloud Datastore backups and Avro formats.
      */
     compression?: string;
+    /**
+     * [Optional, Trusted Tester] Connection for external data source.
+     */
+    connectionId?: string;
     /**
      * Additional properties to set if sourceFormat is set to CSV.
      */
@@ -970,6 +1208,38 @@ declare namespace bigquery {
      * feature.
      */
     numericalValue?: number;
+  };
+
+  /**
+   * Request message for `GetIamPolicy` method.
+   */
+  type IGetIamPolicyRequest = {
+    /**
+     * OPTIONAL: A `GetPolicyOptions` object for specifying options to
+     * `GetIamPolicy`.
+     */
+    options?: IGetPolicyOptions;
+  };
+
+  /**
+   * Encapsulates settings provided to GetIamPolicy.
+   */
+  type IGetPolicyOptions = {
+    /**
+     * Optional. The policy format version to be returned.
+     *
+     * Valid values are 0, 1, and 3. Requests specifying an invalid value will be
+     * rejected.
+     *
+     * Requests for policies with any conditional bindings must specify version 3.
+     * Policies without any conditional bindings may specify any valid value or
+     * leave the field unset.
+     *
+     * To learn which resources support conditions in their IAM policies, see the
+     * [IAM
+     * documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
+     */
+    requestedPolicyVersion?: number;
   };
 
   type IGetQueryResultsResponse = {
@@ -1161,7 +1431,7 @@ declare namespace bigquery {
     /**
      * The labels associated with this job. You can use these to organize and group your jobs. Label keys and values can be no longer than 63 characters, can only contain lowercase letters, numeric characters, underscores and dashes. International characters are allowed. Label values are optional. Label keys must start with a letter and each label in the list must have a different key.
      */
-    labels?: {[key: string]: string};
+    labels?: { [key: string]: string };
     /**
      * [Pick one] Configures a load job.
      */
@@ -1394,7 +1664,7 @@ declare namespace bigquery {
     /**
      * [Optional] If querying an external data source outside of BigQuery, describes the data format, location and other properties of the data source. By defining these properties, the data source can then be queried as if it were a standard BigQuery table.
      */
-    tableDefinitions?: {[key: string]: IExternalDataConfiguration};
+    tableDefinitions?: { [key: string]: IExternalDataConfiguration };
     /**
      * Time-based partitioning specification for the destination table. Only one of timePartitioning and rangePartitioning should be specified.
      */
@@ -1755,7 +2025,7 @@ declare namespace bigquery {
   /**
    * Represents a single JSON object.
    */
-  type IJsonObject = {[key: string]: IJsonValue};
+  type IJsonObject = { [key: string]: IJsonValue };
 
   type IJsonValue = any;
 
@@ -1867,7 +2137,7 @@ declare namespace bigquery {
      * Label values are optional. Label keys must start with a letter and each
      * label in the list must have a different key.
      */
-    labels?: {[key: string]: string};
+    labels?: { [key: string]: string };
     /**
      * Output only. The time when this model was last modified, in millisecs since the epoch.
      */
@@ -1945,6 +2215,130 @@ declare namespace bigquery {
      * Confusion matrix at different thresholds.
      */
     confusionMatrixList?: Array<IConfusionMatrix>;
+  };
+
+  /**
+   * An Identity and Access Management (IAM) policy, which specifies access
+   * controls for Google Cloud resources.
+   *
+   *
+   * A `Policy` is a collection of `bindings`. A `binding` binds one or more
+   * `members` to a single `role`. Members can be user accounts, service accounts,
+   * Google groups, and domains (such as G Suite). A `role` is a named list of
+   * permissions; each `role` can be an IAM predefined role or a user-created
+   * custom role.
+   *
+   * For some types of Google Cloud resources, a `binding` can also specify a
+   * `condition`, which is a logical expression that allows access to a resource
+   * only if the expression evaluates to `true`. A condition can add constraints
+   * based on attributes of the request, the resource, or both. To learn which
+   * resources support conditions in their IAM policies, see the
+   * [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
+   *
+   * **JSON example:**
+   *
+   *     {
+   *       "bindings": [
+   *         {
+   *           "role": "roles/resourcemanager.organizationAdmin",
+   *           "members": [
+   *             "user:mike@example.com",
+   *             "group:admins@example.com",
+   *             "domain:google.com",
+   *             "serviceAccount:my-project-id@appspot.gserviceaccount.com"
+   *           ]
+   *         },
+   *         {
+   *           "role": "roles/resourcemanager.organizationViewer",
+   *           "members": [
+   *             "user:eve@example.com"
+   *           ],
+   *           "condition": {
+   *             "title": "expirable access",
+   *             "description": "Does not grant access after Sep 2020",
+   *             "expression": "request.time < timestamp('2020-10-01T00:00:00.000Z')",
+   *           }
+   *         }
+   *       ],
+   *       "etag": "BwWWja0YfJA=",
+   *       "version": 3
+   *     }
+   *
+   * **YAML example:**
+   *
+   *     bindings:
+   *     - members:
+   *       - user:mike@example.com
+   *       - group:admins@example.com
+   *       - domain:google.com
+   *       - serviceAccount:my-project-id@appspot.gserviceaccount.com
+   *       role: roles/resourcemanager.organizationAdmin
+   *     - members:
+   *       - user:eve@example.com
+   *       role: roles/resourcemanager.organizationViewer
+   *       condition:
+   *         title: expirable access
+   *         description: Does not grant access after Sep 2020
+   *         expression: request.time < timestamp('2020-10-01T00:00:00.000Z')
+   *     - etag: BwWWja0YfJA=
+   *     - version: 3
+   *
+   * For a description of IAM and its features, see the
+   * [IAM documentation](https://cloud.google.com/iam/docs/).
+   */
+  type IPolicy = {
+    /**
+     * Specifies cloud audit logging configuration for this policy.
+     */
+    auditConfigs?: Array<IAuditConfig>;
+    /**
+     * Associates a list of `members` to a `role`. Optionally, may specify a
+     * `condition` that determines how and when the `bindings` are applied. Each
+     * of the `bindings` must contain at least one member.
+     */
+    bindings?: Array<IBinding>;
+    /**
+     * `etag` is used for optimistic concurrency control as a way to help
+     * prevent simultaneous updates of a policy from overwriting each other.
+     * It is strongly suggested that systems make use of the `etag` in the
+     * read-modify-write cycle to perform policy updates in order to avoid race
+     * conditions: An `etag` is returned in the response to `getIamPolicy`, and
+     * systems are expected to put that etag in the request to `setIamPolicy` to
+     * ensure that their change will be applied to the same version of the policy.
+     *
+     * **Important:** If you use IAM Conditions, you must include the `etag` field
+     * whenever you call `setIamPolicy`. If you omit this field, then IAM allows
+     * you to overwrite a version `3` policy with a version `1` policy, and all of
+     * the conditions in the version `3` policy are lost.
+     */
+    etag?: string;
+    /**
+     * Specifies the format of the policy.
+     *
+     * Valid values are `0`, `1`, and `3`. Requests that specify an invalid value
+     * are rejected.
+     *
+     * Any operation that affects conditional role bindings must specify version
+     * `3`. This requirement applies to the following operations:
+     *
+     * * Getting a policy that includes a conditional role binding
+     * * Adding a conditional role binding to a policy
+     * * Changing a conditional role binding in a policy
+     * * Removing any role binding, with or without a condition, from a policy
+     *   that includes conditions
+     *
+     * **Important:** If you use IAM Conditions, you must include the `etag` field
+     * whenever you call `setIamPolicy`. If you omit this field, then IAM allows
+     * you to overwrite a version `3` policy with a version `1` policy, and all of
+     * the conditions in the version `3` policy are lost.
+     *
+     * If a policy does not include any conditions, operations on that policy may
+     * specify any valid version or leave the field unset.
+     *
+     * To learn which resources support conditions in their IAM policies, see the
+     * [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
+     */
+    version?: number;
   };
 
   type IProjectList = {
@@ -2049,7 +2443,7 @@ declare namespace bigquery {
     /**
      * [Optional] The struct field values, in order of the struct type's declaration.
      */
-    structValues?: {[key: string]: IQueryParameterValue};
+    structValues?: { [key: string]: IQueryParameterValue };
     /**
      * [Optional] The value of this value, if a simple scalar type.
      */
@@ -2074,6 +2468,10 @@ declare namespace bigquery {
      */
     kind?: string;
     /**
+     * The labels associated with this job. You can use these to organize and group your jobs. Label keys and values can be no longer than 63 characters, can only contain lowercase letters, numeric characters, underscores and dashes. International characters are allowed. Label values are optional. Label keys must start with a letter and each label in the list must have a different key.
+     */
+    labels?: { [key: string]: string };
+    /**
      * The geographic location where the job should run. See details at https://cloud.google.com/bigquery/docs/locations#specifying_your_location.
      */
     location?: string;
@@ -2081,6 +2479,10 @@ declare namespace bigquery {
      * [Optional] The maximum number of rows of data to return per page of results. Setting this flag to a small value such as 1000 and then paging through results might improve reliability when the query result set is large. In addition to this limit, responses are also limited to 10 MB. By default, there is no maximum row count, and only the byte limit applies.
      */
     maxResults?: number;
+    /**
+     * [Optional] Limits the bytes billed for this job. Queries that will have bytes billed beyond this limit will fail (without incurring a charge). If unspecified, this will be set to your project default.
+     */
+    maximumBytesBilled?: string;
     /**
      * Standard SQL only. Set to POSITIONAL to use positional (?) query parameters or to NAMED to use named (@myparam) query parameters in this query.
      */
@@ -2097,6 +2499,10 @@ declare namespace bigquery {
      * Query parameters for Standard SQL queries.
      */
     queryParameters?: Array<IQueryParameter>;
+    /**
+     * A unique user provided identifier to ensure idempotent behavior for queries. Note that this is different from the job_id. It has the following properties: 1. It is case-sensitive, limited to up to 36 ASCII characters. A UUID is recommended. 2. Read only queries can ignore this token since they are nullipotent by definition. 3. When a duplicate mutating query request is detected (i.e. having the same request_id as an earlier query), it returns: a. the results of the mutation if it completes successfully within the timeout. b. the running operation if it is still in progress at the end of the timeout. 4. Its lifetime is limited to 15 minutes. In other words, if two requests are sent with the same request_id, but more than 15 minutes apart, idempotency is not guaranteed.
+     */
+    requestId?: string;
     /**
      * [Optional] How long to wait for the query to complete, in milliseconds, before the request times out and returns. Note that this is only a timeout for the request, not the query. If the query takes longer to run than the timeout value, the call returns without any results and with the 'jobComplete' flag set to false. You can call GetQueryResults() to wait for the query to complete and read the results. The default value is 10000 milliseconds (10 seconds).
      */
@@ -2452,6 +2858,27 @@ declare namespace bigquery {
   };
 
   /**
+   * Request message for `SetIamPolicy` method.
+   */
+  type ISetIamPolicyRequest = {
+    /**
+     * REQUIRED: The complete policy to be applied to the `resource`. The size of
+     * the policy is limited to a few 10s of KB. An empty policy is a
+     * valid policy but certain Cloud Platform services (such as Projects)
+     * might reject them.
+     */
+    policy?: IPolicy;
+    /**
+     * OPTIONAL: A FieldMask specifying which fields of the policy to modify. Only
+     * the fields in the mask will be modified. If no mask is provided, the
+     * following default mask is used:
+     *
+     * `paths: "bindings, etag"`
+     */
+    updateMask?: string;
+  };
+
+  /**
    * The type of a variable, e.g., a function argument.
    * Examples:
    * INT64: {type_kind="INT64"}
@@ -2509,7 +2936,7 @@ declare namespace bigquery {
     type?: IStandardSqlDataType;
   };
 
-  type IStandardSqlStructType = {fields?: Array<IStandardSqlField>};
+  type IStandardSqlStructType = { fields?: Array<IStandardSqlField> };
 
   type IStreamingbuffer = {
     /**
@@ -2570,7 +2997,7 @@ declare namespace bigquery {
     /**
      * The labels associated with this table. You can use these to organize and group your tables. Label keys and values can be no longer than 63 characters, can only contain lowercase letters, numeric characters, underscores and dashes. International characters are allowed. Label values are optional. Label keys must start with a letter and each label in the list must have a different key.
      */
-    labels?: {[key: string]: string};
+    labels?: { [key: string]: string };
     /**
      * [Output-only] The time when this table was last modified, in milliseconds since the epoch.
      */
@@ -2641,7 +3068,7 @@ declare namespace bigquery {
     view?: IViewDefinition;
   };
 
-  type ITableCell = {v?: any};
+  type ITableCell = { v?: any };
 
   type ITableDataInsertAllRequest = {
     /**
@@ -2800,7 +3227,7 @@ declare namespace bigquery {
       /**
        * The labels associated with this table. You can use these to organize and group your tables.
        */
-      labels?: {[key: string]: string};
+      labels?: { [key: string]: string };
       /**
        * The range partitioning specification for this table, if configured.
        */
@@ -2860,6 +3287,30 @@ declare namespace bigquery {
      * Describes the fields in a table.
      */
     fields?: Array<ITableFieldSchema>;
+  };
+
+  /**
+   * Request message for `TestIamPermissions` method.
+   */
+  type ITestIamPermissionsRequest = {
+    /**
+     * The set of permissions to check for the `resource`. Permissions with
+     * wildcards (such as '*' or 'storage.*') are not allowed. For more
+     * information see
+     * [IAM Overview](https://cloud.google.com/iam/docs/overview#permissions).
+     */
+    permissions?: Array<string>;
+  };
+
+  /**
+   * Response message for `TestIamPermissions` method.
+   */
+  type ITestIamPermissionsResponse = {
+    /**
+     * A subset of `TestPermissionsRequest.permissions` that the caller is
+     * allowed.
+     */
+    permissions?: Array<string>;
   };
 
   type ITimePartitioning = {
@@ -2974,7 +3425,7 @@ declare namespace bigquery {
      * Weights associated with each label class, for rebalancing the
      * training data. Only applicable for classification models.
      */
-    labelClassWeights?: {[key: string]: number};
+    labelClassWeights?: { [key: string]: number };
     /**
      * Learning rate in training. Used only for iterative training algorithms.
      */
@@ -3078,6 +3529,9 @@ declare namespace bigquery {
     trainingOptions?: ITrainingOptions;
   };
 
+  /**
+   * This is used for defining User Defined Function (UDF) resources only when using legacy SQL. Users of Standard SQL should leverage either DDL (e.g. CREATE [TEMPORARY] FUNCTION ... ) or the Routines API to define UDF resources. For additional information on migrating, see: https://cloud.google.com/bigquery/docs/reference/standard-sql/migrating-from-legacy-sql#differences_in_user-defined_javascript_functions
+   */
   type IUserDefinedFunctionResource = {
     /**
      * [Pick one] An inline resource that contains code for a user-defined function (UDF). Providing a inline code resource is equivalent to providing a URI for a file containing the same code.
@@ -3356,3 +3810,4 @@ declare namespace bigquery {
 }
 
 export default bigquery;
+
