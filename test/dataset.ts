@@ -21,7 +21,7 @@ import {
 import * as pfy from '@google-cloud/promisify';
 import arrify = require('arrify');
 import * as assert from 'assert';
-import {describe, it} from 'mocha';
+import {describe, it, before, beforeEach} from 'mocha';
 import * as extend from 'extend';
 import * as proxyquire from 'proxyquire';
 
@@ -29,8 +29,17 @@ import * as _root from '../src';
 import {DatasetOptions} from '../src/dataset';
 import {FormattedMetadata, TableOptions} from '../src/table';
 
+interface CalledWithDataset extends ServiceObject {
+  calledWith_: Array<{
+    parent: {};
+    baseUrl: string;
+    id: string;
+    methods: string[];
+  }>;
+}
+
 let promisified = false;
-const fakePfy = extend({}, pfy, {
+const fakePfy = Object.assign({}, pfy, {
   promisifyAll: (c: Function, options: pfy.PromisifyAllOptions) => {
     if (c.name !== 'Dataset') {
       return;
@@ -66,6 +75,7 @@ class FakeServiceObject extends ServiceObject {
   calledWith_: IArguments;
   constructor(config: ServiceObjectConfig) {
     super(config);
+    // eslint-disable-next-line prefer-rest-params
     this.calledWith_ = arguments;
   }
 }
@@ -82,7 +92,7 @@ describe('BigQuery/Dataset', () => {
   let Dataset: typeof _root.Dataset;
   // tslint:disable-next-line variable-name
   let Table: typeof _root.Table;
-  // tslint:disable-next-line no-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let ds: any;
 
   before(() => {
@@ -117,7 +127,7 @@ describe('BigQuery/Dataset', () => {
     it('should inherit from ServiceObject', () => {
       assert(ds instanceof ServiceObject);
 
-      const calledWith = ds.calledWith_[0];
+      const calledWith = (ds as CalledWithDataset).calledWith_[0];
 
       assert.strictEqual(calledWith.parent, BIGQUERY);
       assert.strictEqual(calledWith.baseUrl, '/datasets');
@@ -139,11 +149,11 @@ describe('BigQuery/Dataset', () => {
     });
 
     describe('createMethod', () => {
-      // tslint:disable-next-line no-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let bq: any;
-      // tslint:disable-next-line no-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let ds: any;
-      // tslint:disable-next-line no-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let config: any;
 
       beforeEach(() => {
@@ -217,7 +227,7 @@ describe('BigQuery/Dataset', () => {
           },
         };
 
-        const expectedHeaders = extend({}, fakeReqOpts.headers, {
+        const expectedHeaders = Object.assign({}, fakeReqOpts.headers, {
           'If-Match': FAKE_ETAG,
         });
 
@@ -322,7 +332,7 @@ describe('BigQuery/Dataset', () => {
     });
 
     it('should pass along options', done => {
-      // tslint:disable-next-line no-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ds.bigQuery.createQueryStream = (opts: any) => {
         assert.strictEqual(opts.a, options.a);
         assert.strictEqual(opts.c, options.c);
@@ -511,7 +521,7 @@ describe('BigQuery/Dataset', () => {
     });
 
     it('should pass the location to the Table', done => {
-      const response = extend({location: LOCATION}, API_RESPONSE);
+      const response = Object.assign({location: LOCATION}, API_RESPONSE);
 
       ds.request = (reqOpts: DecorateRequestOptions, callback: Function) => {
         callback(null, response);
@@ -545,7 +555,7 @@ describe('BigQuery/Dataset', () => {
     });
 
     it('should assign metadata to the Table object', done => {
-      const apiResponse = extend(
+      const apiResponse = Object.assign(
         {
           a: 'b',
           c: 'd',
@@ -909,7 +919,7 @@ describe('BigQuery/Dataset', () => {
     });
 
     it('should pass along options', done => {
-      // tslint:disable-next-line no-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ds.bigQuery.query = (opts: any) => {
         assert.strictEqual(opts.a, options.a);
         assert.strictEqual(opts.c, options.c);

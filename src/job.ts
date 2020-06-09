@@ -416,7 +416,7 @@ class Job extends Operation {
           return;
         }
 
-        // tslint:disable-next-line no-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         let rows: any = [];
 
         if (resp.schema && resp.rows) {
@@ -426,10 +426,10 @@ class Job extends Operation {
         let nextQuery: {} | null = null;
         if (resp.jobComplete === false) {
           // Query is still running.
-          nextQuery = extend({}, options);
+          nextQuery = Object.assign({}, options);
         } else if (resp.pageToken) {
           // More results exist.
-          nextQuery = extend({}, options, {
+          nextQuery = Object.assign({}, options, {
             pageToken: resp.pageToken,
           });
         }

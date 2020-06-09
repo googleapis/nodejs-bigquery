@@ -16,8 +16,7 @@ import {DecorateRequestOptions, util} from '@google-cloud/common';
 import * as pfy from '@google-cloud/promisify';
 import arrify = require('arrify');
 import * as assert from 'assert';
-import {describe, it} from 'mocha';
-import * as extend from 'extend';
+import {describe, it, beforeEach, afterEach, before} from 'mocha';
 import * as proxyquire from 'proxyquire';
 import * as sinon from 'sinon';
 
@@ -25,18 +24,28 @@ import {BigQuery} from '../src/bigquery';
 import {QueryResultsOptions} from '../src/job';
 
 class FakeOperation {
-  calledWith_: IArguments;
+  calledWith_: Array<{}>;
   interceptors: Array<{}>;
   id: {};
-  constructor() {
-    this.calledWith_ = arguments;
+  constructor(...args: Array<{}>) {
+    this.calledWith_ = args;
     this.interceptors = [];
-    this.id = this.calledWith_[0].id;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    this.id = (this.calledWith_[0] as any).id;
   }
 }
 
+interface CalledWithJob extends FakeOperation {
+  calledWith_: Array<{
+    parent: {};
+    baseUrl: string;
+    id: string;
+    methods: string[];
+  }>;
+}
+
 let promisified = false;
-const fakePfy = extend({}, pfy, {
+const fakePfy = Object.assign({}, pfy, {
   promisifyAll: (c: Function) => {
     if (c.name === 'Job') {
       promisified = true;
@@ -62,12 +71,10 @@ const fakePaginator = {
   },
 };
 
-let sandbox: sinon.SinonSandbox;
-beforeEach(() => (sandbox = sinon.createSandbox()));
-afterEach(() => sandbox.restore());
+const sandbox = sinon.createSandbox();
 
 describe('BigQuery/Job', () => {
-  // tslint:disable-next-line no-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const BIGQUERY: any = {
     projectId: 'my-project',
     Promise,
@@ -75,9 +82,9 @@ describe('BigQuery/Job', () => {
   const JOB_ID = 'job_XYrk_3z';
   const LOCATION = 'asia-northeast1';
 
-  // tslint:disable-next-line no-any variable-name
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let Job: any;
-  // tslint:disable-next-line no-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let job: any;
 
   before(() => {
@@ -91,6 +98,8 @@ describe('BigQuery/Job', () => {
   beforeEach(() => {
     job = new Job(BIGQUERY, JOB_ID);
   });
+
+  afterEach(() => sandbox.restore());
 
   describe('initialization', () => {
     it('should paginate all the things', () => {
@@ -108,7 +117,7 @@ describe('BigQuery/Job', () => {
     it('should inherit from Operation', () => {
       assert(job instanceof FakeOperation);
 
-      const calledWith = job.calledWith_[0];
+      const calledWith = (job as CalledWithJob).calledWith_[0];
 
       assert.strictEqual(calledWith.parent, BIGQUERY);
       assert.strictEqual(calledWith.baseUrl, '/jobs');
@@ -203,7 +212,7 @@ describe('BigQuery/Job', () => {
 
     it('should optionally accept options', done => {
       const options = {a: 'b'};
-      const expectedOptions = extend({location: undefined}, options);
+      const expectedOptions = Object.assign({location: undefined}, options);
 
       BIGQUERY.request = (reqOpts: DecorateRequestOptions) => {
         assert.deepStrictEqual(reqOpts.qs, expectedOptions);
