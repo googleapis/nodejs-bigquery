@@ -25,8 +25,14 @@ const execSync = cmd => cp.execSync(cmd, {encoding: 'utf-8'});
 const bigquery = new BigQuery();
 
 describe('Models', () => {
-  const datasetId = `gcloud_tests_${uuid.v4()}`.replace(/-/gi, '_');
-  const modelId = `gcloud_tests_${uuid.v4()}`.replace(/-/gi, '_');
+  const datasetId = `nodejs_samples_tests_models_${uuid.v4()}`.replace(
+    /-/gi,
+    '_'
+  );
+  const modelId = `nodejs_samples_tests_models_${uuid.v4()}`.replace(
+    /-/gi,
+    '_'
+  );
 
   before(async () => {
     const query = `CREATE OR REPLACE MODEL \`${datasetId}.${modelId}\`
@@ -91,8 +97,14 @@ describe('Models', () => {
 });
 
 describe('Delete Model', () => {
-  const datasetId = `gcloud_tests_${uuid.v4()}`.replace(/-/gi, '_');
-  const modelId = `gcloud_tests_${uuid.v4()}`.replace(/-/gi, '_');
+  const datasetId = `nodejs_samples_tests_models_delete_${uuid.v4()}`.replace(
+    /-/gi,
+    '_'
+  );
+  const modelId = `nodejs_samples_tests_models_delete_${uuid.v4()}`.replace(
+    /-/gi,
+    '_'
+  );
 
   before(async () => {
     const query = `CREATE OR REPLACE MODEL \`${datasetId}.${modelId}\`
