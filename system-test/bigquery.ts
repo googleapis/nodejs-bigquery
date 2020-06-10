@@ -1673,11 +1673,7 @@ describe('BigQuery', () => {
   function isResourceStale(creationTime: number | string) {
     const oneDayMs = 86400000;
     const now = new Date();
-    let created = new Date(creationTime);
-    // If creationTime was returned as unix timestamp, convert.
-    if (created.toString() === 'Invalid Date') {
-      created = new Date(parseInt(creationTime as string));
-    }
+    const created = new Date(creationTime);
     return now.getTime() - created.getTime() >= oneDayMs;
   }
 
@@ -1702,20 +1698,13 @@ describe('BigQuery', () => {
       filter: `labels.${GCLOUD_TESTS_PREFIX}`,
     });
 
-    const datasetPromises = datasets.map(async ds => {
-      const datasetReference = bigquery.dataset(ds.id!);
-      return await datasetReference.get();
-    });
-
-    const datasetsWithMetadata = await Promise.all(datasetPromises);
-
-    const deleteDatasetPromises = datasetsWithMetadata
-      .filter(dataset => {
-        const creationTime = dataset[0].metadata.creationTime;
-        return creationTime && isResourceStale(creationTime);
+    const deleteDatasetPromises = datasets
+      .filter(async dataset => {
+        const [metadata] = await dataset.getMetadata();
+        return isResourceStale(parseInt(metadata.creationTime));
       })
-      .map(async dataset => {
-        await dataset[0].delete({force: true});
+      .map(dataset => {
+        return dataset.delete({force: true});
       });
 
     await Promise.all(deleteDatasetPromises);
