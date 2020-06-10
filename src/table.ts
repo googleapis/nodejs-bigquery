@@ -1677,7 +1677,7 @@ class Table extends common.ServiceObject {
       rows = BigQuery.mergeSchemaWithRows_(
         this.metadata.schema,
         rows || [],
-        options.selectedFields
+        options.selectedFields ? options.selectedFields!.split(',') : []
       );
       callback!(null, rows, nextQuery, resp);
     };

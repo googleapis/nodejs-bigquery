@@ -376,17 +376,17 @@ export class BigQuery extends common.Service {
    *
    * @param {object} schema
    * @param {array} rows
-   * @param {string} selectedFields List of fields to return (comma-separated).
+   * @param {array} selectedFields List of fields to return.
    * If unspecified, all fields are returned.
    * @returns {array} Fields using their matching names from the table's schema.
    */
   static mergeSchemaWithRows_(
     schema: TableSchema | TableField,
     rows: TableRow[],
-    selectedFields?: string
+    selectedFields?: string[]
   ) {
-    if (selectedFields) {
-      const selectedFieldsArray = selectedFields.split(',').map(c => {
+    if (selectedFields && selectedFields!.length > 0) {
+      const selectedFieldsArray = selectedFields!.map(c => {
         return c.split('.');
       });
 
@@ -400,8 +400,7 @@ export class BigQuery extends common.Service {
       );
       selectedFields = selectedFieldsArray
         .filter(c => c.length > 0)
-        .map(c => c.join('.'))
-        .join(',');
+        .map(c => c.join('.'));
     }
 
     return arrify(rows)
@@ -429,7 +428,7 @@ export class BigQuery extends common.Service {
       schemaField: TableField,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       value: any,
-      selectedFields?: string
+      selectedFields?: string[]
     ) {
       if (is.null(value)) {
         return value;
