@@ -90,7 +90,6 @@ export type Query = JobRequest<bigquery.IJobConfigurationQuery> & {
   params?: any[] | {[param: string]: any};
   dryRun?: boolean;
   types?: string[] | string[][] | {[type: string]: string[]};
-  defaultDataset?: Dataset;
   job?: Job;
   maxResults?: number;
   timeoutMs?: number;
@@ -1057,6 +1056,8 @@ export class BigQuery extends common.Service {
    * @param {string} options.query A query string, following the BigQuery query
    *     syntax, of the query to execute.
    * @param {boolean} [options.useLegacySql=false] Option to use legacy sql syntax.
+   * @param {object} [options.defaultDataset] The dataset. This must be in
+   *     the format of the [`DatasetReference`](https://cloud.google.com/bigquery/docs/reference/rest/v2/datasets#DatasetReference)
    * @param {function} [callback] The callback function.
    * @param {?error} callback.err An error returned while making this request.
    * @param {Job} callback.job The newly created job for your query.
