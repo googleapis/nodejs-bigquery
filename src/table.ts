@@ -1373,13 +1373,16 @@ class Table extends common.ServiceObject {
       metadata.schema = Table.createSchemaFromString_(metadata.schema);
     }
 
-    extend(true, metadata, {
-      destinationTable: {
-        projectId: this.bigQuery.projectId,
-        datasetId: this.dataset.id,
-        tableId: this.id,
+    metadata = {
+      ...{
+        destinationTable: {
+          projectId: this.bigQuery.projectId,
+          datasetId: this.dataset.id,
+          tableId: this.id,
+        },
       },
-    });
+      ...metadata,
+    };
 
     let jobId = metadata.jobId || uuid.v4();
 
