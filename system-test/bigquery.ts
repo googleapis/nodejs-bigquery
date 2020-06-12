@@ -1701,7 +1701,7 @@ describe('BigQuery', () => {
     const deleteDatasetPromises = datasets
       .filter(async dataset => {
         const [metadata] = await dataset.getMetadata();
-        const creationTime = parseInt(metadata.creationTime);
+        const creationTime = Number(metadata.creationTime);
         return creationTime && isResourceStale(creationTime);
       })
       .map(dataset => {
