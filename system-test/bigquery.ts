@@ -101,11 +101,13 @@ describe('BigQuery', () => {
   ];
 
   before(async () => {
-    // Remove buckets created for the tests.
-    await deleteBuckets();
+    await Promise.all([
+      // Remove buckets created for the tests.
+      deleteBuckets(),
 
-    // Remove datasets created for the tests.
-    await deleteDatasets();
+      // Remove datasets created for the tests.
+      deleteDatasets(),
+    ]);
 
     // Create the test dataset with a label tagging this as a test run.
     await dataset.create({labels: {[GCLOUD_TESTS_PREFIX]: ''}});
