@@ -1507,6 +1507,36 @@ describe('BigQuery/Table', () => {
       table.createWriteStream_({schema: SCHEMA_STRING}).emit('writing');
     });
 
+    it('should override destination table', done => {
+      const expectedMetadata = {
+        destinationTable: {
+          projectId: 'projectId-override',
+          datasetId: 'datasetId-override',
+          tableId: 'tableId-override',
+        },
+      };
+      makeWritableStreamOverride = (
+        stream: stream.Stream,
+        options: MakeWritableStreamOptions
+      ) => {
+        assert.deepStrictEqual(
+          options.metadata.configuration?.load?.destinationTable,
+          expectedMetadata.destinationTable
+        );
+        done();
+      };
+
+      table
+        .createWriteStream_({
+          destinationTable: {
+            projectId: 'projectId-override',
+            datasetId: 'datasetId-override',
+            tableId: 'tableId-override',
+          },
+        })
+        .emit('writing');
+    });
+
     it('should return a stream', () => {
       assert(table.createWriteStream_() instanceof stream.Stream);
     });
