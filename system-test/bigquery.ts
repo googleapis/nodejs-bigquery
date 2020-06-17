@@ -101,16 +101,12 @@ describe('BigQuery', () => {
   ];
 
   before(async () => {
-    await Promise.all([
-      // Remove buckets created for the tests.
-      deleteBuckets(),
-
+    // Remove buckets created for the tests.
+    await deleteBuckets(),
       // Remove datasets created for the tests.
-      deleteDatasets(),
-    ]);
-
-    // Create the test dataset with a label tagging this as a test run.
-    await dataset.create({labels: {[GCLOUD_TESTS_PREFIX]: ''}});
+      await deleteDatasets(),
+      // Create the test dataset with a label tagging this as a test run.
+      await dataset.create({labels: {[GCLOUD_TESTS_PREFIX]: ''}});
 
     // Create the test table.
     await table.create({schema: SCHEMA});
@@ -1700,14 +1696,21 @@ describe('BigQuery', () => {
       filter: `labels.${GCLOUD_TESTS_PREFIX}`,
     });
 
-    const deleteDatasetPromises = datasets
-      .filter(async dataset => {
-        const [metadata] = await dataset.getMetadata();
-        const creationTime = Number(metadata.creationTime);
-        return creationTime && isResourceStale(creationTime);
+    const datasetTimePromises = datasets.map(async dataset => {
+      const [metadata] = await dataset.getMetadata();
+      return [dataset, metadata.creationTime];
+    });
+
+    const datasetTimes = await Promise.all(datasetTimePromises);
+
+    const deleteDatasetPromises = datasetTimes
+      .filter(datasetTime => {
+        const creationTime = Number(datasetTime[1]);
+        return isResourceStale(creationTime);
       })
-      .map(dataset => {
-        return dataset.delete({force: true});
+      .map(async datasetTime => {
+        const [exists] = await datasetTime[0].exists();
+        return exists ? datasetTime[0].delete({force: true}) : undefined;
       });
 
     await Promise.all(deleteDatasetPromises);
