@@ -1507,6 +1507,36 @@ describe('BigQuery/Table', () => {
       table.createWriteStream_({schema: SCHEMA_STRING}).emit('writing');
     });
 
+    it('should override destination table', done => {
+      const expectedMetadata = {
+        destinationTable: {
+          projectId: 'projectId-override',
+          datasetId: 'datasetId-override',
+          tableId: 'tableId-override',
+        },
+      };
+      makeWritableStreamOverride = (
+        stream: stream.Stream,
+        options: MakeWritableStreamOptions
+      ) => {
+        assert.deepStrictEqual(
+          options.metadata.configuration?.load?.destinationTable,
+          expectedMetadata.destinationTable
+        );
+        done();
+      };
+
+      table
+        .createWriteStream_({
+          destinationTable: {
+            projectId: 'projectId-override',
+            datasetId: 'datasetId-override',
+            tableId: 'tableId-override',
+          },
+        })
+        .emit('writing');
+    });
+
     it('should return a stream', () => {
       assert(table.createWriteStream_() instanceof stream.Stream);
     });
@@ -1992,6 +2022,112 @@ describe('BigQuery/Table', () => {
         });
         // Original object isn't affected.
         assert.deepStrictEqual(options, {a: 'b', c: 'd'});
+        done();
+      });
+    });
+
+    it('should return selected fields', done => {
+      const selectedFields = 'age';
+      const rows = [{f: [{v: 40}]}];
+      const schema = {
+        fields: [
+          {name: 'name', type: 'string'},
+          {name: 'age', type: 'INTEGER'},
+        ],
+      };
+      const result = [{age: 40}];
+
+      table.metadata = {schema};
+
+      sandbox.restore();
+
+      table.request = (reqOpts: DecorateRequestOptions, callback: Function) => {
+        callback(null, {rows});
+      };
+
+      table.getRows({selectedFields}, (err: Error, rows: {}) => {
+        assert.ifError(err);
+        assert.deepStrictEqual(rows, result);
+        done();
+      });
+    });
+
+    it('should return selected fields from nested objects', done => {
+      const selectedFields = 'objects.nested_object.nested_property_1';
+      const rows = [
+        {
+          f: [
+            {
+              v: [
+                {
+                  v: {
+                    f: [
+                      {
+                        v: {
+                          f: [
+                            {
+                              v: 'nested_property_1_value',
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          ],
+        },
+      ];
+      const schema = {
+        fields: [
+          {name: 'name', type: 'string'},
+          {
+            name: 'objects',
+            type: 'RECORD',
+            mode: 'REPEATED',
+            fields: [
+              {
+                name: 'nested_object',
+                type: 'RECORD',
+                fields: [
+                  {
+                    name: 'nested_property',
+                    type: 'STRING',
+                  },
+                  {
+                    name: 'nested_property_1',
+                    type: 'STRING',
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      };
+      const result = [
+        {
+          objects: [
+            {
+              nested_object: {
+                nested_property_1: 'nested_property_1_value',
+              },
+            },
+          ],
+        },
+      ];
+
+      table.metadata = {schema};
+
+      sandbox.restore();
+
+      table.request = (reqOpts: DecorateRequestOptions, callback: Function) => {
+        callback(null, {rows});
+      };
+
+      table.getRows({selectedFields}, (err: Error, rows: {}) => {
+        assert.ifError(err);
+        assert.deepStrictEqual(rows, result);
         done();
       });
     });

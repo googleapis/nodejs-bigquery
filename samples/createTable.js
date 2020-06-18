@@ -27,7 +27,12 @@ function main(
   // [START bigquery_create_table]
   // Import the Google Cloud client library and create a client
   const {BigQuery} = require('@google-cloud/bigquery');
-  const bigquery = new BigQuery();
+  const bigquery = new BigQuery({
+    keyFilename:
+      '/Users/sofialeon/Downloads/coleleah-sofialeon-b56ce5ae0aee.json',
+    // projectId: 
+    //   process.env.GOOGLE_CLOUD_PROJECT  
+  });
 
   async function createTable() {
     // Creates a new table named "my_table" in "my_dataset".
