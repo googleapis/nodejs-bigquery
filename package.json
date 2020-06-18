@@ -48,7 +48,7 @@
     "precompile": "gts clean"
   },
   "dependencies": {
-    "@google-cloud/common": "^3.0.0",
+    "@google-cloud/common": "^3.1.0",
     "@google-cloud/paginator": "^3.0.0",
     "@google-cloud/promisify": "^2.0.0",
     "arrify": "^2.0.1",
@@ -82,7 +82,7 @@
     "jsdoc-fresh": "^1.0.1",
     "jsdoc-region-tag": "^1.0.2",
     "linkinator": "^2.0.0",
-    "mocha": "^7.0.0",
+    "mocha": "^8.0.0",
     "mv": "^2.1.1",
     "ncp": "^2.0.0",
     "p-reflect": "^2.1.0",

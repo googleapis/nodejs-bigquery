@@ -25,7 +25,10 @@ const execSync = cmd => cp.execSync(cmd, {encoding: 'utf-8'});
 const bigquery = new BigQuery();
 
 describe('Quickstart', () => {
-  const datasetName = `gcloud_tests_${uuid.v4()}`.replace(/-/gi, '_');
+  const datasetName = `nodejs_samples_tests_quickstart_${uuid.v4()}`.replace(
+    /-/gi,
+    '_'
+  );
 
   after(async () => {
     await bigquery.dataset(datasetName).delete({force: true});
