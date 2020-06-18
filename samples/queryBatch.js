@@ -18,7 +18,7 @@ function main() {
   // [START bigquery_query_batch]
   // Import the Google Cloud client library and create a client
   const {BigQuery} = require('@google-cloud/bigquery');
-  const bigquery = new BigQuery();
+  const bigquery = new BigQuery({quotaProjectId: 'internalTesting'});
 
   async function queryBatch() {
     // Runs a query at batch priority.
@@ -28,7 +28,7 @@ function main() {
     const queryJobConfig = {
       query: `SELECT corpus
               FROM \`bigquery-public-data.samples.shakespeare\` 
-              LIMIT 10`,
+              LIMIT 100`,
       useLegacySql: false,
       priority: 'BATCH',
     };
