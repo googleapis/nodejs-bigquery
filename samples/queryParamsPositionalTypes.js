@@ -14,11 +14,7 @@
 
 'use strict';
 
-function main(
-  projectId = 'my_project',
-  datasetId = 'my_dataset',
-  tableId = 'my_table'
-) {
+function main() {
   // [START bigquery_query_params_positional_types]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
@@ -27,46 +23,18 @@ function main(
   async function queryParamsPositionalTypes() {
     // Run a query using positional query parameters and provided parameter types.
 
-    /**
-     * TODO(developer): Uncomment the following lines before running the sample.
-     */
-    // projectId = 'my_project';
-    // const datasetId = 'my_dataset';
-    // const tableId = 'my_table';
-
-    // Describe the schema of the table
-    // For more information on supported data types, see
-    // https://cloud.google.com/bigquery/docs/reference/standard-sql/data-types
-    const schema = [
-      {
-        name: 'name',
-        type: 'STRING',
-      },
-      {
-        name: 'age',
-        type: 'INT64',
-      },
-    ];
-    const tableOptions = {
-      schema: schema,
-    };
-
-    // Create a new table in the dataset
-    const [table] = await bigquery
-      .dataset(datasetId)
-      .createTable(tableId, tableOptions);
-
-    console.log(`Table ${table.id} created.`);
-
     // The SQL query to run
-    const sqlQuery = `SELECT name , age
-          FROM \`${projectId}.${datasetId}.${tableId}\`
-          WHERE name IN UNNEST(?)`;
+    const sqlQuery = `SELECT word, word_count
+    FROM \`bigquery-public-data.samples.shakespeare\`
+    WHERE word IN UNNEST(?)
+    AND corpus = ?
+    AND word_count >= ?
+    ORDER BY word_count DESC`;
 
     const queryOptions = {
       query: sqlQuery,
-      params: [[['jane', 'bob', 'sally']]],
-      types: [['STRING']],
+      params: [['and', 'is', 'the', 'moon'], 'romeoandjuliet', 250],
+      types: [['STRING'], 'STRING', 'INT64'],
     };
 
     // Run the query

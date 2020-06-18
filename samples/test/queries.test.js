@@ -27,8 +27,6 @@ const generateUuid = () =>
 const datasetId = generateUuid();
 const tableId = generateUuid();
 const destTableId = generateUuid();
-const namedParamsTableId = generateUuid();
-const positionalParamsTableId = generateUuid();
 let projectId;
 
 const bigquery = new BigQuery();
@@ -86,10 +84,9 @@ describe('Queries', () => {
   });
 
   it('should run a query with named params and provided types', async () => {
-    const output = execSync(
-      `node queryParamsNamedTypes.js ${projectId} ${datasetId} ${namedParamsTableId}`
-    );
+    const output = execSync('node queryParamsNamedTypes.js');
     assert.match(output, /Rows:/);
+    assert.match(output, /word/);
   });
 
   it('should run a query with positional params', async () => {
@@ -99,10 +96,9 @@ describe('Queries', () => {
   });
 
   it('should run a query with positional params and provided types', async () => {
-    const output = execSync(
-      `node queryParamsPositionalTypes.js ${projectId} ${datasetId} ${positionalParamsTableId}`
-    );
+    const output = execSync('node queryParamsPositionalTypes.js');
     assert.match(output, /Rows:/);
+    assert.match(output, /word/);
   });
 
   it('should run a query with struct params', async () => {

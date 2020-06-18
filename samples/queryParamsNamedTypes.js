@@ -14,11 +14,7 @@
 
 'use strict';
 
-function main(
-  projectId = 'my_project',
-  datasetId = 'my_dataset',
-  tableId = 'my_table'
-) {
+function main() {
   // [START bigquery_query_params_named_types]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
@@ -27,46 +23,22 @@ function main(
   async function queryParamsNamedTypes() {
     // Run a query using named query parameters and provided parameter types.
 
-    /**
-     * TODO(developer): Uncomment the following lines before running the sample.
-     */
-    // projectId = 'my_project';
-    // const datasetId = 'my_dataset';
-    // const tableId = 'my_table';
-
-    // Describe the schema of the table
-    // For more information on supported data types, see
-    // https://cloud.google.com/bigquery/docs/reference/standard-sql/data-types
-    const schema = [
-      {
-        name: 'name',
-        type: 'STRING',
-      },
-      {
-        name: 'age',
-        type: 'INT64',
-      },
-    ];
-    const tableOptions = {
-      schema: schema,
-    };
-
-    // Create a new table in the dataset
-    const [table] = await bigquery
-      .dataset(datasetId)
-      .createTable(tableId, tableOptions);
-
-    console.log(`Table ${table.id} created.`);
-
     // The SQL query to run
-    const sqlQuery = `SELECT name , age
-          FROM \`${projectId}.${datasetId}.${tableId}\`
-          WHERE name IN UNNEST(@names)`;
+    const sqlQuery = `SELECT word, word_count
+          FROM \`bigquery-public-data.samples.shakespeare\`
+          WHERE word IN UNNEST(@wordList)
+          AND corpus = @corpus
+          AND word_count >= @minWordCount
+          ORDER BY word_count DESC`;
 
     const queryOptions = {
       query: sqlQuery,
-      params: {names: ['jane', 'bob', 'sally']},
-      types: {names: ['STRING']},
+      params: {
+        wordList: ['and', 'is', 'the', 'moon'],
+        corpus: 'romeoandjuliet',
+        minWordCount: 250,
+      },
+      types: {wordList: ['STRING'], corpus: 'STRING', minWordCount: 'INT64'},
     };
 
     // Run the query
