@@ -30,7 +30,7 @@ function main(
     /**
      * TODO(developer): Uncomment the following lines before running the sample.
      */
-    // projectId = process.env.PROJECT_ID;
+    // projectId = 'my_project';
     // const datasetId = 'my_dataset';
     // const tableId = 'my_table';
 
