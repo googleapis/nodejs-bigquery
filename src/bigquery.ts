@@ -163,6 +163,7 @@ export interface BigQueryOptions extends common.GoogleAuthOptions {
   autoRetry?: boolean;
   maxRetries?: number;
   location?: string;
+  userAgent?: string;
   /**
    * The API endpoint of the service used to make requests.
    * Defaults to `bigquery.googleapis.com`.
@@ -199,6 +200,8 @@ export interface BigQueryOptions extends common.GoogleAuthOptions {
  *     native Promises.
  * @property {string} [location] The geographic location of all datasets and
  *     jobs referenced and created through the client.
+ * @property {string} [userAgent] The value to be prepended to the User-Agent
+ *     header in API requests.
  * @property {string[]} [scopes] Additional OAuth scopes to use in requests. For
  *     example, to access an external data source, you may need the
  *     `https://www.googleapis.com/auth/drive.readonly` scope.
@@ -373,12 +376,33 @@ export class BigQuery extends common.Service {
    *
    * @param {object} schema
    * @param {array} rows
+   * @param {array} selectedFields List of fields to return.
+   * If unspecified, all fields are returned.
    * @returns {array} Fields using their matching names from the table's schema.
    */
   static mergeSchemaWithRows_(
     schema: TableSchema | TableField,
-    rows: TableRow[]
+    rows: TableRow[],
+    selectedFields?: string[]
   ) {
+    if (selectedFields && selectedFields!.length > 0) {
+      const selectedFieldsArray = selectedFields!.map(c => {
+        return c.split('.');
+      });
+
+      const currentFields = selectedFieldsArray.map(c => c.shift());
+      //filter schema fields based on selected fields.
+      schema.fields = schema.fields?.filter(
+        field =>
+          currentFields
+            .map(c => c!.toLowerCase())
+            .indexOf(field.name!.toLowerCase()) >= 0
+      );
+      selectedFields = selectedFieldsArray
+        .filter(c => c.length > 0)
+        .map(c => c.join('.'));
+    }
+
     return arrify(rows)
       .map(mergeSchema)
       .map(flattenRows);
@@ -388,10 +412,10 @@ export class BigQuery extends common.Service {
         let value = field.v;
         if (schemaField.mode === 'REPEATED') {
           value = (value as TableRowField[]).map(val => {
-            return convert(schemaField, val.v);
+            return convert(schemaField, val.v, selectedFields);
           });
         } else {
-          value = convert(schemaField, value);
+          value = convert(schemaField, value, selectedFields);
         }
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const fieldObject: any = {};
@@ -400,8 +424,12 @@ export class BigQuery extends common.Service {
       });
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    function convert(schemaField: TableField, value: any) {
+    function convert(
+      schemaField: TableField,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      value: any,
+      selectedFields?: string[]
+    ) {
       if (is.null(value)) {
         return value;
       }
@@ -431,7 +459,11 @@ export class BigQuery extends common.Service {
           break;
         }
         case 'RECORD': {
-          value = BigQuery.mergeSchemaWithRows_(schemaField, value).pop();
+          value = BigQuery.mergeSchemaWithRows_(
+            schemaField,
+            value,
+            selectedFields
+          ).pop();
           break;
         }
         case 'DATE': {
