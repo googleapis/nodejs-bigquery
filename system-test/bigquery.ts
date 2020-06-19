@@ -1698,16 +1698,18 @@ describe('BigQuery', () => {
       filter: `labels.${GCLOUD_TESTS_PREFIX}`,
     });
 
-    const deleteDatasetPromises = datasets
-      .filter(async dataset => {
-        const [metadata] = await dataset.getMetadata();
-        const creationTime = Number(metadata.creationTime);
-        return creationTime && isResourceStale(creationTime);
-      })
-      .map(dataset => {
-        return dataset.delete({force: true});
-      });
+    for (const dataset of datasets) {
+      const [metadata] = await dataset.getMetadata();
+      const creationTime = Number(metadata.creationTime);
 
-    await Promise.all(deleteDatasetPromises);
+      if (isResourceStale(creationTime)) {
+        try {
+          await dataset.delete({force: true});
+        } catch (e) {
+          console.log(`dataset(${dataset.id}).delete() failed`);
+          console.log(e);
+        }
+      }
+    }
   }
 });

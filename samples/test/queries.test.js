@@ -83,10 +83,22 @@ describe('Queries', () => {
     assert.match(output, /word_count/);
   });
 
+  it('should run a query with named params and provided types', async () => {
+    const output = execSync('node queryParamsNamedTypes.js');
+    assert.match(output, /Rows:/);
+    assert.match(output, /word/);
+  });
+
   it('should run a query with positional params', async () => {
     const output = execSync('node queryParamsPositional.js');
     assert.match(output, /Rows:/);
     assert.match(output, /word_count/);
+  });
+
+  it('should run a query with positional params and provided types', async () => {
+    const output = execSync('node queryParamsPositionalTypes.js');
+    assert.match(output, /Rows:/);
+    assert.match(output, /word/);
   });
 
   it('should run a query with struct params', async () => {
