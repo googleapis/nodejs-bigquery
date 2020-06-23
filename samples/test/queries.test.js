@@ -22,7 +22,8 @@ const uuid = require('uuid');
 const {BigQuery} = require('@google-cloud/bigquery');
 
 const execSync = cmd => cp.execSync(cmd, {encoding: 'utf-8'});
-const generateUuid = () => `gcloud-tests-${uuid.v4()}`.replace(/-/gi, '_');
+const generateUuid = () =>
+  `nodejs_samples_tests_queries_${uuid.v4()}`.replace(/-/gi, '_');
 const datasetId = generateUuid();
 const tableId = generateUuid();
 const destTableId = generateUuid();
@@ -82,10 +83,22 @@ describe('Queries', () => {
     assert.match(output, /word_count/);
   });
 
+  it('should run a query with named params and provided types', async () => {
+    const output = execSync('node queryParamsNamedTypes.js');
+    assert.match(output, /Rows:/);
+    assert.match(output, /word/);
+  });
+
   it('should run a query with positional params', async () => {
     const output = execSync('node queryParamsPositional.js');
     assert.match(output, /Rows:/);
     assert.match(output, /word_count/);
+  });
+
+  it('should run a query with positional params and provided types', async () => {
+    const output = execSync('node queryParamsPositionalTypes.js');
+    assert.match(output, /Rows:/);
+    assert.match(output, /word/);
   });
 
   it('should run a query with struct params', async () => {

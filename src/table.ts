@@ -1373,13 +1373,17 @@ class Table extends common.ServiceObject {
       metadata.schema = Table.createSchemaFromString_(metadata.schema);
     }
 
-    extend(true, metadata, {
-      destinationTable: {
-        projectId: this.bigQuery.projectId,
-        datasetId: this.dataset.id,
-        tableId: this.id,
+    metadata = extend(
+      true,
+      {
+        destinationTable: {
+          projectId: this.bigQuery.projectId,
+          datasetId: this.dataset.id,
+          tableId: this.id,
+        },
       },
-    });
+      metadata
+    );
 
     let jobId = metadata.jobId || uuid.v4();
 
@@ -1674,7 +1678,11 @@ class Table extends common.ServiceObject {
         callback!(err, null, null, resp);
         return;
       }
-      rows = BigQuery.mergeSchemaWithRows_(this.metadata.schema, rows || []);
+      rows = BigQuery.mergeSchemaWithRows_(
+        this.metadata.schema,
+        rows || [],
+        options.selectedFields ? options.selectedFields!.split(',') : []
+      );
       callback!(null, rows, nextQuery, resp);
     };
 
