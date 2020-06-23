@@ -23,7 +23,9 @@ function main(
   // [START bigquery_copy_table]
   // Import the Google Cloud client library and create a client
   const {BigQuery} = require('@google-cloud/bigquery');
-  const bigquery = new BigQuery();
+  const bigquery = new BigQuery({
+    keyfileName: "/Users/sofialeon/Downloads/coleleah-sofialeon-b56ce5ae0aee.json",
+});
 
   async function copyTable() {
     // Copies src_dataset:src_table to dest_dataset:dest_table.
