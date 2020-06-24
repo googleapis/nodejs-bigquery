@@ -78,7 +78,9 @@
   * [Query Legacy Large Results](#query-legacy-large-results)
   * [Query Params Arrays](#query-params-arrays)
   * [Query Params Named](#query-params-named)
+  * [Query Params Named Types](#query-params-named-types)
   * [Query Params Positional](#query-params-positional)
+  * [Query Params Positional Types](#query-params-positional-types)
   * [Query Params Structs](#query-params-structs)
   * [Query Params Timestamps](#query-params-timestamps)
   * [Query Stack Overflow](#query-stack-overflow)
@@ -1248,6 +1250,23 @@ __Usage:__
 
 
 
+### Query Params Named Types
+
+View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/queryParamsNamedTypes.js).
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/queryParamsNamedTypes.js,samples/README.md)
+
+__Usage:__
+
+
+`node samples/queryParamsNamedTypes.js`
+
+
+-----
+
+
+
+
 ### Query Params Positional
 
 View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/queryParamsPositional.js).
@@ -1258,6 +1277,23 @@ __Usage:__
 
 
 `node samples/queryParamsPositional.js`
+
+
+-----
+
+
+
+
+### Query Params Positional Types
+
+View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/queryParamsPositionalTypes.js).
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/queryParamsPositionalTypes.js,samples/README.md)
+
+__Usage:__
+
+
+`node samples/queryParamsPositionalTypes.js`
 
 
 -----
