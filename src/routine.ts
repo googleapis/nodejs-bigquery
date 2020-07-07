@@ -254,7 +254,7 @@ class Routine extends common.ServiceObject {
       baseUrl: '/routines',
       id,
       methods,
-      createMethod: dataset.createRoutine.bind(dataset, id),
+      createMethod: dataset.createRoutine.bind(dataset),
     });
   }
 
