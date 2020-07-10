@@ -4,6 +4,13 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+### [5.0.1](https://www.github.com/googleapis/nodejs-bigquery/compare/v5.0.0...v5.0.1) (2020-07-07)
+
+
+### Bug Fixes
+
+* add tests for Routine ([#807](https://www.github.com/googleapis/nodejs-bigquery/issues/807)) ([c969f3d](https://www.github.com/googleapis/nodejs-bigquery/commit/c969f3d15d4e545b9efd92c4f8a9649216cbd927))
+
 ## [5.0.0](https://www.github.com/googleapis/nodejs-bigquery/compare/v4.7.0...v5.0.0) (2020-06-19)
 
 
