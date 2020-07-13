@@ -4,6 +4,51 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+### [5.0.1](https://www.github.com/googleapis/nodejs-bigquery/compare/v5.0.0...v5.0.1) (2020-07-07)
+
+
+### Bug Fixes
+
+* add tests for Routine ([#807](https://www.github.com/googleapis/nodejs-bigquery/issues/807)) ([c969f3d](https://www.github.com/googleapis/nodejs-bigquery/commit/c969f3d15d4e545b9efd92c4f8a9649216cbd927))
+
+## [5.0.0](https://www.github.com/googleapis/nodejs-bigquery/compare/v4.7.0...v5.0.0) (2020-06-19)
+
+
+### ⚠ BREAKING CHANGES
+
+* don't return Stream from createLoadJob (#647)
+* drop Node 8 from engines field (#662)
+
+### Features
+
+* drop Node 8 from engines field ([#662](https://www.github.com/googleapis/nodejs-bigquery/issues/662)) ([712b029](https://www.github.com/googleapis/nodejs-bigquery/commit/712b0294c6329545de70febb48762abd8b0567b9))
+* improved types ([40087fa](https://www.github.com/googleapis/nodejs-bigquery/commit/40087fa40f1e9a4180da7aaa43e2bb8a018bd632))
+* update types.d.ts ([#667](https://www.github.com/googleapis/nodejs-bigquery/issues/667)) ([a12b094](https://www.github.com/googleapis/nodejs-bigquery/commit/a12b094d2e6e48049203c9cd773fecb98713a3fa)), closes [#662](https://www.github.com/googleapis/nodejs-bigquery/issues/662) [#662](https://www.github.com/googleapis/nodejs-bigquery/issues/662) [#647](https://www.github.com/googleapis/nodejs-bigquery/issues/647) [#647](https://www.github.com/googleapis/nodejs-bigquery/issues/647) [#640](https://www.github.com/googleapis/nodejs-bigquery/issues/640) [#640](https://www.github.com/googleapis/nodejs-bigquery/issues/640) [#647](https://www.github.com/googleapis/nodejs-bigquery/issues/647) [#661](https://www.github.com/googleapis/nodejs-bigquery/issues/661) [#661](https://www.github.com/googleapis/nodejs-bigquery/issues/661) [#658](https://www.github.com/googleapis/nodejs-bigquery/issues/658) [#658](https://www.github.com/googleapis/nodejs-bigquery/issues/658) [#8203](https://www.github.com/googleapis/nodejs-bigquery/issues/8203) [#8203](https://www.github.com/googleapis/nodejs-bigquery/issues/8203) [#8203](https://www.github.com/googleapis/nodejs-bigquery/issues/8203) [#8203](https://www.github.com/googleapis/nodejs-bigquery/issues/8203) [#8203](https://www.github.com/googleapis/nodejs-bigquery/issues/8203) [#657](https://www.github.com/googleapis/nodejs-bigquery/issues/657) [#657](https://www.github.com/googleapis/nodejs-bigquery/issues/657) [#8203](https://www.github.com/googleapis/nodejs-bigquery/issues/8203) [#8203](https://www.github.com/googleapis/nodejs-bigquery/issues/8203) [#8203](https://www.github.com/googleapis/nodejs-bigquery/issues/8203) [#8203](https://www.github.com/googleapis/nodejs-bigquery/issues/8203) [#8203](https://www.github.com/googleapis/nodejs-bigquery/issues/8203) [#8203](https://www.github.com/googleapis/nodejs-bigquery/issues/8203) [#8203](https://www.github.com/googleapis/nodejs-bigquery/issues/8203) [#8203](https://www.github.com/googleapis/nodejs-bigquery/issues/8203) [#660](https://www.github.com/googleapis/nodejs-bigquery/issues/660) [#660](https://www.github.com/googleapis/nodejs-bigquery/issues/660) [#8203](https://www.github.com/googleapis/nodejs-bigquery/issues/8203) [#8203](https://www.github.com/googleapis/nodejs-bigquery/issues/8203) [#8203](https://www.github.com/googleapis/nodejs-bigquery/issues/8203) [#8203](https://www.github.com/googleapis/nodejs-bigquery/issues/8203) [#8203](https://www.github.com/googleapis/nodejs-bigquery/issues/8203) [#8203](https://www.github.com/googleapis/nodejs-bigquery/issues/8203) [#8203](https://www.github.com/googleapis/nodejs-bigquery/issues/8203) [#8203](https://www.github.com/googleapis/nodejs-bigquery/issues/8203) [#8203](https://www.github.com/googleapis/nodejs-bigquery/issues/8203) [#8203](https://www.github.com/googleapis/nodejs-bigquery/issues/8203) [#8203](https://www.github.com/googleapis/nodejs-bigquery/issues/8203) [#8203](https://www.github.com/googleapis/nodejs-bigquery/issues/8203) [#665](https://www.github.com/googleapis/nodejs-bigquery/issues/665) [#665](https://www.github.com/googleapis/nodejs-bigquery/issues/665) [#454](https://www.github.com/googleapis/nodejs-bigquery/issues/454) [#454](https://www.github.com/googleapis/nodejs-bigquery/issues/454) [#456](https://www.github.com/googleapis/nodejs-bigquery/issues/456) [#456](https://www.github.com/googleapis/nodejs-bigquery/issues/456) [#463](https://www.github.com/googleapis/nodejs-bigquery/issues/463) [#463](https://www.github.com/googleapis/nodejs-bigquery/issues/463)
+* **userAgent:** allow for optional user agent to be provided ([#671](https://www.github.com/googleapis/nodejs-bigquery/issues/671)) ([25aeca8](https://www.github.com/googleapis/nodejs-bigquery/commit/25aeca8f6c136d03d6029bda54e7cdab98af80ca))
+
+
+### Bug Fixes
+
+* add types for hasDrift and seasonalPeriods ([#680](https://www.github.com/googleapis/nodejs-bigquery/issues/680)) ([d6c9566](https://www.github.com/googleapis/nodejs-bigquery/commit/d6c95667577df2d32bff6f9d07117d011379ecd2))
+* **deps:** update dependency @google-cloud/paginator to v3 ([#658](https://www.github.com/googleapis/nodejs-bigquery/issues/658)) ([a09c493](https://www.github.com/googleapis/nodejs-bigquery/commit/a09c493f1f94e4a0272c17cb62009c92945c20d0))
+* apache license URL ([#468](https://www.github.com/googleapis/nodejs-bigquery/issues/468)) ([#669](https://www.github.com/googleapis/nodejs-bigquery/issues/669)) ([d3ed602](https://www.github.com/googleapis/nodejs-bigquery/commit/d3ed602e47ba005ca4c9d2f382867d19336f239d))
+* drop dependency on string-format-obj ([#698](https://www.github.com/googleapis/nodejs-bigquery/issues/698)) ([cf8f58f](https://www.github.com/googleapis/nodejs-bigquery/commit/cf8f58f851a8e32a4857f35c05a081cd031be124))
+* load job to a different project ID ([#748](https://www.github.com/googleapis/nodejs-bigquery/issues/748)) ([bfb74ad](https://www.github.com/googleapis/nodejs-bigquery/commit/bfb74add1850925837fa1737fded8642c80f0356))
+* **docs:** fix link for job configuration load ([#678](https://www.github.com/googleapis/nodejs-bigquery/issues/678)) ([ea3d7af](https://www.github.com/googleapis/nodejs-bigquery/commit/ea3d7afe18f8f22c6541043c92c26625ae9e0e85))
+* selectedFields on getRows not working correctly  ([#712](https://www.github.com/googleapis/nodejs-bigquery/issues/712)) ([13b7e39](https://www.github.com/googleapis/nodejs-bigquery/commit/13b7e391cb3cfd87caec094f058143842cb39306))
+* **deps:** update dependency @google-cloud/promisify to v2 ([#657](https://www.github.com/googleapis/nodejs-bigquery/issues/657)) ([5d8112c](https://www.github.com/googleapis/nodejs-bigquery/commit/5d8112c2cd3994d1d32102d63a7a90fb9478223c))
+* **deps:** update dependency @google-cloud/storage to v5 ([#700](https://www.github.com/googleapis/nodejs-bigquery/issues/700)) ([a2e34ef](https://www.github.com/googleapis/nodejs-bigquery/commit/a2e34ef32a79c0dccaa11954ca2fa3f90795c63a))
+* **deps:** update dependency google-auth-library to v6 ([#660](https://www.github.com/googleapis/nodejs-bigquery/issues/660)) ([3ea642e](https://www.github.com/googleapis/nodejs-bigquery/commit/3ea642ec9f1c471bff0d5d095fcc3e1b3813e52a))
+* **docs:** configuration.copy link ([#709](https://www.github.com/googleapis/nodejs-bigquery/issues/709)) ([4a81b1e](https://www.github.com/googleapis/nodejs-bigquery/commit/4a81b1e25c9b8f09eca28142bd54f6ca42b1f866))
+* **docs:** correct createTablePartitioned sample argument ([#701](https://www.github.com/googleapis/nodejs-bigquery/issues/701)) ([9a7520e](https://www.github.com/googleapis/nodejs-bigquery/commit/9a7520e62ebe7f561190de0a3c1080bbc07567ba))
+* **table:** add retries for insert partial failures ([#589](https://www.github.com/googleapis/nodejs-bigquery/issues/589)) ([b8639c2](https://www.github.com/googleapis/nodejs-bigquery/commit/b8639c27009aaa4eb03bbd9ebf0fa1463e2bcd2b)), closes [#655](https://www.github.com/googleapis/nodejs-bigquery/issues/655)
+* **types:** drop changes for drift and seasonal ([#681](https://www.github.com/googleapis/nodejs-bigquery/issues/681)) ([679d990](https://www.github.com/googleapis/nodejs-bigquery/commit/679d990f391433fbef180a4bbba2e32442e358da))
+
+
+### Code Refactoring
+
+* don't return Stream from createLoadJob ([#647](https://www.github.com/googleapis/nodejs-bigquery/issues/647)) ([8e26fb5](https://www.github.com/googleapis/nodejs-bigquery/commit/8e26fb561a9595e0f05e0506cebb71aa1eaba432)), closes [#640](https://www.github.com/googleapis/nodejs-bigquery/issues/640) [#640](https://www.github.com/googleapis/nodejs-bigquery/issues/640)
+
 ## [4.7.0](https://www.github.com/googleapis/nodejs-bigquery/compare/v4.6.1...v4.7.0) (2020-01-30)
 
 
