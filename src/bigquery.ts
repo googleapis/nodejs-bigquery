@@ -1071,7 +1071,7 @@ export class BigQuery extends common.Service {
    * @see [Jobs: insert API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert}
    *
    * @param {object|string} options The configuration object. This must be in
-   *     the format of the [`configuration.query`](http://goo.gl/wRpHvR)
+   * the format of the [`configuration.query`](https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationQuery)
    * property of a Jobs resource. If a string is provided, this is used as the
    * query string, and all other options are defaulted.
    * @param {Table} [options.destination] The table to save the
