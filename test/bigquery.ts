@@ -1474,6 +1474,16 @@ describe('BigQuery', () => {
         });
 
         it('should allow for optional parameter types', () => {
+          const queryParameter = {};
+
+          BigQuery.valueToQueryParameter_ = (
+            value: {},
+            providedType: string
+          ) => {
+            assert.strictEqual(value, NAMED_PARAMS.key);
+            assert.strictEqual(providedType, NAMED_TYPES.key);
+            return queryParameter;
+          };
           bq.createJob = (reqOpts: JobOptions) => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             assert.strictEqual((reqOpts as any).params, undefined);
@@ -1484,6 +1494,29 @@ describe('BigQuery', () => {
               query: QUERY_STRING,
               params: NAMED_PARAMS,
               types: NAMED_TYPES,
+            },
+            assert.ifError
+          );
+        });
+
+        it('should allow for providing only some parameter types', () => {
+          const queryParameter = {};
+
+          BigQuery.valueToQueryParameter_ = (value: {}) => {
+            assert.strictEqual(value, NAMED_PARAMS.key);
+            return queryParameter;
+          };
+
+          bq.createJob = (reqOpts: JobOptions) => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            assert.strictEqual((reqOpts as any).params, undefined);
+          };
+
+          bq.createQueryJob(
+            {
+              query: QUERY_STRING,
+              params: NAMED_PARAMS,
+              types: {},
             },
             assert.ifError
           );
@@ -1502,6 +1535,12 @@ describe('BigQuery', () => {
 
       describe('positional', () => {
         it('should set the correct parameter mode', done => {
+          const queryParameter = {};
+
+          BigQuery.valueToQueryParameter_ = () => {
+            return queryParameter;
+          };
+
           bq.createJob = (reqOpts: JobOptions) => {
             const query = reqOpts.configuration!.query!;
             assert.strictEqual(query.parameterMode, 'positional');
