@@ -1498,18 +1498,6 @@ describe('BigQuery', () => {
             });
           }, /Provided types must match the value type passed to `params`/);
         });
-
-        it('should throw if named param not present in provided types', () => {
-          const INVALID_TYPES = {other: 'string'};
-
-          assert.throws(() => {
-            bq.createQueryJob({
-              query: QUERY_STRING,
-              params: NAMED_PARAMS,
-              types: INVALID_TYPES,
-            });
-          }, /Type not provided for parameter: key/);
-        });
       });
 
       describe('positional', () => {
