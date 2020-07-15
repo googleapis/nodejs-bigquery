@@ -27,11 +27,12 @@ const generateUuid = () =>
 const datasetId = generateUuid();
 const tableId = generateUuid();
 const destTableId = generateUuid();
+const routineId = generateUuid();
 let projectId;
 
 const bigquery = new BigQuery();
 
-describe('Queries', () => {
+describe.only('Queries', () => {
   before(async () => {
     const schema = [{name: 'age', type: 'STRING', mode: 'REQUIRED'}];
     const options = {
@@ -182,5 +183,12 @@ describe('Queries', () => {
     );
     assert.match(output, /Rows:/);
     assert.match(output, /post_abbr/);
+  });
+
+  it('should create a routine using DDL', async () => {
+    const output = execSync(
+      `node createRoutineDDL.js ${projectId} ${datasetId} ${routineId}`
+    );
+    assert.include(output, `Routine ${routineId} created.`);
   });
 });

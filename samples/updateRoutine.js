@@ -16,15 +16,15 @@
 
 function main(
   datasetId = 'my_dataset', // Existing dataset
-  routineId = 'my_routine' // Routine to be created
+  routineId = 'my_routine' // Existing routine
 ) {
-  // [START bigquery_create_routine]
-  // Import the Google Cloud client library and create a client
+  // [START bigquery_update_routine]
+  // Import the Google Cloud client library and update a client
   const {BigQuery} = require('@google-cloud/bigquery');
   const bigquery = new BigQuery();
 
-  async function createRoutine() {
-    // Creates a new routine named "my_routine" in "my_dataset".
+  async function updateRoutine() {
+    // Updates a routine named "my_routine" in "my_dataset".
 
     /**
      * TODO(developer): Uncomment the following lines before running the sample.
@@ -32,33 +32,21 @@ function main(
     // const datasetId = 'my_dataset';
     // const routineId = 'my_routine';
 
+    const updates = {
+      description: 'New description',
+    };
+
     const dataset = bigquery.dataset(datasetId);
 
     // Create routine reference
     let routine = dataset.routine(routineId);
 
-    const config = {
-      arguments: [
-        {
-          name: 'x',
-          dataType: {
-            typeKind: 'INT64',
-          },
-        },
-      ],
-      definitionBody: 'x * 3',
-      routineType: 'SCALAR_FUNCTION',
-      returnType: {
-        typeKind: 'INT64',
-      },
-    };
-
     // Make API call
-    [routine] = await routine.create(config);
+    [routine] = await routine.setMetadata(updates);
 
-    console.log(`Routine ${routineId} created.`);
+    console.log(`Routine description: ${routine.description}`);
   }
-  // [END bigquery_create_routine]
-  createRoutine();
+  // [END bigquery_update_routine]
+  updateRoutine();
 }
 main(...process.argv.slice(2));
