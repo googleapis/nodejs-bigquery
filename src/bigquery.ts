@@ -1196,9 +1196,7 @@ export class BigQuery extends common.Service {
                 query.types[namedParameter]
               );
             } else {
-              throw new Error(
-                `Type not provided for parameter: ${namedParameter}`
-              );
+              queryParameter = BigQuery.valueToQueryParameter_(value);
             }
           } else {
             queryParameter = BigQuery.valueToQueryParameter_(value);
