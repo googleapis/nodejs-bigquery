@@ -89,7 +89,7 @@ export type Query = JobRequest<bigquery.IJobConfigurationQuery> & {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   params?: any[] | {[param: string]: any};
   dryRun?: boolean;
-  types?: string[] | string[][] | {[type: string]: string[]};
+  types?: string[] | string[][] | {[type: string]: string | string[]};
   defaultDataset?: Dataset;
   job?: Job;
   maxResults?: number;
