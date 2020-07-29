@@ -19,7 +19,7 @@ function main(
   routineId = 'my_routine' // Existing routine
 ) {
   // [START bigquery_update_routine]
-  // Import the Google Cloud client library and update a client
+  // Import the Google Cloud client library and create a client
   const {BigQuery} = require('@google-cloud/bigquery');
   const bigquery = new BigQuery();
 
