@@ -18,7 +18,7 @@ function main(
   datasetId = 'my_dataset' // Existing dataset
 ) {
   // [START bigquery_list_routines]
-  // Import the Google Cloud client library and list a client
+  // Import the Google Cloud client library and create a client
   const {BigQuery} = require('@google-cloud/bigquery');
   const bigquery = new BigQuery();
 

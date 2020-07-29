@@ -16,15 +16,15 @@
 
 function main(
   datasetId = 'my_dataset', // Existing dataset
-  routineId = 'my_routine' // Routine to be created
+  routineId = 'my_routine' // Existing routine
 ) {
   // [START bigquery_get_routine]
-  // Import the Google Cloud client library and get a client
+  // Import the Google Cloud client library and create a client
   const {BigQuery} = require('@google-cloud/bigquery');
   const bigquery = new BigQuery();
 
   async function getRoutine() {
-    // Gets a routine named "my_routine" in "my_dataset", if it exists.
+    // Gets an existing routine named "my_routine" in "my_dataset".
 
     /**
      * TODO(developer): Uncomment the following lines before running the sample.

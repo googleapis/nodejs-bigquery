@@ -32,7 +32,7 @@ let projectId;
 
 const bigquery = new BigQuery();
 
-describe.only('Queries', () => {
+describe('Queries', () => {
   before(async () => {
     const schema = [{name: 'age', type: 'STRING', mode: 'REQUIRED'}];
     const options = {

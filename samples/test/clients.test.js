@@ -24,6 +24,6 @@ describe('Client', () => {
   it('should should set providedUserAgent', async () => {
     const output = execSync('node setUserAgent.js');
     assert.match(output, /User agent:/);
-    assert.match(output, /test-agent/);
+    assert.match(output, /my-user-agent/);
   });
 });

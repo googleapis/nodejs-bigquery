@@ -23,14 +23,14 @@ const {BigQuery} = require('@google-cloud/bigquery');
 
 const execSync = cmd => cp.execSync(cmd, {encoding: 'utf-8'});
 const generateUuid = () =>
-  `nodejs-samples-tests-authView-${uuid.v4()}`.replace(/-/gi, '_');
+  `nodejs-samples-tests-routines-${uuid.v4()}`.replace(/-/gi, '_');
 const datasetId = generateUuid();
 const routineId = generateUuid();
 const newRoutineId = generateUuid();
 
 const bigquery = new BigQuery();
 
-describe.only('Routines', () => {
+describe('Routines', () => {
   after(async () => {
     await bigquery
       .dataset(datasetId)
@@ -75,7 +75,7 @@ describe.only('Routines', () => {
   it('should list routines', async () => {
     const output = execSync(`node listRoutines.js ${datasetId}`);
     assert.match(output, /Routines:/);
-    assert.match(output, new RegExp(routineId));
+    assert.include(output, routineId);
   });
 
   it('should update routine', async () => {

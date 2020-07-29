@@ -16,10 +16,10 @@
 
 function main(
   datasetId = 'my_dataset', // Existing dataset
-  routineId = 'my_routine' // Routine to be created
+  routineId = 'my_routine' // Routine to be deleted
 ) {
   // [START bigquery_delete_routine]
-  // Import the Google Cloud client library and get a client
+  // Import the Google Cloud client library and create a client
   const {BigQuery} = require('@google-cloud/bigquery');
   const bigquery = new BigQuery();
 

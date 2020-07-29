@@ -15,10 +15,11 @@
 'use strict';
 
 function main() {
-  // Import the Google Cloud client library using default credentials
   // [START bigquery_set_user_agent]
+  // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
-  const bigquery = new BigQuery({userAgent: 'test-agent'});
+  // Create a client and set the user agent
+  const bigquery = new BigQuery({userAgent: 'my-user-agent'});
 
   async function setUserAgent() {
     console.log('User agent:');

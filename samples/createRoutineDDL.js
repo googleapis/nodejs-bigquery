@@ -17,10 +17,10 @@
 function main(
   projectId = 'my_project', // GCP project
   datasetId = 'my_dataset', // Existing dataset
-  routineId = 'my_routine6' // Routine to be created
+  routineId = 'my_routine' // Routine to be created
 ) {
   // [START bigquery_create_routine_ddl]
-  // Import the Google Cloud client library using default credentials
+  // Import the Google Cloud client library and create a client
   const {BigQuery} = require('@google-cloud/bigquery');
   const bigquery = new BigQuery();
 
@@ -46,7 +46,7 @@ function main(
 
     console.log(`Routine ${routineId} created.`);
   }
-  // [END bigquery_query]
+  // [END bigquery_create_routine_ddl]
   createRoutineDDL();
 }
 main(...process.argv.slice(2));
