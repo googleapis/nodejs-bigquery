@@ -250,7 +250,7 @@ class Model extends common.ServiceObject {
    *    object.
    * @param {object} [options] The configuration object.
    * @param {string} [options.format] The format to export the data in.
-   *    Allowed options are "ML_TF_SAVED_MODEL" or "ML_XGBOOST_BOOSTER". 
+   *    Allowed options are "ML_TF_SAVED_MODEL" or "ML_XGBOOST_BOOSTER".
    *    Default: "ML_TF_SAVED_MODEL".
    * @param {string} [options.jobId] Custom job id.
    * @param {string} [options.jobPrefix] Prefix to apply to the job id.
