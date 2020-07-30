@@ -14,13 +14,13 @@
 
 import * as assert from 'assert';
 import {describe, it, before, beforeEach, afterEach} from 'mocha';
-import * as proxyquire from 'proxyquire';
 import * as sinon from 'sinon';
 import * as extend from 'extend';
+import * as proxyquire from 'proxyquire';
+import * as pfy from '@google-cloud/promisify';
 import {EventEmitter} from 'events';
 import {JobOptions} from '../src/job';
 import {ServiceObject, ServiceObjectConfig, util} from '@google-cloud/common';
-import * as pfy from '@google-cloud/promisify';
 
 let promisified = false;
 
@@ -133,10 +133,10 @@ describe('BigQuery/Model', () => {
   });
 
   describe('createExtractJob', () => {
-    const URI = 'gs://';
+    const URI = 'gs://bucket-name/model-export';
 
     const FILE = {
-      name: 'file-name.json',
+      name: 'model-export',
       bucket: {
         name: 'bucket-name',
       },
@@ -213,7 +213,7 @@ describe('BigQuery/Model', () => {
         model.bigQuery.createJob = (reqOpts: JobOptions) => {
           assert.deepStrictEqual(
             reqOpts.configuration!.extract!.destinationUris,
-            [URI + FILE.bucket.name + '/' + FILE.name]
+            ['gs://' + FILE.bucket.name + '/' + FILE.name]
           );
           done();
         };

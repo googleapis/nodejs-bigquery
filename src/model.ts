@@ -230,30 +230,27 @@ class Model extends common.ServiceObject {
   }
 
   createExtractJob(
-    destination: File | File[] | string | string[],
+    destination: string | File,
     options?: CreateExtractJobOptions
   ): Promise<JobResponse>;
   createExtractJob(
-    destination: File | File[] | string | string[],
+    destination: string | File,
     options: CreateExtractJobOptions,
     callback: JobCallback
   ): void;
-  createExtractJob(
-    destination: File | File[] | string | string[],
-    callback: JobCallback
-  ): void;
+  createExtractJob(destination: string | File, callback: JobCallback): void;
   /**
    * Export model to Cloud Storage.
    *
    * @see [Jobs: insert API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert}
    *
-   * @param {string|string[]|File|File[]} destination Where the model should be exported
-   *    to. A string, string array, {@link
+   * @param {string|File} destination Where the model should be exported
+   *    to. A string or {@link
    *    https://cloud.google.com/nodejs/docs/reference/storage/latest/File File}
-   *    object, or File object array.
+   *    object.
    * @param {object} [options] - The configuration object.
-   * @param {string} [options.format="ML_TF_SAVED_MODEL"] - The format to export the data in. 
-   *    Allowed options are "ML_TF_SAVED_MODEL" or "ML_XGBOOST_BOOSTER". Default: 
+   * @param {string} [options.format="ML_TF_SAVED_MODEL"] - The format to export the data in.
+   *    Allowed options are "ML_TF_SAVED_MODEL" or "ML_XGBOOST_BOOSTER". Default:
    *    "ML_TF_SAVED_MODEL".
    * @param {string} [options.jobId] Custom job id.
    * @param {string} [options.jobPrefix] Prefix to apply to the job id.
@@ -294,18 +291,18 @@ class Model extends common.ServiceObject {
    *   jobId: '123abc'
    * };
    *
-   * model.createExtractJob(extractedFile, options, callback);
+   * model.createExtractJob(extractedModel, options, callback);
    *
    * //-
    * // If the callback is omitted, we'll return a Promise.
    * //-
-   * model.createExtractJob(extractedFile, options).then((data) => {
+   * model.createExtractJob(extractedModel, options).then((data) => {
    *   const job = data[0];
    *   const apiResponse = data[1];
    * });
    */
   createExtractJob(
-    destination: File | File[] | string | string[],
+    destination: string | File,
     optionsOrCallback?: CreateExtractJobOptions | JobCallback,
     cb?: JobCallback
   ): void | Promise<JobResponse> {
@@ -370,28 +367,25 @@ class Model extends common.ServiceObject {
   }
 
   extract(
-    destination: File | File[] | string | string[],
+    destination: string | File,
     options?: CreateExtractJobOptions
   ): Promise<JobMetadataResponse>;
   extract(
-    destination: File | File[] | string | string[],
+    destination: string | File,
     options: CreateExtractJobOptions,
     callback?: JobMetadataCallback
   ): void;
-  extract(
-    destination: File | File[] | string | string[],
-    callback?: JobMetadataCallback
-  ): void;
+  extract(destination: string | File, callback?: JobMetadataCallback): void;
   /**
    * Export model to Cloud Storage.
    *
    * @param {string|File} destination Where the model should be exported
-   *    to. A string, string array, {@link
+   *    to. A string or {@link
    *    https://cloud.google.com/nodejs/docs/reference/storage/latest/File File}
-   *    object, or File object array.
+   *    object.
    * @param {object} [options] The configuration object.
-   * @param {string} [options.format='ML_TF_SAVED_MODEL'] The format to export 
-   *    the data in. Allowed options are "ML_TF_SAVED_MODEL" or 
+   * @param {string} [options.format='ML_TF_SAVED_MODEL'] The format to export
+   *    the data in. Allowed options are "ML_TF_SAVED_MODEL" or
    *    "ML_XGBOOST_BOOSTER". Default: "ML_TF_SAVED_MODEL".
    * @param {string} [options.jobId] Custom id for the underlying job.
    * @param {string} [options.jobPrefix] Prefix to apply to the underlying job id.
@@ -400,8 +394,7 @@ class Model extends common.ServiceObject {
    * @param {object} callback.apiResponse The full API response.
    * @returns {Promise}
    *
-   * @throws {Error} If destination isn't a File object.
-   * @throws {Error} If destination format isn't recongized.
+   * @throws {Error} If destination isn't a string or File object.
    *
    * @example
    * const {BigQuery} = require('@google-cloud/bigquery');
@@ -411,9 +404,9 @@ class Model extends common.ServiceObject {
    *
    * const extractedModel = 'gs://my-bucket/extracted-model';
    *
-   * 
+   *
    * //-
-     * function callback(err, job, apiResponse) {
+   * function callback(err, job, apiResponse) {
    *   // `job` is a Job object that can be used to check the status of the
    *   // request.
    * }
@@ -435,18 +428,18 @@ class Model extends common.ServiceObject {
    *   jobId: '123abc'
    * };
    *
-   * model.createExtractJob(extractedFile, options, callback);
+   * model.createExtractJob(extractedModel, options, callback);
    *
    * //-
    * // If the callback is omitted, we'll return a Promise.
    * //-
-   * model.createExtractJob(extractedFile, options).then((data) => {
+   * model.createExtractJob(extractedModel, options).then((data) => {
    *   const job = data[0];
    *   const apiResponse = data[1];
    * });
    */
   extract(
-    destination: File | File[] | string | string[],
+    destination: string | File,
     optionsOrCallback?: CreateExtractJobOptions | JobMetadataCallback,
     cb?: JobMetadataCallback
   ): void | Promise<JobMetadataResponse> {
