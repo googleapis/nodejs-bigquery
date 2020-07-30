@@ -4,6 +4,19 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## [5.1.0](https://www.github.com/googleapis/nodejs-bigquery/compare/v5.0.1...v5.1.0) (2020-07-27)
+
+
+### Features
+
+* detect param type if not in provided types ([#813](https://www.github.com/googleapis/nodejs-bigquery/issues/813)) ([1e5a4cc](https://www.github.com/googleapis/nodejs-bigquery/commit/1e5a4cc0e7927dfe9690842e564982bfbef9310f))
+
+
+### Bug Fixes
+
+* add string type for query types ([#827](https://www.github.com/googleapis/nodejs-bigquery/issues/827)) ([acdecbd](https://www.github.com/googleapis/nodejs-bigquery/commit/acdecbd06f6a6ac1e5d1d8d0cd68afcb9a4d3ba7))
+* move gitattributes files to node templates ([#829](https://www.github.com/googleapis/nodejs-bigquery/issues/829)) ([f26e641](https://www.github.com/googleapis/nodejs-bigquery/commit/f26e64100e543cb520bcd7cd99913eca68e84af5))
+
 ### [5.0.1](https://www.github.com/googleapis/nodejs-bigquery/compare/v5.0.0...v5.0.1) (2020-07-07)
 
 
