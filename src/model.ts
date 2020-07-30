@@ -30,7 +30,7 @@ import {JobMetadata} from './job';
 import bigquery from './types';
 
 // This is supposed to be a @google-cloud/storage `File` type. The storage npm
-// module includes these types, but is current installed as a devDependency.
+// module includes these types, but is currently installed as a devDependency.
 // Unless it's included as a production dependency, the types would not be
 // included.  The storage module is fairly large, and only really needed for
 // types.  We need to figure out how to include these types properly.
@@ -248,16 +248,16 @@ class Model extends common.ServiceObject {
    *    to. A string or {@link
    *    https://cloud.google.com/nodejs/docs/reference/storage/latest/File File}
    *    object.
-   * @param {object} [options] - The configuration object.
-   * @param {string} [options.format="ML_TF_SAVED_MODEL"] - The format to export the data in.
-   *    Allowed options are "ML_TF_SAVED_MODEL" or "ML_XGBOOST_BOOSTER". Default:
-   *    "ML_TF_SAVED_MODEL".
+   * @param {object} [options] The configuration object.
+   * @param {string} [options.format] The format to export the data in.
+   *    Allowed options are "ML_TF_SAVED_MODEL" or "ML_XGBOOST_BOOSTER". 
+   *    Default: "ML_TF_SAVED_MODEL".
    * @param {string} [options.jobId] Custom job id.
    * @param {string} [options.jobPrefix] Prefix to apply to the job id.
-   * @param {function} [callback] - The callback function.
-   * @param {?error} callback.err - An error returned while making this request.
-   * @param {Job} callback.job - The job used to export the model.
-   * @param {object} callback.apiResponse - The full API response.
+   * @param {function} [callback] The callback function.
+   * @param {?error} callback.err An error returned while making this request.
+   * @param {Job} callback.job The job used to export the model.
+   * @param {object} callback.apiResponse The full API response.
    *
    * @throws {Error} If a destination isn't a string or File object.
    *
@@ -323,7 +323,6 @@ class Model extends common.ServiceObject {
           if (typeof dest === 'string') {
             return dest;
           }
-
           throw new Error('Destination must be a string or a File object.');
         }
       ),
@@ -384,7 +383,7 @@ class Model extends common.ServiceObject {
    *    https://cloud.google.com/nodejs/docs/reference/storage/latest/File File}
    *    object.
    * @param {object} [options] The configuration object.
-   * @param {string} [options.format='ML_TF_SAVED_MODEL'] The format to export
+   * @param {string} [options.format] The format to export
    *    the data in. Allowed options are "ML_TF_SAVED_MODEL" or
    *    "ML_XGBOOST_BOOSTER". Default: "ML_TF_SAVED_MODEL".
    * @param {string} [options.jobId] Custom id for the underlying job.
