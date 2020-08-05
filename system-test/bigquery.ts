@@ -680,15 +680,11 @@ describe('BigQuery', () => {
       assert.strictEqual(metadata.friendlyName, friendlyName);
     });
 
-    it('should extract a model', () => {
+    it('should extract a model', async () => {
       const jobId = generateName('model-export-job');
 
-      return model.createExtractJob(extractDest, {jobId}).then(data => {
-        const job = data[0];
-
-        assert.strictEqual(job.id, jobId);
-        return job.promise();
-      });
+      const [job] = await model.createExtractJob(extractDest, {jobId});
+      assert.strictEqual(job.id, jobId);
     });
   });
 
