@@ -1,7 +1,7 @@
 {
   "name": "@google-cloud/bigquery",
   "description": "Google BigQuery Client Library for Node.js",
-  "version": "5.0.1",
+  "version": "5.1.0",
   "license": "Apache-2.0",
   "author": "Google LLC",
   "engines": {
@@ -45,7 +45,9 @@
     "predocs-test": "npm run docs",
     "types": "dtsd bigquery v2 > ./src/types.d.ts",
     "prelint": "cd samples; npm link ../; npm install",
-    "precompile": "gts clean"
+    "precompile": "gts clean",
+    "api-extractor": "api-extractor run --local",
+    "api-documenter": "api-documenter yaml --input-folder=temp"
   },
   "dependencies": {
     "@google-cloud/common": "^3.1.0",
@@ -89,6 +91,8 @@
     "proxyquire": "^2.1.0",
     "sinon": "^9.0.0",
     "tmp": "0.2.1",
-    "typescript": "^3.8.3"
+    "typescript": "^3.8.3",
+    "@microsoft/api-documenter": "^7.8.10",
+    "@microsoft/api-extractor": "^7.8.10"
   }
 }

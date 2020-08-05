@@ -16,7 +16,7 @@
     "test": "mocha --timeout 200000"
   },
   "dependencies": {
-    "@google-cloud/bigquery": "^5.0.1",
+    "@google-cloud/bigquery": "^5.1.0",
     "@google-cloud/storage": "^5.0.0",
     "google-auth-library": "^6.0.0",
     "readline-promise": "^1.0.4",
