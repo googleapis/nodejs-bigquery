@@ -15,7 +15,6 @@
 import * as assert from 'assert';
 import {describe, it, before, beforeEach, afterEach} from 'mocha';
 import * as sinon from 'sinon';
-import * as extend from 'extend';
 import * as proxyquire from 'proxyquire';
 import * as pfy from '@google-cloud/promisify';
 import {EventEmitter} from 'events';
@@ -76,22 +75,6 @@ describe('BigQuery/Model', () => {
       },
       '@google-cloud/promisify': fakePfy,
     }).Model;
-
-    const modelCached = extend(true, {}, Model);
-
-    // Override all util methods, allowing them to be mocked. Overrides are
-    // removed before each test.
-    Object.keys(Model).forEach(modelMethod => {
-      if (typeof Model[modelMethod] !== 'function') {
-        return;
-      }
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      Model[modelMethod] = (...args: any[]) => {
-        const method = modelOverrides[modelMethod] || modelCached[modelMethod];
-        return method(...args);
-      };
-    });
   });
 
   beforeEach(() => {
@@ -108,7 +91,6 @@ describe('BigQuery/Model', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let Model: any;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const modelOverrides: any = {};
 
   describe('instantiation', () => {
     it('should promisify all the things', () => {
@@ -147,11 +129,8 @@ describe('BigQuery/Model', () => {
         return false;
       };
 
-      model.bigQuery.job = (id: string) => {
-        return {id};
-      };
-
-      model.bigQuery.createJob = () => {};
+      model.bigQuery.job = sinon.stub();
+      model.bigQuery.createJob = sinon.stub();
     });
 
     it('should call createJob correctly', done => {

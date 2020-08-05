@@ -625,7 +625,7 @@ describe('BigQuery', () => {
     });
   });
 
-  describe.only('BigQuery/Model', () => {
+  describe('BigQuery/Model', () => {
     let model: Model;
     const bucket = storage.bucket(generateName('bucket'));
     const extractDest =
