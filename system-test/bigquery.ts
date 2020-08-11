@@ -612,7 +612,7 @@ describe('BigQuery', () => {
             });
           });
 
-          it('should extract the table', () => {
+          it('should extract a table', () => {
             return table.createExtractJob(extractFile).then(data => {
               const job = data[0];
 
@@ -627,8 +627,13 @@ describe('BigQuery', () => {
 
   describe('BigQuery/Model', () => {
     let model: Model;
+    const bucket = storage.bucket(generateName('bucket'));
+    const extractDest =
+      'gs://' + bucket.name + '/' + generateName('model-export');
 
-    before(() => {
+    before(async () => {
+      await bucket.create();
+
       model = dataset.model('testmodel');
       return bigquery.query(`
         CREATE MODEL \`${dataset.id}.${model.id}\`
@@ -673,6 +678,13 @@ describe('BigQuery', () => {
       await model.setMetadata({friendlyName});
       const [metadata] = await model.getMetadata();
       assert.strictEqual(metadata.friendlyName, friendlyName);
+    });
+
+    it('should extract a model', async () => {
+      const jobId = generateName('model-export-job');
+
+      const [job] = await model.createExtractJob(extractDest, {jobId});
+      assert.strictEqual(job.id, jobId);
     });
   });
 
