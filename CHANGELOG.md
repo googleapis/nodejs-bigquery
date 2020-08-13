@@ -4,6 +4,13 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## [5.2.0](https://www.github.com/googleapis/nodejs-bigquery/compare/v5.1.0...v5.2.0) (2020-08-13)
+
+
+### Features
+
+* model extract ([#832](https://www.github.com/googleapis/nodejs-bigquery/issues/832)) ([1541e98](https://www.github.com/googleapis/nodejs-bigquery/commit/1541e98076ee33da7d7e5f5a10d3ea45fc393736))
+
 ## [5.1.0](https://www.github.com/googleapis/nodejs-bigquery/compare/v5.0.1...v5.1.0) (2020-07-27)
 
 
