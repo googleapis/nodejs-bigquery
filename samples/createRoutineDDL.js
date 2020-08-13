@@ -27,6 +27,13 @@ function main(
   async function createRoutineDDL() {
     // Creates a routine using DDL.
 
+    /**
+     * TODO(developer): Uncomment the following lines before running the sample.
+     */
+    // projectId = 'my_project';
+    // const datasetId = 'my_dataset';
+    // const routineId = 'my_routine';
+
     const query = `CREATE FUNCTION \`${projectId}.${datasetId}.${routineId}\`(
         arr ARRAY<STRUCT<name STRING, val INT64>>
     ) AS (

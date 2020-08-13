@@ -21,13 +21,17 @@ const cp = require('child_process');
 const uuid = require('uuid');
 
 const execSync = cmd => cp.execSync(cmd, {encoding: 'utf-8'});
-const GCLOUD_TESTS_PREFIX = 'nodejs_samples_tests_datasets';
-const datasetId = `${GCLOUD_TESTS_PREFIX}_${uuid.v4()}`.replace(/-/gi, '_');
+const GCLOUD_TESTS_PREFIX = 'nodejs_samples_tests';
+const datasetId = `${GCLOUD_TESTS_PREFIX}_datasets_${uuid.v4()}`.replace(
+  /-/gi,
+  '_'
+);
 
 const bigquery = new BigQuery();
 
 describe('Datasets', () => {
   before(async () => {
+    // Delete any stale datasets from samples tests
     await deleteDatasets();
   });
 

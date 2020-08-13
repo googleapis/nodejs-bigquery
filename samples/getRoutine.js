@@ -35,9 +35,11 @@ function main(
     const dataset = bigquery.dataset(datasetId);
 
     // Create routine reference and make API call
-    await dataset.routine(routineId).get();
+    const [routine] = await dataset.routine(routineId).get();
 
-    console.log(`Routine ${routineId} retrieved.`);
+    console.log(
+      `Routine ${routine.metadata.routineReference.routineId} retrieved.`
+    );
   }
   getRoutine();
   // [END bigquery_get_routine]

@@ -38,8 +38,6 @@ const bigquery = new BigQuery();
 
 describe('Queries', () => {
   before(async () => {
-    await deleteDatasets();
-
     const schema = [{name: 'age', type: 'STRING', mode: 'REQUIRED'}];
     const options = {
       schema: schema,
@@ -198,34 +196,4 @@ describe('Queries', () => {
     );
     assert.include(output, `Routine ${routineId} created.`);
   });
-
-  // Only delete a resource if it is older than 24 hours. That will prevent
-  // collisions with parallel CI test runs.
-  function isResourceStale(creationTime) {
-    const oneDayMs = 86400000;
-    const now = new Date();
-    const created = new Date(creationTime);
-    return now.getTime() - created.getTime() >= oneDayMs;
-  }
-
-  async function deleteDatasets() {
-    let [datasets] = await bigquery.getDatasets();
-    datasets = datasets.filter(dataset =>
-      dataset.id.includes(GCLOUD_TESTS_PREFIX)
-    );
-
-    for (const dataset of datasets) {
-      const [metadata] = await dataset.getMetadata();
-      const creationTime = Number(metadata.creationTime);
-
-      if (isResourceStale(creationTime)) {
-        try {
-          await dataset.delete({force: true});
-        } catch (e) {
-          console.log(`dataset(${dataset.id}).delete() failed`);
-          console.log(e);
-        }
-      }
-    }
-  }
 });
