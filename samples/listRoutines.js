@@ -36,7 +36,7 @@ function main(
     console.log('Routines:');
     routines.forEach(routine => console.log(routine.id));
   }
-  // [END bigquery_list_routines]
   listRoutines();
+  // [END bigquery_list_routines]
 }
 main(...process.argv.slice(2));

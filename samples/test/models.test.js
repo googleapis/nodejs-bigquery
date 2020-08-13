@@ -22,19 +22,17 @@ const uuid = require('uuid');
 
 const execSync = cmd => cp.execSync(cmd, {encoding: 'utf-8'});
 
+const GCLOUD_TESTS_PREFIX = 'nodejs_samples_tests_models';
+
 const bigquery = new BigQuery();
 
 describe('Models', () => {
-  const datasetId = `nodejs_samples_tests_models_${uuid.v4()}`.replace(
-    /-/gi,
-    '_'
-  );
-  const modelId = `nodejs_samples_tests_models_${uuid.v4()}`.replace(
-    /-/gi,
-    '_'
-  );
+  const datasetId = `${GCLOUD_TESTS_PREFIX}_${uuid.v4()}`.replace(/-/gi, '_');
+  const modelId = `${GCLOUD_TESTS_PREFIX}_${uuid.v4()}`.replace(/-/gi, '_');
 
   before(async () => {
+    await deleteDatasets();
+
     const query = `CREATE OR REPLACE MODEL \`${datasetId}.${modelId}\`
         OPTIONS(model_type='logistic_reg') AS
         SELECT
@@ -94,14 +92,44 @@ describe('Models', () => {
     const output = execSync(`node updateModel.js ${datasetId} ${modelId}`);
     assert.include(output, `${modelId} description: A really great model.`);
   });
+
+  // Only delete a resource if it is older than 24 hours. That will prevent
+  // collisions with parallel CI test runs.
+  function isResourceStale(creationTime) {
+    const oneDayMs = 86400000;
+    const now = new Date();
+    const created = new Date(creationTime);
+    return now.getTime() - created.getTime() >= oneDayMs;
+  }
+
+  async function deleteDatasets() {
+    let [datasets] = await bigquery.getDatasets();
+    datasets = datasets.filter(dataset =>
+      dataset.id.includes(GCLOUD_TESTS_PREFIX)
+    );
+
+    for (const dataset of datasets) {
+      const [metadata] = await dataset.getMetadata();
+      const creationTime = Number(metadata.creationTime);
+
+      if (isResourceStale(creationTime)) {
+        try {
+          await dataset.delete({force: true});
+        } catch (e) {
+          console.log(`dataset(${dataset.id}).delete() failed`);
+          console.log(e);
+        }
+      }
+    }
+  }
 });
 
 describe('Delete Model', () => {
-  const datasetId = `nodejs_samples_tests_models_delete_${uuid.v4()}`.replace(
+  const datasetId = `${GCLOUD_TESTS_PREFIX}_delete_${uuid.v4()}`.replace(
     /-/gi,
     '_'
   );
-  const modelId = `nodejs_samples_tests_models_delete_${uuid.v4()}`.replace(
+  const modelId = `${GCLOUD_TESTS_PREFIX}_delete_${uuid.v4()}`.replace(
     /-/gi,
     '_'
   );

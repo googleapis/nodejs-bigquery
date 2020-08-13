@@ -46,7 +46,7 @@ function main(
 
     console.log(`Routine ${routineId} created.`);
   }
-  // [END bigquery_create_routine_ddl]
   createRoutineDDL();
+  // [END bigquery_create_routine_ddl]
 }
 main(...process.argv.slice(2));

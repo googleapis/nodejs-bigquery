@@ -22,8 +22,12 @@ const uuid = require('uuid');
 const {BigQuery} = require('@google-cloud/bigquery');
 
 const execSync = cmd => cp.execSync(cmd, {encoding: 'utf-8'});
+
+const GCLOUD_TESTS_PREFIX = 'nodejs_samples_tests_queries';
+
 const generateUuid = () =>
-  `nodejs_samples_tests_queries_${uuid.v4()}`.replace(/-/gi, '_');
+  `${GCLOUD_TESTS_PREFIX}_${uuid.v4()}`.replace(/-/gi, '_');
+
 const datasetId = generateUuid();
 const tableId = generateUuid();
 const destTableId = generateUuid();
@@ -34,6 +38,8 @@ const bigquery = new BigQuery();
 
 describe('Queries', () => {
   before(async () => {
+    await deleteDatasets();
+
     const schema = [{name: 'age', type: 'STRING', mode: 'REQUIRED'}];
     const options = {
       schema: schema,
@@ -45,6 +51,7 @@ describe('Queries', () => {
       .createTable(tableId, options);
     projectId = tableData.metadata.tableReference.projectId;
   });
+
   after(async () => {
     await bigquery
       .dataset(datasetId)
@@ -191,4 +198,34 @@ describe('Queries', () => {
     );
     assert.include(output, `Routine ${routineId} created.`);
   });
+
+  // Only delete a resource if it is older than 24 hours. That will prevent
+  // collisions with parallel CI test runs.
+  function isResourceStale(creationTime) {
+    const oneDayMs = 86400000;
+    const now = new Date();
+    const created = new Date(creationTime);
+    return now.getTime() - created.getTime() >= oneDayMs;
+  }
+
+  async function deleteDatasets() {
+    let [datasets] = await bigquery.getDatasets();
+    datasets = datasets.filter(dataset =>
+      dataset.id.includes(GCLOUD_TESTS_PREFIX)
+    );
+
+    for (const dataset of datasets) {
+      const [metadata] = await dataset.getMetadata();
+      const creationTime = Number(metadata.creationTime);
+
+      if (isResourceStale(creationTime)) {
+        try {
+          await dataset.delete({force: true});
+        } catch (e) {
+          console.log(`dataset(${dataset.id}).delete() failed`);
+          console.log(e);
+        }
+      }
+    }
+  }
 });

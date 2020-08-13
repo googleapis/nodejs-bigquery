@@ -42,7 +42,7 @@ function main(
 
     console.log(`Routine ${routineId} deleted.`);
   }
-  // [END bigquery_delete_routine]
   deleteRoutine();
+  // [END bigquery_delete_routine]
 }
 main(...process.argv.slice(2));

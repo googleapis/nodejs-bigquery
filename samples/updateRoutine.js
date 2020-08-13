@@ -46,7 +46,7 @@ function main(
 
     console.log(`Routine description: ${routine.description}`);
   }
-  // [END bigquery_update_routine]
   updateRoutine();
+  // [END bigquery_update_routine]
 }
 main(...process.argv.slice(2));

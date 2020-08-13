@@ -21,11 +21,8 @@ function main() {
   // Create a client and set the user agent
   const bigquery = new BigQuery({userAgent: 'my-user-agent'});
 
-  async function setUserAgent() {
-    console.log('User agent:');
-    console.log(bigquery.providedUserAgent);
-  }
+  console.log('User agent:');
+  console.log(bigquery.providedUserAgent);
   // [END bigquery_set_user_agent]
-  setUserAgent();
 }
 main(...process.argv.slice(2));
