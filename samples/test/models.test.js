@@ -96,7 +96,7 @@ describe('Models', () => {
   });
 });
 
-describe('Delete Model', () => {
+describe('Create/Delete Model', () => {
   const datasetId = `nodejs_samples_tests_models_delete_${uuid.v4()}`.replace(
     /-/gi,
     '_'
@@ -107,35 +107,10 @@ describe('Delete Model', () => {
   );
 
   before(async () => {
-    const query = `CREATE OR REPLACE MODEL \`${datasetId}.${modelId}\`
-         OPTIONS(model_type='logistic_reg') AS
-         SELECT
-           IF(totals.transactions IS NULL, 0, 1) AS label,
-           IFNULL(device.operatingSystem, "") AS os,
-           device.isMobile AS is_mobile,
-           IFNULL(geoNetwork.country, "") AS country,
-           IFNULL(totals.pageviews, 0) AS pageviews
-         FROM
-           \`bigquery-public-data.google_analytics_sample.ga_sessions_*\`
-         WHERE
-           _TABLE_SUFFIX BETWEEN '20160801' AND '20170631'
-         LIMIT  100000;`;
-
     const datasetOptions = {
       location: 'US',
     };
-
-    const queryOptions = {
-      query: query,
-    };
-
     await bigquery.createDataset(datasetId, datasetOptions);
-
-    // Run query to create a model
-    const [job] = await bigquery.createQueryJob(queryOptions);
-
-    // Wait for the query to finish
-    await job.getQueryResults();
   });
 
   after(async () => {
@@ -143,6 +118,16 @@ describe('Delete Model', () => {
       .dataset(datasetId)
       .delete({force: true})
       .catch(console.warn);
+  });
+
+  it('should create a model', async () => {
+    const output = execSync(`node createModel.js ${datasetId} ${modelId}`);
+    assert.include(output, `Model ${modelId} created.`);
+    const [exists] = await bigquery
+      .dataset(datasetId)
+      .model(modelId)
+      .exists();
+    assert.strictEqual(exists, true);
   });
 
   it('should delete a model', async () => {
