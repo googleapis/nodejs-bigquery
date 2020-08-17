@@ -14,6 +14,11 @@
 
 'use strict';
 
+// sample-metadata:
+//   title: Create Model
+//   description: Creates a model in a dataset.
+//   usage: node createModel.js <DATASET_ID> <MODEL_ID>
+
 function main(datasetId = 'my_dataset', modelId = 'my_model') {
   // [START bigquery_create_model]
   // Import the Google Cloud client library
@@ -21,7 +26,7 @@ function main(datasetId = 'my_dataset', modelId = 'my_model') {
   const bigquery = new BigQuery();
 
   async function createModel() {
-    // Creates a model named "my_model" from "my_dataset".
+    // Creates a model named "my_model" in "my_dataset".
 
     /**
      * TODO(developer): Uncomment the following lines before running the sample
