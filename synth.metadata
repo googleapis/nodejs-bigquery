@@ -4,7 +4,7 @@
       "git": {
         "name": ".",
         "remote": "https://github.com/googleapis/nodejs-bigquery.git",
-        "sha": "d8da5a47dddc1729885c3094a6bbe85934437573"
+        "sha": "bc49d136252c32681083860fd7703010dcacfc93"
       }
     },
     {
