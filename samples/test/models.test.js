@@ -22,17 +22,13 @@ const uuid = require('uuid');
 
 const execSync = cmd => cp.execSync(cmd, {encoding: 'utf-8'});
 
+const GCLOUD_TESTS_PREFIX = 'nodejs_samples_tests_models';
+
 const bigquery = new BigQuery();
 
 describe('Models', () => {
-  const datasetId = `nodejs_samples_tests_models_${uuid.v4()}`.replace(
-    /-/gi,
-    '_'
-  );
-  const modelId = `nodejs_samples_tests_models_${uuid.v4()}`.replace(
-    /-/gi,
-    '_'
-  );
+  const datasetId = `${GCLOUD_TESTS_PREFIX}_${uuid.v4()}`.replace(/-/gi, '_');
+  const modelId = `${GCLOUD_TESTS_PREFIX}_${uuid.v4()}`.replace(/-/gi, '_');
 
   before(async () => {
     const query = `CREATE OR REPLACE MODEL \`${datasetId}.${modelId}\`
@@ -97,11 +93,11 @@ describe('Models', () => {
 });
 
 describe('Create/Delete Model', () => {
-  const datasetId = `nodejs_samples_tests_models_delete_${uuid.v4()}`.replace(
+  const datasetId = `${GCLOUD_TESTS_PREFIX}_delete_${uuid.v4()}`.replace(
     /-/gi,
     '_'
   );
-  const modelId = `nodejs_samples_tests_models_delete_${uuid.v4()}`.replace(
+  const modelId = `${GCLOUD_TESTS_PREFIX}_delete_${uuid.v4()}`.replace(
     /-/gi,
     '_'
   );

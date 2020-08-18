@@ -22,8 +22,10 @@ const uuid = require('uuid');
 const {BigQuery} = require('@google-cloud/bigquery');
 
 const execSync = cmd => cp.execSync(cmd, {encoding: 'utf-8'});
+
+const GCLOUD_TESTS_PREFIX = 'nodejs_samples_tests_authView';
 const generateUuid = () =>
-  `nodejs-samples-tests-authView-${uuid.v4()}`.replace(/-/gi, '_');
+  `${GCLOUD_TESTS_PREFIX}_${uuid.v4()}`.replace(/-/gi, '_');
 let projectId;
 const datasetId = generateUuid();
 const tableId = generateUuid();
