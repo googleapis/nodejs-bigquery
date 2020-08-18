@@ -60,7 +60,7 @@ function main(datasetId = 'my_dataset', modelId = 'my_model') {
 
     console.log(`Model ${modelId} created.`);
   }
-  // [END bigquery_create_model]
   createModel();
+  // [END bigquery_create_model]
 }
 main(...process.argv.slice(2));
