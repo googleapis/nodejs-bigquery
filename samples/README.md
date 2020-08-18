@@ -23,6 +23,8 @@
   * [Copy Table Multiple Source](#copy-table-multiple-source)
   * [Create Dataset](#create-dataset)
   * [Create Job](#create-job)
+  * [Create Routine](#create-routine)
+  * [Create Routine DDL](#create-routine-ddl)
   * [Create Table](#create-table)
   * [Create Table Partitioned](#create-table-partitioned)
   * [Create Table Range Partitioned](#create-table-range-partitioned)
@@ -32,6 +34,7 @@
   * [Delete Label Dataset](#delete-label-dataset)
   * [Delete Label Table](#delete-label-table)
   * [Delete Model](#delete-model)
+  * [Delete Routine](#delete-routine)
   * [Delete Table](#delete-table)
   * [Extract Table Compressed](#extract-table-compressed)
   * [Extract Table JSON](#extract-table-json)
@@ -40,6 +43,7 @@
   * [Get Dataset Labels](#get-dataset-labels)
   * [Get Job](#get-job)
   * [BigQuery Get Model](#bigquery-get-model)
+  * [Get Routine](#get-routine)
   * [BigQuery Get Table](#bigquery-get-table)
   * [Get Table Labels](#get-table-labels)
   * [Get View](#get-view)
@@ -52,6 +56,7 @@
   * [List Jobs](#list-jobs)
   * [BigQuery List Models](#bigquery-list-models)
   * [BigQuery List Models Streaming](#bigquery-list-models-streaming)
+  * [List Routines](#list-routines)
   * [List Tables](#list-tables)
   * [Load CSV From GCS](#load-csv-from-gcs)
   * [Load CSV From GCS Autodetect](#load-csv-from-gcs-autodetect)
@@ -88,11 +93,13 @@
   * [Relax Column](#relax-column)
   * [Relax Column Load Append](#relax-column-load-append)
   * [Relax Column Query Append](#relax-column-query-append)
+  * [Set User Agent](#set-user-agent)
   * [Undelete Table](#undelete-table)
   * [Update Dataset Access](#update-dataset-access)
   * [Update Dataset Description](#update-dataset-description)
   * [Update Dataset Expiration](#update-dataset-expiration)
   * [BigQuery Update Model](#bigquery-update-model)
+  * [Update Routine](#update-routine)
   * [Update Table Description](#update-table-description)
   * [Update Table Expiration](#update-table-expiration)
   * [Update View Query](#update-view-query)
@@ -299,6 +306,40 @@ __Usage:__
 
 
 
+### Create Routine
+
+View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/createRoutine.js).
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/createRoutine.js,samples/README.md)
+
+__Usage:__
+
+
+`node samples/createRoutine.js`
+
+
+-----
+
+
+
+
+### Create Routine DDL
+
+View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/createRoutineDDL.js).
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/createRoutineDDL.js,samples/README.md)
+
+__Usage:__
+
+
+`node samples/createRoutineDDL.js`
+
+
+-----
+
+
+
+
 ### Create Table
 
 View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/createTable.js).
@@ -454,6 +495,23 @@ __Usage:__
 
 
 
+### Delete Routine
+
+View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/deleteRoutine.js).
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/deleteRoutine.js,samples/README.md)
+
+__Usage:__
+
+
+`node samples/deleteRoutine.js`
+
+
+-----
+
+
+
+
 ### Delete Table
 
 View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/deleteTable.js).
@@ -587,6 +645,23 @@ __Usage:__
 
 
 `node getModel.js <DATASET_ID> <MODEL_ID>`
+
+
+-----
+
+
+
+
+### Get Routine
+
+View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/getRoutine.js).
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/getRoutine.js,samples/README.md)
+
+__Usage:__
+
+
+`node samples/getRoutine.js`
 
 
 -----
@@ -801,6 +876,23 @@ __Usage:__
 
 
 `node listModelsStreaming.js <DATASET_ID>`
+
+
+-----
+
+
+
+
+### List Routines
+
+View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/listRoutines.js).
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/listRoutines.js,samples/README.md)
+
+__Usage:__
+
+
+`node samples/listRoutines.js`
 
 
 -----
@@ -1420,6 +1512,23 @@ __Usage:__
 
 
 
+### Set User Agent
+
+View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/setUserAgent.js).
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/setUserAgent.js,samples/README.md)
+
+__Usage:__
+
+
+`node samples/setUserAgent.js`
+
+
+-----
+
+
+
+
 ### Undelete Table
 
 View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/undeleteTable.js).
@@ -1500,6 +1609,23 @@ __Usage:__
 
 
 `node updateModel.js <DATASET_ID> <MODEL_ID>`
+
+
+-----
+
+
+
+
+### Update Routine
+
+View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/updateRoutine.js).
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/updateRoutine.js,samples/README.md)
+
+__Usage:__
+
+
+`node samples/updateRoutine.js`
 
 
 -----
