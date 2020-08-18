@@ -22,11 +22,16 @@ const uuid = require('uuid');
 const {BigQuery} = require('@google-cloud/bigquery');
 
 const execSync = cmd => cp.execSync(cmd, {encoding: 'utf-8'});
+
+const GCLOUD_TESTS_PREFIX = 'nodejs_samples_tests_queries';
+
 const generateUuid = () =>
-  `nodejs_samples_tests_queries_${uuid.v4()}`.replace(/-/gi, '_');
+  `${GCLOUD_TESTS_PREFIX}_${uuid.v4()}`.replace(/-/gi, '_');
+
 const datasetId = generateUuid();
 const tableId = generateUuid();
 const destTableId = generateUuid();
+const routineId = generateUuid();
 let projectId;
 
 const bigquery = new BigQuery();
@@ -44,6 +49,7 @@ describe('Queries', () => {
       .createTable(tableId, options);
     projectId = tableData.metadata.tableReference.projectId;
   });
+
   after(async () => {
     await bigquery
       .dataset(datasetId)
@@ -182,5 +188,12 @@ describe('Queries', () => {
     );
     assert.match(output, /Rows:/);
     assert.match(output, /post_abbr/);
+  });
+
+  it('should create a routine using DDL', async () => {
+    const output = execSync(
+      `node createRoutineDDL.js ${projectId} ${datasetId} ${routineId}`
+    );
+    assert.include(output, `Routine ${routineId} created.`);
   });
 });

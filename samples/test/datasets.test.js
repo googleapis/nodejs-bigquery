@@ -16,19 +16,25 @@
 
 const {BigQuery} = require('@google-cloud/bigquery');
 const {assert} = require('chai');
-const {describe, it, after} = require('mocha');
+const {describe, it, after, before} = require('mocha');
 const cp = require('child_process');
 const uuid = require('uuid');
 
 const execSync = cmd => cp.execSync(cmd, {encoding: 'utf-8'});
-
-const datasetId = `nodejs_samples_tests_datasets_${uuid.v4()}`.replace(
+const GCLOUD_TESTS_PREFIX = 'nodejs_samples_tests';
+const datasetId = `${GCLOUD_TESTS_PREFIX}_datasets_${uuid.v4()}`.replace(
   /-/gi,
   '_'
 );
+
 const bigquery = new BigQuery();
 
 describe('Datasets', () => {
+  before(async () => {
+    // Delete any stale datasets from samples tests
+    await deleteDatasets();
+  });
+
   after(async () => {
     await bigquery
       .dataset(datasetId)
@@ -105,4 +111,34 @@ describe('Datasets', () => {
     const [exists] = await bigquery.dataset(datasetId).exists();
     assert.strictEqual(exists, false);
   });
+
+  // Only delete a resource if it is older than 24 hours. That will prevent
+  // collisions with parallel CI test runs.
+  function isResourceStale(creationTime) {
+    const oneDayMs = 86400000;
+    const now = new Date();
+    const created = new Date(creationTime);
+    return now.getTime() - created.getTime() >= oneDayMs;
+  }
+
+  async function deleteDatasets() {
+    let [datasets] = await bigquery.getDatasets();
+    datasets = datasets.filter(dataset =>
+      dataset.id.includes(GCLOUD_TESTS_PREFIX)
+    );
+
+    for (const dataset of datasets) {
+      const [metadata] = await dataset.getMetadata();
+      const creationTime = Number(metadata.creationTime);
+
+      if (isResourceStale(creationTime)) {
+        try {
+          await dataset.delete({force: true});
+        } catch (e) {
+          console.log(`dataset(${dataset.id}).delete() failed`);
+          console.log(e);
+        }
+      }
+    }
+  }
 });
