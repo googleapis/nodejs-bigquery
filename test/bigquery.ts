@@ -170,6 +170,14 @@ describe('BigQuery', () => {
   });
 
   describe('instantiation', () => {
+    function setHost(host: string) {
+      process.env.BIGQUERY_BASE_URL = host;
+    }
+
+    function unsetVariables() {
+      delete process.env.BIGQUERY_BASE_URL;
+    }
+
     it('should extend the correct methods', () => {
       assert(extended); // See `fakePaginator.extend`
     });
@@ -211,6 +219,17 @@ describe('BigQuery', () => {
         calledWith.baseUrl,
         `https://${apiEndpoint}/bigquery/v2`
       );
+    });
+
+    it('should allow overriding the baseUrl', () => {
+      const baseUrl = 'http://bigquery.test.url.com';
+      setHost(baseUrl);
+
+      bq = new BigQuery();
+      const calledWith = bq.calledWith_[0];
+      assert.strictEqual(calledWith.baseUrl, baseUrl);
+
+      unsetVariables();
     });
 
     it('should capture any user specified location', () => {
