@@ -171,11 +171,11 @@ describe('BigQuery', () => {
 
   describe('instantiation', () => {
     function setHost(host: string) {
-      process.env.BIGQUERY_BASE_URL = host;
+      process.env.BIGQUERY_EMULATOR_HOST = host;
     }
 
     function unsetVariables() {
-      delete process.env.BIGQUERY_BASE_URL;
+      delete process.env.BIGQUERY_EMULATOR_HOST;
     }
 
     it('should extend the correct methods', () => {

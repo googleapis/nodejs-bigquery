@@ -253,7 +253,7 @@ export class BigQuery extends common.Service {
     });
 
     const baseUrl =
-      process.env.BIGQUERY_BASE_URL ||
+      process.env.BIGQUERY_EMULATOR_HOST ||
       `https://${options.apiEndpoint}/bigquery/v2`;
 
     const config = {
