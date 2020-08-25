@@ -174,9 +174,9 @@ describe('BigQuery', () => {
       process.env.BIGQUERY_EMULATOR_HOST = host;
     }
 
-    function unsetVariables() {
+    afterEach(() => {
       delete process.env.BIGQUERY_EMULATOR_HOST;
-    }
+    });
 
     it('should extend the correct methods', () => {
       assert(extended); // See `fakePaginator.extend`
@@ -228,8 +228,6 @@ describe('BigQuery', () => {
       bq = new BigQuery();
       const calledWith = bq.calledWith_[0];
       assert.strictEqual(calledWith.baseUrl, baseUrl);
-
-      unsetVariables();
     });
 
     it('should capture any user specified location', () => {
