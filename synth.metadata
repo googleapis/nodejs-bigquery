@@ -4,7 +4,7 @@
       "git": {
         "name": ".",
         "remote": "https://github.com/googleapis/nodejs-bigquery.git",
-        "sha": "b600555eee2b7081bcc2d13d3e74b3df02a88bbb"
+        "sha": "04b2785b7910d799d8e4c466b298eb590b77fb4e"
       }
     },
     {
@@ -64,9 +64,7 @@
     "LICENSE",
     "README.md",
     "api-extractor.json",
-    "package-lock.json.769359454",
     "renovate.json",
-    "samples/README.md",
-    "samples/package-lock.json.2139348847"
+    "samples/README.md"
   ]
 }
