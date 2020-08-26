@@ -23,6 +23,7 @@
   * [Copy Table Multiple Source](#copy-table-multiple-source)
   * [Create Dataset](#create-dataset)
   * [Create Job](#create-job)
+  * [Create Model](#create-model)
   * [Create Routine](#create-routine)
   * [Create Routine DDL](#create-routine-ddl)
   * [Create Table](#create-table)
@@ -299,6 +300,25 @@ __Usage:__
 
 
 `node samples/createJob.js`
+
+
+-----
+
+
+
+
+### Create Model
+
+Creates a model in a dataset.
+
+View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/createModel.js).
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/createModel.js,samples/README.md)
+
+__Usage:__
+
+
+`node createModel.js <DATASET_ID> <MODEL_ID>`
 
 
 -----
