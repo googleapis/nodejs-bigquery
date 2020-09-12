@@ -4,14 +4,14 @@
       "git": {
         "name": ".",
         "remote": "https://github.com/googleapis/nodejs-bigquery.git",
-        "sha": "c2058e4f4a0c985c405f0cfb0718053b520367cf"
+        "sha": "58dcf34d8d22b4b5c9e488935b75eeaf8c8fd69e"
       }
     },
     {
       "git": {
         "name": "synthtool",
         "remote": "https://github.com/googleapis/synthtool.git",
-        "sha": "8cf6d2834ad14318e64429c3b94f6443ae83daf9"
+        "sha": "fdd03c161003ab97657cc0218f25c82c89ddf4b6"
       }
     }
   ],
