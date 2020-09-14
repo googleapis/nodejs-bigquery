@@ -1698,6 +1698,39 @@ describe('BigQuery/Table', () => {
           })
           .emit('writing');
       });
+
+      describe('with BIGQUERY_EMULATOR_HOST environment variable', () => {
+        const emulatorDataset = {
+          id: 'dataset-id',
+          createTable: util.noop,
+          bigQuery: {
+            projectId: 'project-id',
+            job: (id: string) => {
+              return {id};
+            },
+            apiEndpoint: '',
+            baseUrl: 'http://test.test.dev/',
+            request: util.noop,
+          },
+        };
+
+        it('should pass the correct request uri', done => {
+          const table = new Table(emulatorDataset, TABLE_ID);
+
+          makeWritableStreamOverride = (
+            stream: stream.Stream,
+            options: MakeWritableStreamOptions
+          ) => {
+            assert.deepStrictEqual(options.request, {
+              uri:
+                'http://test.test.dev/upload/bigquery/v2/projects/project-id/jobs',
+            });
+            done();
+          };
+
+          table.createWriteStream_({a: 'b', c: 'd'}).emit('writing');
+        });
+      });
     });
   });
 

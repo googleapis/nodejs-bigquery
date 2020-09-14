@@ -22,7 +22,7 @@ import {
 import * as pfy from '@google-cloud/promisify';
 import arrify = require('arrify');
 import * as assert from 'assert';
-import {describe, it, afterEach, before, beforeEach} from 'mocha';
+import {describe, it, after, afterEach, before, beforeEach} from 'mocha';
 import Big from 'big.js';
 import * as extend from 'extend';
 import * as proxyquire from 'proxyquire';
@@ -141,7 +141,10 @@ describe('BigQuery', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let bq: any;
 
+  const BIGQUERY_EMULATOR_HOST = process.env.BIGQUERY_EMULATOR_HOST;
+
   before(() => {
+    delete process.env.BIGQUERY_EMULATOR_HOST;
     BigQuery = proxyquire('../src/bigquery', {
       uuid: fakeUuid,
       './dataset': {
@@ -169,15 +172,13 @@ describe('BigQuery', () => {
     bq = new BigQuery({projectId: PROJECT_ID});
   });
 
-  describe('instantiation', () => {
-    function setHost(host: string) {
-      process.env.BIGQUERY_EMULATOR_HOST = host;
+  after(() => {
+    if (BIGQUERY_EMULATOR_HOST) {
+      process.env.BIGQUERY_EMULATOR_HOST = BIGQUERY_EMULATOR_HOST;
     }
+  });
 
-    afterEach(() => {
-      delete process.env.BIGQUERY_EMULATOR_HOST;
-    });
-
+  describe('instantiation', () => {
     it('should extend the correct methods', () => {
       assert(extended); // See `fakePaginator.extend`
     });
@@ -221,15 +222,6 @@ describe('BigQuery', () => {
       );
     });
 
-    it('should allow overriding the baseUrl', () => {
-      const baseUrl = 'http://bigquery.test.url.com';
-      setHost(baseUrl);
-
-      bq = new BigQuery();
-      const calledWith = bq.calledWith_[0];
-      assert.strictEqual(calledWith.baseUrl, baseUrl);
-    });
-
     it('should capture any user specified location', () => {
       const bq = new BigQuery({
         projectId: PROJECT_ID,
@@ -264,6 +256,30 @@ describe('BigQuery', () => {
       assert.notStrictEqual(calledWith, options);
       assert.notDeepStrictEqual(calledWith, options);
       assert.deepStrictEqual(calledWith, expectedCalledWith);
+    });
+
+    describe('with BIGQUERY_EMULATOR_HOST environment variable', () => {
+      function setHost(host: string) {
+        process.env.BIGQUERY_EMULATOR_HOST = host;
+      }
+
+      function unsetHost() {
+        delete process.env.BIGQUERY_EMULATOR_HOST;
+      }
+
+      after(() => {
+        unsetHost();
+      });
+
+      it('should allow overriding the baseUrl', () => {
+        const baseUrl = 'http://bigquery.test.url.com';
+        setHost(baseUrl);
+
+        bq = new BigQuery();
+        const calledWith = bq.calledWith_[0];
+        assert.strictEqual(calledWith.baseUrl, baseUrl);
+        assert.strictEqual(calledWith.apiEndpoint, '');
+      });
     });
   });
 

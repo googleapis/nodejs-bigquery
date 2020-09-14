@@ -248,13 +248,20 @@ export class BigQuery extends common.Service {
   getJobsStream: (options?: GetJobsOptions) => ResourceStream<Job>;
 
   constructor(options: BigQueryOptions = {}) {
+    let apiEndpoint = 'bigquery.googleapis.com';
+
+    const EMULATOR_HOST = process.env.BIGQUERY_EMULATOR_HOST;
+
+    if (typeof EMULATOR_HOST === 'string') {
+      apiEndpoint = '';
+    }
+
     options = Object.assign({}, options, {
-      apiEndpoint: options.apiEndpoint || 'bigquery.googleapis.com',
+      apiEndpoint: options.apiEndpoint || apiEndpoint,
     });
 
     const baseUrl =
-      process.env.BIGQUERY_EMULATOR_HOST ||
-      `https://${options.apiEndpoint}/bigquery/v2`;
+      EMULATOR_HOST || `https://${options.apiEndpoint}/bigquery/v2`;
 
     const config = {
       apiEndpoint: options.apiEndpoint!,
