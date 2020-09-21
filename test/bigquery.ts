@@ -272,11 +272,13 @@ describe('BigQuery', () => {
       });
 
       it('should allow overriding the baseUrl', () => {
-        const baseUrl = 'http://bigquery.test.url.com';
+        let baseUrl = 'http://bigquery.test.url.com/';
         setHost(baseUrl);
 
         bq = new BigQuery();
         const calledWith = bq.calledWith_[0];
+
+        baseUrl = baseUrl.replace(/\/+$/, ''); // Remove trailing slash
         assert.strictEqual(calledWith.baseUrl, baseUrl);
         assert.strictEqual(calledWith.apiEndpoint, '');
       });

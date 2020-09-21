@@ -260,8 +260,9 @@ export class BigQuery extends common.Service {
       apiEndpoint: options.apiEndpoint || apiEndpoint,
     });
 
-    const baseUrl =
-      EMULATOR_HOST || `https://${options.apiEndpoint}/bigquery/v2`;
+    let baseUrl = EMULATOR_HOST || `https://${options.apiEndpoint}/bigquery/v2`;
+
+    baseUrl = baseUrl.replace(/\/+$/, ''); // Remove trailing slashes
 
     const config = {
       apiEndpoint: options.apiEndpoint!,

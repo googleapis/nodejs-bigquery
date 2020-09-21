@@ -1709,7 +1709,7 @@ describe('BigQuery/Table', () => {
               return {id};
             },
             apiEndpoint: '',
-            baseUrl: 'http://test.test.dev/',
+            baseUrl: 'http://test.test.dev',
             request: util.noop,
           },
         };

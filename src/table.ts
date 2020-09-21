@@ -1400,7 +1400,7 @@ class Table extends common.ServiceObject {
     let uri: string;
 
     if (this.bigQuery.baseUrl) {
-      const baseUrl = this.bigQuery.baseUrl.replace(/\/+$/, ''); // Remove trailing slashes
+      const baseUrl = this.bigQuery.baseUrl;
       uri = `${baseUrl}/upload/bigquery/v2/projects/${this.bigQuery.projectId}/jobs`;
     } else {
       uri = `https://${this.bigQuery.apiEndpoint}/upload/bigquery/v2/projects/${this.bigQuery.projectId}/jobs`;
