@@ -1422,7 +1422,7 @@ class Table extends common.ServiceObject {
             },
           } as {},
           request: {
-            uri: uri,
+            uri: `${this.bigQuery.baseUrl}/upload/bigquery/v2/projects/${this.bigQuery.projectId}/jobs`,
           },
         },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
