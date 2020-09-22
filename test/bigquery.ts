@@ -280,7 +280,10 @@ describe('BigQuery', () => {
 
         baseUrl = baseUrl.replace(/\/+$/, ''); // Remove trailing slash
         assert.strictEqual(calledWith.baseUrl, baseUrl);
-        assert.strictEqual(calledWith.apiEndpoint, '');
+        assert.strictEqual(
+          calledWith.apiEndpoint,
+          'http://bigquery.test.url.com'
+        );
       });
     });
   });
