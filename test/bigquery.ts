@@ -286,6 +286,27 @@ describe('BigQuery', () => {
         );
       });
     });
+
+    describe('prettyPrint request interceptor', () => {
+      let requestInterceptor: Function;
+
+      beforeEach(() => {
+        requestInterceptor = bq.interceptors.pop().request;
+      });
+
+      it('should disable prettyPrint', () => {
+        assert.deepStrictEqual(requestInterceptor({}), {
+          qs: {prettyPrint: false},
+        });
+      });
+
+      it('should clone json', () => {
+        const reqOpts = {qs: {a: 'b'}};
+        const expectedReqOpts = {qs: {a: 'b', prettyPrint: false}};
+        assert.deepStrictEqual(requestInterceptor(reqOpts), expectedReqOpts);
+        assert.notDeepStrictEqual(reqOpts, expectedReqOpts);
+      });
+    });
   });
 
   describe('mergeSchemaWithRows_', () => {

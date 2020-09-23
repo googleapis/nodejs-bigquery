@@ -383,6 +383,14 @@ export class BigQuery extends common.Service {
      *   });
      */
     this.getJobsStream = paginator.streamify<Job>('getJobs');
+
+    // Disable `prettyPrint` for better performance.
+    // https://github.com/googleapis/nodejs-bigquery/issues/858
+    this.interceptors.push({
+      request: (reqOpts: common.DecorateRequestOptions) => {
+        return extend(true, {}, reqOpts, {qs: {prettyPrint: false}});
+      },
+    });
   }
 
   private static sanitizeEndpoint(url: string) {
