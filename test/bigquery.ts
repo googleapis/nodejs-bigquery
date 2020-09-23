@@ -244,12 +244,12 @@ describe('BigQuery', () => {
       assert.deepStrictEqual(calledWith.scopes, expectedScopes);
     });
 
-    it('should not modify options argument', () => {
+    it('should not correctly modify options argument', () => {
       const options = {
         projectId: PROJECT_ID,
       };
       const expectedCalledWith = Object.assign({}, options, {
-        apiEndpoint: 'bigquery.googleapis.com',
+        apiEndpoint: 'https://bigquery.googleapis.com',
       });
       const bigquery = new BigQuery(options);
       const calledWith = bigquery.calledWith_[1];

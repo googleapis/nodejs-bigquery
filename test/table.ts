@@ -164,7 +164,7 @@ describe('BigQuery/Table', () => {
       job: (id: string) => {
         return {id};
       },
-      apiEndpoint: 'bigquery.googleapis.com',
+      apiEndpoint: 'https://bigquery.googleapis.com',
       request: util.noop,
     },
   };
@@ -1699,7 +1699,7 @@ describe('BigQuery/Table', () => {
           .emit('writing');
       });
 
-      describe('with BIGQUERY_EMULATOR_HOST environment variable', () => {
+      describe('with BIGQUERY_EMULATOR_HOST baseUrl set', () => {
         const emulatorDataset = {
           id: 'dataset-id',
           createTable: util.noop,
@@ -1708,7 +1708,7 @@ describe('BigQuery/Table', () => {
             job: (id: string) => {
               return {id};
             },
-            apiEndpoint: '',
+            apiEndpoint: 'http://test.test.dev',
             baseUrl: 'http://test.test.dev',
             request: util.noop,
           },

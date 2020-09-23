@@ -1397,14 +1397,6 @@ class Table extends common.ServiceObject {
     }
 
     const dup = streamEvents(duplexify());
-    let uri: string;
-
-    if (this.bigQuery.baseUrl) {
-      const baseUrl = this.bigQuery.baseUrl;
-      uri = `${baseUrl}/upload/bigquery/v2/projects/${this.bigQuery.projectId}/jobs`;
-    } else {
-      uri = `https://${this.bigQuery.apiEndpoint}/upload/bigquery/v2/projects/${this.bigQuery.projectId}/jobs`;
-    }
 
     dup.once('writing', () => {
       common.util.makeWritableStream(
@@ -1422,7 +1414,7 @@ class Table extends common.ServiceObject {
             },
           } as {},
           request: {
-            uri: `${this.bigQuery.baseUrl}/upload/bigquery/v2/projects/${this.bigQuery.projectId}/jobs`,
+            uri: `${this.bigQuery.apiEndpoint}/upload/bigquery/v2/projects/${this.bigQuery.projectId}/jobs`,
           },
         },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
