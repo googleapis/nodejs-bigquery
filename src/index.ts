@@ -37,6 +37,7 @@ export {
   PagedCallback,
   PagedRequest,
   PagedResponse,
+  PROTOCOL_REGEX,
   Query,
   QueryOptions,
   QueryParameter,

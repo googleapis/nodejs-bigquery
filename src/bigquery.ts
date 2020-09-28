@@ -270,7 +270,7 @@ export class BigQuery extends common.Service {
 
     const config = {
       apiEndpoint: options.apiEndpoint!,
-      baseUrl: BigQuery.sanitizeEndpoint(baseUrl),
+      baseUrl,
       scopes: ['https://www.googleapis.com/auth/bigquery'],
       packageJson: require('../../package.json'),
     };
