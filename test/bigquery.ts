@@ -269,7 +269,7 @@ describe('BigQuery', () => {
       assert.deepStrictEqual(calledWith.scopes, expectedScopes);
     });
 
-    it('should not correctly modify options argument', () => {
+    it('should not modify options argument', () => {
       const options = {
         projectId: PROJECT_ID,
       };
