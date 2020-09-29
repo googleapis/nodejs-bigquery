@@ -302,6 +302,19 @@ describe('BigQuery', () => {
     });
   });
 
+  it('should honor the labels option', done => {
+    const options = {
+      query,
+      labels: {foo: 'bar'},
+    };
+
+    bigquery.createQueryJob(options, (err, _, job) => {
+      assert.ifError(err);
+      assert(job!.configuration!.labels);
+      done();
+    });
+  });
+
   it('should query as a stream', done => {
     let rowsEmitted = 0;
 

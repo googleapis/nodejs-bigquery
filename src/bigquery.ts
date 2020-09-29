@@ -89,6 +89,7 @@ export type Query = JobRequest<bigquery.IJobConfigurationQuery> & {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   params?: any[] | {[param: string]: any};
   dryRun?: boolean;
+  labels?: {[label: string]: string};
   types?: string[] | string[][] | {[type: string]: string[]};
   job?: Job;
   maxResults?: number;
@@ -1254,6 +1255,11 @@ export class BigQuery extends common.Service {
     if (query.dryRun) {
       reqOpts.configuration.dryRun = query.dryRun;
       delete query.dryRun;
+    }
+
+    if (query.labels) {
+      reqOpts.configuration.labels = query.labels;
+      delete query.labels;
     }
 
     if (query.jobPrefix) {
