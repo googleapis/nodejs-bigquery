@@ -1595,7 +1595,8 @@ describe('BigQuery/Table', () => {
           options: MakeWritableStreamOptions
         ) => {
           const uri =
-            table.bigQuery.apiEndpoint + '/upload/bigquery/v2/projects/' +
+            table.bigQuery.apiEndpoint +
+            '/upload/bigquery/v2/projects/' +
             table.bigQuery.projectId +
             '/jobs';
           assert.strictEqual(options.request.uri, uri);
