@@ -1087,6 +1087,8 @@ export class BigQuery extends common.Service {
    * @param {boolean} [options.dryRun] If set, don't actually run this job. A
    *     valid query will update the job with processing statistics. These can
    * be accessed via `job.metadata`.
+   * @param {object} [options.labels] String key/value pairs to be attached as
+   *     labels to the newly created Job.
    * @param {string} [options.location] The geographic location of the job.
    *     Required except for US and EU.
    * @param {string} [options.jobId] Custom job id.
