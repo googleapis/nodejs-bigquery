@@ -1769,6 +1769,25 @@ describe('BigQuery', () => {
       bq.createQueryJob(options, assert.ifError);
     });
 
+    it('should accept the label options', done => {
+      const options = {
+        query: QUERY_STRING,
+        labels: {foo: 'bar'},
+      };
+
+      bq.createJob = (reqOpts: JobOptions) => {
+        assert.strictEqual(
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (reqOpts.configuration!.query as any).labels,
+          undefined
+        );
+        assert.deepStrictEqual(reqOpts.configuration!.labels, options.labels);
+        done();
+      };
+
+      bq.createQueryJob(options, assert.ifError);
+    });
+
     it('should accept a job prefix', done => {
       const options = {
         query: QUERY_STRING,
