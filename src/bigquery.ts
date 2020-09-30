@@ -89,6 +89,7 @@ export type Query = JobRequest<bigquery.IJobConfigurationQuery> & {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   params?: any[] | {[param: string]: any};
   dryRun?: boolean;
+  labels?: {[label: string]: string};
   types?: string[] | string[][] | {[type: string]: string[]};
   job?: Job;
   maxResults?: number;
@@ -1086,6 +1087,8 @@ export class BigQuery extends common.Service {
    * @param {boolean} [options.dryRun] If set, don't actually run this job. A
    *     valid query will update the job with processing statistics. These can
    * be accessed via `job.metadata`.
+   * @param {object} [options.labels] String key/value pairs to be attached as
+   *     labels to the newly created Job.
    * @param {string} [options.location] The geographic location of the job.
    *     Required except for US and EU.
    * @param {string} [options.jobId] Custom job id.
@@ -1254,6 +1257,11 @@ export class BigQuery extends common.Service {
     if (query.dryRun) {
       reqOpts.configuration.dryRun = query.dryRun;
       delete query.dryRun;
+    }
+
+    if (query.labels) {
+      reqOpts.configuration.labels = query.labels;
+      delete query.labels;
     }
 
     if (query.jobPrefix) {
