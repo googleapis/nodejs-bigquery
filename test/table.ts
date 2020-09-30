@@ -164,7 +164,7 @@ describe('BigQuery/Table', () => {
       job: (id: string) => {
         return {id};
       },
-      apiEndpoint: 'https://bigquery.googleapis.com',
+      apiEndpoint: 'bigquery.googleapis.com',
       request: util.noop,
     },
   };
@@ -1595,7 +1595,7 @@ describe('BigQuery/Table', () => {
           options: MakeWritableStreamOptions
         ) => {
           const uri =
-            'https://bigquery.googleapis.com/upload/bigquery/v2/projects/' +
+            table.bigQuery.apiEndpoint + '/upload/bigquery/v2/projects/' +
             table.bigQuery.projectId +
             '/jobs';
           assert.strictEqual(options.request.uri, uri);
