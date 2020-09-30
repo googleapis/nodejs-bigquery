@@ -4,6 +4,20 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## [5.3.0](https://www.github.com/googleapis/nodejs-bigquery/compare/v5.2.0...v5.3.0) (2020-09-30)
+
+
+### Features
+
+* **constructor:** add option to set baseUrl using environment variable ([#849](https://www.github.com/googleapis/nodejs-bigquery/issues/849)) ([8c54f20](https://www.github.com/googleapis/nodejs-bigquery/commit/8c54f20777a902a343035fcf09e63978d71135ad))
+* allow setting BigQuery Job labels in createQueryJob method ([#865](https://www.github.com/googleapis/nodejs-bigquery/issues/865)) ([be074e7](https://www.github.com/googleapis/nodejs-bigquery/commit/be074e72ae1907f0649fbc5e085e22a31c3a6393))
+
+
+### Bug Fixes
+
+* **deps:** update dependency yargs to v16 ([#854](https://www.github.com/googleapis/nodejs-bigquery/issues/854)) ([58dcf34](https://www.github.com/googleapis/nodejs-bigquery/commit/58dcf34d8d22b4b5c9e488935b75eeaf8c8fd69e))
+* **perf:** disable prettyPrint for slimmer API responses ([#860](https://www.github.com/googleapis/nodejs-bigquery/issues/860)) ([1e56383](https://www.github.com/googleapis/nodejs-bigquery/commit/1e56383da5e6d8ce1335a711b32fea1155bddada))
+
 ## [5.2.0](https://www.github.com/googleapis/nodejs-bigquery/compare/v5.1.0...v5.2.0) (2020-08-13)
 
 
