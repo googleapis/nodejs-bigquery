@@ -22,7 +22,7 @@ import {
 import * as pfy from '@google-cloud/promisify';
 import arrify = require('arrify');
 import * as assert from 'assert';
-import {describe, it, afterEach, before, beforeEach} from 'mocha';
+import {describe, it, after, afterEach, before, beforeEach} from 'mocha';
 import Big from 'big.js';
 import * as extend from 'extend';
 import * as proxyquire from 'proxyquire';
@@ -33,6 +33,7 @@ import {
   BigQueryDate,
   Dataset,
   Job,
+  PROTOCOL_REGEX,
   Table,
   JobOptions,
   TableField,
@@ -141,7 +142,10 @@ describe('BigQuery', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let bq: any;
 
+  const BIGQUERY_EMULATOR_HOST = process.env.BIGQUERY_EMULATOR_HOST;
+
   before(() => {
+    delete process.env.BIGQUERY_EMULATOR_HOST;
     BigQuery = proxyquire('../src/bigquery', {
       uuid: fakeUuid,
       './dataset': {
@@ -167,6 +171,12 @@ describe('BigQuery', () => {
     Object.assign(fakeUtil, originalFakeUtil);
     BigQuery = Object.assign(BigQuery, BigQueryCached);
     bq = new BigQuery({projectId: PROJECT_ID});
+  });
+
+  after(() => {
+    if (BIGQUERY_EMULATOR_HOST) {
+      process.env.BIGQUERY_EMULATOR_HOST = BIGQUERY_EMULATOR_HOST;
+    }
   });
 
   describe('instantiation', () => {
@@ -202,15 +212,39 @@ describe('BigQuery', () => {
     });
 
     it('should allow overriding the apiEndpoint', () => {
-      const apiEndpoint = 'not.real.local';
+      const apiEndpoint = 'https://not.real.local';
       bq = new BigQuery({
         apiEndpoint,
       });
       const calledWith = bq.calledWith_[0];
+      assert.strictEqual(calledWith.baseUrl, `${apiEndpoint}/bigquery/v2`);
+      assert.strictEqual(calledWith.apiEndpoint, `${apiEndpoint}`);
+    });
+
+    it('should prepend apiEndpoint with default protocol', () => {
+      const protocollessApiEndpoint = 'some.fake.endpoint';
+      bq = new BigQuery({
+        apiEndpoint: protocollessApiEndpoint,
+      });
+      const calledWith = bq.calledWith_[0];
       assert.strictEqual(
         calledWith.baseUrl,
-        `https://${apiEndpoint}/bigquery/v2`
+        `https://${protocollessApiEndpoint}/bigquery/v2`
       );
+      assert.strictEqual(
+        calledWith.apiEndpoint,
+        `https://${protocollessApiEndpoint}`
+      );
+    });
+
+    it('should strip trailing slash from apiEndpoint', () => {
+      const apiEndpoint = 'https://some.fake.endpoint/';
+      bq = new BigQuery({
+        apiEndpoint: apiEndpoint,
+      });
+      const calledWith = bq.calledWith_[0];
+      assert.strictEqual(calledWith.baseUrl, `${apiEndpoint}bigquery/v2`);
+      assert.strictEqual(calledWith.apiEndpoint, 'https://some.fake.endpoint');
     });
 
     it('should capture any user specified location', () => {
@@ -240,13 +274,65 @@ describe('BigQuery', () => {
         projectId: PROJECT_ID,
       };
       const expectedCalledWith = Object.assign({}, options, {
-        apiEndpoint: 'bigquery.googleapis.com',
+        apiEndpoint: 'https://bigquery.googleapis.com',
       });
       const bigquery = new BigQuery(options);
       const calledWith = bigquery.calledWith_[1];
       assert.notStrictEqual(calledWith, options);
       assert.notDeepStrictEqual(calledWith, options);
       assert.deepStrictEqual(calledWith, expectedCalledWith);
+    });
+
+    describe('BIGQUERY_EMULATOR_HOST', () => {
+      const EMULATOR_HOST = 'https://internal.benchmark.com/path';
+
+      before(() => {
+        process.env.BIGQUERY_EMULATOR_HOST = EMULATOR_HOST;
+      });
+
+      after(() => {
+        delete process.env.BIGQUERY_EMULATOR_HOST;
+      });
+
+      it('should set baseUrl to env var STORAGE_EMULATOR_HOST', () => {
+        bq = new BigQuery({
+          projectId: PROJECT_ID,
+        });
+
+        const calledWith = bq.calledWith_[0];
+        assert.strictEqual(calledWith.baseUrl, EMULATOR_HOST);
+        assert.strictEqual(
+          calledWith.apiEndpoint,
+          'https://internal.benchmark.com/path'
+        );
+      });
+
+      it('should be overriden by apiEndpoint', () => {
+        bq = new BigQuery({
+          projectId: PROJECT_ID,
+          apiEndpoint: 'https://some.api.com',
+        });
+
+        const calledWith = bq.calledWith_[0];
+        assert.strictEqual(calledWith.baseUrl, EMULATOR_HOST);
+        assert.strictEqual(calledWith.apiEndpoint, 'https://some.api.com');
+      });
+
+      it('should prepend default protocol and strip trailing slash', () => {
+        const EMULATOR_HOST = 'internal.benchmark.com/path/';
+        process.env.BIGQUERY_EMULATOR_HOST = EMULATOR_HOST;
+
+        bq = new BigQuery({
+          projectId: PROJECT_ID,
+        });
+
+        const calledWith = bq.calledWith_[0];
+        assert.strictEqual(calledWith.baseUrl, EMULATOR_HOST);
+        assert.strictEqual(
+          calledWith.apiEndpoint,
+          'https://internal.benchmark.com/path'
+        );
+      });
     });
 
     describe('prettyPrint request interceptor', () => {
@@ -2240,6 +2326,40 @@ describe('BigQuery', () => {
       bq.queryAsStream_(query, done);
       assert(cbStub.calledOnceWithExactly(query, sinon.match.func));
       assert(queryStub.notCalled);
+    });
+  });
+
+  describe('#sanitizeEndpoint', () => {
+    const USER_DEFINED_SHORT_API_ENDPOINT = 'myapi.com:8080';
+    const USER_DEFINED_PROTOCOL = 'myproto';
+    const USER_DEFINED_FULL_API_ENDPOINT = `${USER_DEFINED_PROTOCOL}://myapi.com:8080`;
+
+    it('should default protocol to https', () => {
+      const endpoint = BigQuery.sanitizeEndpoint(
+        USER_DEFINED_SHORT_API_ENDPOINT
+      );
+      assert.strictEqual(endpoint.match(PROTOCOL_REGEX)![1], 'https');
+    });
+
+    it('should not override protocol', () => {
+      const endpoint = BigQuery.sanitizeEndpoint(
+        USER_DEFINED_FULL_API_ENDPOINT
+      );
+      assert.strictEqual(
+        endpoint.match(PROTOCOL_REGEX)![1],
+        USER_DEFINED_PROTOCOL
+      );
+    });
+
+    it('should remove trailing slashes from URL', () => {
+      const endpointsWithTrailingSlashes = [
+        `${USER_DEFINED_FULL_API_ENDPOINT}/`,
+        `${USER_DEFINED_FULL_API_ENDPOINT}//`,
+      ];
+      for (const endpointWithTrailingSlashes of endpointsWithTrailingSlashes) {
+        const endpoint = BigQuery.sanitizeEndpoint(endpointWithTrailingSlashes);
+        assert.strictEqual(endpoint.endsWith('/'), false);
+      }
     });
   });
 });

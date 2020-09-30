@@ -1414,7 +1414,7 @@ class Table extends common.ServiceObject {
             },
           } as {},
           request: {
-            uri: `https://${this.bigQuery.apiEndpoint}/upload/bigquery/v2/projects/${this.bigQuery.projectId}/jobs`,
+            uri: `${this.bigQuery.apiEndpoint}/upload/bigquery/v2/projects/${this.bigQuery.projectId}/jobs`,
           },
         },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

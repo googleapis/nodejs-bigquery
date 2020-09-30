@@ -171,6 +171,8 @@ export interface BigQueryOptions extends common.GoogleAuthOptions {
   apiEndpoint?: string;
 }
 
+export const PROTOCOL_REGEX = /^(\w*):\/\//;
+
 /**
  * @typedef {object} BigQueryOptions
  * @property {string} [projectId] The project ID from the Google Developer's
@@ -249,12 +251,27 @@ export class BigQuery extends common.Service {
   getJobsStream: (options?: GetJobsOptions) => ResourceStream<Job>;
 
   constructor(options: BigQueryOptions = {}) {
+    let apiEndpoint = 'https://bigquery.googleapis.com';
+
+    const EMULATOR_HOST = process.env.BIGQUERY_EMULATOR_HOST;
+
+    if (typeof EMULATOR_HOST === 'string') {
+      apiEndpoint = BigQuery.sanitizeEndpoint(EMULATOR_HOST);
+    }
+
+    if (options.apiEndpoint) {
+      apiEndpoint = BigQuery.sanitizeEndpoint(options.apiEndpoint);
+    }
+
     options = Object.assign({}, options, {
-      apiEndpoint: options.apiEndpoint || 'bigquery.googleapis.com',
+      apiEndpoint,
     });
+
+    const baseUrl = EMULATOR_HOST || `${options.apiEndpoint}/bigquery/v2`;
+
     const config = {
       apiEndpoint: options.apiEndpoint!,
-      baseUrl: `https://${options.apiEndpoint}/bigquery/v2`,
+      baseUrl,
       scopes: ['https://www.googleapis.com/auth/bigquery'],
       packageJson: require('../../package.json'),
     };
@@ -375,6 +392,13 @@ export class BigQuery extends common.Service {
         return extend(true, {}, reqOpts, {qs: {prettyPrint: false}});
       },
     });
+  }
+
+  private static sanitizeEndpoint(url: string) {
+    if (!PROTOCOL_REGEX.test(url)) {
+      url = `https://${url}`;
+    }
+    return url.replace(/\/+$/, ''); // Remove trailing slashes
   }
 
   /**
