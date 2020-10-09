@@ -64,7 +64,7 @@
   },
   "devDependencies": {
     "@google-cloud/storage": "^5.0.0",
-    "@types/big.js": "^4.0.5",
+    "@types/big.js": "^6.0.0",
     "@types/execa": "^0.9.0",
     "@types/extend": "^3.0.1",
     "@types/is": "0.0.21",
