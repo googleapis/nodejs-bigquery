@@ -95,6 +95,7 @@ export type Query = JobRequest<bigquery.IJobConfigurationQuery> & {
   maxResults?: number;
   timeoutMs?: number;
   pageToken?: string;
+  wrapIntegers?: boolean | IntegerTypeCastOptions;
 };
 
 export type QueryOptions = QueryResultsOptions;
@@ -170,6 +171,16 @@ export interface BigQueryOptions extends common.GoogleAuthOptions {
    */
   apiEndpoint?: string;
 }
+
+export interface IntegerTypeCastOptions {
+  integerTypeCastFunction?: Function;
+  fields?: string | string[];
+}
+
+export type IntegerTypeCastValue = {
+  integerValue: string | number;
+  schemaFieldName?: string;
+};
 
 export const PROTOCOL_REGEX = /^(\w*):\/\//;
 
@@ -415,6 +426,7 @@ export class BigQuery extends common.Service {
   static mergeSchemaWithRows_(
     schema: TableSchema | TableField,
     rows: TableRow[],
+    wrapIntegers: boolean | IntegerTypeCastOptions,
     selectedFields?: string[]
   ) {
     if (selectedFields && selectedFields!.length > 0) {
@@ -444,10 +456,10 @@ export class BigQuery extends common.Service {
         let value = field.v;
         if (schemaField.mode === 'REPEATED') {
           value = (value as TableRowField[]).map(val => {
-            return convert(schemaField, val.v, selectedFields);
+            return convert(schemaField, val.v, wrapIntegers, selectedFields);
           });
         } else {
-          value = convert(schemaField, value, selectedFields);
+          value = convert(schemaField, value, wrapIntegers, selectedFields);
         }
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const fieldObject: any = {};
@@ -460,6 +472,7 @@ export class BigQuery extends common.Service {
       schemaField: TableField,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       value: any,
+      wrapIntegers: boolean | IntegerTypeCastOptions,
       selectedFields?: string[]
     ) {
       if (is.null(value)) {
@@ -483,7 +496,15 @@ export class BigQuery extends common.Service {
         }
         case 'INTEGER':
         case 'INT64': {
-          value = Number(value);
+          value = wrapIntegers
+            ? typeof wrapIntegers === 'object'
+              ? BigQuery.int(
+                  {integerValue: value, schemaFieldName: schemaField.name},
+                  wrapIntegers
+                )
+              : BigQuery.int(value)
+            : Number(value);
+
           break;
         }
         case 'NUMERIC': {
@@ -494,6 +515,7 @@ export class BigQuery extends common.Service {
           value = BigQuery.mergeSchemaWithRows_(
             schemaField,
             value,
+            wrapIntegers,
             selectedFields
           ).pop();
           break;
@@ -766,6 +788,29 @@ export class BigQuery extends common.Service {
   }
 
   /**
+   * A timestamp represents an absolute point in time, independent of any time
+   * zone or convention such as Daylight Savings Time.
+   *
+   * @method BigQuery#timestamp
+   * @param {Date|string} value The time.
+   *
+   * @example
+   * const {BigQuery} = require('@google-cloud/bigquery');
+   * const bigquery = new BigQuery();
+   * const timestamp = bigquery.timestamp(new Date());
+   */
+  static int(
+    value: IntegerTypeCastValue,
+    wrapIntegers?: IntegerTypeCastOptions
+  ) {
+    return new BigQueryInt(value, wrapIntegers);
+  }
+
+  int(value: IntegerTypeCastValue, wrapIntegers?: IntegerTypeCastOptions) {
+    return BigQuery.int(value, wrapIntegers);
+  }
+
+  /**
    * A geography value represents a surface area on the Earth
    * in Well-known Text (WKT) format.
    *
@@ -795,6 +840,31 @@ export class BigQuery extends common.Service {
 
   geography(value: string) {
     return BigQuery.geography(value);
+  }
+
+  /**
+   * Convert an INT64 value to Number.
+   *
+   * @private
+   * @param {object} value The INT64 value to convert.
+   */
+  static decodeIntegerValue(value: IntegerTypeCastValue) {
+    const num = Number(value.integerValue);
+    if (!Number.isSafeInteger(num)) {
+      throw new Error(
+        'We attempted to return all of the numeric values, but ' +
+          (value.schemaFieldName ? value.schemaFieldName + ' ' : '') +
+          'value ' +
+          value.integerValue +
+          " is out of bounds of 'Number.MAX_SAFE_INTEGER'.\n" +
+          "To prevent this error, please consider passing 'options.wrapNumbers' as\n" +
+          '{\n' +
+          '  integerTypeCastFunction: provide <your_custom_function>\n' +
+          '  properties: optionally specify property name(s) to be custom casted\n' +
+          '}\n'
+      );
+    }
+    return num;
   }
 
   /**
@@ -1826,7 +1896,9 @@ export class BigQuery extends common.Service {
       query.job.getQueryResults(query, callback as QueryRowsCallback);
       return;
     }
-    this.query(query, {autoPaginate: false}, callback);
+    const wrapIntegers = query.wrapIntegers ? query.wrapIntegers : false;
+    delete query.wrapIntegers;
+    this.query(query, {autoPaginate: false, wrapIntegers}, callback);
   }
 }
 
@@ -1847,6 +1919,7 @@ promisifyAll(BigQuery, {
     'date',
     'datetime',
     'geography',
+    'int',
     'job',
     'time',
     'timestamp',
@@ -1924,4 +1997,100 @@ export class BigQueryTime {
     }
     this.value = value as string;
   }
+}
+
+/**
+ * Build a Datastore Int object. For long integers, a string can be provided.
+ *
+ * @class
+ * @param {number|string} value The integer value.
+ * @param {object} [typeCastOptions] Configuration to convert
+ *     values of `integerValue` type to a custom value. Must provide an
+ *     `integerTypeCastFunction` to handle `integerValue` conversion.
+ * @param {function} typeCastOptions.integerTypeCastFunction A custom user
+ *     provided function to convert `integerValue`.
+ * @param {sting|string[]} [typeCastOptions.properties] `Entity` property
+ *     names to be converted using `integerTypeCastFunction`.
+ *
+ * @example
+ * const {Datastore} = require('@google-cloud/datastore');
+ * const datastore = new Datastore();
+ * const anInt = datastore.int(7);
+ */
+export class BigQueryInt extends Number {
+  type: string;
+  value: string;
+  typeCastFunction?: Function;
+  private _schemaFieldName: string | undefined;
+  constructor(
+    value: string | number | IntegerTypeCastValue,
+    typeCastOptions?: IntegerTypeCastOptions
+  ) {
+    super(typeof value === 'object' ? value.integerValue : value);
+    this._schemaFieldName =
+      typeof value === 'object' ? value.schemaFieldName : undefined;
+    this.value =
+      typeof value === 'object'
+        ? value.integerValue.toString()
+        : value.toString();
+    /**
+     * @name Int#type
+     * @type {string}
+     */
+    this.type = 'BigQueryInt';
+    /**
+     * @name Int#value
+     * @type {string}
+     */
+
+    if (typeCastOptions) {
+      const typeCastFields = typeCastOptions.fields
+        ? arrify(typeCastOptions.fields)
+        : undefined;
+
+      const CUSTOM_CAST =
+        typeCastFields && this._schemaFieldName
+          ? typeCastFields.includes(this._schemaFieldName)
+            ? true
+            : false
+          : false;
+
+      if (typeof typeCastOptions.integerTypeCastFunction !== 'function') {
+        throw new Error(
+          'integerTypeCastFunction is not a function or was not provided.'
+        );
+      }
+
+      this.typeCastFunction = CUSTOM_CAST
+      ? typeCastOptions.integerTypeCastFunction
+      : undefined;
+    }
+  }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  valueOf(): any {
+    const shouldCustomCast = this.typeCastFunction ? true : false;
+
+    if (shouldCustomCast) {
+      try {
+        return this.typeCastFunction!(this.value);
+      } catch (error) {
+        error.message = `integerTypeCastFunction threw an error:\n\n  - ${error.message}`;
+        throw error;
+      }
+    } else {
+      // return this.value;
+      return BigQuery.decodeIntegerValue({
+        integerValue: this.value,
+        schemaFieldName: this._schemaFieldName,
+      });
+    }
+  }
+
+  toJSON(): Json {
+    return {type: this.type, value: this.value};
+  }
+}
+
+export interface Json {
+  [field: string]: string;
 }

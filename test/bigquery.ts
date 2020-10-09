@@ -30,8 +30,10 @@ import * as sinon from 'sinon';
 import * as uuid from 'uuid';
 
 import {
+  BigQueryInt,
   BigQueryDate,
   Dataset,
+  IntegerTypeCastValue,
   Job,
   PROTOCOL_REGEX,
   Table,
@@ -69,6 +71,7 @@ const fakePfy = Object.assign({}, pfy, {
       'date',
       'datetime',
       'geography',
+      'int',
       'job',
       'time',
       'timestamp',
@@ -773,6 +776,173 @@ describe('BigQuery', () => {
 
       const geography = bq.geography(INPUT_STRING);
       assert.strictEqual(geography, fakeGeography);
+    });
+  });
+
+  describe('int', () => {
+    const INPUT_STRING = '100';
+
+    it('should call through to the static method', () => {
+      const fakeInt = new BigQueryInt('1');
+
+      sandbox
+        .stub(BigQuery, 'int')
+        .withArgs(INPUT_STRING)
+        .returns(fakeInt);
+
+      const int = bq.int(INPUT_STRING);
+      assert.strictEqual(int, fakeInt);
+    });
+
+    it('should have the correct constructor name', () => {
+      const int = BigQuery.int(INPUT_STRING);
+      assert.strictEqual(int.constructor.name, 'BigQueryInt');
+    });
+  });
+
+  describe.only('BigQueryInt', () => {
+    const INPUT_STRING = '9223372036854775807';
+
+    it('should store the stringified value', () => {
+      const value = 10;
+      const int = new BigQueryInt(value);
+      assert.strictEqual(int.value, value.toString());
+    });
+
+    describe('valueOf', () => {
+      let valueObject: any;
+
+      beforeEach(() => {
+        valueObject = {
+          integerValue: '8',
+        };
+      });
+
+      describe('integerTypeCastFunction is not provided', () => {
+        const expectedError = (opts: {
+          integerValue: string;
+          schemaFieldName?: string;
+        }) => {
+          return new Error(
+            'We attempted to return all of the numeric values, but ' +
+              (opts.schemaFieldName ? opts.schemaFieldName + ' ' : '') +
+              'value ' +
+              opts.integerValue +
+              " is out of bounds of 'Number.MAX_SAFE_INTEGER'.\n" +
+              "To prevent this error, please consider passing 'options.wrapNumbers' as\n" +
+              '{\n' +
+              '  integerTypeCastFunction: provide <your_custom_function>\n' +
+              '  properties: optionally specify property name(s) to be custom casted\n' +
+              '}\n'
+          );
+        };
+
+        it('should throw if integerTypeCastOptions is provided but integerTypeCastFunction is not', () => {
+          assert.throws(
+            () => new BigQueryInt(valueObject, {}).valueOf(),
+            /integerTypeCastFunction is not a function or was not provided\./
+          );
+        });
+
+        it('should throw if integer value is outside of bounds passing objects', () => {
+          const largeIntegerValue = (Number.MAX_SAFE_INTEGER + 1).toString();
+          const smallIntegerValue = (Number.MIN_SAFE_INTEGER - 1).toString();
+
+          const valueObject = {
+            integerValue: largeIntegerValue,
+            schemaFieldName: 'field',
+          };
+
+          const valueObject2 = {
+            integerValue: smallIntegerValue,
+            schemaFieldName: 'field',
+          };
+
+          assert.throws(() => {
+            new BigQueryInt(valueObject).valueOf();
+          }, expectedError(valueObject));
+
+          assert.throws(() => {
+            new BigQueryInt(valueObject2).valueOf();
+          }, expectedError(valueObject2));
+        });
+
+        //   it('should throw if integer value is outside of bounds passing strings or Numbers', () => {
+        //     const largeIntegerValue = Number.MAX_SAFE_INTEGER + 1;
+        //     const smallIntegerValue = Number.MIN_SAFE_INTEGER - 1;
+
+        //     // should throw when Number is passed
+        //     assert.throws(() => {
+        //       new entity.Int(largeIntegerValue).valueOf();
+        //     }, expectedError({integerValue: largeIntegerValue}));
+
+        //     // should throw when string is passed
+        //     assert.throws(() => {
+        //       new entity.Int(smallIntegerValue.toString()).valueOf();
+        //     }, expectedError({integerValue: smallIntegerValue}));
+        //   });
+
+        //   it('should not auto throw on initialization', () => {
+        //     const largeIntegerValue = Number.MAX_SAFE_INTEGER + 1;
+
+        //     const valueProto = {
+        //       valueType: 'integerValue',
+        //       integerValue: largeIntegerValue,
+        //     };
+
+        //     assert.doesNotThrow(() => {
+        //       const a = new entity.Int(valueProto);
+        //     }, new RegExp(`Integer value ${largeIntegerValue} is out of bounds.`));
+        //   });
+        // });
+
+        // describe('integerTypeCastFunction is provided', () => {
+        //   it('should throw if integerTypeCastFunction is not a function', () => {
+        //     assert.throws(
+        //       () =>
+        //         new entity.Int(valueProto, {
+        //           integerTypeCastFunction: {},
+        //         }).valueOf(),
+        //       /integerTypeCastFunction is not a function or was not provided\./
+        //     );
+        //   });
+
+        //   it('should custom-cast integerValue when integerTypeCastFunction is provided', () => {
+        //     const stub = sinon.stub();
+
+        //     new entity.Int(valueProto, {
+        //       integerTypeCastFunction: stub,
+        //     }).valueOf();
+        //     assert.ok(stub.calledOnce);
+        //   });
+
+        //   it('should custom-cast integerValue if `properties` specified by user', () => {
+        //     const stub = sinon.stub();
+        //     Object.assign(valueProto, {
+        //       propertyName: 'thisValue',
+        //     });
+
+        //     new entity.Int(valueProto, {
+        //       integerTypeCastFunction: stub,
+        //       properties: 'thisValue',
+        //     }).valueOf();
+        //     assert.ok(stub.calledOnce);
+        //   });
+
+        //   it('should not custom-cast integerValue if `properties` not specified by user', () => {
+        //     const stub = sinon.stub();
+
+        //     Object.assign(valueProto, {
+        //       propertyName: 'thisValue',
+        //     });
+
+        //     new entity.Int(valueProto, {
+        //       integerTypeCastFunction: stub,
+        //       properties: 'thatValue',
+        //     }).valueOf();
+        //     assert.ok(stub.notCalled);
+        //   });
+      });
     });
   });
 

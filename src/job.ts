@@ -30,6 +30,7 @@ import * as extend from 'extend';
 
 import {
   BigQuery,
+  IntegerTypeCastOptions,
   JobRequest,
   PagedRequest,
   QueryRowsCallback,
@@ -45,9 +46,10 @@ export type JobOptions = JobRequest<JobMetadata>;
 export type CancelCallback = RequestCallback<bigquery.IJobCancelResponse>;
 export type CancelResponse = [bigquery.IJobCancelResponse];
 
-export type QueryResultsOptions = {job?: Job} & PagedRequest<
-  bigquery.jobs.IGetQueryResultsParams
->;
+export type QueryResultsOptions = {
+  job?: Job;
+  wrapIntegers?: boolean | IntegerTypeCastOptions;
+} & PagedRequest<bigquery.jobs.IGetQueryResultsParams>;
 
 /**
  * @callback QueryResultsCallback
@@ -402,9 +404,10 @@ class Job extends Operation {
       },
       options
     );
-
+  
+    const wrapIntegers = qs.wrapIntegers;
+    delete qs.wrapIntegers;
     delete qs.job;
-
     this.bigQuery.request(
       {
         uri: '/queries/' + this.id,
@@ -420,7 +423,11 @@ class Job extends Operation {
         let rows: any = [];
 
         if (resp.schema && resp.rows) {
-          rows = BigQuery.mergeSchemaWithRows_(resp.schema, resp.rows);
+          rows = BigQuery.mergeSchemaWithRows_(
+            resp.schema,
+            resp.rows,
+            wrapIntegers!
+          );
         }
 
         let nextQuery: {} | null = null;

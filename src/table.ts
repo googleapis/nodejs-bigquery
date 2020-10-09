@@ -44,6 +44,7 @@ import {GoogleErrorBody} from '@google-cloud/common/build/src/util';
 import {Duplex, Writable} from 'stream';
 import {JobMetadata} from './job';
 import bigquery from './types';
+import {IntegerTypeCastOptions} from './bigquery';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const duplexify = require('duplexify');
@@ -102,7 +103,9 @@ export type TableRow = bigquery.ITableRow;
 export type TableRowField = bigquery.ITableCell;
 export type TableRowValue = string | TableRow;
 
-export type GetRowsOptions = PagedRequest<bigquery.tabledata.IListParams>;
+export type GetRowsOptions = PagedRequest<bigquery.tabledata.IListParams> & {
+  wrapIntegers?: boolean | IntegerTypeCastOptions;
+};
 
 export type JobLoadMetadata = JobRequest<bigquery.IJobConfigurationLoad> & {
   format?: string;
@@ -1681,6 +1684,7 @@ class Table extends common.ServiceObject {
       rows = BigQuery.mergeSchemaWithRows_(
         this.metadata.schema,
         rows || [],
+        options.wrapIntegers!,
         options.selectedFields ? options.selectedFields!.split(',') : []
       );
       callback!(null, rows, nextQuery, resp);
