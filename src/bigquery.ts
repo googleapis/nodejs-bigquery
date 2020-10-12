@@ -1115,7 +1115,7 @@ export class BigQuery extends common.Service {
    *     labels to the newly created Job.
    * @param {string} [options.location] The geographic location of the job.
    *     Required except for US and EU.
-   * @param {string|number} [options.jobTimeoutMs] Job timeout in milliseconds.
+   * @param {number} [options.jobTimeoutMs] Job timeout in milliseconds.
    *     If this time limit is exceeded, BigQuery might attempt to stop the job.
    * @param {string} [options.jobId] Custom job id.
    * @param {string} [options.jobPrefix] Prefix to apply to the job id.
