@@ -322,6 +322,32 @@ describe('BigQuery/Job', () => {
       });
     });
 
+    it('should return an error when the job is not complete & timeout is overridden', done => {
+      const options = {job: {}, timeoutMs: 1000};
+      const message = `The query did not complete before ${options.timeoutMs}ms`;
+      const response = {
+        jobComplete: false,
+      };
+
+      BIGQUERY.request = (
+        reqOpts: DecorateRequestOptions,
+        callback: Function
+      ) => {
+        callback(null, response);
+      };
+
+      job.getQueryResults(
+        options,
+        (err: Error, rows: {}, nextQuery: {}, resp: {}) => {
+          assert.strictEqual(err.message, message);
+          assert.strictEqual(rows, null);
+          assert.strictEqual(nextQuery, null);
+          assert.strictEqual(resp, response);
+          done();
+        }
+      );
+    });
+
     it('should populate nextQuery when more results exist', done => {
       job.getQueryResults(
         options,

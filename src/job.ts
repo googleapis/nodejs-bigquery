@@ -335,9 +335,9 @@ class Job extends Operation {
    * to the `nextQuery` argument of your callback.
    * @param {number} [options.startIndex] Zero-based index of the starting row.
    * @param {number} [options.timeoutMs] How long to wait for the query to
-   *     complete, in milliseconds, before returning. Default is to return
-   *     immediately. If the timeout passes before the job completes, the
-   * request will fail with a `TIMEOUT` error.
+   *     complete, in milliseconds, before returning. Default is 10 seconds.
+   *     If the timeout passes before the job completes, the 'jobComplete' field
+   *     in the response will be false.
    * @param {QueryResultsCallback|ManualQueryResultsCallback} [callback] The
    *     callback function. If `autoPaginate` is set to false a
    *     {@link ManualQueryResultsCallback} should be used.
@@ -405,6 +405,8 @@ class Job extends Operation {
 
     delete qs.job;
 
+    const timeoutOverride = qs.timeoutMs ? qs.timeoutMs : false;
+
     this.bigQuery.request(
       {
         uri: '/queries/' + this.id,
@@ -426,6 +428,15 @@ class Job extends Operation {
         let nextQuery: {} | null = null;
         if (resp.jobComplete === false) {
           // Query is still running.
+          // If timeout override was provided, return error.
+          if (timeoutOverride) {
+            const err = new Error(
+              `The query did not complete before ${timeoutOverride}ms`
+            );
+            callback!(err, null, null, resp);
+            return;
+          }
+          // Continue to poll for query results.
           nextQuery = Object.assign({}, options);
         } else if (resp.pageToken) {
           // More results exist.

@@ -93,7 +93,7 @@ export type Query = JobRequest<bigquery.IJobConfigurationQuery> & {
   types?: string[] | string[][] | {[type: string]: string[]};
   job?: Job;
   maxResults?: number;
-  timeoutMs?: number;
+  jobTimeoutMs?: string | number;
   pageToken?: string;
 };
 
@@ -1115,6 +1115,8 @@ export class BigQuery extends common.Service {
    *     labels to the newly created Job.
    * @param {string} [options.location] The geographic location of the job.
    *     Required except for US and EU.
+   * @param {string|number} [options.jobTimeoutMs] Job timeout in milliseconds.
+   *     If this time limit is exceeded, BigQuery might attempt to stop the job.
    * @param {string} [options.jobId] Custom job id.
    * @param {string} [options.jobPrefix] Prefix to apply to the job id.
    * @param {string} options.query A query string, following the BigQuery query
@@ -1277,6 +1279,11 @@ export class BigQuery extends common.Service {
         query,
       },
     };
+
+    if (query.jobTimeoutMs) {
+      reqOpts.configuration.jobTimeoutMs = query.jobTimeoutMs;
+      delete query.jobTimeoutMs;
+    }
 
     if (query.dryRun) {
       reqOpts.configuration.dryRun = query.dryRun;
