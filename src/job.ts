@@ -339,7 +339,12 @@ class Job extends Operation {
    * @param {number} [options.timeoutMs] How long to wait for the query to
    *     complete, in milliseconds, before returning. Default is to return
    *     immediately. If the timeout passes before the job completes, the
-   * request will fail with a `TIMEOUT` error.
+   *     request will fail with a `TIMEOUT` error.
+   * @param {boolean|IntegerTypeCastOptions} [options.wrapIntegers=false] Wrap values
+   *     of 'INT64' type in {@link BigQueryInt} objects.
+   *     If a `boolean`, this will wrap values in {@link BigQueryInt} objects.
+   *     If an `object`, this will return a value returned by
+   *     `wrapNumbers.integerTypeCastFunction`.
    * @param {QueryResultsCallback|ManualQueryResultsCallback} [callback] The
    *     callback function. If `autoPaginate` is set to false a
    *     {@link ManualQueryResultsCallback} should be used.

@@ -1624,6 +1624,11 @@ class Table extends common.ServiceObject {
    *     automatically.
    * @param {number} [options.maxApiCalls] Maximum number of API calls to make.
    * @param {number} [options.maxResults] Maximum number of results to return.
+   * @param {boolean|IntegerTypeCastOptions} [options.wrapIntegers=false] Wrap values
+   *     of 'INT64' type in {@link BigQueryInt} objects.
+   *     If a `boolean`, this will wrap values in {@link BigQueryInt} objects.
+   *     If an `object`, this will return a value returned by
+   *     `wrapNumbers.integerTypeCastFunction`.
    * @param {function} [callback] The callback function.
    * @param {?error} callback.err An error returned while making this request
    * @param {array} callback.rows The table data from specified set of rows.

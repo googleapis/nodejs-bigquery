@@ -33,6 +33,7 @@ import {
   BigQueryInt,
   BigQueryDate,
   IntegerTypeCastValue,
+  IntegerTypeCastOptions,
   Dataset,
   Job,
   PROTOCOL_REGEX,
@@ -599,8 +600,11 @@ describe('BigQuery', () => {
         raw: {
           f: [{v: 100}],
         },
-        expected: {
+        expectedBool: {
           fave_number: fakeInt,
+        },
+        expectedObj: {
+          fave_number: fakeInt.valueOf(),
         },
       };
 
@@ -612,7 +616,7 @@ describe('BigQuery', () => {
         wrapIntegersBoolean
       );
       mergedRows.forEach((mergedRow: {}) => {
-        assert.deepStrictEqual(mergedRow, rows.expected);
+        assert.deepStrictEqual(mergedRow, rows.expectedBool);
       });
 
       mergedRows = BigQuery.mergeSchemaWithRows_(
@@ -621,7 +625,7 @@ describe('BigQuery', () => {
         wrapIntegersObject
       );
       mergedRows.forEach((mergedRow: {}) => {
-        assert.deepStrictEqual(mergedRow, rows.expected);
+        assert.deepStrictEqual(mergedRow, rows.expectedObj);
       });
     });
   });
@@ -826,7 +830,7 @@ describe('BigQuery', () => {
     const INPUT_STRING = '100';
 
     it('should call through to the static method', () => {
-      const fakeInt = new BigQueryInt('100');
+      const fakeInt = new BigQueryInt(INPUT_STRING);
 
       sandbox
         .stub(BigQuery, 'int')
@@ -845,9 +849,9 @@ describe('BigQuery', () => {
 
   describe('BigQueryInt', () => {
     it('should store the stringified value', () => {
-      const value = 10;
-      const int = new BigQueryInt(value);
-      assert.strictEqual(int.value, value.toString());
+      const INPUT_NUM = 100;
+      const int = new BigQueryInt(INPUT_NUM);
+      assert.strictEqual(int.value, INPUT_NUM.toString());
     });
 
     describe('valueOf', () => {
@@ -880,7 +884,11 @@ describe('BigQuery', () => {
 
         it('should throw if integerTypeCastOptions is provided but integerTypeCastFunction is not', () => {
           assert.throws(
-            () => new BigQueryInt(valueObject, {}).valueOf(),
+            () =>
+              new BigQueryInt(
+                valueObject,
+                {} as IntegerTypeCastOptions
+              ).valueOf(),
             /integerTypeCastFunction is not a function or was not provided\./
           );
         });
