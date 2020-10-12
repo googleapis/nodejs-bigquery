@@ -423,7 +423,7 @@ export class BigQuery extends common.Service {
    *     'INT64' type in {@link BigQueryInt} objects.
    *     If a `boolean`, this will wrap values in {@link BigQueryInt} objects.
    *     If an `object`, this will return a value returned by
-   *     `wrapNumbers.integerTypeCastFunction`.
+   *     `wrapIntegers.integerTypeCastFunction`.
    *     Please see {@link IntegerTypeCastOptions} for options descriptions.
    * @param {array} selectedFields List of fields to return.
    * If unspecified, all fields are returned.
@@ -814,9 +814,9 @@ export class BigQuery extends common.Service {
    *    integerTypeCastFunction: customTypeCast
    * };
    *
-   * const bigQueryInt = bigquery.int(largeIntegerValue, wrapIntegers);
+   * const bqInteger = bigquery.int(largeIntegerValue, wrapIntegers);
    *
-   * const wrappedValue = bigQueryInt.valueOf();
+   * const customValue = bqInteger.valueOf();
    */
   static int(
     value: string | number | IntegerTypeCastValue,
@@ -982,6 +982,8 @@ export class BigQuery extends common.Service {
       typeName = 'BYTES';
     } else if (value instanceof Big) {
       typeName = 'NUMERIC';
+    } else if (value instanceof BigQueryInt) {
+      typeName = 'INT64';
     } else if (Array.isArray(value)) {
       if (value.length === 0) {
         throw new Error(
@@ -1033,7 +1035,7 @@ export class BigQuery extends common.Service {
    * @see [Jobs.query API Reference Docs (see `queryParameters`)]{@link https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs/query#request-body}
    *
    * @param {*} value The value.
-   * @param {string | ProvidedTypeStruct | ProvidedTypeArray} providedType Provided
+   * @param {string|ProvidedTypeStruct|ProvidedTypeArray} providedType Provided
    *     query parameter type.
    * @returns {object} A properly-formed `queryParameter` object.
    */
@@ -1045,7 +1047,6 @@ export class BigQuery extends common.Service {
     if (is.date(value)) {
       value = BigQuery.timestamp(value as Date);
     }
-
     let parameterType: bigquery.IQueryParameterType;
     if (providedType) {
       parameterType = BigQuery.getTypeDescriptorFromProvidedType_(providedType);
@@ -1097,11 +1098,18 @@ export class BigQuery extends common.Service {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     function getValue(value: any, type: ValueType): any {
+      if (value.type!) {
+        type = value;
+      }
       return isCustomType(type) ? value.value : value;
     }
 
     function isCustomType({type}: ValueType): boolean {
-      return type!.indexOf('TIME') > -1 || type!.indexOf('DATE') > -1;
+      return (
+        type!.indexOf('TIME') > -1 ||
+        type!.indexOf('DATE') > -1 ||
+        type!.indexOf('BigQueryInt') > -1
+      );
     }
   }
 
@@ -1808,7 +1816,7 @@ export class BigQuery extends common.Service {
    *     of 'INT64' type in {@link BigQueryInt} objects.
    *     If a `boolean`, this will wrap values in {@link BigQueryInt} objects.
    *     If an `object`, this will return a value returned by
-   *     `wrapNumbers.integerTypeCastFunction`.
+   *     `wrapIntegers.integerTypeCastFunction`.
    *     Please see {@link IntegerTypeCastOptions} for options descriptions.
    * @param {function} [callback] The callback function.
    * @param {?error} callback.err An error returned while making this request
@@ -2033,7 +2041,7 @@ export class BigQueryTime {
  * Build a BigQueryInt object. For long integers, a string can be provided.
  *
  * @class
- * @param {string|number|IntegerTypeCastValue} value The integer value.
+ * @param {string|number|IntegerTypeCastValue} value The 'INT64' value.
  * @param {object} [typeCastOptions] Configuration to convert
  *     values of 'INT64' type to a custom value. Must provide an
  *     `integerTypeCastFunction` to handle conversion.

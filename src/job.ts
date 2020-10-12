@@ -344,7 +344,7 @@ class Job extends Operation {
    *     of 'INT64' type in {@link BigQueryInt} objects.
    *     If a `boolean`, this will wrap values in {@link BigQueryInt} objects.
    *     If an `object`, this will return a value returned by
-   *     `wrapNumbers.integerTypeCastFunction`.
+   *     `wrapIntegers.integerTypeCastFunction`.
    * @param {QueryResultsCallback|ManualQueryResultsCallback} [callback] The
    *     callback function. If `autoPaginate` is set to false a
    *     {@link ManualQueryResultsCallback} should be used.

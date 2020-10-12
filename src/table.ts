@@ -1628,7 +1628,7 @@ class Table extends common.ServiceObject {
    *     of 'INT64' type in {@link BigQueryInt} objects.
    *     If a `boolean`, this will wrap values in {@link BigQueryInt} objects.
    *     If an `object`, this will return a value returned by
-   *     `wrapNumbers.integerTypeCastFunction`.
+   *     `wrapIntegers.integerTypeCastFunction`.
    * @param {function} [callback] The callback function.
    * @param {?error} callback.err An error returned while making this request
    * @param {array} callback.rows The table data from specified set of rows.
@@ -1688,7 +1688,6 @@ class Table extends common.ServiceObject {
         callback!(err, null, null, resp);
         return;
       }
-
       rows = BigQuery.mergeSchemaWithRows_(
         this.metadata.schema,
         rows || [],

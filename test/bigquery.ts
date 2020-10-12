@@ -954,7 +954,7 @@ describe('BigQuery', () => {
             );
           });
 
-          it('should custom-cast integerValue when integerTypeCastFunction is provided', () => {
+          it('should custom-cast value when integerTypeCastFunction is provided', () => {
             const stub = sinon.stub();
 
             new BigQueryInt(valueObject, {
@@ -963,7 +963,7 @@ describe('BigQuery', () => {
             assert.ok(stub.calledOnce);
           });
 
-          it('should custom-cast integerValue if in `fields` specified by user', () => {
+          it('should custom-cast value if in `fields` specified by user', () => {
             const stub = sinon.stub();
 
             Object.assign(valueObject, {
@@ -977,7 +977,7 @@ describe('BigQuery', () => {
             assert.ok(stub.calledOnce);
           });
 
-          it('should not custom-cast integerValue if not in `fields` specified by user', () => {
+          it('should not custom-cast value if not in `fields` specified by user', () => {
             const stub = sinon.stub();
 
             Object.assign(valueObject, {
@@ -1053,6 +1053,10 @@ describe('BigQuery', () => {
       assert.strictEqual(
         BigQuery.getTypeDescriptorFromValue_(new Big('1.1')).type,
         'NUMERIC'
+      );
+      assert.strictEqual(
+        BigQuery.getTypeDescriptorFromValue_(new BigQueryInt('100')).type,
+        'INT64'
       );
     });
 
@@ -1265,6 +1269,30 @@ describe('BigQuery', () => {
 
       const {parameterValue} = BigQuery.valueToQueryParameter_(times);
       assert.deepStrictEqual(parameterValue.arrayValues, times);
+    });
+
+    it('should locate the value on BigQueryInt objects', () => {
+      const int = new BigQueryInt(100);
+
+      sandbox.stub(BigQuery, 'getTypeDescriptorFromValue_').returns({
+        type: 'INT64',
+      });
+
+      const queryParameter = BigQuery.valueToQueryParameter_(int);
+      assert.strictEqual(queryParameter.parameterValue.value, int.value);
+    });
+
+    it('should locate the value on nested BigQueryInt objects', () => {
+      const ints = [new BigQueryInt('100')];
+      const expected = [{value: '100'}];
+
+      sandbox.stub(BigQuery, 'getTypeDescriptorFromValue_').returns({
+        type: 'ARRAY',
+        arrayType: {type: 'INT64'},
+      });
+
+      const {parameterValue} = BigQuery.valueToQueryParameter_(ints);
+      assert.deepStrictEqual(parameterValue.arrayValues, expected);
     });
 
     it('should format an array', () => {
