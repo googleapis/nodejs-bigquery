@@ -1671,6 +1671,8 @@ class Table extends common.ServiceObject {
       typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
     const callback =
       typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
+    const wrapIntegers = options.wrapIntegers ? options.wrapIntegers : false;
+    delete options.wrapIntegers;
     const onComplete = (
       err: Error | null,
       rows: TableRow[] | null,
@@ -1681,10 +1683,11 @@ class Table extends common.ServiceObject {
         callback!(err, null, null, resp);
         return;
       }
+
       rows = BigQuery.mergeSchemaWithRows_(
         this.metadata.schema,
         rows || [],
-        options.wrapIntegers!,
+        wrapIntegers,
         options.selectedFields ? options.selectedFields!.split(',') : []
       );
       callback!(null, rows, nextQuery, resp);

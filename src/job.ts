@@ -404,7 +404,7 @@ class Job extends Operation {
       },
       options
     );
-  
+
     const wrapIntegers = qs.wrapIntegers ? qs.wrapIntegers : false;
     delete qs.wrapIntegers;
 

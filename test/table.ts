@@ -149,9 +149,11 @@ describe('BigQuery/Table', () => {
     table = new Table(DATASET, TABLE_ID);
     table.bigQuery.request = util.noop;
     table.bigQuery.createJob = util.noop;
-    sandbox.stub(BigQuery, 'mergeSchemaWithRows_').callsFake((schema, rows) => {
-      return rows;
-    });
+    sandbox
+      .stub(BigQuery, 'mergeSchemaWithRows_')
+      .callsFake((schema, rows, wrapIntegers) => {
+        return rows;
+      });
   });
 
   afterEach(() => sandbox.restore());
@@ -1894,6 +1896,7 @@ describe('BigQuery/Table', () => {
       // Using "Stephen" so you know who to blame for these tests.
       const rows = [{f: [{v: 'stephen'}]}];
       const schema = {fields: [{name: 'name', type: 'string'}]};
+      const wrapIntegers = false;
       const mergedRows = [{name: 'stephen'}];
 
       beforeEach(() => {
@@ -1907,9 +1910,10 @@ describe('BigQuery/Table', () => {
         sandbox.restore();
         sandbox
           .stub(BigQuery, 'mergeSchemaWithRows_')
-          .callsFake((schema_, rows_) => {
+          .callsFake((schema_, rows_, wrapIntegers_) => {
             assert.strictEqual(schema_, schema);
             assert.strictEqual(rows_, rows);
+            assert.strictEqual(wrapIntegers_, wrapIntegers);
             return mergedRows;
           });
       });
@@ -1963,6 +1967,7 @@ describe('BigQuery/Table', () => {
     it('should return schema-merged rows', done => {
       const rows = [{f: [{v: 'stephen'}]}];
       const schema = {fields: [{name: 'name', type: 'string'}]};
+      const wrapIntegers = false;
       const merged = [{name: 'stephen'}];
 
       table.metadata = {schema};
@@ -1974,9 +1979,10 @@ describe('BigQuery/Table', () => {
       sandbox.restore();
       sandbox
         .stub(BigQuery, 'mergeSchemaWithRows_')
-        .callsFake((schema_, rows_) => {
+        .callsFake((schema_, rows_, wrapIntegers_) => {
           assert.strictEqual(schema_, schema);
           assert.strictEqual(rows_, rows);
+          assert.strictEqual(wrapIntegers_, wrapIntegers);
           return merged;
         });
 
@@ -2131,6 +2137,27 @@ describe('BigQuery/Table', () => {
         assert.deepStrictEqual(rows, result);
         done();
       });
+    });
+
+    it('should wrap integers', done => {
+      const wrapIntegers = {integerTypeCastFunction: sinon.stub()};
+      const options = {wrapIntegers};
+      const merged = [{name: 'stephen'}];
+
+      table.request = (reqOpts: DecorateRequestOptions, callback: Function) => {
+        assert.deepStrictEqual(reqOpts.qs, {});
+        callback(null, {});
+      };
+
+      sandbox.restore();
+      sandbox
+        .stub(BigQuery, 'mergeSchemaWithRows_')
+        .callsFake((schema_, rows_, wrapIntegers_) => {
+          assert.strictEqual(wrapIntegers_, wrapIntegers);
+          return merged;
+        });
+
+      table.getRows(options, done);
     });
   });
 

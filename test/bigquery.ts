@@ -32,8 +32,8 @@ import * as uuid from 'uuid';
 import {
   BigQueryInt,
   BigQueryDate,
-  Dataset,
   IntegerTypeCastValue,
+  Dataset,
   Job,
   PROTOCOL_REGEX,
   Table,
@@ -575,10 +575,53 @@ describe('BigQuery', () => {
       });
 
       const rawRows = rows.map(x => x.raw);
-      const mergedRows = BigQuery.mergeSchemaWithRows_(schemaObject, rawRows);
+      const mergedRows = BigQuery.mergeSchemaWithRows_(
+        schemaObject,
+        rawRows,
+        false
+      );
 
       mergedRows.forEach((mergedRow: {}, index: number) => {
         assert.deepStrictEqual(mergedRow, rows[index].expected);
+      });
+    });
+
+    it('should wrap integers with option', () => {
+      const wrapIntegersBoolean = true;
+      const wrapIntegersObject = {};
+      const fakeInt = new BigQueryInt(100);
+
+      const SCHEMA_OBJECT = {
+        fields: [{name: 'fave_number', type: 'INTEGER'}],
+      } as {fields: TableField[]};
+
+      const rows = {
+        raw: {
+          f: [{v: 100}],
+        },
+        expected: {
+          fave_number: fakeInt,
+        },
+      };
+
+      sandbox.stub(BigQuery, 'int').returns(fakeInt);
+
+      let mergedRows = BigQuery.mergeSchemaWithRows_(
+        SCHEMA_OBJECT,
+        rows.raw,
+        wrapIntegersBoolean
+      );
+      mergedRows.forEach((mergedRow: {}) => {
+        assert.deepStrictEqual(mergedRow, rows.expected);
+      });
+
+      mergedRows = BigQuery.mergeSchemaWithRows_(
+        SCHEMA_OBJECT,
+        rows.raw,
+        wrapIntegersObject
+      );
+      mergedRows.forEach((mergedRow: {}) => {
+        assert.deepStrictEqual(mergedRow, rows.expected);
       });
     });
   });
@@ -783,7 +826,7 @@ describe('BigQuery', () => {
     const INPUT_STRING = '100';
 
     it('should call through to the static method', () => {
-      const fakeInt = new BigQueryInt('1');
+      const fakeInt = new BigQueryInt('100');
 
       sandbox
         .stub(BigQuery, 'int')
@@ -800,9 +843,7 @@ describe('BigQuery', () => {
     });
   });
 
-  describe.only('BigQueryInt', () => {
-    const INPUT_STRING = '9223372036854775807';
-
+  describe('BigQueryInt', () => {
     it('should store the stringified value', () => {
       const value = 10;
       const int = new BigQueryInt(value);
@@ -810,17 +851,17 @@ describe('BigQuery', () => {
     });
 
     describe('valueOf', () => {
-      let valueObject: any;
+      let valueObject: IntegerTypeCastValue;
 
       beforeEach(() => {
         valueObject = {
-          integerValue: '8',
+          integerValue: 8,
         };
       });
 
       describe('integerTypeCastFunction is not provided', () => {
         const expectedError = (opts: {
-          integerValue: string;
+          integerValue: string | number;
           schemaFieldName?: string;
         }) => {
           return new Error(
@@ -867,81 +908,101 @@ describe('BigQuery', () => {
           }, expectedError(valueObject2));
         });
 
-        //   it('should throw if integer value is outside of bounds passing strings or Numbers', () => {
-        //     const largeIntegerValue = Number.MAX_SAFE_INTEGER + 1;
-        //     const smallIntegerValue = Number.MIN_SAFE_INTEGER - 1;
+        it('should throw if integer value is outside of bounds passing strings or Numbers', () => {
+          const largeIntegerValue = Number.MAX_SAFE_INTEGER + 1;
+          const smallIntegerValue = Number.MIN_SAFE_INTEGER - 1;
 
-        //     // should throw when Number is passed
-        //     assert.throws(() => {
-        //       new entity.Int(largeIntegerValue).valueOf();
-        //     }, expectedError({integerValue: largeIntegerValue}));
+          // should throw when Number is passed
+          assert.throws(() => {
+            new BigQueryInt(largeIntegerValue).valueOf();
+          }, expectedError({integerValue: largeIntegerValue}));
 
-        //     // should throw when string is passed
-        //     assert.throws(() => {
-        //       new entity.Int(smallIntegerValue.toString()).valueOf();
-        //     }, expectedError({integerValue: smallIntegerValue}));
-        //   });
+          // should throw when string is passed
+          assert.throws(() => {
+            new BigQueryInt(smallIntegerValue.toString()).valueOf();
+          }, expectedError({integerValue: smallIntegerValue}));
+        });
 
-        //   it('should not auto throw on initialization', () => {
-        //     const largeIntegerValue = Number.MAX_SAFE_INTEGER + 1;
+        it('should not auto throw on initialization', () => {
+          const largeIntegerValue = Number.MAX_SAFE_INTEGER + 1;
 
-        //     const valueProto = {
-        //       valueType: 'integerValue',
-        //       integerValue: largeIntegerValue,
-        //     };
+          const valueObject = {
+            integerValue: largeIntegerValue,
+          };
 
-        //     assert.doesNotThrow(() => {
-        //       const a = new entity.Int(valueProto);
-        //     }, new RegExp(`Integer value ${largeIntegerValue} is out of bounds.`));
-        //   });
-        // });
+          assert.doesNotThrow(() => {
+            new BigQueryInt(valueObject);
+          }, new RegExp(`Integer value ${largeIntegerValue} is out of bounds.`));
+        });
 
-        // describe('integerTypeCastFunction is provided', () => {
-        //   it('should throw if integerTypeCastFunction is not a function', () => {
-        //     assert.throws(
-        //       () =>
-        //         new entity.Int(valueProto, {
-        //           integerTypeCastFunction: {},
-        //         }).valueOf(),
-        //       /integerTypeCastFunction is not a function or was not provided\./
-        //     );
-        //   });
+        describe('integerTypeCastFunction is provided', () => {
+          it('should throw if integerTypeCastFunction is not a function', () => {
+            assert.throws(
+              () =>
+                new BigQueryInt(valueObject, {
+                  integerTypeCastFunction: {} as Function,
+                }).valueOf(),
+              /integerTypeCastFunction is not a function or was not provided\./
+            );
+          });
 
-        //   it('should custom-cast integerValue when integerTypeCastFunction is provided', () => {
-        //     const stub = sinon.stub();
+          it('should custom-cast integerValue when integerTypeCastFunction is provided', () => {
+            const stub = sinon.stub();
 
-        //     new entity.Int(valueProto, {
-        //       integerTypeCastFunction: stub,
-        //     }).valueOf();
-        //     assert.ok(stub.calledOnce);
-        //   });
+            new BigQueryInt(valueObject, {
+              integerTypeCastFunction: stub,
+            }).valueOf();
+            assert.ok(stub.calledOnce);
+          });
 
-        //   it('should custom-cast integerValue if `properties` specified by user', () => {
-        //     const stub = sinon.stub();
-        //     Object.assign(valueProto, {
-        //       propertyName: 'thisValue',
-        //     });
+          it('should custom-cast integerValue if in `fields` specified by user', () => {
+            const stub = sinon.stub();
 
-        //     new entity.Int(valueProto, {
-        //       integerTypeCastFunction: stub,
-        //       properties: 'thisValue',
-        //     }).valueOf();
-        //     assert.ok(stub.calledOnce);
-        //   });
+            Object.assign(valueObject, {
+              schemaFieldName: 'funField',
+            });
 
-        //   it('should not custom-cast integerValue if `properties` not specified by user', () => {
-        //     const stub = sinon.stub();
+            new BigQueryInt(valueObject, {
+              integerTypeCastFunction: stub,
+              fields: 'funField',
+            }).valueOf();
+            assert.ok(stub.calledOnce);
+          });
 
-        //     Object.assign(valueProto, {
-        //       propertyName: 'thisValue',
-        //     });
+          it('should not custom-cast integerValue if not in `fields` specified by user', () => {
+            const stub = sinon.stub();
 
-        //     new entity.Int(valueProto, {
-        //       integerTypeCastFunction: stub,
-        //       properties: 'thatValue',
-        //     }).valueOf();
-        //     assert.ok(stub.notCalled);
-        //   });
+            Object.assign(valueObject, {
+              schemaFieldName: 'funField',
+            });
+
+            new BigQueryInt(valueObject, {
+              integerTypeCastFunction: stub,
+              fields: 'unFunField',
+            }).valueOf();
+            assert.ok(stub.notCalled);
+          });
+
+          it('should catch integerTypeCastFunction error and throw', () => {
+            const error = new Error('My bad!');
+            const stub = sinon.stub().throws(error);
+            assert.throws(
+              () =>
+                new BigQueryInt(valueObject, {
+                  integerTypeCastFunction: stub,
+                }).valueOf(),
+              /integerTypeCastFunction threw an error:/
+            );
+          });
+        });
+      });
+
+      describe('toJSON', () => {
+        it('should return correct JSON', () => {
+          const expected = {type: 'BigQueryInt', value: '8'};
+          const JSON = new BigQueryInt(valueObject).toJSON();
+          assert.deepStrictEqual(JSON, expected);
+        });
       });
     });
   });
@@ -2480,7 +2541,7 @@ describe('BigQuery', () => {
       assert(
         queryStub.calledOnceWithExactly(
           query,
-          {autoPaginate: false},
+          {autoPaginate: false, wrapIntegers: false},
           sinon.match.func
         )
       );
@@ -2496,6 +2557,25 @@ describe('BigQuery', () => {
       bq.queryAsStream_(query, done);
       assert(cbStub.calledOnceWithExactly(query, sinon.match.func));
       assert(queryStub.notCalled);
+    });
+
+    it('should pass wrapIntegers if supplied', done => {
+      const statement = 'SELECT';
+      const wrapIntegers = {
+        integerValue: 100,
+      };
+      const query = {
+        query: statement,
+        wrapIntegers,
+      };
+      bq.queryAsStream_(query, done);
+      assert(
+        queryStub.calledOnceWithExactly(
+          query,
+          {autoPaginate: false, wrapIntegers},
+          sinon.match.func
+        )
+      );
     });
   });
 

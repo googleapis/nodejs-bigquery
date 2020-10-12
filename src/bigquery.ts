@@ -2056,14 +2056,16 @@ export class BigQueryInt extends Number {
       let customCast = true;
 
       if (typeCastFields) {
-        customCast = this._schemaFieldName ? typeCastFields.includes(this._schemaFieldName) 
-        ? true : false
-        : false
+        customCast = this._schemaFieldName
+          ? typeCastFields.includes(this._schemaFieldName)
+            ? true
+            : false
+          : false;
       }
 
       this.typeCastFunction = customCast
-      ? typeCastOptions.integerTypeCastFunction
-      : undefined;
+        ? typeCastOptions.integerTypeCastFunction
+        : undefined;
     }
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
