@@ -93,7 +93,7 @@ export type Query = JobRequest<bigquery.IJobConfigurationQuery> & {
   types?: string[] | string[][] | {[type: string]: string[]};
   job?: Job;
   maxResults?: number;
-  jobTimeoutMs?: string | number;
+  jobTimeoutMs?: number;
   pageToken?: string;
 };
 
