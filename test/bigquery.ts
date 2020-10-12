@@ -1055,7 +1055,7 @@ describe('BigQuery', () => {
         'NUMERIC'
       );
       assert.strictEqual(
-        BigQuery.getTypeDescriptorFromValue_(new BigQueryInt('100')).type,
+        BigQuery.getTypeDescriptorFromValue_(bq.int('100')).type,
         'INT64'
       );
     });
