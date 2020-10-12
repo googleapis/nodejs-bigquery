@@ -405,9 +405,11 @@ class Job extends Operation {
       options
     );
   
-    const wrapIntegers = qs.wrapIntegers;
+    const wrapIntegers = qs.wrapIntegers ? qs.wrapIntegers : false;
     delete qs.wrapIntegers;
+
     delete qs.job;
+
     this.bigQuery.request(
       {
         uri: '/queries/' + this.id,
@@ -426,7 +428,7 @@ class Job extends Operation {
           rows = BigQuery.mergeSchemaWithRows_(
             resp.schema,
             resp.rows,
-            wrapIntegers!
+            wrapIntegers
           );
         }
 

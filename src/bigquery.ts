@@ -504,7 +504,6 @@ export class BigQuery extends common.Service {
                 )
               : BigQuery.int(value)
             : Number(value);
-
           break;
         }
         case 'NUMERIC': {
@@ -2044,24 +2043,25 @@ export class BigQueryInt extends Number {
      */
 
     if (typeCastOptions) {
-      const typeCastFields = typeCastOptions.fields
-        ? arrify(typeCastOptions.fields)
-        : undefined;
-
-      const CUSTOM_CAST =
-        typeCastFields && this._schemaFieldName
-          ? typeCastFields.includes(this._schemaFieldName)
-            ? true
-            : false
-          : false;
-
       if (typeof typeCastOptions.integerTypeCastFunction !== 'function') {
         throw new Error(
           'integerTypeCastFunction is not a function or was not provided.'
         );
       }
 
-      this.typeCastFunction = CUSTOM_CAST
+      const typeCastFields = typeCastOptions.fields
+        ? arrify(typeCastOptions.fields)
+        : undefined;
+
+      let customCast = true;
+
+      if (typeCastFields) {
+        customCast = this._schemaFieldName ? typeCastFields.includes(this._schemaFieldName) 
+        ? true : false
+        : false
+      }
+
+      this.typeCastFunction = customCast
       ? typeCastOptions.integerTypeCastFunction
       : undefined;
     }
