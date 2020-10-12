@@ -1714,9 +1714,9 @@ export class BigQuery extends common.Service {
    * @param {object} [options] Configuration object for query results.
    * @param {number} [options.maxResults] Maximum number of results to read.
    * @param {number} [options.timeoutMs] How long to wait for the query to
-   *     complete, in milliseconds, before returning. Default is to return
-   *     immediately. If the timeout passes before the job completes, the
-   * request will fail with a `TIMEOUT` error.
+   *     complete, in milliseconds, before returning. Default is 10 seconds.
+   *     If the timeout passes before the job completes, an error will be returned
+   *     and the 'jobComplete' field in the response will be false.
    * @param {function} [callback] The callback function.
    * @param {?error} callback.err An error returned while making this request
    * @param {array} callback.rows The list of results from your query.

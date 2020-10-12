@@ -336,8 +336,8 @@ class Job extends Operation {
    * @param {number} [options.startIndex] Zero-based index of the starting row.
    * @param {number} [options.timeoutMs] How long to wait for the query to
    *     complete, in milliseconds, before returning. Default is 10 seconds.
-   *     If the timeout passes before the job completes, the 'jobComplete' field
-   *     in the response will be false.
+   *     If the timeout passes before the job completes, an error will be returned
+   *     and the 'jobComplete' field in the response will be false.
    * @param {QueryResultsCallback|ManualQueryResultsCallback} [callback] The
    *     callback function. If `autoPaginate` is set to false a
    *     {@link ManualQueryResultsCallback} should be used.
