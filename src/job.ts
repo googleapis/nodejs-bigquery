@@ -405,7 +405,8 @@ class Job extends Operation {
 
     delete qs.job;
 
-    const timeoutOverride = qs.timeoutMs ? qs.timeoutMs : false;
+    const timeoutOverride =
+      typeof qs.timeoutMs === 'number' ? qs.timeoutMs : false;
 
     this.bigQuery.request(
       {
@@ -428,16 +429,16 @@ class Job extends Operation {
         let nextQuery: {} | null = null;
         if (resp.jobComplete === false) {
           // Query is still running.
+          nextQuery = Object.assign({}, options);
+
           // If timeout override was provided, return error.
           if (timeoutOverride) {
             const err = new Error(
               `The query did not complete before ${timeoutOverride}ms`
             );
-            callback!(err, null, null, resp);
+            callback!(err, null, nextQuery, resp);
             return;
           }
-          // Continue to poll for query results.
-          nextQuery = Object.assign({}, options);
         } else if (resp.pageToken) {
           // More results exist.
           nextQuery = Object.assign({}, options, {

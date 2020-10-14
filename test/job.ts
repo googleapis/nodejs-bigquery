@@ -341,7 +341,7 @@ describe('BigQuery/Job', () => {
         (err: Error, rows: {}, nextQuery: {}, resp: {}) => {
           assert.strictEqual(err.message, message);
           assert.strictEqual(rows, null);
-          assert.strictEqual(nextQuery, null);
+          assert.deepStrictEqual(nextQuery, options);
           assert.strictEqual(resp, response);
           done();
         }
