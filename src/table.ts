@@ -467,6 +467,7 @@ class Table extends common.ServiceObject {
     const customTypeConstructorNames = [
       'BigQueryDate',
       'BigQueryDatetime',
+      'BigQueryInt',
       'BigQueryTime',
       'BigQueryTimestamp',
       'Geography',

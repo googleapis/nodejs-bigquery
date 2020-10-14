@@ -360,16 +360,24 @@ describe('BigQuery/Table', () => {
           this.value = value;
         }
       }
+      class BigQueryInt {
+        value: {};
+        constructor(value: {}) {
+          this.value = value;
+        }
+      }
 
       const date = new BigQueryDate('date');
       const datetime = new BigQueryDatetime('datetime');
       const time = new BigQueryTime('time');
       const timestamp = new BigQueryTimestamp('timestamp');
+      const integer = new BigQueryInt('integer');
 
       assert.strictEqual(Table.encodeValue_(date), 'date');
       assert.strictEqual(Table.encodeValue_(datetime), 'datetime');
       assert.strictEqual(Table.encodeValue_(time), 'time');
       assert.strictEqual(Table.encodeValue_(timestamp), 'timestamp');
+      assert.strictEqual(Table.encodeValue_(integer), 'integer');
     });
 
     it('should properly encode arrays', () => {
