@@ -1283,9 +1283,6 @@ describe('BigQuery', () => {
       status: {
         state: 'RUNNING',
       },
-      jobReference: {
-        location: LOCATION,
-      },
     };
 
     let fakeJobId: string;
@@ -1380,7 +1377,7 @@ describe('BigQuery', () => {
       bq.createJob({}, assert.ifError);
     });
 
-    it('should return any request errors', done => {
+    it('should return a non-409 request error', done => {
       const response = {};
       const error = new Error('err.');
 
@@ -1392,6 +1389,40 @@ describe('BigQuery', () => {
         assert.strictEqual(err, error);
         assert.strictEqual(job, null);
         assert.strictEqual(resp, response);
+        done();
+      });
+    });
+
+    it('should refresh metadata when API returns 409', done => {
+      bq.job = () => {
+        return {
+          getMetadata: async () => [RESPONSE],
+        };
+      };
+
+      bq.request = (reqOpts: DecorateRequestOptions, callback: Function) => {
+        const error = new util.ApiError('Error.');
+        error.code = 409;
+        callback(error);
+      };
+
+      bq.createJob({}, (err: Error, job: Job, resp: {}) => {
+        assert.ifError(err);
+        assert.strictEqual(resp, RESPONSE);
+        done();
+      });
+    });
+
+    it('should return 409 if the user provided the job ID', done => {
+      const error = new util.ApiError('Error.');
+      error.code = 409;
+
+      bq.request = (reqOpts: DecorateRequestOptions, callback: Function) => {
+        callback(error);
+      };
+
+      bq.createJob({jobId: 'job-id'}, (err: Error) => {
+        assert.strictEqual(err, error);
         done();
       });
     });
@@ -1429,7 +1460,7 @@ describe('BigQuery', () => {
         callback(null, RESPONSE);
       };
 
-      bq.createJob({}, (err: Error, job: Job, resp: {}) => {
+      bq.createJob({location: LOCATION}, (err: Error, job: Job, resp: {}) => {
         assert.ifError(err);
         assert.strictEqual(job, fakeJob);
         assert.strictEqual(job.metadata, RESPONSE);

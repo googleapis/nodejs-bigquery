@@ -1418,9 +1418,11 @@ export class BigQuery extends common.Service {
             // we tried the request again, which tried to create it again,
             // unnecessarily. We will get the job's metadata and treat it as if
             // it just came back from the create call.
+            err = null;
             [resp] = await job.getMetadata();
           } else {
             callback!(err, null, resp);
+            return;
           }
         }
 
