@@ -877,7 +877,7 @@ describe('BigQuery', () => {
               "To prevent this error, please consider passing 'options.wrapNumbers' as\n" +
               '{\n' +
               '  integerTypeCastFunction: provide <your_custom_function>\n' +
-              '  properties: optionally specify property name(s) to be custom casted\n' +
+              '  fields: optionally specify field name(s) to be custom casted\n' +
               '}\n'
           );
         };
@@ -2577,7 +2577,7 @@ describe('BigQuery', () => {
       assert(
         queryStub.calledOnceWithExactly(
           query,
-          {autoPaginate: false, wrapIntegers: false},
+          {autoPaginate: false},
           sinon.match.func
         )
       );
@@ -2597,18 +2597,19 @@ describe('BigQuery', () => {
 
     it('should pass wrapIntegers if supplied', done => {
       const statement = 'SELECT';
-      const wrapIntegers = {
-        integerValue: 100,
-      };
       const query = {
         query: statement,
-        wrapIntegers,
       };
-      bq.queryAsStream_(query, done);
+      const options = {
+        wrapIntegers: {
+          integerValue: 100,
+        },
+      };
+      bq.queryAsStream_(query, options, done);
       assert(
         queryStub.calledOnceWithExactly(
           query,
-          {autoPaginate: false, wrapIntegers},
+          {autoPaginate: false, wrapIntegers: options.wrapIntegers},
           sinon.match.func
         )
       );

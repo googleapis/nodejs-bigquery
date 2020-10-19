@@ -99,6 +99,9 @@ export type Query = JobRequest<bigquery.IJobConfigurationQuery> & {
 };
 
 export type QueryOptions = QueryResultsOptions;
+export type QueryStreamOptions = {
+  wrapIntegers?: boolean | IntegerTypeCastOptions;
+};
 export type DatasetResource = bigquery.IDataset;
 export type ValueType = bigquery.IQueryParameterType;
 
@@ -817,6 +820,7 @@ export class BigQuery extends common.Service {
    * const bqInteger = bigquery.int(largeIntegerValue, wrapIntegers);
    *
    * const customValue = bqInteger.valueOf();
+   * // customValue is the value returned from your `integerTypeCastFunction`.
    */
   static int(
     value: string | number | IntegerTypeCastValue,
@@ -882,7 +886,7 @@ export class BigQuery extends common.Service {
           "To prevent this error, please consider passing 'options.wrapNumbers' as\n" +
           '{\n' +
           '  integerTypeCastFunction: provide <your_custom_function>\n' +
-          '  properties: optionally specify property name(s) to be custom casted\n' +
+          '  fields: optionally specify field name(s) to be custom casted\n' +
           '}\n'
       );
     }
@@ -1929,14 +1933,26 @@ export class BigQuery extends common.Service {
    *
    * @private
    */
-  queryAsStream_(query: Query, callback?: SimpleQueryRowsCallback) {
+  queryAsStream_(
+    query: Query,
+    optionsOrCallback?: QueryStreamOptions,
+    cb?: SimpleQueryRowsCallback
+  ) {
+    let options =
+      typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
+    const callback =
+      typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
+
+    options = query.job
+      ? extend(query, options)
+      : extend(options, {autoPaginate: false});
+
     if (query.job) {
-      query.job.getQueryResults(query, callback as QueryRowsCallback);
+      query.job!.getQueryResults(options, callback as QueryRowsCallback);
       return;
     }
-    const wrapIntegers = query.wrapIntegers ? query.wrapIntegers : false;
-    delete query.wrapIntegers;
-    this.query(query, {autoPaginate: false, wrapIntegers}, callback);
+
+    this.query(query, options, callback);
   }
 }
 
