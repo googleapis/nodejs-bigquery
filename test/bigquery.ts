@@ -815,6 +815,10 @@ describe('BigQuery', () => {
         BigQuery.getTypeDescriptorFromValue_(new Big('1.1')).type,
         'NUMERIC'
       );
+      assert.strictEqual(
+        BigQuery.getTypeDescriptorFromValue_(bq.geography('POINT (1 1')).type,
+        'GEOGRAPHY'
+      );
     });
 
     it('should return correct type for an array', () => {

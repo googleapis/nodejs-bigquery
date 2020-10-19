@@ -890,6 +890,8 @@ export class BigQuery extends common.Service {
       typeName = 'BYTES';
     } else if (value instanceof Big) {
       typeName = 'NUMERIC';
+    } else if (value instanceof Geography) {
+      typeName = 'GEOGRAPHY';
     } else if (Array.isArray(value)) {
       if (value.length === 0) {
         throw new Error(
@@ -1007,7 +1009,11 @@ export class BigQuery extends common.Service {
     }
 
     function isCustomType({type}: ValueType): boolean {
-      return type!.indexOf('TIME') > -1 || type!.indexOf('DATE') > -1;
+      return (
+        type!.indexOf('TIME') > -1 ||
+        type!.indexOf('DATE') > -1 ||
+        type!.indexOf('GEOGRAPHY') > -1
+      );
     }
   }
 
