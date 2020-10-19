@@ -1280,7 +1280,7 @@ export class BigQuery extends common.Service {
       },
     };
 
-    if (query.jobTimeoutMs) {
+    if (typeof query.jobTimeoutMs === 'number') {
       reqOpts.configuration.jobTimeoutMs = query.jobTimeoutMs;
       delete query.jobTimeoutMs;
     }
