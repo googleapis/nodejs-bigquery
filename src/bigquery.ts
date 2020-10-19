@@ -810,7 +810,9 @@ export class BigQuery extends common.Service {
    *    return value.split('');
    * };
    *
-   * const wrapIntegers = {
+   * const options = {
+   *   integerTypeCastFunction: value => value.split(),
+   * };
    *    integerTypeCastFunction: customTypeCast
    * };
    *
