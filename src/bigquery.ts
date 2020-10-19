@@ -809,17 +809,11 @@ export class BigQuery extends common.Service {
    *
    * const largeIntegerValue = Number.MAX_SAFE_INTEGER + 1;
    *
-   * customTypeCast = (value) => {
-   *    return value.split('');
-   * };
-   *
    * const options = {
    *   integerTypeCastFunction: value => value.split(),
    * };
-   *    integerTypeCastFunction: customTypeCast
-   * };
    *
-   * const bqInteger = bigquery.int(largeIntegerValue, wrapIntegers);
+   * const bqInteger = bigquery.int(largeIntegerValue, options);
    *
    * const customValue = bqInteger.valueOf();
    * // customValue is the value returned from your `integerTypeCastFunction`.
