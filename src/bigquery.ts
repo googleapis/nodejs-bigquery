@@ -884,7 +884,7 @@ export class BigQuery extends common.Service {
           "To prevent this error, please consider passing 'options.wrapNumbers' as\n" +
           '{\n' +
           '  integerTypeCastFunction: provide <your_custom_function>\n' +
-          '  properties: optionally specify property name(s) to be custom casted\n' +
+          '  fields: optionally specify field name(s) to be custom casted\n' +
           '}\n'
       );
     }
