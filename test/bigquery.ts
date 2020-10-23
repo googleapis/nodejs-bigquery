@@ -1175,6 +1175,38 @@ describe('BigQuery', () => {
         },
       });
     });
+
+    describe('_getValue', () => {
+      it('should return currect value', () => {
+        const value = 'VALUE';
+        const type = 'TYPE';
+
+        sandbox.stub(BigQuery, '_isCustomType').returns(false);
+        assert.strictEqual(BigQuery._getValue(value, type), value);
+      });
+
+      it('should return value of custom type', () => {
+        const geography = bq.geography('POINT (1 1)');
+
+        sandbox.stub(BigQuery, '_isCustomType').returns(true);
+        assert.strictEqual(
+          BigQuery._getValue(geography, geography.type),
+          geography.value
+        );
+      });
+    });
+
+    describe('_isCustomType', () => {
+      it('should identify custom types', () => {
+        const time = {type: 'TIME'};
+        const date = {type: 'DATE'};
+        const geo = {type: 'GEOGRAPHY'};
+
+        assert.strictEqual(BigQuery._isCustomType(time), true);
+        assert.strictEqual(BigQuery._isCustomType(date), true);
+        assert.strictEqual(BigQuery._isCustomType(geo), true);
+      });
+    });
   });
 
   describe('createDataset', () => {
