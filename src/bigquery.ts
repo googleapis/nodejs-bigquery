@@ -95,9 +95,13 @@ export type Query = JobRequest<bigquery.IJobConfigurationQuery> & {
   maxResults?: number;
   timeoutMs?: number;
   pageToken?: string;
+  wrapIntegers?: boolean | IntegerTypeCastOptions;
 };
 
 export type QueryOptions = QueryResultsOptions;
+export type QueryStreamOptions = {
+  wrapIntegers?: boolean | IntegerTypeCastOptions;
+};
 export type DatasetResource = bigquery.IDataset;
 export type ValueType = bigquery.IQueryParameterType;
 
@@ -170,6 +174,16 @@ export interface BigQueryOptions extends common.GoogleAuthOptions {
    */
   apiEndpoint?: string;
 }
+
+export interface IntegerTypeCastOptions {
+  integerTypeCastFunction: Function;
+  fields?: string | string[];
+}
+
+export type IntegerTypeCastValue = {
+  integerValue: string | number;
+  schemaFieldName?: string;
+};
 
 export const PROTOCOL_REGEX = /^(\w*):\/\//;
 
@@ -408,6 +422,12 @@ export class BigQuery extends common.Service {
    *
    * @param {object} schema
    * @param {array} rows
+   * @param {boolean|IntegerTypeCastOptions} wrapIntegers Wrap values of
+   *     'INT64' type in {@link BigQueryInt} objects.
+   *     If a `boolean`, this will wrap values in {@link BigQueryInt} objects.
+   *     If an `object`, this will return a value returned by
+   *     `wrapIntegers.integerTypeCastFunction`.
+   *     Please see {@link IntegerTypeCastOptions} for options descriptions.
    * @param {array} selectedFields List of fields to return.
    * If unspecified, all fields are returned.
    * @returns {array} Fields using their matching names from the table's schema.
@@ -415,6 +435,7 @@ export class BigQuery extends common.Service {
   static mergeSchemaWithRows_(
     schema: TableSchema | TableField,
     rows: TableRow[],
+    wrapIntegers: boolean | IntegerTypeCastOptions,
     selectedFields?: string[]
   ) {
     if (selectedFields && selectedFields!.length > 0) {
@@ -444,10 +465,10 @@ export class BigQuery extends common.Service {
         let value = field.v;
         if (schemaField.mode === 'REPEATED') {
           value = (value as TableRowField[]).map(val => {
-            return convert(schemaField, val.v, selectedFields);
+            return convert(schemaField, val.v, wrapIntegers, selectedFields);
           });
         } else {
-          value = convert(schemaField, value, selectedFields);
+          value = convert(schemaField, value, wrapIntegers, selectedFields);
         }
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const fieldObject: any = {};
@@ -460,6 +481,7 @@ export class BigQuery extends common.Service {
       schemaField: TableField,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       value: any,
+      wrapIntegers: boolean | IntegerTypeCastOptions,
       selectedFields?: string[]
     ) {
       if (is.null(value)) {
@@ -483,7 +505,14 @@ export class BigQuery extends common.Service {
         }
         case 'INTEGER':
         case 'INT64': {
-          value = Number(value);
+          value = wrapIntegers
+            ? typeof wrapIntegers === 'object'
+              ? BigQuery.int(
+                  {integerValue: value, schemaFieldName: schemaField.name},
+                  wrapIntegers
+                ).valueOf()
+              : BigQuery.int(value)
+            : Number(value);
           break;
         }
         case 'NUMERIC': {
@@ -494,6 +523,7 @@ export class BigQuery extends common.Service {
           value = BigQuery.mergeSchemaWithRows_(
             schemaField,
             value,
+            wrapIntegers,
             selectedFields
           ).pop();
           break;
@@ -766,6 +796,43 @@ export class BigQuery extends common.Service {
   }
 
   /**
+   * A BigQueryInt wraps 'INT64' values. Can be used to maintain precision.
+   *
+   * @method BigQuery#int
+   * @param {string|number|IntegerTypeCastValue} value The INT64 value to convert.
+   * @param {IntegerTypeCastOptions} typeCastOptions Configuration to convert
+   *     value. Must provide an `integerTypeCastFunction` to handle conversion.
+   *
+   * @example
+   * const {BigQuery} = require('@google-cloud/bigquery');
+   * const bigquery = new BigQuery();
+   *
+   * const largeIntegerValue = Number.MAX_SAFE_INTEGER + 1;
+   *
+   * const options = {
+   *   integerTypeCastFunction: value => value.split(),
+   * };
+   *
+   * const bqInteger = bigquery.int(largeIntegerValue, options);
+   *
+   * const customValue = bqInteger.valueOf();
+   * // customValue is the value returned from your `integerTypeCastFunction`.
+   */
+  static int(
+    value: string | number | IntegerTypeCastValue,
+    typeCastOptions?: IntegerTypeCastOptions
+  ) {
+    return new BigQueryInt(value, typeCastOptions);
+  }
+
+  int(
+    value: string | number | IntegerTypeCastValue,
+    typeCastOptions?: IntegerTypeCastOptions
+  ) {
+    return BigQuery.int(value, typeCastOptions);
+  }
+
+  /**
    * A geography value represents a surface area on the Earth
    * in Well-known Text (WKT) format.
    *
@@ -795,6 +862,31 @@ export class BigQuery extends common.Service {
 
   geography(value: string) {
     return BigQuery.geography(value);
+  }
+
+  /**
+   * Convert an INT64 value to Number.
+   *
+   * @private
+   * @param {object} value The INT64 value to convert.
+   */
+  static decodeIntegerValue_(value: IntegerTypeCastValue) {
+    const num = Number(value.integerValue);
+    if (!Number.isSafeInteger(num)) {
+      throw new Error(
+        'We attempted to return all of the numeric values, but ' +
+          (value.schemaFieldName ? value.schemaFieldName + ' ' : '') +
+          'value ' +
+          value.integerValue +
+          " is out of bounds of 'Number.MAX_SAFE_INTEGER'.\n" +
+          "To prevent this error, please consider passing 'options.wrapNumbers' as\n" +
+          '{\n' +
+          '  integerTypeCastFunction: provide <your_custom_function>\n' +
+          '  fields: optionally specify field name(s) to be custom casted\n' +
+          '}\n'
+      );
+    }
+    return num;
   }
 
   /**
@@ -890,6 +982,8 @@ export class BigQuery extends common.Service {
       typeName = 'BYTES';
     } else if (value instanceof Big) {
       typeName = 'NUMERIC';
+    } else if (value instanceof BigQueryInt) {
+      typeName = 'INT64';
     } else if (value instanceof Geography) {
       typeName = 'GEOGRAPHY';
     } else if (Array.isArray(value)) {
@@ -943,6 +1037,8 @@ export class BigQuery extends common.Service {
    * @see [Jobs.query API Reference Docs (see `queryParameters`)]{@link https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs/query#request-body}
    *
    * @param {*} value The value.
+   * @param {string|ProvidedTypeStruct|ProvidedTypeArray} providedType Provided
+   *     query parameter type.
    * @returns {object} A properly-formed `queryParameter` object.
    */
   static valueToQueryParameter_(
@@ -953,7 +1049,6 @@ export class BigQuery extends common.Service {
     if (is.date(value)) {
       value = BigQuery.timestamp(value as Date);
     }
-
     let parameterType: bigquery.IQueryParameterType;
     if (providedType) {
       parameterType = BigQuery.getTypeDescriptorFromProvidedType_(providedType);
@@ -1009,6 +1104,7 @@ export class BigQuery extends common.Service {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private static _getValue(value: any, type: ValueType): any {
+    if (value.type!) type = value;
     return BigQuery._isCustomType(type) ? value.value : value;
   }
 
@@ -1016,7 +1112,8 @@ export class BigQuery extends common.Service {
     return (
       type!.indexOf('TIME') > -1 ||
       type!.indexOf('DATE') > -1 ||
-      type!.indexOf('GEOGRAPHY') > -1
+      type!.indexOf('GEOGRAPHY') > -1 ||
+      type!.indexOf('BigQueryInt') > -1
     );
   }
 
@@ -1719,6 +1816,12 @@ export class BigQuery extends common.Service {
    *     complete, in milliseconds, before returning. Default is to return
    *     immediately. If the timeout passes before the job completes, the
    * request will fail with a `TIMEOUT` error.
+   * @param {boolean|IntegerTypeCastOptions} [options.wrapIntegers=false] Wrap values
+   *     of 'INT64' type in {@link BigQueryInt} objects.
+   *     If a `boolean`, this will wrap values in {@link BigQueryInt} objects.
+   *     If an `object`, this will return a value returned by
+   *     `wrapIntegers.integerTypeCastFunction`.
+   *     Please see {@link IntegerTypeCastOptions} for options descriptions.
    * @param {function} [callback] The callback function.
    * @param {?error} callback.err An error returned while making this request
    * @param {array} callback.rows The list of results from your query.
@@ -1830,12 +1933,26 @@ export class BigQuery extends common.Service {
    *
    * @private
    */
-  queryAsStream_(query: Query, callback?: SimpleQueryRowsCallback) {
+  queryAsStream_(
+    query: Query,
+    optionsOrCallback?: QueryStreamOptions,
+    cb?: SimpleQueryRowsCallback
+  ) {
+    let options =
+      typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
+    const callback =
+      typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
+
+    options = query.job
+      ? extend(query, options)
+      : extend(options, {autoPaginate: false});
+
     if (query.job) {
-      query.job.getQueryResults(query, callback as QueryRowsCallback);
+      query.job!.getQueryResults(options, callback as QueryRowsCallback);
       return;
     }
-    this.query(query, {autoPaginate: false}, callback);
+
+    this.query(query, options, callback);
   }
 }
 
@@ -1856,6 +1973,7 @@ promisifyAll(BigQuery, {
     'date',
     'datetime',
     'geography',
+    'int',
     'job',
     'time',
     'timestamp',
@@ -1933,4 +2051,95 @@ export class BigQueryTime {
     }
     this.value = value as string;
   }
+}
+
+/**
+ * Build a BigQueryInt object. For long integers, a string can be provided.
+ *
+ * @class
+ * @param {string|number|IntegerTypeCastValue} value The 'INT64' value.
+ * @param {object} [typeCastOptions] Configuration to convert
+ *     values of 'INT64' type to a custom value. Must provide an
+ *     `integerTypeCastFunction` to handle conversion.
+ * @param {function} typeCastOptions.integerTypeCastFunction A custom user
+ *     provided function to convert value.
+ * @param {string|string[]} [typeCastOptions.fields] Schema field
+ *     names to be converted using `integerTypeCastFunction`.
+ *
+ * @example
+ * const {BigQuery} = require('@google-cloud/bigquery');
+ * const bigquery = new BigQuery();
+ * const anInt = bigquery.int(7);
+ */
+export class BigQueryInt extends Number {
+  type: string;
+  value: string;
+  typeCastFunction?: Function;
+  private _schemaFieldName: string | undefined;
+  constructor(
+    value: string | number | IntegerTypeCastValue,
+    typeCastOptions?: IntegerTypeCastOptions
+  ) {
+    super(typeof value === 'object' ? value.integerValue : value);
+    this._schemaFieldName =
+      typeof value === 'object' ? value.schemaFieldName : undefined;
+    this.value =
+      typeof value === 'object'
+        ? value.integerValue.toString()
+        : value.toString();
+
+    this.type = 'BigQueryInt';
+
+    if (typeCastOptions) {
+      if (typeof typeCastOptions.integerTypeCastFunction !== 'function') {
+        throw new Error(
+          'integerTypeCastFunction is not a function or was not provided.'
+        );
+      }
+
+      const typeCastFields = typeCastOptions.fields
+        ? arrify(typeCastOptions.fields)
+        : undefined;
+
+      let customCast = true;
+
+      if (typeCastFields) {
+        customCast = this._schemaFieldName
+          ? typeCastFields.includes(this._schemaFieldName)
+            ? true
+            : false
+          : false;
+      }
+
+      customCast &&
+        (this.typeCastFunction = typeCastOptions.integerTypeCastFunction);
+    }
+  }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  valueOf(): any {
+    const shouldCustomCast = this.typeCastFunction ? true : false;
+
+    if (shouldCustomCast) {
+      try {
+        return this.typeCastFunction!(this.value);
+      } catch (error) {
+        error.message = `integerTypeCastFunction threw an error:\n\n  - ${error.message}`;
+        throw error;
+      }
+    } else {
+      // return this.value;
+      return BigQuery.decodeIntegerValue_({
+        integerValue: this.value,
+        schemaFieldName: this._schemaFieldName,
+      });
+    }
+  }
+
+  toJSON(): Json {
+    return {type: this.type, value: this.value};
+  }
+}
+
+export interface Json {
+  [field: string]: string;
 }

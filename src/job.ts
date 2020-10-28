@@ -30,6 +30,7 @@ import * as extend from 'extend';
 
 import {
   BigQuery,
+  IntegerTypeCastOptions,
   JobRequest,
   PagedRequest,
   QueryRowsCallback,
@@ -45,9 +46,10 @@ export type JobOptions = JobRequest<JobMetadata>;
 export type CancelCallback = RequestCallback<bigquery.IJobCancelResponse>;
 export type CancelResponse = [bigquery.IJobCancelResponse];
 
-export type QueryResultsOptions = {job?: Job} & PagedRequest<
-  bigquery.jobs.IGetQueryResultsParams
->;
+export type QueryResultsOptions = {
+  job?: Job;
+  wrapIntegers?: boolean | IntegerTypeCastOptions;
+} & PagedRequest<bigquery.jobs.IGetQueryResultsParams>;
 
 /**
  * @callback QueryResultsCallback
@@ -337,7 +339,12 @@ class Job extends Operation {
    * @param {number} [options.timeoutMs] How long to wait for the query to
    *     complete, in milliseconds, before returning. Default is to return
    *     immediately. If the timeout passes before the job completes, the
-   * request will fail with a `TIMEOUT` error.
+   *     request will fail with a `TIMEOUT` error.
+   * @param {boolean|IntegerTypeCastOptions} [options.wrapIntegers=false] Wrap values
+   *     of 'INT64' type in {@link BigQueryInt} objects.
+   *     If a `boolean`, this will wrap values in {@link BigQueryInt} objects.
+   *     If an `object`, this will return a value returned by
+   *     `wrapIntegers.integerTypeCastFunction`.
    * @param {QueryResultsCallback|ManualQueryResultsCallback} [callback] The
    *     callback function. If `autoPaginate` is set to false a
    *     {@link ManualQueryResultsCallback} should be used.
@@ -403,6 +410,9 @@ class Job extends Operation {
       options
     );
 
+    const wrapIntegers = qs.wrapIntegers ? qs.wrapIntegers : false;
+    delete qs.wrapIntegers;
+
     delete qs.job;
 
     this.bigQuery.request(
@@ -420,7 +430,11 @@ class Job extends Operation {
         let rows: any = [];
 
         if (resp.schema && resp.rows) {
-          rows = BigQuery.mergeSchemaWithRows_(resp.schema, resp.rows);
+          rows = BigQuery.mergeSchemaWithRows_(
+            resp.schema,
+            resp.rows,
+            wrapIntegers
+          );
         }
 
         let nextQuery: {} | null = null;

@@ -44,6 +44,7 @@ import {GoogleErrorBody} from '@google-cloud/common/build/src/util';
 import {Duplex, Writable} from 'stream';
 import {JobMetadata} from './job';
 import bigquery from './types';
+import {IntegerTypeCastOptions} from './bigquery';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const duplexify = require('duplexify');
@@ -102,7 +103,9 @@ export type TableRow = bigquery.ITableRow;
 export type TableRowField = bigquery.ITableCell;
 export type TableRowValue = string | TableRow;
 
-export type GetRowsOptions = PagedRequest<bigquery.tabledata.IListParams>;
+export type GetRowsOptions = PagedRequest<bigquery.tabledata.IListParams> & {
+  wrapIntegers?: boolean | IntegerTypeCastOptions;
+};
 
 export type JobLoadMetadata = JobRequest<bigquery.IJobConfigurationLoad> & {
   format?: string;
@@ -464,6 +467,7 @@ class Table extends common.ServiceObject {
     const customTypeConstructorNames = [
       'BigQueryDate',
       'BigQueryDatetime',
+      'BigQueryInt',
       'BigQueryTime',
       'BigQueryTimestamp',
       'Geography',
@@ -1621,6 +1625,11 @@ class Table extends common.ServiceObject {
    *     automatically.
    * @param {number} [options.maxApiCalls] Maximum number of API calls to make.
    * @param {number} [options.maxResults] Maximum number of results to return.
+   * @param {boolean|IntegerTypeCastOptions} [options.wrapIntegers=false] Wrap values
+   *     of 'INT64' type in {@link BigQueryInt} objects.
+   *     If a `boolean`, this will wrap values in {@link BigQueryInt} objects.
+   *     If an `object`, this will return a value returned by
+   *     `wrapIntegers.integerTypeCastFunction`.
    * @param {function} [callback] The callback function.
    * @param {?error} callback.err An error returned while making this request
    * @param {array} callback.rows The table data from specified set of rows.
@@ -1668,6 +1677,8 @@ class Table extends common.ServiceObject {
       typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
     const callback =
       typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
+    const wrapIntegers = options.wrapIntegers ? options.wrapIntegers : false;
+    delete options.wrapIntegers;
     const onComplete = (
       err: Error | null,
       rows: TableRow[] | null,
@@ -1681,6 +1692,7 @@ class Table extends common.ServiceObject {
       rows = BigQuery.mergeSchemaWithRows_(
         this.metadata.schema,
         rows || [],
+        wrapIntegers,
         options.selectedFields ? options.selectedFields!.split(',') : []
       );
       callback!(null, rows, nextQuery, resp);
