@@ -1058,6 +1058,10 @@ describe('BigQuery', () => {
         BigQuery.getTypeDescriptorFromValue_(bq.int('100')).type,
         'INT64'
       );
+      assert.strictEqual(
+        BigQuery.getTypeDescriptorFromValue_(bq.geography('POINT (1 1')).type,
+        'GEOGRAPHY'
+      );
     });
 
     it('should return correct type for an array', () => {
@@ -1436,6 +1440,38 @@ describe('BigQuery', () => {
         parameterValue: {
           value: 8,
         },
+      });
+    });
+
+    describe('_getValue', () => {
+      it('should return currect value', () => {
+        const value = 'VALUE';
+        const type = 'TYPE';
+
+        sandbox.stub(BigQuery, '_isCustomType').returns(false);
+        assert.strictEqual(BigQuery._getValue(value, type), value);
+      });
+
+      it('should return value of custom type', () => {
+        const geography = bq.geography('POINT (1 1)');
+
+        sandbox.stub(BigQuery, '_isCustomType').returns(true);
+        assert.strictEqual(
+          BigQuery._getValue(geography, geography.type),
+          geography.value
+        );
+      });
+    });
+
+    describe('_isCustomType', () => {
+      it('should identify custom types', () => {
+        const time = {type: 'TIME'};
+        const date = {type: 'DATE'};
+        const geo = {type: 'GEOGRAPHY'};
+
+        assert.strictEqual(BigQuery._isCustomType(time), true);
+        assert.strictEqual(BigQuery._isCustomType(date), true);
+        assert.strictEqual(BigQuery._isCustomType(geo), true);
       });
     });
   });
