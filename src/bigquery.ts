@@ -890,6 +890,8 @@ export class BigQuery extends common.Service {
       typeName = 'BYTES';
     } else if (value instanceof Big) {
       typeName = 'NUMERIC';
+    } else if (value instanceof Geography) {
+      typeName = 'GEOGRAPHY';
     } else if (Array.isArray(value)) {
       if (value.length === 0) {
         throw new Error(
@@ -964,7 +966,7 @@ export class BigQuery extends common.Service {
     if (typeName === 'ARRAY') {
       queryParameter.parameterValue!.arrayValues = (value as Array<{}>).map(
         itemValue => {
-          const value = getValue(itemValue, parameterType.arrayType!);
+          const value = BigQuery._getValue(itemValue, parameterType.arrayType!);
           if (is.object(value) || is.array(value)) {
             if (is.array(providedType)) {
               providedType = providedType as [];
@@ -996,19 +998,26 @@ export class BigQuery extends common.Service {
         {}
       );
     } else {
-      queryParameter.parameterValue!.value = getValue(value, parameterType);
+      queryParameter.parameterValue!.value = BigQuery._getValue(
+        value,
+        parameterType
+      );
     }
 
     return queryParameter;
+  }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    function getValue(value: any, type: ValueType): any {
-      return isCustomType(type) ? value.value : value;
-    }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private static _getValue(value: any, type: ValueType): any {
+    return BigQuery._isCustomType(type) ? value.value : value;
+  }
 
-    function isCustomType({type}: ValueType): boolean {
-      return type!.indexOf('TIME') > -1 || type!.indexOf('DATE') > -1;
-    }
+  private static _isCustomType({type}: ValueType): boolean {
+    return (
+      type!.indexOf('TIME') > -1 ||
+      type!.indexOf('DATE') > -1 ||
+      type!.indexOf('GEOGRAPHY') > -1
+    );
   }
 
   createDataset(
