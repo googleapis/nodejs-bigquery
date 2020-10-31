@@ -196,7 +196,11 @@ describe('BigQuery/Job', () => {
         callback(null, RESPONSE);
       };
 
-      BIGQUERY.mergeSchemaWithRows_ = (schema: {}, rows: {}) => {
+      BIGQUERY.mergeSchemaWithRows_ = (
+        schema: {},
+        rows: {},
+        wrapIntegers: {}
+      ) => {
         return rows;
       };
     });
@@ -291,9 +295,10 @@ describe('BigQuery/Job', () => {
 
       sandbox
         .stub(BigQuery, 'mergeSchemaWithRows_')
-        .callsFake((schema, rows) => {
+        .callsFake((schema, rows, wrapIntegers) => {
           assert.strictEqual(schema, response.schema);
           assert.strictEqual(rows, response.rows);
+          assert.strictEqual(wrapIntegers, false);
           return mergedRows;
         });
 
@@ -302,6 +307,34 @@ describe('BigQuery/Job', () => {
         assert.strictEqual(rows, mergedRows);
         done();
       });
+    });
+
+    it('it should wrap integers', done => {
+      const response = {
+        schema: {},
+        rows: [],
+      };
+
+      const mergedRows: Array<{}> = [];
+
+      const options = {wrapIntegers: true};
+      const expectedOptions = Object.assign({location: undefined});
+
+      BIGQUERY.request = (reqOpts: DecorateRequestOptions) => {
+        assert.deepStrictEqual(reqOpts.qs, expectedOptions);
+        done();
+      };
+
+      sandbox
+        .stub(BigQuery, 'mergeSchemaWithRows_')
+        .callsFake((schema, rows, wrapIntegers) => {
+          assert.strictEqual(schema, response.schema);
+          assert.strictEqual(rows, response.rows);
+          assert.strictEqual(wrapIntegers, true);
+          return mergedRows;
+        });
+
+      job.getQueryResults(options, assert.ifError);
     });
 
     it('should return the query when the job is not complete', done => {
