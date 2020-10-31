@@ -3,22 +3,15 @@
  */
 declare namespace bigquery {
   /**
-   * Aggregate metrics for classification/classifier models. For multi-class
-   * models, the metrics are either macro-averaged or micro-averaged. When
-   * macro-averaged, the metrics are calculated for each label and then an
-   * unweighted average is taken of those values. When micro-averaged, the
-   * metric is calculated globally by counting the total number of correctly
-   * predicted rows.
+   * Aggregate metrics for classification/classifier models. For multi-class models, the metrics are either macro-averaged or micro-averaged. When macro-averaged, the metrics are calculated for each label and then an unweighted average is taken of those values. When micro-averaged, the metric is calculated globally by counting the total number of correctly predicted rows.
    */
   type IAggregateClassificationMetrics = {
     /**
-     * Accuracy is the fraction of predictions given the correct label. For
-     * multiclass this is a micro-averaged metric.
+     * Accuracy is the fraction of predictions given the correct label. For multiclass this is a micro-averaged metric.
      */
     accuracy?: number;
     /**
-     * The F1 score is an average of recall and precision. For multiclass
-     * this is a macro-averaged metric.
+     * The F1 score is an average of recall and precision. For multiclass this is a macro-averaged metric.
      */
     f1Score?: number;
     /**
@@ -26,26 +19,19 @@ declare namespace bigquery {
      */
     logLoss?: number;
     /**
-     * Precision is the fraction of actual positive predictions that had
-     * positive actual labels. For multiclass this is a macro-averaged
-     * metric treating each class as a binary classifier.
+     * Precision is the fraction of actual positive predictions that had positive actual labels. For multiclass this is a macro-averaged metric treating each class as a binary classifier.
      */
     precision?: number;
     /**
-     * Recall is the fraction of actual positive labels that were given a
-     * positive prediction. For multiclass this is a macro-averaged metric.
+     * Recall is the fraction of actual positive labels that were given a positive prediction. For multiclass this is a macro-averaged metric.
      */
     recall?: number;
     /**
-     * Area Under a ROC Curve. For multiclass this is a macro-averaged
-     * metric.
+     * Area Under a ROC Curve. For multiclass this is a macro-averaged metric.
      */
     rocAuc?: number;
     /**
-     * Threshold at which the metrics are computed. For binary
-     * classification models this is the positive class threshold.
-     * For multi-class classfication models this is the confidence
-     * threshold.
+     * Threshold at which the metrics are computed. For binary classification models this is the positive class threshold. For multi-class classfication models this is the confidence threshold.
      */
     threshold?: number;
   };
@@ -63,8 +49,7 @@ declare namespace bigquery {
      */
     dataType?: IStandardSqlDataType;
     /**
-     * Optional. Specifies whether the argument is input or output.
-     * Can be set for procedures only.
+     * Optional. Specifies whether the argument is input or output. Can be set for procedures only.
      */
     mode?: 'MODE_UNSPECIFIED' | 'IN' | 'OUT' | 'INOUT';
     /**
@@ -110,6 +95,46 @@ declare namespace bigquery {
   };
 
   /**
+   * Model evaluation metrics for ARIMA forecasting models.
+   */
+  type IArimaForecastingMetrics = {
+    /**
+     * Arima model fitting metrics.
+     */
+    arimaFittingMetrics?: Array<IArimaFittingMetrics>;
+    /**
+     * Repeated as there can be many metric sets (one for each model) in auto-arima and the large-scale case.
+     */
+    arimaSingleModelForecastingMetrics?: Array<
+      IArimaSingleModelForecastingMetrics
+    >;
+    /**
+     * Whether Arima model fitted with drift or not. It is always false when d is not 1.
+     */
+    hasDrift?: Array<boolean>;
+    /**
+     * Non-seasonal order.
+     */
+    nonSeasonalOrder?: Array<IArimaOrder>;
+    /**
+     * Seasonal periods. Repeated because multiple periods are supported for one time series.
+     */
+    seasonalPeriods?: Array<
+      | 'SEASONAL_PERIOD_TYPE_UNSPECIFIED'
+      | 'NO_SEASONALITY'
+      | 'DAILY'
+      | 'WEEKLY'
+      | 'MONTHLY'
+      | 'QUARTERLY'
+      | 'YEARLY'
+    >;
+    /**
+     * Id to differentiate different time series for the large-scale case.
+     */
+    timeSeriesId?: Array<string>;
+  };
+
+  /**
    * Arima model information.
    */
   type IArimaModelInfo = {
@@ -122,8 +147,7 @@ declare namespace bigquery {
      */
     arimaFittingMetrics?: IArimaFittingMetrics;
     /**
-     * Whether Arima model fitted with drift or not. It is always false
-     * when d is not 1.
+     * Whether Arima model fitted with drift or not. It is always false when d is not 1.
      */
     hasDrift?: boolean;
     /**
@@ -131,8 +155,7 @@ declare namespace bigquery {
      */
     nonSeasonalOrder?: IArimaOrder;
     /**
-     * Seasonal periods. Repeated because multiple periods are supported
-     * for one time series.
+     * Seasonal periods. Repeated because multiple periods are supported for one time series.
      */
     seasonalPeriods?: Array<
       | 'SEASONAL_PERIOD_TYPE_UNSPECIFIED'
@@ -168,18 +191,15 @@ declare namespace bigquery {
   };
 
   /**
-   * (Auto-)arima fitting result. Wrap everything in ArimaResult for easier
-   * refactoring if we want to use model-specific iteration results.
+   * (Auto-)arima fitting result. Wrap everything in ArimaResult for easier refactoring if we want to use model-specific iteration results.
    */
   type IArimaResult = {
     /**
-     * This message is repeated because there are multiple arima models
-     * fitted in auto-arima. For non-auto-arima model, its size is one.
+     * This message is repeated because there are multiple arima models fitted in auto-arima. For non-auto-arima model, its size is one.
      */
     arimaModelInfo?: Array<IArimaModelInfo>;
     /**
-     * Seasonal periods. Repeated because multiple periods are supported for
-     * one time series.
+     * Seasonal periods. Repeated because multiple periods are supported for one time series.
      */
     seasonalPeriods?: Array<
       | 'SEASONAL_PERIOD_TYPE_UNSPECIFIED'
@@ -190,6 +210,72 @@ declare namespace bigquery {
       | 'QUARTERLY'
       | 'YEARLY'
     >;
+  };
+
+  /**
+   * Model evaluation metrics for a single ARIMA forecasting model.
+   */
+  type IArimaSingleModelForecastingMetrics = {
+    /**
+     * Arima fitting metrics.
+     */
+    arimaFittingMetrics?: IArimaFittingMetrics;
+    /**
+     * Is arima model fitted with drift or not. It is always false when d is not 1.
+     */
+    hasDrift?: boolean;
+    /**
+     * Non-seasonal order.
+     */
+    nonSeasonalOrder?: IArimaOrder;
+    /**
+     * Seasonal periods. Repeated because multiple periods are supported for one time series.
+     */
+    seasonalPeriods?: Array<
+      | 'SEASONAL_PERIOD_TYPE_UNSPECIFIED'
+      | 'NO_SEASONALITY'
+      | 'DAILY'
+      | 'WEEKLY'
+      | 'MONTHLY'
+      | 'QUARTERLY'
+      | 'YEARLY'
+    >;
+    /**
+     * The id to indicate different time series.
+     */
+    timeSeriesId?: string;
+  };
+
+  /**
+   * Specifies the audit configuration for a service. The configuration determines which permission types are logged, and what identities, if any, are exempted from logging. An AuditConfig must have one or more AuditLogConfigs. If there are AuditConfigs for both `allServices` and a specific service, the union of the two AuditConfigs is used for that service: the log_types specified in each AuditConfig are enabled, and the exempted_members in each AuditLogConfig are exempted. Example Policy with multiple AuditConfigs: { "audit_configs": [ { "service": "allServices", "audit_log_configs": [ { "log_type": "DATA_READ", "exempted_members": [ "user:jose@example.com" ] }, { "log_type": "DATA_WRITE" }, { "log_type": "ADMIN_READ" } ] }, { "service": "sampleservice.googleapis.com", "audit_log_configs": [ { "log_type": "DATA_READ" }, { "log_type": "DATA_WRITE", "exempted_members": [ "user:aliya@example.com" ] } ] } ] } For sampleservice, this policy enables DATA_READ, DATA_WRITE and ADMIN_READ logging. It also exempts jose@example.com from DATA_READ logging, and aliya@example.com from DATA_WRITE logging.
+   */
+  type IAuditConfig = {
+    /**
+     * The configuration for logging of each type of permission.
+     */
+    auditLogConfigs?: Array<IAuditLogConfig>;
+    /**
+     * Specifies a service that will be enabled for audit logging. For example, `storage.googleapis.com`, `cloudsql.googleapis.com`. `allServices` is a special value that covers all services.
+     */
+    service?: string;
+  };
+
+  /**
+   * Provides the configuration for logging a type of permissions. Example: { "audit_log_configs": [ { "log_type": "DATA_READ", "exempted_members": [ "user:jose@example.com" ] }, { "log_type": "DATA_WRITE" } ] } This enables 'DATA_READ' and 'DATA_WRITE' logging, while exempting jose@example.com from DATA_READ logging.
+   */
+  type IAuditLogConfig = {
+    /**
+     * Specifies the identities that do not cause logging for this type of permission. Follows the same format of Binding.members.
+     */
+    exemptedMembers?: Array<string>;
+    /**
+     * The log type that this config enables.
+     */
+    logType?:
+      | 'LOG_TYPE_UNSPECIFIED'
+      | 'ADMIN_READ'
+      | 'DATA_WRITE'
+      | 'DATA_READ';
   };
 
   type IBigQueryModelTraining = {
@@ -312,13 +398,11 @@ declare namespace bigquery {
      */
     positiveClassThreshold?: number;
     /**
-     * The fraction of actual positive predictions that had positive actual
-     * labels.
+     * The fraction of actual positive predictions that had positive actual labels.
      */
     precision?: number;
     /**
-     * The fraction of actual positive labels that were given a positive
-     * prediction.
+     * The fraction of actual positive labels that were given a positive prediction.
      */
     recall?: number;
     /**
@@ -329,6 +413,24 @@ declare namespace bigquery {
      * Number of true samples predicted as true.
      */
     truePositives?: string;
+  };
+
+  /**
+   * Associates `members` with a `role`.
+   */
+  type IBinding = {
+    /**
+     * The condition that is associated with this binding. If the condition evaluates to `true`, then this binding applies to the current request. If the condition evaluates to `false`, then this binding does not apply to the current request. However, a different role binding might grant the same role to one or more of the members in this binding. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
+     */
+    condition?: IExpr;
+    /**
+     * Specifies the identities requesting access for a Cloud Platform resource. `members` can have the following values: * `allUsers`: A special identifier that represents anyone who is on the internet; with or without a Google account. * `allAuthenticatedUsers`: A special identifier that represents anyone who is authenticated with a Google account or a service account. * `user:{emailid}`: An email address that represents a specific Google account. For example, `alice@example.com` . * `serviceAccount:{emailid}`: An email address that represents a service account. For example, `my-other-app@appspot.gserviceaccount.com`. * `group:{emailid}`: An email address that represents a Google group. For example, `admins@example.com`. * `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a user that has been recently deleted. For example, `alice@example.com?uid=123456789012345678901`. If the user is recovered, this value reverts to `user:{emailid}` and the recovered user retains the role in the binding. * `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a service account that has been recently deleted. For example, `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`. If the service account is undeleted, this value reverts to `serviceAccount:{emailid}` and the undeleted service account retains the role in the binding. * `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a Google group that has been recently deleted. For example, `admins@example.com?uid=123456789012345678901`. If the group is recovered, this value reverts to `group:{emailid}` and the recovered group retains the role in the binding. * `domain:{domain}`: The G Suite domain (primary) that represents all the users of that domain. For example, `google.com` or `example.com`.
+     */
+    members?: Array<string>;
+    /**
+     * Role that is assigned to `members`. For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
+     */
+    role?: string;
   };
 
   type IBqmlIterationResult = {
@@ -388,10 +490,7 @@ declare namespace bigquery {
    */
   type ICategoricalValue = {
     /**
-     * Counts of all categories for the categorical feature. If there are
-     * more than ten categories, we return top ten (by count) and return
-     * one more CategoryCount with category "_OTHER_" and count as
-     * aggregate counts of remaining categories.
+     * Counts of all categories for the categorical feature. If there are more than ten categories, we return top ten (by count) and return one more CategoryCount with category "_OTHER_" and count as aggregate counts of remaining categories.
      */
     categoryCounts?: Array<ICategoryCount>;
   };
@@ -405,8 +504,7 @@ declare namespace bigquery {
      */
     category?: string;
     /**
-     * The count of training samples matching the category within the
-     * cluster.
+     * The count of training samples matching the category within the cluster.
      */
     count?: string;
   };
@@ -438,8 +536,7 @@ declare namespace bigquery {
      */
     centroidId?: string;
     /**
-     * Cluster radius, the average distance from centroid
-     * to each point assigned to the cluster.
+     * Cluster radius, the average distance from centroid to each point assigned to the cluster.
      */
     clusterRadius?: number;
     /**
@@ -478,8 +575,7 @@ declare namespace bigquery {
    */
   type IConfusionMatrix = {
     /**
-     * Confidence threshold used when computing the entries of the
-     * confusion matrix.
+     * Confidence threshold used when computing the entries of the confusion matrix.
      */
     confidenceThreshold?: number;
     /**
@@ -527,8 +623,7 @@ declare namespace bigquery {
   };
 
   /**
-   * Data split result. This contains references to the training and evaluation
-   * data tables that were used to train the model.
+   * Data split result. This contains references to the training and evaluation data tables that were used to train the model.
    */
   type IDataSplitResult = {
     /**
@@ -562,6 +657,10 @@ declare namespace bigquery {
        * [Required] An IAM role ID that should be granted to the user, group, or domain specified in this access entry. The following legacy mappings will be applied: OWNER  roles/bigquery.dataOwner WRITER  roles/bigquery.dataEditor READER  roles/bigquery.dataViewer This field will accept any of the above formats, but will return only the legacy format. For example, if you set this field to "roles/bigquery.dataOwner", it will be returned back as "OWNER".
        */
       role?: string;
+      /**
+       * [Pick one] A routine from a different dataset to grant access to. Queries executed against that routine will have read access to views/tables/routines in this dataset. Only UDF is supported for now. The role field is not required when this field is set. If that routine is updated by any user, access to the routine needs to be granted again via an update operation.
+       */
+      routine?: IRoutineReference;
       /**
        * [Pick one] A special group to grant access to. Possible values include: projectOwners: Owners of the enclosing project. projectReaders: Readers of the enclosing project. projectWriters: Writers of the enclosing project. allAuthenticatedUsers: All authenticated BigQuery users. Maps to similarly-named IAM members.
        */
@@ -624,6 +723,10 @@ declare namespace bigquery {
      * The geographic location where the dataset should reside. The default value is US. See details at https://cloud.google.com/bigquery/docs/locations.
      */
     location?: string;
+    /**
+     * [Output-only] Reserved for future use.
+     */
+    satisfiesPZS?: boolean;
     /**
      * [Output-only] A URL that can be used to access the resource again. You can use this URL in Get or Update requests to the resource.
      */
@@ -716,9 +819,7 @@ declare namespace bigquery {
      */
     itemCount?: string;
     /**
-     * The predicted label. For confidence_threshold > 0, we will
-     * also add an entry indicating the number of items under the
-     * confidence threshold.
+     * The predicted label. For confidence_threshold > 0, we will also add an entry indicating the number of items under the confidence threshold.
      */
     predictedLabel?: string;
   };
@@ -743,11 +844,13 @@ declare namespace bigquery {
   };
 
   /**
-   * Evaluation metrics of a model. These are either computed on all training
-   * data or just the eval data based on whether eval data was used during
-   * training. These are not present for imported models.
+   * Evaluation metrics of a model. These are either computed on all training data or just the eval data based on whether eval data was used during training. These are not present for imported models.
    */
   type IEvaluationMetrics = {
+    /**
+     * Populated for ARIMA models.
+     */
+    arimaForecastingMetrics?: IArimaForecastingMetrics;
     /**
      * Populated for binary classification/classifier models.
      */
@@ -761,13 +864,11 @@ declare namespace bigquery {
      */
     multiClassClassificationMetrics?: IMultiClassClassificationMetrics;
     /**
-     * [Alpha] Populated for implicit feedback type matrix factorization
-     * models.
+     * Populated for implicit feedback type matrix factorization models.
      */
     rankingMetrics?: IRankingMetrics;
     /**
-     * Populated for regression models and explicit feedback type matrix
-     * factorization models.
+     * Populated for regression models and explicit feedback type matrix factorization models.
      */
     regressionMetrics?: IRegressionMetrics;
   };
@@ -906,6 +1007,42 @@ declare namespace bigquery {
     substeps?: Array<string>;
   };
 
+  /**
+   * Explanation for a single feature.
+   */
+  type IExplanation = {
+    /**
+     * Attribution of feature.
+     */
+    attribution?: number;
+    /**
+     * Full name of the feature. For non-numerical features, will be formatted like .. Overall size of feature name will always be truncated to first 120 characters.
+     */
+    featureName?: string;
+  };
+
+  /**
+   * Represents a textual expression in the Common Expression Language (CEL) syntax. CEL is a C-like expression language. The syntax and semantics of CEL are documented at https://github.com/google/cel-spec. Example (Comparison): title: "Summary size limit" description: "Determines if a summary is less than 100 chars" expression: "document.summary.size() < 100" Example (Equality): title: "Requestor is owner" description: "Determines if requestor is the document owner" expression: "document.owner == request.auth.claims.email" Example (Logic): title: "Public documents" description: "Determine whether the document should be publicly visible" expression: "document.type != 'private' && document.type != 'internal'" Example (Data Manipulation): title: "Notification string" description: "Create a notification string with a timestamp." expression: "'New message received at ' + string(document.create_time)" The exact variables and functions that may be referenced within an expression are determined by the service that evaluates it. See the service documentation for additional information.
+   */
+  type IExpr = {
+    /**
+     * Optional. Description of the expression. This is a longer text which describes the expression, e.g. when hovered over it in a UI.
+     */
+    description?: string;
+    /**
+     * Textual representation of an expression in Common Expression Language syntax.
+     */
+    expression?: string;
+    /**
+     * Optional. String indicating the location of the expression for error reporting, e.g. a file name and a position in the file.
+     */
+    location?: string;
+    /**
+     * Optional. Title for the expression, i.e. a short string describing its purpose. This can be used e.g. in UIs which allow to enter the expression.
+     */
+    title?: string;
+  };
+
   type IExternalDataConfiguration = {
     /**
      * Try to detect schema and format options automatically. Any option specified explicitly will be honored.
@@ -919,6 +1056,10 @@ declare namespace bigquery {
      * [Optional] The compression type of the data source. Possible values include GZIP and NONE. The default value is NONE. This setting is ignored for Google Cloud Bigtable, Google Cloud Datastore backups and Avro formats.
      */
     compression?: string;
+    /**
+     * [Optional, Trusted Tester] Connection for external data source.
+     */
+    connectionId?: string;
     /**
      * Additional properties to set if sourceFormat is set to CSV.
      */
@@ -966,10 +1107,29 @@ declare namespace bigquery {
      */
     featureColumn?: string;
     /**
-     * The numerical feature value. This is the centroid value for this
-     * feature.
+     * The numerical feature value. This is the centroid value for this feature.
      */
     numericalValue?: number;
+  };
+
+  /**
+   * Request message for `GetIamPolicy` method.
+   */
+  type IGetIamPolicyRequest = {
+    /**
+     * OPTIONAL: A `GetPolicyOptions` object for specifying options to `GetIamPolicy`.
+     */
+    options?: IGetPolicyOptions;
+  };
+
+  /**
+   * Encapsulates settings provided to GetIamPolicy.
+   */
+  type IGetPolicyOptions = {
+    /**
+     * Optional. The policy format version to be returned. Valid values are 0, 1, and 3. Requests specifying an invalid value will be rejected. Requests for policies with any conditional bindings must specify version 3. Policies without any conditional bindings may specify any valid value or leave the field unset. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
+     */
+    requestedPolicyVersion?: number;
   };
 
   type IGetQueryResultsResponse = {
@@ -1034,6 +1194,20 @@ declare namespace bigquery {
     kind?: string;
   };
 
+  /**
+   * Global explanations containing the top most important features after training.
+   */
+  type IGlobalExplanation = {
+    /**
+     * Class label for this set of global explanations. Will be empty/null for binary logistic and linear regression models. Sorted alphabetically in descending order.
+     */
+    classLabel?: string;
+    /**
+     * A list of the top global explanations. Sorted by absolute value of attribution in descending order.
+     */
+    explanations?: Array<IExplanation>;
+  };
+
   type IGoogleSheetsOptions = {
     /**
      * [Optional] Range of a sheet to query from. Only used when non-empty. Typical format: sheet_name!top_left_cell_id:bottom_right_cell_id For example: sheet1!A1:B20
@@ -1047,11 +1221,15 @@ declare namespace bigquery {
 
   type IHivePartitioningOptions = {
     /**
-     * [Optional, Trusted Tester] When set, what mode of hive partitioning to use when reading data. Two modes are supported. (1) AUTO: automatically infer partition key name(s) and type(s). (2) STRINGS: automatically infer partition key name(s). All types are interpreted as strings. Not all storage formats support hive partitioning. Requesting hive partitioning on an unsupported format will lead to an error. Currently supported types include: AVRO, CSV, JSON, ORC and Parquet.
+     * [Optional] When set, what mode of hive partitioning to use when reading data. The following modes are supported. (1) AUTO: automatically infer partition key name(s) and type(s). (2) STRINGS: automatically infer partition key name(s). All types are interpreted as strings. (3) CUSTOM: partition key schema is encoded in the source URI prefix. Not all storage formats support hive partitioning. Requesting hive partitioning on an unsupported format will lead to an error. Currently supported types include: AVRO, CSV, JSON, ORC and Parquet.
      */
     mode?: string;
     /**
-     * [Optional, Trusted Tester] When hive partition detection is requested, a common prefix for all source uris should be supplied. The prefix must end immediately before the partition key encoding begins. For example, consider files following this data layout. gs://bucket/path_to_table/dt=2019-01-01/country=BR/id=7/file.avro gs://bucket/path_to_table/dt=2018-12-31/country=CA/id=3/file.avro When hive partitioning is requested with either AUTO or STRINGS detection, the common prefix can be either of gs://bucket/path_to_table or gs://bucket/path_to_table/ (trailing slash does not matter).
+     * [Optional] If set to true, queries over this table require a partition filter that can be used for partition elimination to be specified. Note that this field should only be true when creating a permanent external table or querying a temporary external table. Hive-partitioned loads with requirePartitionFilter explicitly set to true will fail.
+     */
+    requirePartitionFilter?: boolean;
+    /**
+     * [Optional] When hive partition detection is requested, a common prefix for all source uris should be supplied. The prefix must end immediately before the partition key encoding begins. For example, consider files following this data layout. gs://bucket/path_to_table/dt=2019-01-01/country=BR/id=7/file.avro gs://bucket/path_to_table/dt=2018-12-31/country=CA/id=3/file.avro When hive partitioning is requested with either AUTO or STRINGS detection, the common prefix can be either of gs://bucket/path_to_table or gs://bucket/path_to_table/ (trailing slash does not matter).
      */
     sourceUriPrefix?: string;
   };
@@ -1178,7 +1356,7 @@ declare namespace bigquery {
      */
     compression?: string;
     /**
-     * [Optional] The exported file format. Possible values include CSV, NEWLINE_DELIMITED_JSON or AVRO for tables and ML_TF_SAVED_MODEL or ML_XGBOOST_BOOSTER for models. The default value for tables is CSV. Tables with nested or repeated fields cannot be exported as CSV. The default value for models is ML_TF_SAVED_MODEL.
+     * [Optional] The exported file format. Possible values include CSV, NEWLINE_DELIMITED_JSON, PARQUET or AVRO for tables and ML_TF_SAVED_MODEL or ML_XGBOOST_BOOSTER for models. The default value for tables is CSV. Tables with nested or repeated fields cannot be exported as CSV. The default value for models is ML_TF_SAVED_MODEL.
      */
     destinationFormat?: string;
     /**
@@ -1232,6 +1410,10 @@ declare namespace bigquery {
      * [Optional] Specifies whether the job is allowed to create new tables. The following values are supported: CREATE_IF_NEEDED: If the table does not exist, BigQuery creates the table. CREATE_NEVER: The table must already exist. If it does not, a 'notFound' error is returned in the job result. The default value is CREATE_IF_NEEDED. Creation, truncation and append actions occur as one atomic update upon job completion.
      */
     createDisposition?: string;
+    /**
+     * [Trusted Tester] Defines the list of possible SQL data types to which the source decimal values are converted. This list and the precision and the scale parameters of the decimal field determine the target type. In the order of NUMERIC, BIGNUMERIC, and STRING, a type is picked if it is in the specified list and if it supports the precision and the scale. STRING supports all precision and scale values. If none of the listed types supports the precision and the scale, the type supporting the widest range in the specified list is picked, and if a value exceeds the supported range when reading the data, an error will be thrown. For example: suppose decimal_target_type = ["NUMERIC", "BIGNUMERIC"]. Then if (precision,scale) is: * (38,9) -> NUMERIC; * (39,9) -> BIGNUMERIC (NUMERIC cannot hold 30 integer digits); * (38,10) -> BIGNUMERIC (NUMERIC cannot hold 10 fractional digits); * (76,38) -> BIGNUMERIC; * (77,38) -> BIGNUMERIC (error if value exeeds supported range). For duplicated types in this field, only one will be considered and the rest will be ignored. The order of the types in this field is ignored. For example, ["BIGNUMERIC", "NUMERIC"] is the same as ["NUMERIC", "BIGNUMERIC"] and NUMERIC always takes precedence over BIGNUMERIC.
+     */
+    decimalTargetTypes?: Array<string>;
     /**
      * Custom encryption configuration (e.g., Cloud KMS keys).
      */
@@ -1427,9 +1609,17 @@ declare namespace bigquery {
      */
     destinationEncryptionConfiguration?: IEncryptionConfiguration;
     /**
+     * [Optional] The time when the destination table expires. Expired tables will be deleted and their storage reclaimed.
+     */
+    destinationExpirationTime?: any;
+    /**
      * [Required] The destination table
      */
     destinationTable?: ITableReference;
+    /**
+     * [Optional] Supported operation types in table copy job.
+     */
+    operationType?: string;
     /**
      * [Pick one] Source table to copy.
      */
@@ -1589,6 +1779,10 @@ declare namespace bigquery {
      * [Output-only] Slot-milliseconds for the job.
      */
     totalSlotMs?: string;
+    /**
+     * [Output-only] [Alpha] Information of the multi-statement transaction if this job is part of one.
+     */
+    transactionInfoTemplate?: ITransactionInfo;
   };
 
   type IJobStatistics2 = {
@@ -1761,9 +1955,7 @@ declare namespace bigquery {
 
   type IListModelsResponse = {
     /**
-     * Models in the requested dataset. Only the following fields are populated:
-     * model_reference, model_type, creation_time, last_modified_time and
-     * labels.
+     * Models in the requested dataset. Only the following fields are populated: model_reference, model_type, creation_time, last_modified_time and labels.
      */
     models?: Array<IModel>;
     /**
@@ -1778,23 +1970,31 @@ declare namespace bigquery {
      */
     nextPageToken?: string;
     /**
-     * Routines in the requested dataset. Unless read_mask is set in the request,
-     * only the following fields are populated:
-     * etag, project_id, dataset_id, routine_id, routine_type, creation_time,
-     * last_modified_time, and language.
+     * Routines in the requested dataset. Unless read_mask is set in the request, only the following fields are populated: etag, project_id, dataset_id, routine_id, routine_type, creation_time, last_modified_time, and language.
      */
     routines?: Array<IRoutine>;
   };
 
   /**
-   * BigQuery-specific metadata about a location. This will be set on
-   * google.cloud.location.Location.metadata in Cloud Location API
-   * responses.
+   * Response message for the ListRowAccessPolicies method.
+   */
+  type IListRowAccessPoliciesResponse = {
+    /**
+     * A token to request the next page of results.
+     */
+    nextPageToken?: string;
+    /**
+     * Row access policies on the requested table.
+     */
+    rowAccessPolicies?: Array<IRowAccessPolicy>;
+  };
+
+  /**
+   * BigQuery-specific metadata about a location. This will be set on google.cloud.location.Location.metadata in Cloud Location API responses.
    */
   type ILocationMetadata = {
     /**
-     * The legacy BigQuery location ID, e.g. “EU” for the “europe” location.
-     * This is for any API consumers that need the legacy “US” and “EU” locations.
+     * The legacy BigQuery location ID, e.g. “EU” for the “europe” location. This is for any API consumers that need the legacy “US” and “EU” locations.
      */
     legacyLocationId?: string;
   };
@@ -1828,10 +2028,7 @@ declare namespace bigquery {
      */
     description?: string;
     /**
-     * Custom encryption configuration (e.g., Cloud KMS keys). This shows the
-     * encryption configuration of the model data while stored in BigQuery
-     * storage. This field can be used with PatchModel to update encryption key
-     * for an already encrypted model.
+     * Custom encryption configuration (e.g., Cloud KMS keys). This shows the encryption configuration of the model data while stored in BigQuery storage. This field can be used with PatchModel to update encryption key for an already encrypted model.
      */
     encryptionConfiguration?: IEncryptionConfiguration;
     /**
@@ -1839,11 +2036,7 @@ declare namespace bigquery {
      */
     etag?: string;
     /**
-     * Optional. The time when this model expires, in milliseconds since the epoch.
-     * If not present, the model will persist indefinitely. Expired models
-     * will be deleted and their storage reclaimed.  The defaultTableExpirationMs
-     * property of the encapsulating dataset can be used to set a default
-     * expirationTime on newly created models.
+     * Optional. The time when this model expires, in milliseconds since the epoch. If not present, the model will persist indefinitely. Expired models will be deleted and their storage reclaimed. The defaultTableExpirationMs property of the encapsulating dataset can be used to set a default expirationTime on newly created models.
      */
     expirationTime?: string;
     /**
@@ -1855,17 +2048,11 @@ declare namespace bigquery {
      */
     friendlyName?: string;
     /**
-     * Output only. Label columns that were used to train this model.
-     * The output of the model will have a "predicted_" prefix to these columns.
+     * Output only. Label columns that were used to train this model. The output of the model will have a "predicted_" prefix to these columns.
      */
     labelColumns?: Array<IStandardSqlField>;
     /**
-     * The labels associated with this model. You can use these to organize
-     * and group your models. Label keys and values can be no longer
-     * than 63 characters, can only contain lowercase letters, numeric
-     * characters, underscores and dashes. International characters are allowed.
-     * Label values are optional. Label keys must start with a letter and each
-     * label in the list must have a different key.
+     * The labels associated with this model. You can use these to organize and group your models. Label keys and values can be no longer than 63 characters, can only contain lowercase letters, numeric characters, underscores and dashes. International characters are allowed. Label values are optional. Label keys must start with a letter and each label in the list must have a different key.
      */
     labels?: {[key: string]: string};
     /**
@@ -1873,8 +2060,7 @@ declare namespace bigquery {
      */
     lastModifiedTime?: string;
     /**
-     * Output only. The geographic location where the model resides. This value
-     * is inherited from the dataset.
+     * Output only. The geographic location where the model resides. This value is inherited from the dataset.
      */
     location?: string;
     /**
@@ -1895,6 +2081,7 @@ declare namespace bigquery {
       | 'DNN_REGRESSOR'
       | 'BOOSTED_TREE_REGRESSOR'
       | 'BOOSTED_TREE_CLASSIFIER'
+      | 'ARIMA'
       | 'AUTOML_REGRESSOR'
       | 'AUTOML_CLASSIFIER';
     /**
@@ -1945,6 +2132,28 @@ declare namespace bigquery {
      * Confusion matrix at different thresholds.
      */
     confusionMatrixList?: Array<IConfusionMatrix>;
+  };
+
+  /**
+   * An Identity and Access Management (IAM) policy, which specifies access controls for Google Cloud resources. A `Policy` is a collection of `bindings`. A `binding` binds one or more `members` to a single `role`. Members can be user accounts, service accounts, Google groups, and domains (such as G Suite). A `role` is a named list of permissions; each `role` can be an IAM predefined role or a user-created custom role. For some types of Google Cloud resources, a `binding` can also specify a `condition`, which is a logical expression that allows access to a resource only if the expression evaluates to `true`. A condition can add constraints based on attributes of the request, the resource, or both. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies). **JSON example:** { "bindings": [ { "role": "roles/resourcemanager.organizationAdmin", "members": [ "user:mike@example.com", "group:admins@example.com", "domain:google.com", "serviceAccount:my-project-id@appspot.gserviceaccount.com" ] }, { "role": "roles/resourcemanager.organizationViewer", "members": [ "user:eve@example.com" ], "condition": { "title": "expirable access", "description": "Does not grant access after Sep 2020", "expression": "request.time < timestamp('2020-10-01T00:00:00.000Z')", } } ], "etag": "BwWWja0YfJA=", "version": 3 } **YAML example:** bindings: - members: - user:mike@example.com - group:admins@example.com - domain:google.com - serviceAccount:my-project-id@appspot.gserviceaccount.com role: roles/resourcemanager.organizationAdmin - members: - user:eve@example.com role: roles/resourcemanager.organizationViewer condition: title: expirable access description: Does not grant access after Sep 2020 expression: request.time < timestamp('2020-10-01T00:00:00.000Z') - etag: BwWWja0YfJA= - version: 3 For a description of IAM and its features, see the [IAM documentation](https://cloud.google.com/iam/docs/).
+   */
+  type IPolicy = {
+    /**
+     * Specifies cloud audit logging configuration for this policy.
+     */
+    auditConfigs?: Array<IAuditConfig>;
+    /**
+     * Associates a list of `members` to a `role`. Optionally, may specify a `condition` that determines how and when the `bindings` are applied. Each of the `bindings` must contain at least one member.
+     */
+    bindings?: Array<IBinding>;
+    /**
+     * `etag` is used for optimistic concurrency control as a way to help prevent simultaneous updates of a policy from overwriting each other. It is strongly suggested that systems make use of the `etag` in the read-modify-write cycle to perform policy updates in order to avoid race conditions: An `etag` is returned in the response to `getIamPolicy`, and systems are expected to put that etag in the request to `setIamPolicy` to ensure that their change will be applied to the same version of the policy. **Important:** If you use IAM Conditions, you must include the `etag` field whenever you call `setIamPolicy`. If you omit this field, then IAM allows you to overwrite a version `3` policy with a version `1` policy, and all of the conditions in the version `3` policy are lost.
+     */
+    etag?: string;
+    /**
+     * Specifies the format of the policy. Valid values are `0`, `1`, and `3`. Requests that specify an invalid value are rejected. Any operation that affects conditional role bindings must specify version `3`. This requirement applies to the following operations: * Getting a policy that includes a conditional role binding * Adding a conditional role binding to a policy * Changing a conditional role binding in a policy * Removing any role binding, with or without a condition, from a policy that includes conditions **Important:** If you use IAM Conditions, you must include the `etag` field whenever you call `setIamPolicy`. If you omit this field, then IAM allows you to overwrite a version `3` policy with a version `1` policy, and all of the conditions in the version `3` policy are lost. If a policy does not include any conditions, operations on that policy may specify any valid version or leave the field unset. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
+     */
+    version?: number;
   };
 
   type IProjectList = {
@@ -2074,6 +2283,10 @@ declare namespace bigquery {
      */
     kind?: string;
     /**
+     * The labels associated with this job. You can use these to organize and group your jobs. Label keys and values can be no longer than 63 characters, can only contain lowercase letters, numeric characters, underscores and dashes. International characters are allowed. Label values are optional. Label keys must start with a letter and each label in the list must have a different key.
+     */
+    labels?: {[key: string]: string};
+    /**
      * The geographic location where the job should run. See details at https://cloud.google.com/bigquery/docs/locations#specifying_your_location.
      */
     location?: string;
@@ -2081,6 +2294,10 @@ declare namespace bigquery {
      * [Optional] The maximum number of rows of data to return per page of results. Setting this flag to a small value such as 1000 and then paging through results might improve reliability when the query result set is large. In addition to this limit, responses are also limited to 10 MB. By default, there is no maximum row count, and only the byte limit applies.
      */
     maxResults?: number;
+    /**
+     * [Optional] Limits the bytes billed for this job. Queries that will have bytes billed beyond this limit will fail (without incurring a charge). If unspecified, this will be set to your project default.
+     */
+    maximumBytesBilled?: string;
     /**
      * Standard SQL only. Set to POSITIONAL to use positional (?) query parameters or to NAMED to use named (@myparam) query parameters in this query.
      */
@@ -2097,6 +2314,10 @@ declare namespace bigquery {
      * Query parameters for Standard SQL queries.
      */
     queryParameters?: Array<IQueryParameter>;
+    /**
+     * A unique user provided identifier to ensure idempotent behavior for queries. Note that this is different from the job_id. It has the following properties: 1. It is case-sensitive, limited to up to 36 ASCII characters. A UUID is recommended. 2. Read only queries can ignore this token since they are nullipotent by definition. 3. For the purposes of idempotency ensured by the request_id, a request is considered duplicate of another only if they have the same request_id and are actually duplicates. When determining whether a request is a duplicate of the previous request, all parameters in the request that may affect the behavior are considered. For example, query, connection_properties, query_parameters, use_legacy_sql are parameters that affect the result and are considered when determining whether a request is a duplicate, but properties like timeout_ms don't affect the result and are thus not considered. Dry run query requests are never considered duplicate of another request. 4. When a duplicate mutating query request is detected, it returns: a. the results of the mutation if it completes successfully within the timeout. b. the running operation if it is still in progress at the end of the timeout. 5. Its lifetime is limited to 15 minutes. In other words, if two requests are sent with the same request_id, but more than 15 minutes apart, idempotency is not guaranteed.
+     */
+    requestId?: string;
     /**
      * [Optional] How long to wait for the query to complete, in milliseconds, before the request times out and returns. Note that this is only a timeout for the request, not the query. If the query takes longer to run than the timeout value, the call returns without any results and with the 'jobComplete' flag set to false. You can call GetQueryResults() to wait for the query to complete and read the results. The default value is 10000 milliseconds (10 seconds).
      */
@@ -2206,38 +2427,29 @@ declare namespace bigquery {
   };
 
   /**
-   * Evaluation metrics used by weighted-ALS models specified by
-   * feedback_type=implicit.
+   * Evaluation metrics used by weighted-ALS models specified by feedback_type=implicit.
    */
   type IRankingMetrics = {
     /**
-     * Determines the goodness of a ranking by computing the percentile rank
-     * from the predicted confidence and dividing it by the original rank.
+     * Determines the goodness of a ranking by computing the percentile rank from the predicted confidence and dividing it by the original rank.
      */
     averageRank?: number;
     /**
-     * Calculates a precision per user for all the items by ranking them and
-     * then averages all the precisions across all the users.
+     * Calculates a precision per user for all the items by ranking them and then averages all the precisions across all the users.
      */
     meanAveragePrecision?: number;
     /**
-     * Similar to the mean squared error computed in regression and explicit
-     * recommendation models except instead of computing the rating directly,
-     * the output from evaluate is computed against a preference which is 1 or 0
-     * depending on if the rating exists or not.
+     * Similar to the mean squared error computed in regression and explicit recommendation models except instead of computing the rating directly, the output from evaluate is computed against a preference which is 1 or 0 depending on if the rating exists or not.
      */
     meanSquaredError?: number;
     /**
-     * A metric to determine the goodness of a ranking calculated from the
-     * predicted confidence by comparing it to an ideal rank measured by the
-     * original ratings.
+     * A metric to determine the goodness of a ranking calculated from the predicted confidence by comparing it to an ideal rank measured by the original ratings.
      */
     normalizedDiscountedCumulativeGain?: number;
   };
 
   /**
-   * Evaluation metrics for regression and explicit feedback type matrix
-   * factorization models.
+   * Evaluation metrics for regression and explicit feedback type matrix factorization models.
    */
   type IRegressionMetrics = {
     /**
@@ -2271,34 +2483,11 @@ declare namespace bigquery {
      */
     arguments?: Array<IArgument>;
     /**
-     * Output only. The time when this routine was created, in milliseconds since
-     * the epoch.
+     * Output only. The time when this routine was created, in milliseconds since the epoch.
      */
     creationTime?: string;
     /**
-     * Required. The body of the routine.
-     *
-     * For functions, this is the expression in the AS clause.
-     *
-     * If language=SQL, it is the substring inside (but excluding) the
-     * parentheses. For example, for the function created with the following
-     * statement:
-     *
-     * `CREATE FUNCTION JoinLines(x string, y string) as (concat(x, "\n", y))`
-     *
-     * The definition_body is `concat(x, "\n", y)` (\n is not replaced with
-     * linebreak).
-     *
-     * If language=JAVASCRIPT, it is the evaluated string in the AS clause.
-     * For example, for the function created with the following statement:
-     *
-     * `CREATE FUNCTION f() RETURNS STRING LANGUAGE js AS 'return "\n";\n'`
-     *
-     * The definition_body is
-     *
-     * `return "\n";\n`
-     *
-     * Note that both \n are replaced with linebreaks.
+     * Required. The body of the routine. For functions, this is the expression in the AS clause. If language=SQL, it is the substring inside (but excluding) the parentheses. For example, for the function created with the following statement: `CREATE FUNCTION JoinLines(x string, y string) as (concat(x, "\n", y))` The definition_body is `concat(x, "\n", y)` (\n is not replaced with linebreak). If language=JAVASCRIPT, it is the evaluated string in the AS clause. For example, for the function created with the following statement: `CREATE FUNCTION f() RETURNS STRING LANGUAGE js AS 'return "\n";\n'` The definition_body is `return "\n";\n` Note that both \n are replaced with linebreaks.
      */
     definitionBody?: string;
     /**
@@ -2306,12 +2495,18 @@ declare namespace bigquery {
      */
     description?: string;
     /**
+     * Optional. [Experimental] The determinism level of the JavaScript UDF if defined.
+     */
+    determinismLevel?:
+      | 'DETERMINISM_LEVEL_UNSPECIFIED'
+      | 'DETERMINISTIC'
+      | 'NOT_DETERMINISTIC';
+    /**
      * Output only. A hash of this resource.
      */
     etag?: string;
     /**
-     * Optional. If language = "JAVASCRIPT", this field stores the path of the
-     * imported JAVASCRIPT libraries.
+     * Optional. If language = "JAVASCRIPT", this field stores the path of the imported JAVASCRIPT libraries.
      */
     importedLibraries?: Array<string>;
     /**
@@ -2319,33 +2514,11 @@ declare namespace bigquery {
      */
     language?: 'LANGUAGE_UNSPECIFIED' | 'SQL' | 'JAVASCRIPT';
     /**
-     * Output only. The time when this routine was last modified, in milliseconds
-     * since the epoch.
+     * Output only. The time when this routine was last modified, in milliseconds since the epoch.
      */
     lastModifiedTime?: string;
     /**
-     * Optional if language = "SQL"; required otherwise.
-     *
-     * If absent, the return type is inferred from definition_body at query time
-     * in each query that references this routine. If present, then the evaluated
-     * result will be cast to the specified returned type at query time.
-     *
-     * For example, for the functions created with the following statements:
-     *
-     * * `CREATE FUNCTION Add(x FLOAT64, y FLOAT64) RETURNS FLOAT64 AS (x + y);`
-     *
-     * * `CREATE FUNCTION Increment(x FLOAT64) AS (Add(x, 1));`
-     *
-     * * `CREATE FUNCTION Decrement(x FLOAT64) RETURNS FLOAT64 AS (Add(x, -1));`
-     *
-     * The return_type is `{type_kind: "FLOAT64"}` for `Add` and `Decrement`, and
-     * is absent for `Increment` (inferred as FLOAT64 at query time).
-     *
-     * Suppose the function `Add` is replaced by
-     *   `CREATE OR REPLACE FUNCTION Add(x INT64, y INT64) AS (x + y);`
-     *
-     * Then the inferred return type of `Increment` is automatically changed to
-     * INT64 at query time, while the return type of `Decrement` remains FLOAT64.
+     * Optional if language = "SQL"; required otherwise. If absent, the return type is inferred from definition_body at query time in each query that references this routine. If present, then the evaluated result will be cast to the specified returned type at query time. For example, for the functions created with the following statements: * `CREATE FUNCTION Add(x FLOAT64, y FLOAT64) RETURNS FLOAT64 AS (x + y);` * `CREATE FUNCTION Increment(x FLOAT64) AS (Add(x, 1));` * `CREATE FUNCTION Decrement(x FLOAT64) RETURNS FLOAT64 AS (Add(x, -1));` The return_type is `{type_kind: "FLOAT64"}` for `Add` and `Decrement`, and is absent for `Increment` (inferred as FLOAT64 at query time). Suppose the function `Add` is replaced by `CREATE OR REPLACE FUNCTION Add(x INT64, y INT64) AS (x + y);` Then the inferred return type of `Increment` is automatically changed to INT64 at query time, while the return type of `Decrement` remains FLOAT64.
      */
     returnType?: IStandardSqlDataType;
     /**
@@ -2385,6 +2558,32 @@ declare namespace bigquery {
      * Info describing predicted label distribution.
      */
     entries?: Array<IEntry>;
+  };
+
+  /**
+   * Represents access on a subset of rows on the specified table, defined by its filter predicate. Access to the subset of rows is controlled by its IAM policy.
+   */
+  type IRowAccessPolicy = {
+    /**
+     * Output only. The time when this row access policy was created, in milliseconds since the epoch.
+     */
+    creationTime?: string;
+    /**
+     * Output only. A hash of this resource.
+     */
+    etag?: string;
+    /**
+     * Required. A SQL boolean expression that represents the rows defined by this row access policy, similar to the boolean expression in a WHERE clause of a SELECT query on a table. References to other tables, routines, and temporary functions are not supported. Examples: region="EU" date_field = CAST('2019-9-27' as DATE) nullable_field is not NULL numeric_field BETWEEN 1.0 AND 5.0
+     */
+    filterPredicate?: string;
+    /**
+     * Output only. The time when this row access policy was last modified, in milliseconds since the epoch.
+     */
+    lastModifiedTime?: string;
+    /**
+     * Required. Reference describing the ID of this row access policy.
+     */
+    rowAccessPolicyReference?: IRowAccessPolicyReference;
   };
 
   type IRowAccessPolicyReference = {
@@ -2452,16 +2651,32 @@ declare namespace bigquery {
   };
 
   /**
-   * The type of a variable, e.g., a function argument.
-   * Examples:
-   * INT64: {type_kind="INT64"}
-   * ARRAY<STRING>: {type_kind="ARRAY", array_element_type="STRING"}
-   * STRUCT<x STRING, y ARRAY<DATE>>:
-   *   {type_kind="STRUCT",
-   *    struct_type={fields=[
-   *      {name="x", type={type_kind="STRING"}},
-   *      {name="y", type={type_kind="ARRAY", array_element_type="DATE"}}
-   *    ]}}
+   * Request message for `SetIamPolicy` method.
+   */
+  type ISetIamPolicyRequest = {
+    /**
+     * REQUIRED: The complete policy to be applied to the `resource`. The size of the policy is limited to a few 10s of KB. An empty policy is a valid policy but certain Cloud Platform services (such as Projects) might reject them.
+     */
+    policy?: IPolicy;
+    /**
+     * OPTIONAL: A FieldMask specifying which fields of the policy to modify. Only the fields in the mask will be modified. If no mask is provided, the following default mask is used: `paths: "bindings, etag"`
+     */
+    updateMask?: string;
+  };
+
+  type ISnapshotDefinition = {
+    /**
+     * [Required] Reference describing the ID of the table that is snapshotted.
+     */
+    baseTableReference?: ITableReference;
+    /**
+     * [Required] The time at which the base table was snapshot.
+     */
+    snapshotTime?: string;
+  };
+
+  /**
+   * The type of a variable, e.g., a function argument. Examples: INT64: {type_kind="INT64"} ARRAY: {type_kind="ARRAY", array_element_type="STRING"} STRUCT>: {type_kind="STRUCT", struct_type={fields=[ {name="x", type={type_kind="STRING"}}, {name="y", type={type_kind="ARRAY", array_element_type="DATE"}} ]}}
    */
   type IStandardSqlDataType = {
     /**
@@ -2473,8 +2688,7 @@ declare namespace bigquery {
      */
     structType?: IStandardSqlStructType;
     /**
-     * Required. The top level type of this field.
-     * Can be any standard SQL data type (e.g., "INT64", "DATE", "ARRAY").
+     * Required. The top level type of this field. Can be any standard SQL data type (e.g., "INT64", "DATE", "ARRAY").
      */
     typeKind?:
       | 'TYPE_KIND_UNSPECIFIED'
@@ -2489,6 +2703,7 @@ declare namespace bigquery {
       | 'DATETIME'
       | 'GEOGRAPHY'
       | 'NUMERIC'
+      | 'BIGNUMERIC'
       | 'ARRAY'
       | 'STRUCT';
   };
@@ -2502,9 +2717,7 @@ declare namespace bigquery {
      */
     name?: string;
     /**
-     * Optional. The type of this parameter. Absent if not explicitly
-     * specified (e.g., CREATE FUNCTION statement can omit the return type;
-     * in this case the output parameter does not have this "type" field).
+     * Optional. The type of this parameter. Absent if not explicitly specified (e.g., CREATE FUNCTION statement can omit the return type; in this case the output parameter does not have this "type" field).
      */
     type?: IStandardSqlDataType;
   };
@@ -2620,6 +2833,10 @@ declare namespace bigquery {
      */
     selfLink?: string;
     /**
+     * [Output-only] Snapshot definition.
+     */
+    snapshotDefinition?: ISnapshotDefinition;
+    /**
      * [Output-only] Contains information regarding this table's streaming buffer, if one is present. This field will be absent if the table is not being streamed to or if there is no data in the streaming buffer.
      */
     streamingBuffer?: IStreamingbuffer;
@@ -2632,7 +2849,7 @@ declare namespace bigquery {
      */
     timePartitioning?: ITimePartitioning;
     /**
-     * [Output-only] Describes the table type. The following values are supported: TABLE: A normal BigQuery table. VIEW: A virtual table defined by a SQL query. [TrustedTester] MATERIALIZED_VIEW: SQL query whose result is persisted. EXTERNAL: A table that references data stored in an external storage system, such as Google Cloud Storage. The default value is TABLE.
+     * [Output-only] Describes the table type. The following values are supported: TABLE: A normal BigQuery table. VIEW: A virtual table defined by a SQL query. SNAPSHOT: An immutable, read-only table that is a copy of another table. [TrustedTester] MATERIALIZED_VIEW: SQL query whose result is persisted. EXTERNAL: A table that references data stored in an external storage system, such as Google Cloud Storage. The default value is TABLE.
      */
     type?: string;
     /**
@@ -2862,6 +3079,26 @@ declare namespace bigquery {
     fields?: Array<ITableFieldSchema>;
   };
 
+  /**
+   * Request message for `TestIamPermissions` method.
+   */
+  type ITestIamPermissionsRequest = {
+    /**
+     * The set of permissions to check for the `resource`. Permissions with wildcards (such as '*' or 'storage.*') are not allowed. For more information see [IAM Overview](https://cloud.google.com/iam/docs/overview#permissions).
+     */
+    permissions?: Array<string>;
+  };
+
+  /**
+   * Response message for `TestIamPermissions` method.
+   */
+  type ITestIamPermissionsResponse = {
+    /**
+     * A subset of `TestPermissionsRequest.permissions` that the caller is allowed.
+     */
+    permissions?: Array<string>;
+  };
+
   type ITimePartitioning = {
     /**
      * [Optional] Number of milliseconds for which to keep the storage for partitions in the table. The storage in a partition will have an expiration time of its partition time plus this value.
@@ -2873,34 +3110,42 @@ declare namespace bigquery {
     field?: string;
     requirePartitionFilter?: boolean;
     /**
-     * [Required] The only type supported is DAY, which will generate one partition per day.
+     * [Required] The supported types are DAY, HOUR, MONTH, and YEAR, which will generate one partition per day, hour, month, and year, respectively. When the type is not specified, the default behavior is DAY.
      */
     type?: string;
   };
 
   type ITrainingOptions = {
     /**
+     * Whether to enable auto ARIMA or not.
+     */
+    autoArima?: boolean;
+    /**
+     * The max value of non-seasonal p and q.
+     */
+    autoArimaMaxOrder?: string;
+    /**
      * Batch size for dnn models.
      */
     batchSize?: string;
     /**
-     * The column to split data with. This column won't be used as a
-     * feature.
-     * 1. When data_split_method is CUSTOM, the corresponding column should
-     * be boolean. The rows with true value tag are eval data, and the false
-     * are training data.
-     * 2. When data_split_method is SEQ, the first DATA_SPLIT_EVAL_FRACTION
-     * rows (from smallest to largest) in the corresponding column are used
-     * as training data, and the rest are eval data. It respects the order
-     * in Orderable data types:
-     * https://cloud.google.com/bigquery/docs/reference/standard-sql/data-types#data-type-properties
+     * The data frequency of a time series.
+     */
+    dataFrequency?:
+      | 'DATA_FREQUENCY_UNSPECIFIED'
+      | 'AUTO_FREQUENCY'
+      | 'YEARLY'
+      | 'QUARTERLY'
+      | 'MONTHLY'
+      | 'WEEKLY'
+      | 'DAILY'
+      | 'HOURLY';
+    /**
+     * The column to split data with. This column won't be used as a feature. 1. When data_split_method is CUSTOM, the corresponding column should be boolean. The rows with true value tag are eval data, and the false are training data. 2. When data_split_method is SEQ, the first DATA_SPLIT_EVAL_FRACTION rows (from smallest to largest) in the corresponding column are used as training data, and the rest are eval data. It respects the order in Orderable data types: https://cloud.google.com/bigquery/docs/reference/standard-sql/data-types#data-type-properties
      */
     dataSplitColumn?: string;
     /**
-     * The fraction of evaluation data over the whole input data. The rest
-     * of data will be used as training data. The format should be double.
-     * Accurate to two decimal places.
-     * Default value is 0.2.
+     * The fraction of evaluation data over the whole input data. The rest of data will be used as training data. The format should be double. Accurate to two decimal places. Default value is 0.2.
      */
     dataSplitEvalFraction?: number;
     /**
@@ -2922,14 +3167,11 @@ declare namespace bigquery {
      */
     dropout?: number;
     /**
-     * Whether to stop early when the loss doesn't improve significantly
-     * any more (compared to min_relative_progress). Used only for iterative
-     * training algorithms.
+     * Whether to stop early when the loss doesn't improve significantly any more (compared to min_relative_progress). Used only for iterative training algorithms.
      */
     earlyStop?: boolean;
     /**
-     * Feedback type that specifies which algorithm to run for matrix
-     * factorization.
+     * Feedback type that specifies which algorithm to run for matrix factorization.
      */
     feedbackType?: 'FEEDBACK_TYPE_UNSPECIFIED' | 'IMPLICIT' | 'EXPLICIT';
     /**
@@ -2937,8 +3179,88 @@ declare namespace bigquery {
      */
     hiddenUnits?: Array<string>;
     /**
-     * Specifies the initial learning rate for the line search learn rate
-     * strategy.
+     * The geographical region based on which the holidays are considered in time series modeling. If a valid value is specified, then holiday effects modeling is enabled.
+     */
+    holidayRegion?:
+      | 'HOLIDAY_REGION_UNSPECIFIED'
+      | 'GLOBAL'
+      | 'NA'
+      | 'JAPAC'
+      | 'EMEA'
+      | 'LAC'
+      | 'AE'
+      | 'AR'
+      | 'AT'
+      | 'AU'
+      | 'BE'
+      | 'BR'
+      | 'CA'
+      | 'CH'
+      | 'CL'
+      | 'CN'
+      | 'CO'
+      | 'CS'
+      | 'CZ'
+      | 'DE'
+      | 'DK'
+      | 'DZ'
+      | 'EC'
+      | 'EE'
+      | 'EG'
+      | 'ES'
+      | 'FI'
+      | 'FR'
+      | 'GB'
+      | 'GR'
+      | 'HK'
+      | 'HU'
+      | 'ID'
+      | 'IE'
+      | 'IL'
+      | 'IN'
+      | 'IR'
+      | 'IT'
+      | 'JP'
+      | 'KR'
+      | 'LV'
+      | 'MA'
+      | 'MX'
+      | 'MY'
+      | 'NG'
+      | 'NL'
+      | 'NO'
+      | 'NZ'
+      | 'PE'
+      | 'PH'
+      | 'PK'
+      | 'PL'
+      | 'PT'
+      | 'RO'
+      | 'RS'
+      | 'RU'
+      | 'SA'
+      | 'SE'
+      | 'SG'
+      | 'SI'
+      | 'SK'
+      | 'TH'
+      | 'TR'
+      | 'TW'
+      | 'UA'
+      | 'US'
+      | 'VE'
+      | 'VN'
+      | 'ZA';
+    /**
+     * The number of periods ahead that need to be forecasted.
+     */
+    horizon?: string;
+    /**
+     * Include drift when fitting an ARIMA model.
+     */
+    includeDrift?: boolean;
+    /**
+     * Specifies the initial learning rate for the line search learn rate strategy.
      */
     initialLearnRate?: number;
     /**
@@ -2950,8 +3272,7 @@ declare namespace bigquery {
      */
     itemColumn?: string;
     /**
-     * The column used to provide the initial centroids for kmeans algorithm
-     * when kmeans_initialization_method is CUSTOM.
+     * The column used to provide the initial centroids for kmeans algorithm when kmeans_initialization_method is CUSTOM.
      */
     kmeansInitializationColumn?: string;
     /**
@@ -2971,8 +3292,7 @@ declare namespace bigquery {
      */
     l2Regularization?: number;
     /**
-     * Weights associated with each label class, for rebalancing the
-     * training data. Only applicable for classification models.
+     * Weights associated with each label class, for rebalancing the training data. Only applicable for classification models.
      */
     labelClassWeights?: {[key: string]: number};
     /**
@@ -2991,8 +3311,7 @@ declare namespace bigquery {
      */
     lossType?: 'LOSS_TYPE_UNSPECIFIED' | 'MEAN_SQUARED_LOSS' | 'MEAN_LOG_LOSS';
     /**
-     * The maximum number of iterations in training. Used only for iterative
-     * training algorithms.
+     * The maximum number of iterations in training. Used only for iterative training algorithms.
      */
     maxIterations?: string;
     /**
@@ -3000,9 +3319,7 @@ declare namespace bigquery {
      */
     maxTreeDepth?: string;
     /**
-     * When early_stop is true, stops training when accuracy improvement is
-     * less than 'min_relative_progress'. Used only for iterative training
-     * algorithms.
+     * When early_stop is true, stops training when accuracy improvement is less than 'min_relative_progress'. Used only for iterative training algorithms.
      */
     minRelativeProgress?: number;
     /**
@@ -3010,10 +3327,13 @@ declare namespace bigquery {
      */
     minSplitLoss?: number;
     /**
-     * [Beta] Google Cloud Storage URI from which the model was imported. Only
-     * applicable for imported models.
+     * [Beta] Google Cloud Storage URI from which the model was imported. Only applicable for imported models.
      */
     modelUri?: string;
+    /**
+     * A specification of the non-seasonal part of the ARIMA model: the three components (p, d, q) are the AR order, the degree of differencing, and the MA order.
+     */
+    nonSeasonalOrder?: IArimaOrder;
     /**
      * Number of clusters for clustering models.
      */
@@ -3030,17 +3350,31 @@ declare namespace bigquery {
       | 'BATCH_GRADIENT_DESCENT'
       | 'NORMAL_EQUATION';
     /**
-     * Subsample fraction of the training data to grow tree to prevent
-     * overfitting for boosted tree models.
+     * Whether to preserve the input structs in output feature names. Suppose there is a struct A with field b. When false (default), the output feature name is A_b. When true, the output feature name is A.b.
+     */
+    preserveInputStructs?: boolean;
+    /**
+     * Subsample fraction of the training data to grow tree to prevent overfitting for boosted tree models.
      */
     subsample?: number;
+    /**
+     * Column to be designated as time series data for ARIMA model.
+     */
+    timeSeriesDataColumn?: string;
+    /**
+     * The id column that will be used to indicate different time series to forecast in parallel.
+     */
+    timeSeriesIdColumn?: string;
+    /**
+     * Column to be designated as time series timestamp for ARIMA model.
+     */
+    timeSeriesTimestampColumn?: string;
     /**
      * User column specified for matrix factorization models.
      */
     userColumn?: string;
     /**
-     * Hyperparameter for matrix factoration when implicit feedback type is
-     * specified.
+     * Hyperparameter for matrix factoration when implicit feedback type is specified.
      */
     walsAlpha?: number;
     /**
@@ -3054,15 +3388,17 @@ declare namespace bigquery {
    */
   type ITrainingRun = {
     /**
-     * Data split result of the training run. Only set when the input data is
-     * actually split.
+     * Data split result of the training run. Only set when the input data is actually split.
      */
     dataSplitResult?: IDataSplitResult;
     /**
-     * The evaluation metrics over training/eval data that were computed at the
-     * end of training.
+     * The evaluation metrics over training/eval data that were computed at the end of training.
      */
     evaluationMetrics?: IEvaluationMetrics;
+    /**
+     * Global explanations for important features of the model. For multi-class models, there is one entry for each label class. For other models, there is only one entry in the list.
+     */
+    globalExplanations?: Array<IGlobalExplanation>;
     /**
      * Output of each iteration run, results.size() <= max_iterations.
      */
@@ -3072,12 +3408,21 @@ declare namespace bigquery {
      */
     startTime?: string;
     /**
-     * Options that were used for this training run, includes
-     * user specified and default options that were used.
+     * Options that were used for this training run, includes user specified and default options that were used.
      */
     trainingOptions?: ITrainingOptions;
   };
 
+  type ITransactionInfo = {
+    /**
+     * [Output-only] // [Alpha] Id of the transaction.
+     */
+    transactionId?: string;
+  };
+
+  /**
+   * This is used for defining User Defined Function (UDF) resources only when using legacy SQL. Users of Standard SQL should leverage either DDL (e.g. CREATE [TEMPORARY] FUNCTION ... ) or the Routines API to define UDF resources. For additional information on migrating, see: https://cloud.google.com/bigquery/docs/reference/standard-sql/migrating-from-legacy-sql#differences_in_user-defined_javascript_functions
+   */
   type IUserDefinedFunctionResource = {
     /**
      * [Pick one] An inline resource that contains code for a user-defined function (UDF). Providing a inline code resource is equivalent to providing a URI for a file containing the same code.
@@ -3226,18 +3571,15 @@ declare namespace bigquery {
 
   namespace models {
     /**
-     * Lists all models in the specified dataset. Requires the READER dataset
-     * role.
+     * Lists all models in the specified dataset. Requires the READER dataset role.
      */
     type IListParams = {
       /**
-       * The maximum number of results to return in a single response page.
-       * Leverage the page tokens to iterate through the entire collection.
+       * The maximum number of results to return in a single response page. Leverage the page tokens to iterate through the entire collection.
        */
       maxResults?: number;
       /**
-       * Page token, returned by a previous call to request the next page of
-       * results
+       * Page token, returned by a previous call to request the next page of results
        */
       pageToken?: string;
     };
@@ -3265,42 +3607,47 @@ declare namespace bigquery {
      */
     type IGetParams = {
       /**
-       * If set, only the Routine fields in the field mask are returned in the
-       * response. If unset, all Routine fields are returned.
+       * If set, only the Routine fields in the field mask are returned in the response. If unset, all Routine fields are returned.
        */
       readMask?: string;
     };
 
     /**
-     * Lists all routines in the specified dataset. Requires the READER dataset
-     * role.
+     * Lists all routines in the specified dataset. Requires the READER dataset role.
      */
     type IListParams = {
       /**
-       * If set, then only the Routines matching this filter are returned.
-       * The current supported form is either "routine_type:<RoutineType>" or
-       * "routineType:<RoutineType>", where <RoutineType> is a RoutineType enum.
-       * Example: "routineType:SCALAR_FUNCTION".
+       * If set, then only the Routines matching this filter are returned. The current supported form is either "routine_type:" or "routineType:", where is a RoutineType enum. Example: "routineType:SCALAR_FUNCTION".
        */
       filter?: string;
       /**
-       * The maximum number of results to return in a single response page.
-       * Leverage the page tokens to iterate through the entire collection.
+       * The maximum number of results to return in a single response page. Leverage the page tokens to iterate through the entire collection.
        */
       maxResults?: number;
       /**
-       * Page token, returned by a previous call, to request the next page of
-       * results
+       * Page token, returned by a previous call, to request the next page of results
        */
       pageToken?: string;
       /**
-       * If set, then only the Routine fields in the field mask, as well as
-       * project_id, dataset_id and routine_id, are returned in the response.
-       * If unset, then the following Routine fields are returned:
-       * etag, project_id, dataset_id, routine_id, routine_type, creation_time,
-       * last_modified_time, and language.
+       * If set, then only the Routine fields in the field mask, as well as project_id, dataset_id and routine_id, are returned in the response. If unset, then the following Routine fields are returned: etag, project_id, dataset_id, routine_id, routine_type, creation_time, last_modified_time, and language.
        */
       readMask?: string;
+    };
+  }
+
+  namespace rowAccessPolicies {
+    /**
+     * Lists all row access policies on the specified table.
+     */
+    type IListParams = {
+      /**
+       * The maximum number of results to return in a single response page. Leverage the page tokens to iterate through the entire collection.
+       */
+      pageSize?: number;
+      /**
+       * Page token, returned by a previous call, to request the next page of results.
+       */
+      pageToken?: string;
     };
   }
 

@@ -44,6 +44,7 @@ import {
   ViewDefinition,
 } from '../src/table';
 import bigquery from '../src/types';
+import {domNode} from 'is';
 
 interface CalledWithTable extends ServiceObject {
   calledWith_: Array<{
@@ -2755,6 +2756,141 @@ describe('BigQuery/Table', () => {
       };
 
       table.setMetadata(fakeMetadata, done);
+    });
+  });
+
+  describe('setIamPolicy', () => {
+    const BIGQUERY_DATA_VIEWER = 'roles/bigquery.dataViewer';
+
+    it('should make correct API request', done => {
+      const binding = {role: BIGQUERY_DATA_VIEWER, members: ['Turing']};
+      const policy = {bindings: [binding], etag: 'abc'};
+
+      table.request = (reqOpts: DecorateRequestOptions) => {
+        assert.deepStrictEqual(reqOpts.json.policy, policy);
+        assert.strictEqual(reqOpts.uri, '/:setIamPolicy');
+        assert.strictEqual(reqOpts.method, 'POST');
+        done();
+      };
+
+      table.setIamPolicy(policy);
+    });
+
+    it('should accept a callback', () => {
+      const binding = {role: BIGQUERY_DATA_VIEWER, members: ['Turing']};
+      const policy = {bindings: [binding], etag: 'abc'};
+
+      table.request = (reqOpts: DecorateRequestOptions, callback: Function) => {
+        callback(null, policy);
+      };
+
+      table.setIamPolicy(policy, (err: Error, resp: {}) => {
+        assert.ifError(err);
+        assert.strictEqual(resp, policy);
+      });
+    });
+
+    it('should accept options', done => {
+      const policy = {};
+      const updateMask = 'binding';
+
+      table.request = (reqOpts: DecorateRequestOptions) => {
+        assert.deepStrictEqual(reqOpts.json.policy, policy);
+        assert.strictEqual(reqOpts.json.updateMask, updateMask);
+        assert.strictEqual(reqOpts.uri, '/:setIamPolicy');
+        assert.strictEqual(reqOpts.method, 'POST');
+        done();
+      };
+
+      table.setIamPolicy(policy, {updateMask});
+    });
+
+    it('should throw with invalid policy version', () => {
+      const policy = {version: 100};
+      assert.throws(() => {
+        table.setIamPolicy(policy, util.noop);
+      }, /Only IAM policy version 1 is supported./);
+    });
+  });
+
+  describe('getIamPolicy', () => {
+    it('should make correct API call', done => {
+      table.request = (reqOpts: DecorateRequestOptions) => {
+        assert.strictEqual(reqOpts.uri, '/:getIamPolicy');
+        assert.strictEqual(reqOpts.method, 'POST');
+        done();
+      };
+
+      table.getIamPolicy();
+    });
+
+    it('should accept just a callback', () => {
+      const policy = {};
+
+      table.request = (reqOpts: DecorateRequestOptions, callback: Function) => {
+        assert.strictEqual(reqOpts.uri, '/:getIamPolicy');
+        assert.strictEqual(reqOpts.method, 'POST');
+        callback(null, policy);
+      };
+
+      table.getIamPolicy((err: Error, resp: {}) => {
+        assert.ifError(err);
+        assert.strictEqual(resp, policy);
+      });
+    });
+
+    it('should accept options', () => {
+      const policy = {};
+      const options = {requestedPolicyVersion: 1};
+
+      table.request = (reqOpts: DecorateRequestOptions, callback: Function) => {
+        assert.deepStrictEqual(reqOpts.json.options, options);
+        assert.strictEqual(reqOpts.uri, '/:getIamPolicy');
+        assert.strictEqual(reqOpts.method, 'POST');
+        callback(null, policy);
+      };
+
+      table.getIamPolicy(options, (err: Error, resp: {}) => {
+        assert.ifError(err);
+        assert.strictEqual(resp, policy);
+      });
+    });
+
+    it('should throw with invalid policy version', () => {
+      const options = {requestedPolicyVersion: 100};
+      assert.throws(() => {
+        table.getIamPolicy(options, util.noop);
+      }, /Only IAM policy version 1 is supported./);
+    });
+  });
+
+  describe('testIamPermissions', () => {
+    it('should make correct API call', () => {
+      const permissions = ['bigquery.do.stuff'];
+
+      table.request = (reqOpts: DecorateRequestOptions) => {
+        assert.strictEqual(reqOpts.uri, '/:testIamPermissions');
+        assert.strictEqual(reqOpts.method, 'POST');
+        assert.deepStrictEqual(reqOpts.json, {permissions});
+      };
+
+      table.testIamPermissions(permissions, util.noop);
+    });
+
+    it('should accept a callback', () => {
+      const permissions = ['bigquery.do.stuff'];
+
+      table.request = (reqOpts: DecorateRequestOptions, callback: Function) => {
+        assert.deepStrictEqual(reqOpts.json.permissions, permissions);
+        assert.strictEqual(reqOpts.uri, '/:testIamPermissions');
+        assert.strictEqual(reqOpts.method, 'POST');
+        callback(null, {permissions});
+      };
+
+      table.testIamPermissions(permissions, (err: Error, resp: {}) => {
+        assert.ifError(err);
+        assert.deepStrictEqual(resp, {permissions});
+      });
     });
   });
 });
