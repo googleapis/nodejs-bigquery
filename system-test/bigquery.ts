@@ -583,6 +583,16 @@ describe('BigQuery', () => {
           const [rows] = await job.getQueryResults();
           assert(rows!.length > 0);
         });
+
+        it('should return error if timeout passed', async () => {
+          const [job] = await dataset.createQueryJob(QUERY);
+          assert.strictEqual(job.location, LOCATION);
+          await job.promise();
+          const options = {timeoutMs: 1};
+          await job.getQueryResults(options, (err, resp) => {
+            assert.ifError(err);
+          });
+        });
       });
 
       describe('job.insert', () => {

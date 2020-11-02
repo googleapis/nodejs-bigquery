@@ -2179,6 +2179,28 @@ describe('BigQuery', () => {
       bq.createQueryJob(options, assert.ifError);
     });
 
+    it('should accept the jobTimeoutMs options', done => {
+      const options = {
+        query: QUERY_STRING,
+        jobTimeoutMs: 1000,
+      };
+
+      bq.createJob = (reqOpts: JobOptions) => {
+        assert.strictEqual(
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (reqOpts.configuration!.query as any).jobTimeoutMs,
+          undefined
+        );
+        assert.strictEqual(
+          reqOpts.configuration!.jobTimeoutMs,
+          options.jobTimeoutMs
+        );
+        done();
+      };
+
+      bq.createQueryJob(options, assert.ifError);
+    });
+
     it('should pass the callback to createJob', done => {
       bq.createJob = (reqOpts: DecorateRequestOptions, callback: Function) => {
         callback(); // the done fn

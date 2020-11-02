@@ -337,9 +337,9 @@ class Job extends Operation {
    * to the `nextQuery` argument of your callback.
    * @param {number} [options.startIndex] Zero-based index of the starting row.
    * @param {number} [options.timeoutMs] How long to wait for the query to
-   *     complete, in milliseconds, before returning. Default is to return
-   *     immediately. If the timeout passes before the job completes, the
-   *     request will fail with a `TIMEOUT` error.
+   *     complete, in milliseconds, before returning. Default is 10 seconds.
+   *     If the timeout passes before the job completes, an error will be returned
+   *     and the 'jobComplete' field in the response will be false.
    * @param {boolean|IntegerTypeCastOptions} [options.wrapIntegers=false] Wrap values
    *     of 'INT64' type in {@link BigQueryInt} objects.
    *     If a `boolean`, this will wrap values in {@link BigQueryInt} objects.
@@ -415,6 +415,9 @@ class Job extends Operation {
 
     delete qs.job;
 
+    const timeoutOverride =
+      typeof qs.timeoutMs === 'number' ? qs.timeoutMs : false;
+
     this.bigQuery.request(
       {
         uri: '/queries/' + this.id,
@@ -441,6 +444,15 @@ class Job extends Operation {
         if (resp.jobComplete === false) {
           // Query is still running.
           nextQuery = Object.assign({}, options);
+
+          // If timeout override was provided, return error.
+          if (timeoutOverride) {
+            const err = new Error(
+              `The query did not complete before ${timeoutOverride}ms`
+            );
+            callback!(err, null, nextQuery, resp);
+            return;
+          }
         } else if (resp.pageToken) {
           // More results exist.
           nextQuery = Object.assign({}, options, {
