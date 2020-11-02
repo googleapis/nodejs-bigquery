@@ -44,7 +44,7 @@ import {GoogleErrorBody} from '@google-cloud/common/build/src/util';
 import {Duplex, Writable} from 'stream';
 import {JobMetadata} from './job';
 import bigquery from './types';
-import {BigQueryInt, IntegerTypeCastOptions} from './bigquery';
+import {IntegerTypeCastOptions} from './bigquery';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const duplexify = require('duplexify');

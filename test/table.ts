@@ -44,7 +44,6 @@ import {
   ViewDefinition,
 } from '../src/table';
 import bigquery from '../src/types';
-import {domNode} from 'is';
 
 interface CalledWithTable extends ServiceObject {
   calledWith_: Array<{
