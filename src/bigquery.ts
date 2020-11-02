@@ -1483,8 +1483,10 @@ export class BigQuery extends common.Service {
     options: JobOptions,
     callback?: JobCallback
   ): void | Promise<JobResponse> {
+    const JOB_ID_PROVIDED = typeof options.jobId !== 'undefined';
+
     const reqOpts = Object.assign({}, options);
-    let jobId = reqOpts.jobId || uuid.v4();
+    let jobId = JOB_ID_PROVIDED ? reqOpts.jobId : uuid.v4();
 
     if (reqOpts.jobId) {
       delete reqOpts.jobId;
@@ -1506,16 +1508,35 @@ export class BigQuery extends common.Service {
       delete reqOpts.location;
     }
 
+    const job = this.job(jobId!, {
+      location: reqOpts.jobReference.location,
+    });
+
     this.request(
       {
         method: 'POST',
         uri: '/jobs',
         json: reqOpts,
       },
-      (err, resp) => {
+      async (err, resp) => {
+        const ALREADY_EXISTS_CODE = 409;
+
         if (err) {
-          callback!(err, null, resp);
-          return;
+          if (
+            (err as common.ApiError).code === ALREADY_EXISTS_CODE &&
+            !JOB_ID_PROVIDED
+          ) {
+            // The last insert attempt flaked, but the API still processed the
+            // request and created the job. Because of our "autoRetry" feature,
+            // we tried the request again, which tried to create it again,
+            // unnecessarily. We will get the job's metadata and treat it as if
+            // it just came back from the create call.
+            err = null;
+            [resp] = await job.getMetadata();
+          } else {
+            callback!(err, null, resp);
+            return;
+          }
         }
 
         if (resp.status.errors) {
@@ -1524,10 +1545,6 @@ export class BigQuery extends common.Service {
             response: resp,
           } as GoogleErrorBody);
         }
-
-        const job = this.job(jobId, {
-          location: resp.jobReference.location,
-        });
 
         job.metadata = resp;
         callback!(err, job, resp);
