@@ -4,6 +4,21 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## [5.4.0](https://www.github.com/googleapis/nodejs-bigquery/compare/v5.3.0...v5.4.0) (2020-11-02)
+
+
+### Features
+
+* optionally wrap INT64 in BigQueryInt or provide a custom INT64 value type cast options ([#873](https://www.github.com/googleapis/nodejs-bigquery/issues/873)) ([be7c6e6](https://www.github.com/googleapis/nodejs-bigquery/commit/be7c6e6411e351bfab4b557fb34162470bbfd7f4))
+
+
+### Bug Fixes
+
+* Detect Geography type during parameterized query ([#877](https://www.github.com/googleapis/nodejs-bigquery/issues/877)) ([bc0ca69](https://www.github.com/googleapis/nodejs-bigquery/commit/bc0ca695a5b2d9df15df9383f6a791be30e851ec))
+* do not retry jobs.insert when it flakes ([#864](https://www.github.com/googleapis/nodejs-bigquery/issues/864)) ([255491b](https://www.github.com/googleapis/nodejs-bigquery/commit/255491b958171907695b10aca7e536d58a52354c))
+* return error when custom getQueryResults() timeout has been exceeded  ([#872](https://www.github.com/googleapis/nodejs-bigquery/issues/872)) ([96f939c](https://www.github.com/googleapis/nodejs-bigquery/commit/96f939cefe2f31a5252002bbfecd5f503b32f841))
+* **deps:** update dependency big.js to v6 ([#862](https://www.github.com/googleapis/nodejs-bigquery/issues/862)) ([a47afb5](https://www.github.com/googleapis/nodejs-bigquery/commit/a47afb5c97115d0159ad94615a7997db15d03d01))
+
 ## [5.3.0](https://www.github.com/googleapis/nodejs-bigquery/compare/v5.2.0...v5.3.0) (2020-09-30)
 
 
