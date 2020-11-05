@@ -1516,7 +1516,8 @@ export class BigQuery extends common.Service {
       },
       async (err, resp) => {
         const job = this.job(jobId!, {
-          location: reqOpts.jobReference.location || resp.jobReference.location,
+          location:
+            reqOpts.jobReference?.location || resp.jobReference.location,
         });
 
         const ALREADY_EXISTS_CODE = 409;
