@@ -1546,6 +1546,8 @@ export class BigQuery extends common.Service {
           } as GoogleErrorBody);
         }
 
+        // Update the location with the one used by the API.
+        job.location = resp.jobReference.location;
         job.metadata = resp;
         callback!(err, job, resp);
       }
