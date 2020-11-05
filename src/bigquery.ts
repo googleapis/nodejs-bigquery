@@ -1508,10 +1508,6 @@ export class BigQuery extends common.Service {
       delete reqOpts.location;
     }
 
-    const job = this.job(jobId!, {
-      location: reqOpts.jobReference.location,
-    });
-
     this.request(
       {
         method: 'POST',
@@ -1519,6 +1515,10 @@ export class BigQuery extends common.Service {
         json: reqOpts,
       },
       async (err, resp) => {
+        const job = this.job(jobId!, {
+          location: reqOpts.jobReference.location || resp.jobReference.location,
+        });
+
         const ALREADY_EXISTS_CODE = 409;
 
         if (err) {
