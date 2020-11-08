@@ -93,7 +93,7 @@ export type Query = JobRequest<bigquery.IJobConfigurationQuery> & {
   types?: string[] | string[][] | {[type: string]: string[]};
   job?: Job;
   maxResults?: number;
-  timeoutMs?: number;
+  jobTimeoutMs?: number;
   pageToken?: string;
   wrapIntegers?: boolean | IntegerTypeCastOptions;
 };
@@ -1221,6 +1221,8 @@ export class BigQuery extends common.Service {
    *     labels to the newly created Job.
    * @param {string} [options.location] The geographic location of the job.
    *     Required except for US and EU.
+   * @param {number} [options.jobTimeoutMs] Job timeout in milliseconds.
+   *     If this time limit is exceeded, BigQuery might attempt to stop the job.
    * @param {string} [options.jobId] Custom job id.
    * @param {string} [options.jobPrefix] Prefix to apply to the job id.
    * @param {string} options.query A query string, following the BigQuery query
@@ -1384,6 +1386,11 @@ export class BigQuery extends common.Service {
       },
     };
 
+    if (typeof query.jobTimeoutMs === 'number') {
+      reqOpts.configuration.jobTimeoutMs = query.jobTimeoutMs;
+      delete query.jobTimeoutMs;
+    }
+
     if (query.dryRun) {
       reqOpts.configuration.dryRun = query.dryRun;
       delete query.dryRun;
@@ -1476,8 +1483,10 @@ export class BigQuery extends common.Service {
     options: JobOptions,
     callback?: JobCallback
   ): void | Promise<JobResponse> {
+    const JOB_ID_PROVIDED = typeof options.jobId !== 'undefined';
+
     const reqOpts = Object.assign({}, options);
-    let jobId = reqOpts.jobId || uuid.v4();
+    let jobId = JOB_ID_PROVIDED ? reqOpts.jobId : uuid.v4();
 
     if (reqOpts.jobId) {
       delete reqOpts.jobId;
@@ -1499,16 +1508,35 @@ export class BigQuery extends common.Service {
       delete reqOpts.location;
     }
 
+    const job = this.job(jobId!, {
+      location: reqOpts.jobReference.location,
+    });
+
     this.request(
       {
         method: 'POST',
         uri: '/jobs',
         json: reqOpts,
       },
-      (err, resp) => {
+      async (err, resp) => {
+        const ALREADY_EXISTS_CODE = 409;
+
         if (err) {
-          callback!(err, null, resp);
-          return;
+          if (
+            (err as common.ApiError).code === ALREADY_EXISTS_CODE &&
+            !JOB_ID_PROVIDED
+          ) {
+            // The last insert attempt flaked, but the API still processed the
+            // request and created the job. Because of our "autoRetry" feature,
+            // we tried the request again, which tried to create it again,
+            // unnecessarily. We will get the job's metadata and treat it as if
+            // it just came back from the create call.
+            err = null;
+            [resp] = await job.getMetadata();
+          } else {
+            callback!(err, null, resp);
+            return;
+          }
         }
 
         if (resp.status.errors) {
@@ -1517,10 +1545,6 @@ export class BigQuery extends common.Service {
             response: resp,
           } as GoogleErrorBody);
         }
-
-        const job = this.job(jobId, {
-          location: resp.jobReference.location,
-        });
 
         job.metadata = resp;
         callback!(err, job, resp);
@@ -1813,9 +1837,9 @@ export class BigQuery extends common.Service {
    * @param {object} [options] Configuration object for query results.
    * @param {number} [options.maxResults] Maximum number of results to read.
    * @param {number} [options.timeoutMs] How long to wait for the query to
-   *     complete, in milliseconds, before returning. Default is to return
-   *     immediately. If the timeout passes before the job completes, the
-   * request will fail with a `TIMEOUT` error.
+   *     complete, in milliseconds, before returning. Default is 10 seconds.
+   *     If the timeout passes before the job completes, an error will be returned
+   *     and the 'jobComplete' field in the response will be false.
    * @param {boolean|IntegerTypeCastOptions} [options.wrapIntegers=false] Wrap values
    *     of 'INT64' type in {@link BigQueryInt} objects.
    *     If a `boolean`, this will wrap values in {@link BigQueryInt} objects.
