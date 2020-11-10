@@ -143,6 +143,15 @@ export interface PartialInsertFailure {
   row: RowMetadata;
 }
 
+export type Policy = bigquery.IPolicy;
+export type GetPolicyOptions = bigquery.IGetPolicyOptions;
+export type SetPolicyOptions = Omit<bigquery.ISetIamPolicyRequest, 'policy'>;
+export type PolicyRequest = bigquery.IGetIamPolicyRequest;
+export type PolicyResponse = [Policy];
+export type PolicyCallback = RequestCallback<PolicyResponse>;
+export type PermissionsResponse = [bigquery.ITestIamPermissionsResponse];
+export type PermissionsCallback = RequestCallback<PermissionsResponse>;
+
 /**
  * The file formats accepted by BigQuery.
  *
@@ -2236,6 +2245,129 @@ class Table extends common.ServiceObject {
   ): void | Promise<common.SetMetadataResponse> {
     const body = Table.formatMetadata_(metadata as TableMetadata);
     super.setMetadata(body, callback!);
+  }
+
+  getIamPolicy(
+    optionsOrCallback?: GetPolicyOptions | PolicyCallback
+  ): Promise<PolicyResponse>;
+  getIamPolicy(options: GetPolicyOptions, callback: PolicyCallback): void;
+  /**
+   * Run a query scoped to your dataset.
+   * @returns {Promise}
+   */
+  getIamPolicy(
+    optionsOrCallback?: GetPolicyOptions,
+    cb?: PolicyCallback
+  ): void | Promise<PolicyResponse> {
+    const options =
+      typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
+    const callback =
+      typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
+
+    if (
+      typeof options.requestedPolicyVersion === 'number' &&
+      options.requestedPolicyVersion !== 1
+    ) {
+      throw new Error('Only IAM policy version 1 is supported.');
+    }
+
+    const json = extend(true, {}, {options});
+
+    this.request(
+      {
+        method: 'POST',
+        uri: '/:getIamPolicy',
+        json,
+      },
+      (err, resp) => {
+        if (err) {
+          callback!(err, null);
+          return;
+        }
+        callback!(null, resp);
+      }
+    );
+  }
+
+  setIamPolicy(
+    policy: Policy,
+    options?: SetPolicyOptions
+  ): Promise<PolicyResponse>;
+  setIamPolicy(
+    policy: Policy,
+    options: SetPolicyOptions,
+    callback: PolicyCallback
+  ): void;
+  setIamPolicy(policy: Policy, callback: PolicyCallback): void;
+  /**
+   * Run a query scoped to your dataset.
+   * @returns {Promise}
+   */
+  setIamPolicy(
+    policy: Policy,
+    optionsOrCallback?: SetPolicyOptions | PolicyCallback,
+    cb?: PolicyCallback
+  ): void | Promise<PolicyResponse> {
+    const options =
+      typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
+    const callback =
+      typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
+
+    if (policy.version && policy.version !== 1) {
+      throw new Error('Only IAM policy version 1 is supported.');
+    }
+
+    const json = extend(true, {}, options, {policy});
+
+    this.request(
+      {
+        method: 'POST',
+        uri: '/:setIamPolicy',
+        json,
+      },
+      (err, resp) => {
+        if (err) {
+          callback!(err, null);
+          return;
+        }
+        callback!(null, resp);
+      }
+    );
+  }
+
+  testIamPermissions(
+    permissions: string | string[]
+  ): Promise<PermissionsResponse>;
+  testIamPermissions(
+    permissions: string | string[],
+    callback: PermissionsCallback
+  ): void;
+  /**
+   * Run a query scoped to your dataset.
+   * @returns {Promise}
+   */
+  testIamPermissions(
+    permissions: string | string[],
+    callback?: PermissionsCallback
+  ): void | Promise<PermissionsResponse> {
+    permissions = arrify(permissions);
+
+    const json = extend(true, {}, {permissions});
+
+    this.request(
+      {
+        method: 'POST',
+        uri: '/:testIamPermissions',
+        json,
+      },
+      (err, resp) => {
+        if (err) {
+          callback!(err, null);
+          return;
+        }
+        callback!(null, resp);
+      }
+    );
   }
 }
 
