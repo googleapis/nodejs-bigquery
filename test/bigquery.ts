@@ -1586,6 +1586,9 @@ describe('BigQuery', () => {
       status: {
         state: 'RUNNING',
       },
+      jobReference: {
+        location: LOCATION,
+      },
     };
 
     let fakeJobId: string;
@@ -1768,6 +1771,24 @@ describe('BigQuery', () => {
         assert.strictEqual(job, fakeJob);
         assert.strictEqual(job.metadata, RESPONSE);
         assert.strictEqual(resp, RESPONSE);
+        done();
+      });
+    });
+
+    it('should update the job location in the official API format', done => {
+      const fakeJob: {location?: string} = {};
+
+      bq.job = () => {
+        return fakeJob;
+      };
+
+      bq.request = (reqOpts: DecorateRequestOptions, callback: Function) => {
+        callback(null, RESPONSE);
+      };
+
+      bq.createJob({}, (err: Error) => {
+        assert.ifError(err);
+        assert.strictEqual(fakeJob.location, LOCATION);
         done();
       });
     });
