@@ -2265,7 +2265,7 @@ class Table extends common.ServiceObject {
       typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
 
     if (
-      options.requestedPolicyVersion &&
+      typeof options.requestedPolicyVersion === 'number' &&
       options.requestedPolicyVersion !== 1
     ) {
       throw new Error('Only IAM policy version 1 is supported.');
