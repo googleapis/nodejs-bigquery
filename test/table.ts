@@ -2810,6 +2810,20 @@ describe('BigQuery/Table', () => {
         table.setIamPolicy(policy, util.noop);
       }, /Only IAM policy version 1 is supported./);
     });
+
+    it('should return errors', () => {
+      const policy = {};
+      const error = new Error('a bad thing!');
+
+      table.request = (reqOpts: DecorateRequestOptions, callback: Function) => {
+        callback(error, null);
+      };
+
+      table.setIamPolicy(policy, (err: Error, resp: {}) => {
+        assert.strictEqual(err, error);
+        assert.strictEqual(resp, null);
+      });
+    });
   });
 
   describe('getIamPolicy', () => {
@@ -2861,6 +2875,19 @@ describe('BigQuery/Table', () => {
         table.getIamPolicy(options, util.noop);
       }, /Only IAM policy version 1 is supported./);
     });
+
+    it('should return errors', () => {
+      const error = new Error('a bad thing!');
+
+      table.request = (reqOpts: DecorateRequestOptions, callback: Function) => {
+        callback(error, null);
+      };
+
+      table.getIamPolicy((err: Error, resp: {}) => {
+        assert.strictEqual(err, error);
+        assert.strictEqual(resp, null);
+      });
+    });
   });
 
   describe('testIamPermissions', () => {
@@ -2889,6 +2916,20 @@ describe('BigQuery/Table', () => {
       table.testIamPermissions(permissions, (err: Error, resp: {}) => {
         assert.ifError(err);
         assert.deepStrictEqual(resp, {permissions});
+      });
+    });
+
+    it('should return errors', () => {
+      const permissions = ['bigquery.do.stuff'];
+      const error = new Error('a bad thing!');
+
+      table.request = (reqOpts: DecorateRequestOptions, callback: Function) => {
+        callback(error, null);
+      };
+
+      table.testIamPermissions(permissions, (err: Error, resp: {}) => {
+        assert.strictEqual(err, error);
+        assert.strictEqual(resp, null);
       });
     });
   });
