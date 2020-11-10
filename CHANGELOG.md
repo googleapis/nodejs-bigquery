@@ -4,6 +4,18 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## [5.5.0](https://www.github.com/googleapis/nodejs-bigquery/compare/v5.4.0...v5.5.0) (2020-11-10)
+
+
+### Features
+
+* Add support for Table IAM policies ([#892](https://www.github.com/googleapis/nodejs-bigquery/issues/892)) ([005422a](https://www.github.com/googleapis/nodejs-bigquery/commit/005422a07a46edd0eaf3fba3035753b42a86dadb))
+
+
+### Bug Fixes
+
+* update returned Job with API-determined location ([#890](https://www.github.com/googleapis/nodejs-bigquery/issues/890)) ([3894140](https://www.github.com/googleapis/nodejs-bigquery/commit/38941409c63221bf704ee8580ab3b032802ddc4e))
+
 ## [5.4.0](https://www.github.com/googleapis/nodejs-bigquery/compare/v5.3.0...v5.4.0) (2020-11-02)
 
 
