@@ -29,7 +29,7 @@ const datasetId = `${GCLOUD_TESTS_PREFIX}_datasets_${uuid.v4()}`.replace(
 
 const bigquery = new BigQuery();
 
-describe('Datasets', () => {
+describe.only('Datasets', () => {
   before(async () => {
     // Delete any stale datasets from samples tests
     await deleteDatasets();
@@ -94,8 +94,8 @@ describe('Datasets', () => {
 
   it("should update dataset's access", async () => {
     const output = execSync(`node updateDatasetAccess.js ${datasetId}`);
-    assert.include(output, "role: 'READER'");
-    assert.include(output, "userByEmail: 'sample.bigquery.dev@gmail.com'");
+    assert.include(output, "role: 'roles/bigquery.metadataViewer'");
+    assert.include(output, "specialGroup: 'projectWriters");
   });
 
   it('should filter datasets by label', async () => {

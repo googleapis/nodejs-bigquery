@@ -21,7 +21,7 @@ function main(datasetId = 'my_dataset') {
   const bigquery = new BigQuery();
 
   async function updateDatasetAccess() {
-    // Updates a datasets's access controls.
+    // Update a datasets's access controls.
 
     /**
      * TODO(developer): Uncomment the following lines before running the sample.
@@ -30,9 +30,9 @@ function main(datasetId = 'my_dataset') {
 
     // Create new role metadata
     const newRole = {
-      role: 'READER',
-      entity_type: 'userByEmail',
-      userByEmail: 'sample.bigquery.dev@gmail.com',
+      role: 'roles/bigquery.metadataViewer',
+      entity_type: 'specialGroup',
+      specialGroup: 'projectOwners',
     };
 
     // Retreive current dataset metadata
