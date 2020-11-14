@@ -210,11 +210,20 @@ describe('Tables', () => {
   });
 
   it('should browse table rows', async () => {
-    const output = execSync(`node browseRows.js ${datasetId} ${tableId}`);
+    const output = execSync(`node browseTable.js ${datasetId} ${tableId}`);
     assert.include(
       output,
       "Rows:\n{ Name: 'Gandalf', Age: 2000, Weight: 140, IsMagic: true }"
     );
+  });
+
+  it('should auto-paginate through destination table rows', async () => {
+    const queryDestTableId = generateUuid();
+    const output = execSync(
+      `node queryPagination.js ${datasetId} ${queryDestTableId}`
+    );
+    assert.match(output, /name/);
+    assert.match(output, /total_people/);
   });
 
   it('should extract a table to GCS CSV file', async () => {

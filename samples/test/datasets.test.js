@@ -29,7 +29,7 @@ const datasetId = `${GCLOUD_TESTS_PREFIX}_datasets_${uuid.v4()}`.replace(
 
 const bigquery = new BigQuery();
 
-describe.only('Datasets', () => {
+describe('Datasets', () => {
   before(async () => {
     // Delete any stale datasets from samples tests
     await deleteDatasets();
