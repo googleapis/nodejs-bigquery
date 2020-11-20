@@ -59,4 +59,10 @@ describe('Jobs', () => {
     const output = execSync('node createJob.js');
     assert.include(output, 'Rows:');
   });
+
+  it('should auto-paginate through query result rows', async () => {
+    const output = execSync('node queryPagination.js');
+    assert.match(output, /name/);
+    assert.match(output, /total people/);
+  });
 });

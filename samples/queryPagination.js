@@ -14,59 +14,37 @@
 
 'use strict';
 
-function main(
-  datasetId = 'my_dataset', // Existing dataset
-  tableId = 'my_new_table'
-) {
+function main() {
   // [START bigquery_query_pagination]
   // Import the Google Cloud client library using default credentials
   const {BigQuery} = require('@google-cloud/bigquery');
   const bigquery = new BigQuery();
 
   async function queryPagination() {
-    // Run a query with a destination table and get rows using automatic pagination.
+    // Run a query and get rows using automatic pagination.
 
     const query = `SELECT name, SUM(number) as total_people
     FROM \`bigquery-public-data.usa_names.usa_1910_2013\`
     GROUP BY name
     ORDER BY total_people DESC`;
 
-    /**
-     * TODO(developer): Uncomment the following lines before running the sample.
-     */
-    // const datasetId = 'my_dataset'; // Existing dataset
-    // const tableId = 'my_new_table';
-
-    // Create destination table reference.
-    const dataset = bigquery.dataset(datasetId);
-    const destinationTable = dataset.table(tableId);
-
-    // For all options, see https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs/query
-    const queryOptions = {
-      query: query,
-      destination: destinationTable,
-    };
-
     // Run the query as a job.
-    const [job] = await bigquery.createQueryJob(queryOptions);
+    const [job] = await bigquery.createQueryJob(query);
 
-    // Wait for job to complete.
-    await job.getQueryResults();
-
-    // For all options, see https://cloud.google.com/bigquery/docs/reference/v2/tabledata/list
-    const getRowsOptions = {
+    // For all options, see https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs/getQueryResults
+    const options = {
       maxResults: 20,
     };
 
-    // Get rows.
-    const [rows] = await destinationTable.getRows(getRowsOptions);
+    // Wait for job to complete and get rows.
+    const [rows] = await job.getQueryResults(options);
 
-    console.log('Rows:');
+    console.log('Query results:');
     rows.forEach(row => {
-      console.log(row);
+      console.log(`name: ${row.name}, ${row.total_people} total people`);
     });
   }
-  // [END bigquery_query_pagination]
   queryPagination();
+  // [END bigquery_query_pagination]
 }
 main(...process.argv.slice(2));

@@ -30,9 +30,9 @@ function main(datasetId = 'my_dataset') {
 
     // Create new role metadata
     const newRole = {
-      role: 'roles/bigquery.metadataViewer',
-      entity_type: 'specialGroup',
-      specialGroup: 'projectOwners',
+      role: 'READER',
+      entity_type: 'userByEmail',
+      userByEmail: 'sample.bigquery.dev@gmail.com',
     };
 
     // Retreive current dataset metadata

@@ -94,8 +94,8 @@ describe('Datasets', () => {
 
   it("should update dataset's access", async () => {
     const output = execSync(`node updateDatasetAccess.js ${datasetId}`);
-    assert.include(output, "role: 'roles/bigquery.metadataViewer'");
-    assert.include(output, "specialGroup: 'projectWriters");
+    assert.include(output, "role: 'READER'");
+    assert.include(output, "userByEmail: 'sample.bigquery.dev@gmail.com'");
   });
 
   it('should filter datasets by label', async () => {

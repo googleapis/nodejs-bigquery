@@ -55,7 +55,7 @@ function main(
     // Retrieve rows.
     table.getRows(options, manualPaginationCallback);
   }
-  // [END bigquery_browse_table]
   browseTable();
+  // [END bigquery_browse_table]
 }
 main(...process.argv.slice(2));

@@ -217,15 +217,6 @@ describe('Tables', () => {
     );
   });
 
-  it('should auto-paginate through destination table rows', async () => {
-    const queryDestTableId = generateUuid();
-    const output = execSync(
-      `node queryPagination.js ${datasetId} ${queryDestTableId}`
-    );
-    assert.match(output, /name/);
-    assert.match(output, /total_people/);
-  });
-
   it('should extract a table to GCS CSV file', async () => {
     const output = execSync(
       `node extractTableToGCS.js ${datasetId} ${tableId} ${bucketName} ${exportCSVFileName}`
