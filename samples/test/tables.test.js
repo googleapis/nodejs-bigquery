@@ -52,7 +52,7 @@ const partialDataFilePath = path.join(
 );
 const bigquery = new BigQuery();
 
-describe('Tables', () => {
+describe.only('Tables', () => {
   before(async () => {
     const [bucket] = await storage.createBucket(bucketName);
     await Promise.all([
@@ -210,11 +210,12 @@ describe('Tables', () => {
   });
 
   it('should browse table rows', async () => {
-    const output = execSync(`node browseTable.js ${datasetId} ${tableId}`);
-    assert.include(
-      output,
-      "Rows:\n{ Name: 'Gandalf', Age: 2000, Weight: 140, IsMagic: true }"
+    const browseDestTable = generateUuid();
+    const output = execSync(
+      `node browseTable.js ${datasetId} ${browseDestTable}`
     );
+    assert.match(output, /name/);
+    assert.match(output, /total people/);
   });
 
   it('should extract a table to GCS CSV file', async () => {

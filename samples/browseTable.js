@@ -16,7 +16,7 @@
 
 function main(
   datasetId = 'my_dataset', // Existing dataset
-  tableId = 'my_table' // Existing table
+  tableId = 'my_table' // Table to create
 ) {
   // [START bigquery_browse_table]
   // Import the Google Cloud client library using default credentials
@@ -30,30 +30,55 @@ function main(
      * TODO(developer): Uncomment the following lines before running the sample.
      */
     // const datasetId = 'my_dataset'; // Existing dataset
-    // const tableId = 'my_table'; // Existing table
+    // const tableId = 'my_table'; // Table to create
+
+    const query = `SELECT name, SUM(number) as total_people
+      FROM \`bigquery-public-data.usa_names.usa_1910_2013\`
+      GROUP BY name 
+      ORDER BY total_people 
+      DESC LIMIT 100`;
 
     // Create table reference.
     const dataset = bigquery.dataset(datasetId);
-    const table = dataset.table(tableId);
+    const destinationTable = dataset.table(tableId);
+
+    // For all options, see https://cloud.google.com/bigquery/docs/reference/v2/tables#resource
+    const queryOptions = {
+      query: query,
+      destination: destinationTable,
+    };
+
+    // Run the query as a job
+    const [job] = await bigquery.createQueryJob(queryOptions);
+
+    // For all options, see https://cloud.google.com/bigquery/docs/reference/v2/jobs/getQueryResults
+    const queryResultsOptions = {
+      // Retrieve zero resulting rows.
+      maxResults: 0,
+    };
+
+    // Wait for the job to finish.
+    await job.getQueryResults(queryResultsOptions);
 
     function manualPaginationCallback(err, rows, nextQuery) {
-      console.log('Rows:');
-      rows.forEach(row => console.log(row));
+      rows.forEach(row => {
+        console.log(`name: ${row.name}, ${row.total_people} total people`);
+      });
 
       if (nextQuery) {
         // More results exist.
-        table.getRows(nextQuery, manualPaginationCallback);
+        destinationTable.getRows(nextQuery, manualPaginationCallback);
       }
     }
 
     // For all options, see https://cloud.google.com/bigquery/docs/reference/v2/tabledata/list
-    const options = {
+    const getRowsOptions = {
       autoPaginate: false,
-      maxResults: 10,
+      maxResults: 20,
     };
 
-    // Retrieve rows.
-    table.getRows(options, manualPaginationCallback);
+    // Retrieve all rows.
+    destinationTable.getRows(getRowsOptions, manualPaginationCallback);
   }
   browseTable();
   // [END bigquery_browse_table]
