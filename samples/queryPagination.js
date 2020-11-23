@@ -26,18 +26,14 @@ function main() {
     const query = `SELECT name, SUM(number) as total_people
     FROM \`bigquery-public-data.usa_names.usa_1910_2013\`
     GROUP BY name
-    ORDER BY total_people DESC`;
+    ORDER BY total_people DESC
+    LIMIT 100`;
 
     // Run the query as a job.
     const [job] = await bigquery.createQueryJob(query);
 
-    // For all options, see https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs/getQueryResults
-    const options = {
-      maxResults: 20,
-    };
-
     // Wait for job to complete and get rows.
-    const [rows] = await job.getQueryResults(options);
+    const [rows] = await job.getQueryResults();
 
     console.log('Query results:');
     rows.forEach(row => {

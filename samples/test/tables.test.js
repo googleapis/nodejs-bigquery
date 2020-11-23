@@ -52,7 +52,7 @@ const partialDataFilePath = path.join(
 );
 const bigquery = new BigQuery();
 
-describe.only('Tables', () => {
+describe('Tables', () => {
   before(async () => {
     const [bucket] = await storage.createBucket(bucketName);
     await Promise.all([
