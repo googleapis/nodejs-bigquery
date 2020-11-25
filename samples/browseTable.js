@@ -42,7 +42,7 @@ function main(
     const dataset = bigquery.dataset(datasetId);
     const destinationTable = dataset.table(tableId);
 
-    // For all options, see https://cloud.google.com/bigquery/docs/reference/v2/tables#resource
+    // For all options, see https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#jobconfigurationquery
     const queryOptions = {
       query: query,
       destination: destinationTable,
