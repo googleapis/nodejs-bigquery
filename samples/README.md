@@ -16,7 +16,7 @@
   * [Add Column Query Append](#add-column-query-append)
   * [Add Empty Column](#add-empty-column)
   * [Auth View Tutorial](#auth-view-tutorial)
-  * [Browse Rows](#browse-rows)
+  * [Browse Table](#browse-table)
   * [Cancel Job](#cancel-job)
   * [Client JSON Credentials](#client-json-credentials)
   * [Copy Table](#copy-table)
@@ -82,6 +82,7 @@
   * [Query External GCS Perm](#query-external-gcs-perm)
   * [Query Legacy](#query-legacy)
   * [Query Legacy Large Results](#query-legacy-large-results)
+  * [Query Pagination](#query-pagination)
   * [Query Params Arrays](#query-params-arrays)
   * [Query Params Named](#query-params-named)
   * [Query Params Named Types](#query-params-named-types)
@@ -188,16 +189,16 @@ __Usage:__
 
 
 
-### Browse Rows
+### Browse Table
 
-View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/browseRows.js).
+View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/browseTable.js).
 
-[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/browseRows.js,samples/README.md)
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/browseTable.js,samples/README.md)
 
 __Usage:__
 
 
-`node samples/browseRows.js`
+`node samples/browseTable.js`
 
 
 -----
@@ -1321,6 +1322,23 @@ __Usage:__
 
 
 `node samples/queryLegacyLargeResults.js`
+
+
+-----
+
+
+
+
+### Query Pagination
+
+View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/master/samples/queryPagination.js).
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/queryPagination.js,samples/README.md)
+
+__Usage:__
+
+
+`node samples/queryPagination.js`
 
 
 -----
