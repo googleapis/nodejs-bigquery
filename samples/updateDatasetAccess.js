@@ -21,7 +21,7 @@ function main(datasetId = 'my_dataset') {
   const bigquery = new BigQuery();
 
   async function updateDatasetAccess() {
-    // Updates a datasets's access controls.
+    // Update a datasets's access controls.
 
     /**
      * TODO(developer): Uncomment the following lines before running the sample.
