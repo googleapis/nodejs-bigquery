@@ -150,6 +150,18 @@ describe('BigQuery/Job', () => {
         },
       });
     });
+
+    it('should update the location after initializing job object', () => {
+      const job = new Job(BIGQUERY, JOB_ID);
+      job.location = LOCATION;
+      const calledWith = job.calledWith_[0];
+
+      assert.deepStrictEqual(calledWith.methods.getMetadata, {
+        reqOpts: {
+          qs: {location: LOCATION},
+        },
+      });
+    });
   });
 
   describe('cancel', () => {

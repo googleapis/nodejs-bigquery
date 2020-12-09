@@ -126,10 +126,7 @@ class Job extends Operation {
     options?: QueryResultsOptions
   ) => ResourceStream<RowMetadata>;
   constructor(bigQuery: BigQuery, id: string, options?: JobOptions) {
-    let location;
-    if (options && options.location) {
-      location = options.location;
-    }
+    let location: string;
 
     const methods = {
       /**
@@ -222,7 +219,11 @@ class Job extends Operation {
        */
       getMetadata: {
         reqOpts: {
-          qs: {location},
+          qs: {
+            get location() {
+              return location;
+            },
+          },
         },
       },
     };
@@ -232,6 +233,15 @@ class Job extends Operation {
       baseUrl: '/jobs',
       id,
       methods,
+    });
+
+    Object.defineProperty(this, 'location', {
+      get() {
+        return location;
+      },
+      set(_location) {
+        location = _location;
+      },
     });
 
     this.bigQuery = bigQuery;
