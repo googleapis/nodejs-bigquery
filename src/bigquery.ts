@@ -90,7 +90,7 @@ export type Query = JobRequest<bigquery.IJobConfigurationQuery> & {
   params?: any[] | {[param: string]: any};
   dryRun?: boolean;
   labels?: {[label: string]: string};
-  types?: string[] | string[][] | {[type: string]: string[]};
+  types?: string[] | string[][] | {[type: string]: string | string[]};
   job?: Job;
   maxResults?: number;
   jobTimeoutMs?: number;
