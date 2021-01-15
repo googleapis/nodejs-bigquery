@@ -27,7 +27,8 @@ npm i json@9.0.6 -g
 NAME=$(cat .repo-metadata.json | json name)
 
 mkdir ./_devsite
-cp ./yaml/$NAME/* ./_devsite
+mkdir ./_devsite/$NAME
+cp ./yaml/$NAME/* ./_devsite/$NAME
 
 # Clean up TOC
 # Delete SharePoint item, see https://github.com/microsoft/rushstack/issues/1229
