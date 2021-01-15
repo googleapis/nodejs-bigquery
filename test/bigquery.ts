@@ -719,7 +719,12 @@ describe('BigQuery', () => {
 
   describe('time', () => {
     const INPUT_STRING = '14:2:38.883388';
-    const INPUT_OBJ = {
+    const INPUT_OBJ: {
+      hours: number;
+      minutes: number;
+      seconds: number;
+      fractional?: number;
+    } = {
       hours: 14,
       minutes: 2,
       seconds: 38,
