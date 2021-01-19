@@ -48,7 +48,7 @@ function main(
     // Configure the load job. For full list of options, see:
     // https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationLoad
     const jobConfigurationLoad = {
-      load: {sourceFormat: 'AVRO'},
+      sourceFormat: 'AVRO',
     };
 
     // Load data from a Google Cloud Storage file into the table
