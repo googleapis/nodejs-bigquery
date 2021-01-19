@@ -389,6 +389,7 @@ describe('Tables', () => {
       `node loadCSVFromGCSTruncate.js ${datasetId} ${tableId}`
     );
     assert.match(output, /completed\./);
+    assert.include(output, 'Write disposition used: WRITE_TRUNCATE.');
     const [rows] = await bigquery
       .dataset(datasetId)
       .table(tableId)
@@ -402,6 +403,7 @@ describe('Tables', () => {
       `node loadJSONFromGCSTruncate.js ${datasetId} ${tableId}`
     );
     assert.match(output, /completed\./);
+    assert.include(output, 'Write disposition used: WRITE_TRUNCATE.');
     const [rows] = await bigquery
       .dataset(datasetId)
       .table(tableId)
@@ -415,6 +417,7 @@ describe('Tables', () => {
       `node loadParquetFromGCSTruncate.js ${datasetId} ${tableId}`
     );
     assert.match(output, /completed\./);
+    assert.include(output, 'Write disposition used: WRITE_TRUNCATE.');
     const [rows] = await bigquery
       .dataset(datasetId)
       .table(tableId)
@@ -428,6 +431,7 @@ describe('Tables', () => {
       `node loadOrcFromGCSTruncate.js ${datasetId} ${tableId}`
     );
     assert.match(output, /completed\./);
+    assert.include(output, 'Write disposition used: WRITE_TRUNCATE.');
     const [rows] = await bigquery
       .dataset(datasetId)
       .table(tableId)
@@ -441,6 +445,7 @@ describe('Tables', () => {
       `node loadTableGCSAvroTruncate.js ${datasetId} ${tableId}`
     );
     assert.match(output, /completed\./);
+    assert.include(output, 'Write disposition used: WRITE_TRUNCATE.');
     const [rows] = await bigquery
       .dataset(datasetId)
       .table(tableId)
