@@ -51,10 +51,8 @@ function main(
     // Configure the load job. For full list of options, see:
     // https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationLoad
     const jobConfigurationLoad = {
-      load: {
-        sourceFormat: 'AVRO',
-        writeDisposition: 'WRITE_TRUNCATE',
-      },
+      sourceFormat: 'AVRO',
+      writeDisposition: 'WRITE_TRUNCATE',
     };
 
     // Load data from a Google Cloud Storage file into the table
@@ -65,6 +63,9 @@ function main(
 
     // load() waits for the job to finish
     console.log(`Job ${job.id} completed.`);
+    console.log(
+      `Write disposition used: ${job.configuration.load.writeDisposition}.`
+    );
 
     // Check the job's status for errors
     const errors = job.status.errors;
