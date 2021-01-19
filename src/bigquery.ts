@@ -70,12 +70,12 @@ export type PagedRequest<P> = P & {
 export type QueryRowsResponse = PagedResponse<
   RowMetadata,
   Query,
-  bigquery.ITableDataList
+  bigquery.IGetQueryResultsResponse
 >;
 export type QueryRowsCallback = PagedCallback<
   RowMetadata,
   Query,
-  bigquery.ITableDataList
+  bigquery.IGetQueryResultsResponse
 >;
 
 export type SimpleQueryRowsResponse = [RowMetadata[], bigquery.IJob];
