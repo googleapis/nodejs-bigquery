@@ -29,6 +29,8 @@ fi
 dir="$(cd "$(dirname "$0")"; pwd)"
 . "$dir/.kokoro/release/generate-devsite.sh"
 
+npm i json@9.0.6 -g
+
 # create docs.metadata, based on package.json and .repo-metadata.json.
 pip install -U pip
 python3 -m pip install --user gcp-docuploader
