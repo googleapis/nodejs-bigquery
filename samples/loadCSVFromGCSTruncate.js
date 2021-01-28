@@ -58,7 +58,6 @@ function main(datasetId = 'my_dataset', tableId = 'my_table') {
       },
       // Set the write disposition to overwrite existing table data.
       writeDisposition: 'WRITE_TRUNCATE',
-      location: 'US',
     };
 
     // Load data from a Google Cloud Storage file into the table
@@ -68,6 +67,9 @@ function main(datasetId = 'my_dataset', tableId = 'my_table') {
       .load(storage.bucket(bucketName).file(filename), metadata);
     // load() waits for the job to finish
     console.log(`Job ${job.id} completed.`);
+    console.log(
+      `Write disposition used: ${job.configuration.load.writeDisposition}.`
+    );
 
     // Check the job's status for errors
     const errors = job.status.errors;
