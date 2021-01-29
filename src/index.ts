@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 export {
   BigQuery,
   BigQueryDate,
@@ -38,15 +39,18 @@ export {
   IntegerTypeCastValue,
   JobRequest,
   Json,
+  PROTOCOL_REGEX,
   PagedCallback,
   PagedRequest,
   PagedResponse,
-  PROTOCOL_REGEX,
+  ProvidedTypeArray,
+  ProvidedTypeStruct,
   Query,
   QueryOptions,
   QueryParameter,
   QueryRowsCallback,
   QueryRowsResponse,
+  QueryStreamOptions,
   RequestCallback,
   ResourceCallback,
   SimpleQueryRowsCallback,
@@ -85,21 +89,29 @@ export {
 } from './job';
 
 export {
-  CopyTableMetadata,
-  CreateCopyJobMetadata,
   CreateExtractJobOptions,
   File,
-  FormattedMetadata,
-  GetPolicyOptions,
-  GetRowsOptions,
-  InsertRowsCallback,
-  InsertRowsOptions,
-  InsertRowsResponse,
   JobCallback,
-  JobLoadMetadata,
   JobMetadataCallback,
   JobMetadataResponse,
   JobResponse,
+  Model,
+} from './model';
+
+export {Routine} from './routine';
+
+export {
+  CopyTableMetadata,
+  CreateCopyJobMetadata,
+  FormattedMetadata,
+  GetPolicyOptions,
+  GetRowsOptions,
+  InsertRow,
+  InsertRowsCallback,
+  InsertRowsOptions,
+  InsertRowsResponse,
+  JobLoadMetadata,
+  PartialInsertFailure,
   PermissionsCallback,
   PermissionsResponse,
   Policy,
@@ -121,6 +133,3 @@ export {
   TableSchema,
   ViewDefinition,
 } from './table';
-
-export {Routine} from './routine';
-export {Model} from './model';
