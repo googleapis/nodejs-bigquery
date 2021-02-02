@@ -4,6 +4,13 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+### [5.5.1](https://www.github.com/googleapis/nodejs-bigquery/compare/v5.5.0...v5.5.1) (2021-02-02)
+
+
+### Bug Fixes
+
+* update returned Job with API-determined location in getMetadata ([#900](https://www.github.com/googleapis/nodejs-bigquery/issues/900)) ([8c31358](https://www.github.com/googleapis/nodejs-bigquery/commit/8c313582595ba7819f1cebf01625b24814c38174))
+
 ## [5.5.0](https://www.github.com/googleapis/nodejs-bigquery/compare/v5.4.0...v5.5.0) (2020-11-10)
 
 
