@@ -45,6 +45,7 @@ import {Duplex, Writable} from 'stream';
 import {JobMetadata} from './job';
 import bigquery from './types';
 import {IntegerTypeCastOptions} from './bigquery';
+import {InsertQueue} from './insertQueue';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const duplexify = require('duplexify');
@@ -2060,6 +2061,52 @@ class Table extends common.ServiceObject {
     }
 
     return resp;
+  }
+
+  createInsertStream_(options?: InsertRowsOptions | any): Writable {
+    options = typeof options === 'object' ? options : undefined;
+
+    const json = extend(true, {}, options);
+
+    // Implementing with duplexify, but not working without data event.
+    // With data event, I get this extra buffer on the end.
+    // No clue why.
+    /*
+      const fileWriteStream = duplexify.obj();
+      const insertQueue = new Queue(this, fileWriteStream, options);
+      const stream = streamEvents(fileWriteStream) as Duplex;
+
+      stream.on('writing', (chunk:any, encoding:any, cb:any) => {
+        // insertQueue.add(chunk, (err: any, resp:any)=>{})
+        console.log(chunk);
+        console.log('stream.on writing!')
+        cb()
+      })
+
+      stream.on('data', () =>{
+      })
+
+      fileWriteStream.on('response', stream.emit.bind(stream, 'response'));
+
+      return stream as Writable;
+    */
+
+    const dup = new Duplex({objectMode: true});
+
+    // dup.on('response', (obj: any) => {
+    //   dup.emit.bind(dup, 'response', obj)
+    //   console.log('fileStream reponse')
+    // });
+    const insertQueue = new InsertQueue(this, dup, options);
+    dup._write = (chunk: any, encoding: any, cb: any) => {
+      insertQueue.add(chunk, (err: any, resp: any) => {
+        console.log(err, resp);
+      });
+      cb();
+    };
+
+    dup._read = function(chunk: any) {};
+    return dup as Writable;
   }
 
   load(
