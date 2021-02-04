@@ -9,5 +9,6 @@
   "repo": "googleapis/nodejs-bigquery",
   "distribution_name": "@google-cloud/bigquery",
   "api_id": "bigquery.googleapis.com",
-  "requires_billing": false
+  "requires_billing": false,
+  "codeowner_team": "@googleapis/api-bigquery"
 }

@@ -519,6 +519,10 @@ export class BigQuery extends common.Service {
           value = new Big(value);
           break;
         }
+        case 'BIGNUMERIC': {
+          value = new Big(value);
+          break;
+        }
         case 'RECORD': {
           value = BigQuery.mergeSchemaWithRows_(
             schemaField,
@@ -912,6 +916,7 @@ export class BigQuery extends common.Service {
       'TIMESTAMP',
       'BYTES',
       'NUMERIC',
+      'BIGNUMERIC',
       'BOOL',
       'INT64',
       'FLOAT64',
@@ -981,7 +986,11 @@ export class BigQuery extends common.Service {
     } else if (value instanceof Buffer) {
       typeName = 'BYTES';
     } else if (value instanceof Big) {
-      typeName = 'NUMERIC';
+      if (value.c.length - value.e >= 10) {
+        typeName = 'BIGNUMERIC';
+      } else {
+        typeName = 'NUMERIC';
+      }
     } else if (value instanceof BigQueryInt) {
       typeName = 'INT64';
     } else if (value instanceof Geography) {
