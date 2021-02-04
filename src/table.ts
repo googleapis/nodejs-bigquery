@@ -2063,8 +2063,48 @@ class Table extends common.ServiceObject {
     return resp;
   }
 
+  createInsertStream(options?: InsertRowsOptions): Writable {
+    const stream = this.createInsertStream_(options);
+    // stream.on('prefinish', () => {
+    //   stream.cork();
+    // });
+    // stream.on('job', (job: Job) => {
+    //   job
+    //     .on('error', err => {
+    //       stream.destroy(err);
+    //     })
+    //     .on('complete', () => {
+    //       stream.emit('complete', job);
+    //       stream.uncork();
+    //     });
+    // });
+    return stream;
+  }
+
   createInsertStream_(options?: InsertRowsOptions): Writable {
     options = typeof options === 'object' ? options : undefined;
+
+    // Implementing with duplexify, but not working without data event.
+    // With data event, I get an extra buffer on the end of the stream.
+    // No clue why.
+    /*
+      const fileWriteStream = duplexify.obj();
+      const insertQueue = new Queue(this, fileWriteStream, options);
+      const stream = streamEvents(fileWriteStream) as Duplex;
+
+      stream.on('writing', (chunk:any, encoding:any, cb:any) => {
+        console.log(chunk);
+        // insertQueue.add(chunk, (err: any, resp:any)=>{})
+        cb()
+      })
+
+      stream.on('data', () =>{
+      })
+
+      fileWriteStream.on('response', stream.emit.bind(stream, 'response'));
+
+      return stream as Writable;
+    */
 
     const dup = new Duplex({objectMode: true});
 
