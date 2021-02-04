@@ -1466,7 +1466,6 @@ describe('BigQuery', () => {
         const value = null;
         const type = 'TYPE';
 
-        sandbox.stub(BigQuery, '_isCustomType').returns(false);
         assert.strictEqual(BigQuery._getValue(value, type), value);
       });
     });
