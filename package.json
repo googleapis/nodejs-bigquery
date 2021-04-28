@@ -53,7 +53,7 @@
     "@google-cloud/common": "^3.1.0",
     "@google-cloud/paginator": "^3.0.0",
     "@google-cloud/promisify": "^2.0.0",
-    "arrify": "^2.0.1",
+    "arrify": "^3.0.0",
     "big.js": "^6.0.0",
     "duplexify": "^4.0.0",
     "extend": "^3.0.2",
