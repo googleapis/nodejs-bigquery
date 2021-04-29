@@ -27,7 +27,6 @@ import {describe, it, afterEach, beforeEach, before, after} from 'mocha';
 import Big from 'big.js';
 import {EventEmitter} from 'events';
 import * as extend from 'extend';
-import * as pReflect from 'p-reflect';
 import * as proxyquire from 'proxyquire';
 import * as sinon from 'sinon';
 import * as stream from 'stream';
@@ -37,7 +36,6 @@ import {BigQuery, Query} from '../src/bigquery';
 import {Job, JobOptions} from '../src/job';
 import {
   CopyTableMetadata,
-  InsertRowsResponse,
   JobLoadMetadata,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   Table,
@@ -74,6 +72,23 @@ const fakePfy = Object.assign({}, pfy, {
     pfy.promisifyAll(c);
   },
 });
+
+async function pReflect<T>(promise: Promise<T>) {
+  try {
+    const value = await promise;
+    return {
+      isFulfilled: true,
+      isRejected: false,
+      value,
+    };
+  } catch (error) {
+    return {
+      isFulfilled: false,
+      isRejected: true,
+      reason: error,
+    };
+  }
+}
 
 let extended = false;
 const fakePaginator = {
@@ -149,11 +164,7 @@ describe('BigQuery/Table', () => {
     table = new Table(DATASET, TABLE_ID);
     table.bigQuery.request = util.noop;
     table.bigQuery.createJob = util.noop;
-    sandbox
-      .stub(BigQuery, 'mergeSchemaWithRows_')
-      .callsFake((schema, rows, wrapIntegers) => {
-        return rows;
-      });
+    sandbox.stub(BigQuery, 'mergeSchemaWithRows_').returnsArg(1);
   });
 
   afterEach(() => sandbox.restore());
@@ -2232,9 +2243,7 @@ describe('BigQuery/Table', () => {
      * @param fn
      * @returns {Promise<pReflect.PromiseResult<any>>}
      */
-    async function reflectAfterTimer<FnReturn>(
-      fn: () => Promise<FnReturn>
-    ): Promise<pReflect.PromiseResult<FnReturn>> {
+    async function reflectAfterTimer<FnReturn>(fn: () => Promise<FnReturn>) {
       // When `fn` rejects/throws, we need to capture this and test
       // for it as needed. Using reflection avoids try/catch's potential for
       // false-positives.
@@ -2242,10 +2251,7 @@ describe('BigQuery/Table', () => {
       // internal timer (delay) has been completed.
 
       const fnPromise: Promise<FnReturn> = fn();
-      const reflectedPromise: Promise<pReflect.PromiseResult<
-        FnReturn
-      >> = pReflect(fnPromise);
-
+      const reflectedPromise = pReflect(fnPromise);
       await clock.runAllAsync();
       return reflectedPromise;
     }
@@ -2331,7 +2337,7 @@ describe('BigQuery/Table', () => {
 
       const reflection = await reflectAfterTimer(() => table.insert(data));
       assert(reflection.isRejected);
-      const {reason} = reflection as pReflect.PromiseRejectedResult;
+      const {reason} = reflection;
       assert.deepStrictEqual((reason as GoogleErrorBody).errors, [
         {
           row: dataApiFormat.rows[0].json,
@@ -2491,11 +2497,7 @@ describe('BigQuery/Table', () => {
         'fourth call: previous failures were 2/5'
       );
       assert(!requestStub.getCall(4), 'fifth call: should not have happened');
-
-      const {value} = reflection as pReflect.PromiseFulfilledResult<
-        InsertRowsResponse
-      >;
-      assert(value);
+      assert.ok(reflection.value);
     });
 
     it('should insert raw data', async () => {
@@ -2603,9 +2605,7 @@ describe('BigQuery/Table', () => {
           table.insert(data, OPTIONS)
         );
         assert(reflection.isRejected);
-
-        const {reason} = reflection as pReflect.PromiseRejectedResult;
-        assert.strictEqual(reason, error);
+        assert.strictEqual(reflection.reason, error);
       });
 
       it('should ignore 409 errors', async () => {
@@ -2641,11 +2641,7 @@ describe('BigQuery/Table', () => {
             json: dataApiFormat,
           })
         );
-
-        const {value} = reflection as pReflect.PromiseFulfilledResult<
-          InsertRowsResponse
-        >;
-        assert.deepStrictEqual(value, goodResponse);
+        assert.deepStrictEqual(reflection.value, goodResponse);
       });
     });
   });
