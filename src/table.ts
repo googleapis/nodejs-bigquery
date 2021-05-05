@@ -1904,14 +1904,17 @@ class Table extends common.ServiceObject {
         ? optionsOrCallback
         : ({} as InsertRowsOptions);
     const callback =
-      typeof optionsOrCallback === 'function'
-        ? optionsOrCallback
-        : (cb as InsertRowsCallback);
+      typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
 
-    this._insertAndCreateTable(rows, options).then(
-      resp => callback(null, resp),
-      err => callback(err, null)
-    );
+    const promise = this._insertAndCreateTable(rows, options);
+    if (callback) {
+      promise.then(
+        resp => callback(null, resp),
+        err => callback(err, null)
+      );
+    } else {
+      return promise.then(r => [r]);
+    }
   }
 
   /**

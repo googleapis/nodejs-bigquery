@@ -2274,6 +2274,16 @@ describe('BigQuery/Table', () => {
       );
     });
 
+    it('should return a promise if no callback is provided', () => {
+      const promise = table.insert(data);
+      assert(promise instanceof Promise);
+    });
+
+    it('should resolve to an array on success', async () => {
+      const resp = await table.insert(data);
+      assert(Array.isArray(resp));
+    });
+
     it('should generate insertId', async () => {
       await table.insert([data[0]]);
       assert(
