@@ -4,6 +4,14 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+### [5.6.1](https://www.github.com/googleapis/nodejs-bigquery/compare/v5.6.0...v5.6.1) (2021-05-17)
+
+
+### Bug Fixes
+
+* **deps:** update dependency yargs to v17 ([#954](https://www.github.com/googleapis/nodejs-bigquery/issues/954)) ([28cf08d](https://www.github.com/googleapis/nodejs-bigquery/commit/28cf08d74184b388cd8d18a9622630939c5f99cf))
+* promise never returned on table.insert ([#953](https://www.github.com/googleapis/nodejs-bigquery/issues/953)) ([a138347](https://www.github.com/googleapis/nodejs-bigquery/commit/a138347855f74d4e5c889dc42b00992c4a3808a6))
+
 ## [5.6.0](https://www.github.com/googleapis/nodejs-bigquery/compare/v5.5.0...v5.6.0) (2021-04-28)
 
 
