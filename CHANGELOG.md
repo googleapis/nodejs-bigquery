@@ -4,6 +4,19 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## [5.6.0](https://www.github.com/googleapis/nodejs-bigquery/compare/v5.5.0...v5.6.0) (2021-04-28)
+
+
+### Features
+
+* Adds support for BIGNUMERIC type ([#904](https://www.github.com/googleapis/nodejs-bigquery/issues/904)) ([ef5552a](https://www.github.com/googleapis/nodejs-bigquery/commit/ef5552a5230240650fadd5bca8405a69b561a712))
+
+
+### Bug Fixes
+
+* **deps:** update dependency google-auth-library to v7 ([#928](https://www.github.com/googleapis/nodejs-bigquery/issues/928)) ([2ce28c7](https://www.github.com/googleapis/nodejs-bigquery/commit/2ce28c7beec18d80a744e5dafaa0b8288041c35f))
+* update returned Job with API-determined location in getMetadata ([#900](https://www.github.com/googleapis/nodejs-bigquery/issues/900)) ([8c31358](https://www.github.com/googleapis/nodejs-bigquery/commit/8c313582595ba7819f1cebf01625b24814c38174))
+
 ## [5.5.0](https://www.github.com/googleapis/nodejs-bigquery/compare/v5.4.0...v5.5.0) (2020-11-10)
 
 
