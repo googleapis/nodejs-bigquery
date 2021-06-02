@@ -44,7 +44,7 @@ function main(
     // Retrieve existing view metadata
     const [metadata] = await view.getMetadata();
 
-    // Uodate view query
+    // Update view query
     metadata.view = newViewQuery;
 
     // Set metadata
