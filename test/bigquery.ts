@@ -1470,6 +1470,13 @@ describe('BigQuery', () => {
           geography.value
         );
       });
+
+      it('should handle null values', () => {
+        const value = null;
+        const type = 'TYPE';
+
+        assert.strictEqual(BigQuery._getValue(value, type), value);
+      });
     });
 
     describe('_isCustomType', () => {
