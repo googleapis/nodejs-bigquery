@@ -1113,7 +1113,10 @@ export class BigQuery extends common.Service {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private static _getValue(value: any, type: ValueType): any {
-    if (value.type!) type = value;
+    if (value === null) {
+      return null;
+    }
+    if (value.type) type = value;
     return BigQuery._isCustomType(type) ? value.value : value;
   }
 
