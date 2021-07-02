@@ -971,7 +971,7 @@ class Table extends common.ServiceObject {
    *
    * @param {string|File} destination Where the file should be exported
    *     to. A string or a {@link
-   * https://cloud.google.com/nodejs/docs/reference/storage/latest/File File}
+   * https://googleapis.dev/nodejs/storage/latest/File.html File}
    * object.
    * @param {object=} options - The configuration object.
    * @param {string} options.format - The format to export the data in. Allowed
@@ -1007,7 +1007,7 @@ class Table extends common.ServiceObject {
    *
    * //-
    * // To use the default options, just pass a {@link
-   * https://cloud.google.com/nodejs/docs/reference/storage/latest/File File}
+   * https://googleapis.dev/nodejs/storage/latest/File.html File}
    * object.
    * //
    * // Note: The exported format type will be inferred by the file's extension.
@@ -1131,7 +1131,7 @@ class Table extends common.ServiceObject {
   createLoadJob(source: string | File, callback: JobCallback): void;
   /**
    * Load data from a local file or Storage {@link
-   * https://cloud.google.com/nodejs/docs/reference/storage/latest/File File}.
+   * https://googleapis.dev/nodejs/storage/latest/File.html File}.
    *
    * By loading data this way, you create a load job that will run your data
    * load asynchronously. If you would like instantaneous access to your data,
@@ -1144,7 +1144,7 @@ class Table extends common.ServiceObject {
    *
    * @param {string|File|File[]} source The source file to load. A string (path)
    * to a local file, or one or more {@link
-   * https://cloud.google.com/nodejs/docs/reference/storage/latest/File File}
+   * https://googleapis.dev/nodejs/storage/latest/File.html File}
    * objects.
    * @param {object} [metadata] Metadata to set with the load operation. The
    *     metadata object should be in the format of the
@@ -1536,7 +1536,7 @@ class Table extends common.ServiceObject {
    *
    * @param {string|File} destination Where the file should be exported
    *     to. A string or a {@link
-   * https://cloud.google.com/nodejs/docs/reference/storage/latest/File File}.
+   * https://googleapis.dev/nodejs/storage/latest/File.html File}.
    * @param {object} [options] The configuration object.
    * @param {string} [options.format="CSV"] The format to export the data in.
    *     Allowed options are "AVRO", "CSV", "JSON", "ORC" or "PARQUET".
@@ -1566,7 +1566,7 @@ class Table extends common.ServiceObject {
    *
    * //-
    * // To use the default options, just pass a {@link
-   * https://cloud.google.com/nodejs/docs/reference/storage/latest/File File}
+   * https://googleapis.dev/nodejs/storage/latest/File.html File}
    * object.
    * //
    * // Note: The exported format type will be inferred by the file's extension.
@@ -2077,7 +2077,7 @@ class Table extends common.ServiceObject {
   load(source: string | File, callback: JobMetadataCallback): void;
   /**
    * Load data from a local file or Storage {@link
-   * https://cloud.google.com/nodejs/docs/reference/storage/latest/File File}.
+   * https://googleapis.dev/nodejs/storage/latest/File.html File}.
    *
    * By loading data this way, you create a load job that will run your data
    * load asynchronously. If you would like instantaneous access to your data,
@@ -2088,7 +2088,7 @@ class Table extends common.ServiceObject {
    *
    * @param {string|File} source The source file to load. A filepath as a string
    *     or a {@link
-   * https://cloud.google.com/nodejs/docs/reference/storage/latest/File File}
+   * https://googleapis.dev/nodejs/storage/latest/File.html File}
    * object.
    * @param {object} [metadata] Metadata to set with the load operation. The
    *     metadata object should be in the format of the
