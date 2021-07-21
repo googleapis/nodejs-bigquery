@@ -4,6 +4,21 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## [5.7.0](https://www.github.com/googleapis/nodejs-bigquery/compare/v5.6.0...v5.7.0) (2021-07-21)
+
+
+### Features
+
+* add `gcf-owl-bot[bot]` to `ignoreAuthors` ([#958](https://www.github.com/googleapis/nodejs-bigquery/issues/958)) ([9eab78d](https://www.github.com/googleapis/nodejs-bigquery/commit/9eab78de56d087f3dc756ab2c0974737a80ad43f))
+
+
+### Bug Fixes
+
+* **deps:** update dependency yargs to v17 ([#954](https://www.github.com/googleapis/nodejs-bigquery/issues/954)) ([28cf08d](https://www.github.com/googleapis/nodejs-bigquery/commit/28cf08d74184b388cd8d18a9622630939c5f99cf))
+* extend definition of Query.types for simple named parameters ([#906](https://www.github.com/googleapis/nodejs-bigquery/issues/906)) ([#907](https://www.github.com/googleapis/nodejs-bigquery/issues/907)) ([44e1ac7](https://www.github.com/googleapis/nodejs-bigquery/commit/44e1ac7cf8604d79508316d70a3a98e2953d59f0))
+* handle null query parameter value ([#920](https://www.github.com/googleapis/nodejs-bigquery/issues/920)) ([3bf900a](https://www.github.com/googleapis/nodejs-bigquery/commit/3bf900a54a92c0422fa8f3c48480dc430a7d134d))
+* promise never returned on table.insert ([#953](https://www.github.com/googleapis/nodejs-bigquery/issues/953)) ([a138347](https://www.github.com/googleapis/nodejs-bigquery/commit/a138347855f74d4e5c889dc42b00992c4a3808a6))
+
 ## [5.6.0](https://www.github.com/googleapis/nodejs-bigquery/compare/v5.5.0...v5.6.0) (2021-04-28)
 
 
