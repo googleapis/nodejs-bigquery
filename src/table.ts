@@ -45,6 +45,7 @@ import {Duplex, Writable} from 'stream';
 import {JobMetadata} from './job';
 import bigquery from './types';
 import {IntegerTypeCastOptions} from './bigquery';
+import {InsertQueue} from './insertQueue';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const duplexify = require('duplexify');
@@ -2063,6 +2064,23 @@ class Table extends common.ServiceObject {
     }
 
     return resp;
+  }
+
+  createInsertStream_(options?: InsertRowsOptions): Writable {
+    options = typeof options === 'object' ? options : undefined;
+
+    const dup = new Duplex({objectMode: true});
+
+    const insertQueue = new InsertQueue(this, dup, options);
+    dup._write = (chunk: any, encoding: any, cb: any) => {
+      insertQueue.add(chunk, (err: any, resp: any) => {
+        console.log(err, resp);
+      });
+      cb();
+    };
+
+    dup._read = function(chunk: any) {};
+    return dup as Writable;
   }
 
   load(
