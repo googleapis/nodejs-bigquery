@@ -589,7 +589,9 @@ describe('BigQuery', () => {
           assert.strictEqual(job.location, LOCATION);
           await job.promise();
           const options = {timeoutMs: 1};
-          await job.getQueryResults(options);
+          await job.getQueryResults(options, (err, resp) => {
+            assert.ifError(err);
+          });
         });
       });
 
