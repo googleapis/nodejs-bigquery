@@ -16,21 +16,38 @@ import * as assert from 'assert';
 import {describe, it} from 'mocha';
 import * as cp from 'child_process';
 import * as fs from 'fs';
+import * as rimraf from 'rimraf';
 
 const execSync = (cmd: string) => cp.execSync(cmd, {encoding: 'utf-8'});
 const fixtures = './system-test/fixtures/kitchen/src';
+const buildDir = `${fixtures}/build`;
 
 describe('exportTypes', () => {
+  after('erase build', async () => {
+    rimraf(buildDir, error => {
+      console.log('Error: ', error);
+    });
+  });
+
   it('exportTypes.js works', () => {
+    if (!fs.existsSync(buildDir)) {
+      rimraf.sync(buildDir);
+    }
+    fs.mkdirSync(buildDir);
+    fs.copyFileSync(
+      `${fixtures}/exportTypes-index.ts`,
+      `${buildDir}/exportTypes-index.ts`
+    );
+
     execSync(
-      `node ./scripts/exportTypes.js ${fixtures} ${fixtures}/exportTypes-index.ts`
+      `node ./scripts/exportTypes.js ${fixtures} ${buildDir}/exportTypes-index.ts`
     );
     const expected = fs
       .readFileSync(`${fixtures}/exportTypes-expected.ts`)
       .toString()
       .replace(/\s/g, '');
     const actual = fs
-      .readFileSync(`${fixtures}/exportTypes-index.ts`)
+      .readFileSync(`${buildDir}/exportTypes-index.ts`)
       .toString()
       .replace(/\s/g, '');
     assert.strictEqual(actual, expected);

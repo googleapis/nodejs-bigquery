@@ -71,15 +71,13 @@ async function main(args) {
         }
       }
       if (unique.size > 0) {
-        statements = '';
-        unique.forEach(value => {
-          statements += `${value},\n`;
-        });
+        statements = Array.from(unique).join(',\n');
+        // statements = statements.join(',\n');
         // Build export statement.
         const template = `export {\n${statements}\n} from './${fileName.replace(
           '.ts',
           ''
-        )}'`;
+        )}';`;
         newText += `\n\n${template}`;
       }
     }
