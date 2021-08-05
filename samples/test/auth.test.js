@@ -33,7 +33,7 @@ describe('authUserFlow()', () => {
     generateUrlStub = sinon.stub().returns('https://example.com');
     tokenStub = sinon.stub().returns({tokens: 'tokens'});
 
-    authUserFlow = proxyquire('../authUserFlow.js', {
+    authUserFlow = proxyquire('../auth-user-sample/authUserFlow.js', {
       'google-auth-library': {
         OAuth2Client: sinon.stub().callsFake(() => {
           return {
