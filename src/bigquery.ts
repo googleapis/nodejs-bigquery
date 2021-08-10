@@ -1895,7 +1895,7 @@ export class BigQuery extends common.Service {
    * @param {?error} callback.err An error returned while making this request
    * @param {array} callback.rows The list of results from your query.
    * @returns {Promise}
-   * 
+   *
    * @example
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();

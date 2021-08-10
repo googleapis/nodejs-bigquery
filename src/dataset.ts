@@ -1138,7 +1138,6 @@ class Dataset extends ServiceObject {
     return new Model(this, id);
   }
 
-
   query(options: Query): Promise<QueryRowsResponse>;
   query(options: Query, callback: SimpleQueryRowsCallback): void;
   /**
