@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@google-cloud/bigquery": "^5.7.0",
+    "@google-cloud/datacatalog": "^2.4.0",
     "@google-cloud/storage": "^5.0.0",
     "google-auth-library": "^7.0.0",
     "readline-promise": "^1.0.4",

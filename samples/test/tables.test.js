@@ -52,7 +52,7 @@ const partialDataFilePath = path.join(
 );
 const bigquery = new BigQuery();
 
-describe('Tables', () => {
+describe.only('Tables', () => {
   before(async () => {
     const [bucket] = await storage.createBucket(bucketName);
     await Promise.all([
@@ -139,6 +139,46 @@ describe('Tables', () => {
     const [exists] = await bigquery
       .dataset(datasetId)
       .table(rangePartTableId)
+      .exists();
+    assert.ok(exists);
+  });
+
+  it('should create a clustered table', async () => {
+    const clusteredTableId = generateUuid();
+    const output = execSync(
+      `node createTableClustered.js ${datasetId} ${clusteredTableId}`
+    );
+    assert.include(
+      output,
+      `Table ${clusteredTableId} created with clustering:`
+    );
+    assert.include(
+      output,
+      "{ fields: [ 'city', 'zipcode' ] }"
+    );
+    const [exists] = await bigquery
+      .dataset(datasetId)
+      .table(clusteredTableId)
+      .exists();
+    assert.ok(exists);
+  });
+
+  it.only('should update table clustering', async () => {
+    const clusteredTableId = generateUuid();
+    const output = execSync(
+      `node tableClusteredMutable.js ${datasetId} ${clusteredTableId}`
+    );
+    assert.include(
+      output,
+      `Table ${clusteredTableId} created with clustering.`
+    );
+    assert.include(
+      output,
+      `Table ${clusteredTableId} updated clustering:`
+    );
+    const [exists] = await bigquery
+      .dataset(datasetId)
+      .table(clusteredTableId)
       .exists();
     assert.ok(exists);
   });
