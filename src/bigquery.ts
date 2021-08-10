@@ -1715,7 +1715,7 @@ export class BigQuery extends common.Service {
   /**
    * @callback GetJobsCallback
    * @param {?Error} err Request error, if any.
-   * @param {object} jobs An array of [Job]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs] objects.
+   * @param {object} jobs An array of [Job]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs} objects.
    */
   /**
    * @typedef {array} GetJobsResponse
