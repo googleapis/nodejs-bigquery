@@ -28,38 +28,9 @@ function main(
   // Import the Google Cloud client library and create a client
   const {BigQuery} = require('@google-cloud/bigquery');
   const bigquery = new BigQuery();
-  const {PolicyTagManagerClient, DataCatalogClient} = require('@google-cloud/datacatalog').v1;
-  const policyClient = new PolicyTagManagerClient();
-  const dataCatClient = new DataCatalogClient();
 
   async function createTable() {
-    const projectId = await policyClient.getProjectId()
-    const location = 'us';
-    const parent = dataCatClient.locationPath(projectId, location)
-    // const parent = 'projects/sbexperimental/locations/us/taxonomies/7713239888537306761';
-    const req = {
-      parent: parent,
-      policyTag: {
-        displayName: 'nodejsSampleTest2',
-      }
-    }
-    const taxReq = {
-      parent,
-      taxonomy: {
-        displayName: 'nodejsSampleTest1',
-        activatedPolicyTypes: ['FINE_GRAINED_ACCESS_CONTROL']
-      }
-    }
-    try {
-      const resp = await policyClient.createTaxonomy(taxReq)
-    //   // const resp = await policyClient.createPolicyTag(req)
-      console.log(resp)
-    //   console.log(parent)
-    } catch(e) {
-      console.error(e);
-    }
-
-    // Creates a new table named "my_table" in "my_dataset".
+    // Creates a new table named "my_table" in "my_dataset" with column .
 
     /**
      * TODO(developer): Uncomment the following lines before running the sample.
@@ -75,15 +46,15 @@ function main(
     };
 
     // Create a new table in the dataset
-    // const [table] = await bigquery
-    //   .dataset(datasetId)
-    //   .createTable(tableId, options);
+    const [table] = await bigquery
+      .dataset(datasetId)
+      .createTable(tableId, options);
 
-    // // console.log(table.metadata.schema.fields[0]);
-    // const resp = await policyClient.deletePolicyTag({name: 'projects/sbexperimental/locations/us/taxonomies/7713239888537306761/policyTags/2909610878197260299'})
-    // const resp = await policyClient.deleteTaxonomy({name: 'projects/sbexperimental/locations/us/taxonomies/7713239888537306761'})
+    // console.log(table.metadata.schema.fields[0]);
+    const resp = await policyClient.deletePolicyTag({name: 'projects/sbexperimental/locations/us/taxonomies/7713239888537306761/policyTags/2909610878197260299'})
+    const resp = await policyClient.deleteTaxonomy({name: 'projects/sbexperimental/locations/us/taxonomies/7713239888537306761'})
     
-    // console.log(resp)
+    console.log(resp)
   }
   // [END bigquery_create_table]
   createTable();
