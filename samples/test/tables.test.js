@@ -197,7 +197,7 @@ describe('Tables', () => {
   it('should update table clustering', async () => {
     const clusteredTableId = generateUuid();
     const output = execSync(
-      `node tableClusteredMutable.js ${datasetId} ${clusteredTableId}`
+      `node removeTableClustering.js ${datasetId} ${clusteredTableId}`
     );
     assert.include(
       output,
