@@ -19,13 +19,13 @@ function main(
   tableId = 'my_table', // Table to be created
   policyTagName = 'projects/myProject/location/us/taxonomies/myTaxonomy/policyTags/myPolicyTag' // Existing policy tag
 ) {
-  // [START bigquery_create_table_column_ACL]
+  // [START bigquery_update_table_column_ACL]
   // Import the Google Cloud client library and create a client
   const {BigQuery} = require('@google-cloud/bigquery');
   const bigquery = new BigQuery();
 
-  async function createTableColumnACL() {
-    // Creates a new table named "my_table" in "my_dataset" with column-level security.
+  async function updateTableColumnACL() {
+    // Updates a new table named "my_table" in "my_dataset" with column-level security.
 
     /**
      * TODO(developer): Uncomment the following lines before running the sample.
@@ -35,31 +35,28 @@ function main(
     // const policyTagName = 'projects/myProject/location/us/taxonomies/myTaxonomy/policyTags/myPolicyTag';
 
     const schema = [
-      {
-        name: 'Name',
-        type: 'STRING',
-        mode: 'REQUIRED',
-        policyTags: {names: [policyTagName]},
-      },
-      {name: 'Age', type: 'INTEGER'},
+      {name: 'Name', type: 'STRING', mode: 'REQUIRED'},
+      {name: 'Age', type: 'INTEGER', policyTags: {names: [policyTagName]}},
       {name: 'Weight', type: 'FLOAT'},
     ];
 
-    // // For all options, see https://cloud.google.com/bigquery/docs/reference/v2/tables#resource
-    const options = {
-      schema: schema,
-      // location: 'US',
-    };
-
-    // Create a new table in the dataset
+    // Get the existing table.
     const [table] = await bigquery
       .dataset(datasetId)
-      .createTable(tableId, options);
+      .table(tableId)
+      .get();
 
-    console.log(`Created table ${tableId} with schema:`);
-    console.log(table.metadata.schema.fields[0]);
+    // Retreive the table metadata.
+    const [metadata] = await table.getMetadata();
+
+    // Update the table metadata with new schema.
+    metadata.schema.fields = schema;
+    const [apiResponse] = await table.setMetadata(metadata);
+
+    console.log(`Updated table ${tableId} with schema:`);
+    console.log(apiResponse.schema.fields[1]);
   }
-  // [END bigquery_create_table_column_ACL]
-  createTableColumnACL();
+  // [END bigquery_update_table_column_ACL]
+  updateTableColumnACL();
 }
 main(...process.argv.slice(2));

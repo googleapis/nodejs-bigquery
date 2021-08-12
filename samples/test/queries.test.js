@@ -138,6 +138,15 @@ describe('Queries', () => {
     assert.match(output, /word/);
   });
 
+  it('should run a query with a clustered destination table', async () => {
+    const clusteredTableId = generateUuid();
+    const output = execSync(
+      `node queryClusteredTable.js ${datasetId} ${clusteredTableId}`
+    );
+    assert.match(output, /started/);
+    assert.match(output, /Status/);
+  });
+
   it('should run a query with legacy SQL and large results', async () => {
     const destTableId = generateUuid();
     const output = execSync(

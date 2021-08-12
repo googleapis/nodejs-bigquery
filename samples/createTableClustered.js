@@ -34,7 +34,7 @@ function main(datasetId = 'my_dataset', tableId = 'my_table') {
     const options = {
       schema: schema,
       clustering: {
-        fields: ['city', 'zipcode']
+        fields: ['city', 'zipcode'],
       },
     };
 

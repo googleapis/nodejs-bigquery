@@ -20,7 +20,7 @@ function main(datasetId = 'my_dataset', tableId = 'my_table') {
   const {BigQuery} = require('@google-cloud/bigquery');
   const bigquery = new BigQuery();
 
-  async function createTableClustered() {
+  async function removeTableClustering() {
     // Removes clustering from a new clustered table named "my_table" in "my_dataset".
 
     /**
@@ -34,24 +34,24 @@ function main(datasetId = 'my_dataset', tableId = 'my_table') {
     const options = {
       schema: schema,
       clustering: {
-        fields: ['city', 'zipcode']
+        fields: ['city', 'zipcode'],
       },
     };
 
     // Create a new table in the dataset with clustering.
-    let [table] = await bigquery
+    const [table] = await bigquery
       .dataset(datasetId)
       .createTable(tableId, options);
     console.log(`Table ${tableId} created with clustering.`);
 
     // Remove clustering from table.
-    let metadata = table.metadata
+    const metadata = table.metadata;
     metadata.clustering = null;
     const [apiResponse] = await table.setMetadata(metadata);
     console.log(`Table ${tableId} updated clustering:`);
     console.log(apiResponse.clustering);
   }
   // [END bigquery_clustered_table_mutable]
-  createTableClustered(datasetId, tableId);
+  removeTableClustering(datasetId, tableId);
 }
 main(...process.argv.slice(2));
