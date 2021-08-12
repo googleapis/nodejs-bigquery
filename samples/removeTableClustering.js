@@ -15,7 +15,7 @@
 'use strict';
 
 function main(datasetId = 'my_dataset', tableId = 'my_table') {
-  // [START bigquery_clustered_table_mutable]
+  // [START bigquery_remove_table_clustering]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
   const bigquery = new BigQuery();
@@ -51,7 +51,7 @@ function main(datasetId = 'my_dataset', tableId = 'my_table') {
     console.log(`Table ${tableId} updated clustering:`);
     console.log(apiResponse.clustering);
   }
-  // [END bigquery_clustered_table_mutable]
+  // [END bigquery_remove_table_clustering]
   removeTableClustering(datasetId, tableId);
 }
 main(...process.argv.slice(2));
