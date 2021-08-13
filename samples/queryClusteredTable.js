@@ -21,7 +21,7 @@ function main(datasetId = 'my_dataset', tableId = 'my_table') {
   const bigquery = new BigQuery();
 
   async function queryClusteredTable() {
-    // Runs a dry query of the U.S. given names dataset for the state of Texas.
+    // Queries a table that has a clustering specification.
 
     // Create destination table reference
     const dataset = bigquery.dataset(datasetId);

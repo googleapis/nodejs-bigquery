@@ -45,10 +45,9 @@ function main(
       {name: 'Weight', type: 'FLOAT'},
     ];
 
-    // // For all options, see https://cloud.google.com/bigquery/docs/reference/v2/tables#resource
+    // For all options, see https://cloud.google.com/bigquery/docs/reference/v2/tables#resource
     const options = {
       schema: schema,
-      // location: 'US',
     };
 
     // Create a new table in the dataset

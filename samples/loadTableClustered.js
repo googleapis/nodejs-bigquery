@@ -26,7 +26,7 @@ function main(datasetId = 'my_dataset', tableId = 'my_table') {
 
   /**
    * This sample loads the CSV file at
-   * https://storage.googleapis.com/cloud-samples-data/bigquery/us-states/us-states.csv
+   * https://storage.googleapis.com/cloud-samples-data/sample-transactions/transactions.csv
    *
    * TODO(developer): Replace the following lines with the path to your file.
    */

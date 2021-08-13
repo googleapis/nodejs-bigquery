@@ -25,7 +25,7 @@ function main(
   const bigquery = new BigQuery();
 
   async function updateTableColumnACL() {
-    // Updates a new table named "my_table" in "my_dataset" with column-level security.
+    // Updates an existing table named "my_table" in "my_dataset" with column-level security.
 
     /**
      * TODO(developer): Uncomment the following lines before running the sample.
@@ -51,6 +51,7 @@ function main(
 
     // Update the table metadata with new schema.
     metadata.schema.fields = schema;
+
     const [apiResponse] = await table.setMetadata(metadata);
 
     console.log(`Updated table ${tableId} with schema:`);
