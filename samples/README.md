@@ -27,6 +27,8 @@
   * [Create Routine](#create-routine)
   * [Create Routine DDL](#create-routine-ddl)
   * [Create Table](#create-table)
+  * [Create Table Clustered](#create-table-clustered)
+  * [Create Table Column ACL](#create-table-column-acl)
   * [Create Table Partitioned](#create-table-partitioned)
   * [Create Table Range Partitioned](#create-table-range-partitioned)
   * [Create View](#create-view)
@@ -68,6 +70,7 @@
   * [Load Local File](#load-local-file)
   * [Load Orc From GCS Truncate](#load-orc-from-gcs-truncate)
   * [Load Parquet From GCS Truncate](#load-parquet-from-gcs-truncate)
+  * [Load Table Clustered](#load-table-clustered)
   * [Load Table GCS Avro](#load-table-gcs-avro)
   * [Load Table GCS Avro Truncate](#load-table-gcs-avro-truncate)
   * [Load Table GCSORC](#load-table-gcsorc)
@@ -76,6 +79,7 @@
   * [Nested Repeated Schema](#nested-repeated-schema)
   * [Query](#query)
   * [Query Batch](#query-batch)
+  * [Query Clustered Table](#query-clustered-table)
   * [Query Destination Table](#query-destination-table)
   * [Query Disable Cache](#query-disable-cache)
   * [Query Dry Run](#query-dry-run)
@@ -95,6 +99,7 @@
   * [Relax Column](#relax-column)
   * [Relax Column Load Append](#relax-column-load-append)
   * [Relax Column Query Append](#relax-column-query-append)
+  * [Remove Table Clustering](#remove-table-clustering)
   * [Set User Agent](#set-user-agent)
   * [Undelete Table](#undelete-table)
   * [Update Dataset Access](#update-dataset-access)
@@ -102,6 +107,7 @@
   * [Update Dataset Expiration](#update-dataset-expiration)
   * [BigQuery Update Model](#bigquery-update-model)
   * [Update Routine](#update-routine)
+  * [Update Table Column ACL](#update-table-column-acl)
   * [Update Table Description](#update-table-description)
   * [Update Table Expiration](#update-table-expiration)
   * [Update View Query](#update-view-query)
@@ -371,6 +377,40 @@ __Usage:__
 
 
 `node samples/createTable.js`
+
+
+-----
+
+
+
+
+### Create Table Clustered
+
+View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/main/samples/createTableClustered.js).
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/createTableClustered.js,samples/README.md)
+
+__Usage:__
+
+
+`node samples/createTableClustered.js`
+
+
+-----
+
+
+
+
+### Create Table Column ACL
+
+View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/main/samples/createTableColumnACL.js).
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/createTableColumnACL.js,samples/README.md)
+
+__Usage:__
+
+
+`node samples/createTableColumnACL.js`
 
 
 -----
@@ -1091,6 +1131,23 @@ __Usage:__
 
 
 
+### Load Table Clustered
+
+View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/main/samples/loadTableClustered.js).
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/loadTableClustered.js,samples/README.md)
+
+__Usage:__
+
+
+`node samples/loadTableClustered.js`
+
+
+-----
+
+
+
+
 ### Load Table GCS Avro
 
 View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/main/samples/loadTableGCSAvro.js).
@@ -1220,6 +1277,23 @@ __Usage:__
 
 
 `node samples/queryBatch.js`
+
+
+-----
+
+
+
+
+### Query Clustered Table
+
+View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/main/samples/queryClusteredTable.js).
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/queryClusteredTable.js,samples/README.md)
+
+__Usage:__
+
+
+`node samples/queryClusteredTable.js`
 
 
 -----
@@ -1550,6 +1624,23 @@ __Usage:__
 
 
 
+### Remove Table Clustering
+
+View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/main/samples/removeTableClustering.js).
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/removeTableClustering.js,samples/README.md)
+
+__Usage:__
+
+
+`node samples/removeTableClustering.js`
+
+
+-----
+
+
+
+
 ### Set User Agent
 
 View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/main/samples/setUserAgent.js).
@@ -1664,6 +1755,23 @@ __Usage:__
 
 
 `node samples/updateRoutine.js`
+
+
+-----
+
+
+
+
+### Update Table Column ACL
+
+View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/main/samples/updateTableColumnACL.js).
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/updateTableColumnACL.js,samples/README.md)
+
+__Usage:__
+
+
+`node samples/updateTableColumnACL.js`
 
 
 -----
