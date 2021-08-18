@@ -372,6 +372,7 @@ describe('BigQuery', () => {
         {name: 'hair_count', type: 'FLOAT'},
         {name: 'teeth_count', type: 'FLOAT64'},
         {name: 'numeric_col', type: 'NUMERIC'},
+        {name: 'bignumeric_col', type: 'BIGNUMERIC'},
       ],
     } as {fields: TableField[]};
 
@@ -428,6 +429,7 @@ describe('BigQuery', () => {
               {v: '5.222330009847'},
               {v: '30.2232138'},
               {v: '3.14'},
+              {v: '9.9876543210123456789'},
               {
                 v: [
                   {
@@ -481,6 +483,7 @@ describe('BigQuery', () => {
             hair_count: 5.222330009847,
             teeth_count: 30.2232138,
             numeric_col: new Big(3.14),
+            bignumeric_col: new Big('9.9876543210123456789'),
             arr: [10],
             arr2: [2],
             nullable: null,
@@ -1055,6 +1058,12 @@ describe('BigQuery', () => {
         'NUMERIC'
       );
       assert.strictEqual(
+        BigQuery.getTypeDescriptorFromValue_(
+          new Big('1999.9876543210123456789')
+        ).type,
+        'BIGNUMERIC'
+      );
+      assert.strictEqual(
         BigQuery.getTypeDescriptorFromValue_(bq.int('100')).type,
         'INT64'
       );
@@ -1460,6 +1469,13 @@ describe('BigQuery', () => {
           BigQuery._getValue(geography, geography.type),
           geography.value
         );
+      });
+
+      it('should handle null values', () => {
+        const value = null;
+        const type = 'TYPE';
+
+        assert.strictEqual(BigQuery._getValue(value, type), value);
       });
     });
 

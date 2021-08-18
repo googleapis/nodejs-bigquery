@@ -246,7 +246,7 @@ class Model extends common.ServiceObject {
    *
    * @param {string|File} destination Where the model should be exported
    *    to. A string or {@link
-   *    https://cloud.google.com/nodejs/docs/reference/storage/latest/File File}
+   *    https://googleapis.dev/nodejs/storage/latest/File.html File}
    *    object.
    * @param {object} [options] The configuration object.
    * @param {string} [options.format] The format to export the data in.
@@ -276,7 +276,7 @@ class Model extends common.ServiceObject {
    *
    * //-
    * // To use the default options, just pass a string or a {@link
-   * https://cloud.google.com/nodejs/docs/reference/storage/latest/File File}
+   * https://googleapis.dev/nodejs/storage/latest/File.html File}
    * object.
    * //
    * // Note: The default format is 'ML_TF_SAVED_MODEL'.
@@ -380,7 +380,7 @@ class Model extends common.ServiceObject {
    *
    * @param {string|File} destination Where the model should be exported
    *    to. A string or {@link
-   *    https://cloud.google.com/nodejs/docs/reference/storage/latest/File File}
+   *    https://googleapis.dev/nodejs/storage/latest/File.html File}
    *    object.
    * @param {object} [options] The configuration object.
    * @param {string} [options.format] The format to export
@@ -412,7 +412,7 @@ class Model extends common.ServiceObject {
    *
    * //-
    * // To use the default options, just pass a string or a {@link
-   * https://cloud.google.com/nodejs/docs/reference/storage/latest/File File}
+   * https://googleapis.dev/nodejs/storage/latest/File.html File}
    * object.
    * //
    * // Note: The default format is 'ML_TF_SAVED_MODEL'.

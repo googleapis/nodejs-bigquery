@@ -90,7 +90,7 @@ export type Query = JobRequest<bigquery.IJobConfigurationQuery> & {
   params?: any[] | {[param: string]: any};
   dryRun?: boolean;
   labels?: {[label: string]: string};
-  types?: string[] | string[][] | {[type: string]: string[]};
+  types?: string[] | string[][] | {[type: string]: string | string[]};
   job?: Job;
   maxResults?: number;
   jobTimeoutMs?: number;
@@ -519,6 +519,10 @@ export class BigQuery extends common.Service {
           value = new Big(value);
           break;
         }
+        case 'BIGNUMERIC': {
+          value = new Big(value);
+          break;
+        }
         case 'RECORD': {
           value = BigQuery.mergeSchemaWithRows_(
             schemaField,
@@ -912,6 +916,7 @@ export class BigQuery extends common.Service {
       'TIMESTAMP',
       'BYTES',
       'NUMERIC',
+      'BIGNUMERIC',
       'BOOL',
       'INT64',
       'FLOAT64',
@@ -981,7 +986,11 @@ export class BigQuery extends common.Service {
     } else if (value instanceof Buffer) {
       typeName = 'BYTES';
     } else if (value instanceof Big) {
-      typeName = 'NUMERIC';
+      if (value.c.length - value.e >= 10) {
+        typeName = 'BIGNUMERIC';
+      } else {
+        typeName = 'NUMERIC';
+      }
     } else if (value instanceof BigQueryInt) {
       typeName = 'INT64';
     } else if (value instanceof Geography) {
@@ -1104,7 +1113,10 @@ export class BigQuery extends common.Service {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private static _getValue(value: any, type: ValueType): any {
-    if (value.type!) type = value;
+    if (value === null) {
+      return null;
+    }
+    if (value.type) type = value;
     return BigQuery._isCustomType(type) ? value.value : value;
   }
 
