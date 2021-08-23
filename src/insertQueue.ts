@@ -21,6 +21,7 @@ import {RequestCallback, Table} from '.';
 import {GoogleErrorBody} from '@google-cloud/common/build/src/util';
 import bigquery from './types';
 import {BATCH_LIMITS, RowBatch} from './rowBatch';
+import { Stream } from 'stream';
 
 export const defaultOptions = {
   // The maximum number of rows we'll batch up for insert().
@@ -72,12 +73,12 @@ export interface BatchInsertOptions {
 }
 
 export abstract class RowQueue {
-  batchOptions: any;
-  table: any;
-  insertOpts: any;
+  batchOptions!: BatchInsertOptions;
+  table: Table;
+  insertOpts!: InsertRowsOptions;
   pending?: NodeJS.Timer;
-  stream: any;
-  constructor(table: any, dup: any, options?: any) {
+  stream: Stream;
+  constructor(table: Table, dup: Stream, options?: InsertRowsOptions) {
     this.table = table;
     this.stream = dup;
   }
@@ -90,7 +91,7 @@ export abstract class RowQueue {
    * @param {object} row The row to add.
    * @param {InsertCallback} callback The insert callback.
    */
-  abstract add(row: any, callback: any): void;
+  abstract add(row: RowMetadata, callback: InsertRowsCallback): void;
   /**
    * Method to initiate inserting rows.
    *
@@ -104,12 +105,15 @@ export abstract class RowQueue {
    * @param {InsertCallback[]} callbacks The corresponding callback functions.
    * @param {function} [callback] Callback to be fired when insert is done.
    */
-  _insert(rows: any, callbacks: any[], callback?: any): void {
+  _insert(rows: RowMetadata | RowMetadata[], callbacks: InsertRowsCallback[], cb?: InsertRowsCallback): void {
     const uri = `http://${this.table.bigQuery.apiEndpoint}/bigquery/v2/projects/${this.table.bigQuery.projectId}/datasets/${this.table.dataset.id}/tables/${this.table.id}/insertAll`;
 
     const reqOpts = {
       uri,
     };
+    if (!cb) {
+      cb = () =>{}
+    }
 
     const json = extend(true, {}, {rows});
     this.table.request(
@@ -140,9 +144,10 @@ export abstract class RowQueue {
             response: resp,
           } as GoogleErrorBody);
         }
-        callbacks.forEach(callback => callback(err, resp));
+        callbacks.forEach(callback => callback!(err, resp));
         this.stream.emit('response', resp);
-        callback(err, resp);
+        console.log('$$$$$ table line 145')
+        cb!(err, resp);
       }
     );
   }
@@ -160,18 +165,18 @@ export abstract class RowQueue {
  */
 export class InsertQueue extends RowQueue {
   batch: RowBatch;
-  batchOptions: any;
+  batchOptions!: BatchInsertOptions;
   error: any;
-  batches: any;
+  // batches: any];
   inFlight: any;
-  constructor(table: any, dup: any, options?: any) {
+  constructor(table: Table, dup: Stream, options?: InsertRowsOptions) {
     super(table, dup, options);
     if (typeof options === 'object') {
       this.batchOptions = options;
     } else {
       this.setOptions();
     }
-    this.batch = new RowBatch(this.batchOptions);
+    this.batch = new RowBatch(this.batchOptions); // check
     this.inFlight = false;
   }
   /**
@@ -180,7 +185,7 @@ export class InsertQueue extends RowQueue {
    * @param {BigQueryRow} row The row to insert.
    * @param {InsertRowsCallback} callback The insert callback.
    */
-  add(row: any, callback: any): void {
+  add(row: RowMetadata, callback: InsertRowsCallback): void {
     row = {json: Table.encodeValue_(row)};
     // if (options.createInsertId !== false) {
     row.insertId = uuid.v4();
@@ -189,13 +194,13 @@ export class InsertQueue extends RowQueue {
     if (!this.batch.canFit(row)) {
       this.insert();
     }
-
+    console.log('&&&&&&&&&&&&&&&&& insertQueue line 193')
     this.batch.add(row, callback!);
 
     if (this.batch.isFull()) {
       this.insert();
     } else if (!this.pending) {
-      const {maxMilliseconds} = this.batchOptions;
+      const {maxMilliseconds} = this.batchOptions!;
       this.pending = setTimeout(() => {
         this.insert();
       }, maxMilliseconds!);
@@ -204,35 +209,33 @@ export class InsertQueue extends RowQueue {
   /**
    * Cancels any pending inserts and calls _insert immediately.
    */
-  insert(callback?: any): void {
+  insert(callback?: InsertRowsCallback): void {
     const {rows, callbacks} = this.batch;
     const definedCallback = callback || (() => {});
 
-    this.batch = new RowBatch(this.batchOptions);
+    this.batch = new RowBatch(this.batchOptions!);
 
     if (this.pending) {
       clearTimeout(this.pending);
       delete this.pending;
     }
-
-    this._insert(rows, callbacks, callback);
+    console.log('@@@@@@@@@@@@@@@@@@@@@@@@@ line 218')
+    this._insert(rows, callbacks, callback!);
   }
 
-  setOptions(options?: any): void {
+  setOptions(options?: BatchInsertOptions): void {
     const defaults = {
-      batching: {
         maxBytes: defaultOptions.maxOutstandingBytes,
         maxRows: defaultOptions.maxOutstandingRows,
         maxMilliseconds: defaultOptions.maxDelayMillis,
-      },
     };
 
     const opts = typeof options === 'object' ? options : defaults;
 
     this.batchOptions = {
-      maxBytes: Math.min(opts.batching.maxBytes, BATCH_LIMITS.maxBytes!),
-      maxRows: Math.min(opts.batching.maxRows, BATCH_LIMITS.maxRows!),
-      maxMilliseconds: opts.batching.maxMilliseconds,
+      maxBytes: Math.min(opts.maxBytes!, BATCH_LIMITS.maxBytes!),
+      maxRows: Math.min(opts.maxRows!, BATCH_LIMITS.maxRows!),
+      maxMilliseconds: opts.maxMilliseconds,
     };
   }
 }

@@ -44,7 +44,7 @@ export const BATCH_LIMITS: any = {
  * @param {BatchInsertOptions} options The batching options.
  */
 export class RowBatch {
-  batchOptions: BatchInsertOptions | any;
+  batchOptions!: BatchInsertOptions;
   rows: any[];
   callbacks: any[];
   created: number;
