@@ -161,6 +161,7 @@ export type PermissionsCallback = RequestCallback<PermissionsResponse>;
 const FORMATS = {
   avro: 'AVRO',
   csv: 'CSV',
+  export_metadata: 'DATASTORE_BACKUP',
   json: 'NEWLINE_DELIMITED_JSON',
   orc: 'ORC',
   parquet: 'PARQUET',
