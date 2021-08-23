@@ -15,7 +15,7 @@
 'use strict';
 
 function main(datasetId = 'my_dataset', tableId = 'my_table') {
-  // [START bigquery_load_table_gcs_csv]
+  // [START bigquery_load_table_uri_firestore]
   // Import the Google Cloud client libraries
   const {BigQuery} = require('@google-cloud/bigquery');
   const {Storage} = require('@google-cloud/storage');
@@ -31,13 +31,13 @@ function main(datasetId = 'my_dataset', tableId = 'my_table') {
   const filename =
     'bigquery/us-states/2021-07-02T16:04:48_70344/all_namespaces/kind_us-states/all_namespaces_kind_us-states.export_metadata';
 
-  async function loadCSVFromGCS() {
+  async function loadTableURIFirestore() {
     // Imports a GCS Firestore export file into a table.
 
     /**
      * TODO(developer): Uncomment the following lines before running the sample.
      */
-    // const datasetId = 'testing';
+    // const datasetId = 'my_dataset';
     // const tableId = 'my_table';
 
     // Load data from a Google Cloud Storage file into the table
@@ -55,7 +55,7 @@ function main(datasetId = 'my_dataset', tableId = 'my_table') {
       throw errors;
     }
   }
-  // [END bigquery_load_table_gcs_csv]
-  loadCSVFromGCS();
+  // [END bigquery_load_table_uri_firestore]
+  loadTableURIFirestore();
 }
 main(...process.argv.slice(2));
