@@ -73,6 +73,7 @@
   * [Load Table GCSORC](#load-table-gcsorc)
   * [Load Table GCS Parquet](#load-table-gcs-parquet)
   * [Load Table Partitioned](#load-table-partitioned)
+  * [Load Table URI Firestore](#load-table-uri-firestore)
   * [Nested Repeated Schema](#nested-repeated-schema)
   * [Query](#query)
   * [Query Batch](#query-batch)
@@ -1169,6 +1170,23 @@ __Usage:__
 
 
 `node samples/loadTablePartitioned.js`
+
+
+-----
+
+
+
+
+### Load Table URI Firestore
+
+View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/main/samples/loadTableURIFirestore.js).
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/loadTableURIFirestore.js,samples/README.md)
+
+__Usage:__
+
+
+`node samples/loadTableURIFirestore.js`
 
 
 -----
