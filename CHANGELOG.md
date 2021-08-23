@@ -4,6 +4,13 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+### [5.7.1](https://www.github.com/googleapis/nodejs-bigquery/compare/v5.7.0...v5.7.1) (2021-08-10)
+
+
+### Bug Fixes
+
+* **build:** migrate to using main branch ([#986](https://www.github.com/googleapis/nodejs-bigquery/issues/986)) ([16e7a4e](https://www.github.com/googleapis/nodejs-bigquery/commit/16e7a4e36245af42a4f19048941a4dab1303f106))
+
 ## [5.7.0](https://www.github.com/googleapis/nodejs-bigquery/compare/v5.6.0...v5.7.0) (2021-07-21)
 
 
