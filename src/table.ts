@@ -161,6 +161,7 @@ export type PermissionsCallback = RequestCallback<PermissionsResponse>;
 const FORMATS = {
   avro: 'AVRO',
   csv: 'CSV',
+  export_metadata: 'DATASTORE_BACKUP',
   json: 'NEWLINE_DELIMITED_JSON',
   orc: 'ORC',
   parquet: 'PARQUET',
@@ -201,16 +202,27 @@ class Table extends common.ServiceObject {
   constructor(dataset: Dataset, id: string, options?: TableOptions) {
     const methods = {
       /**
+       * @callback CreateTableCallback
+       * @param {?Error} err Request error, if any.
+       * @param {Table} table The table.
+       * @param {object} apiResponse The full API response body.
+       */
+      /**
+       * @typedef {array} CreateTableResponse
+       * @property {Table} 0 The table.
+       * @property {object} 1 The full API response body.
+       */
+      /**
        * Create a table.
        *
        * @method Table#create
        * @param {object} [options] See {@link Dataset#createTable}.
-       * @param {function} [callback]
+       * @param {CreateTableCallback} [callback]
        * @param {?error} callback.err An error returned while making this
        *     request.
        * @param {Table} callback.table The new {@link Table}.
        * @param {object} callback.apiResponse The full API response.
-       * @returns {Promise}
+       * @returns {Promise<CreateTableResponse>}
        *
        * @example
        * const {BigQuery} = require('@google-cloud/bigquery');
@@ -236,16 +248,25 @@ class Table extends common.ServiceObject {
       create: true,
 
       /**
+       * @callback DeleteTableCallback
+       * @param {?Error} err Request error, if any.
+       * @param {object} apiResponse The full API response.
+       */
+      /**
+       * @typedef {array} DeleteTableResponse
+       * @property {object} 0 The full API response.
+       */
+      /**
        * Delete a table and all its data.
        *
        * @see [Tables: delete API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/tables/delete}
        *
        * @method Table#delete
-       * @param {function} [callback]
+       * @param {DeleteTableCallback} [callback]
        * @param {?error} callback.err An error returned while making this
        *     request.
        * @param {object} callback.apiResponse The full API response.
-       * @returns {Promise}
+       * @returns {Promise<DeleteTableResponse>}
        *
        * @example
        * const {BigQuery} = require('@google-cloud/bigquery');
@@ -266,14 +287,23 @@ class Table extends common.ServiceObject {
       delete: true,
 
       /**
+       * @callback TableExistsCallback
+       * @param {?Error} err Request error, if any.
+       * @param {boolean} exists Indicates if the table exists.
+       */
+      /**
+       * @typedef {array} TableExistsCallback
+       * @property {boolean} 0 Indicates if the table exists.
+       */
+      /**
        * Check if the table exists.
        *
        * @method Table#exists
-       * @param {function} [callback]
+       * @param {TableExistsCallback} [callback]
        * @param {?error} callback.err An error returned while making this
        *     request.
        * @param {boolean} callback.exists Whether the table exists or not.
-       * @returns {Promise}
+       * @returns {Promise<TableExistsCallback>}
        *
        * @example
        * const {BigQuery} = require('@google-cloud/bigquery');
@@ -294,6 +324,17 @@ class Table extends common.ServiceObject {
       exists: true,
 
       /**
+       * @callback GetTableCallback
+       * @param {?Error} err Request error, if any.
+       * @param {Table} table The table.
+       * @param {object} apiResponse The full API response body.
+       */
+      /**
+       * @typedef {array} GetTableResponse
+       * @property {Table} 0 The table.
+       * @property {object} 1 The full API response body.
+       */
+      /**
        * Get a table if it exists.
        *
        * You may optionally use this to "get or create" an object by providing
@@ -310,7 +351,7 @@ class Table extends common.ServiceObject {
        *     request.
        * @param {Table} callback.table The {@link Table}.
        * @param {object} callback.apiResponse The full API response.
-       * @returns {Promise}
+       * @returns {Promise<GetTableResponse>}
        *
        * @example
        * const {BigQuery} = require('@google-cloud/bigquery');
@@ -334,17 +375,28 @@ class Table extends common.ServiceObject {
       get: true,
 
       /**
+       * @callback GetTableMetadataCallback
+       * @param {?Error} err Request error, if any.
+       * @param {object} metadata The table metadata.
+       * @param {object} apiResponse The full API response.
+       */
+      /**
+       * @typedef {array} GetTableMetadataResponse
+       * @property {object} 0 The table metadata.
+       * @property {object} 1 The full API response.
+       */
+      /**
        * Return the metadata associated with the Table.
        *
        * @see [Tables: get API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/tables/get}
        *
        * @method Table#getMetadata
-       * @param {function} [callback] The callback function.
+       * @param {GetTableMetadataCallback} [callback] The callback function.
        * @param {?error} callback.err An error returned while making this
        *     request.
        * @param {object} callback.metadata The metadata of the Table.
        * @param {object} callback.apiResponse The full API response.
-       * @returns {Promise}
+       * @returns {Promise<GetTableMetadataResponse>}
        *
        * @example
        * const {BigQuery} = require('@google-cloud/bigquery');
@@ -569,6 +621,15 @@ class Table extends common.ServiceObject {
   ): void;
   copy(destination: Table, callback: JobMetadataCallback): void;
   /**
+   * @callback JobMetadataCallback
+   * @param {?Error} err Request error, if any.
+   * @param {object} apiResponse The full API response.
+   */
+  /**
+   * @typedef {array} JobMetadataResponse
+   * @property {object} 0 The full API response.
+   */
+  /**
    * Copy data from one table to another, optionally creating that table.
    *
    * @param {Table} destination The destination table.
@@ -580,10 +641,10 @@ class Table extends common.ServiceObject {
    * @param {string} [metadata.jobId] Custom id for the underlying job.
    * @param {string} [metadata.jobPrefix] Prefix to apply to the underlying job
    *     id.
-   * @param {function} [callback] The callback function.
+   * @param {JobMetadataCallback} [callback] The callback function.
    * @param {?error} callback.err An error returned while making this request
    * @param {object} callback.apiResponse The full API response.
-   * @returns {Promise}
+   * @returns {Promise<JobMetadataResponse>}
    *
    * @throws {Error} If a destination other than a Table object is provided.
    *
@@ -651,6 +712,15 @@ class Table extends common.ServiceObject {
   ): void;
   copyFrom(sourceTables: Table | Table[], callback: JobMetadataCallback): void;
   /**
+   * @callback JobMetadataCallback
+   * @param {?Error} err Request error, if any.
+   * @param {object} apiResponse The full API response.
+   */
+  /**
+   * @typedef {array} JobMetadataResponse
+   * @property {object} 0 The full API response.
+   */
+  /**
    * Copy data from multiple tables into this table.
    *
    * @param {Table|Table[]} sourceTables The
@@ -662,10 +732,10 @@ class Table extends common.ServiceObject {
    * @param {string} [metadata.jobId] Custom id for the underlying job.
    * @param {string} [metadata.jobPrefix] Prefix to apply to the underlying job
    *     id.
-   * @param {function} [callback] The callback function.
+   * @param {JobMetadataCallback} [callback] The callback function.
    * @param {?error} callback.err An error returned while making this request
    * @param {object} callback.apiResponse The full API response.
-   * @returns {Promise}
+   * @returns {Promise<JobMetadataResponse>}
    *
    * @throws {Error} If a source other than a Table object is provided.
    *
@@ -742,11 +812,11 @@ class Table extends common.ServiceObject {
    *     object.
    * @param {string} [metadata.jobId] Custom job id.
    * @param {string} [metadata.jobPrefix] Prefix to apply to the job id.
-   * @param {function} [callback] The callback function.
+   * @param {JobCallback} [callback] The callback function.
    * @param {?error} callback.err An error returned while making this request
    * @param {Job} callback.job The job used to copy your table.
    * @param {object} callback.apiResponse The full API response.
-   * @returns {Promise}
+   * @returns {Promise<JobResponse>}
    *
    * @throws {Error} If a destination other than a Table object is provided.
    *
@@ -854,11 +924,11 @@ class Table extends common.ServiceObject {
    *     object.
    * @param {string} [metadata.jobId] Custom job id.
    * @param {string} [metadata.jobPrefix] Prefix to apply to the job id.
-   * @param {function} [callback] The callback function.
+   * @param {JobCallback} [callback] The callback function.
    * @param {?error} callback.err An error returned while making this request
    * @param {Job} callback.job The job used to copy your table.
    * @param {object} callback.apiResponse The full API response.
-   * @returns {Promise}
+   * @returns {Promise<JobResponse>}
    *
    * @throws {Error} If a source other than a Table object is provided.
    *
@@ -980,10 +1050,11 @@ class Table extends common.ServiceObject {
    *     with GZIP. Default: false.
    * @param {string} [options.jobId] Custom job id.
    * @param {string} [options.jobPrefix] Prefix to apply to the job id.
-   * @param {function} callback - The callback function.
+   * @param {JobCallback} callback - The callback function.
    * @param {?error} callback.err - An error returned while making this request
    * @param {Job} callback.job - The job used to export the table.
    * @param {object} callback.apiResponse - The full API response.
+   * @returns {Promise<JobResponse>}
    *
    * @throws {Error} If destination isn't a File object.
    * @throws {Error} If destination format isn't recongized.
@@ -1154,11 +1225,11 @@ class Table extends common.ServiceObject {
    *     Allowed options are "AVRO", "CSV", "JSON", "ORC", or "PARQUET".
    * @param {string} [metadata.jobId] Custom job id.
    * @param {string} [metadata.jobPrefix] Prefix to apply to the job id.
-   * @param {function} [callback] The callback function.
+   * @param {JobCallback} [callback] The callback function.
    * @param {?error} callback.err An error returned while making this request
    * @param {Job} callback.job The job used to load your data.
    * @param {object} callback.apiResponse The full API response.
-   * @returns {Promise}
+   * @returns {Promise<JobResponse>}
    *
    * @throws {Error} If the source isn't a string file name or a File instance.
    *
@@ -1544,10 +1615,10 @@ class Table extends common.ServiceObject {
    *     with GZIP. Default: false.
    * @param {string} [options.jobId] Custom id for the underlying job.
    * @param {string} [options.jobPrefix] Prefix to apply to the underlying job id.
-   * @param {function} [callback] The callback function.
+   * @param {JobMetadataCallback} [callback] The callback function.
    * @param {?error} callback.err An error returned while making this request
    * @param {object} callback.apiResponse The full API response.
-   * @returns {Promise}
+   * @returns {Promise<JobMetadataResponse>}
    *
    * @throws {Error} If destination isn't a File object.
    * @throws {Error} If destination format isn't recongized.
@@ -1624,6 +1695,17 @@ class Table extends common.ServiceObject {
   getRows(options: GetRowsOptions, callback: RowsCallback): void;
   getRows(callback: RowsCallback): void;
   /**
+   * @callback RowsCallback
+   * @param {?Error} err Request error, if any.
+   * @param {array} rows The rows.
+   * @param {object} apiResponse The full API response.
+   */
+  /**
+   * @typedef {array} RowsResponse
+   * @property {array} 0 The rows.
+   */
+
+  /**
    * Retrieves table data from a specified set of rows. The rows are returned to
    * your callback as an array of objects matching your table's schema.
    *
@@ -1639,10 +1721,11 @@ class Table extends common.ServiceObject {
    *     If a `boolean`, this will wrap values in {@link BigQueryInt} objects.
    *     If an `object`, this will return a value returned by
    *     `wrapIntegers.integerTypeCastFunction`.
-   * @param {function} [callback] The callback function.
+   * @param {RowsCallback} [callback] The callback function. If `autoPaginate`
+   *     is set to false a {@link ManualQueryResultsCallback} should be used.
    * @param {?error} callback.err An error returned while making this request
    * @param {array} callback.rows The table data from specified set of rows.
-   * @returns {Promise}
+   * @returns {Promise<RowsResponse>}
    *
    * @example
    * const {BigQuery} = require('@google-cloud/bigquery');
@@ -1758,6 +1841,18 @@ class Table extends common.ServiceObject {
   ): void;
   insert(rows: RowMetadata | RowMetadata[], callback: InsertRowsCallback): void;
   /**
+   * @callback InsertRowsCallback
+   * @param {?Error} err Request error, if any.
+   * @param {?Error} err.errors If present, these represent partial
+   *     failures. It's possible for part of your request to be completed
+   *     successfully, while the other part was not.
+   * @param {object} apiResponse The full API response.
+   */
+  /**
+   * @typedef {array} InsertRowsResponse
+   * @property {object} 0 The full API response.
+   */
+  /**
    * Stream data into BigQuery one record at a time without running a load job.
    *
    * If you need to create an entire table from a file, consider using
@@ -1801,13 +1896,13 @@ class Table extends common.ServiceObject {
    *     [Automatic table creation using template
    * tables](https://cloud.google.com/bigquery/streaming-data-into-bigquery#template-tables)
    *     for considerations when working with templates tables.
-   * @param {function} [callback] The callback function.
+   * @param {InsertRowsCallback} [callback] The callback function.
    * @param {?error} callback.err An error returned while making this request.
    * @param {object[]} callback.err.errors If present, these represent partial
    *     failures. It's possible for part of your request to be completed
    *     successfully, while the other part was not.
    * @param {object} callback.apiResponse The full API response.
-   * @returns {Promise}
+   * @returns {Promise<InsertRowsResponse>}
    *
    * @example
    * const {BigQuery} = require('@google-cloud/bigquery');
@@ -2099,10 +2194,10 @@ class Table extends common.ServiceObject {
    * @param {string} [metadata.jobId] Custom id for the underlying job.
    * @param {string} [metadata.jobPrefix] Prefix to apply to the underlying job
    *     id.
-   * @param {function} [callback] The callback function.
+   * @param {JobMetadataCallback} [callback] The callback function.
    * @param {?error} callback.err An error returned while making this request
    * @param {object} callback.apiResponse The full API response.
-   * @returns {Promise}
+   * @returns {Promise<JobMetadataResponse>}
    *
    * @throws {Error} If the source isn't a string file name or a File instance.
    *
@@ -2183,7 +2278,7 @@ class Table extends common.ServiceObject {
    * See {@link BigQuery#query} for full documentation of this method.
    * @param {object} query See {@link BigQuery#query} for full documentation of this method.
    * @param {function} [callback] See {@link BigQuery#query} for full documentation of this method.
-   * @returns {Promise}
+   * @returns {Promise<SimpleQueryRowsResponse>}
    */
   query(
     query: Query,
@@ -2218,7 +2313,7 @@ class Table extends common.ServiceObject {
    * @param {function} [callback] The callback function.
    * @param {?error} callback.err An error returned while making this request.
    * @param {object} callback.apiResponse The full API response.
-   * @returns {Promise}
+   * @returns {Promise<common.SetMetadataResponse>}
    *
    * @example
    * const {BigQuery} = require('@google-cloud/bigquery');
@@ -2256,7 +2351,7 @@ class Table extends common.ServiceObject {
   getIamPolicy(options: GetPolicyOptions, callback: PolicyCallback): void;
   /**
    * Run a query scoped to your dataset.
-   * @returns {Promise}
+   * @returns {Promise<PolicyResponse>}
    */
   getIamPolicy(
     optionsOrCallback?: GetPolicyOptions,
@@ -2304,7 +2399,7 @@ class Table extends common.ServiceObject {
   setIamPolicy(policy: Policy, callback: PolicyCallback): void;
   /**
    * Run a query scoped to your dataset.
-   * @returns {Promise}
+   * @returns {Promise<PolicyResponse>}
    */
   setIamPolicy(
     policy: Policy,
@@ -2347,7 +2442,7 @@ class Table extends common.ServiceObject {
   ): void;
   /**
    * Run a query scoped to your dataset.
-   * @returns {Promise}
+   * @returns {Promise<PermissionsResponse>}
    */
   testIamPermissions(
     permissions: string | string[],

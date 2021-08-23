@@ -130,14 +130,23 @@ class Job extends Operation {
 
     const methods = {
       /**
+       * @callback JobExistsCallback
+       * @param {?Error} err Request error, if any.
+       * @param {boolean} exists Indicates if the job exists.
+       */
+      /**
+       * @typedef {array} JobExistsResponse
+       * @property {boolean} 0 Indicates if the job exists.
+       */
+      /**
        * Check if the job exists.
        *
        * @method Job#exists
-       * @param {function} [callback] The callback function.
+       * @param {JobExistsCallback} [callback] The callback function.
        * @param {?error} callback.err An error returned while making this
        *     request.
        * @param {boolean} callback.exists Whether the job exists or not.
-       * @returns {Promise}
+       * @returns {Promise<JobExistsResponse>}
        *
        * @example
        * const {BigQuery} = require('@google-cloud/bigquery');
@@ -157,14 +166,26 @@ class Job extends Operation {
       exists: true,
 
       /**
+       * @callback GetJobCallback
+       * @param {?Error} err Request error, if any.
+       * @param {Model} model The job.
+       * @param {object} apiResponse The full API response body.
+       */
+      /**
+       * @typedef {array} GetJobResponse
+       * @property {Model} 0 The job.
+       * @property {object} 1 The full API response body.
+       */
+
+      /**
        * Get a job if it exists.
        *
        * @method Job#get
-       * @param {function} [callback] The callback function.
+       * @param {GetJobCallback} [callback] The callback function.
        * @param {?error} callback.err An error returned while making this
        *     request.
        * @param {Job} callback.job The job.
-       * @returns {Promise}
+       * @returns {Promise<GetJobResponse>}
        *
        * @example
        * const {BigQuery} = require('@google-cloud/bigquery');
@@ -189,18 +210,30 @@ class Job extends Operation {
       get: true,
 
       /**
+       * @callback GetJobMetadataCallback
+       * @param {?Error} err Request error, if any.
+       * @param {object} metadata The job metadata.
+       * @param {object} apiResponse The full API response.
+       */
+      /**
+       * @typedef {array} GetJobMetadataResponse
+       * @property {object} 0 The job metadata.
+       * @property {object} 1 The full API response.
+       */
+
+      /**
        * Get the metadata of the job. This will mostly be useful for checking
        * the status of a previously-run job.
        *
        * @see [Jobs: get API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/get}
        *
        * @method Job#getMetadata
-       * @param {function} [callback] The callback function.
+       * @param {GetJobMetadataCallback} [callback] The callback function.
        * @param {?error} callback.err An error returned while making this
        *     request.
        * @param {object} callback.metadata The metadata of the job.
        * @param {object} callback.apiResponse The full API response.
-       * @returns {Promise}
+       * @returns {Promise<GetJobMetadataResponse>}
        *
        * @example
        * const {BigQuery} = require('@google-cloud/bigquery');
@@ -280,15 +313,26 @@ class Job extends Operation {
   cancel(): Promise<CancelResponse>;
   cancel(callback: CancelCallback): void;
   /**
+   * @callback CancelCallback
+   * @param {?Error} err Request error, if any.
+   * @param {object} metadata The job metadata.
+   * @param {object} apiResponse The full API response.
+   */
+  /**
+   * @typedef {array} CancelResponse
+   * @property {object} 0 The job metadata.
+   * @property {object} 1 The full API response.
+   */
+  /**
    * Cancel a job. Use {@link Job#getMetadata} to see if the cancel
    * completes successfully. See an example implementation below.
    *
    * @see [Jobs: get API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/cancel}
    *
-   * @param {function} [callback] The callback function.
+   * @param {CancelCallback} [callback] The callback function.
    * @param {?error} callback.err An error returned while making this request.
    * @param {object} callback.apiResponse The full API response.
-   * @returns {Promise}
+   * @returns {Promise<CancelResponse>}
    *
    * @example
    * const {BigQuery} = require('@google-cloud/bigquery');
@@ -358,7 +402,7 @@ class Job extends Operation {
    * @param {QueryResultsCallback|ManualQueryResultsCallback} [callback] The
    *     callback function. If `autoPaginate` is set to false a
    *     {@link ManualQueryResultsCallback} should be used.
-   * @returns {Promise}
+   * @returns {Promise<QueryResultsCallback>}
    *
    * @example
    * const {BigQuery} = require('@google-cloud/bigquery');

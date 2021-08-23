@@ -104,7 +104,11 @@ class Routine extends common.ServiceObject {
        * const dataset = bigquery.dataset('my-dataset');
        * const routine = dataset.routine('my_routine');
        *
-       * routine.delete((err, apiResponse) => {});
+       * routine.delete((err, apiResponse) => {
+       *   if (!err) {
+       *     // The routine was deleted successfully.
+       *   }
+       * });
        *
        * @example <caption>If the callback is omitted a Promise will be returned</caption>
        * const [apiResponse] = await routine.delete();

@@ -4,6 +4,13 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## [5.8.0](https://www.github.com/googleapis/nodejs-bigquery/compare/v5.7.1...v5.8.0) (2021-08-23)
+
+
+### Features
+
+* add support for loading Firestore export file ([#991](https://www.github.com/googleapis/nodejs-bigquery/issues/991)) ([c17a44e](https://www.github.com/googleapis/nodejs-bigquery/commit/c17a44ec97af6acff24a712a519355a0957999a3))
+
 ### [5.7.1](https://www.github.com/googleapis/nodejs-bigquery/compare/v5.7.0...v5.7.1) (2021-08-10)
 
 
