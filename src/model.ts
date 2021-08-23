@@ -85,12 +85,17 @@ class Model extends common.ServiceObject {
   constructor(dataset: Dataset, id: string) {
     const methods = {
       /**
+       * @callback DeleteModelCallback
+       * @param {?Error} err Request error, if any.
+       * @param {object} apiResponse The full API response.
+       */
+      /**
        * Delete the model.
        *
        * @see [Models: delete API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/rest/v2/models/delete}
        *
        * @method Model#delete
-       * @param {function} [callback] The callback function.
+       * @param {DeleteModelCallback} [callback] The callback function.
        * @param {?error} callback.err An error returned while making this
        *     request.
        * @param {object} callback.apiResponse The full API response.
@@ -106,18 +111,28 @@ class Model extends common.ServiceObject {
        *
        * @example <caption>If the callback is omitted we'll return a Promise.</caption>
        * const [apiResponse] = await model.delete();
+       * @example <caption>If successful, the response body is empty.</caption>
        */
       delete: true,
 
       /**
+       * @callback ModelExistsCallback
+       * @param {?Error} err Request error, if any.
+       * @param {boolean} exists Indicates if the model exists.
+       */
+      /**
+       * @typedef {array} ModelExistsResponse
+       * @property {boolean} 0 Indicates if the model exists.
+       */
+      /**
        * Check if the model exists.
        *
        * @method Model#exists
-       * @param {function} [callback] The callback function.
+       * @param {ModelExistsCallback} [callback] The callback function.
        * @param {?error} callback.err An error returned while making this
        *     request.
        * @param {boolean} callback.exists Whether the model exists or not.
-       * @returns {Promise}
+       * @returns {Promise<ModelExistsResponse>}
        *
        * @example
        * const {BigQuery} = require('@google-cloud/bigquery');
@@ -133,17 +148,28 @@ class Model extends common.ServiceObject {
       exists: true,
 
       /**
+       * @callback GetModelCallback
+       * @param {?Error} err Request error, if any.
+       * @param {Model} model The model.
+       * @param {object} apiResponse The full API response body.
+       */
+      /**
+       * @typedef {array} GetModelResponse
+       * @property {Model} 0 The model.
+       * @property {object} 1 The full API response body.
+       */
+      /**
        * Get a model if it exists.
        *
        * @see [Models: get API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/rest/v2/models/get}
        *
        * @method Model#get:
-       * @param {function} [callback] The callback function.
+       * @param {GetModelCallback} [callback] The callback function.
        * @param {?error} callback.err An error returned while making this
        *     request.
        * @param {Model} callback.model The {@link Model}.
        * @param {object} callback.apiResponse The full API response.
-       * @returns {Promise}
+       * @returns {Promise<GetModelResponse>}
        *
        * @example
        * const {BigQuery} = require('@google-cloud/bigquery');
@@ -163,17 +189,28 @@ class Model extends common.ServiceObject {
       get: true,
 
       /**
+       * @callback GetModelMetadataCallback
+       * @param {?Error} err Request error, if any.
+       * @param {object} metadata The model metadata.
+       * @param {object} apiResponse The full API response.
+       */
+      /**
+       * @typedef {array} GetModelMetadataResponse
+       * @property {object} 0 The model metadata.
+       * @property {object} 1 The full API response.
+       */
+      /**
        * Return the metadata associated with the model.
        *
        * @see [Models: get API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/rest/v2/models/get}
        *
        * @method Model#getMetadata
-       * @param {function} [callback] The callback function.
+       * @param {GetModelMetadataCallback} [callback] The callback function.
        * @param {?error} callback.err An error returned while making this
        *     request.
        * @param {object} callback.metadata The metadata of the model.
        * @param {object} callback.apiResponse The full API response.
-       * @returns {Promise}
+       * @returns {Promise<GetModelMetadataResponse>}
        *
        * @example
        * const {BigQuery} = require('@google-cloud/bigquery');
@@ -189,16 +226,27 @@ class Model extends common.ServiceObject {
       getMetadata: true,
 
       /**
+       * @callback SetModelMetadataCallback
+       * @param {?Error} err Request error, if any.
+       * @param {object} metadata The model metadata.
+       * @param {object} apiResponse The full API response.
+       */
+      /**
+       * @typedef {array} SetModelMetadataResponse
+       * @property {object} 0 The model metadata.
+       * @property {object} 1 The full API response.
+       */
+      /**
        * @see [Models: patch API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/rest/v2/models/patch}
        *
        * @method Model#setMetadata
        * @param {object} metadata The metadata key/value object to set.
-       * @param {function} [callback] The callback function.
+       * @param {SetModelMetadataCallback} [callback] The callback function.
        * @param {?error} callback.err An error returned while making this
        *     request.
        * @param {object} callback.metadata The updated metadata of the model.
        * @param {object} callback.apiResponse The full API response.
-       * @returns {Promise}
+       * @returns {Promise<SetModelMetadataResponse>}
        *
        * @example
        * const {BigQuery} = require('@google-cloud/bigquery');
@@ -240,6 +288,17 @@ class Model extends common.ServiceObject {
   ): void;
   createExtractJob(destination: string | File, callback: JobCallback): void;
   /**
+   * @callback JobCallback
+   * @param {?Error} err Request error, if any.
+   * @param {object} Job The [Job]{@link https://cloud.google.com/bigquery/docs/reference/v2/Job} resource.
+   * @param {object} apiResponse The full API response.
+   */
+  /**
+   * @typedef {array} JobResponse
+   * @property {object} 0 The [Job]{@link https://cloud.google.com/bigquery/docs/reference/v2/Job} resource.
+   * @property {object} 1 The full API response.
+   */
+  /**
    * Export model to Cloud Storage.
    *
    * @see [Jobs: insert API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert}
@@ -248,16 +307,17 @@ class Model extends common.ServiceObject {
    *    to. A string or {@link
    *    https://googleapis.dev/nodejs/storage/latest/File.html File}
    *    object.
-   * @param {object} [options] The configuration object.
+   * @param {object} [options] The configuration object. For all extract job options, see [CreateExtractJobOptions]{@link https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationExtract}.
    * @param {string} [options.format] The format to export the data in.
    *    Allowed options are "ML_TF_SAVED_MODEL" or "ML_XGBOOST_BOOSTER".
    *    Default: "ML_TF_SAVED_MODEL".
    * @param {string} [options.jobId] Custom job id.
    * @param {string} [options.jobPrefix] Prefix to apply to the job id.
-   * @param {function} [callback] The callback function.
+   * @param {JobCallback} [callback] The callback function.
    * @param {?error} callback.err An error returned while making this request.
    * @param {Job} callback.job The job used to export the model.
    * @param {object} callback.apiResponse The full API response.
+   * @returns {Promise<JobResponse>}
    *
    * @throws {Error} If a destination isn't a string or File object.
    *
@@ -376,22 +436,33 @@ class Model extends common.ServiceObject {
   ): void;
   extract(destination: string | File, callback?: JobMetadataCallback): void;
   /**
+   * @callback JobMetadataCallback
+   * @param {?Error} err Request error, if any.
+   * @param {object} metadata The job metadata.
+   * @param {object} apiResponse The full API response.
+   */
+  /**
+   * @typedef {array} JobMetadataResponse
+   * @property {object} 0 The job metadata.
+   * @property {object} 1 The full API response.
+   */
+  /**
    * Export model to Cloud Storage.
    *
    * @param {string|File} destination Where the model should be exported
    *    to. A string or {@link
    *    https://googleapis.dev/nodejs/storage/latest/File.html File}
    *    object.
-   * @param {object} [options] The configuration object.
+   * @param {object} [options] The configuration object. For all extract job options, see [CreateExtractJobOptions]{@link https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationExtract}.
    * @param {string} [options.format] The format to export
    *    the data in. Allowed options are "ML_TF_SAVED_MODEL" or
    *    "ML_XGBOOST_BOOSTER". Default: "ML_TF_SAVED_MODEL".
    * @param {string} [options.jobId] Custom id for the underlying job.
    * @param {string} [options.jobPrefix] Prefix to apply to the underlying job id.
-   * @param {function} [callback] The callback function.
+   * @param {JobMetadataCallback} [callback] The callback function.
    * @param {?error} callback.err An error returned while making this request
    * @param {object} callback.apiResponse The full API response.
-   * @returns {Promise}
+   * @returns {Promise<JobMetadataResponse>}
    *
    * @throws {Error} If destination isn't a string or File object.
    *
