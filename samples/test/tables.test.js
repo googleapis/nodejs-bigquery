@@ -292,6 +292,19 @@ describe('Tables', () => {
     assert.ok(rows.length > 0);
   });
 
+  it('should load a GCS Firestore backup file', async () => {
+    const tableId = generateUuid();
+    const output = execSync(
+      `node loadTableURIFirestore.js ${datasetId} ${tableId}`
+    );
+    assert.match(output, /completed\./);
+    const [rows] = await bigquery
+      .dataset(datasetId)
+      .table(tableId)
+      .getRows();
+    assert.ok(rows.length > 0);
+  });
+
   it('should load a GCS CSV file with explicit schema', async () => {
     const tableId = generateUuid();
     const output = execSync(`node loadCSVFromGCS.js ${datasetId} ${tableId}`);
