@@ -14,21 +14,17 @@
  * limitations under the License.
  */
 
-import {InsertRowsCallback} from './insertQueue';
+import {InsertRowsCallback, RowMetadata} from './insertQueue';
+import {RowBatchOptions} from './table';
 
-export interface BatchInsertOptions {
-  maxBytes?: number;
-  maxRows?: number;
-  maxMilliseconds?: number;
-}
-
+// TODO: check these limits for BigQuery /insertAll
 export const BATCH_LIMITS: any = {
   maxBytes: Math.pow(1024, 2) * 9,
-  maxMessages: 1000,
+  maxRows: 300,
 };
 
 /**
- * @typedef BatchInsertOptions
+ * @typedef InsertOptions
  * @property {number} [maxBytes=1 * 1024 * 1024] The maximum number of bytes to
  *     buffer before sending a payload.
  * @property {number} [maxRows=100] The maximum number of rows to
@@ -36,6 +32,12 @@ export const BATCH_LIMITS: any = {
  * @property {number} [maxMilliseconds=10] The maximum duration to wait before
  *     sending a payload.
  */
+export interface InsertOptions {
+  maxBytes?: number;
+  maxRows?: number;
+  maxMilliseconds?: number;
+}
+
 /**
  * Call used to help batch rows.
  *
@@ -44,13 +46,13 @@ export const BATCH_LIMITS: any = {
  * @param {BatchInsertOptions} options The batching options.
  */
 export class RowBatch {
-  batchOptions!: BatchInsertOptions;
+  batchOptions: RowBatchOptions;
   rows: any[];
   callbacks: any[];
   created: number;
   bytes: number;
-  constructor(options: BatchInsertOptions) {
-    this.batchOptions = options;
+  constructor(options: RowBatchOptions) {
+    this.batchOptions = options!;
     this.rows = [];
     this.callbacks = [];
     this.created = Date.now();
@@ -59,10 +61,10 @@ export class RowBatch {
   /**
    * Adds a row to the current batch.
    *
-   * @param {object} message The row to insert.
+   * @param {object} row The row to insert.
    * @param {InsertRowsCallback} callback The callback function.
    */
-  add(row: any, callback: any): void {
+  add(row: RowMetadata, callback: InsertRowsCallback): void {
     this.rows.push(row);
     this.callbacks.push(callback);
     this.bytes += Buffer.byteLength(JSON.stringify(row));
@@ -73,8 +75,9 @@ export class RowBatch {
    * @param {object} row The row in question.
    * @returns {boolean}
    */
-  canFit(row: any): boolean {
+  canFit(row: RowMetadata): boolean {
     const {maxRows, maxBytes} = this.batchOptions;
+
     return (
       this.rows.length < maxRows! &&
       this.bytes + Buffer.byteLength(JSON.stringify(row)) <= maxBytes!

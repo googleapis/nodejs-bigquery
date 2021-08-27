@@ -45,7 +45,7 @@ import {Duplex, Writable} from 'stream';
 import {JobMetadata} from './job';
 import bigquery from './types';
 import {IntegerTypeCastOptions} from './bigquery';
-import {InsertQueue} from './insertQueue';
+import {RowQueue} from './insertQueue';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const duplexify = require('duplexify');
@@ -153,6 +153,16 @@ export type PolicyCallback = RequestCallback<PolicyResponse>;
 export type PermissionsResponse = [bigquery.ITestIamPermissionsResponse];
 export type PermissionsCallback = RequestCallback<PermissionsResponse>;
 
+export interface InsertStreamOptions {
+  insertRowsOptions?: InsertRowsOptions;
+  batchOptions?: RowBatchOptions;
+}
+export interface RowBatchOptions {
+  maxBytes: number;
+  maxRows: number;
+  maxMilliseconds: number;
+}
+
 /**
  * The file formats accepted by BigQuery.
  *
@@ -198,6 +208,7 @@ class Table extends common.ServiceObject {
   dataset: Dataset;
   bigQuery: BigQuery;
   location?: string;
+  rowQueue?: RowQueue;
   createReadStream: (options?: GetRowsOptions) => ResourceStream<RowMetadata>;
   constructor(dataset: Dataset, id: string, options?: TableOptions) {
     const methods = {
@@ -2066,60 +2077,16 @@ class Table extends common.ServiceObject {
     return resp;
   }
 
-  createInsertStream(options?: InsertRowsOptions): Writable {
-    const stream = this.createInsertStream_(options);
-    // stream.on('prefinish', () => {
-    //   stream.cork();
-    // });
-    // stream.on('job', (job: Job) => {
-    //   job
-    //     .on('error', err => {
-    //       stream.destroy(err);
-    //     })
-    //     .on('complete', () => {
-    //       stream.emit('complete', job);
-    //       stream.uncork();
-    //     });
-    // });
-    return stream;
-  }
-
-  createInsertStream_(options?: InsertRowsOptions): Writable {
-    options = typeof options === 'object' ? options : undefined;
-
-    // Implementing with duplexify, but not working without data event.
-    // With data event, I get an extra buffer on the end of the stream.
-    // No clue why.
-    /*
-      const fileWriteStream = duplexify.obj();
-      const insertQueue = new Queue(this, fileWriteStream, options);
-      const stream = streamEvents(fileWriteStream) as Duplex;
-
-      stream.on('writing', (chunk:any, encoding:any, cb:any) => {
-        console.log(chunk);
-        // insertQueue.add(chunk, (err: any, resp:any)=>{})
-        cb()
-      })
-
-      stream.on('data', () =>{
-      })
-
-      fileWriteStream.on('response', stream.emit.bind(stream, 'response'));
-
-      return stream as Writable;
-    */
-
+  createInsertStream(options?: InsertStreamOptions): Writable {
+    options = typeof options === 'object' ? options : {};
     const dup = new Duplex({objectMode: true});
-
-    const insertQueue = new InsertQueue(this, dup, options);
     dup._write = (chunk: any, encoding: any, cb: any) => {
-      insertQueue.add(chunk, (err: any, resp: any) => {
-        console.log(err, resp);
-      });
+      this.rowQueue!.add(chunk, () => {});
       cb();
     };
+    dup._read = function() {};
 
-    dup._read = function(chunk: any) {};
+    this.rowQueue = new RowQueue(this, dup, options);
     return dup as Writable;
   }
 
