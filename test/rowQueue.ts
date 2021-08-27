@@ -18,7 +18,7 @@ import {describe, it, before, beforeEach, afterEach} from 'mocha';
 import {Duplex, Stream} from 'stream';
 import * as proxyquire from 'proxyquire';
 import * as sinon from 'sinon';
-import * as q from '../src/insertQueue';
+import * as q from '../src/rowQueue';
 import * as t from '../src/table';
 import * as _root from '../src';
 
@@ -67,122 +67,20 @@ describe('Queues', () => {
 
   const Table = require('../src/table').Table;
   let dup: Stream;
-  let queue: q.RowQueue;
   let fakeTable: t.Table;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let InsertQueue: any;
   let RowQueue: any;
 
   before(() => {
-    const mocked = proxyquire('../src/insertQueue.js', {
+    const mocked = proxyquire('../src/rowQueue.js', {
       './rowBatch': {RowBatch: FakeRowBatch},
     });
-
-    InsertQueue = mocked.InsertQueue;
     RowQueue = mocked.RowQueue;
   });
 
   afterEach(() => {
     sandbox.restore();
-  });
-
-  describe('InsertQueue', () => {
-    beforeEach(() => {
-      dup = new Duplex({objectMode: true});
-      fakeTable = new Table(DATASET, 'fake_table_id');
-      queue = new InsertQueue(fakeTable, dup, {});
-    });
-
-    describe('initialization', () => {
-      it('should localize the stream', () => {
-        assert.strictEqual(queue.stream, dup);
-      });
-
-      it('should localize the table', () => {
-        assert.strictEqual(queue.table, fakeTable);
-      });
-    });
-  });
-
-  describe('_insert', () => {
-    const rows = [{}, {}, {}];
-    const callbacks = rows.map(() => sandbox.spy());
-
-    const row0Error = {message: 'Error.', reason: 'notFound'};
-    const row1Error = {message: 'Error.', reason: 'notFound'};
-    const data = [
-      {state: 'MI', gender: 'M', year: '2015', name: 'Berkley', count: '0'},
-      {state: 'MI', gender: 'M', year: '2015', name: 'Berkley', count: '0'},
-      {state: 'MI', gender: 'M', year: '2015', name: 'Berkley', count: '0'},
-      {state: 'MI', gender: 'M', year: '2015', name: 'Berkley', count: '0'},
-      {state: 'MI', gender: 'M', year: '2015', name: 'Berkley', count: '0'},
-    ];
-
-    const dataApiFormat = {
-      rows: data.map(row => {
-        return {
-          json: row,
-        };
-      }),
-    };
-    const error = ({
-      errors: [
-        {
-          row: dataApiFormat.rows[0].json,
-          errors: [row0Error],
-        },
-        {
-          row: dataApiFormat.rows[1].json,
-          errors: [row1Error],
-        },
-      ],
-    } as unknown) as Error;
-
-    it('should make the correct request', () => {
-      const stub = sandbox.stub(fakeTable, 'request');
-      queue = new InsertQueue(fakeTable, dup);
-
-      queue._insert(rows, callbacks);
-
-      const [{json, method, uri}] = stub.lastCall.args;
-      assert.deepStrictEqual(json.rows[0].json, rows[0]);
-      assert.deepStrictEqual(json.rows[1].json, rows[1]);
-      assert.deepStrictEqual(json.rows[2].json, rows[2]);
-      assert.strictEqual(method, 'POST');
-      assert.strictEqual(uri, '/insertAll');
-    });
-
-    it('should make the correct request with raw data', () => {
-      const stub = sandbox.stub(fakeTable, 'request');
-      queue = new InsertQueue(fakeTable, dup, {insertRowsOptions: {raw: true}});
-
-      queue._insert(rows, callbacks);
-
-      const [{json, method, uri}] = stub.lastCall.args;
-      assert.deepStrictEqual(json.rows, rows);
-      assert.strictEqual(method, 'POST');
-      assert.strictEqual(uri, '/insertAll');
-    });
-
-    it('should pass back any request errors', done => {
-      queue = new q.RowQueue(fakeTable, dup, {});
-
-      sandbox.stub(fakeTable, 'request').callsFake((config, callback) => {
-        return callback(error, config);
-      });
-
-      queue._insert(rows, callbacks, (err: any) => {
-        assert.strictEqual(err, error);
-
-        callbacks.forEach(callback => {
-          const [err] = callback.lastCall.args;
-          assert.strictEqual(err, error);
-        });
-
-        done();
-      });
-    });
   });
 
   describe('RowQueue', () => {
@@ -191,9 +89,6 @@ describe('Queues', () => {
     beforeEach(() => {
       dup = new Duplex({objectMode: true});
       fakeTable = new Table(DATASET, 'fake_table_id');
-      sandbox.stub(fakeTable, 'request').callsFake((config, callback) => {
-        return callback(null, config);
-      });
       queue = new RowQueue(fakeTable, dup);
     });
 
@@ -205,6 +100,14 @@ describe('Queues', () => {
       it('should create a row batch', () => {
         assert.ok(queue.batch instanceof FakeRowBatch);
         assert.strictEqual(queue.batch.batchOptions, queue.batchOptions);
+      });
+
+      it('should localize the stream', () => {
+        assert.strictEqual(queue.stream, dup);
+      });
+
+      it('should localize the table', () => {
+        assert.strictEqual(queue.table, fakeTable);
       });
     });
 
@@ -324,6 +227,86 @@ describe('Queues', () => {
 
         queue.insert();
         assert.ok(stub.notCalled);
+      });
+    });
+
+    describe('_insert', () => {
+      const rows = [{}, {}, {}];
+      const callbacks = rows.map(() => sandbox.spy());
+
+      const row0Error = {message: 'Error.', reason: 'notFound'};
+      const row1Error = {message: 'Error.', reason: 'notFound'};
+      const data = [
+        {state: 'MI', gender: 'M', year: '2015', name: 'Berkley', count: '0'},
+        {state: 'MI', gender: 'M', year: '2015', name: 'Berkley', count: '0'},
+        {state: 'MI', gender: 'M', year: '2015', name: 'Berkley', count: '0'},
+        {state: 'MI', gender: 'M', year: '2015', name: 'Berkley', count: '0'},
+        {state: 'MI', gender: 'M', year: '2015', name: 'Berkley', count: '0'},
+      ];
+
+      const dataApiFormat = {
+        rows: data.map(row => {
+          return {
+            json: row,
+          };
+        }),
+      };
+      const error = ({
+        errors: [
+          {
+            row: dataApiFormat.rows[0].json,
+            errors: [row0Error],
+          },
+          {
+            row: dataApiFormat.rows[1].json,
+            errors: [row1Error],
+          },
+        ],
+      } as unknown) as Error;
+
+      it('should make the correct request', () => {
+        const stub = sandbox.stub(fakeTable, 'request');
+        queue = new RowQueue(fakeTable, dup);
+
+        queue._insert(rows, callbacks);
+
+        const [{json, method, uri}] = stub.lastCall.args;
+        assert.deepStrictEqual(json.rows[0].json, rows[0]);
+        assert.deepStrictEqual(json.rows[1].json, rows[1]);
+        assert.deepStrictEqual(json.rows[2].json, rows[2]);
+        assert.strictEqual(method, 'POST');
+        assert.strictEqual(uri, '/insertAll');
+      });
+
+      it('should make the correct request with raw data', () => {
+        const stub = sandbox.stub(fakeTable, 'request');
+        queue = new RowQueue(fakeTable, dup, {insertRowsOptions: {raw: true}});
+
+        queue._insert(rows, callbacks);
+
+        const [{json, method, uri}] = stub.lastCall.args;
+        assert.deepStrictEqual(json.rows, rows);
+        assert.strictEqual(method, 'POST');
+        assert.strictEqual(uri, '/insertAll');
+      });
+
+      it('should pass back any request errors', done => {
+        queue = new q.RowQueue(fakeTable, dup, {});
+
+        sandbox.stub(fakeTable, 'request').callsFake((config, callback) => {
+          return callback(error, config);
+        });
+
+        queue._insert(rows, callbacks, (err: any) => {
+          assert.strictEqual(err, error);
+
+          callbacks.forEach(callback => {
+            const [err] = callback.lastCall.args;
+            assert.strictEqual(err, error);
+          });
+
+          done();
+        });
       });
     });
   });

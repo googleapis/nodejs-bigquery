@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {InsertRowsCallback, RowMetadata} from './insertQueue';
+import {InsertRowsCallback, RowMetadata} from './rowQueue';
 import {RowBatchOptions} from './table';
 
 // TODO: check these limits for BigQuery /insertAll

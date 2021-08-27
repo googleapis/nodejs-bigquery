@@ -56,38 +56,81 @@ export interface PartialInsertFailure {
   row: RowMetadata;
 }
 
-export abstract class InsertQueue {
+/**
+ * Standard row queue used for inserting rows.
+ *
+ *
+ * @param {Table} table The table.
+ * @param {Duplex} dup Row stream.
+ * @param {InsertStreamOptions} options Insert and batch options.
+ */
+export class RowQueue {
   table: Table;
-  insertRowsOptions: InsertRowsOptions = {};
-  pending?: NodeJS.Timer;
   stream: Stream;
+  insertRowsOptions: InsertRowsOptions = {};
+  batch: RowBatch;
+  batchOptions?: RowBatchOptions;
+  inFlight: boolean;
+  pending?: NodeJS.Timer;
   constructor(table: Table, dup: Stream, options?: InsertStreamOptions) {
     this.table = table;
     this.stream = dup;
-    if (typeof options === 'object') {
-      if (options.insertRowsOptions) {
-        this.insertRowsOptions = options.insertRowsOptions;
-      } else {
-        this.insertRowsOptions = {};
-      }
+    this.inFlight = false;
+
+    const opts = typeof options === 'object' ? options : {};
+
+    if (opts.insertRowsOptions) {
+      this.insertRowsOptions = opts.insertRowsOptions;
+    } else {
+      this.insertRowsOptions = {};
     }
+    if (opts.batchOptions) {
+      this.setOptions(opts.batchOptions);
+    } else {
+      this.setOptions();
+    }
+
+    this.batch = new RowBatch(this.batchOptions!);
   }
 
   /**
    * Adds a row to the queue.
    *
-   * @abstract
-   *
-   * @param {object} row The row to add.
-   * @param {InsertCallback} callback The insert callback.
+   * @param {RowMetadata} row The row to insert.
+   * @param {InsertRowsCallback} callback The insert callback.
    */
-  abstract add(row: RowMetadata, callback: InsertRowsCallback): void;
+  add(row: RowMetadata, callback: InsertRowsCallback): void {
+    if (!this.batch.canFit(row)) {
+      this.insert();
+    }
+    this.batch.add(row, callback);
+
+    if (this.batch.isFull()) {
+      this.insert();
+    } else if (!this.pending) {
+      const {maxMilliseconds} = this.batchOptions!;
+      this.pending = setTimeout(() => {
+        this.insert();
+      }, maxMilliseconds);
+    }
+  }
   /**
-   * Method to initiate inserting rows.
-   *
-   * @abstract
+   * Cancels any pending inserts and calls _insert immediately.
    */
-  abstract insert(): void;
+  insert(callback?: InsertRowsCallback): void {
+    const {rows, callbacks} = this.batch;
+
+    this.batch = new RowBatch(this.batchOptions!);
+
+    if (this.pending) {
+      clearTimeout(this.pending);
+      delete this.pending;
+    }
+    if (rows.length > 0) {
+      this._insert(rows, callbacks, callback!);
+    }
+  }
+
   /**
    * Accepts a batch of rows and inserts them into table.
    *
@@ -161,70 +204,6 @@ export abstract class InsertQueue {
         cb!(err, resp);
       }
     );
-  }
-}
-
-/**
- * Standard row queue used for inserting rows.
- *
- * @private
- * @extends RowQueue
- *
- * @param {Table} table The table.
- * @param {Duplex} dup Row stream.
- * @param {InsertStreamOptions} options Insert and batch options.
- */
-export class RowQueue extends InsertQueue {
-  batch: RowBatch;
-  batchOptions?: RowBatchOptions;
-  inFlight: any;
-  constructor(table: Table, dup: Stream, options?: InsertStreamOptions) {
-    super(table, dup, options);
-    if (typeof options === 'object') {
-      this.setOptions(options.batchOptions);
-    } else {
-      this.setOptions();
-    }
-    this.batch = new RowBatch(this.batchOptions!);
-    this.inFlight = false;
-  }
-
-  /**
-   * Adds a row to the queue.
-   *
-   * @param {RowMetadata} row The row to insert.
-   * @param {InsertRowsCallback} callback The insert callback.
-   */
-  add(row: RowMetadata, callback: InsertRowsCallback): void {
-    if (!this.batch.canFit(row)) {
-      this.insert();
-    }
-    this.batch.add(row, callback);
-
-    if (this.batch.isFull()) {
-      this.insert();
-    } else if (!this.pending) {
-      const {maxMilliseconds} = this.batchOptions!;
-      this.pending = setTimeout(() => {
-        this.insert();
-      }, maxMilliseconds);
-    }
-  }
-  /**
-   * Cancels any pending inserts and calls _insert immediately.
-   */
-  insert(callback?: InsertRowsCallback): void {
-    const {rows, callbacks} = this.batch;
-
-    this.batch = new RowBatch(this.batchOptions!);
-
-    if (this.pending) {
-      clearTimeout(this.pending);
-      delete this.pending;
-    }
-    if (rows.length > 0) {
-      this._insert(rows, callbacks, callback!);
-    }
   }
 
   /**

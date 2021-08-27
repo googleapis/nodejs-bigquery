@@ -44,7 +44,7 @@ import {
 } from '../src/table';
 import bigquery from '../src/types';
 import {Duplex, Stream} from 'stream';
-import {RowQueue} from '../src/insertQueue';
+import {RowQueue} from '../src/rowQueue';
 
 interface CalledWithTable extends ServiceObject {
   calledWith_: Array<{
@@ -942,8 +942,6 @@ describe('BigQuery/Table', () => {
   });
 
   describe('createInsertStream', () => {
-    // let InsertQueue: any, RowQueue:any, stub: any
-
     it('should create a row queue', async () => {
       await table.createInsertStream();
       assert(table.rowQueue instanceof RowQueue);
