@@ -304,7 +304,8 @@ export class BigQuery extends common.Service {
     /**
      * Run a query scoped to your project as a readable object stream.
      *
-     * @param {object} query Configuration object. See {@link Query} for a complete
+     * @method
+     * @param {object} query Configuration object. See {@link BigQuery#query} for a complete
      *     list of options.
      * @returns {stream}
      *
@@ -608,6 +609,7 @@ export class BigQuery extends common.Service {
    * @param {string|number} value.year Four digits.
    * @param {string|number} value.month One or two digits.
    * @param {string|number} value.day One or two digits.
+   * @returns {BigQueryDate}
    *
    * @example
    * const {BigQuery} = require('@google-cloud/bigquery');
@@ -644,6 +646,7 @@ export class BigQuery extends common.Service {
    * @param {string|number} [value.seconds] One or two digits (`00` - `59`).
    * @param {string|number} [value.fractional] Up to six digits for microsecond
    *     precision.
+   * @returns {BigQueryDatetime}
    *
    * @example
    * const {BigQuery} = require('@google-cloud/bigquery');
@@ -717,6 +720,7 @@ export class BigQuery extends common.Service {
    * @param {string|number} [value.seconds] One or two digits (`00` - `59`).
    * @param {string|number} [value.fractional] Up to six digits for microsecond
    *     precision.
+   * @returns {BigQueryTime}
    *
    * @example
    * const {BigQuery} = require('@google-cloud/bigquery');
@@ -785,6 +789,7 @@ export class BigQuery extends common.Service {
    *
    * @method BigQuery#timestamp
    * @param {Date|string} value The time.
+   * @returns {BigQueryTimestamp}
    *
    * @example
    * const {BigQuery} = require('@google-cloud/bigquery');
@@ -806,6 +811,7 @@ export class BigQuery extends common.Service {
    * @param {string|number|IntegerTypeCastValue} value The INT64 value to convert.
    * @param {IntegerTypeCastOptions} typeCastOptions Configuration to convert
    *     value. Must provide an `integerTypeCastFunction` to handle conversion.
+   * @returns {BigQueryInt}
    *
    * @example
    * const {BigQuery} = require('@google-cloud/bigquery');
@@ -854,6 +860,7 @@ export class BigQuery extends common.Service {
    *
    * @method BigQuery#geography
    * @param {string} value The geospatial data.
+   * @returns {Geography}
    *
    * @example
    * const {BigQuery} = require('@google-cloud/bigquery');
@@ -1140,6 +1147,12 @@ export class BigQuery extends common.Service {
   ): void;
   createDataset(id: string, callback: DatasetCallback): void;
   /**
+   * @callback DatasetCallback
+   * @param {?Error} err Request error, if any.
+   * @param {object} dataset The [dataset resource]{@link https://cloud.google.com/bigquery/docs/reference/rest/v2/datasets#resource}.
+   * @param {object} apiResponse The full API response.
+   */
+  /**
    * Create a dataset.
    *
    * @see [Datasets: insert API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/datasets/insert}
@@ -1148,11 +1161,11 @@ export class BigQuery extends common.Service {
    * @param {object} [options] See a
    *     [Dataset
    * resource](https://cloud.google.com/bigquery/docs/reference/v2/datasets#resource).
-   * @param {function} [callback] The callback function.
+   * @param {DatasetCallback} [callback] The callback function.
    * @param {?error} callback.err An error returned while making this request
    * @param {Dataset} callback.dataset The newly created dataset
    * @param {object} callback.apiResponse The full API response.
-   * @returns {Promise}
+   * @returns {Promise<Dataset>}
    *
    * @example
    * const {BigQuery} = require('@google-cloud/bigquery');
@@ -1213,6 +1226,12 @@ export class BigQuery extends common.Service {
   createQueryJob(options: Query | string): Promise<JobResponse>;
   createQueryJob(options: Query | string, callback: JobCallback): void;
   /**
+   * @callback JobCallback
+   * @param {?Error} err Request error, if any.
+   * @param {object} job The newly created job for your query.
+   * @param {object} apiResponse The full API response.
+   */
+  /**
    * Run a query as a job. No results are immediately returned. Instead, your
    * callback will be executed with a {@link Job} object that you must
    * ping for the results. See the Job documentation for explanations of how to
@@ -1242,11 +1261,14 @@ export class BigQuery extends common.Service {
    * @param {boolean} [options.useLegacySql=false] Option to use legacy sql syntax.
    * @param {object} [options.defaultDataset] The dataset. This must be in
    *     the format of the [`DatasetReference`](https://cloud.google.com/bigquery/docs/reference/rest/v2/datasets#DatasetReference)
-   * @param {function} [callback] The callback function.
+   * @param {boolean} [options.wrapIntegers] Optionally wrap INT64 in BigQueryInt
+   *     or custom INT64 value type.
+   * @param {object|array} [options.params] Option to provide query prarameters.
+   * @param {JobCallback} [callback] The callback function.
    * @param {?error} callback.err An error returned while making this request.
    * @param {Job} callback.job The newly created job for your query.
    * @param {object} callback.apiResponse The full API response.
-   * @returns {Promise}
+   * @returns {Promise<JobResponse>}
    *
    * @throws {Error} If a query is not specified.
    * @throws {Error} If a Table is not provided as a destination.
@@ -1456,11 +1478,11 @@ export class BigQuery extends common.Service {
    * @param {string} [options.jobPrefix] Prefix to apply to the job id.
    * @param {string} [options.location] The geographic location of the job.
    *     Required except for US and EU.
-   * @param {function} [callback] The callback function.
+   * @param {JobCallback} [callback] The callback function.
    * @param {?error} callback.err An error returned while making this request.
    * @param {Job} callback.job The newly created job.
    * @param {object} callback.apiResponse The full API response.
-   * @returns {Promise}
+   * @returns {Promise<JobResponse>}
    *
    * @example
    * const {BigQuery} = require('@google-cloud/bigquery');
@@ -1607,10 +1629,10 @@ export class BigQuery extends common.Service {
    * @param {number} [options.maxResults] Maximum number of results to return.
    * @param {string} [options.pageToken] Token returned from a previous call, to
    *     request the next page of results.
-   * @param {function} [callback] The callback function.
+   * @param {DatasetsCallback} [callback] The callback function.
    * @param {?error} callback.err An error returned while making this request
    * @param {Dataset[]} callback.datasets The list of datasets in your project.
-   * @returns {Promise}
+   * @returns {Promise<DatasetsResponse>}
    *
    * @example
    * const {BigQuery} = require('@google-cloud/bigquery');
@@ -1691,6 +1713,15 @@ export class BigQuery extends common.Service {
   getJobs(options: GetJobsOptions, callback: GetJobsCallback): void;
   getJobs(callback: GetJobsCallback): void;
   /**
+   * @callback GetJobsCallback
+   * @param {?Error} err Request error, if any.
+   * @param {object} jobs An array of [Job]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs} objects.
+   */
+  /**
+   * @typedef {array} GetJobsResponse
+   * @property {object} 0 An array of Job objects.
+   */
+  /**
    * Get all of the jobs from your project.
    *
    * @see [Jobs: list API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/list}
@@ -1710,11 +1741,11 @@ export class BigQuery extends common.Service {
    * @param {string} [options.stateFilter] Filter for job state. Acceptable
    *     values are "done", "pending", and "running". Sending an array to this
    *     option performs a disjunction.
-   * @param {function} [callback] The callback function.
+   * @param {GetJobsCallback} [callback] The callback function.
    * @param {?error} callback.err An error returned while making this request
    * @param {Job[]} callback.jobs The list of jobs in your
    *     project.
-   * @returns {Promise}
+   * @returns {Promise<GetJobsResponse>}
    *
    * @example
    * const {BigQuery} = require('@google-cloud/bigquery');

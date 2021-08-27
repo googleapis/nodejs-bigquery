@@ -1050,8 +1050,21 @@ describe('BigQuery/Table', () => {
 
         table.createExtractJob(FILE, {format: 'parquet'}, assert.ifError);
       });
-    });
 
+      it('should accept Firestore backup', done => {
+        table.bigQuery.createJob = (reqOpts: JobOptions) => {
+          const extract = reqOpts.configuration!.extract!;
+          assert.strictEqual(extract.destinationFormat, 'DATASTORE_BACKUP');
+          done();
+        };
+
+        table.createExtractJob(
+          FILE,
+          {format: 'export_metadata'},
+          assert.ifError
+        );
+      });
+    });
     it('should parse out full gs:// urls from files', done => {
       table.bigQuery.createJob = (reqOpts: JobOptions) => {
         assert.deepStrictEqual(
@@ -1444,6 +1457,20 @@ describe('BigQuery/Table', () => {
           })
         );
       });
+
+      it('should accept export_metadata', async () => {
+        await table.createLoadJob(FILE, {format: 'export_metadata'});
+        assert(bqCreateJobStub.calledOnce);
+        assert(
+          bqCreateJobStub.calledWithMatch({
+            configuration: {
+              load: {
+                sourceFormat: 'DATASTORE_BACKUP',
+              },
+            },
+          })
+        );
+      });
     });
   });
 
@@ -1486,6 +1513,19 @@ describe('BigQuery/Table', () => {
 
   describe('createWriteStream_', () => {
     describe('formats', () => {
+      it('should accept export_metadata', done => {
+        makeWritableStreamOverride = (
+          stream: stream.Stream,
+          options: MakeWritableStreamOptions
+        ) => {
+          const load = options.metadata.configuration!.load!;
+          assert.strictEqual(load.sourceFormat, 'DATASTORE_BACKUP');
+          done();
+        };
+
+        table.createWriteStream_('export_metadata').emit('writing');
+      });
+
       it('should accept csv', done => {
         makeWritableStreamOverride = (
           stream: stream.Stream,
@@ -1523,6 +1563,19 @@ describe('BigQuery/Table', () => {
         };
 
         table.createWriteStream_('avro').emit('writing');
+      });
+
+      it('should accept export_metadata', done => {
+        makeWritableStreamOverride = (
+          stream: stream.Stream,
+          options: MakeWritableStreamOptions
+        ) => {
+          const load = options.metadata.configuration!.load!;
+          assert.strictEqual(load.sourceFormat, 'DATASTORE_BACKUP');
+          done();
+        };
+
+        table.createWriteStream_('export_metadata').emit('writing');
       });
     });
 
