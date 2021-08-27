@@ -1,0 +1,252 @@
+/*!
+ * Copyright 2021 Google Inc. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import * as common from '@google-cloud/common';
+import * as extend from 'extend';
+import * as uuid from 'uuid';
+import {RequestCallback, Table, InsertStreamOptions} from '.';
+import {GoogleErrorBody} from '@google-cloud/common/build/src/util';
+import bigquery from './types';
+import {BATCH_LIMITS, RowBatch} from './rowBatch';
+import {Stream} from 'stream';
+import {RowBatchOptions, InsertRowsOptions} from './table';
+
+export const defaultOptions = {
+  // The maximum number of rows we'll batch up for insert().
+  maxOutstandingRows: 300,
+
+  // The maximum size of the total batched up rows for insert().
+  maxOutstandingBytes: 1 * 1024 * 1024,
+
+  // The maximum time we'll wait to send batched rows, in milliseconds.
+  maxDelayMillis: 10,
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type RowMetadata = any;
+
+export type InsertRowsResponse = [
+  bigquery.ITableDataInsertAllResponse | bigquery.ITable
+];
+export type InsertRowsCallback = RequestCallback<
+  bigquery.ITableDataInsertAllResponse | bigquery.ITable
+>;
+export interface InsertRow {
+  insertId?: string;
+  json?: bigquery.IJsonObject;
+}
+
+export type TableRow = bigquery.ITableRow;
+export interface PartialInsertFailure {
+  message: string;
+  reason: string;
+  row: RowMetadata;
+}
+
+export abstract class InsertQueue {
+  table: Table;
+  insertRowsOptions: InsertRowsOptions = {};
+  pending?: NodeJS.Timer;
+  stream: Stream;
+  constructor(table: Table, dup: Stream, options?: InsertStreamOptions) {
+    this.table = table;
+    this.stream = dup;
+    if (typeof options === 'object') {
+      if (options.insertRowsOptions) {
+        this.insertRowsOptions = options.insertRowsOptions;
+      } else {
+        this.insertRowsOptions = {};
+      }
+    }
+  }
+
+  /**
+   * Adds a row to the queue.
+   *
+   * @abstract
+   *
+   * @param {object} row The row to add.
+   * @param {InsertCallback} callback The insert callback.
+   */
+  abstract add(row: RowMetadata, callback: InsertRowsCallback): void;
+  /**
+   * Method to initiate inserting rows.
+   *
+   * @abstract
+   */
+  abstract insert(): void;
+  /**
+   * Accepts a batch of rows and inserts them into table.
+   *
+   * @param {object[]} rows The rows to insert.
+   * @param {InsertCallback[]} callbacks The corresponding callback functions.
+   * @param {function} [callback] Callback to be fired when insert is done.
+   */
+  _insert(
+    rows: RowMetadata | RowMetadata[],
+    callbacks: InsertRowsCallback[],
+    cb?: InsertRowsCallback
+  ): void {
+    if (!cb) {
+      cb = () => {};
+    }
+
+    const json = extend(true, {}, this.insertRowsOptions, {rows});
+
+    if (!this.insertRowsOptions.raw) {
+      json.rows = rows.map((row: RowMetadata) => {
+        const encoded: InsertRow = {
+          json: Table.encodeValue_(row)!,
+        };
+
+        if (this.insertRowsOptions.createInsertId !== false) {
+          encoded.insertId = uuid.v4();
+        }
+
+        return encoded;
+      });
+    }
+
+    delete json.createInsertId;
+    delete json.partialRetries;
+    delete json.raw;
+
+    this.table.request(
+      {
+        method: 'POST',
+        uri: '/insertAll',
+        json,
+      },
+      (err: any, resp: any) => {
+        const partialFailures = (resp.insertErrors || []).map(
+          (insertError: GoogleErrorBody) => {
+            return {
+              errors: insertError.errors!.map(error => {
+                return {
+                  message: error.message,
+                  reason: error.reason,
+                };
+              }),
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              row: rows[(insertError as any).index],
+            };
+          }
+        );
+
+        if (partialFailures.length > 0) {
+          err = new common.util.PartialFailureError({
+            errors: partialFailures,
+            response: resp,
+          } as GoogleErrorBody);
+
+          callbacks.forEach(callback => callback!(err, resp));
+          this.stream.emit('error', err);
+        } else {
+          callbacks.forEach(callback => callback!(err, resp));
+          this.stream.emit('response', resp);
+        }
+        cb!(err, resp);
+      }
+    );
+  }
+}
+
+/**
+ * Standard row queue used for inserting rows.
+ *
+ * @private
+ * @extends RowQueue
+ *
+ * @param {Table} table The table.
+ * @param {Duplex} dup Row stream.
+ * @param {InsertStreamOptions} options Insert and batch options.
+ */
+export class RowQueue extends InsertQueue {
+  batch: RowBatch;
+  batchOptions?: RowBatchOptions;
+  inFlight: any;
+  constructor(table: Table, dup: Stream, options?: InsertStreamOptions) {
+    super(table, dup, options);
+    if (typeof options === 'object') {
+      this.setOptions(options.batchOptions);
+    } else {
+      this.setOptions();
+    }
+    this.batch = new RowBatch(this.batchOptions!);
+    this.inFlight = false;
+  }
+
+  /**
+   * Adds a row to the queue.
+   *
+   * @param {RowMetadata} row The row to insert.
+   * @param {InsertRowsCallback} callback The insert callback.
+   */
+  add(row: RowMetadata, callback: InsertRowsCallback): void {
+    if (!this.batch.canFit(row)) {
+      this.insert();
+    }
+    this.batch.add(row, callback);
+
+    if (this.batch.isFull()) {
+      this.insert();
+    } else if (!this.pending) {
+      const {maxMilliseconds} = this.batchOptions!;
+      this.pending = setTimeout(() => {
+        this.insert();
+      }, maxMilliseconds);
+    }
+  }
+  /**
+   * Cancels any pending inserts and calls _insert immediately.
+   */
+  insert(callback?: InsertRowsCallback): void {
+    const {rows, callbacks} = this.batch;
+
+    this.batch = new RowBatch(this.batchOptions!);
+
+    if (this.pending) {
+      clearTimeout(this.pending);
+      delete this.pending;
+    }
+    if (rows.length > 0) {
+      this._insert(rows, callbacks, callback!);
+    }
+  }
+
+  /**
+   * Sets the batching options.
+   *
+   *
+   * @param {RowBatchOptions} [options] The batching options.
+   */
+  setOptions(options?: RowBatchOptions): void {
+    const defaults = {
+      maxBytes: defaultOptions.maxOutstandingBytes,
+      maxRows: defaultOptions.maxOutstandingRows,
+      maxMilliseconds: defaultOptions.maxDelayMillis,
+    };
+
+    // TODO: set individual defaults for any unset options
+    const opts = typeof options === 'object' ? options : defaults;
+
+    this.batchOptions = {
+      maxBytes: Math.min(opts.maxBytes, BATCH_LIMITS.maxBytes),
+      maxRows: Math.min(opts.maxRows!, BATCH_LIMITS.maxRows),
+      maxMilliseconds: opts.maxMilliseconds!,
+    };
+  }
+}

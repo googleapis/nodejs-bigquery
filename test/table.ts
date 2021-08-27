@@ -36,12 +36,15 @@ import {BigQuery, Query} from '../src/bigquery';
 import {Job, JobOptions} from '../src/job';
 import {
   CopyTableMetadata,
+  InsertStreamOptions,
   JobLoadMetadata,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   Table,
   ViewDefinition,
 } from '../src/table';
 import bigquery from '../src/types';
+import {Duplex, Stream} from 'stream';
+import {RowQueue} from '../src/insertQueue';
 
 interface CalledWithTable extends ServiceObject {
   calledWith_: Array<{
@@ -935,6 +938,20 @@ describe('BigQuery/Table', () => {
       };
 
       table.createCopyFromJob(SOURCE_TABLE, done);
+    });
+  });
+
+  describe('createInsertStream', () => {
+    // let InsertQueue: any, RowQueue:any, stub: any
+
+    it('should create a row queue', async () => {
+      await table.createInsertStream();
+      assert(table.rowQueue instanceof RowQueue);
+    });
+
+    it('should return a stream', () => {
+      const stream = table.createInsertStream();
+      assert(stream instanceof Duplex);
     });
   });
 

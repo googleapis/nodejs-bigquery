@@ -45,6 +45,7 @@ import {Duplex, Writable} from 'stream';
 import {JobMetadata} from './job';
 import bigquery from './types';
 import {IntegerTypeCastOptions} from './bigquery';
+import {RowQueue} from './insertQueue';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const duplexify = require('duplexify');
@@ -152,6 +153,16 @@ export type PolicyCallback = RequestCallback<PolicyResponse>;
 export type PermissionsResponse = [bigquery.ITestIamPermissionsResponse];
 export type PermissionsCallback = RequestCallback<PermissionsResponse>;
 
+export interface InsertStreamOptions {
+  insertRowsOptions?: InsertRowsOptions;
+  batchOptions?: RowBatchOptions;
+}
+export interface RowBatchOptions {
+  maxBytes: number;
+  maxRows: number;
+  maxMilliseconds: number;
+}
+
 /**
  * The file formats accepted by BigQuery.
  *
@@ -198,6 +209,7 @@ class Table extends common.ServiceObject {
   dataset: Dataset;
   bigQuery: BigQuery;
   location?: string;
+  rowQueue?: RowQueue;
   createReadStream: (options?: GetRowsOptions) => ResourceStream<RowMetadata>;
   constructor(dataset: Dataset, id: string, options?: TableOptions) {
     const methods = {
@@ -2158,6 +2170,19 @@ class Table extends common.ServiceObject {
     }
 
     return resp;
+  }
+
+  createInsertStream(options?: InsertStreamOptions): Writable {
+    options = typeof options === 'object' ? options : {};
+    const dup = new Duplex({objectMode: true});
+    dup._write = (chunk: any, encoding: any, cb: any) => {
+      this.rowQueue!.add(chunk, () => {});
+      cb();
+    };
+    dup._read = function() {};
+
+    this.rowQueue = new RowQueue(this, dup, options);
+    return dup as Writable;
   }
 
   load(

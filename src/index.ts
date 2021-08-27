@@ -110,6 +110,7 @@ export {
   InsertRowsCallback,
   InsertRowsOptions,
   InsertRowsResponse,
+  InsertStreamOptions,
   JobLoadMetadata,
   PartialInsertFailure,
   PermissionsCallback,
