@@ -100,6 +100,16 @@ export class RowQueue {
    * @param {InsertRowsCallback} callback The insert callback.
    */
   add(row: RowMetadata, callback: InsertRowsCallback): void {
+    if (!this.insertRowsOptions.raw) {
+      row = {
+        json: Table.encodeValue_(row)!,
+      };
+
+      if (this.insertRowsOptions.createInsertId !== false) {
+        row.insertId = uuid.v4();
+      }
+    }
+
     if (!this.batch.canFit(row)) {
       this.insert();
     }
@@ -148,20 +158,6 @@ export class RowQueue {
     }
 
     const json = extend(true, {}, this.insertRowsOptions, {rows});
-
-    if (!this.insertRowsOptions.raw) {
-      json.rows = rows.map((row: RowMetadata) => {
-        const encoded: InsertRow = {
-          json: Table.encodeValue_(row)!,
-        };
-
-        if (this.insertRowsOptions.createInsertId !== false) {
-          encoded.insertId = uuid.v4();
-        }
-
-        return encoded;
-      });
-    }
 
     delete json.createInsertId;
     delete json.partialRetries;

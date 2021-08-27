@@ -140,7 +140,7 @@ describe('Queues', () => {
         queue.add(fakeRowMetadata, spy);
 
         const [row, callback] = stub.lastCall.args;
-        assert.deepStrictEqual(row, fakeRowMetadata);
+        assert.deepStrictEqual(row.json, fakeRowMetadata);
         assert.strictEqual(callback, spy);
         clock.restore();
       });
@@ -271,9 +271,9 @@ describe('Queues', () => {
         queue._insert(rows, callbacks);
 
         const [{json, method, uri}] = stub.lastCall.args;
-        assert.deepStrictEqual(json.rows[0].json, rows[0]);
-        assert.deepStrictEqual(json.rows[1].json, rows[1]);
-        assert.deepStrictEqual(json.rows[2].json, rows[2]);
+        assert.deepStrictEqual(json.rows[0], rows[0]);
+        assert.deepStrictEqual(json.rows[1], rows[1]);
+        assert.deepStrictEqual(json.rows[2], rows[2]);
         assert.strictEqual(method, 'POST');
         assert.strictEqual(uri, '/insertAll');
       });
