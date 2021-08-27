@@ -32,7 +32,7 @@ export const defaultOptions = {
   maxOutstandingBytes: 1 * 1024 * 1024,
 
   // The maximum time we'll wait to send batched rows, in milliseconds.
-  maxDelayMillis: 1000,
+  maxDelayMillis: 10000,
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
