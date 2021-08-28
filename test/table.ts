@@ -2784,7 +2784,7 @@ describe('BigQuery/Table', () => {
   describe('query', () => {
     it('should pass args through to datasetInstance.query()', done => {
       table.dataset.query = (a: {}, b: {}) => {
-        assert.strictEqual(a, 'a');
+        assert.deepStrictEqual(a, {query: 'a'});
         assert.strictEqual(b, 'b');
         done();
       };

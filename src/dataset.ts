@@ -1139,7 +1139,9 @@ class Dataset extends ServiceObject {
   }
 
   query(options: Query): Promise<QueryRowsResponse>;
+  query(options: string): Promise<QueryRowsResponse>;
   query(options: Query, callback: SimpleQueryRowsCallback): void;
+  query(options: string, callback: SimpleQueryRowsCallback): void;
   /**
    * Run a query scoped to your dataset.
    *
@@ -1151,7 +1153,7 @@ class Dataset extends ServiceObject {
    * @returns {Promise<QueryRowsResponse>} See {@link BigQuery#query} for full documentation of this method.
    */
   query(
-    options: Query,
+    options: Query | string,
     callback?: SimpleQueryRowsCallback
   ): void | Promise<QueryRowsResponse> {
     if (typeof options === 'string') {
