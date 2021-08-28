@@ -1473,7 +1473,7 @@ export class BigQuery extends common.Service {
    * @see [Jobs Overview]{@link https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs}
    * @see [Jobs: insert API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert}
    *
-   * @param {object} options Object in the form of a [Job resource](https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs);
+   * @param {object} options Object in the form of a [Job resource](https://cloud.google.com/bigquery/docs/reference/rest/v2/Job);
    * @param {string} [options.jobId] Custom job id.
    * @param {string} [options.jobPrefix] Prefix to apply to the job id.
    * @param {string} [options.location] The geographic location of the job.
