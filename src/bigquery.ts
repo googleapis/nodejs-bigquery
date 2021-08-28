@@ -1467,7 +1467,7 @@ export class BigQuery extends common.Service {
    *
    * However in the event you need a finer level of control over the job
    * creation, you can use this method to pass in a raw [Job
-   * resource](https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs)
+   * resource](https://cloud.google.com/bigquery/docs/reference/rest/v2/Job)
    * object.
    *
    * @see [Jobs Overview]{@link https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs}
@@ -1715,7 +1715,7 @@ export class BigQuery extends common.Service {
   /**
    * @callback GetJobsCallback
    * @param {?Error} err Request error, if any.
-   * @param {object} jobs An array of [Job]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs} objects.
+   * @param {object} jobs An array of [Job]{@link https://cloud.google.com/bigquery/docs/reference/v2/Job} objects.
    */
   /**
    * @typedef {array} GetJobsResponse
