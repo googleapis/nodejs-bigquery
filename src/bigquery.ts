@@ -2008,7 +2008,7 @@ export class BigQuery extends common.Service {
     cb?: SimpleQueryRowsCallback
   ) {
     let options =
-      typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
+      typeof optionsOrCallback === 'object' ? optionsOrCallback : query;
     const callback =
       typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
 
