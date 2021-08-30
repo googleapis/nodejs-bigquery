@@ -2271,6 +2271,7 @@ class Table extends common.ServiceObject {
   }
 
   query(query: Query): Promise<SimpleQueryRowsResponse>;
+  query(query: string): Promise<SimpleQueryRowsResponse>;
   query(query: Query, callback: SimpleQueryRowsCallback): void;
   /**
    * Run a query scoped to your dataset.
@@ -2281,9 +2282,14 @@ class Table extends common.ServiceObject {
    * @returns {Promise<SimpleQueryRowsResponse>}
    */
   query(
-    query: Query,
+    query: Query | string,
     callback?: SimpleQueryRowsCallback
   ): void | Promise<SimpleQueryRowsResponse> {
+    if (typeof query === 'string') {
+      query = {
+        query,
+      };
+    }
     this.dataset.query(query, callback!);
   }
 
