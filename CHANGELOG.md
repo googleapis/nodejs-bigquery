@@ -4,6 +4,13 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+### [5.8.1](https://www.github.com/googleapis/nodejs-bigquery/compare/v5.8.0...v5.8.1) (2021-09-07)
+
+
+### Bug Fixes
+
+* return 409 error in createJob() for dry run ([#1003](https://www.github.com/googleapis/nodejs-bigquery/issues/1003)) ([281e3ff](https://www.github.com/googleapis/nodejs-bigquery/commit/281e3ff7aadd0f300cba3510bddfc08fe4dfa642))
+
 ## [5.8.0](https://www.github.com/googleapis/nodejs-bigquery/compare/v5.7.1...v5.8.0) (2021-08-23)
 
 
