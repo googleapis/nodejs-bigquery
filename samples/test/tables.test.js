@@ -21,6 +21,12 @@ const uuid = require('uuid');
 const cp = require('child_process');
 const {Storage} = require('@google-cloud/storage');
 const {BigQuery} = require('@google-cloud/bigquery');
+const {
+  DataCatalogClient,
+  PolicyTagManagerClient,
+} = require('@google-cloud/datacatalog').v1;
+const dataCatalog = new DataCatalogClient();
+const policyTagManager = new PolicyTagManagerClient();
 
 const execSync = cmd => cp.execSync(cmd, {encoding: 'utf-8'});
 
@@ -38,6 +44,7 @@ const tableId = generateUuid();
 const nestedTableId = generateUuid();
 const partitionedTableId = generateUuid();
 const srcTableId = tableId;
+const aclTableId = generateUuid();
 const destTableId = generateUuid();
 const viewId = generateUuid();
 const bucketName = generateUuid();
@@ -46,6 +53,9 @@ const exportJSONFileName = 'data.json';
 const importFileName = 'data.avro';
 const partialDataFileName = 'partialdata.csv';
 const localFilePath = path.join(__dirname, `../resources/${importFileName}`);
+let projectId;
+let policyTag0;
+let policyTag1;
 const partialDataFilePath = path.join(
   __dirname,
   `../resources/${partialDataFileName}`
@@ -60,6 +70,30 @@ describe('Tables', () => {
       bigquery.createDataset(srcDatasetId),
       bigquery.createDataset(destDatasetId),
     ]);
+
+    // Delete stale Data Catalog resources
+    projectId = await dataCatalog.getProjectId();
+    await deleteStaleTaxonomies();
+
+    // Create Data Catalog resources
+    const parent = dataCatalog.locationPath(projectId, 'us');
+    const taxRequest = {
+      parent,
+      taxonomy: {
+        displayName: generateUuid(),
+        activatedPolicyTypes: ['FINE_GRAINED_ACCESS_CONTROL'],
+      },
+    };
+    const [taxonomy] = await policyTagManager.createTaxonomy(taxRequest);
+    const tagRequest = {
+      parent: taxonomy.name,
+      policyTag: {
+        displayName: generateUuid(),
+      },
+    };
+    [policyTag0] = await policyTagManager.createPolicyTag(tagRequest);
+    tagRequest.policyTag.displayName = generateUuid();
+    [policyTag1] = await policyTagManager.createPolicyTag(tagRequest);
   });
 
   // to avoid getting rate limited
@@ -143,6 +177,40 @@ describe('Tables', () => {
     assert.ok(exists);
   });
 
+  it('should create a clustered table', async () => {
+    const clusteredTableId = generateUuid();
+    const output = execSync(
+      `node createTableClustered.js ${datasetId} ${clusteredTableId}`
+    );
+    assert.include(
+      output,
+      `Table ${clusteredTableId} created with clustering:`
+    );
+    assert.include(output, "{ fields: [ 'city', 'zipcode' ] }");
+    const [exists] = await bigquery
+      .dataset(datasetId)
+      .table(clusteredTableId)
+      .exists();
+    assert.ok(exists);
+  });
+
+  it('should update table clustering', async () => {
+    const clusteredTableId = generateUuid();
+    const output = execSync(
+      `node removeTableClustering.js ${datasetId} ${clusteredTableId}`
+    );
+    assert.include(
+      output,
+      `Table ${clusteredTableId} created with clustering.`
+    );
+    assert.include(output, `Table ${clusteredTableId} updated clustering:`);
+    const [exists] = await bigquery
+      .dataset(datasetId)
+      .table(clusteredTableId)
+      .exists();
+    assert.ok(exists);
+  });
+
   it('should create a table with nested schema', async () => {
     const output = execSync(
       `node nestedRepeatedSchema.js ${datasetId} ${nestedTableId}`
@@ -151,6 +219,32 @@ describe('Tables', () => {
     const [exists] = await bigquery
       .dataset(datasetId)
       .table(nestedTableId)
+      .exists();
+    assert.ok(exists);
+  });
+
+  it('should create a table with column-level security', async () => {
+    const output = execSync(
+      `node createTableColumnACL.js ${datasetId} ${aclTableId} ${policyTag0.name}`
+    );
+    assert.include(output, `Created table ${aclTableId} with schema:`);
+    assert.include(output, policyTag0.name);
+    const [exists] = await bigquery
+      .dataset(datasetId)
+      .table(aclTableId)
+      .exists();
+    assert.ok(exists);
+  });
+
+  it('should update a table with column-level security', async () => {
+    const output = execSync(
+      `node updateTableColumnACL.js ${datasetId} ${aclTableId} ${policyTag1.name}`
+    );
+    assert.include(output, `Updated table ${aclTableId} with schema:`);
+    assert.include(output, policyTag1.name);
+    const [exists] = await bigquery
+      .dataset(datasetId)
+      .table(aclTableId)
       .exists();
     assert.ok(exists);
   });
@@ -318,6 +412,19 @@ describe('Tables', () => {
     const tableId = generateUuid();
     const output = execSync(
       `node loadTablePartitioned.js ${datasetId} ${tableId}`
+    );
+    assert.match(output, /completed\./);
+    const [rows] = await bigquery
+      .dataset(datasetId)
+      .table(tableId)
+      .getRows();
+    assert.ok(rows.length > 0);
+  });
+
+  it('should load a GCS CSV file to clustered table', async () => {
+    const tableId = generateUuid();
+    const output = execSync(
+      `node loadTableClustered.js ${datasetId} ${tableId}`
     );
     assert.match(output, /completed\./);
     const [rows] = await bigquery
@@ -588,4 +695,36 @@ describe('Tables', () => {
       assert.strictEqual(exists, true);
     });
   });
+
+  // Only delete a resource if it is older than 24 hours. That will prevent
+  // collisions with parallel CI test runs.
+  function isResourceStale(creationTime) {
+    const oneDayMs = 86400000;
+    const now = new Date();
+    const created = new Date(creationTime * 1000);
+    return now.getTime() - created.getTime() >= oneDayMs;
+  }
+
+  async function deleteStaleTaxonomies() {
+    const location = 'us';
+    const listTaxonomiesRequest = {
+      parent: dataCatalog.locationPath(projectId, location),
+    };
+    let [taxonomies] = await policyTagManager.listTaxonomies(
+      listTaxonomiesRequest
+    );
+
+    taxonomies = taxonomies.filter(taxonomy => {
+      return taxonomy.displayName.includes(GCLOUD_TESTS_PREFIX);
+    });
+    taxonomies.forEach(async taxonomy => {
+      if (isResourceStale(taxonomy.taxonomyTimestamps.createTime.seconds)) {
+        try {
+          await policyTagManager.deleteTaxonomy({name: taxonomy.name});
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    });
+  }
 });
