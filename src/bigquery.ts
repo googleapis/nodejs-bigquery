@@ -2008,6 +2008,8 @@ export class BigQuery extends common.Service {
     cb?: SimpleQueryRowsCallback
   ) {
     let options =
+      // Default to using query as options to ensure the options set
+      // in a Query type are passed through to the query() method.
       typeof optionsOrCallback === 'object' ? optionsOrCallback : query;
     const callback =
       typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;

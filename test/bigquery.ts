@@ -2697,13 +2697,25 @@ describe('BigQuery', () => {
       queryStub = sandbox.stub(bq, 'query').callsArgAsync(2);
     });
 
-    it('should call query correctly', done => {
+    it('should call query correctly with a string', done => {
       const query = 'SELECT';
       bq.queryAsStream_(query, done);
       assert(
         queryStub.calledOnceWithExactly(
           query,
           {autoPaginate: false},
+          sinon.match.func
+        )
+      );
+    });
+
+    it('should call query correctly with a Query object', done => {
+      const query = {query: 'SELECT', wrapIntegers: true};
+      bq.queryAsStream_(query, done);
+      assert(
+        queryStub.calledOnceWithExactly(
+          query,
+          extend(query, {autoPaginate: false}),
           sinon.match.func
         )
       );
