@@ -1518,6 +1518,9 @@ export class BigQuery extends common.Service {
     callback?: JobCallback
   ): void | Promise<JobResponse> {
     const JOB_ID_PROVIDED = typeof options.jobId !== 'undefined';
+    const DRY_RUN = options.configuration?.dryRun
+      ? options.configuration.dryRun
+      : false;
 
     const reqOpts = Object.assign({}, options);
     let jobId = JOB_ID_PROVIDED ? reqOpts.jobId : uuid.v4();
@@ -1558,7 +1561,8 @@ export class BigQuery extends common.Service {
         if (err) {
           if (
             (err as common.ApiError).code === ALREADY_EXISTS_CODE &&
-            !JOB_ID_PROVIDED
+            !JOB_ID_PROVIDED &&
+            !DRY_RUN
           ) {
             // The last insert attempt flaked, but the API still processed the
             // request and created the job. Because of our "autoRetry" feature,

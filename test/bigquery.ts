@@ -1749,6 +1749,20 @@ describe('BigQuery', () => {
       });
     });
 
+    it('should return 409 if dryRun is true', done => {
+      const error = new util.ApiError('Error.');
+      error.code = 409;
+
+      bq.request = (reqOpts: DecorateRequestOptions, callback: Function) => {
+        callback(error);
+      };
+
+      bq.createJob({configuration: {dryRun: true}}, (err: Error) => {
+        assert.strictEqual(err, error);
+        done();
+      });
+    });
+
     it('should return any status errors', done => {
       const errors = [{reason: 'notFound'}];
       const response = extend(true, {}, RESPONSE, {
