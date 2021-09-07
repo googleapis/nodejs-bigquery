@@ -1597,7 +1597,7 @@ describe('BigQuery', () => {
     });
   });
 
-  describe('createJob', () => {
+  describe.only('createJob', () => {
     const RESPONSE = {
       status: {
         state: 'RUNNING',
@@ -1744,6 +1744,20 @@ describe('BigQuery', () => {
       };
 
       bq.createJob({jobId: 'job-id'}, (err: Error) => {
+        assert.strictEqual(err, error);
+        done();
+      });
+    });
+
+    it('should return 409 if dryRun is true', done => {
+      const error = new util.ApiError('Error.');
+      error.code = 409;
+
+      bq.request = (reqOpts: DecorateRequestOptions, callback: Function) => {
+        callback(error);
+      };
+
+      bq.createJob({configuration: {dryRun: true}}, (err: Error) => {
         assert.strictEqual(err, error);
         done();
       });
