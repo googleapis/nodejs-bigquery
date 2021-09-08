@@ -4,6 +4,18 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## [5.9.0](https://www.github.com/googleapis/nodejs-bigquery/compare/v5.8.0...v5.9.0) (2021-09-08)
+
+
+### Features
+
+* publish post-processor images to cloud-devrel-public-resources ([#1203](https://www.github.com/googleapis/nodejs-bigquery/issues/1203)) ([#1005](https://www.github.com/googleapis/nodejs-bigquery/issues/1005)) ([e852cb2](https://www.github.com/googleapis/nodejs-bigquery/commit/e852cb22d0dd539941a0b1a8e6f9a7dde214fe84))
+
+
+### Bug Fixes
+
+* return 409 error in createJob() for dry run ([#1003](https://www.github.com/googleapis/nodejs-bigquery/issues/1003)) ([281e3ff](https://www.github.com/googleapis/nodejs-bigquery/commit/281e3ff7aadd0f300cba3510bddfc08fe4dfa642))
+
 ## [5.8.0](https://www.github.com/googleapis/nodejs-bigquery/compare/v5.7.1...v5.8.0) (2021-08-23)
 
 
