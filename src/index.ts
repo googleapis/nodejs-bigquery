@@ -82,6 +82,7 @@ export {
 export {
   CancelCallback,
   CancelResponse,
+  DeleteCallback,
   Job,
   JobMetadata,
   JobOptions,
