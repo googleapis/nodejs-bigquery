@@ -646,7 +646,7 @@ describe('BigQuery', () => {
     });
   });
 
-  describe.only('BigQuery/Job', () => {
+  describe('BigQuery/Job', () => {
     it('should delete a job', async () => {
       const opts = {
         configuration: {
