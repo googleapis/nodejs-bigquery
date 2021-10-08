@@ -59,12 +59,6 @@ function main(
 
     // load() waits for the job to finish
     console.log(`Job ${job.id} completed.`);
-
-    // Check the job's status for errors
-    const errors = job.status.errors;
-    if (errors && errors.length > 0) {
-      throw errors;
-    }
   }
   // [END bigquery_load_table_gcs_avro]
   loadTableGCSAvro();
