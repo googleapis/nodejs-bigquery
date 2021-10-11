@@ -66,12 +66,6 @@ function main(
     console.log(
       `Write disposition used: ${job.configuration.load.writeDisposition}.`
     );
-
-    // Check the job's status for errors
-    const errors = job.status.errors;
-    if (errors && errors.length > 0) {
-      throw errors;
-    }
   }
   // [END bigquery_load_table_gcs_avro_truncate]
   loadTableGCSAvroTruncate();

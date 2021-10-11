@@ -41,12 +41,6 @@ function main(
       .load(filename);
 
     console.log(`Job ${job.id} completed.`);
-
-    // Check the job's status for errors
-    const errors = job.status.errors;
-    if (errors && errors.length > 0) {
-      throw errors;
-    }
   }
   // [END bigquery_load_from_file]
   loadLocalFile();
