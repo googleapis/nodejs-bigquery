@@ -1,4 +1,4 @@
-// Copyright 2020 Google LLC
+// Copyright 2021 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,12 +14,9 @@
 
 'use strict';
 
-function main(
-  datasetId = 'my_dataset', // Existing dataset ID
-  tableId = 'us_states' // Existing table ID
-) {
-  // [START bigquery_load_table_gcs_avro_truncate]
-  // Import the Google Cloud client libraries
+function main(datasetId = 'my_dataset', tableId = 'my_table') {
+  // [START bigquery_load_table_clustered]
+  // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
   const {Storage} = require('@google-cloud/storage');
 
@@ -28,46 +25,49 @@ function main(
   const storage = new Storage();
 
   /**
-   * This sample loads the Avro file at
-   * https://storage.googleapis.com/cloud-samples-data/bigquery/us-states/us-states.avro
+   * This sample loads the CSV file at
+   * https://storage.googleapis.com/cloud-samples-data/sample-transactions/transactions.csv
    *
    * TODO(developer): Replace the following lines with the path to your file.
    */
   const bucketName = 'cloud-samples-data';
-  const filename = 'bigquery/us-states/us-states.avro';
+  const filename = 'bigquery/sample-transactions/transactions.csv';
 
-  async function loadTableGCSAvroTruncate() {
-    /**
-     * Imports a GCS file into a table and overwrites
-     * table data if table already exists.
-     */
+  async function loadTableClustered() {
+    // Loads a new clustered table named "my_table" in "my_dataset".
 
     /**
      * TODO(developer): Uncomment the following lines before running the sample.
      */
-    // const datasetId = 'my_dataset';
-    // const tableId = 'us_states';
+    // const datasetId = "my_dataset";
+    // const tableId = "my_table";
 
-    // Configure the load job. For full list of options, see:
-    // https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationLoad
-    const jobConfigurationLoad = {
-      sourceFormat: 'AVRO',
-      writeDisposition: 'WRITE_TRUNCATE',
+    const metadata = {
+      sourceFormat: 'CSV',
+      skipLeadingRows: 1,
+      schema: {
+        fields: [
+          {name: 'timestamp', type: 'TIMESTAMP'},
+          {name: 'origin', type: 'STRING'},
+          {name: 'destination', type: 'STRING'},
+          {name: 'amount', type: 'NUMERIC'},
+        ],
+      },
+      clustering: {
+        fields: ['origin', 'destination'],
+      },
     };
 
     // Load data from a Google Cloud Storage file into the table
     const [job] = await bigquery
       .dataset(datasetId)
       .table(tableId)
-      .load(storage.bucket(bucketName).file(filename), jobConfigurationLoad);
+      .load(storage.bucket(bucketName).file(filename), metadata);
 
     // load() waits for the job to finish
     console.log(`Job ${job.id} completed.`);
-    console.log(
-      `Write disposition used: ${job.configuration.load.writeDisposition}.`
-    );
   }
-  // [END bigquery_load_table_gcs_avro_truncate]
-  loadTableGCSAvroTruncate();
+  // [END bigquery_load_table_clustered]
+  loadTableClustered(datasetId, tableId);
 }
 main(...process.argv.slice(2));

@@ -1,4 +1,4 @@
-// Copyright 2020 Google LLC
+// Copyright 2021 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,11 +14,8 @@
 
 'use strict';
 
-function main(
-  datasetId = 'my_dataset', // Existing dataset ID
-  tableId = 'us_states' // Existing table ID
-) {
-  // [START bigquery_load_table_gcs_avro_truncate]
+function main(datasetId = 'my_dataset', tableId = 'my_table') {
+  // [START bigquery_load_table_uri_firestore]
   // Import the Google Cloud client libraries
   const {BigQuery} = require('@google-cloud/bigquery');
   const {Storage} = require('@google-cloud/storage');
@@ -28,46 +25,31 @@ function main(
   const storage = new Storage();
 
   /**
-   * This sample loads the Avro file at
-   * https://storage.googleapis.com/cloud-samples-data/bigquery/us-states/us-states.avro
-   *
    * TODO(developer): Replace the following lines with the path to your file.
    */
   const bucketName = 'cloud-samples-data';
-  const filename = 'bigquery/us-states/us-states.avro';
+  const filename =
+    'bigquery/us-states/2021-07-02T16:04:48_70344/all_namespaces/kind_us-states/all_namespaces_kind_us-states.export_metadata';
 
-  async function loadTableGCSAvroTruncate() {
-    /**
-     * Imports a GCS file into a table and overwrites
-     * table data if table already exists.
-     */
+  async function loadTableURIFirestore() {
+    // Imports a GCS Firestore export file into a table.
 
     /**
      * TODO(developer): Uncomment the following lines before running the sample.
      */
     // const datasetId = 'my_dataset';
-    // const tableId = 'us_states';
-
-    // Configure the load job. For full list of options, see:
-    // https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationLoad
-    const jobConfigurationLoad = {
-      sourceFormat: 'AVRO',
-      writeDisposition: 'WRITE_TRUNCATE',
-    };
+    // const tableId = 'my_table';
 
     // Load data from a Google Cloud Storage file into the table
     const [job] = await bigquery
       .dataset(datasetId)
       .table(tableId)
-      .load(storage.bucket(bucketName).file(filename), jobConfigurationLoad);
+      .load(storage.bucket(bucketName).file(filename));
 
     // load() waits for the job to finish
     console.log(`Job ${job.id} completed.`);
-    console.log(
-      `Write disposition used: ${job.configuration.load.writeDisposition}.`
-    );
   }
-  // [END bigquery_load_table_gcs_avro_truncate]
-  loadTableGCSAvroTruncate();
+  // [END bigquery_load_table_uri_firestore]
+  loadTableURIFirestore();
 }
 main(...process.argv.slice(2));

@@ -1467,13 +1467,13 @@ export class BigQuery extends common.Service {
    *
    * However in the event you need a finer level of control over the job
    * creation, you can use this method to pass in a raw [Job
-   * resource](https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs)
+   * resource](https://cloud.google.com/bigquery/docs/reference/rest/v2/Job)
    * object.
    *
    * @see [Jobs Overview]{@link https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs}
    * @see [Jobs: insert API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert}
    *
-   * @param {object} options Object in the form of a [Job resource](https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs);
+   * @param {object} options Object in the form of a [Job resource](https://cloud.google.com/bigquery/docs/reference/rest/v2/Job);
    * @param {string} [options.jobId] Custom job id.
    * @param {string} [options.jobPrefix] Prefix to apply to the job id.
    * @param {string} [options.location] The geographic location of the job.
@@ -1518,6 +1518,9 @@ export class BigQuery extends common.Service {
     callback?: JobCallback
   ): void | Promise<JobResponse> {
     const JOB_ID_PROVIDED = typeof options.jobId !== 'undefined';
+    const DRY_RUN = options.configuration?.dryRun
+      ? options.configuration.dryRun
+      : false;
 
     const reqOpts = Object.assign({}, options);
     let jobId = JOB_ID_PROVIDED ? reqOpts.jobId : uuid.v4();
@@ -1558,7 +1561,8 @@ export class BigQuery extends common.Service {
         if (err) {
           if (
             (err as common.ApiError).code === ALREADY_EXISTS_CODE &&
-            !JOB_ID_PROVIDED
+            !JOB_ID_PROVIDED &&
+            !DRY_RUN
           ) {
             // The last insert attempt flaked, but the API still processed the
             // request and created the job. Because of our "autoRetry" feature,
@@ -1715,7 +1719,7 @@ export class BigQuery extends common.Service {
   /**
    * @callback GetJobsCallback
    * @param {?Error} err Request error, if any.
-   * @param {object} jobs An array of [Job]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs} objects.
+   * @param {object} jobs An array of [Job]{@link https://cloud.google.com/bigquery/docs/reference/v2/Job} objects.
    */
   /**
    * @typedef {array} GetJobsResponse
