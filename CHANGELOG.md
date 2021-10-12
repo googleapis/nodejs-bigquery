@@ -4,6 +4,13 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+### [5.9.1](https://www.github.com/googleapis/nodejs-bigquery/compare/v5.9.0...v5.9.1) (2021-10-12)
+
+
+### Bug Fixes
+
+* update queryAsStream_ to set options with Query type ([#999](https://www.github.com/googleapis/nodejs-bigquery/issues/999)) ([e7eab0b](https://www.github.com/googleapis/nodejs-bigquery/commit/e7eab0b25c18c6bbb9fa0f92f180ba70632675aa))
+
 ## [5.9.0](https://www.github.com/googleapis/nodejs-bigquery/compare/v5.8.0...v5.9.0) (2021-09-08)
 
 
