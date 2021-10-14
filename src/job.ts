@@ -181,6 +181,9 @@ class Job extends Operation {
        * Get a job if it exists.
        *
        * @method Job#get
+       * @param {object} [options] Configuration object.
+       * @param {string} [options.location] The geographic location of the job.
+       *     Required except for US and EU.
        * @param {GetJobCallback} [callback] The callback function.
        * @param {?error} callback.err An error returned while making this
        *     request.
