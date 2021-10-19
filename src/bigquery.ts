@@ -234,7 +234,7 @@ export const PROTOCOL_REGEX = /^(\w*):\/\//;
  *
  * @class
  *
- * @see [What is BigQuery?]{@link https://cloud.google.com/bigquery/what-is-bigquery}
+ * See {@link https://cloud.google.com/bigquery/what-is-bigquery| What is BigQuery?}
  *
  * @param {BigQueryOptions} options Constructor options.
  *
@@ -907,7 +907,7 @@ export class BigQuery extends common.Service {
    *
    * @throws {error} If the type provided is invalid.
    *
-   * @see [Data Type]{@link https://cloud.google.com/bigquery/data-types}
+   * See {@link https://cloud.google.com/bigquery/data-types| Data Type}
    *
    * @param {*} providedType The type.
    * @returns {string} The valid type provided.
@@ -968,7 +968,7 @@ export class BigQuery extends common.Service {
    *
    * @throws {error} If the type could not be detected.
    *
-   * @see [Data Type]{@link https://cloud.google.com/bigquery/data-types}
+   * See {@link https://cloud.google.com/bigquery/data-types| Data Type}
    *
    * @param {*} value The value.
    * @returns {string} The type detected from the value.
@@ -1050,7 +1050,7 @@ export class BigQuery extends common.Service {
    *
    * @private
    *
-   * @see [Jobs.query API Reference Docs (see `queryParameters`)]{@link https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs/query#request-body}
+   * See {@link https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs/query#request-body| Jobs.query API Reference Docs (see `queryParameters`)}
    *
    * @param {*} value The value.
    * @param {string|ProvidedTypeStruct|ProvidedTypeArray} providedType Provided
@@ -1155,7 +1155,7 @@ export class BigQuery extends common.Service {
   /**
    * Create a dataset.
    *
-   * @see [Datasets: insert API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/datasets/insert}
+   * See {@link https://cloud.google.com/bigquery/docs/reference/v2/datasets/insert| Datasets: insert API Documentation}
    *
    * @param {string} id ID of the dataset to create.
    * @param {object} [options] See a
@@ -1237,7 +1237,7 @@ export class BigQuery extends common.Service {
    * ping for the results. See the Job documentation for explanations of how to
    * check on the status of the job.
    *
-   * @see [Jobs: insert API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert}
+   * See {@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert| Jobs: insert API Documentation}
    *
    * @param {object|string} options The configuration object. This must be in
    * the format of the [`configuration.query`](https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationQuery)
@@ -1470,8 +1470,8 @@ export class BigQuery extends common.Service {
    * resource](https://cloud.google.com/bigquery/docs/reference/rest/v2/Job)
    * object.
    *
-   * @see [Jobs Overview]{@link https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs}
-   * @see [Jobs: insert API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert}
+   * See {@link https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs| Jobs Overview}
+   * See {@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert| Jobs: insert API Documentation}
    *
    * @param {object} options Object in the form of a [Job resource](https://cloud.google.com/bigquery/docs/reference/rest/v2/Job);
    * @param {string} [options.jobId] Custom job id.
@@ -1623,7 +1623,7 @@ export class BigQuery extends common.Service {
   /**
    * List all or some of the datasets in your project.
    *
-   * @see [Datasets: list API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/datasets/list}
+   * See {@link https://cloud.google.com/bigquery/docs/reference/v2/datasets/list| Datasets: list API Documentation}
    *
    * @param {object} [options] Configuration object.
    * @param {boolean} [options.all] List all datasets, including hidden ones.
@@ -1728,7 +1728,7 @@ export class BigQuery extends common.Service {
   /**
    * Get all of the jobs from your project.
    *
-   * @see [Jobs: list API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/list}
+   * See {@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/list| Jobs: list API Documentation}
    *
    * @param {object} [options] Configuration object.
    * @param {boolean} [options.allUsers] Display jobs owned by all users in the
@@ -1860,7 +1860,7 @@ export class BigQuery extends common.Service {
    * Run a query scoped to your project. For manual pagination please refer to
    * {@link BigQuery#createQueryJob}.
    *
-   * @see [Jobs: query API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/query}
+   * See {@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/query| Jobs: query API Documentation}
    *
    * @param {string|object} query A string SQL query or configuration object.
    *     For all available options, see

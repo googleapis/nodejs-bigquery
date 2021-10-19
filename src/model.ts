@@ -92,7 +92,7 @@ class Model extends common.ServiceObject {
       /**
        * Delete the model.
        *
-       * @see [Models: delete API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/rest/v2/models/delete}
+       * See {@link https://cloud.google.com/bigquery/docs/reference/rest/v2/models/delete| Models: delete API Documentation}
        *
        * @method Model#delete
        * @param {DeleteModelCallback} [callback] The callback function.
@@ -161,7 +161,7 @@ class Model extends common.ServiceObject {
       /**
        * Get a model if it exists.
        *
-       * @see [Models: get API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/rest/v2/models/get}
+       * See {@link https://cloud.google.com/bigquery/docs/reference/rest/v2/models/get| Models: get API Documentation}
        *
        * @method Model#get:
        * @param {GetModelCallback} [callback] The callback function.
@@ -202,7 +202,7 @@ class Model extends common.ServiceObject {
       /**
        * Return the metadata associated with the model.
        *
-       * @see [Models: get API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/rest/v2/models/get}
+       * See {@link https://cloud.google.com/bigquery/docs/reference/rest/v2/models/get| Models: get API Documentation}
        *
        * @method Model#getMetadata
        * @param {GetModelMetadataCallback} [callback] The callback function.
@@ -237,7 +237,7 @@ class Model extends common.ServiceObject {
        * @property {object} 1 The full API response.
        */
       /**
-       * @see [Models: patch API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/rest/v2/models/patch}
+       * See {@link https://cloud.google.com/bigquery/docs/reference/rest/v2/models/patch| Models: patch API Documentation}
        *
        * @method Model#setMetadata
        * @param {object} metadata The metadata key/value object to set.
@@ -301,7 +301,7 @@ class Model extends common.ServiceObject {
   /**
    * Export model to Cloud Storage.
    *
-   * @see [Jobs: insert API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert}
+   * See {@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert| Jobs: insert API Documentation}
    *
    * @param {string|File} destination Where the model should be exported
    *    to. A string or {@link
