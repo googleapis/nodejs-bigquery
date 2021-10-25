@@ -264,7 +264,7 @@ class Dataset extends ServiceObject {
       /**
        * Get the metadata for the Dataset.
        *
-       * @see [Datasets: get API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/datasets/get}
+       * See {@link https://cloud.google.com/bigquery/docs/reference/v2/datasets/get| Datasets: get API Documentation}
        *
        * @method Dataset#getMetadata
        * @param {GetDatasetMetadataCallback} [callback] The callback function.
@@ -302,7 +302,7 @@ class Dataset extends ServiceObject {
       /**
        * Sets the metadata of the Dataset object.
        *
-       * @see [Datasets: patch API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/datasets/patch}
+       * See {@link https://cloud.google.com/bigquery/docs/reference/v2/datasets/patch| Datasets: patch API Documentation}
        *
        * @method Dataset#setMetadata
        * @param {object} metadata Metadata to save on the Dataset.
@@ -542,7 +542,7 @@ class Dataset extends ServiceObject {
   /**
    * Create a {@link Routine}.
    *
-   * @see [Routines: insert API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/rest/v2/routines/insert}
+   * See {@link https://cloud.google.com/bigquery/docs/reference/rest/v2/routines/insert| Routines: insert API Documentation}
    *
    * @param {string} id The routine ID.
    * @param {object} config A [routine resource]{@link https://cloud.google.com/bigquery/docs/reference/rest/v2/routines#Routine}.
@@ -631,7 +631,7 @@ class Dataset extends ServiceObject {
   /**
    * Create a {@link Table} given a tableId or configuration object.
    *
-   * @see [Tables: insert API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/tables/insert}
+   * See {@link https://cloud.google.com/bigquery/docs/reference/v2/tables/insert| Tables: insert API Documentation}
    *
    * @param {string} id Table id.
    * @param {object} [options] See a
@@ -725,7 +725,7 @@ class Dataset extends ServiceObject {
   /**
    * Delete the dataset.
    *
-   * @see [Datasets: delete API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/datasets/delete}
+   * See {@link https://cloud.google.com/bigquery/docs/reference/v2/datasets/delete| Datasets: delete API Documentation}
    *
    * @param {object} [options] The configuration object.
    * @param {boolean} [options.force=false] Force delete dataset and all tables.
@@ -809,7 +809,7 @@ class Dataset extends ServiceObject {
   /**
    * Get a list of {@link Model} resources.
    *
-   * @see [Models: list API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/rest/v2/models/list}
+   * See {@link https://cloud.google.com/bigquery/docs/reference/rest/v2/models/list| Models: list API Documentation}
    *
    * @param {GetModelsOptions} [options] Configuration object.
    * @param {boolean} [options.autoPaginate=true] Have pagination handled
@@ -919,7 +919,7 @@ class Dataset extends ServiceObject {
   /**
    * Get a list of routines.
    *
-   * @see [Routines: list API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/rest/v2/routines/list}
+   * See {@link https://cloud.google.com/bigquery/docs/reference/rest/v2/routines/list| Routines: list API Documentation}
    *
    * @param {GetRoutinesOptions} [options] Request options.
    * @param {boolean} [options.autoPaginate=true] Have pagination handled
@@ -1027,7 +1027,7 @@ class Dataset extends ServiceObject {
   /**
    * Get a list of {@link Table} resources.
    *
-   * @see [Tables: list API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/tables/list}
+   * See {@link https://cloud.google.com/bigquery/docs/reference/v2/tables/list| Tables: list API Documentation}
    *
    * @param {GetTablesOptions} options Configuration object.
    * @param {boolean} [options.autoPaginate=true] Have pagination handled automatically.

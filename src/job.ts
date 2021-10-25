@@ -228,7 +228,7 @@ class Job extends Operation {
        * Get the metadata of the job. This will mostly be useful for checking
        * the status of a previously-run job.
        *
-       * @see [Jobs: get API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/get}
+       * See {@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/get| Jobs: get API Documentation}
        *
        * @method Job#getMetadata
        * @param {GetJobMetadataCallback} [callback] The callback function.
@@ -330,7 +330,7 @@ class Job extends Operation {
    * Cancel a job. Use {@link Job#getMetadata} to see if the cancel
    * completes successfully. See an example implementation below.
    *
-   * @see [Jobs: get API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/cancel}
+   * See {@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/cancel| Jobs: get API Documentation}
    *
    * @param {CancelCallback} [callback] The callback function.
    * @param {?error} callback.err An error returned while making this request.
@@ -382,7 +382,7 @@ class Job extends Operation {
   /**
    * Get the results of a job.
    *
-   * @see [Jobs: getQueryResults API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/getQueryResults}
+   * See {@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/getQueryResults| Jobs: getQueryResults API Documentation}
    *
    * @param {object} [options] Configuration object.
    * @param {boolean} [options.autoPaginate=true] Have pagination handled
