@@ -259,7 +259,7 @@ class Table extends common.ServiceObject {
       /**
        * Delete a table and all its data.
        *
-       * @see [Tables: delete API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/tables/delete}
+       * See {@link https://cloud.google.com/bigquery/docs/reference/v2/tables/delete| Tables: delete API Documentation}
        *
        * @method Table#delete
        * @param {DeleteTableCallback} [callback]
@@ -388,7 +388,7 @@ class Table extends common.ServiceObject {
       /**
        * Return the metadata associated with the Table.
        *
-       * @see [Tables: get API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/tables/get}
+       * See {@link https://cloud.google.com/bigquery/docs/reference/v2/tables/get| Tables: get API Documentation}
        *
        * @method Table#getMetadata
        * @param {GetTableMetadataCallback} [callback] The callback function.
@@ -449,7 +449,7 @@ class Table extends common.ServiceObject {
      * Create a readable stream of the rows of data in your table. This method
      * is simply a wrapper around {@link Table#getRows}.
      *
-     * @see [Tabledata: list API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/tabledata/list}
+     * See {@link https://cloud.google.com/bigquery/docs/reference/v2/tabledata/list| Tabledata: list API Documentation}
      *
      * @returns {ReadableStream}
      *
@@ -803,7 +803,7 @@ class Table extends common.ServiceObject {
   /**
    * Copy data from one table to another, optionally creating that table.
    *
-   * @see [Jobs: insert API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert}
+   * See {@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert| Jobs: insert API Documentation}
    *
    * @param {Table} destination The destination table.
    * @param {object} [metadata] Metadata to set with the copy operation. The
@@ -914,7 +914,7 @@ class Table extends common.ServiceObject {
   /**
    * Copy data from multiple tables into this table.
    *
-   * @see [Jobs: insert API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert}
+   * See {@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert| Jobs: insert API Documentation}
    *
    * @param {Table|Table[]} sourceTables The
    *     source table(s) to copy data from.
@@ -1037,7 +1037,7 @@ class Table extends common.ServiceObject {
   /**
    * Export table to Cloud Storage.
    *
-   * @see [Jobs: insert API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert}
+   * See {@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert| Jobs: insert API Documentation}
    *
    * @param {string|File} destination Where the file should be exported
    *     to. A string or a {@link
@@ -1211,7 +1211,7 @@ class Table extends common.ServiceObject {
    * Note: The file type will be inferred by the given file's extension. If you
    * wish to override this, you must provide `metadata.format`.
    *
-   * @see [Jobs: insert API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert}
+   * See {@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert| Jobs: insert API Documentation}
    *
    * @param {string|File|File[]} source The source file to load. A string (path)
    * to a local file, or one or more {@link
@@ -1518,7 +1518,7 @@ class Table extends common.ServiceObject {
    * Load data into your table from a readable stream of AVRO, CSV, JSON, ORC,
    * or PARQUET data.
    *
-   * @see [Jobs: insert API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert}
+   * See {@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert| Jobs: insert API Documentation}
    *
    * @param {string|object} [metadata] Metadata to set with the load operation.
    *     The metadata object should be in the format of the
@@ -1709,7 +1709,7 @@ class Table extends common.ServiceObject {
    * Retrieves table data from a specified set of rows. The rows are returned to
    * your callback as an array of objects matching your table's schema.
    *
-   * @see [Tabledata: list API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/tabledata/list}
+   * See {@link https://cloud.google.com/bigquery/docs/reference/v2/tabledata/list| Tabledata: list API Documentation}
    *
    * @param {object} [options] The configuration object.
    * @param {boolean} [options.autoPaginate=true] Have pagination handled
@@ -1863,9 +1863,9 @@ class Table extends common.ServiceObject {
    * automatically retry those failed inserts, and it will even create the
    * table with the provided schema if it does not exist.
    *
-   * @see [Tabledata: insertAll API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/tabledata/insertAll}
-   * @see [Streaming Insert Limits]{@link https://cloud.google.com/bigquery/quotas#streaming_inserts}
-   * @see [Troubleshooting Errors]{@link https://developers.google.com/bigquery/troubleshooting-errors}
+   * See {@link https://cloud.google.com/bigquery/docs/reference/v2/tabledata/insertAll| Tabledata: insertAll API Documentation}
+   * See {@link https://cloud.google.com/bigquery/quotas#streaming_inserts| Streaming Insert Limits}
+   * See {@link https://developers.google.com/bigquery/troubleshooting-errors| Troubleshooting Errors}
    *
    * @param {object|object[]} rows The rows to insert into the table.
    * @param {object} [options] Configuration object.
@@ -2303,7 +2303,7 @@ class Table extends common.ServiceObject {
   /**
    * Set the metadata on the table.
    *
-   * @see [Tables: patch API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/tables/patch}
+   * See {@link https://cloud.google.com/bigquery/docs/reference/v2/tables/patch| Tables: patch API Documentation}
    *
    * @param {object} metadata The metadata key/value object to set.
    * @param {string} metadata.description A user-friendly description of the

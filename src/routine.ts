@@ -42,7 +42,7 @@ class Routine extends common.ServiceObject {
       /**
        * Create a routine.
        *
-       * @see [Routines: insert API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/rest/v2/routines/insert}
+       * See {@link https://cloud.google.com/bigquery/docs/reference/rest/v2/routines/insert| Routines: insert API Documentation}
        *
        * @method Routine#create
        * @param {object} config A [routine resource]{@link https://cloud.google.com/bigquery/docs/reference/rest/v2/routines#Routine}.
@@ -92,7 +92,7 @@ class Routine extends common.ServiceObject {
       /**
        * Deletes a routine.
        *
-       * @see [Routines: delete API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/rest/v2/routines/delete}
+       * See {@link https://cloud.google.com/bigquery/docs/reference/rest/v2/routines/delete| Routines: delete API Documentation}
        *
        * @method Routine#delete
        * @param {DeleteRoutineCallback} [callback] The callback function.
@@ -158,7 +158,7 @@ class Routine extends common.ServiceObject {
       /**
        * Get a routine if it exists.
        *
-       * @see [Routines: get API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/rest/v2/routines/get}
+       * See {@link https://cloud.google.com/bigquery/docs/reference/rest/v2/routines/get| Routines: get API Documentation}
        *
        * @method Routine#get
        * @param {GetRoutineCallback} [callback] The callback function.
@@ -191,7 +191,7 @@ class Routine extends common.ServiceObject {
       /**
        * Get the metadata associated with a routine.
        *
-       * @see [Routines: get API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/rest/v2/routines/get}
+       * See {@link https://cloud.google.com/bigquery/docs/reference/rest/v2/routines/get| Routines: get API Documentation}
        *
        * @method Routine#getMetadata
        * @param {GetRoutineMetadataCallback} [callback] The callback function.
@@ -224,7 +224,7 @@ class Routine extends common.ServiceObject {
       /**
        * Update a routine.
        *
-       * @see [Routines: update API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/rest/v2/routines/update}
+       * See {@link https://cloud.google.com/bigquery/docs/reference/rest/v2/routines/update| Routines: update API Documentation}
        *
        * @method Routine#setMetadata
        * @param {object} metadata A [routine resource object]{@link https://cloud.google.com/bigquery/docs/reference/rest/v2/routines#Routine}.
