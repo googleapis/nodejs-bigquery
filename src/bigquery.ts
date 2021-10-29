@@ -227,7 +227,7 @@ export const PROTOCOL_REGEX = /^(\w*):\/\//;
 /**
  * In the following examples from this page and the other modules (`Dataset`,
  * `Table`, etc.), we are going to be using a dataset from
- * [data.gov](http://goo.gl/f2SXcb) of higher education institutions.
+ * {@link http://goo.gl/f2SXcb| data.gov} of higher education institutions.
  *
  * We will create a table with the correct schema, import the public CSV file
  * into that table, and query it for data.
@@ -1195,7 +1195,7 @@ export class BigQuery extends common.Service {
    *
    * @param {string} id ID of the dataset to create.
    * @param {object} [options] See a
-   *     [Dataset resource](https://cloud.google.com/bigquery/docs/reference/v2/datasets#resource).
+   *     {@link https://cloud.google.com/bigquery/docs/reference/v2/datasets#resource| Dataset resource}.
    * @param {DatasetCallback} [callback] The callback function.
    * @param {?error} callback.err An error returned while making this request
    * @param {Dataset} callback.dataset The newly created dataset
@@ -1277,7 +1277,7 @@ export class BigQuery extends common.Service {
    * See {@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert| Jobs: insert API Documentation}
    *
    * @param {object|string} options The configuration object. This must be in
-   * the format of the [`configuration.query`](https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationQuery)
+   * the format of the {@link https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationQuery| `configuration.query`}
    * property of a Jobs resource. If a string is provided, this is used as the
    * query string, and all other options are defaulted.
    * @param {Table} [options.destination] The table to save the
@@ -1297,7 +1297,7 @@ export class BigQuery extends common.Service {
    *     syntax, of the query to execute.
    * @param {boolean} [options.useLegacySql=false] Option to use legacy sql syntax.
    * @param {object} [options.defaultDataset] The dataset. This must be in
-   *     the format of the [`DatasetReference`](https://cloud.google.com/bigquery/docs/reference/rest/v2/datasets#DatasetReference)
+   *     the format of the {@link https://cloud.google.com/bigquery/docs/reference/rest/v2/datasets#DatasetReference| `DatasetReference`}
    * @param {boolean} [options.wrapIntegers] Optionally wrap INT64 in BigQueryInt
    *     or custom INT64 value type.
    * @param {object|array} [options.params] Option to provide query prarameters.
@@ -1505,13 +1505,13 @@ export class BigQuery extends common.Service {
    * - {@link Table#createLoadJob}
    *
    * However in the event you need a finer level of control over the job
-   * creation, you can use this method to pass in a raw [Job resource](https://cloud.google.com/bigquery/docs/reference/rest/v2/Job)
+   * creation, you can use this method to pass in a raw {@link https://cloud.google.com/bigquery/docs/reference/rest/v2/Job| Job resource}
    * object.
    *
    * See {@link https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs| Jobs Overview}
    * See {@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert| Jobs: insert API Documentation}
    *
-   * @param {object} options Object in the form of a [Job resource](https://cloud.google.com/bigquery/docs/reference/rest/v2/Job);
+   * @param {object} options Object in the form of a {@link https://cloud.google.com/bigquery/docs/reference/rest/v2/Job| Job resource};
    * @param {string} [options.jobId] Custom job id.
    * @param {string} [options.jobPrefix] Prefix to apply to the job id.
    * @param {string} [options.location] The geographic location of the job.
@@ -1912,7 +1912,7 @@ export class BigQuery extends common.Service {
    *
    * @param {string|object} query A string SQL query or configuration object.
    *     For all available options, see
-   *     [Jobs: query request body](https://cloud.google.com/bigquery/docs/reference/v2/jobs/query#request-body).
+   *     {@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/query#request-body| Jobs: query request body}.
    * @param {string} [query.location] The geographic location of the job.
    *     Required except for US and EU.
    * @param {string} [query.jobId] Custom id for the underlying job.

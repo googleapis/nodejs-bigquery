@@ -661,13 +661,13 @@ class Dataset extends ServiceObject {
    *
    * @param {string} id Table id.
    * @param {object} [options] See a
-   *     [Table resource](https://cloud.google.com/bigquery/docs/reference/v2/tables#resource).
+   *     {@link https://cloud.google.com/bigquery/docs/reference/v2/tables#resource| Table resource}.
    * @param {string|object} [options.schema] A comma-separated list of name:type
    *     pairs. Valid types are "string", "integer", "float", "boolean", and
    *     "timestamp". If the type is omitted, it is assumed to be "string".
    *     Example: "name:string, age:integer". Schemas can also be specified as a
    *     JSON array of fields, which allows for nested and repeated fields. See
-   *     a [Table resource](http://goo.gl/sl8Dmg) for more detailed information.
+   *     a {@link http://goo.gl/sl8Dmg| Table resource} for more detailed information.
    * @param {TableCallback} [callback] The callback function.
    * @param {?error} callback.err An error returned while making this request
    * @param {Table} callback.table The newly created table.
