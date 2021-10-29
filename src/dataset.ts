@@ -112,9 +112,11 @@ export type TableCallback = ResourceCallback<Table, bigquery.ITable>;
  *      Defaults to US.
  *
  * @example
+ * ```
  * const {BigQuery} = require('@google-cloud/bigquery');
  * const bigquery = new BigQuery();
  * const dataset = bigquery.dataset('institutions');
+ * ```
  */
 class Dataset extends ServiceObject {
   bigQuery: BigQuery;
@@ -147,6 +149,7 @@ class Dataset extends ServiceObject {
        * @returns {Promise<CreateDatasetResponse>}
        *
        * @example
+       * ```
        * const {BigQuery} = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        * const dataset = bigquery.dataset('institutions');
@@ -163,6 +166,7 @@ class Dataset extends ServiceObject {
        *   const dataset = data[0];
        *   const apiResponse = data[1];
        * });
+       * ```
        */
       create: true,
 
@@ -186,6 +190,7 @@ class Dataset extends ServiceObject {
        * @returns {Promise<DatasetExistsResponse>}
        *
        * @example
+       * ```
        * const {BigQuery} = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        * const dataset = bigquery.dataset('institutions');
@@ -197,6 +202,7 @@ class Dataset extends ServiceObject {
        * dataset.exists().then((data) => {
        *   const exists = data[0];
        * });
+       * ```
        */
       exists: true,
 
@@ -231,6 +237,7 @@ class Dataset extends ServiceObject {
        * @returns {Promise<GetDatasetResponse>}
        *
        * @example
+       * ```
        * const {BigQuery} = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        * const dataset = bigquery.dataset('institutions');
@@ -247,6 +254,7 @@ class Dataset extends ServiceObject {
        *   const dataset = data[0];
        *   const apiResponse = data[1];
        * });
+       * ```
        */
       get: true,
 
@@ -275,6 +283,7 @@ class Dataset extends ServiceObject {
        * @returns {Promise<GetDatasetMetadataResponse>}
        *
        * @example
+       * ```
        * const {BigQuery} = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        * const dataset = bigquery.dataset('institutions');
@@ -287,6 +296,7 @@ class Dataset extends ServiceObject {
        *   const metadata = data[0];
        *   const apiResponse = data[1];
        * });
+       * ```
        */
       getMetadata: true,
 
@@ -313,6 +323,7 @@ class Dataset extends ServiceObject {
        * @returns {Promise<SetDatasetMetadataResponse>}
        *
        * @example
+       * ```
        * const {BigQuery} = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        * const dataset = bigquery.dataset('institutions');
@@ -329,6 +340,7 @@ class Dataset extends ServiceObject {
        * dataset.setMetadata(metadata).then((data) => {
        *   const apiResponse = data[0];
        * });
+       * ```
        */
       setMetadata: true,
     };
@@ -382,6 +394,7 @@ class Dataset extends ServiceObject {
      * @return {stream}
      *
      * @example
+     * ```
      * const {BigQuery} = require('@google-cloud/bigquery');
      * const bigquery = new BigQuery();
      * const dataset = bigquery.dataset('institutions');
@@ -393,11 +406,14 @@ class Dataset extends ServiceObject {
      *     // All models have been retrieved
      *   });
      *
-     * @example <caption>If you anticipate many results, you can end a stream early to prevent unnecessary processing and API requests.</caption>
+     * ```
+     * @example If you anticipate many results, you can end a stream early to prevent unnecessary processing and API requests.
+     * ```
      * dataset.getModelsStream()
      *   .on('data', function(model) {
      *     this.end();
      *   });
+     * ```
      */
     this.getModelsStream = paginator.streamify<Model>('getModels');
 
@@ -410,6 +426,7 @@ class Dataset extends ServiceObject {
      * @returns {stream}
      *
      * @example
+     * ```
      * const {BigQuery} = require('@google-cloud/bigquery');
      * const bigquery = new BigQuery();
      * const dataset = bigquery.dataset('institutions');
@@ -421,11 +438,14 @@ class Dataset extends ServiceObject {
      *     // All routines have been retrieved
      *   });
      *
-     * @example <caption>If you anticipate many results, you can end a stream early to prevent unnecessary processing and API requests.</caption>
+     * ```
+     * @example If you anticipate many results, you can end a stream early to prevent unnecessary processing and API requests.
+     * ```
      * dataset.getRoutinesStream()
      *   .on('data', function(routine) {
      *     this.end();
      *   });
+     * ```
      */
     this.getRoutinesStream = paginator.streamify<Routine>('getRoutines');
 
@@ -439,6 +459,7 @@ class Dataset extends ServiceObject {
      * @return {stream}
      *
      * @example
+     * ```
      * const {BigQuery} = require('@google-cloud/bigquery');
      * const bigquery = new BigQuery();
      * const dataset = bigquery.dataset('institutions');
@@ -458,6 +479,7 @@ class Dataset extends ServiceObject {
      *   .on('data', function(table) {
      *     this.end();
      *   });
+     * ```
      */
     this.getTablesStream = paginator.streamify<Table>('getTables');
   }
@@ -550,6 +572,7 @@ class Dataset extends ServiceObject {
    * @returns {Promise<CreateRoutineResponse>}
    *
    * @example
+   * ```
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('my-dataset');
@@ -575,8 +598,11 @@ class Dataset extends ServiceObject {
    *   }
    * });
    *
-   * @example <caption>If the callback is omitted a Promise will be returned</caption>
+   * ```
+   * @example If the callback is omitted a Promise will be returned
+   * ```
    * const [routine, apiResponse] = await dataset.createRoutine(id, config);
+   * ```
    */
   createRoutine(
     id: string,
@@ -635,8 +661,7 @@ class Dataset extends ServiceObject {
    *
    * @param {string} id Table id.
    * @param {object} [options] See a
-   *     [Table
-   * resource](https://cloud.google.com/bigquery/docs/reference/v2/tables#resource).
+   *     [Table resource](https://cloud.google.com/bigquery/docs/reference/v2/tables#resource).
    * @param {string|object} [options.schema] A comma-separated list of name:type
    *     pairs. Valid types are "string", "integer", "float", "boolean", and
    *     "timestamp". If the type is omitted, it is assumed to be "string".
@@ -650,6 +675,7 @@ class Dataset extends ServiceObject {
    * @returns {Promise<TableResponse>}
    *
    * @example
+   * ```
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('institutions');
@@ -670,6 +696,7 @@ class Dataset extends ServiceObject {
    *   const table = data[0];
    *   const apiResponse = data[1];
    * });
+   * ```
    */
   createTable(
     id: string,
@@ -735,6 +762,7 @@ class Dataset extends ServiceObject {
    * @returns {Promise<Metadata>}
    *
    * @example
+   * ```
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('institutions');
@@ -755,6 +783,7 @@ class Dataset extends ServiceObject {
    * dataset.delete().then((data) => {
    *   const apiResponse = data[0];
    * });
+   * ```
    */
   delete(
     optionsOrCallback?: DeleteCallback | DatasetDeleteOptions,
@@ -828,6 +857,7 @@ class Dataset extends ServiceObject {
    * @returns {Promise<GetModelsResponse>}
    *
    * @example
+   * ```
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('institutions');
@@ -836,7 +866,9 @@ class Dataset extends ServiceObject {
    *   // models is an array of `Model` objects.
    * });
    *
-   * @example <caption>To control how many API requests are made and page through the results manually, set `autoPaginate` to `false`.</caption>
+   * ```
+   * @example To control how many API requests are made and page through the results manually, set `autoPaginate` to `false`.
+   * ```
    * function manualPaginationCallback(err, models, nextQuery, apiResponse) {
    *   if (nextQuery) {
    *     // More results exist.
@@ -848,10 +880,13 @@ class Dataset extends ServiceObject {
    *   autoPaginate: false
    * }, manualPaginationCallback);
    *
-   * @example <caption>If the callback is omitted, we'll return a Promise.</caption>
+   * ```
+   * @example If the callback is omitted, we'll return a Promise.
+   * ```
    * dataset.getModels().then((data) => {
    *   const models = data[0];
    * });
+   * ```
    */
   getModels(
     optsOrCb?: GetModelsOptions | GetModelsCallback,
@@ -938,6 +973,7 @@ class Dataset extends ServiceObject {
    * @returns {Promise<GetRoutinesResponse>}
    *
    * @example
+   * ```
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('institutions');
@@ -946,7 +982,9 @@ class Dataset extends ServiceObject {
    *   // routines is an array of `Routine` objects.
    * });
    *
-   * @example <caption>To control how many API requests are made and page through the results manually, set `autoPaginate` to `false`.</caption>
+   * ```
+   * @example To control how many API requests are made and page through the results manually, set `autoPaginate` to `false`.
+   * ```
    * function manualPaginationCallback(err, routines, nextQuery, apiResponse) {
    *   if (nextQuery) {
    *     // More results exist.
@@ -958,8 +996,11 @@ class Dataset extends ServiceObject {
    *   autoPaginate: false
    * }, manualPaginationCallback);
    *
-   * @example <caption>If the callback is omitted a Promise will be returned</caption>
+   * ```
+   * @example If the callback is omitted a Promise will be returned
+   * ```
    * const [routines] = await dataset.getRoutines();
+   * ```
    */
   getRoutines(
     optsOrCb?: GetRoutinesOptions | GetRoutinesCallback,
@@ -1045,6 +1086,7 @@ class Dataset extends ServiceObject {
    * @returns {Promise<GetTablesResponse>}
    *
    * @example
+   * ```
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('institutions');
@@ -1074,6 +1116,7 @@ class Dataset extends ServiceObject {
    * dataset.getTables().then((data) => {
    *   const tables = data[0];
    * });
+   * ```
    */
   getTables(
     optionsOrCallback?: GetTablesOptions | GetTablesCallback,
@@ -1124,11 +1167,13 @@ class Dataset extends ServiceObject {
    * @return {Model}
    *
    * @example
+   * ```
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('institutions');
    *
    * const model = dataset.model('my-model');
+   * ```
    */
   model(id: string): Model {
     if (typeof id !== 'string') {
@@ -1181,11 +1226,13 @@ class Dataset extends ServiceObject {
    * @returns {Routine}
    *
    * @example
+   * ```
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('institutions');
    *
    * const routine = dataset.routine('my_routine');
+   * ```
    */
   routine(id: string): Routine {
     if (typeof id !== 'string') {
@@ -1211,11 +1258,13 @@ class Dataset extends ServiceObject {
    * @return {Table}
    *
    * @example
+   * ```
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('institutions');
    *
    * const institutions = dataset.table('institution_data');
+   * ```
    */
   table(id: string, options?: TableOptions) {
     if (typeof id !== 'string') {

@@ -188,11 +188,13 @@ export interface TableOptions {
  *      table.
  *
  * @example
+ * ```
  * const {BigQuery} = require('@google-cloud/bigquery');
  * const bigquery = new BigQuery();
  * const dataset = bigquery.dataset('my-dataset');
  *
  * const table = dataset.table('my-table');
+ * ```
  */
 class Table extends common.ServiceObject {
   dataset: Dataset;
@@ -225,6 +227,7 @@ class Table extends common.ServiceObject {
        * @returns {Promise<CreateTableResponse>}
        *
        * @example
+       * ```
        * const {BigQuery} = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        * const dataset = bigquery.dataset('my-dataset');
@@ -244,6 +247,7 @@ class Table extends common.ServiceObject {
        *   const table = data[0];
        *   const apiResponse = data[1];
        * });
+       * ```
        */
       create: true,
 
@@ -269,6 +273,7 @@ class Table extends common.ServiceObject {
        * @returns {Promise<DeleteTableResponse>}
        *
        * @example
+       * ```
        * const {BigQuery} = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        * const dataset = bigquery.dataset('my-dataset');
@@ -283,6 +288,7 @@ class Table extends common.ServiceObject {
        * table.delete().then((data) => {
        *   const apiResponse = data[0];
        * });
+       * ```
        */
       delete: true,
 
@@ -306,6 +312,7 @@ class Table extends common.ServiceObject {
        * @returns {Promise<TableExistsCallback>}
        *
        * @example
+       * ```
        * const {BigQuery} = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        * const dataset = bigquery.dataset('my-dataset');
@@ -320,6 +327,7 @@ class Table extends common.ServiceObject {
        * table.exists().then((data) => {
        *   const exists = data[0];
        * });
+       * ```
        */
       exists: true,
 
@@ -354,6 +362,7 @@ class Table extends common.ServiceObject {
        * @returns {Promise<GetTableResponse>}
        *
        * @example
+       * ```
        * const {BigQuery} = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        * const dataset = bigquery.dataset('my-dataset');
@@ -371,6 +380,7 @@ class Table extends common.ServiceObject {
        *   const table = data[0];
        *   const apiResponse = data[1];
        * });
+       * ```
        */
       get: true,
 
@@ -399,6 +409,7 @@ class Table extends common.ServiceObject {
        * @returns {Promise<GetTableMetadataResponse>}
        *
        * @example
+       * ```
        * const {BigQuery} = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        * const dataset = bigquery.dataset('my-dataset');
@@ -414,6 +425,7 @@ class Table extends common.ServiceObject {
        *   const metadata = data[0];
        *   const apiResponse = data[1];
        * });
+       * ```
        */
       getMetadata: true,
     };
@@ -454,6 +466,7 @@ class Table extends common.ServiceObject {
      * @returns {ReadableStream}
      *
      * @example
+     * ```
      * const {BigQuery} = require('@google-cloud/bigquery');
      * const bigquery = new BigQuery();
      * const dataset = bigquery.dataset('my-dataset');
@@ -474,6 +487,7 @@ class Table extends common.ServiceObject {
      *   .on('data', function(row) {
      *     this.end();
      *   });
+     * ```
      */
     this.createReadStream = paginator.streamify<RowMetadata>('getRows');
   }
@@ -649,6 +663,7 @@ class Table extends common.ServiceObject {
    * @throws {Error} If a destination other than a Table object is provided.
    *
    * @example
+   * ```
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('my-dataset');
@@ -675,6 +690,7 @@ class Table extends common.ServiceObject {
    * table.copy(yourTable, metadata).then((data) => {
    *   const apiResponse = data[0];
    * });
+   * ```
    */
   copy(
     destination: Table,
@@ -740,6 +756,7 @@ class Table extends common.ServiceObject {
    * @throws {Error} If a source other than a Table object is provided.
    *
    * @example
+   * ```
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('my-dataset');
@@ -769,6 +786,7 @@ class Table extends common.ServiceObject {
    * table.copyFrom(sourceTables, metadata).then((data) => {
    *   const apiResponse = data[0];
    * });
+   * ```
    */
   copyFrom(
     sourceTables: Table | Table[],
@@ -821,6 +839,7 @@ class Table extends common.ServiceObject {
    * @throws {Error} If a destination other than a Table object is provided.
    *
    * @example
+   * ```
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('my-dataset');
@@ -850,6 +869,7 @@ class Table extends common.ServiceObject {
    *   const job = data[0];
    *   const apiResponse = data[1];
    * });
+   * ```
    */
   createCopyJob(
     destination: Table,
@@ -933,6 +953,7 @@ class Table extends common.ServiceObject {
    * @throws {Error} If a source other than a Table object is provided.
    *
    * @example
+   * ```
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('my-dataset');
@@ -968,6 +989,7 @@ class Table extends common.ServiceObject {
    *   const job = data[0];
    *   const apiResponse = data[1];
    * });
+   * ```
    */
   createCopyFromJob(
     source: Table | Table[],
@@ -1060,6 +1082,7 @@ class Table extends common.ServiceObject {
    * @throws {Error} If destination format isn't recongized.
    *
    * @example
+   * ```
    * const {Storage} = require('@google-cloud/storage');
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
@@ -1112,6 +1135,7 @@ class Table extends common.ServiceObject {
    *   const job = data[0];
    *   const apiResponse = data[1];
    * });
+   * ```
    */
   createExtractJob(
     destination: File,
@@ -1234,6 +1258,7 @@ class Table extends common.ServiceObject {
    * @throws {Error} If the source isn't a string file name or a File instance.
    *
    * @example
+   * ```
    * const {Storage} = require('@google-cloud/storage');
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
@@ -1286,6 +1311,7 @@ class Table extends common.ServiceObject {
    *   const job = data[0];
    *   const apiResponse = data[1];
    * });
+   * ```
    */
   createLoadJob(
     source: string | File | File[],
@@ -1532,6 +1558,7 @@ class Table extends common.ServiceObject {
    * @throws {Error} If source format isn't recognized.
    *
    * @example
+   * ```
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('my-dataset');
@@ -1573,6 +1600,7 @@ class Table extends common.ServiceObject {
    *   .on('complete', (job) => {
    *     // The job has completed successfully.
    *   });
+   * ```
    */
   createWriteStream(metadata: JobLoadMetadata | string) {
     const stream = this.createWriteStream_(metadata);
@@ -1624,6 +1652,7 @@ class Table extends common.ServiceObject {
    * @throws {Error} If destination format isn't recongized.
    *
    * @example
+   * ```
    * const Storage = require('@google-cloud/storage');
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
@@ -1670,6 +1699,7 @@ class Table extends common.ServiceObject {
    * table.extract(extractedFile, options).then((data) => {
    *   const apiResponse = data[0];
    * });
+   * ```
    */
   extract(
     destination: File,
@@ -1728,6 +1758,7 @@ class Table extends common.ServiceObject {
    * @returns {Promise<RowsResponse>}
    *
    * @example
+   * ```
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('my-dataset');
@@ -1760,6 +1791,7 @@ class Table extends common.ServiceObject {
    * table.getRows().then((data) => {
    *   const rows = data[0];
    *   });
+   * ```
    */
   getRows(
     optionsOrCallback?: GetRowsOptions | RowsCallback,
@@ -1893,8 +1925,7 @@ class Table extends common.ServiceObject {
    *     base template, and insert the rows into an instance table named
    *     "{destination}{templateSuffix}". BigQuery will manage creation of
    *     the instance table, using the schema of the base template table. See
-   *     [Automatic table creation using template
-   * tables](https://cloud.google.com/bigquery/streaming-data-into-bigquery#template-tables)
+   *     [Automatic table creation using template tables](https://cloud.google.com/bigquery/streaming-data-into-bigquery#template-tables)
    *     for considerations when working with templates tables.
    * @param {InsertRowsCallback} [callback] The callback function.
    * @param {?error} callback.err An error returned while making this request.
@@ -1905,6 +1936,7 @@ class Table extends common.ServiceObject {
    * @returns {Promise<InsertRowsResponse>}
    *
    * @example
+   * ```
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('my-dataset');
@@ -1988,6 +2020,7 @@ class Table extends common.ServiceObject {
    *       // err.errors[].errors[].message
    *     }
    *   });
+   * ```
    */
   insert(
     rows: RowMetadata | RowMetadata[],
@@ -2202,6 +2235,7 @@ class Table extends common.ServiceObject {
    * @throws {Error} If the source isn't a string file name or a File instance.
    *
    * @example
+   * ```
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('my-dataset');
@@ -2247,6 +2281,7 @@ class Table extends common.ServiceObject {
    * table.load(data).then(function(data) {
    *   const apiResponse = data[0];
    * });
+   * ```
    */
   load(
     source: string | File,
@@ -2322,6 +2357,7 @@ class Table extends common.ServiceObject {
    * @returns {Promise<common.SetMetadataResponse>}
    *
    * @example
+   * ```
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('my-dataset');
@@ -2342,6 +2378,7 @@ class Table extends common.ServiceObject {
    *   const metadata = data[0];
    *   const apiResponse = data[1];
    * });
+   * ```
    */
   setMetadata(
     metadata: SetTableMetadataOptions,

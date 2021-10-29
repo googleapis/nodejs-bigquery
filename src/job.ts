@@ -90,6 +90,7 @@ export type QueryResultsOptions = {
  *      Required except for US and EU.
  *
  * @example
+ * ```
  * const {BigQuery} = require('@google-cloud/bigquery');
  * const bigquery = new BigQuery();
  *
@@ -118,6 +119,7 @@ export type QueryResultsOptions = {
  * // The easiest way to do this is with `removeAllListeners()`.
  * //-
  * job.removeAllListeners();
+ * ```
  */
 class Job extends Operation {
   bigQuery: BigQuery;
@@ -149,6 +151,7 @@ class Job extends Operation {
        * @returns {Promise<JobExistsResponse>}
        *
        * @example
+       * ```
        * const {BigQuery} = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        *
@@ -162,6 +165,7 @@ class Job extends Operation {
        * job.exists().then((data) => {
        *   const exists = data[0];
        * });
+       * ```
        */
       exists: true,
 
@@ -191,6 +195,7 @@ class Job extends Operation {
        * @returns {Promise<GetJobResponse>}
        *
        * @example
+       * ```
        * const {BigQuery} = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        *
@@ -209,6 +214,7 @@ class Job extends Operation {
        *   const job = data[0];
        *   const apiResponse = data[1];
        * });
+       * ```
        */
       get: true,
 
@@ -239,6 +245,7 @@ class Job extends Operation {
        * @returns {Promise<GetJobMetadataResponse>}
        *
        * @example
+       * ```
        * const {BigQuery} = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        *
@@ -252,6 +259,7 @@ class Job extends Operation {
        *   const metadata = data[0];
        *   const apiResponse = data[1];
        * });
+       * ```
        */
       getMetadata: {
         reqOpts: {
@@ -294,6 +302,7 @@ class Job extends Operation {
      * @return {stream}
      *
      * @example
+     * ```
      * const through2 = require('through2');
      * const fs = require('fs');
      * const {BigQuery} = require('@google-cloud/bigquery');
@@ -307,6 +316,7 @@ class Job extends Operation {
      *     next();
      *   }))
      *   .pipe(fs.createWriteStream('./test/testdata/testfile.json'));
+     * ```
      */
     this.getQueryResultsStream = paginator.streamify<RowMetadata>(
       'getQueryResultsAsStream_'
@@ -338,6 +348,7 @@ class Job extends Operation {
    * @returns {Promise<CancelResponse>}
    *
    * @example
+   * ```
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    *
@@ -355,6 +366,7 @@ class Job extends Operation {
    * job.cancel().then((data) => {
    *   const apiResponse = data[0];
    * });
+   * ```
    */
   cancel(callback?: CancelCallback): void | Promise<CancelResponse> {
     let qs;
@@ -408,6 +420,7 @@ class Job extends Operation {
    * @returns {Promise<QueryResultsCallback>}
    *
    * @example
+   * ```
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    *
@@ -450,6 +463,7 @@ class Job extends Operation {
    * job.getQueryResults().then((data) => {
    *   const rows = data[0];
    * });
+   * ```
    */
   getQueryResults(
     optionsOrCallback?: QueryResultsOptions | QueryRowsCallback,
