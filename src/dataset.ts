@@ -642,7 +642,7 @@ class Dataset extends ServiceObject {
    *     "timestamp". If the type is omitted, it is assumed to be "string".
    *     Example: "name:string, age:integer". Schemas can also be specified as a
    *     JSON array of fields, which allows for nested and repeated fields. See
-   *     a [Table resource](http://goo.gl/sl8Dmg) for more detailed information.
+   *     a {@link http://goo.gl/sl8Dmg| Table resource} for more detailed information.
    * @param {TableCallback} [callback] The callback function.
    * @param {?error} callback.err An error returned while making this request
    * @param {Table} callback.table The newly created table.
