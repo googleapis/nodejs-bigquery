@@ -85,6 +85,7 @@
   * [Query Disable Cache](#query-disable-cache)
   * [Query Dry Run](#query-dry-run)
   * [Query External GCS Perm](#query-external-gcs-perm)
+  * [Query External GCS Temp](#query-external-gcs-temp)
   * [Query Legacy](#query-legacy)
   * [Query Legacy Large Results](#query-legacy-large-results)
   * [Query Pagination](#query-pagination)
@@ -1380,6 +1381,23 @@ __Usage:__
 
 
 `node samples/queryExternalGCSPerm.js`
+
+
+-----
+
+
+
+
+### Query External GCS Temp
+
+View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/main/samples/queryExternalGCSTemp.js).
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/queryExternalGCSTemp.js,samples/README.md)
+
+__Usage:__
+
+
+`node samples/queryExternalGCSTemp.js`
 
 
 -----
