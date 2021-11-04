@@ -190,11 +190,17 @@ describe('Queries', () => {
     assert.match(output, /Created new view/);
   });
 
-  it('should query an external data source', async () => {
+  it('should query an external data source with permanent table', async () => {
     const permTableId = generateUuid();
     const output = execSync(
       `node queryExternalGCSPerm.js ${datasetId} ${permTableId}`
     );
+    assert.match(output, /Rows:/);
+    assert.match(output, /post_abbr/);
+  });
+
+  it('should query an external data source with temporary table', async () => {
+    const output = execSync('node queryExternalGCSTemp.js');
     assert.match(output, /Rows:/);
     assert.match(output, /post_abbr/);
   });
