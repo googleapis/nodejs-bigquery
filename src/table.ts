@@ -635,7 +635,7 @@ class Table extends common.ServiceObject {
    * @param {Table} destination The destination table.
    * @param {object} [metadata] Metadata to set with the copy operation. The
    *     metadata object should be in the format of a
-   *     [`JobConfigurationTableCopy`](https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationTableCopy)
+   *     {@link https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationTableCopy| `JobConfigurationTableCopy`}
    * object.
    *     object.
    * @param {string} [metadata.jobId] Custom id for the underlying job.
@@ -727,7 +727,7 @@ class Table extends common.ServiceObject {
    *     source table(s) to copy data from.
    * @param {object=} metadata Metadata to set with the copy operation. The
    *     metadata object should be in the format of a
-   *     [`JobConfigurationTableCopy`](https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationTableCopy)
+   *     {@link https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationTableCopy| `JobConfigurationTableCopy`}
    *     object.
    * @param {string} [metadata.jobId] Custom id for the underlying job.
    * @param {string} [metadata.jobPrefix] Prefix to apply to the underlying job
@@ -808,7 +808,7 @@ class Table extends common.ServiceObject {
    * @param {Table} destination The destination table.
    * @param {object} [metadata] Metadata to set with the copy operation. The
    *     metadata object should be in the format of a
-   *     [`JobConfigurationTableCopy`](https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationTableCopy)
+   *     {@link https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationTableCopy| `JobConfigurationTableCopy`}
    *     object.
    * @param {string} [metadata.jobId] Custom job id.
    * @param {string} [metadata.jobPrefix] Prefix to apply to the job id.
@@ -920,7 +920,7 @@ class Table extends common.ServiceObject {
    *     source table(s) to copy data from.
    * @param {object} [metadata] Metadata to set with the copy operation. The
    *     metadata object should be in the format of a
-   *     [`JobConfigurationTableCopy`](https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationTableCopy)
+   *     {@link https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationTableCopy| `JobConfigurationTableCopy`}
    *     object.
    * @param {string} [metadata.jobId] Custom job id.
    * @param {string} [metadata.jobPrefix] Prefix to apply to the job id.
@@ -1219,7 +1219,7 @@ class Table extends common.ServiceObject {
    * objects.
    * @param {object} [metadata] Metadata to set with the load operation. The
    *     metadata object should be in the format of the
-   *     [`configuration.load`](https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationLoad)
+   *     {@link https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationLoad| `configuration.load`}
    * property of a Jobs resource.
    * @param {string} [metadata.format] The format the data being loaded is in.
    *     Allowed options are "AVRO", "CSV", "JSON", "ORC", or "PARQUET".
@@ -1438,7 +1438,7 @@ class Table extends common.ServiceObject {
    *
    * @param {string|object} [metadata] Metadata to set with the load operation.
    *     The metadata object should be in the format of the
-   *     [`configuration.load`](https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationLoad)
+   *     {@link https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationLoad| `configuration.load`}
    * property of a Jobs resource. If a string is given, it will be used
    * as the filetype.
    * @param {string} [metadata.jobId] Custom job id.
@@ -1522,7 +1522,7 @@ class Table extends common.ServiceObject {
    *
    * @param {string|object} [metadata] Metadata to set with the load operation.
    *     The metadata object should be in the format of the
-   *     [`configuration.load`](https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationLoad)
+   *     {@link https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationLoad| `configuration.load`}
    * property of a Jobs resource. If a string is given,
    * it will be used as the filetype.
    * @param {string} [metadata.jobId] Custom job id.
@@ -1877,7 +1877,7 @@ class Table extends common.ServiceObject {
    *     inserting rows for cases of partial failures.
    * @param {boolean} [options.raw] If `true`, the `rows` argument is expected to
    *     be formatted as according to the
-   *     [specification](https://cloud.google.com/bigquery/docs/reference/v2/tabledata/insertAll).
+   *     {@link https://cloud.google.com/bigquery/docs/reference/v2/tabledata/insertAll| specification}.
    * @param {string|object} [options.schema] If provided will automatically
    *     create a table if it doesn't already exist. Note that this can take
    *     longer than 2 minutes to complete. A comma-separated list of
@@ -1886,7 +1886,7 @@ class Table extends common.ServiceObject {
    *     "timestamp". If the type is omitted, it is assumed to be "string".
    *     Example: "name:string, age:integer". Schemas can also be specified as a
    *     JSON array of fields, which allows for nested and repeated fields. See
-   *     a [Table resource](http://goo.gl/sl8Dmg) for more detailed information.
+   *     a {@link http://goo.gl/sl8Dmg| Table resource} for more detailed information.
    * @param {boolean} [options.skipInvalidRows=false] Insert all valid rows of a
    *     request, even if invalid rows exist.
    * @param {string} [options.templateSuffix] Treat the destination table as a
@@ -2187,7 +2187,7 @@ class Table extends common.ServiceObject {
    * object.
    * @param {object} [metadata] Metadata to set with the load operation. The
    *     metadata object should be in the format of the
-   *     [`configuration.load`](https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationLoad)
+   *     {@link https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationLoad| `configuration.load`}
    * property of a Jobs resource.
    * @param {string} [metadata.format] The format the data being loaded is in.
    *     Allowed options are "AVRO", "CSV", "JSON", "ORC", or "PARQUET".
@@ -2314,7 +2314,7 @@ class Table extends common.ServiceObject {
    * "bytes", "record", and "timestamp". If the type is omitted, it is assumed
    * to be "string". Example: "name:string, age:integer". Schemas can also be
    *     specified as a JSON array of fields, which allows for nested and
-   * repeated fields. See a [Table resource](http://goo.gl/sl8Dmg) for more
+   * repeated fields. See a {@link http://goo.gl/sl8Dmg| Table resource} for more
    * detailed information.
    * @param {function} [callback] The callback function.
    * @param {?error} callback.err An error returned while making this request.
