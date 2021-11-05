@@ -323,8 +323,6 @@ class Job extends Operation {
     );
   }
 
-  cancel(): Promise<CancelResponse>;
-  cancel(callback: CancelCallback): void;
   /**
    * @callback CancelCallback
    * @param {?Error} err Request error, if any.
@@ -368,6 +366,8 @@ class Job extends Operation {
    * });
    * ```
    */
+  cancel(): Promise<CancelResponse>;
+  cancel(callback: CancelCallback): void;
   cancel(callback?: CancelCallback): void | Promise<CancelResponse> {
     let qs;
 
@@ -385,12 +385,6 @@ class Job extends Operation {
     );
   }
 
-  getQueryResults(options?: QueryResultsOptions): Promise<QueryRowsResponse>;
-  getQueryResults(
-    options: QueryResultsOptions,
-    callback: QueryRowsCallback
-  ): void;
-  getQueryResults(callback: QueryRowsCallback): void;
   /**
    * Get the results of a job.
    *
@@ -465,6 +459,12 @@ class Job extends Operation {
    * });
    * ```
    */
+  getQueryResults(options?: QueryResultsOptions): Promise<QueryRowsResponse>;
+  getQueryResults(
+    options: QueryResultsOptions,
+    callback: QueryRowsCallback
+  ): void;
+  getQueryResults(callback: QueryRowsCallback): void;
   getQueryResults(
     optionsOrCallback?: QueryResultsOptions | QueryRowsCallback,
     cb?: QueryRowsCallback

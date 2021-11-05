@@ -301,16 +301,6 @@ class Model extends common.ServiceObject {
     this.bigQuery = dataset.bigQuery;
   }
 
-  createExtractJob(
-    destination: string | File,
-    options?: CreateExtractJobOptions
-  ): Promise<JobResponse>;
-  createExtractJob(
-    destination: string | File,
-    options: CreateExtractJobOptions,
-    callback: JobCallback
-  ): void;
-  createExtractJob(destination: string | File, callback: JobCallback): void;
   /**
    * @callback JobCallback
    * @param {?Error} err Request error, if any.
@@ -389,6 +379,16 @@ class Model extends common.ServiceObject {
    */
   createExtractJob(
     destination: string | File,
+    options?: CreateExtractJobOptions
+  ): Promise<JobResponse>;
+  createExtractJob(
+    destination: string | File,
+    options: CreateExtractJobOptions,
+    callback: JobCallback
+  ): void;
+  createExtractJob(destination: string | File, callback: JobCallback): void;
+  createExtractJob(
+    destination: string | File,
     optionsOrCallback?: CreateExtractJobOptions | JobCallback,
     cb?: JobCallback
   ): void | Promise<JobResponse> {
@@ -451,16 +451,6 @@ class Model extends common.ServiceObject {
     this.bigQuery.createJob(body, callback!);
   }
 
-  extract(
-    destination: string | File,
-    options?: CreateExtractJobOptions
-  ): Promise<JobMetadataResponse>;
-  extract(
-    destination: string | File,
-    options: CreateExtractJobOptions,
-    callback?: JobMetadataCallback
-  ): void;
-  extract(destination: string | File, callback?: JobMetadataCallback): void;
   /**
    * @callback JobMetadataCallback
    * @param {?Error} err Request error, if any.
@@ -536,6 +526,16 @@ class Model extends common.ServiceObject {
    * });
    * ```
    */
+  extract(
+    destination: string | File,
+    options?: CreateExtractJobOptions
+  ): Promise<JobMetadataResponse>;
+  extract(
+    destination: string | File,
+    options: CreateExtractJobOptions,
+    callback?: JobMetadataCallback
+  ): void;
+  extract(destination: string | File, callback?: JobMetadataCallback): void;
   extract(
     destination: string | File,
     optionsOrCallback?: CreateExtractJobOptions | JobMetadataCallback,
