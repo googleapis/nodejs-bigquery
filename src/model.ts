@@ -72,11 +72,13 @@ const FORMATS = ['ML_TF_SAVED_MODEL', 'ML_XGBOOST_BOOSTER'];
  * @param {string} id The ID of the model.
  *
  * @example
+ * ```
  * const {BigQuery} = require('@google-cloud/bigquery');
  * const bigquery = new BigQuery();
  * const dataset = bigquery.dataset('my-dataset');
  *
  * const model = dataset.model('my-model');
+ * ```
  */
 class Model extends common.ServiceObject {
   dataset: Dataset;
@@ -102,6 +104,7 @@ class Model extends common.ServiceObject {
        * @returns {Promise}
        *
        * @example
+       * ```
        * const {BigQuery} = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        * const dataset = bigquery.dataset('my-dataset');
@@ -109,9 +112,14 @@ class Model extends common.ServiceObject {
        *
        * model.delete((err, apiResponse) => {});
        *
-       * @example <caption>If the callback is omitted we'll return a Promise.</caption>
+       * ```
+       * @example If the callback is omitted we'll return a Promise.
+       * ```
        * const [apiResponse] = await model.delete();
-       * @example <caption>If successful, the response body is empty.</caption>
+       * ```
+       * @example If successful, the response body is empty.
+       * ```
+       * ```
        */
       delete: true,
 
@@ -135,6 +143,7 @@ class Model extends common.ServiceObject {
        * @returns {Promise<ModelExistsResponse>}
        *
        * @example
+       * ```
        * const {BigQuery} = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        * const dataset = bigquery.dataset('my-dataset');
@@ -142,8 +151,11 @@ class Model extends common.ServiceObject {
        *
        * model.exists((err, exists) => {});
        *
-       * @example <caption>If the callback is omitted we'll return a Promise.</caption>
+       * ```
+       * @example If the callback is omitted we'll return a Promise.
+       * ```
        * const [exists] = await model.exists();
+       * ```
        */
       exists: true,
 
@@ -172,6 +184,7 @@ class Model extends common.ServiceObject {
        * @returns {Promise<GetModelResponse>}
        *
        * @example
+       * ```
        * const {BigQuery} = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        * const dataset = bigquery.dataset('my-dataset');
@@ -183,8 +196,11 @@ class Model extends common.ServiceObject {
        *   }
        * });
        *
-       * @example <caption>If the callback is omitted we'll return a Promise.</caption>
+       * ```
+       * @example If the callback is omitted we'll return a Promise.
+       * ```
        * await model.get();
+       * ```
        */
       get: true,
 
@@ -213,6 +229,7 @@ class Model extends common.ServiceObject {
        * @returns {Promise<GetModelMetadataResponse>}
        *
        * @example
+       * ```
        * const {BigQuery} = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        * const dataset = bigquery.dataset('my-dataset');
@@ -220,8 +237,11 @@ class Model extends common.ServiceObject {
        *
        * model.getMetadata((err, metadata, apiResponse) => {});
        *
-       * @example <caption>If the callback is omitted we'll return a Promise.</caption>
+       * ```
+       * @example If the callback is omitted we'll return a Promise.
+       * ```
        * const [metadata, apiResponse] = await model.getMetadata();
+       * ```
        */
       getMetadata: true,
 
@@ -249,6 +269,7 @@ class Model extends common.ServiceObject {
        * @returns {Promise<SetModelMetadataResponse>}
        *
        * @example
+       * ```
        * const {BigQuery} = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        * const dataset = bigquery.dataset('my-dataset');
@@ -260,8 +281,11 @@ class Model extends common.ServiceObject {
        *
        * model.setMetadata(metadata, (err, metadata, apiResponse) => {});
        *
-       * @example <caption>If the callback is omitted we'll return a Promise.</caption>
+       * ```
+       * @example If the callback is omitted we'll return a Promise.
+       * ```
        * const [metadata, apiResponse] = await model.setMetadata(metadata);
+       * ```
        */
       setMetadata: true,
     };
@@ -322,6 +346,7 @@ class Model extends common.ServiceObject {
    * @throws {Error} If a destination isn't a string or File object.
    *
    * @example
+   * ```
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('my-dataset');
@@ -360,6 +385,7 @@ class Model extends common.ServiceObject {
    *   const job = data[0];
    *   const apiResponse = data[1];
    * });
+   * ```
    */
   createExtractJob(
     destination: string | File,
@@ -467,6 +493,7 @@ class Model extends common.ServiceObject {
    * @throws {Error} If destination isn't a string or File object.
    *
    * @example
+   * ```
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('my-dataset');
@@ -507,6 +534,7 @@ class Model extends common.ServiceObject {
    *   const job = data[0];
    *   const apiResponse = data[1];
    * });
+   * ```
    */
   extract(
     destination: string | File,

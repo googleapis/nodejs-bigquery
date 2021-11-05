@@ -30,11 +30,13 @@ import {Dataset, RoutineMetadata} from './dataset';
  * @param {string} id The ID of the routine.
  *
  * @example
+ * ```
  * const {BigQuery} = require('@google-cloud/bigquery');
  * const bigquery = new BigQuery();
  * const dataset = bigquery.dataset('my-dataset');
  *
  * const routine = dataset.routine('my_routine');
+ * ```
  */
 class Routine extends common.ServiceObject {
   constructor(dataset: Dataset, id: string) {
@@ -50,6 +52,7 @@ class Routine extends common.ServiceObject {
        * @returns {Promise<CreateRoutineResponse>}
        *
        * @example
+       * ```
        * const {BigQuery} = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        * const dataset = bigquery.dataset('my-dataset');
@@ -75,8 +78,11 @@ class Routine extends common.ServiceObject {
        *   }
        * });
        *
-       * @example <caption>If the callback is omitted a Promise will be returned</caption>
+       * ```
+       * @example If the callback is omitted a Promise will be returned
+       * ```
        * const [routine, apiResponse] = await routine.create(config);
+       * ```
        */
       create: true,
 
@@ -99,6 +105,7 @@ class Routine extends common.ServiceObject {
        * @returns {Promise<DeleteRoutineResponse>}
        *
        * @example
+       * ```
        * const {BigQuery} = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        * const dataset = bigquery.dataset('my-dataset');
@@ -110,8 +117,11 @@ class Routine extends common.ServiceObject {
        *   }
        * });
        *
-       * @example <caption>If the callback is omitted a Promise will be returned</caption>
+       * ```
+       * @example If the callback is omitted a Promise will be returned
+       * ```
        * const [apiResponse] = await routine.delete();
+       * ```
        */
       delete: true,
 
@@ -132,6 +142,7 @@ class Routine extends common.ServiceObject {
        * @returns {Promise<RoutineExistsResponse>}
        *
        * @example
+       * ```
        * const {BigQuery} = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        * const dataset = bigquery.dataset('my-dataset');
@@ -139,8 +150,11 @@ class Routine extends common.ServiceObject {
        *
        * routine.exists((err, exists) => {});
        *
-       * @example <caption>If the callback is omitted a Promise will be returned</caption>
+       * ```
+       * @example If the callback is omitted a Promise will be returned
+       * ```
        * const [exists] = await routine.exists();
+       * ```
        */
       exists: true,
 
@@ -165,6 +179,7 @@ class Routine extends common.ServiceObject {
        * @returns {Promise<GetRoutineResponse>}
        *
        * @example
+       * ```
        * const {BigQuery} = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        * const dataset = bigquery.dataset('my-dataset');
@@ -172,8 +187,11 @@ class Routine extends common.ServiceObject {
        *
        * routine.get((err, routine) => {});
        *
-       * @example <caption>If the callback is omitted a Promise will be returned</caption>
+       * ```
+       * @example If the callback is omitted a Promise will be returned
+       * ```
        * const [routine2] = await routine.get();
+       * ```
        */
       get: true,
 
@@ -198,6 +216,7 @@ class Routine extends common.ServiceObject {
        * @returns {Promise<GetRoutineMetadataResponse>}
        *
        * @example
+       * ```
        * const {BigQuery} = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        * const dataset = bigquery.dataset('my-dataset');
@@ -205,8 +224,11 @@ class Routine extends common.ServiceObject {
        *
        * routine.getMetadata((err, metadata, apiResponse) => {});
        *
-       * @example <caption>If the callback is omitted a Promise will be returned</caption>
+       * ```
+       * @example If the callback is omitted a Promise will be returned
+       * ```
        * const [metadata, apiResponse] = await routine.getMetadata();
+       * ```
        */
       getMetadata: true,
 
@@ -232,6 +254,7 @@ class Routine extends common.ServiceObject {
        * @returns {Promise<SetRoutineMetadataResponse>}
        *
        * @example
+       * ```
        * const {BigQuery} = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        * const dataset = bigquery.dataset('my-dataset');
@@ -243,8 +266,11 @@ class Routine extends common.ServiceObject {
        *
        * routine.setMetadata(updates, (err, metadata, apiResponse) => {});
        *
-       * @example <caption>If the callback is omitted a Promise will be returned</caption>
+       * ```
+       * @example If the callback is omitted a Promise will be returned
+       * ```
        * const [metadata, apiResponse] = await routine.setMetadata(updates);
+       * ```
        */
       setMetadata: {
         reqOpts: {
