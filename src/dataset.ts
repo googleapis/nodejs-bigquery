@@ -484,8 +484,6 @@ class Dataset extends ServiceObject {
     this.getTablesStream = paginator.streamify<Table>('getTables');
   }
 
-  createQueryJob(options: string | Query): Promise<JobResponse>;
-  createQueryJob(options: string | Query, callback: JobCallback): void;
   /**
    * Run a query as a job. No results are immediately returned. Instead, your
    * callback will be executed with a {@link Job} object that you must
@@ -498,6 +496,8 @@ class Dataset extends ServiceObject {
    * @param {JobCallback} [callback] See {@link BigQuery#createQueryJob} for full documentation of this method.
    * @returns {Promise<JobResponse>} See {@link BigQuery#createQueryJob} for full documentation of this method.
    */
+  createQueryJob(options: string | Query): Promise<JobResponse>;
+  createQueryJob(options: string | Query, callback: JobCallback): void;
   createQueryJob(
     options: string | Query,
     callback?: JobCallback
@@ -544,12 +544,6 @@ class Dataset extends ServiceObject {
     return this.bigQuery.createQueryStream(options);
   }
 
-  createRoutine(id: string, config: RoutineMetadata): Promise<RoutineResponse>;
-  createRoutine(
-    id: string,
-    config: RoutineMetadata,
-    callback: RoutineCallback
-  ): void;
   /**
    * @callback CreateRoutineCallback
    * @param {?Error} err Request error, if any.
@@ -604,6 +598,12 @@ class Dataset extends ServiceObject {
    * const [routine, apiResponse] = await dataset.createRoutine(id, config);
    * ```
    */
+  createRoutine(id: string, config: RoutineMetadata): Promise<RoutineResponse>;
+  createRoutine(
+    id: string,
+    config: RoutineMetadata,
+    callback: RoutineCallback
+  ): void;
   createRoutine(
     id: string,
     config: RoutineMetadata,
@@ -636,13 +636,6 @@ class Dataset extends ServiceObject {
     );
   }
 
-  createTable(id: string, options: TableMetadata): Promise<TableResponse>;
-  createTable(
-    id: string,
-    options: TableMetadata,
-    callback: TableCallback
-  ): void;
-  createTable(id: string, callback: TableCallback): void;
   /**
    * @callback TableCallback
    * @param {?Error} err Request error, if any.
@@ -698,6 +691,13 @@ class Dataset extends ServiceObject {
    * });
    * ```
    */
+  createTable(id: string, options: TableMetadata): Promise<TableResponse>;
+  createTable(
+    id: string,
+    options: TableMetadata,
+    callback: TableCallback
+  ): void;
+  createTable(id: string, callback: TableCallback): void;
   createTable(
     id: string,
     optionsOrCallback?: TableMetadata | TableCallback,
@@ -737,9 +737,6 @@ class Dataset extends ServiceObject {
     );
   }
 
-  delete(options?: DatasetDeleteOptions): Promise<[Metadata]>;
-  delete(options: DatasetDeleteOptions, callback: DeleteCallback): void;
-  delete(callback: DeleteCallback): void;
   /**
    * @callback DeleteCallback
    * @param {?Error} err Request error, if any.
@@ -785,6 +782,9 @@ class Dataset extends ServiceObject {
    * });
    * ```
    */
+  delete(options?: DatasetDeleteOptions): Promise<[Metadata]>;
+  delete(options: DatasetDeleteOptions, callback: DeleteCallback): void;
+  delete(callback: DeleteCallback): void;
   delete(
     optionsOrCallback?: DeleteCallback | DatasetDeleteOptions,
     callback?: DeleteCallback
@@ -808,9 +808,6 @@ class Dataset extends ServiceObject {
     );
   }
 
-  getModels(options?: GetModelsOptions): Promise<GetModelsResponse>;
-  getModels(options: GetModelsOptions, callback: GetModelsCallback): void;
-  getModels(callback: GetModelsCallback): void;
   /**
    * @typedef {object} GetModelsOptions
    * @property {boolean} [autoPaginate=true] Have pagination handled
@@ -888,6 +885,9 @@ class Dataset extends ServiceObject {
    * });
    * ```
    */
+  getModels(options?: GetModelsOptions): Promise<GetModelsResponse>;
+  getModels(options: GetModelsOptions, callback: GetModelsCallback): void;
+  getModels(callback: GetModelsCallback): void;
   getModels(
     optsOrCb?: GetModelsOptions | GetModelsCallback,
     cb?: GetModelsCallback
@@ -924,9 +924,6 @@ class Dataset extends ServiceObject {
     );
   }
 
-  getRoutines(options?: GetRoutinesOptions): Promise<GetRoutinesResponse>;
-  getRoutines(options: GetRoutinesOptions, callback: GetRoutinesCallback): void;
-  getRoutines(callback: GetRoutinesCallback): void;
   /**
    * @typedef {object} GetRoutinesOptions
    * @property {boolean} [autoPaginate=true] Have pagination handled
@@ -1002,6 +999,9 @@ class Dataset extends ServiceObject {
    * const [routines] = await dataset.getRoutines();
    * ```
    */
+  getRoutines(options?: GetRoutinesOptions): Promise<GetRoutinesResponse>;
+  getRoutines(options: GetRoutinesOptions, callback: GetRoutinesCallback): void;
+  getRoutines(callback: GetRoutinesCallback): void;
   getRoutines(
     optsOrCb?: GetRoutinesOptions | GetRoutinesCallback,
     cb?: GetRoutinesCallback
@@ -1038,9 +1038,6 @@ class Dataset extends ServiceObject {
     );
   }
 
-  getTables(options?: GetTablesOptions): Promise<GetTablesResponse>;
-  getTables(options: GetTablesOptions, callback: GetTablesCallback): void;
-  getTables(callback: GetTablesCallback): void;
   /**
    * @typedef {object} GetTablesOptions
    * @property {boolean} [autoPaginate=true] Have pagination handled
@@ -1118,6 +1115,9 @@ class Dataset extends ServiceObject {
    * });
    * ```
    */
+  getTables(options?: GetTablesOptions): Promise<GetTablesResponse>;
+  getTables(options: GetTablesOptions, callback: GetTablesCallback): void;
+  getTables(callback: GetTablesCallback): void;
   getTables(
     optionsOrCallback?: GetTablesOptions | GetTablesCallback,
     cb?: GetTablesCallback
@@ -1183,10 +1183,6 @@ class Dataset extends ServiceObject {
     return new Model(this, id);
   }
 
-  query(options: Query): Promise<QueryRowsResponse>;
-  query(options: string): Promise<QueryRowsResponse>;
-  query(options: Query, callback: SimpleQueryRowsCallback): void;
-  query(options: string, callback: SimpleQueryRowsCallback): void;
   /**
    * Run a query scoped to your dataset.
    *
@@ -1197,6 +1193,10 @@ class Dataset extends ServiceObject {
    * @returns {Promise<SimpleQueryRowsResponse>}
    * @returns {Promise<QueryRowsResponse>} See {@link BigQuery#query} for full documentation of this method.
    */
+  query(options: Query): Promise<QueryRowsResponse>;
+  query(options: string): Promise<QueryRowsResponse>;
+  query(options: Query, callback: SimpleQueryRowsCallback): void;
+  query(options: string, callback: SimpleQueryRowsCallback): void;
   query(
     options: Query | string,
     callback?: SimpleQueryRowsCallback

@@ -1172,16 +1172,6 @@ export class BigQuery extends common.Service {
     );
   }
 
-  createDataset(
-    id: string,
-    options?: DatasetResource
-  ): Promise<DatasetResponse>;
-  createDataset(
-    id: string,
-    options: DatasetResource,
-    callback: DatasetCallback
-  ): void;
-  createDataset(id: string, callback: DatasetCallback): void;
   /**
    * @callback DatasetCallback
    * @param {?Error} err Request error, if any.
@@ -1219,6 +1209,16 @@ export class BigQuery extends common.Service {
    * });
    * ```
    */
+  createDataset(
+    id: string,
+    options?: DatasetResource
+  ): Promise<DatasetResponse>;
+  createDataset(
+    id: string,
+    options: DatasetResource,
+    callback: DatasetCallback
+  ): void;
+  createDataset(id: string, callback: DatasetCallback): void;
   createDataset(
     id: string,
     optionsOrCallback?: DatasetResource | DatasetCallback,
@@ -1260,8 +1260,6 @@ export class BigQuery extends common.Service {
     );
   }
 
-  createQueryJob(options: Query | string): Promise<JobResponse>;
-  createQueryJob(options: Query | string, callback: JobCallback): void;
   /**
    * @callback JobCallback
    * @param {?Error} err Request error, if any.
@@ -1357,6 +1355,8 @@ export class BigQuery extends common.Service {
    * });
    * ```
    */
+  createQueryJob(options: Query | string): Promise<JobResponse>;
+  createQueryJob(options: Query | string, callback: JobCallback): void;
   createQueryJob(
     opts: Query | string,
     callback?: JobCallback
@@ -1492,8 +1492,6 @@ export class BigQuery extends common.Service {
     this.createJob(reqOpts, callback!);
   }
 
-  createJob(options: JobOptions): Promise<JobResponse>;
-  createJob(options: JobOptions, callback: JobCallback): void;
   /**
    * Creates a job. Typically when creating a job you'll have a very specific
    * task in mind. For this we recommend one of the following methods:
@@ -1553,6 +1551,8 @@ export class BigQuery extends common.Service {
    * });
    * ```
    */
+  createJob(options: JobOptions): Promise<JobResponse>;
+  createJob(options: JobOptions, callback: JobCallback): void;
   createJob(
     options: JobOptions,
     callback?: JobCallback
@@ -1659,9 +1659,6 @@ export class BigQuery extends common.Service {
     return new Dataset(this, id, options);
   }
 
-  getDatasets(options?: GetDatasetsOptions): Promise<DatasetsResponse>;
-  getDatasets(options: GetDatasetsOptions, callback: DatasetsCallback): void;
-  getDatasets(callback: DatasetsCallback): void;
   /**
    * List all or some of the datasets in your project.
    *
@@ -1712,6 +1709,9 @@ export class BigQuery extends common.Service {
    * bigquery.getDatasets().then(function(datasets) {});
    * ```
    */
+  getDatasets(options?: GetDatasetsOptions): Promise<DatasetsResponse>;
+  getDatasets(options: GetDatasetsOptions, callback: DatasetsCallback): void;
+  getDatasets(callback: DatasetsCallback): void;
   getDatasets(
     optionsOrCallback?: GetDatasetsOptions | DatasetsCallback,
     cb?: DatasetsCallback
@@ -1757,9 +1757,6 @@ export class BigQuery extends common.Service {
     );
   }
 
-  getJobs(options?: GetJobsOptions): Promise<GetJobsResponse>;
-  getJobs(options: GetJobsOptions, callback: GetJobsCallback): void;
-  getJobs(callback: GetJobsCallback): void;
   /**
    * @callback GetJobsCallback
    * @param {?Error} err Request error, if any.
@@ -1829,6 +1826,9 @@ export class BigQuery extends common.Service {
    * });
    * ```
    */
+  getJobs(options?: GetJobsOptions): Promise<GetJobsResponse>;
+  getJobs(options: GetJobsOptions, callback: GetJobsCallback): void;
+  getJobs(callback: GetJobsCallback): void;
   getJobs(
     optionsOrCallback?: GetJobsOptions | GetJobsCallback,
     cb?: GetJobsCallback
@@ -1890,20 +1890,6 @@ export class BigQuery extends common.Service {
     return new Job(this, id, options);
   }
 
-  query(query: string, options?: QueryOptions): Promise<QueryRowsResponse>;
-  query(query: Query, options?: QueryOptions): Promise<SimpleQueryRowsResponse>;
-  query(
-    query: string,
-    options: QueryOptions,
-    callback?: QueryRowsCallback
-  ): void;
-  query(
-    query: Query,
-    options: QueryOptions,
-    callback?: SimpleQueryRowsCallback
-  ): void;
-  query(query: string, callback?: QueryRowsCallback): void;
-  query(query: Query, callback?: SimpleQueryRowsCallback): void;
   /**
    * Run a query scoped to your project. For manual pagination please refer to
    * {@link BigQuery#createQueryJob}.
@@ -2021,6 +2007,20 @@ export class BigQuery extends common.Service {
    * });
    * ```
    */
+  query(query: string, options?: QueryOptions): Promise<QueryRowsResponse>;
+  query(query: Query, options?: QueryOptions): Promise<SimpleQueryRowsResponse>;
+  query(
+    query: string,
+    options: QueryOptions,
+    callback?: QueryRowsCallback
+  ): void;
+  query(
+    query: Query,
+    options: QueryOptions,
+    callback?: SimpleQueryRowsCallback
+  ): void;
+  query(query: string, callback?: QueryRowsCallback): void;
+  query(query: Query, callback?: SimpleQueryRowsCallback): void;
   query(
     query: string | Query,
     optionsOrCallback?:
