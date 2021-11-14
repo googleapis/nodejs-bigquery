@@ -73,7 +73,7 @@ const fakePaginator = {
 
 const sandbox = sinon.createSandbox();
 
-describe.only('BigQuery/Job', () => {
+describe('BigQuery/Job', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const BIGQUERY: any = {
     projectId: 'my-project',
@@ -123,6 +123,13 @@ describe.only('BigQuery/Job', () => {
       assert.strictEqual(calledWith.baseUrl, '/jobs');
       assert.strictEqual(calledWith.id, JOB_ID);
       assert.deepStrictEqual(calledWith.methods, {
+        delete: {
+          reqOpts: {
+            method: 'DELETE',
+            uri: '/delete',
+            qs: {location: undefined},
+          },
+        },
         exists: true,
         get: true,
         getMetadata: {
