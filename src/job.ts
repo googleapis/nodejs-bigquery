@@ -434,12 +434,6 @@ class Job extends Operation {
     );
   }
 
-  getQueryResults(options?: QueryResultsOptions): Promise<QueryRowsResponse>;
-  getQueryResults(
-    options: QueryResultsOptions,
-    callback: QueryRowsCallback
-  ): void;
-  getQueryResults(callback: QueryRowsCallback): void;
   /**
    * Get the results of a job.
    *
