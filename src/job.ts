@@ -434,54 +434,6 @@ class Job extends Operation {
     );
   }
 
-  // delete(): Promise<r.Request>;
-  // delete(callback: DeleteCallback): void;
-  // /**
-  //  * @callback DeleteJobCallback
-  //  * @param {?Error} err Request error, if any.
-  //  * @param {object} apiResponse The full API response.
-  //  */
-  // /**
-  //  * Delete the job.
-  //  *
-  //  * @see [Jobs: delete API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs/delete}
-  //  *
-  //  * @method Job#delete
-  //  * @param {DeleteJobCallback} [callback] The callback function.
-  //  * @param {?error} callback.err An error returned while making this
-  //  *     request.
-  //  * @param {object} callback.apiResponse The full API response.
-  //  * @returns {Promise}
-  //  *
-  //  * @example
-  //  * const {BigQuery} = require('@google-cloud/bigquery');
-  //  * const bigquery = new BigQuery();
-  //  *
-  //  * const job = bigquery.job(jobId);
-  //  *
-  //  * job.delete((err, apiResponse) => {});
-  //  *
-  //  * @example <caption>If the callback is omitted we'll return a Promise.</caption>
-  //  * const [apiResponse] = await job.delete();
-  //  * @example <caption>If successful, the response body is empty.</caption>
-  //  */
-  // delete(callback?: DeleteCallback): void | Promise<r.Request> {
-  //   let qs;
-
-  //   if (this.location) {
-  //     qs = {location: this.location};
-  //   }
-
-  //   this.request(
-  //     {
-  //       method: 'DELETE',
-  //       uri: '/delete',
-  //       qs,
-  //     },
-  //     callback!
-  //   );
-  // }
-
   getQueryResults(options?: QueryResultsOptions): Promise<QueryRowsResponse>;
   getQueryResults(
     options: QueryResultsOptions,
