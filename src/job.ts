@@ -46,8 +46,6 @@ export type JobOptions = JobRequest<JobMetadata>;
 export type CancelCallback = RequestCallback<bigquery.IJobCancelResponse>;
 export type CancelResponse = [bigquery.IJobCancelResponse];
 
-// export type DeleteCallback = RequestCallback<object>;
-
 export type QueryResultsOptions = {
   job?: Job;
   wrapIntegers?: boolean | IntegerTypeCastOptions;
