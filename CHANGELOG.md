@@ -4,6 +4,13 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+### [5.9.2](https://www.github.com/googleapis/nodejs-bigquery/compare/v5.9.1...v5.9.2) (2021-11-16)
+
+
+### Bug Fixes
+
+* **cloud-rad:** move comments for TSDoc ([#1040](https://www.github.com/googleapis/nodejs-bigquery/issues/1040)) ([93c5e14](https://www.github.com/googleapis/nodejs-bigquery/commit/93c5e14a91418a293775e417b68ab22732bc48e7))
+
 ### [5.9.1](https://www.github.com/googleapis/nodejs-bigquery/compare/v5.9.0...v5.9.1) (2021-10-12)
 
 
