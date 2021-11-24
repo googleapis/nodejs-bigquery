@@ -344,7 +344,6 @@ export class BigQuery extends Service {
      * @method
      * @param {object} query Configuration object. See {@link BigQuery#query} for a complete
      *     list of options.
-     * @returns {stream}
      *
      * @example
      * ```
@@ -381,7 +380,6 @@ export class BigQuery extends Service {
      *
      * @param {object} [options] Configuration object. See
      *     {@link BigQuery#getDatasets} for a complete list of options.
-     * @returns {stream}
      *
      * @example
      * ```
@@ -415,7 +413,6 @@ export class BigQuery extends Service {
      *
      * @param {object} [options] Configuration object. See
      *     {@link BigQuery#getJobs} for a complete list of options.
-     * @returns {stream}
      *
      * @example
      * ```
@@ -474,7 +471,7 @@ export class BigQuery extends Service {
    *     Please see {@link IntegerTypeCastOptions} for options descriptions.
    * @param {array} selectedFields List of fields to return.
    * If unspecified, all fields are returned.
-   * @returns {array} Fields using their matching names from the table's schema.
+   * @returns Fields using their matching names from the table's schema.
    */
   static mergeSchemaWithRows_(
     schema: TableSchema | TableField,
@@ -654,7 +651,6 @@ export class BigQuery extends Service {
    * @param {string|number} value.year Four digits.
    * @param {string|number} value.month One or two digits.
    * @param {string|number} value.day One or two digits.
-   * @returns {BigQueryDate}
    *
    * @example
    * ```
@@ -693,7 +689,6 @@ export class BigQuery extends Service {
    * @param {string|number} [value.seconds] One or two digits (`00` - `59`).
    * @param {string|number} [value.fractional] Up to six digits for microsecond
    *     precision.
-   * @returns {BigQueryDatetime}
    *
    * @example
    * ```
@@ -771,7 +766,6 @@ export class BigQuery extends Service {
    * @param {string|number} [value.seconds] One or two digits (`00` - `59`).
    * @param {string|number} [value.fractional] Up to six digits for microsecond
    *     precision.
-   * @returns {BigQueryTime}
    *
    * @example
    * ```
@@ -846,7 +840,6 @@ export class BigQuery extends Service {
    *
    * @method BigQuery#timestamp
    * @param {Date|string} value The time.
-   * @returns {BigQueryTimestamp}
    *
    * @example
    * ```
@@ -856,7 +849,6 @@ export class BigQuery extends Service {
    * ```
    */
   static timestamp(value: Date | string) {
-    return new BigQueryTimestamp(value);
   }
 
   timestamp(value: Date | string) {
@@ -907,23 +899,7 @@ export class BigQuery extends Service {
    * A geography value represents a surface area on the Earth
    * in Well-known Text (WKT) format.
    *
-   * @method BigQuery.geography
    * @param {string} value The geospatial data.
-   *
-   * @example
-   * ```
-   * const {BigQuery} = require('@google-cloud/bigquery');
-   * const geography = BigQuery.geography('POINT(1, 2)');
-   * ```
-   */
-
-  /**
-   * A geography value represents a surface area on the Earth
-   * in Well-known Text (WKT) format.
-   *
-   * @method BigQuery#geography
-   * @param {string} value The geospatial data.
-   * @returns {Geography}
    *
    * @example
    * ```
@@ -1053,7 +1029,6 @@ export class BigQuery extends Service {
       typeName = 'DATETIME';
     } else if (value instanceof BigQueryTime) {
       typeName = 'TIME';
-    } else if (value instanceof BigQueryTimestamp) {
       typeName = 'TIMESTAMP';
     } else if (value instanceof Buffer) {
       typeName = 'BYTES';
@@ -1219,7 +1194,6 @@ export class BigQuery extends Service {
    * @param {?error} callback.err An error returned while making this request
    * @param {Dataset} callback.dataset The newly created dataset
    * @param {object} callback.apiResponse The full API response.
-   * @returns {Promise<Dataset>}
    *
    * @example
    * ```
@@ -1332,7 +1306,6 @@ export class BigQuery extends Service {
    * @param {?error} callback.err An error returned while making this request.
    * @param {Job} callback.job The newly created job for your query.
    * @param {object} callback.apiResponse The full API response.
-   * @returns {Promise<JobResponse>}
    *
    * @throws {Error} If a query is not specified.
    * @throws {Error} If a Table is not provided as a destination.
@@ -1547,7 +1520,6 @@ export class BigQuery extends Service {
    * @param {?error} callback.err An error returned while making this request.
    * @param {Job} callback.job The newly created job.
    * @param {object} callback.apiResponse The full API response.
-   * @returns {Promise<JobResponse>}
    *
    * @example
    * ```
@@ -1668,7 +1640,6 @@ export class BigQuery extends Service {
    * @param {object} [options] Dataset options.
    * @param {string} [options.location] The geographic location of the dataset.
    *      Required except for US and EU.
-   * @returns {Dataset}
    *
    * @example
    * ```
@@ -1704,7 +1675,6 @@ export class BigQuery extends Service {
    * @param {DatasetsCallback} [callback] The callback function.
    * @param {?error} callback.err An error returned while making this request
    * @param {Dataset[]} callback.datasets The list of datasets in your project.
-   * @returns {Promise<DatasetsResponse>}
    *
    * @example
    * ```
@@ -1819,7 +1789,6 @@ export class BigQuery extends Service {
    * @param {?error} callback.err An error returned while making this request
    * @param {Job[]} callback.jobs The list of jobs in your
    *     project.
-   * @returns {Promise<GetJobsResponse>}
    *
    * @example
    * ```
@@ -1902,7 +1871,6 @@ export class BigQuery extends Service {
    * @param {object} [options] Configuration object.
    * @param {string} [options.location] The geographic location of the job.
    *      Required except for US and EU.
-   * @returns {Job}
    *
    * @example
    * ```
@@ -1960,7 +1928,6 @@ export class BigQuery extends Service {
    * @param {function} [callback] The callback function.
    * @param {?error} callback.err An error returned while making this request
    * @param {array} callback.rows The list of results from your query.
-   * @returns {Promise}
    *
    * @example
    * ```
