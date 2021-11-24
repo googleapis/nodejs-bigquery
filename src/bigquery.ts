@@ -841,7 +841,9 @@ export class BigQuery extends Service {
    * const timestamp = bigquery.timestamp(new Date());
    * ```
    */
-  static timestamp(value: Date | string) {}
+  static timestamp(value: Date | string) {
+    return new BigQueryTimestamp(value);
+  }
 
   timestamp(value: Date | string) {
     return BigQuery.timestamp(value);
