@@ -333,16 +333,12 @@ export class BigQuery extends Service {
 
     super(config, options);
 
-    /**
-     * @name BigQuery#location
-     * @type {string}
-     */
     this.location = options.location;
     /**
      * Run a query scoped to your project as a readable object stream.
      *
      * @method
-     * @param {object} query Configuration object. See {@link BigQuery#query} for a complete
+     * @param {object} query Configuration object. See {@link BigQuery.query} for a complete
      *     list of options.
      *
      * @example
@@ -379,7 +375,7 @@ export class BigQuery extends Service {
      * a readable object stream.
      *
      * @param {object} [options] Configuration object. See
-     *     {@link BigQuery#getDatasets} for a complete list of options.
+     *     {@link BigQuery.getDatasets} for a complete list of options.
      *
      * @example
      * ```
@@ -412,7 +408,7 @@ export class BigQuery extends Service {
      * readable object stream.
      *
      * @param {object} [options] Configuration object. See
-     *     {@link BigQuery#getJobs} for a complete list of options.
+     *     {@link BigQuery.getJobs} for a complete list of options.
      *
      * @example
      * ```
@@ -714,7 +710,6 @@ export class BigQuery extends Service {
    * this does not refer to an absolute instance in time. Instead, it is the
    * civil time, or the time that a user would see on a watch or calendar.
    *
-   * @method BigQuery#datetime
    * @param {object|string} value The time. If a string, this should be in the
    *     format the API describes: `YYYY-[M]M-[D]D[ [H]H:[M]M:[S]S[.DDDDDD]]`.
    *     Otherwise, provide an object.
@@ -786,7 +781,6 @@ export class BigQuery extends Service {
   /**
    * A `TIME` data type represents a time, independent of a specific date.
    *
-   * @method BigQuery#time
    * @param {object|string} value The time. If a string, this should be in the
    *     format the API describes: `[H]H:[M]M:[S]S[.DDDDDD]`. Otherwise, provide
    *     an object.
@@ -838,7 +832,6 @@ export class BigQuery extends Service {
    * A timestamp represents an absolute point in time, independent of any time
    * zone or convention such as Daylight Savings Time.
    *
-   * @method BigQuery#timestamp
    * @param {Date|string} value The time.
    *
    * @example
@@ -857,7 +850,6 @@ export class BigQuery extends Service {
   /**
    * A BigQueryInt wraps 'INT64' values. Can be used to maintain precision.
    *
-   * @method BigQuery#int
    * @param {string|number|IntegerTypeCastValue} value The INT64 value to convert.
    * @param {IntegerTypeCastOptions} typeCastOptions Configuration to convert
    *     value. Must provide an `integerTypeCastFunction` to handle conversion.
@@ -1028,6 +1020,7 @@ export class BigQuery extends Service {
       typeName = 'DATETIME';
     } else if (value instanceof BigQueryTime) {
       typeName = 'TIME';
+    } else if (value instanceof BigQueryTimestamp) {
       typeName = 'TIMESTAMP';
     } else if (value instanceof Buffer) {
       typeName = 'BYTES';
@@ -1497,7 +1490,7 @@ export class BigQuery extends Service {
    * Creates a job. Typically when creating a job you'll have a very specific
    * task in mind. For this we recommend one of the following methods:
    *
-   * - {@link BigQuery#createQueryJob}
+   * - {@link BigQuery.createQueryJob}
    * - {@link Table#createCopyJob}
    * - {@link Table#createCopyFromJob}
    * - {@link Table#createExtractJob}
@@ -1888,7 +1881,7 @@ export class BigQuery extends Service {
 
   /**
    * Run a query scoped to your project. For manual pagination please refer to
-   * {@link BigQuery#createQueryJob}.
+   * {@link BigQuery.createQueryJob}.
    *
    * See {@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/query| Jobs: query API Documentation}
    *
@@ -1902,8 +1895,8 @@ export class BigQuery extends Service {
    * @param {object|Array<*>} query.params For positional SQL parameters, provide
    *     an array of values. For named SQL parameters, provide an object which
    *     maps each named parameter to its value. The supported types are
-   * integers, floats, {@link BigQuery#date} objects, {@link BigQuery#datetime}
-   *     objects, {@link BigQuery#time} objects, {@link BigQuery#timestamp}
+   * integers, floats, {@link BigQuery.date} objects, {@link BigQuery.datetime}
+   *     objects, {@link BigQuery.time} objects, {@link BigQuery.timestamp}
    *     objects, Strings, Booleans, and Objects.
    * @param {string} query.query A query string, following the BigQuery query
    *     syntax, of the query to execute.
@@ -1990,8 +1983,8 @@ export class BigQuery extends Service {
    *
    * //-
    * // If you need to use a `DATE`, `DATETIME`, `TIME`, or `TIMESTAMP` type in
-   * // your query, see {@link BigQuery#date}, {@link BigQuery#datetime},
-   * // {@link BigQuery#time}, and {@link BigQuery#timestamp}.
+   * // your query, see {@link BigQuery.date}, {@link BigQuery.datetime},
+   * // {@link BigQuery.time}, and {@link BigQuery.timestamp}.
    * //-
    *
    * //-
