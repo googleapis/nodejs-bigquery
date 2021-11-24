@@ -170,9 +170,31 @@ export interface ProvidedTypeStruct {
 export type QueryParameter = bigquery.IQueryParameter;
 
 export interface BigQueryOptions extends GoogleAuthOptions {
+  /**
+   * Automatically retry requests if the
+   * response is related to rate limits or certain intermittent server errors.
+   * We will exponentially backoff subsequent requests by default.
+   *
+   * Defaults to `true`.
+   */
   autoRetry?: boolean;
+  /**
+   * Maximum number of automatic retries
+   * attempted before returning the error.
+   *
+   * Defaults to 3.
+   */
   maxRetries?: number;
+
+  /**
+   * The geographic location of all datasets and
+   * jobs referenced and created through the client.
+   */
   location?: string;
+  /**
+   * The value to be prepended to the User-Agent
+   * header in API requests.
+   */
   userAgent?: string;
   /**
    * The API endpoint of the service used to make requests.
@@ -213,21 +235,11 @@ export const PROTOCOL_REGEX = /^(\w*):\/\//;
  * @property {object} [credentials] Credentials object.
  * @property {string} [credentials.client_email]
  * @property {string} [credentials.private_key]
- * @property {boolean} [autoRetry=true] Automatically retry requests if the
- *     response is related to rate limits or certain intermittent server errors.
- *     We will exponentially backoff subsequent requests by default.
- * @property {number} [maxRetries=3] Maximum number of automatic retries
- *     attempted before returning the error.
  * @property {Constructor} [promise] Custom promise module to use instead of
  *     native Promises.
- * @property {string} [location] The geographic location of all datasets and
- *     jobs referenced and created through the client.
- * @property {string} [userAgent] The value to be prepended to the User-Agent
- *     header in API requests.
  * @property {string[]} [scopes] Additional OAuth scopes to use in requests. For
  *     example, to access an external data source, you may need the
  *     `https://www.googleapis.com/auth/drive.readonly` scope.
- * @property {string=} apiEndpoint The API endpoint of the service used to make requests. Defaults to `bigquery.googleapis.com`.
  */
 
 /**
