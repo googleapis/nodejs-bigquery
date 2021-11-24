@@ -15,8 +15,8 @@
  */
 import {
   ServiceObject,
-  ResponseCallback, 
-  SetMetadataResponse
+  ResponseCallback,
+  SetMetadataResponse,
 } from '@google-cloud/common';
 import {promisifyAll} from '@google-cloud/promisify';
 import extend = require('extend');
@@ -292,10 +292,7 @@ class Routine extends ServiceObject {
   }
 
   setMetadata(metadata: RoutineMetadata): Promise<SetMetadataResponse>;
-  setMetadata(
-    metadata: RoutineMetadata,
-    callback: ResponseCallback
-  ): void;
+  setMetadata(metadata: RoutineMetadata, callback: ResponseCallback): void;
   setMetadata(
     metadata: RoutineMetadata,
     callback?: ResponseCallback

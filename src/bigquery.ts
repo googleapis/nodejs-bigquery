@@ -288,17 +288,17 @@ export class BigQuery extends Service {
 
   createQueryStream(options?: Query | string): ResourceStream<RowMetadata> {
     // placeholder body, overwritten in constructor
-    return new ResourceStream<RowMetadata>({}, () => { });
+    return new ResourceStream<RowMetadata>({}, () => {});
   }
 
   getDatasetsStream(options?: GetDatasetsOptions): ResourceStream<Dataset> {
     // placeholder body, overwritten in constructor
-    return new ResourceStream<Dataset>({}, () => { });
+    return new ResourceStream<Dataset>({}, () => {});
   }
 
   getJobsStream(options?: GetJobsOptions): ResourceStream<Job> {
     // placeholder body, overwritten in constructor
-    return new ResourceStream<Job>({}, () => { });
+    return new ResourceStream<Job>({}, () => {});
   }
 
   constructor(options: BigQueryOptions = {}) {
@@ -848,8 +848,7 @@ export class BigQuery extends Service {
    * const timestamp = bigquery.timestamp(new Date());
    * ```
    */
-  static timestamp(value: Date | string) {
-  }
+  static timestamp(value: Date | string) {}
 
   timestamp(value: Date | string) {
     return BigQuery.timestamp(value);

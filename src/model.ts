@@ -14,10 +14,7 @@
  * limitations under the License.
  */
 
-import {
-  ServiceObject,
-  util,
-} from '@google-cloud/common';
+import {ServiceObject, util} from '@google-cloud/common';
 import {promisifyAll} from '@google-cloud/promisify';
 import arrify = require('arrify');
 import * as extend from 'extend';

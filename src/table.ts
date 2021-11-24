@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import{
+import {
   ServiceObject,
-  ApiError, 
+  ApiError,
   ResponseCallback,
-  Metadata, 
+  Metadata,
   util,
   DecorateRequestOptions,
   SetMetadataResponse,
@@ -210,7 +210,7 @@ class Table extends ServiceObject {
   location?: string;
   createReadStream(options?: GetRowsOptions): ResourceStream<RowMetadata> {
     // placeholder body, overwritten in constructor
-    return new ResourceStream<RowMetadata>({}, () => { });
+    return new ResourceStream<RowMetadata>({}, () => {});
   }
   constructor(dataset: Dataset, id: string, options?: TableOptions) {
     const methods = {
@@ -1853,11 +1853,7 @@ class Table extends ServiceObject {
         if (resp.rows && resp.rows.length > 0 && !this.metadata.schema) {
           // We don't know the schema for this table yet. Do a quick stat.
           this.getMetadata(
-            (
-              err: Error,
-              metadata: Metadata,
-              apiResponse: bigquery.ITable
-            ) => {
+            (err: Error, metadata: Metadata, apiResponse: bigquery.ITable) => {
               if (err) {
                 onComplete(err, null, null, apiResponse!);
                 return;
@@ -2384,9 +2380,7 @@ class Table extends ServiceObject {
    * });
    * ```
    */
-  setMetadata(
-    metadata: SetTableMetadataOptions
-  ): Promise<SetMetadataResponse>;
+  setMetadata(metadata: SetTableMetadataOptions): Promise<SetMetadataResponse>;
   setMetadata(
     metadata: SetTableMetadataOptions,
     callback: ResponseCallback

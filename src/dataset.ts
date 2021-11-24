@@ -121,17 +121,17 @@ export type TableCallback = ResourceCallback<Table, bigquery.ITable>;
 class Dataset extends ServiceObject {
   bigQuery: BigQuery;
   location?: string;
-  getModelsStream (options?: GetModelsOptions) : ResourceStream<Model>{
+  getModelsStream(options?: GetModelsOptions): ResourceStream<Model> {
     // placeholder body, overwritten in constructor
-    return new ResourceStream<Model>({}, ()=>{});
+    return new ResourceStream<Model>({}, () => {});
   }
-  getRoutinesStream (options?: GetRoutinesOptions) : ResourceStream<Routine>{
-        // placeholder body, overwritten in constructor
-        return new ResourceStream<Routine>({}, ()=>{});
-  }
-  getTablesStream (options?: GetTablesOptions) : ResourceStream<Table>{
+  getRoutinesStream(options?: GetRoutinesOptions): ResourceStream<Routine> {
     // placeholder body, overwritten in constructor
-    return new ResourceStream<Table>({}, ()=>{});
+    return new ResourceStream<Routine>({}, () => {});
+  }
+  getTablesStream(options?: GetTablesOptions): ResourceStream<Table> {
+    // placeholder body, overwritten in constructor
+    return new ResourceStream<Table>({}, () => {});
   }
   constructor(bigQuery: BigQuery, id: string, options?: DatasetOptions) {
     const methods = {

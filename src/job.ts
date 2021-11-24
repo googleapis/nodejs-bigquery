@@ -124,9 +124,11 @@ export type QueryResultsOptions = {
 class Job extends Operation {
   bigQuery: BigQuery;
   location?: string;
-  getQueryResultsStream(options?: QueryResultsOptions): ResourceStream<RowMetadata> {
+  getQueryResultsStream(
+    options?: QueryResultsOptions
+  ): ResourceStream<RowMetadata> {
     // placeholder body, overwritten in constructor
-    return new ResourceStream<RowMetadata>({}, () => { });
+    return new ResourceStream<RowMetadata>({}, () => {});
   }
   constructor(bigQuery: BigQuery, id: string, options?: JobOptions) {
     let location: string;
