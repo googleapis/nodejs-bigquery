@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
-import * as common from '@google-cloud/common';
+import {
+  ServiceObject,
+  util,
+} from '@google-cloud/common';
 import {promisifyAll} from '@google-cloud/promisify';
 import arrify = require('arrify');
 import * as extend from 'extend';
@@ -80,7 +83,7 @@ const FORMATS = ['ML_TF_SAVED_MODEL', 'ML_XGBOOST_BOOSTER'];
  * const model = dataset.model('my-model');
  * ```
  */
-class Model extends common.ServiceObject {
+class Model extends ServiceObject {
   dataset: Dataset;
   bigQuery: BigQuery;
 
@@ -400,7 +403,7 @@ class Model extends common.ServiceObject {
     options = extend(true, options, {
       destinationUris: (arrify(destination) as Array<File | string>).map(
         dest => {
-          if (common.util.isCustomType(dest, 'storage/file')) {
+          if (util.isCustomType(dest, 'storage/file')) {
             return (
               'gs://' + (dest as File).bucket.name + '/' + (dest as File).name
             );

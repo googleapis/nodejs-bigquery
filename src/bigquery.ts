@@ -14,7 +14,13 @@
  * limitations under the License.
  */
 
-import * as common from '@google-cloud/common';
+import {
+  ApiError,
+  Service,
+  DecorateRequestOptions,
+  GoogleAuthOptions,
+  util,
+} from '@google-cloud/common';
 import {paginator, ResourceStream} from '@google-cloud/paginator';
 import {promisifyAll} from '@google-cloud/promisify';
 import arrify = require('arrify');
@@ -163,7 +169,7 @@ export interface ProvidedTypeStruct {
 
 export type QueryParameter = bigquery.IQueryParameter;
 
-export interface BigQueryOptions extends common.GoogleAuthOptions {
+export interface BigQueryOptions extends GoogleAuthOptions {
   autoRetry?: boolean;
   maxRetries?: number;
   location?: string;
@@ -265,7 +271,7 @@ export const PROTOCOL_REGEX = /^(\w*):\/\//;
  * region_tag:bigquery_quickstart
  * Full quickstart example:
  */
-export class BigQuery extends common.Service {
+export class BigQuery extends Service {
   location?: string;
 
   createQueryStream: (options?: Query | string) => ResourceStream<RowMetadata>;
@@ -417,7 +423,7 @@ export class BigQuery extends common.Service {
     // Disable `prettyPrint` for better performance.
     // https://github.com/googleapis/nodejs-bigquery/issues/858
     this.interceptors.push({
-      request: (reqOpts: common.DecorateRequestOptions) => {
+      request: (reqOpts: DecorateRequestOptions) => {
         return extend(true, {}, reqOpts, {qs: {prettyPrint: false}});
       },
     });
@@ -1600,7 +1606,7 @@ export class BigQuery extends common.Service {
 
         if (err) {
           if (
-            (err as common.ApiError).code === ALREADY_EXISTS_CODE &&
+            (err as ApiError).code === ALREADY_EXISTS_CODE &&
             !JOB_ID_PROVIDED &&
             !DRY_RUN
           ) {
@@ -1618,7 +1624,7 @@ export class BigQuery extends common.Service {
         }
 
         if (resp.status.errors) {
-          err = new common.util.ApiError({
+          err = new util.ApiError({
             errors: resp.status.errors,
             response: resp,
           } as GoogleErrorBody);

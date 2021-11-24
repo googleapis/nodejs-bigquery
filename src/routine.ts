@@ -13,8 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import * as common from '@google-cloud/common';
+import {
+  ServiceObject,
+  ResponseCallback, 
+  SetMetadataResponse
+} from '@google-cloud/common';
 import {promisifyAll} from '@google-cloud/promisify';
 import extend = require('extend');
 
@@ -38,7 +41,7 @@ import {Dataset, RoutineMetadata} from './dataset';
  * const routine = dataset.routine('my_routine');
  * ```
  */
-class Routine extends common.ServiceObject {
+class Routine extends ServiceObject {
   constructor(dataset: Dataset, id: string) {
     const methods = {
       /**
@@ -288,15 +291,15 @@ class Routine extends common.ServiceObject {
     });
   }
 
-  setMetadata(metadata: RoutineMetadata): Promise<common.SetMetadataResponse>;
+  setMetadata(metadata: RoutineMetadata): Promise<SetMetadataResponse>;
   setMetadata(
     metadata: RoutineMetadata,
-    callback: common.ResponseCallback
+    callback: ResponseCallback
   ): void;
   setMetadata(
     metadata: RoutineMetadata,
-    callback?: common.ResponseCallback
-  ): void | Promise<common.SetMetadataResponse> {
+    callback?: ResponseCallback
+  ): void | Promise<SetMetadataResponse> {
     // per the python client, it would appear that in order to update a routine
     // you need to send the routine in its entirety, not just the updated fields
     this.getMetadata((err: Error | null, fullMetadata: RoutineMetadata) => {

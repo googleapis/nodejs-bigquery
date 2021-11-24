@@ -14,7 +14,15 @@
  * limitations under the License.
  */
 
-import * as common from '@google-cloud/common';
+import{
+  ServiceObject,
+  ApiError, 
+  ResponseCallback,
+  Metadata, 
+  util,
+  DecorateRequestOptions,
+  SetMetadataResponse,
+} from '@google-cloud/common';
 import {paginator, ResourceStream} from '@google-cloud/paginator';
 import {promisifyAll} from '@google-cloud/promisify';
 import arrify = require('arrify');
@@ -196,7 +204,7 @@ export interface TableOptions {
  * const table = dataset.table('my-table');
  * ```
  */
-class Table extends common.ServiceObject {
+class Table extends ServiceObject {
   dataset: Dataset;
   bigQuery: BigQuery;
   location?: string;
@@ -448,7 +456,7 @@ class Table extends common.ServiceObject {
     // Catch all for read-modify-write cycle
     // https://cloud.google.com/bigquery/docs/api-performance#read-patch-write
     this.interceptors.push({
-      request: (reqOpts: common.DecorateRequestOptions) => {
+      request: (reqOpts: DecorateRequestOptions) => {
         if (reqOpts.method === 'PATCH' && reqOpts.json.etag) {
           reqOpts.headers = reqOpts.headers || {};
           reqOpts.headers['If-Match'] = reqOpts.json.etag;
@@ -1149,7 +1157,7 @@ class Table extends common.ServiceObject {
 
     options = extend(true, options, {
       destinationUris: arrify(destination).map(dest => {
-        if (!common.util.isCustomType(dest, 'storage/file')) {
+        if (!util.isCustomType(dest, 'storage/file')) {
           throw new Error('Destination must be a File object.');
         }
 
@@ -1400,7 +1408,7 @@ class Table extends common.ServiceObject {
 
     extend(true, body.configuration.load, metadata, {
       sourceUris: arrify(source).map(src => {
-        if (!common.util.isCustomType(src, 'storage/file')) {
+        if (!util.isCustomType(src, 'storage/file')) {
           throw new Error('Source must be a File object.');
         }
 
@@ -1509,7 +1517,7 @@ class Table extends common.ServiceObject {
     const dup = streamEvents(duplexify());
 
     dup.once('writing', () => {
-      common.util.makeWritableStream(
+      util.makeWritableStream(
         dup,
         {
           makeAuthenticatedRequest: this.bigQuery.makeAuthenticatedRequest,
@@ -1844,7 +1852,7 @@ class Table extends common.ServiceObject {
           this.getMetadata(
             (
               err: Error,
-              metadata: common.Metadata,
+              metadata: Metadata,
               apiResponse: bigquery.ITable
             ) => {
               if (err) {
@@ -2063,7 +2071,7 @@ class Table extends common.ServiceObject {
     try {
       return await this._insertWithRetry(rows, options);
     } catch (err) {
-      if ((err as common.ApiError).code !== 404 || !schema) {
+      if ((err as ApiError).code !== 404 || !schema) {
         throw err;
       }
     }
@@ -2071,7 +2079,7 @@ class Table extends common.ServiceObject {
     try {
       await this.create({schema});
     } catch (err) {
-      if ((err as common.ApiError).code !== 409) {
+      if ((err as ApiError).code !== 409) {
         throw err;
       }
     }
@@ -2184,7 +2192,7 @@ class Table extends common.ServiceObject {
     );
 
     if (partialFailures.length > 0) {
-      throw new common.util.PartialFailureError({
+      throw new util.PartialFailureError({
         errors: partialFailures,
         response: resp,
       } as GoogleErrorBody);
@@ -2375,15 +2383,15 @@ class Table extends common.ServiceObject {
    */
   setMetadata(
     metadata: SetTableMetadataOptions
-  ): Promise<common.SetMetadataResponse>;
+  ): Promise<SetMetadataResponse>;
   setMetadata(
     metadata: SetTableMetadataOptions,
-    callback: common.ResponseCallback
+    callback: ResponseCallback
   ): void;
   setMetadata(
     metadata: SetTableMetadataOptions,
-    callback?: common.ResponseCallback
-  ): void | Promise<common.SetMetadataResponse> {
+    callback?: ResponseCallback
+  ): void | Promise<SetMetadataResponse> {
     const body = Table.formatMetadata_(metadata as TableMetadata);
     super.setMetadata(body, callback!);
   }
