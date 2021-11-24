@@ -286,9 +286,20 @@ export const PROTOCOL_REGEX = /^(\w*):\/\//;
 export class BigQuery extends Service {
   location?: string;
 
-  createQueryStream: (options?: Query | string) => ResourceStream<RowMetadata>;
-  getDatasetsStream: (options?: GetDatasetsOptions) => ResourceStream<Dataset>;
-  getJobsStream: (options?: GetJobsOptions) => ResourceStream<Job>;
+  createQueryStream(options?: Query | string): ResourceStream<RowMetadata> {
+    // placeholder body, overwritten in constructor
+    return new ResourceStream<RowMetadata>({}, () => { });
+  }
+
+  getDatasetsStream(options?: GetDatasetsOptions): ResourceStream<Dataset> {
+    // placeholder body, overwritten in constructor
+    return new ResourceStream<Dataset>({}, () => { });
+  }
+
+  getJobsStream(options?: GetJobsOptions): ResourceStream<Job> {
+    // placeholder body, overwritten in constructor
+    return new ResourceStream<Job>({}, () => { });
+  }
 
   constructor(options: BigQueryOptions = {}) {
     let apiEndpoint = 'https://bigquery.googleapis.com';

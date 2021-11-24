@@ -208,7 +208,10 @@ class Table extends ServiceObject {
   dataset: Dataset;
   bigQuery: BigQuery;
   location?: string;
-  createReadStream: (options?: GetRowsOptions) => ResourceStream<RowMetadata>;
+  createReadStream(options?: GetRowsOptions): ResourceStream<RowMetadata> {
+    // placeholder body, overwritten in constructor
+    return new ResourceStream<RowMetadata>({}, () => { });
+  }
   constructor(dataset: Dataset, id: string, options?: TableOptions) {
     const methods = {
       /**
