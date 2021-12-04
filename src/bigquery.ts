@@ -14,7 +14,13 @@
  * limitations under the License.
  */
 
-import * as common from '@google-cloud/common';
+import {
+  ApiError,
+  Service,
+  DecorateRequestOptions,
+  GoogleAuthOptions,
+  util,
+} from '@google-cloud/common';
 import {paginator, ResourceStream} from '@google-cloud/paginator';
 import {promisifyAll} from '@google-cloud/promisify';
 import arrify = require('arrify');
@@ -163,10 +169,32 @@ export interface ProvidedTypeStruct {
 
 export type QueryParameter = bigquery.IQueryParameter;
 
-export interface BigQueryOptions extends common.GoogleAuthOptions {
+export interface BigQueryOptions extends GoogleAuthOptions {
+  /**
+   * Automatically retry requests if the
+   * response is related to rate limits or certain intermittent server errors.
+   * We will exponentially backoff subsequent requests by default.
+   *
+   * Defaults to `true`.
+   */
   autoRetry?: boolean;
+  /**
+   * Maximum number of automatic retries
+   * attempted before returning the error.
+   *
+   * Defaults to 3.
+   */
   maxRetries?: number;
+
+  /**
+   * The geographic location of all datasets and
+   * jobs referenced and created through the client.
+   */
   location?: string;
+  /**
+   * The value to be prepended to the User-Agent
+   * header in API requests.
+   */
   userAgent?: string;
   /**
    * The API endpoint of the service used to make requests.
@@ -207,62 +235,71 @@ export const PROTOCOL_REGEX = /^(\w*):\/\//;
  * @property {object} [credentials] Credentials object.
  * @property {string} [credentials.client_email]
  * @property {string} [credentials.private_key]
- * @property {boolean} [autoRetry=true] Automatically retry requests if the
- *     response is related to rate limits or certain intermittent server errors.
- *     We will exponentially backoff subsequent requests by default.
- * @property {number} [maxRetries=3] Maximum number of automatic retries
- *     attempted before returning the error.
  * @property {Constructor} [promise] Custom promise module to use instead of
  *     native Promises.
- * @property {string} [location] The geographic location of all datasets and
- *     jobs referenced and created through the client.
- * @property {string} [userAgent] The value to be prepended to the User-Agent
- *     header in API requests.
  * @property {string[]} [scopes] Additional OAuth scopes to use in requests. For
  *     example, to access an external data source, you may need the
  *     `https://www.googleapis.com/auth/drive.readonly` scope.
- * @property {string=} apiEndpoint The API endpoint of the service used to make requests. Defaults to `bigquery.googleapis.com`.
  */
 
 /**
  * In the following examples from this page and the other modules (`Dataset`,
  * `Table`, etc.), we are going to be using a dataset from
- * [data.gov](http://goo.gl/f2SXcb) of higher education institutions.
+ * {@link http://goo.gl/f2SXcb| data.gov} of higher education institutions.
  *
  * We will create a table with the correct schema, import the public CSV file
  * into that table, and query it for data.
  *
  * @class
  *
- * @see [What is BigQuery?]{@link https://cloud.google.com/bigquery/what-is-bigquery}
+ * See {@link https://cloud.google.com/bigquery/what-is-bigquery| What is BigQuery?}
  *
  * @param {BigQueryOptions} options Constructor options.
  *
- * @example <caption>Install the client library with <a href="https://www.npmjs.com/">npm</a>:</caption>
+ * @example Install the client library with <a href="https://www.npmjs.com/">npm</a>:
+ * ```
  * npm install @google-cloud/bigquery
  *
- * @example <caption>Import the client library</caption>
+ * ```
+ * @example Import the client library
+ * ```
  * const {BigQuery} = require('@google-cloud/bigquery');
  *
- * @example <caption>Create a client that uses <a href="https://cloud.google.com/docs/authentication/production#providing_credentials_to_your_application">Application Default Credentials (ADC)</a>:</caption>
+ * ```
+ * @example Create a client that uses <a href="https://cloud.google.com/docs/authentication/production#providing_credentials_to_your_application">Application Default Credentials (ADC)</a>:
+ * ```
  * const bigquery = new BigQuery();
  *
- * @example <caption>Create a client with <a href="https://cloud.google.com/docs/authentication/production#obtaining_and_providing_service_account_credentials_manually">explicit credentials</a>:</caption>
+ * ```
+ * @example Create a client with <a href="https://cloud.google.com/docs/authentication/production#obtaining_and_providing_service_account_credentials_manually">explicit credentials</a>:
+ * ```
  * const bigquery = new BigQuery({
  *   projectId: 'your-project-id',
  *   keyFilename: '/path/to/keyfile.json'
  * });
  *
+ * ```
  * @example <caption>include:samples/quickstart.js</caption>
  * region_tag:bigquery_quickstart
  * Full quickstart example:
  */
-export class BigQuery extends common.Service {
+export class BigQuery extends Service {
   location?: string;
 
-  createQueryStream: (options?: Query | string) => ResourceStream<RowMetadata>;
-  getDatasetsStream: (options?: GetDatasetsOptions) => ResourceStream<Dataset>;
-  getJobsStream: (options?: GetJobsOptions) => ResourceStream<Job>;
+  createQueryStream(options?: Query | string): ResourceStream<RowMetadata> {
+    // placeholder body, overwritten in constructor
+    return new ResourceStream<RowMetadata>({}, () => {});
+  }
+
+  getDatasetsStream(options?: GetDatasetsOptions): ResourceStream<Dataset> {
+    // placeholder body, overwritten in constructor
+    return new ResourceStream<Dataset>({}, () => {});
+  }
+
+  getJobsStream(options?: GetJobsOptions): ResourceStream<Job> {
+    // placeholder body, overwritten in constructor
+    return new ResourceStream<Job>({}, () => {});
+  }
 
   constructor(options: BigQueryOptions = {}) {
     let apiEndpoint = 'https://bigquery.googleapis.com';
@@ -296,20 +333,16 @@ export class BigQuery extends common.Service {
 
     super(config, options);
 
-    /**
-     * @name BigQuery#location
-     * @type {string}
-     */
     this.location = options.location;
     /**
      * Run a query scoped to your project as a readable object stream.
      *
      * @method
-     * @param {object} query Configuration object. See {@link BigQuery#query} for a complete
+     * @param {object} query Configuration object. See {@link BigQuery.query} for a complete
      *     list of options.
-     * @returns {stream}
      *
      * @example
+     * ```
      * const {BigQuery} = require('@google-cloud/bigquery');
      * const bigquery = new BigQuery();
      *
@@ -333,6 +366,7 @@ export class BigQuery extends common.Service {
      *   .on('data', function(row) {
      *     this.end();
      *   });
+     * ```
      */
     this.createQueryStream = paginator.streamify<RowMetadata>('queryAsStream_');
 
@@ -341,10 +375,10 @@ export class BigQuery extends common.Service {
      * a readable object stream.
      *
      * @param {object} [options] Configuration object. See
-     *     {@link BigQuery#getDatasets} for a complete list of options.
-     * @returns {stream}
+     *     {@link BigQuery.getDatasets} for a complete list of options.
      *
      * @example
+     * ```
      * const {BigQuery} = require('@google-cloud/bigquery');
      * const bigquery = new BigQuery();
      *
@@ -365,6 +399,7 @@ export class BigQuery extends common.Service {
      *   .on('data', function(dataset) {
      *     this.end();
      *   });
+     * ```
      */
     this.getDatasetsStream = paginator.streamify<Dataset>('getDatasets');
 
@@ -373,10 +408,10 @@ export class BigQuery extends common.Service {
      * readable object stream.
      *
      * @param {object} [options] Configuration object. See
-     *     {@link BigQuery#getJobs} for a complete list of options.
-     * @returns {stream}
+     *     {@link BigQuery.getJobs} for a complete list of options.
      *
      * @example
+     * ```
      * const {BigQuery} = require('@google-cloud/bigquery');
      * const bigquery = new BigQuery();
      *
@@ -397,13 +432,14 @@ export class BigQuery extends common.Service {
      *   .on('data', function(job) {
      *     this.end();
      *   });
+     * ```
      */
     this.getJobsStream = paginator.streamify<Job>('getJobs');
 
     // Disable `prettyPrint` for better performance.
     // https://github.com/googleapis/nodejs-bigquery/issues/858
     this.interceptors.push({
-      request: (reqOpts: common.DecorateRequestOptions) => {
+      request: (reqOpts: DecorateRequestOptions) => {
         return extend(true, {}, reqOpts, {qs: {prettyPrint: false}});
       },
     });
@@ -431,7 +467,7 @@ export class BigQuery extends common.Service {
    *     Please see {@link IntegerTypeCastOptions} for options descriptions.
    * @param {array} selectedFields List of fields to return.
    * If unspecified, all fields are returned.
-   * @returns {array} Fields using their matching names from the table's schema.
+   * @returns Fields using their matching names from the table's schema.
    */
   static mergeSchemaWithRows_(
     schema: TableSchema | TableField,
@@ -585,6 +621,7 @@ export class BigQuery extends common.Service {
    * @param {string|number} value.day One or two digits.
    *
    * @example
+   * ```
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const date = bigquery.date('2017-01-01');
@@ -597,6 +634,7 @@ export class BigQuery extends common.Service {
    *   month: 1,
    *   day: 1
    * });
+   * ```
    */
   static date(value: BigQueryDateOptions | string) {
     return new BigQueryDate(value);
@@ -609,9 +647,9 @@ export class BigQuery extends common.Service {
    * @param {string|number} value.year Four digits.
    * @param {string|number} value.month One or two digits.
    * @param {string|number} value.day One or two digits.
-   * @returns {BigQueryDate}
    *
    * @example
+   * ```
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const date = BigQuery.date('2017-01-01');
    *
@@ -623,6 +661,7 @@ export class BigQuery extends common.Service {
    *   month: 1,
    *   day: 1
    * });
+   * ```
    */
 
   date(value: BigQueryDateOptions | string) {
@@ -646,9 +685,9 @@ export class BigQuery extends common.Service {
    * @param {string|number} [value.seconds] One or two digits (`00` - `59`).
    * @param {string|number} [value.fractional] Up to six digits for microsecond
    *     precision.
-   * @returns {BigQueryDatetime}
    *
    * @example
+   * ```
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const datetime = BigQuery.datetime('2017-01-01 13:00:00');
    *
@@ -663,6 +702,7 @@ export class BigQuery extends common.Service {
    *   minutes: 0,
    *   seconds: 0
    * });
+   * ```
    */
 
   /**
@@ -670,7 +710,6 @@ export class BigQuery extends common.Service {
    * this does not refer to an absolute instance in time. Instead, it is the
    * civil time, or the time that a user would see on a watch or calendar.
    *
-   * @method BigQuery#datetime
    * @param {object|string} value The time. If a string, this should be in the
    *     format the API describes: `YYYY-[M]M-[D]D[ [H]H:[M]M:[S]S[.DDDDDD]]`.
    *     Otherwise, provide an object.
@@ -684,6 +723,7 @@ export class BigQuery extends common.Service {
    *     precision.
    *
    * @example
+   * ```
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const datetime = bigquery.datetime('2017-01-01 13:00:00');
@@ -699,6 +739,7 @@ export class BigQuery extends common.Service {
    *   minutes: 0,
    *   seconds: 0
    * });
+   * ```
    */
   static datetime(value: BigQueryDatetimeOptions | string) {
     return new BigQueryDatetime(value);
@@ -720,9 +761,9 @@ export class BigQuery extends common.Service {
    * @param {string|number} [value.seconds] One or two digits (`00` - `59`).
    * @param {string|number} [value.fractional] Up to six digits for microsecond
    *     precision.
-   * @returns {BigQueryTime}
    *
    * @example
+   * ```
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const time = BigQuery.time('14:00:00'); // 2:00 PM
    *
@@ -734,12 +775,12 @@ export class BigQuery extends common.Service {
    *   minutes: 0,
    *   seconds: 0
    * });
+   * ```
    */
 
   /**
    * A `TIME` data type represents a time, independent of a specific date.
    *
-   * @method BigQuery#time
    * @param {object|string} value The time. If a string, this should be in the
    *     format the API describes: `[H]H:[M]M:[S]S[.DDDDDD]`. Otherwise, provide
    *     an object.
@@ -750,6 +791,7 @@ export class BigQuery extends common.Service {
    *     precision.
    *
    * @example
+   * ```
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const time = bigquery.time('14:00:00'); // 2:00 PM
@@ -762,6 +804,7 @@ export class BigQuery extends common.Service {
    *   minutes: 0,
    *   seconds: 0
    * });
+   * ```
    */
   static time(value: BigQueryTimeOptions | string) {
     return new BigQueryTime(value);
@@ -779,22 +822,24 @@ export class BigQuery extends common.Service {
    * @param {Date|string} value The time.
    *
    * @example
+   * ```
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const timestamp = BigQuery.timestamp(new Date());
+   * ```
    */
 
   /**
    * A timestamp represents an absolute point in time, independent of any time
    * zone or convention such as Daylight Savings Time.
    *
-   * @method BigQuery#timestamp
    * @param {Date|string} value The time.
-   * @returns {BigQueryTimestamp}
    *
    * @example
+   * ```
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const timestamp = bigquery.timestamp(new Date());
+   * ```
    */
   static timestamp(value: Date | string) {
     return new BigQueryTimestamp(value);
@@ -807,13 +852,13 @@ export class BigQuery extends common.Service {
   /**
    * A BigQueryInt wraps 'INT64' values. Can be used to maintain precision.
    *
-   * @method BigQuery#int
    * @param {string|number|IntegerTypeCastValue} value The INT64 value to convert.
    * @param {IntegerTypeCastOptions} typeCastOptions Configuration to convert
    *     value. Must provide an `integerTypeCastFunction` to handle conversion.
    * @returns {BigQueryInt}
    *
    * @example
+   * ```
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    *
@@ -827,6 +872,7 @@ export class BigQuery extends common.Service {
    *
    * const customValue = bqInteger.valueOf();
    * // customValue is the value returned from your `integerTypeCastFunction`.
+   * ```
    */
   static int(
     value: string | number | IntegerTypeCastValue,
@@ -846,26 +892,14 @@ export class BigQuery extends common.Service {
    * A geography value represents a surface area on the Earth
    * in Well-known Text (WKT) format.
    *
-   * @method BigQuery.geography
    * @param {string} value The geospatial data.
    *
    * @example
-   * const {BigQuery} = require('@google-cloud/bigquery');
-   * const geography = BigQuery.geography('POINT(1, 2)');
-   */
-
-  /**
-   * A geography value represents a surface area on the Earth
-   * in Well-known Text (WKT) format.
-   *
-   * @method BigQuery#geography
-   * @param {string} value The geospatial data.
-   * @returns {Geography}
-   *
-   * @example
+   * ```
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const geography = bigquery.geography('POINT(1, 2)');
+   * ```
    */
   static geography(value: string) {
     return new Geography(value);
@@ -907,7 +941,7 @@ export class BigQuery extends common.Service {
    *
    * @throws {error} If the type provided is invalid.
    *
-   * @see [Data Type]{@link https://cloud.google.com/bigquery/data-types}
+   * See {@link https://cloud.google.com/bigquery/data-types| Data Type}
    *
    * @param {*} providedType The type.
    * @returns {string} The valid type provided.
@@ -968,7 +1002,7 @@ export class BigQuery extends common.Service {
    *
    * @throws {error} If the type could not be detected.
    *
-   * @see [Data Type]{@link https://cloud.google.com/bigquery/data-types}
+   * See {@link https://cloud.google.com/bigquery/data-types| Data Type}
    *
    * @param {*} value The value.
    * @returns {string} The type detected from the value.
@@ -1050,7 +1084,7 @@ export class BigQuery extends common.Service {
    *
    * @private
    *
-   * @see [Jobs.query API Reference Docs (see `queryParameters`)]{@link https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs/query#request-body}
+   * See {@link https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs/query#request-body| Jobs.query API Reference Docs (see `queryParameters`)}
    *
    * @param {*} value The value.
    * @param {string|ProvidedTypeStruct|ProvidedTypeArray} providedType Provided
@@ -1136,16 +1170,6 @@ export class BigQuery extends common.Service {
     );
   }
 
-  createDataset(
-    id: string,
-    options?: DatasetResource
-  ): Promise<DatasetResponse>;
-  createDataset(
-    id: string,
-    options: DatasetResource,
-    callback: DatasetCallback
-  ): void;
-  createDataset(id: string, callback: DatasetCallback): void;
   /**
    * @callback DatasetCallback
    * @param {?Error} err Request error, if any.
@@ -1155,19 +1179,18 @@ export class BigQuery extends common.Service {
   /**
    * Create a dataset.
    *
-   * @see [Datasets: insert API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/datasets/insert}
+   * See {@link https://cloud.google.com/bigquery/docs/reference/v2/datasets/insert| Datasets: insert API Documentation}
    *
    * @param {string} id ID of the dataset to create.
    * @param {object} [options] See a
-   *     [Dataset
-   * resource](https://cloud.google.com/bigquery/docs/reference/v2/datasets#resource).
+   *     {@link https://cloud.google.com/bigquery/docs/reference/v2/datasets#resource| Dataset resource}.
    * @param {DatasetCallback} [callback] The callback function.
    * @param {?error} callback.err An error returned while making this request
    * @param {Dataset} callback.dataset The newly created dataset
    * @param {object} callback.apiResponse The full API response.
-   * @returns {Promise<Dataset>}
    *
    * @example
+   * ```
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    *
@@ -1181,7 +1204,18 @@ export class BigQuery extends common.Service {
    *   const dataset = data[0];
    *   const apiResponse = data[1];
    * });
+   * ```
    */
+  createDataset(
+    id: string,
+    options?: DatasetResource
+  ): Promise<DatasetResponse>;
+  createDataset(
+    id: string,
+    options: DatasetResource,
+    callback: DatasetCallback
+  ): void;
+  createDataset(id: string, callback: DatasetCallback): void;
   createDataset(
     id: string,
     optionsOrCallback?: DatasetResource | DatasetCallback,
@@ -1223,8 +1257,6 @@ export class BigQuery extends common.Service {
     );
   }
 
-  createQueryJob(options: Query | string): Promise<JobResponse>;
-  createQueryJob(options: Query | string, callback: JobCallback): void;
   /**
    * @callback JobCallback
    * @param {?Error} err Request error, if any.
@@ -1237,10 +1269,10 @@ export class BigQuery extends common.Service {
    * ping for the results. See the Job documentation for explanations of how to
    * check on the status of the job.
    *
-   * @see [Jobs: insert API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert}
+   * See {@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert| Jobs: insert API Documentation}
    *
    * @param {object|string} options The configuration object. This must be in
-   * the format of the [`configuration.query`](https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationQuery)
+   * the format of the {@link https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationQuery| `configuration.query`}
    * property of a Jobs resource. If a string is provided, this is used as the
    * query string, and all other options are defaulted.
    * @param {Table} [options.destination] The table to save the
@@ -1260,7 +1292,7 @@ export class BigQuery extends common.Service {
    *     syntax, of the query to execute.
    * @param {boolean} [options.useLegacySql=false] Option to use legacy sql syntax.
    * @param {object} [options.defaultDataset] The dataset. This must be in
-   *     the format of the [`DatasetReference`](https://cloud.google.com/bigquery/docs/reference/rest/v2/datasets#DatasetReference)
+   *     the format of the {@link https://cloud.google.com/bigquery/docs/reference/rest/v2/datasets#DatasetReference| `DatasetReference`}
    * @param {boolean} [options.wrapIntegers] Optionally wrap INT64 in BigQueryInt
    *     or custom INT64 value type.
    * @param {object|array} [options.params] Option to provide query prarameters.
@@ -1268,12 +1300,12 @@ export class BigQuery extends common.Service {
    * @param {?error} callback.err An error returned while making this request.
    * @param {Job} callback.job The newly created job for your query.
    * @param {object} callback.apiResponse The full API response.
-   * @returns {Promise<JobResponse>}
    *
    * @throws {Error} If a query is not specified.
    * @throws {Error} If a Table is not provided as a destination.
    *
    * @example
+   * ```
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    *
@@ -1317,7 +1349,10 @@ export class BigQuery extends common.Service {
    *
    *   return job.getQueryResults();
    * });
+   * ```
    */
+  createQueryJob(options: Query | string): Promise<JobResponse>;
+  createQueryJob(options: Query | string, callback: JobCallback): void;
   createQueryJob(
     opts: Query | string,
     callback?: JobCallback
@@ -1453,27 +1488,24 @@ export class BigQuery extends common.Service {
     this.createJob(reqOpts, callback!);
   }
 
-  createJob(options: JobOptions): Promise<JobResponse>;
-  createJob(options: JobOptions, callback: JobCallback): void;
   /**
    * Creates a job. Typically when creating a job you'll have a very specific
    * task in mind. For this we recommend one of the following methods:
    *
-   * - {@link BigQuery#createQueryJob}
+   * - {@link BigQuery.createQueryJob}
    * - {@link Table#createCopyJob}
    * - {@link Table#createCopyFromJob}
    * - {@link Table#createExtractJob}
    * - {@link Table#createLoadJob}
    *
    * However in the event you need a finer level of control over the job
-   * creation, you can use this method to pass in a raw [Job
-   * resource](https://cloud.google.com/bigquery/docs/reference/rest/v2/Job)
+   * creation, you can use this method to pass in a raw {@link https://cloud.google.com/bigquery/docs/reference/rest/v2/Job| Job resource}
    * object.
    *
-   * @see [Jobs Overview]{@link https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs}
-   * @see [Jobs: insert API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert}
+   * See {@link https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs| Jobs Overview}
+   * See {@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert| Jobs: insert API Documentation}
    *
-   * @param {object} options Object in the form of a [Job resource](https://cloud.google.com/bigquery/docs/reference/rest/v2/Job);
+   * @param {object} options Object in the form of a {@link https://cloud.google.com/bigquery/docs/reference/rest/v2/Job| Job resource};
    * @param {string} [options.jobId] Custom job id.
    * @param {string} [options.jobPrefix] Prefix to apply to the job id.
    * @param {string} [options.location] The geographic location of the job.
@@ -1482,9 +1514,9 @@ export class BigQuery extends common.Service {
    * @param {?error} callback.err An error returned while making this request.
    * @param {Job} callback.job The newly created job.
    * @param {object} callback.apiResponse The full API response.
-   * @returns {Promise<JobResponse>}
    *
    * @example
+   * ```
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    *
@@ -1512,7 +1544,10 @@ export class BigQuery extends common.Service {
    *
    *   return job.getQueryResults();
    * });
+   * ```
    */
+  createJob(options: JobOptions): Promise<JobResponse>;
+  createJob(options: JobOptions, callback: JobCallback): void;
   createJob(
     options: JobOptions,
     callback?: JobCallback
@@ -1560,7 +1595,7 @@ export class BigQuery extends common.Service {
 
         if (err) {
           if (
-            (err as common.ApiError).code === ALREADY_EXISTS_CODE &&
+            (err as ApiError).code === ALREADY_EXISTS_CODE &&
             !JOB_ID_PROVIDED &&
             !DRY_RUN
           ) {
@@ -1578,7 +1613,7 @@ export class BigQuery extends common.Service {
         }
 
         if (resp.status.errors) {
-          err = new common.util.ApiError({
+          err = new util.ApiError({
             errors: resp.status.errors,
             response: resp,
           } as GoogleErrorBody);
@@ -1599,12 +1634,13 @@ export class BigQuery extends common.Service {
    * @param {object} [options] Dataset options.
    * @param {string} [options.location] The geographic location of the dataset.
    *      Required except for US and EU.
-   * @returns {Dataset}
    *
    * @example
+   * ```
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('higher_education');
+   * ```
    */
   dataset(id: string, options?: DatasetOptions) {
     if (typeof id !== 'string') {
@@ -1617,13 +1653,10 @@ export class BigQuery extends common.Service {
     return new Dataset(this, id, options);
   }
 
-  getDatasets(options?: GetDatasetsOptions): Promise<DatasetsResponse>;
-  getDatasets(options: GetDatasetsOptions, callback: DatasetsCallback): void;
-  getDatasets(callback: DatasetsCallback): void;
   /**
    * List all or some of the datasets in your project.
    *
-   * @see [Datasets: list API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/datasets/list}
+   * See {@link https://cloud.google.com/bigquery/docs/reference/v2/datasets/list| Datasets: list API Documentation}
    *
    * @param {object} [options] Configuration object.
    * @param {boolean} [options.all] List all datasets, including hidden ones.
@@ -1636,9 +1669,9 @@ export class BigQuery extends common.Service {
    * @param {DatasetsCallback} [callback] The callback function.
    * @param {?error} callback.err An error returned while making this request
    * @param {Dataset[]} callback.datasets The list of datasets in your project.
-   * @returns {Promise<DatasetsResponse>}
    *
    * @example
+   * ```
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    *
@@ -1667,7 +1700,11 @@ export class BigQuery extends common.Service {
    * // If the callback is omitted, we'll return a Promise.
    * //-
    * bigquery.getDatasets().then(function(datasets) {});
+   * ```
    */
+  getDatasets(options?: GetDatasetsOptions): Promise<DatasetsResponse>;
+  getDatasets(options: GetDatasetsOptions, callback: DatasetsCallback): void;
+  getDatasets(callback: DatasetsCallback): void;
   getDatasets(
     optionsOrCallback?: GetDatasetsOptions | DatasetsCallback,
     cb?: DatasetsCallback
@@ -1713,9 +1750,6 @@ export class BigQuery extends common.Service {
     );
   }
 
-  getJobs(options?: GetJobsOptions): Promise<GetJobsResponse>;
-  getJobs(options: GetJobsOptions, callback: GetJobsCallback): void;
-  getJobs(callback: GetJobsCallback): void;
   /**
    * @callback GetJobsCallback
    * @param {?Error} err Request error, if any.
@@ -1728,7 +1762,7 @@ export class BigQuery extends common.Service {
   /**
    * Get all of the jobs from your project.
    *
-   * @see [Jobs: list API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/list}
+   * See {@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/list| Jobs: list API Documentation}
    *
    * @param {object} [options] Configuration object.
    * @param {boolean} [options.allUsers] Display jobs owned by all users in the
@@ -1749,9 +1783,9 @@ export class BigQuery extends common.Service {
    * @param {?error} callback.err An error returned while making this request
    * @param {Job[]} callback.jobs The list of jobs in your
    *     project.
-   * @returns {Promise<GetJobsResponse>}
    *
    * @example
+   * ```
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    *
@@ -1782,7 +1816,11 @@ export class BigQuery extends common.Service {
    * bigquery.getJobs().then(function(data) {
    *   const jobs = data[0];
    * });
+   * ```
    */
+  getJobs(options?: GetJobsOptions): Promise<GetJobsResponse>;
+  getJobs(options: GetJobsOptions, callback: GetJobsCallback): void;
+  getJobs(callback: GetJobsCallback): void;
   getJobs(
     optionsOrCallback?: GetJobsOptions | GetJobsCallback,
     cb?: GetJobsCallback
@@ -1827,13 +1865,14 @@ export class BigQuery extends common.Service {
    * @param {object} [options] Configuration object.
    * @param {string} [options.location] The geographic location of the job.
    *      Required except for US and EU.
-   * @returns {Job}
    *
    * @example
+   * ```
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    *
    * const myExistingJob = bigquery.job('job-id');
+   * ```
    */
   job(id: string, options?: JobOptions) {
     if (this.location) {
@@ -1842,30 +1881,15 @@ export class BigQuery extends common.Service {
     return new Job(this, id, options);
   }
 
-  query(query: string, options?: QueryOptions): Promise<QueryRowsResponse>;
-  query(query: Query, options?: QueryOptions): Promise<SimpleQueryRowsResponse>;
-  query(
-    query: string,
-    options: QueryOptions,
-    callback?: QueryRowsCallback
-  ): void;
-  query(
-    query: Query,
-    options: QueryOptions,
-    callback?: SimpleQueryRowsCallback
-  ): void;
-  query(query: string, callback?: QueryRowsCallback): void;
-  query(query: Query, callback?: SimpleQueryRowsCallback): void;
   /**
    * Run a query scoped to your project. For manual pagination please refer to
-   * {@link BigQuery#createQueryJob}.
+   * {@link BigQuery.createQueryJob}.
    *
-   * @see [Jobs: query API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/query}
+   * See {@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/query| Jobs: query API Documentation}
    *
    * @param {string|object} query A string SQL query or configuration object.
    *     For all available options, see
-   *     [Jobs: query request
-   * body](https://cloud.google.com/bigquery/docs/reference/v2/jobs/query#request-body).
+   *     {@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/query#request-body| Jobs: query request body}.
    * @param {string} [query.location] The geographic location of the job.
    *     Required except for US and EU.
    * @param {string} [query.jobId] Custom id for the underlying job.
@@ -1873,8 +1897,8 @@ export class BigQuery extends common.Service {
    * @param {object|Array<*>} query.params For positional SQL parameters, provide
    *     an array of values. For named SQL parameters, provide an object which
    *     maps each named parameter to its value. The supported types are
-   * integers, floats, {@link BigQuery#date} objects, {@link BigQuery#datetime}
-   *     objects, {@link BigQuery#time} objects, {@link BigQuery#timestamp}
+   * integers, floats, {@link BigQuery.date} objects, {@link BigQuery.datetime}
+   *     objects, {@link BigQuery.time} objects, {@link BigQuery.timestamp}
    *     objects, Strings, Booleans, and Objects.
    * @param {string} query.query A query string, following the BigQuery query
    *     syntax, of the query to execute.
@@ -1898,9 +1922,9 @@ export class BigQuery extends common.Service {
    * @param {function} [callback] The callback function.
    * @param {?error} callback.err An error returned while making this request
    * @param {array} callback.rows The list of results from your query.
-   * @returns {Promise}
    *
    * @example
+   * ```
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    *
@@ -1961,8 +1985,8 @@ export class BigQuery extends common.Service {
    *
    * //-
    * // If you need to use a `DATE`, `DATETIME`, `TIME`, or `TIMESTAMP` type in
-   * // your query, see {@link BigQuery#date}, {@link BigQuery#datetime},
-   * // {@link BigQuery#time}, and {@link BigQuery#timestamp}.
+   * // your query, see {@link BigQuery.date}, {@link BigQuery.datetime},
+   * // {@link BigQuery.time}, and {@link BigQuery.timestamp}.
    * //-
    *
    * //-
@@ -1971,7 +1995,22 @@ export class BigQuery extends common.Service {
    * bigquery.query(query).then(function(data) {
    *   const rows = data[0];
    * });
+   * ```
    */
+  query(query: string, options?: QueryOptions): Promise<QueryRowsResponse>;
+  query(query: Query, options?: QueryOptions): Promise<SimpleQueryRowsResponse>;
+  query(
+    query: string,
+    options: QueryOptions,
+    callback?: QueryRowsCallback
+  ): void;
+  query(
+    query: Query,
+    options: QueryOptions,
+    callback?: SimpleQueryRowsCallback
+  ): void;
+  query(query: string, callback?: QueryRowsCallback): void;
+  query(query: Query, callback?: SimpleQueryRowsCallback): void;
   query(
     query: string | Query,
     optionsOrCallback?:
@@ -2012,7 +2051,9 @@ export class BigQuery extends common.Service {
     cb?: SimpleQueryRowsCallback
   ) {
     let options =
-      typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
+      // Default to using query as options to ensure the options set
+      // in a Query type are passed through to the query() method.
+      typeof optionsOrCallback === 'object' ? optionsOrCallback : query;
     const callback =
       typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
 
@@ -2140,9 +2181,11 @@ export class BigQueryTime {
  *     names to be converted using `integerTypeCastFunction`.
  *
  * @example
+ * ```
  * const {BigQuery} = require('@google-cloud/bigquery');
  * const bigquery = new BigQuery();
  * const anInt = bigquery.int(7);
+ * ```
  */
 export class BigQueryInt extends Number {
   type: string;

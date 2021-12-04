@@ -14,7 +14,15 @@
  * limitations under the License.
  */
 
-import * as common from '@google-cloud/common';
+import {
+  ServiceObject,
+  ApiError,
+  ResponseCallback,
+  Metadata,
+  util,
+  DecorateRequestOptions,
+  SetMetadataResponse,
+} from '@google-cloud/common';
 import {paginator, ResourceStream} from '@google-cloud/paginator';
 import {promisifyAll} from '@google-cloud/promisify';
 import arrify = require('arrify');
@@ -199,18 +207,24 @@ export interface TableOptions {
  *      table.
  *
  * @example
+ * ```
  * const {BigQuery} = require('@google-cloud/bigquery');
  * const bigquery = new BigQuery();
  * const dataset = bigquery.dataset('my-dataset');
  *
  * const table = dataset.table('my-table');
+ * ```
  */
-class Table extends common.ServiceObject {
+class Table extends ServiceObject {
   dataset: Dataset;
   bigQuery: BigQuery;
   location?: string;
   rowQueue?: RowQueue;
   createReadStream: (options?: GetRowsOptions) => ResourceStream<RowMetadata>;
+  createReadStream(options?: GetRowsOptions): ResourceStream<RowMetadata> {
+    // placeholder body, overwritten in constructor
+    return new ResourceStream<RowMetadata>({}, () => {});
+  }
   constructor(dataset: Dataset, id: string, options?: TableOptions) {
     const methods = {
       /**
@@ -237,6 +251,7 @@ class Table extends common.ServiceObject {
        * @returns {Promise<CreateTableResponse>}
        *
        * @example
+       * ```
        * const {BigQuery} = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        * const dataset = bigquery.dataset('my-dataset');
@@ -256,6 +271,7 @@ class Table extends common.ServiceObject {
        *   const table = data[0];
        *   const apiResponse = data[1];
        * });
+       * ```
        */
       create: true,
 
@@ -271,7 +287,7 @@ class Table extends common.ServiceObject {
       /**
        * Delete a table and all its data.
        *
-       * @see [Tables: delete API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/tables/delete}
+       * See {@link https://cloud.google.com/bigquery/docs/reference/v2/tables/delete| Tables: delete API Documentation}
        *
        * @method Table#delete
        * @param {DeleteTableCallback} [callback]
@@ -281,6 +297,7 @@ class Table extends common.ServiceObject {
        * @returns {Promise<DeleteTableResponse>}
        *
        * @example
+       * ```
        * const {BigQuery} = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        * const dataset = bigquery.dataset('my-dataset');
@@ -295,6 +312,7 @@ class Table extends common.ServiceObject {
        * table.delete().then((data) => {
        *   const apiResponse = data[0];
        * });
+       * ```
        */
       delete: true,
 
@@ -318,6 +336,7 @@ class Table extends common.ServiceObject {
        * @returns {Promise<TableExistsCallback>}
        *
        * @example
+       * ```
        * const {BigQuery} = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        * const dataset = bigquery.dataset('my-dataset');
@@ -332,6 +351,7 @@ class Table extends common.ServiceObject {
        * table.exists().then((data) => {
        *   const exists = data[0];
        * });
+       * ```
        */
       exists: true,
 
@@ -366,6 +386,7 @@ class Table extends common.ServiceObject {
        * @returns {Promise<GetTableResponse>}
        *
        * @example
+       * ```
        * const {BigQuery} = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        * const dataset = bigquery.dataset('my-dataset');
@@ -383,6 +404,7 @@ class Table extends common.ServiceObject {
        *   const table = data[0];
        *   const apiResponse = data[1];
        * });
+       * ```
        */
       get: true,
 
@@ -400,7 +422,7 @@ class Table extends common.ServiceObject {
       /**
        * Return the metadata associated with the Table.
        *
-       * @see [Tables: get API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/tables/get}
+       * See {@link https://cloud.google.com/bigquery/docs/reference/v2/tables/get| Tables: get API Documentation}
        *
        * @method Table#getMetadata
        * @param {GetTableMetadataCallback} [callback] The callback function.
@@ -411,6 +433,7 @@ class Table extends common.ServiceObject {
        * @returns {Promise<GetTableMetadataResponse>}
        *
        * @example
+       * ```
        * const {BigQuery} = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        * const dataset = bigquery.dataset('my-dataset');
@@ -426,6 +449,7 @@ class Table extends common.ServiceObject {
        *   const metadata = data[0];
        *   const apiResponse = data[1];
        * });
+       * ```
        */
       getMetadata: true,
     };
@@ -448,7 +472,7 @@ class Table extends common.ServiceObject {
     // Catch all for read-modify-write cycle
     // https://cloud.google.com/bigquery/docs/api-performance#read-patch-write
     this.interceptors.push({
-      request: (reqOpts: common.DecorateRequestOptions) => {
+      request: (reqOpts: DecorateRequestOptions) => {
         if (reqOpts.method === 'PATCH' && reqOpts.json.etag) {
           reqOpts.headers = reqOpts.headers || {};
           reqOpts.headers['If-Match'] = reqOpts.json.etag;
@@ -461,11 +485,12 @@ class Table extends common.ServiceObject {
      * Create a readable stream of the rows of data in your table. This method
      * is simply a wrapper around {@link Table#getRows}.
      *
-     * @see [Tabledata: list API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/tabledata/list}
+     * See {@link https://cloud.google.com/bigquery/docs/reference/v2/tabledata/list| Tabledata: list API Documentation}
      *
      * @returns {ReadableStream}
      *
      * @example
+     * ```
      * const {BigQuery} = require('@google-cloud/bigquery');
      * const bigquery = new BigQuery();
      * const dataset = bigquery.dataset('my-dataset');
@@ -486,6 +511,7 @@ class Table extends common.ServiceObject {
      *   .on('data', function(row) {
      *     this.end();
      *   });
+     * ```
      */
     this.createReadStream = paginator.streamify<RowMetadata>('getRows');
   }
@@ -622,16 +648,6 @@ class Table extends common.ServiceObject {
     return body;
   }
 
-  copy(
-    destination: Table,
-    metadata?: CopyTableMetadata
-  ): Promise<JobMetadataResponse>;
-  copy(
-    destination: Table,
-    metadata: CopyTableMetadata,
-    callback: JobMetadataCallback
-  ): void;
-  copy(destination: Table, callback: JobMetadataCallback): void;
   /**
    * @callback JobMetadataCallback
    * @param {?Error} err Request error, if any.
@@ -647,7 +663,7 @@ class Table extends common.ServiceObject {
    * @param {Table} destination The destination table.
    * @param {object} [metadata] Metadata to set with the copy operation. The
    *     metadata object should be in the format of a
-   *     [`JobConfigurationTableCopy`](https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationTableCopy)
+   *     {@link https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationTableCopy| `JobConfigurationTableCopy`}
    * object.
    *     object.
    * @param {string} [metadata.jobId] Custom id for the underlying job.
@@ -661,6 +677,7 @@ class Table extends common.ServiceObject {
    * @throws {Error} If a destination other than a Table object is provided.
    *
    * @example
+   * ```
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('my-dataset');
@@ -687,7 +704,18 @@ class Table extends common.ServiceObject {
    * table.copy(yourTable, metadata).then((data) => {
    *   const apiResponse = data[0];
    * });
+   * ```
    */
+  copy(
+    destination: Table,
+    metadata?: CopyTableMetadata
+  ): Promise<JobMetadataResponse>;
+  copy(
+    destination: Table,
+    metadata: CopyTableMetadata,
+    callback: JobMetadataCallback
+  ): void;
+  copy(destination: Table, callback: JobMetadataCallback): void;
   copy(
     destination: Table,
     metadataOrCallback?: CopyTableMetadata | JobMetadataCallback,
@@ -713,16 +741,6 @@ class Table extends common.ServiceObject {
     );
   }
 
-  copyFrom(
-    sourceTables: Table | Table[],
-    metadata?: CopyTableMetadata
-  ): Promise<JobMetadataResponse>;
-  copyFrom(
-    sourceTables: Table | Table[],
-    metadata: CopyTableMetadata,
-    callback: JobMetadataCallback
-  ): void;
-  copyFrom(sourceTables: Table | Table[], callback: JobMetadataCallback): void;
   /**
    * @callback JobMetadataCallback
    * @param {?Error} err Request error, if any.
@@ -739,7 +757,7 @@ class Table extends common.ServiceObject {
    *     source table(s) to copy data from.
    * @param {object=} metadata Metadata to set with the copy operation. The
    *     metadata object should be in the format of a
-   *     [`JobConfigurationTableCopy`](https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationTableCopy)
+   *     {@link https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationTableCopy| `JobConfigurationTableCopy`}
    *     object.
    * @param {string} [metadata.jobId] Custom id for the underlying job.
    * @param {string} [metadata.jobPrefix] Prefix to apply to the underlying job
@@ -752,6 +770,7 @@ class Table extends common.ServiceObject {
    * @throws {Error} If a source other than a Table object is provided.
    *
    * @example
+   * ```
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('my-dataset');
@@ -781,7 +800,18 @@ class Table extends common.ServiceObject {
    * table.copyFrom(sourceTables, metadata).then((data) => {
    *   const apiResponse = data[0];
    * });
+   * ```
    */
+  copyFrom(
+    sourceTables: Table | Table[],
+    metadata?: CopyTableMetadata
+  ): Promise<JobMetadataResponse>;
+  copyFrom(
+    sourceTables: Table | Table[],
+    metadata: CopyTableMetadata,
+    callback: JobMetadataCallback
+  ): void;
+  copyFrom(sourceTables: Table | Table[], callback: JobMetadataCallback): void;
   copyFrom(
     sourceTables: Table | Table[],
     metadataOrCallback?: CopyTableMetadata | JobMetadataCallback,
@@ -802,25 +832,15 @@ class Table extends common.ServiceObject {
     });
   }
 
-  createCopyJob(
-    destination: Table,
-    metadata?: CreateCopyJobMetadata
-  ): Promise<JobResponse>;
-  createCopyJob(
-    destination: Table,
-    metadata: CreateCopyJobMetadata,
-    callback: JobCallback
-  ): void;
-  createCopyJob(destination: Table, callback: JobCallback): void;
   /**
    * Copy data from one table to another, optionally creating that table.
    *
-   * @see [Jobs: insert API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert}
+   * See {@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert| Jobs: insert API Documentation}
    *
    * @param {Table} destination The destination table.
    * @param {object} [metadata] Metadata to set with the copy operation. The
    *     metadata object should be in the format of a
-   *     [`JobConfigurationTableCopy`](https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationTableCopy)
+   *     {@link https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationTableCopy| `JobConfigurationTableCopy`}
    *     object.
    * @param {string} [metadata.jobId] Custom job id.
    * @param {string} [metadata.jobPrefix] Prefix to apply to the job id.
@@ -833,6 +853,7 @@ class Table extends common.ServiceObject {
    * @throws {Error} If a destination other than a Table object is provided.
    *
    * @example
+   * ```
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('my-dataset');
@@ -862,7 +883,18 @@ class Table extends common.ServiceObject {
    *   const job = data[0];
    *   const apiResponse = data[1];
    * });
+   * ```
    */
+  createCopyJob(
+    destination: Table,
+    metadata?: CreateCopyJobMetadata
+  ): Promise<JobResponse>;
+  createCopyJob(
+    destination: Table,
+    metadata: CreateCopyJobMetadata,
+    callback: JobCallback
+  ): void;
+  createCopyJob(destination: Table, callback: JobCallback): void;
   createCopyJob(
     destination: Table,
     metadataOrCallback?: CreateCopyJobMetadata | JobCallback,
@@ -913,26 +945,16 @@ class Table extends common.ServiceObject {
     this.bigQuery.createJob(body, callback!);
   }
 
-  createCopyFromJob(
-    source: Table | Table[],
-    metadata?: CopyTableMetadata
-  ): Promise<JobResponse>;
-  createCopyFromJob(
-    source: Table | Table[],
-    metadata: CopyTableMetadata,
-    callback: JobCallback
-  ): void;
-  createCopyFromJob(source: Table | Table[], callback: JobCallback): void;
   /**
    * Copy data from multiple tables into this table.
    *
-   * @see [Jobs: insert API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert}
+   * See {@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert| Jobs: insert API Documentation}
    *
    * @param {Table|Table[]} sourceTables The
    *     source table(s) to copy data from.
    * @param {object} [metadata] Metadata to set with the copy operation. The
    *     metadata object should be in the format of a
-   *     [`JobConfigurationTableCopy`](https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationTableCopy)
+   *     {@link https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationTableCopy| `JobConfigurationTableCopy`}
    *     object.
    * @param {string} [metadata.jobId] Custom job id.
    * @param {string} [metadata.jobPrefix] Prefix to apply to the job id.
@@ -945,6 +967,7 @@ class Table extends common.ServiceObject {
    * @throws {Error} If a source other than a Table object is provided.
    *
    * @example
+   * ```
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('my-dataset');
@@ -980,7 +1003,18 @@ class Table extends common.ServiceObject {
    *   const job = data[0];
    *   const apiResponse = data[1];
    * });
+   * ```
    */
+  createCopyFromJob(
+    source: Table | Table[],
+    metadata?: CopyTableMetadata
+  ): Promise<JobResponse>;
+  createCopyFromJob(
+    source: Table | Table[],
+    metadata: CopyTableMetadata,
+    callback: JobCallback
+  ): void;
+  createCopyFromJob(source: Table | Table[], callback: JobCallback): void;
   createCopyFromJob(
     source: Table | Table[],
     metadataOrCallback?: CopyTableMetadata | JobCallback,
@@ -1036,20 +1070,10 @@ class Table extends common.ServiceObject {
     this.bigQuery.createJob(body, callback!);
   }
 
-  createExtractJob(
-    destination: File,
-    options?: CreateExtractJobOptions
-  ): Promise<JobResponse>;
-  createExtractJob(
-    destination: File,
-    options: CreateExtractJobOptions,
-    callback: JobCallback
-  ): void;
-  createExtractJob(destination: File, callback: JobCallback): void;
   /**
    * Export table to Cloud Storage.
    *
-   * @see [Jobs: insert API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert}
+   * See {@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert| Jobs: insert API Documentation}
    *
    * @param {string|File} destination Where the file should be exported
    *     to. A string or a {@link
@@ -1072,6 +1096,7 @@ class Table extends common.ServiceObject {
    * @throws {Error} If destination format isn't recongized.
    *
    * @example
+   * ```
    * const {Storage} = require('@google-cloud/storage');
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
@@ -1124,7 +1149,18 @@ class Table extends common.ServiceObject {
    *   const job = data[0];
    *   const apiResponse = data[1];
    * });
+   * ```
    */
+  createExtractJob(
+    destination: File,
+    options?: CreateExtractJobOptions
+  ): Promise<JobResponse>;
+  createExtractJob(
+    destination: File,
+    options: CreateExtractJobOptions,
+    callback: JobCallback
+  ): void;
+  createExtractJob(destination: File, callback: JobCallback): void;
   createExtractJob(
     destination: File,
     optionsOrCallback?: CreateExtractJobOptions | JobCallback,
@@ -1137,7 +1173,7 @@ class Table extends common.ServiceObject {
 
     options = extend(true, options, {
       destinationUris: arrify(destination).map(dest => {
-        if (!common.util.isCustomType(dest, 'storage/file')) {
+        if (!util.isCustomType(dest, 'storage/file')) {
           throw new Error('Destination must be a File object.');
         }
 
@@ -1202,16 +1238,6 @@ class Table extends common.ServiceObject {
     this.bigQuery.createJob(body, callback!);
   }
 
-  createLoadJob(
-    source: string | File,
-    metadata?: JobLoadMetadata
-  ): Promise<JobResponse>;
-  createLoadJob(
-    source: string | File,
-    metadata: JobLoadMetadata,
-    callback: JobCallback
-  ): void;
-  createLoadJob(source: string | File, callback: JobCallback): void;
   /**
    * Load data from a local file or Storage {@link
    * https://googleapis.dev/nodejs/storage/latest/File.html File}.
@@ -1223,7 +1249,7 @@ class Table extends common.ServiceObject {
    * Note: The file type will be inferred by the given file's extension. If you
    * wish to override this, you must provide `metadata.format`.
    *
-   * @see [Jobs: insert API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert}
+   * See {@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert| Jobs: insert API Documentation}
    *
    * @param {string|File|File[]} source The source file to load. A string (path)
    * to a local file, or one or more {@link
@@ -1231,7 +1257,7 @@ class Table extends common.ServiceObject {
    * objects.
    * @param {object} [metadata] Metadata to set with the load operation. The
    *     metadata object should be in the format of the
-   *     [`configuration.load`](https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationLoad)
+   *     {@link https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationLoad| `configuration.load`}
    * property of a Jobs resource.
    * @param {string} [metadata.format] The format the data being loaded is in.
    *     Allowed options are "AVRO", "CSV", "JSON", "ORC", or "PARQUET".
@@ -1246,6 +1272,7 @@ class Table extends common.ServiceObject {
    * @throws {Error} If the source isn't a string file name or a File instance.
    *
    * @example
+   * ```
    * const {Storage} = require('@google-cloud/storage');
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
@@ -1298,7 +1325,18 @@ class Table extends common.ServiceObject {
    *   const job = data[0];
    *   const apiResponse = data[1];
    * });
+   * ```
    */
+  createLoadJob(
+    source: string | File,
+    metadata?: JobLoadMetadata
+  ): Promise<JobResponse>;
+  createLoadJob(
+    source: string | File,
+    metadata: JobLoadMetadata,
+    callback: JobCallback
+  ): void;
+  createLoadJob(source: string | File, callback: JobCallback): void;
   createLoadJob(
     source: string | File | File[],
     metadataOrCallback?: JobLoadMetadata | JobCallback,
@@ -1386,7 +1424,7 @@ class Table extends common.ServiceObject {
 
     extend(true, body.configuration.load, metadata, {
       sourceUris: arrify(source).map(src => {
-        if (!common.util.isCustomType(src, 'storage/file')) {
+        if (!util.isCustomType(src, 'storage/file')) {
           throw new Error('Source must be a File object.');
         }
 
@@ -1410,8 +1448,6 @@ class Table extends common.ServiceObject {
     return this.bigQuery.createJob(body);
   }
 
-  createQueryJob(options: Query): Promise<JobResponse>;
-  createQueryJob(options: Query, callback: JobCallback): void;
   /**
    * Run a query as a job. No results are immediately returned. Instead, your
    * callback will be executed with a {@link Job} object that you must
@@ -1420,6 +1456,8 @@ class Table extends common.ServiceObject {
    *
    * See {@link BigQuery#createQueryJob} for full documentation of this method.
    */
+  createQueryJob(options: Query): Promise<JobResponse>;
+  createQueryJob(options: Query, callback: JobCallback): void;
   createQueryJob(
     options: Query,
     callback?: JobCallback
@@ -1450,7 +1488,7 @@ class Table extends common.ServiceObject {
    *
    * @param {string|object} [metadata] Metadata to set with the load operation.
    *     The metadata object should be in the format of the
-   *     [`configuration.load`](https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationLoad)
+   *     {@link https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationLoad| `configuration.load`}
    * property of a Jobs resource. If a string is given, it will be used
    * as the filetype.
    * @param {string} [metadata.jobId] Custom job id.
@@ -1495,7 +1533,7 @@ class Table extends common.ServiceObject {
     const dup = streamEvents(duplexify());
 
     dup.once('writing', () => {
-      common.util.makeWritableStream(
+      util.makeWritableStream(
         dup,
         {
           makeAuthenticatedRequest: this.bigQuery.makeAuthenticatedRequest,
@@ -1530,11 +1568,11 @@ class Table extends common.ServiceObject {
    * Load data into your table from a readable stream of AVRO, CSV, JSON, ORC,
    * or PARQUET data.
    *
-   * @see [Jobs: insert API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert}
+   * See {@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert| Jobs: insert API Documentation}
    *
    * @param {string|object} [metadata] Metadata to set with the load operation.
    *     The metadata object should be in the format of the
-   *     [`configuration.load`](https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationLoad)
+   *     {@link https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationLoad| `configuration.load`}
    * property of a Jobs resource. If a string is given,
    * it will be used as the filetype.
    * @param {string} [metadata.jobId] Custom job id.
@@ -1544,6 +1582,7 @@ class Table extends common.ServiceObject {
    * @throws {Error} If source format isn't recognized.
    *
    * @example
+   * ```
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('my-dataset');
@@ -1585,6 +1624,7 @@ class Table extends common.ServiceObject {
    *   .on('complete', (job) => {
    *     // The job has completed successfully.
    *   });
+   * ```
    */
   createWriteStream(metadata: JobLoadMetadata | string) {
     const stream = this.createWriteStream_(metadata);
@@ -1604,16 +1644,6 @@ class Table extends common.ServiceObject {
     return stream;
   }
 
-  extract(
-    destination: File,
-    options?: CreateExtractJobOptions
-  ): Promise<JobMetadataResponse>;
-  extract(
-    destination: File,
-    options: CreateExtractJobOptions,
-    callback?: JobMetadataCallback
-  ): void;
-  extract(destination: File, callback?: JobMetadataCallback): void;
   /**
    * Export table to Cloud Storage.
    *
@@ -1636,6 +1666,7 @@ class Table extends common.ServiceObject {
    * @throws {Error} If destination format isn't recongized.
    *
    * @example
+   * ```
    * const Storage = require('@google-cloud/storage');
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
@@ -1682,7 +1713,18 @@ class Table extends common.ServiceObject {
    * table.extract(extractedFile, options).then((data) => {
    *   const apiResponse = data[0];
    * });
+   * ```
    */
+  extract(
+    destination: File,
+    options?: CreateExtractJobOptions
+  ): Promise<JobMetadataResponse>;
+  extract(
+    destination: File,
+    options: CreateExtractJobOptions,
+    callback?: JobMetadataCallback
+  ): void;
+  extract(destination: File, callback?: JobMetadataCallback): void;
   extract(
     destination: File,
     optionsOrCallback?: CreateExtractJobOptions | JobMetadataCallback,
@@ -1703,9 +1745,6 @@ class Table extends common.ServiceObject {
     });
   }
 
-  getRows(options?: GetRowsOptions): Promise<RowsResponse>;
-  getRows(options: GetRowsOptions, callback: RowsCallback): void;
-  getRows(callback: RowsCallback): void;
   /**
    * @callback RowsCallback
    * @param {?Error} err Request error, if any.
@@ -1716,12 +1755,15 @@ class Table extends common.ServiceObject {
    * @typedef {array} RowsResponse
    * @property {array} 0 The rows.
    */
+  getRows(options?: GetRowsOptions): Promise<RowsResponse>;
+  getRows(options: GetRowsOptions, callback: RowsCallback): void;
+  getRows(callback: RowsCallback): void;
 
   /**
    * Retrieves table data from a specified set of rows. The rows are returned to
    * your callback as an array of objects matching your table's schema.
    *
-   * @see [Tabledata: list API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/tabledata/list}
+   * See {@link https://cloud.google.com/bigquery/docs/reference/v2/tabledata/list| Tabledata: list API Documentation}
    *
    * @param {object} [options] The configuration object.
    * @param {boolean} [options.autoPaginate=true] Have pagination handled
@@ -1740,6 +1782,7 @@ class Table extends common.ServiceObject {
    * @returns {Promise<RowsResponse>}
    *
    * @example
+   * ```
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('my-dataset');
@@ -1772,6 +1815,7 @@ class Table extends common.ServiceObject {
    * table.getRows().then((data) => {
    *   const rows = data[0];
    *   });
+   * ```
    */
   getRows(
     optionsOrCallback?: GetRowsOptions | RowsCallback,
@@ -1822,11 +1866,7 @@ class Table extends common.ServiceObject {
         if (resp.rows && resp.rows.length > 0 && !this.metadata.schema) {
           // We don't know the schema for this table yet. Do a quick stat.
           this.getMetadata(
-            (
-              err: Error,
-              metadata: common.Metadata,
-              apiResponse: bigquery.ITable
-            ) => {
+            (err: Error, metadata: Metadata, apiResponse: bigquery.ITable) => {
               if (err) {
                 onComplete(err, null, null, apiResponse!);
                 return;
@@ -1842,16 +1882,6 @@ class Table extends common.ServiceObject {
     );
   }
 
-  insert(
-    rows: RowMetadata | RowMetadata[],
-    options?: InsertRowsOptions
-  ): Promise<InsertRowsResponse>;
-  insert(
-    rows: RowMetadata | RowMetadata[],
-    options: InsertRowsOptions,
-    callback: InsertRowsCallback
-  ): void;
-  insert(rows: RowMetadata | RowMetadata[], callback: InsertRowsCallback): void;
   /**
    * @callback InsertRowsCallback
    * @param {?Error} err Request error, if any.
@@ -1875,9 +1905,9 @@ class Table extends common.ServiceObject {
    * automatically retry those failed inserts, and it will even create the
    * table with the provided schema if it does not exist.
    *
-   * @see [Tabledata: insertAll API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/tabledata/insertAll}
-   * @see [Streaming Insert Limits]{@link https://cloud.google.com/bigquery/quotas#streaming_inserts}
-   * @see [Troubleshooting Errors]{@link https://developers.google.com/bigquery/troubleshooting-errors}
+   * See {@link https://cloud.google.com/bigquery/docs/reference/v2/tabledata/insertAll| Tabledata: insertAll API Documentation}
+   * See {@link https://cloud.google.com/bigquery/quotas#streaming_inserts| Streaming Insert Limits}
+   * See {@link https://developers.google.com/bigquery/troubleshooting-errors| Troubleshooting Errors}
    *
    * @param {object|object[]} rows The rows to insert into the table.
    * @param {object} [options] Configuration object.
@@ -1889,7 +1919,7 @@ class Table extends common.ServiceObject {
    *     inserting rows for cases of partial failures.
    * @param {boolean} [options.raw] If `true`, the `rows` argument is expected to
    *     be formatted as according to the
-   *     [specification](https://cloud.google.com/bigquery/docs/reference/v2/tabledata/insertAll).
+   *     {@link https://cloud.google.com/bigquery/docs/reference/v2/tabledata/insertAll| specification}.
    * @param {string|object} [options.schema] If provided will automatically
    *     create a table if it doesn't already exist. Note that this can take
    *     longer than 2 minutes to complete. A comma-separated list of
@@ -1898,15 +1928,14 @@ class Table extends common.ServiceObject {
    *     "timestamp". If the type is omitted, it is assumed to be "string".
    *     Example: "name:string, age:integer". Schemas can also be specified as a
    *     JSON array of fields, which allows for nested and repeated fields. See
-   *     a [Table resource](http://goo.gl/sl8Dmg) for more detailed information.
+   *     a {@link http://goo.gl/sl8Dmg| Table resource} for more detailed information.
    * @param {boolean} [options.skipInvalidRows=false] Insert all valid rows of a
    *     request, even if invalid rows exist.
    * @param {string} [options.templateSuffix] Treat the destination table as a
    *     base template, and insert the rows into an instance table named
    *     "{destination}{templateSuffix}". BigQuery will manage creation of
    *     the instance table, using the schema of the base template table. See
-   *     [Automatic table creation using template
-   * tables](https://cloud.google.com/bigquery/streaming-data-into-bigquery#template-tables)
+   *     {@link https://cloud.google.com/bigquery/streaming-data-into-bigquery#template-tables| Automatic table creation using template tables}
    *     for considerations when working with templates tables.
    * @param {InsertRowsCallback} [callback] The callback function.
    * @param {?error} callback.err An error returned while making this request.
@@ -1917,6 +1946,7 @@ class Table extends common.ServiceObject {
    * @returns {Promise<InsertRowsResponse>}
    *
    * @example
+   * ```
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('my-dataset');
@@ -2000,7 +2030,18 @@ class Table extends common.ServiceObject {
    *       // err.errors[].errors[].message
    *     }
    *   });
+   * ```
    */
+  insert(
+    rows: RowMetadata | RowMetadata[],
+    options?: InsertRowsOptions
+  ): Promise<InsertRowsResponse>;
+  insert(
+    rows: RowMetadata | RowMetadata[],
+    options: InsertRowsOptions,
+    callback: InsertRowsCallback
+  ): void;
+  insert(rows: RowMetadata | RowMetadata[], callback: InsertRowsCallback): void;
   insert(
     rows: RowMetadata | RowMetadata[],
     optionsOrCallback?: InsertRowsOptions | InsertRowsCallback,
@@ -2042,7 +2083,7 @@ class Table extends common.ServiceObject {
     try {
       return await this._insertWithRetry(rows, options);
     } catch (err) {
-      if ((err as common.ApiError).code !== 404 || !schema) {
+      if ((err as ApiError).code !== 404 || !schema) {
         throw err;
       }
     }
@@ -2050,7 +2091,7 @@ class Table extends common.ServiceObject {
     try {
       await this.create({schema});
     } catch (err) {
-      if ((err as common.ApiError).code !== 409) {
+      if ((err as ApiError).code !== 409) {
         throw err;
       }
     }
@@ -2163,7 +2204,7 @@ class Table extends common.ServiceObject {
     );
 
     if (partialFailures.length > 0) {
-      throw new common.util.PartialFailureError({
+      throw new util.PartialFailureError({
         errors: partialFailures,
         response: resp,
       } as GoogleErrorBody);
@@ -2212,7 +2253,7 @@ class Table extends common.ServiceObject {
    * object.
    * @param {object} [metadata] Metadata to set with the load operation. The
    *     metadata object should be in the format of the
-   *     [`configuration.load`](https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationLoad)
+   *     {@link https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationLoad| `configuration.load`}
    * property of a Jobs resource.
    * @param {string} [metadata.format] The format the data being loaded is in.
    *     Allowed options are "AVRO", "CSV", "JSON", "ORC", or "PARQUET".
@@ -2227,6 +2268,7 @@ class Table extends common.ServiceObject {
    * @throws {Error} If the source isn't a string file name or a File instance.
    *
    * @example
+   * ```
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('my-dataset');
@@ -2272,7 +2314,18 @@ class Table extends common.ServiceObject {
    * table.load(data).then(function(data) {
    *   const apiResponse = data[0];
    * });
+   * ```
    */
+  load(
+    source: string | File,
+    metadata?: JobLoadMetadata
+  ): Promise<JobMetadataResponse>;
+  load(
+    source: string | File,
+    metadata: JobLoadMetadata,
+    callback: JobMetadataCallback
+  ): void;
+  load(source: string | File, callback: JobMetadataCallback): void;
   load(
     source: string | File,
     metadataOrCallback?: JobLoadMetadata | JobMetadataCallback,
@@ -2295,9 +2348,6 @@ class Table extends common.ServiceObject {
     });
   }
 
-  query(query: Query): Promise<SimpleQueryRowsResponse>;
-  query(query: string): Promise<SimpleQueryRowsResponse>;
-  query(query: Query, callback: SimpleQueryRowsCallback): void;
   /**
    * Run a query scoped to your dataset.
    *
@@ -2306,6 +2356,9 @@ class Table extends common.ServiceObject {
    * @param {function} [callback] See {@link BigQuery#query} for full documentation of this method.
    * @returns {Promise<SimpleQueryRowsResponse>}
    */
+  query(query: Query): Promise<SimpleQueryRowsResponse>;
+  query(query: string): Promise<SimpleQueryRowsResponse>;
+  query(query: Query, callback: SimpleQueryRowsCallback): void;
   query(
     query: Query | string,
     callback?: SimpleQueryRowsCallback
@@ -2318,17 +2371,10 @@ class Table extends common.ServiceObject {
     this.dataset.query(query, callback!);
   }
 
-  setMetadata(
-    metadata: SetTableMetadataOptions
-  ): Promise<common.SetMetadataResponse>;
-  setMetadata(
-    metadata: SetTableMetadataOptions,
-    callback: common.ResponseCallback
-  ): void;
   /**
    * Set the metadata on the table.
    *
-   * @see [Tables: patch API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/tables/patch}
+   * See {@link https://cloud.google.com/bigquery/docs/reference/v2/tables/patch| Tables: patch API Documentation}
    *
    * @param {object} metadata The metadata key/value object to set.
    * @param {string} metadata.description A user-friendly description of the
@@ -2339,7 +2385,7 @@ class Table extends common.ServiceObject {
    * "bytes", "record", and "timestamp". If the type is omitted, it is assumed
    * to be "string". Example: "name:string, age:integer". Schemas can also be
    *     specified as a JSON array of fields, which allows for nested and
-   * repeated fields. See a [Table resource](http://goo.gl/sl8Dmg) for more
+   * repeated fields. See a {@link http://goo.gl/sl8Dmg| Table resource} for more
    * detailed information.
    * @param {function} [callback] The callback function.
    * @param {?error} callback.err An error returned while making this request.
@@ -2347,6 +2393,7 @@ class Table extends common.ServiceObject {
    * @returns {Promise<common.SetMetadataResponse>}
    *
    * @example
+   * ```
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('my-dataset');
@@ -2367,23 +2414,29 @@ class Table extends common.ServiceObject {
    *   const metadata = data[0];
    *   const apiResponse = data[1];
    * });
+   * ```
    */
+  setMetadata(metadata: SetTableMetadataOptions): Promise<SetMetadataResponse>;
   setMetadata(
     metadata: SetTableMetadataOptions,
-    callback?: common.ResponseCallback
-  ): void | Promise<common.SetMetadataResponse> {
+    callback: ResponseCallback
+  ): void;
+  setMetadata(
+    metadata: SetTableMetadataOptions,
+    callback?: ResponseCallback
+  ): void | Promise<SetMetadataResponse> {
     const body = Table.formatMetadata_(metadata as TableMetadata);
     super.setMetadata(body, callback!);
   }
 
-  getIamPolicy(
-    optionsOrCallback?: GetPolicyOptions | PolicyCallback
-  ): Promise<PolicyResponse>;
-  getIamPolicy(options: GetPolicyOptions, callback: PolicyCallback): void;
   /**
    * Run a query scoped to your dataset.
    * @returns {Promise<PolicyResponse>}
    */
+  getIamPolicy(
+    optionsOrCallback?: GetPolicyOptions | PolicyCallback
+  ): Promise<PolicyResponse>;
+  getIamPolicy(options: GetPolicyOptions, callback: PolicyCallback): void;
   getIamPolicy(
     optionsOrCallback?: GetPolicyOptions,
     cb?: PolicyCallback
@@ -2418,6 +2471,10 @@ class Table extends common.ServiceObject {
     );
   }
 
+  /**
+   * Run a query scoped to your dataset.
+   * @returns {Promise<PolicyResponse>}
+   */
   setIamPolicy(
     policy: Policy,
     options?: SetPolicyOptions
@@ -2428,10 +2485,6 @@ class Table extends common.ServiceObject {
     callback: PolicyCallback
   ): void;
   setIamPolicy(policy: Policy, callback: PolicyCallback): void;
-  /**
-   * Run a query scoped to your dataset.
-   * @returns {Promise<PolicyResponse>}
-   */
   setIamPolicy(
     policy: Policy,
     optionsOrCallback?: SetPolicyOptions | PolicyCallback,
@@ -2464,6 +2517,10 @@ class Table extends common.ServiceObject {
     );
   }
 
+  /**
+   * Run a query scoped to your dataset.
+   * @returns {Promise<PermissionsResponse>}
+   */
   testIamPermissions(
     permissions: string | string[]
   ): Promise<PermissionsResponse>;
@@ -2471,10 +2528,6 @@ class Table extends common.ServiceObject {
     permissions: string | string[],
     callback: PermissionsCallback
   ): void;
-  /**
-   * Run a query scoped to your dataset.
-   * @returns {Promise<PermissionsResponse>}
-   */
   testIamPermissions(
     permissions: string | string[],
     callback?: PermissionsCallback

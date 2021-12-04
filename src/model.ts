@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as common from '@google-cloud/common';
+import {ServiceObject, util} from '@google-cloud/common';
 import {promisifyAll} from '@google-cloud/promisify';
 import arrify = require('arrify');
 import * as extend from 'extend';
@@ -72,13 +72,15 @@ const FORMATS = ['ML_TF_SAVED_MODEL', 'ML_XGBOOST_BOOSTER'];
  * @param {string} id The ID of the model.
  *
  * @example
+ * ```
  * const {BigQuery} = require('@google-cloud/bigquery');
  * const bigquery = new BigQuery();
  * const dataset = bigquery.dataset('my-dataset');
  *
  * const model = dataset.model('my-model');
+ * ```
  */
-class Model extends common.ServiceObject {
+class Model extends ServiceObject {
   dataset: Dataset;
   bigQuery: BigQuery;
 
@@ -92,7 +94,7 @@ class Model extends common.ServiceObject {
       /**
        * Delete the model.
        *
-       * @see [Models: delete API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/rest/v2/models/delete}
+       * See {@link https://cloud.google.com/bigquery/docs/reference/rest/v2/models/delete| Models: delete API Documentation}
        *
        * @method Model#delete
        * @param {DeleteModelCallback} [callback] The callback function.
@@ -102,6 +104,7 @@ class Model extends common.ServiceObject {
        * @returns {Promise}
        *
        * @example
+       * ```
        * const {BigQuery} = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        * const dataset = bigquery.dataset('my-dataset');
@@ -109,9 +112,14 @@ class Model extends common.ServiceObject {
        *
        * model.delete((err, apiResponse) => {});
        *
-       * @example <caption>If the callback is omitted we'll return a Promise.</caption>
+       * ```
+       * @example If the callback is omitted we'll return a Promise.
+       * ```
        * const [apiResponse] = await model.delete();
-       * @example <caption>If successful, the response body is empty.</caption>
+       * ```
+       * @example If successful, the response body is empty.
+       * ```
+       * ```
        */
       delete: true,
 
@@ -135,6 +143,7 @@ class Model extends common.ServiceObject {
        * @returns {Promise<ModelExistsResponse>}
        *
        * @example
+       * ```
        * const {BigQuery} = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        * const dataset = bigquery.dataset('my-dataset');
@@ -142,8 +151,11 @@ class Model extends common.ServiceObject {
        *
        * model.exists((err, exists) => {});
        *
-       * @example <caption>If the callback is omitted we'll return a Promise.</caption>
+       * ```
+       * @example If the callback is omitted we'll return a Promise.
+       * ```
        * const [exists] = await model.exists();
+       * ```
        */
       exists: true,
 
@@ -161,7 +173,7 @@ class Model extends common.ServiceObject {
       /**
        * Get a model if it exists.
        *
-       * @see [Models: get API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/rest/v2/models/get}
+       * See {@link https://cloud.google.com/bigquery/docs/reference/rest/v2/models/get| Models: get API Documentation}
        *
        * @method Model#get:
        * @param {GetModelCallback} [callback] The callback function.
@@ -172,6 +184,7 @@ class Model extends common.ServiceObject {
        * @returns {Promise<GetModelResponse>}
        *
        * @example
+       * ```
        * const {BigQuery} = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        * const dataset = bigquery.dataset('my-dataset');
@@ -183,8 +196,11 @@ class Model extends common.ServiceObject {
        *   }
        * });
        *
-       * @example <caption>If the callback is omitted we'll return a Promise.</caption>
+       * ```
+       * @example If the callback is omitted we'll return a Promise.
+       * ```
        * await model.get();
+       * ```
        */
       get: true,
 
@@ -202,7 +218,7 @@ class Model extends common.ServiceObject {
       /**
        * Return the metadata associated with the model.
        *
-       * @see [Models: get API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/rest/v2/models/get}
+       * See {@link https://cloud.google.com/bigquery/docs/reference/rest/v2/models/get| Models: get API Documentation}
        *
        * @method Model#getMetadata
        * @param {GetModelMetadataCallback} [callback] The callback function.
@@ -213,6 +229,7 @@ class Model extends common.ServiceObject {
        * @returns {Promise<GetModelMetadataResponse>}
        *
        * @example
+       * ```
        * const {BigQuery} = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        * const dataset = bigquery.dataset('my-dataset');
@@ -220,8 +237,11 @@ class Model extends common.ServiceObject {
        *
        * model.getMetadata((err, metadata, apiResponse) => {});
        *
-       * @example <caption>If the callback is omitted we'll return a Promise.</caption>
+       * ```
+       * @example If the callback is omitted we'll return a Promise.
+       * ```
        * const [metadata, apiResponse] = await model.getMetadata();
+       * ```
        */
       getMetadata: true,
 
@@ -237,7 +257,7 @@ class Model extends common.ServiceObject {
        * @property {object} 1 The full API response.
        */
       /**
-       * @see [Models: patch API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/rest/v2/models/patch}
+       * See {@link https://cloud.google.com/bigquery/docs/reference/rest/v2/models/patch| Models: patch API Documentation}
        *
        * @method Model#setMetadata
        * @param {object} metadata The metadata key/value object to set.
@@ -249,6 +269,7 @@ class Model extends common.ServiceObject {
        * @returns {Promise<SetModelMetadataResponse>}
        *
        * @example
+       * ```
        * const {BigQuery} = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        * const dataset = bigquery.dataset('my-dataset');
@@ -260,8 +281,11 @@ class Model extends common.ServiceObject {
        *
        * model.setMetadata(metadata, (err, metadata, apiResponse) => {});
        *
-       * @example <caption>If the callback is omitted we'll return a Promise.</caption>
+       * ```
+       * @example If the callback is omitted we'll return a Promise.
+       * ```
        * const [metadata, apiResponse] = await model.setMetadata(metadata);
+       * ```
        */
       setMetadata: true,
     };
@@ -277,16 +301,6 @@ class Model extends common.ServiceObject {
     this.bigQuery = dataset.bigQuery;
   }
 
-  createExtractJob(
-    destination: string | File,
-    options?: CreateExtractJobOptions
-  ): Promise<JobResponse>;
-  createExtractJob(
-    destination: string | File,
-    options: CreateExtractJobOptions,
-    callback: JobCallback
-  ): void;
-  createExtractJob(destination: string | File, callback: JobCallback): void;
   /**
    * @callback JobCallback
    * @param {?Error} err Request error, if any.
@@ -301,7 +315,7 @@ class Model extends common.ServiceObject {
   /**
    * Export model to Cloud Storage.
    *
-   * @see [Jobs: insert API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert}
+   * See {@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/insert| Jobs: insert API Documentation}
    *
    * @param {string|File} destination Where the model should be exported
    *    to. A string or {@link
@@ -322,6 +336,7 @@ class Model extends common.ServiceObject {
    * @throws {Error} If a destination isn't a string or File object.
    *
    * @example
+   * ```
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('my-dataset');
@@ -360,7 +375,18 @@ class Model extends common.ServiceObject {
    *   const job = data[0];
    *   const apiResponse = data[1];
    * });
+   * ```
    */
+  createExtractJob(
+    destination: string | File,
+    options?: CreateExtractJobOptions
+  ): Promise<JobResponse>;
+  createExtractJob(
+    destination: string | File,
+    options: CreateExtractJobOptions,
+    callback: JobCallback
+  ): void;
+  createExtractJob(destination: string | File, callback: JobCallback): void;
   createExtractJob(
     destination: string | File,
     optionsOrCallback?: CreateExtractJobOptions | JobCallback,
@@ -374,7 +400,7 @@ class Model extends common.ServiceObject {
     options = extend(true, options, {
       destinationUris: (arrify(destination) as Array<File | string>).map(
         dest => {
-          if (common.util.isCustomType(dest, 'storage/file')) {
+          if (util.isCustomType(dest, 'storage/file')) {
             return (
               'gs://' + (dest as File).bucket.name + '/' + (dest as File).name
             );
@@ -425,16 +451,6 @@ class Model extends common.ServiceObject {
     this.bigQuery.createJob(body, callback!);
   }
 
-  extract(
-    destination: string | File,
-    options?: CreateExtractJobOptions
-  ): Promise<JobMetadataResponse>;
-  extract(
-    destination: string | File,
-    options: CreateExtractJobOptions,
-    callback?: JobMetadataCallback
-  ): void;
-  extract(destination: string | File, callback?: JobMetadataCallback): void;
   /**
    * @callback JobMetadataCallback
    * @param {?Error} err Request error, if any.
@@ -467,6 +483,7 @@ class Model extends common.ServiceObject {
    * @throws {Error} If destination isn't a string or File object.
    *
    * @example
+   * ```
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    * const dataset = bigquery.dataset('my-dataset');
@@ -507,7 +524,18 @@ class Model extends common.ServiceObject {
    *   const job = data[0];
    *   const apiResponse = data[1];
    * });
+   * ```
    */
+  extract(
+    destination: string | File,
+    options?: CreateExtractJobOptions
+  ): Promise<JobMetadataResponse>;
+  extract(
+    destination: string | File,
+    options: CreateExtractJobOptions,
+    callback?: JobMetadataCallback
+  ): void;
+  extract(destination: string | File, callback?: JobMetadataCallback): void;
   extract(
     destination: string | File,
     optionsOrCallback?: CreateExtractJobOptions | JobMetadataCallback,

@@ -4,6 +4,20 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+### [5.9.2](https://www.github.com/googleapis/nodejs-bigquery/compare/v5.9.1...v5.9.2) (2021-11-16)
+
+
+### Bug Fixes
+
+* **cloud-rad:** move comments for TSDoc ([#1040](https://www.github.com/googleapis/nodejs-bigquery/issues/1040)) ([93c5e14](https://www.github.com/googleapis/nodejs-bigquery/commit/93c5e14a91418a293775e417b68ab22732bc48e7))
+
+### [5.9.1](https://www.github.com/googleapis/nodejs-bigquery/compare/v5.9.0...v5.9.1) (2021-10-12)
+
+
+### Bug Fixes
+
+* update queryAsStream_ to set options with Query type ([#999](https://www.github.com/googleapis/nodejs-bigquery/issues/999)) ([e7eab0b](https://www.github.com/googleapis/nodejs-bigquery/commit/e7eab0b25c18c6bbb9fa0f92f180ba70632675aa))
+
 ## [5.9.0](https://www.github.com/googleapis/nodejs-bigquery/compare/v5.8.0...v5.9.0) (2021-09-08)
 
 

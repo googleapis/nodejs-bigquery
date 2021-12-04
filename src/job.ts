@@ -90,6 +90,7 @@ export type QueryResultsOptions = {
  *      Required except for US and EU.
  *
  * @example
+ * ```
  * const {BigQuery} = require('@google-cloud/bigquery');
  * const bigquery = new BigQuery();
  *
@@ -118,13 +119,17 @@ export type QueryResultsOptions = {
  * // The easiest way to do this is with `removeAllListeners()`.
  * //-
  * job.removeAllListeners();
+ * ```
  */
 class Job extends Operation {
   bigQuery: BigQuery;
   location?: string;
-  getQueryResultsStream: (
+  getQueryResultsStream(
     options?: QueryResultsOptions
-  ) => ResourceStream<RowMetadata>;
+  ): ResourceStream<RowMetadata> {
+    // placeholder body, overwritten in constructor
+    return new ResourceStream<RowMetadata>({}, () => {});
+  }
   constructor(bigQuery: BigQuery, id: string, options?: JobOptions) {
     let location: string;
 
@@ -149,6 +154,7 @@ class Job extends Operation {
        * @returns {Promise<JobExistsResponse>}
        *
        * @example
+       * ```
        * const {BigQuery} = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        *
@@ -162,6 +168,7 @@ class Job extends Operation {
        * job.exists().then((data) => {
        *   const exists = data[0];
        * });
+       * ```
        */
       exists: true,
 
@@ -181,6 +188,9 @@ class Job extends Operation {
        * Get a job if it exists.
        *
        * @method Job#get
+       * @param {object} [options] Configuration object.
+       * @param {string} [options.location] The geographic location of the job.
+       *     Required except for US and EU.
        * @param {GetJobCallback} [callback] The callback function.
        * @param {?error} callback.err An error returned while making this
        *     request.
@@ -188,6 +198,7 @@ class Job extends Operation {
        * @returns {Promise<GetJobResponse>}
        *
        * @example
+       * ```
        * const {BigQuery} = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        *
@@ -206,6 +217,7 @@ class Job extends Operation {
        *   const job = data[0];
        *   const apiResponse = data[1];
        * });
+       * ```
        */
       get: true,
 
@@ -225,7 +237,7 @@ class Job extends Operation {
        * Get the metadata of the job. This will mostly be useful for checking
        * the status of a previously-run job.
        *
-       * @see [Jobs: get API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/get}
+       * See {@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/get| Jobs: get API Documentation}
        *
        * @method Job#getMetadata
        * @param {GetJobMetadataCallback} [callback] The callback function.
@@ -236,6 +248,7 @@ class Job extends Operation {
        * @returns {Promise<GetJobMetadataResponse>}
        *
        * @example
+       * ```
        * const {BigQuery} = require('@google-cloud/bigquery');
        * const bigquery = new BigQuery();
        *
@@ -249,6 +262,7 @@ class Job extends Operation {
        *   const metadata = data[0];
        *   const apiResponse = data[1];
        * });
+       * ```
        */
       getMetadata: {
         reqOpts: {
@@ -291,6 +305,7 @@ class Job extends Operation {
      * @return {stream}
      *
      * @example
+     * ```
      * const through2 = require('through2');
      * const fs = require('fs');
      * const {BigQuery} = require('@google-cloud/bigquery');
@@ -304,14 +319,13 @@ class Job extends Operation {
      *     next();
      *   }))
      *   .pipe(fs.createWriteStream('./test/testdata/testfile.json'));
+     * ```
      */
     this.getQueryResultsStream = paginator.streamify<RowMetadata>(
       'getQueryResultsAsStream_'
     );
   }
 
-  cancel(): Promise<CancelResponse>;
-  cancel(callback: CancelCallback): void;
   /**
    * @callback CancelCallback
    * @param {?Error} err Request error, if any.
@@ -327,7 +341,7 @@ class Job extends Operation {
    * Cancel a job. Use {@link Job#getMetadata} to see if the cancel
    * completes successfully. See an example implementation below.
    *
-   * @see [Jobs: get API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/cancel}
+   * See {@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/cancel| Jobs: get API Documentation}
    *
    * @param {CancelCallback} [callback] The callback function.
    * @param {?error} callback.err An error returned while making this request.
@@ -335,6 +349,7 @@ class Job extends Operation {
    * @returns {Promise<CancelResponse>}
    *
    * @example
+   * ```
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    *
@@ -352,7 +367,10 @@ class Job extends Operation {
    * job.cancel().then((data) => {
    *   const apiResponse = data[0];
    * });
+   * ```
    */
+  cancel(): Promise<CancelResponse>;
+  cancel(callback: CancelCallback): void;
   cancel(callback?: CancelCallback): void | Promise<CancelResponse> {
     let qs;
 
@@ -370,16 +388,10 @@ class Job extends Operation {
     );
   }
 
-  getQueryResults(options?: QueryResultsOptions): Promise<QueryRowsResponse>;
-  getQueryResults(
-    options: QueryResultsOptions,
-    callback: QueryRowsCallback
-  ): void;
-  getQueryResults(callback: QueryRowsCallback): void;
   /**
    * Get the results of a job.
    *
-   * @see [Jobs: getQueryResults API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/getQueryResults}
+   * See {@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/getQueryResults| Jobs: getQueryResults API Documentation}
    *
    * @param {object} [options] Configuration object.
    * @param {boolean} [options.autoPaginate=true] Have pagination handled
@@ -405,6 +417,7 @@ class Job extends Operation {
    * @returns {Promise<QueryResultsCallback>}
    *
    * @example
+   * ```
    * const {BigQuery} = require('@google-cloud/bigquery');
    * const bigquery = new BigQuery();
    *
@@ -447,7 +460,14 @@ class Job extends Operation {
    * job.getQueryResults().then((data) => {
    *   const rows = data[0];
    * });
+   * ```
    */
+  getQueryResults(options?: QueryResultsOptions): Promise<QueryRowsResponse>;
+  getQueryResults(
+    options: QueryResultsOptions,
+    callback: QueryRowsCallback
+  ): void;
+  getQueryResults(callback: QueryRowsCallback): void;
   getQueryResults(
     optionsOrCallback?: QueryResultsOptions | QueryRowsCallback,
     cb?: QueryRowsCallback
