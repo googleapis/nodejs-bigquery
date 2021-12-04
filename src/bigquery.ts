@@ -14,7 +14,13 @@
  * limitations under the License.
  */
 
-import * as common from '@google-cloud/common';
+import {
+  ApiError,
+  Service,
+  DecorateRequestOptions,
+  GoogleAuthOptions,
+  util,
+} from '@google-cloud/common';
 import {paginator, ResourceStream} from '@google-cloud/paginator';
 import {promisifyAll} from '@google-cloud/promisify';
 import arrify = require('arrify');
@@ -163,10 +169,32 @@ export interface ProvidedTypeStruct {
 
 export type QueryParameter = bigquery.IQueryParameter;
 
-export interface BigQueryOptions extends common.GoogleAuthOptions {
+export interface BigQueryOptions extends GoogleAuthOptions {
+  /**
+   * Automatically retry requests if the
+   * response is related to rate limits or certain intermittent server errors.
+   * We will exponentially backoff subsequent requests by default.
+   *
+   * Defaults to `true`.
+   */
   autoRetry?: boolean;
+  /**
+   * Maximum number of automatic retries
+   * attempted before returning the error.
+   *
+   * Defaults to 3.
+   */
   maxRetries?: number;
+
+  /**
+   * The geographic location of all datasets and
+   * jobs referenced and created through the client.
+   */
   location?: string;
+  /**
+   * The value to be prepended to the User-Agent
+   * header in API requests.
+   */
   userAgent?: string;
   /**
    * The API endpoint of the service used to make requests.
@@ -207,21 +235,11 @@ export const PROTOCOL_REGEX = /^(\w*):\/\//;
  * @property {object} [credentials] Credentials object.
  * @property {string} [credentials.client_email]
  * @property {string} [credentials.private_key]
- * @property {boolean} [autoRetry=true] Automatically retry requests if the
- *     response is related to rate limits or certain intermittent server errors.
- *     We will exponentially backoff subsequent requests by default.
- * @property {number} [maxRetries=3] Maximum number of automatic retries
- *     attempted before returning the error.
  * @property {Constructor} [promise] Custom promise module to use instead of
  *     native Promises.
- * @property {string} [location] The geographic location of all datasets and
- *     jobs referenced and created through the client.
- * @property {string} [userAgent] The value to be prepended to the User-Agent
- *     header in API requests.
  * @property {string[]} [scopes] Additional OAuth scopes to use in requests. For
  *     example, to access an external data source, you may need the
  *     `https://www.googleapis.com/auth/drive.readonly` scope.
- * @property {string=} apiEndpoint The API endpoint of the service used to make requests. Defaults to `bigquery.googleapis.com`.
  */
 
 /**
@@ -265,12 +283,23 @@ export const PROTOCOL_REGEX = /^(\w*):\/\//;
  * region_tag:bigquery_quickstart
  * Full quickstart example:
  */
-export class BigQuery extends common.Service {
+export class BigQuery extends Service {
   location?: string;
 
-  createQueryStream: (options?: Query | string) => ResourceStream<RowMetadata>;
-  getDatasetsStream: (options?: GetDatasetsOptions) => ResourceStream<Dataset>;
-  getJobsStream: (options?: GetJobsOptions) => ResourceStream<Job>;
+  createQueryStream(options?: Query | string): ResourceStream<RowMetadata> {
+    // placeholder body, overwritten in constructor
+    return new ResourceStream<RowMetadata>({}, () => {});
+  }
+
+  getDatasetsStream(options?: GetDatasetsOptions): ResourceStream<Dataset> {
+    // placeholder body, overwritten in constructor
+    return new ResourceStream<Dataset>({}, () => {});
+  }
+
+  getJobsStream(options?: GetJobsOptions): ResourceStream<Job> {
+    // placeholder body, overwritten in constructor
+    return new ResourceStream<Job>({}, () => {});
+  }
 
   constructor(options: BigQueryOptions = {}) {
     let apiEndpoint = 'https://bigquery.googleapis.com';
@@ -304,18 +333,13 @@ export class BigQuery extends common.Service {
 
     super(config, options);
 
-    /**
-     * @name BigQuery#location
-     * @type {string}
-     */
     this.location = options.location;
     /**
      * Run a query scoped to your project as a readable object stream.
      *
      * @method
-     * @param {object} query Configuration object. See {@link BigQuery#query} for a complete
+     * @param {object} query Configuration object. See {@link BigQuery.query} for a complete
      *     list of options.
-     * @returns {stream}
      *
      * @example
      * ```
@@ -351,8 +375,7 @@ export class BigQuery extends common.Service {
      * a readable object stream.
      *
      * @param {object} [options] Configuration object. See
-     *     {@link BigQuery#getDatasets} for a complete list of options.
-     * @returns {stream}
+     *     {@link BigQuery.getDatasets} for a complete list of options.
      *
      * @example
      * ```
@@ -385,8 +408,7 @@ export class BigQuery extends common.Service {
      * readable object stream.
      *
      * @param {object} [options] Configuration object. See
-     *     {@link BigQuery#getJobs} for a complete list of options.
-     * @returns {stream}
+     *     {@link BigQuery.getJobs} for a complete list of options.
      *
      * @example
      * ```
@@ -417,7 +439,7 @@ export class BigQuery extends common.Service {
     // Disable `prettyPrint` for better performance.
     // https://github.com/googleapis/nodejs-bigquery/issues/858
     this.interceptors.push({
-      request: (reqOpts: common.DecorateRequestOptions) => {
+      request: (reqOpts: DecorateRequestOptions) => {
         return extend(true, {}, reqOpts, {qs: {prettyPrint: false}});
       },
     });
@@ -445,7 +467,7 @@ export class BigQuery extends common.Service {
    *     Please see {@link IntegerTypeCastOptions} for options descriptions.
    * @param {array} selectedFields List of fields to return.
    * If unspecified, all fields are returned.
-   * @returns {array} Fields using their matching names from the table's schema.
+   * @returns Fields using their matching names from the table's schema.
    */
   static mergeSchemaWithRows_(
     schema: TableSchema | TableField,
@@ -625,7 +647,6 @@ export class BigQuery extends common.Service {
    * @param {string|number} value.year Four digits.
    * @param {string|number} value.month One or two digits.
    * @param {string|number} value.day One or two digits.
-   * @returns {BigQueryDate}
    *
    * @example
    * ```
@@ -664,7 +685,6 @@ export class BigQuery extends common.Service {
    * @param {string|number} [value.seconds] One or two digits (`00` - `59`).
    * @param {string|number} [value.fractional] Up to six digits for microsecond
    *     precision.
-   * @returns {BigQueryDatetime}
    *
    * @example
    * ```
@@ -690,7 +710,6 @@ export class BigQuery extends common.Service {
    * this does not refer to an absolute instance in time. Instead, it is the
    * civil time, or the time that a user would see on a watch or calendar.
    *
-   * @method BigQuery#datetime
    * @param {object|string} value The time. If a string, this should be in the
    *     format the API describes: `YYYY-[M]M-[D]D[ [H]H:[M]M:[S]S[.DDDDDD]]`.
    *     Otherwise, provide an object.
@@ -742,7 +761,6 @@ export class BigQuery extends common.Service {
    * @param {string|number} [value.seconds] One or two digits (`00` - `59`).
    * @param {string|number} [value.fractional] Up to six digits for microsecond
    *     precision.
-   * @returns {BigQueryTime}
    *
    * @example
    * ```
@@ -763,7 +781,6 @@ export class BigQuery extends common.Service {
   /**
    * A `TIME` data type represents a time, independent of a specific date.
    *
-   * @method BigQuery#time
    * @param {object|string} value The time. If a string, this should be in the
    *     format the API describes: `[H]H:[M]M:[S]S[.DDDDDD]`. Otherwise, provide
    *     an object.
@@ -815,9 +832,7 @@ export class BigQuery extends common.Service {
    * A timestamp represents an absolute point in time, independent of any time
    * zone or convention such as Daylight Savings Time.
    *
-   * @method BigQuery#timestamp
    * @param {Date|string} value The time.
-   * @returns {BigQueryTimestamp}
    *
    * @example
    * ```
@@ -837,7 +852,6 @@ export class BigQuery extends common.Service {
   /**
    * A BigQueryInt wraps 'INT64' values. Can be used to maintain precision.
    *
-   * @method BigQuery#int
    * @param {string|number|IntegerTypeCastValue} value The INT64 value to convert.
    * @param {IntegerTypeCastOptions} typeCastOptions Configuration to convert
    *     value. Must provide an `integerTypeCastFunction` to handle conversion.
@@ -878,23 +892,7 @@ export class BigQuery extends common.Service {
    * A geography value represents a surface area on the Earth
    * in Well-known Text (WKT) format.
    *
-   * @method BigQuery.geography
    * @param {string} value The geospatial data.
-   *
-   * @example
-   * ```
-   * const {BigQuery} = require('@google-cloud/bigquery');
-   * const geography = BigQuery.geography('POINT(1, 2)');
-   * ```
-   */
-
-  /**
-   * A geography value represents a surface area on the Earth
-   * in Well-known Text (WKT) format.
-   *
-   * @method BigQuery#geography
-   * @param {string} value The geospatial data.
-   * @returns {Geography}
    *
    * @example
    * ```
@@ -1190,7 +1188,6 @@ export class BigQuery extends common.Service {
    * @param {?error} callback.err An error returned while making this request
    * @param {Dataset} callback.dataset The newly created dataset
    * @param {object} callback.apiResponse The full API response.
-   * @returns {Promise<Dataset>}
    *
    * @example
    * ```
@@ -1303,7 +1300,6 @@ export class BigQuery extends common.Service {
    * @param {?error} callback.err An error returned while making this request.
    * @param {Job} callback.job The newly created job for your query.
    * @param {object} callback.apiResponse The full API response.
-   * @returns {Promise<JobResponse>}
    *
    * @throws {Error} If a query is not specified.
    * @throws {Error} If a Table is not provided as a destination.
@@ -1496,7 +1492,7 @@ export class BigQuery extends common.Service {
    * Creates a job. Typically when creating a job you'll have a very specific
    * task in mind. For this we recommend one of the following methods:
    *
-   * - {@link BigQuery#createQueryJob}
+   * - {@link BigQuery.createQueryJob}
    * - {@link Table#createCopyJob}
    * - {@link Table#createCopyFromJob}
    * - {@link Table#createExtractJob}
@@ -1518,7 +1514,6 @@ export class BigQuery extends common.Service {
    * @param {?error} callback.err An error returned while making this request.
    * @param {Job} callback.job The newly created job.
    * @param {object} callback.apiResponse The full API response.
-   * @returns {Promise<JobResponse>}
    *
    * @example
    * ```
@@ -1600,7 +1595,7 @@ export class BigQuery extends common.Service {
 
         if (err) {
           if (
-            (err as common.ApiError).code === ALREADY_EXISTS_CODE &&
+            (err as ApiError).code === ALREADY_EXISTS_CODE &&
             !JOB_ID_PROVIDED &&
             !DRY_RUN
           ) {
@@ -1618,7 +1613,7 @@ export class BigQuery extends common.Service {
         }
 
         if (resp.status.errors) {
-          err = new common.util.ApiError({
+          err = new util.ApiError({
             errors: resp.status.errors,
             response: resp,
           } as GoogleErrorBody);
@@ -1639,7 +1634,6 @@ export class BigQuery extends common.Service {
    * @param {object} [options] Dataset options.
    * @param {string} [options.location] The geographic location of the dataset.
    *      Required except for US and EU.
-   * @returns {Dataset}
    *
    * @example
    * ```
@@ -1675,7 +1669,6 @@ export class BigQuery extends common.Service {
    * @param {DatasetsCallback} [callback] The callback function.
    * @param {?error} callback.err An error returned while making this request
    * @param {Dataset[]} callback.datasets The list of datasets in your project.
-   * @returns {Promise<DatasetsResponse>}
    *
    * @example
    * ```
@@ -1790,7 +1783,6 @@ export class BigQuery extends common.Service {
    * @param {?error} callback.err An error returned while making this request
    * @param {Job[]} callback.jobs The list of jobs in your
    *     project.
-   * @returns {Promise<GetJobsResponse>}
    *
    * @example
    * ```
@@ -1873,7 +1865,6 @@ export class BigQuery extends common.Service {
    * @param {object} [options] Configuration object.
    * @param {string} [options.location] The geographic location of the job.
    *      Required except for US and EU.
-   * @returns {Job}
    *
    * @example
    * ```
@@ -1892,7 +1883,7 @@ export class BigQuery extends common.Service {
 
   /**
    * Run a query scoped to your project. For manual pagination please refer to
-   * {@link BigQuery#createQueryJob}.
+   * {@link BigQuery.createQueryJob}.
    *
    * See {@link https://cloud.google.com/bigquery/docs/reference/v2/jobs/query| Jobs: query API Documentation}
    *
@@ -1906,8 +1897,8 @@ export class BigQuery extends common.Service {
    * @param {object|Array<*>} query.params For positional SQL parameters, provide
    *     an array of values. For named SQL parameters, provide an object which
    *     maps each named parameter to its value. The supported types are
-   * integers, floats, {@link BigQuery#date} objects, {@link BigQuery#datetime}
-   *     objects, {@link BigQuery#time} objects, {@link BigQuery#timestamp}
+   * integers, floats, {@link BigQuery.date} objects, {@link BigQuery.datetime}
+   *     objects, {@link BigQuery.time} objects, {@link BigQuery.timestamp}
    *     objects, Strings, Booleans, and Objects.
    * @param {string} query.query A query string, following the BigQuery query
    *     syntax, of the query to execute.
@@ -1931,7 +1922,6 @@ export class BigQuery extends common.Service {
    * @param {function} [callback] The callback function.
    * @param {?error} callback.err An error returned while making this request
    * @param {array} callback.rows The list of results from your query.
-   * @returns {Promise}
    *
    * @example
    * ```
@@ -1995,8 +1985,8 @@ export class BigQuery extends common.Service {
    *
    * //-
    * // If you need to use a `DATE`, `DATETIME`, `TIME`, or `TIMESTAMP` type in
-   * // your query, see {@link BigQuery#date}, {@link BigQuery#datetime},
-   * // {@link BigQuery#time}, and {@link BigQuery#timestamp}.
+   * // your query, see {@link BigQuery.date}, {@link BigQuery.datetime},
+   * // {@link BigQuery.time}, and {@link BigQuery.timestamp}.
    * //-
    *
    * //-
