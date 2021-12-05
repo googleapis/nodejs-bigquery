@@ -29,7 +29,7 @@ export const defaultOptions = {
   maxOutstandingRows: 300,
 
   // The maximum size of the total batched up rows for insert().
-  maxOutstandingBytes: 1 * 1024 * 1024,
+  maxOutstandingBytes: Math.pow(1024, 2) * 9,
 
   // The maximum time we'll wait to send batched rows, in milliseconds.
   maxDelayMillis: 10000,
@@ -153,9 +153,9 @@ export class RowQueue {
     callbacks: InsertRowsCallback[],
     cb?: InsertRowsCallback
   ): void {
-    if (!cb) {
-      cb = () => {};
-    }
+    // if (!cb) {
+    //   cb = () => {};
+    // }
 
     const json = extend(true, {}, this.insertRowsOptions, {rows});
 

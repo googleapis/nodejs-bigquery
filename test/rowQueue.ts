@@ -21,6 +21,8 @@ import * as sinon from 'sinon';
 import * as q from '../src/rowQueue';
 import * as t from '../src/table';
 import * as _root from '../src';
+import {GoogleErrorBody} from '@google-cloud/common/build/src/util';
+import {RowBatch} from '../src/rowBatch';
 
 class FakeRowBatch {
   batchOptions: t.RowBatchOptions;
@@ -109,6 +111,36 @@ describe('Queues', () => {
       it('should localize the table', () => {
         assert.strictEqual(queue.table, fakeTable);
       });
+
+      it('should set options', () => {
+        const opts = {
+          insertRowsOptions: {raw: true},
+          batchOptions: {maxBytes: 10, maxMilliseconds: 10, maxRows: 10},
+        };
+        queue = new RowQueue(fakeTable, dup, opts);
+        assert.deepStrictEqual(queue.batch.batchOptions, opts.batchOptions);
+        assert.deepStrictEqual(queue.insertRowsOptions, opts.insertRowsOptions);
+      });
+    });
+
+    describe('setOptions', () => {
+      it('should use defaults if min', () => {
+        queue = new RowQueue(fakeTable, dup);
+        const opts = {
+          maxRows: q.defaultOptions.maxOutstandingRows,
+          maxBytes: q.defaultOptions.maxOutstandingBytes,
+          maxMilliseconds: q.defaultOptions.maxDelayMillis,
+        };
+        queue.setOptions();
+        assert.deepStrictEqual(queue.batchOptions, opts);
+      });
+
+      // it('should use defaults if min', () => {
+      //   queue = new RowQueue(fakeTable, dup, [])
+      //   // const opts = {maxRows: q.defaultOptions.maxOutstandingRows, maxBytes: q.defaultOptions.maxOutstandingBytes, maxMilliseconds: q.defaultOptions.maxDelayMillis}
+      //   // queue.setOptions()
+      //   assert.deepStrictEqual(queue.batchOptions, {})
+      // });
     });
 
     describe('add', () => {
@@ -184,6 +216,13 @@ describe('Queues', () => {
         clock.tick(maxMilliseconds);
         assert.strictEqual(stub.callCount, 0);
         clock.restore();
+      });
+
+      it('should set insert id', () => {
+        const addStub = sandbox.stub(queue.batch, 'add');
+        queue.insertRowsOptions.createInsertId = true;
+        queue.add(fakeRowMetadata, spy);
+        assert.ok(addStub.args[0][0].insertId);
       });
     });
 
@@ -278,6 +317,20 @@ describe('Queues', () => {
         assert.strictEqual(uri, '/insertAll');
       });
 
+      it('should work without callback provided', () => {
+        const stub = sandbox.stub(fakeTable, 'request');
+        queue = new RowQueue(fakeTable, dup);
+
+        queue._insert(rows, callbacks);
+
+        const [{json, method, uri}] = stub.lastCall.args;
+        assert.deepStrictEqual(json.rows[0], rows[0]);
+        assert.deepStrictEqual(json.rows[1], rows[1]);
+        assert.deepStrictEqual(json.rows[2], rows[2]);
+        assert.strictEqual(method, 'POST');
+        assert.strictEqual(uri, '/insertAll');
+      });
+
       it('should make the correct request with raw data', () => {
         const stub = sandbox.stub(fakeTable, 'request');
         queue = new RowQueue(fakeTable, dup, {insertRowsOptions: {raw: true}});
@@ -308,6 +361,63 @@ describe('Queues', () => {
           done();
         });
       });
+
+      it('should execute callback with API response', done => {
+        // const requestStub = sandbox.stub(fakeTable, 'request');
+        const row0Error = {errors: [{message: 'Error.', reason: 'notFound'}]};
+        const row1Error = {message: 'Error.', reason: 'notFound'};
+        const apiResponse = {insertErrors: [row0Error]};
+        const ok = 10;
+        queue.stream.on('error', () => {
+          assert(true);
+          // assert.strictEqual(ok,100)
+          done();
+        });
+        // requestStub.resolves([apiResponse]);
+        sandbox.stub(fakeTable, 'request').callsFake((config, callback) => {
+          return callback(error, apiResponse);
+        });
+
+        queue._insert(rows, callbacks, (err: any, apiResponse_: any) => {
+          assert.strictEqual(err, error);
+
+          callbacks.forEach(callback => {
+            const [err] = callback.lastCall.args;
+            assert.strictEqual(err, error);
+          });
+          // assert.ifError(err);
+          assert.strictEqual(apiResponse_, apiResponse);
+          // done();
+        });
+      });
+
+      // it('should return partial failures', async () => {
+      //   const row0Error = {message: 'Error.', reason: 'notFound'};
+      //   const row1Error = {message: 'Error.', reason: 'notFound'};
+      //   const requestStub = sandbox.stub(fakeTable, 'request');
+      //   requestStub.resolves([
+      //     {
+      //       insertErrors: [
+      //         {index: 0, errors: [row0Error]},
+      //         {index: 1, errors: [row1Error]},
+      //       ],
+      //     },
+      //   ]);
+
+      //   const reflection = await reflectAfterTimer(async () => queue._insert(rows, []));
+      //   assert(reflection.isRejected);
+      //   const {reason} = reflection;
+      //   assert.deepStrictEqual((reason as GoogleErrorBody).errors, [
+      //     {
+      //       row: dataApiFormat.rows[0].json,
+      //       errors: [row0Error],
+      //     },
+      //     {
+      //       row: dataApiFormat.rows[1].json,
+      //       errors: [row1Error],
+      //     },
+      //   ]);
+      // });
     });
   });
 });

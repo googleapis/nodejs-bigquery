@@ -17,10 +17,9 @@
 import {InsertRowsCallback, RowMetadata} from './rowQueue';
 import {RowBatchOptions} from './table';
 
-// TODO: check these limits for BigQuery /insertAll
 export const BATCH_LIMITS: any = {
   maxBytes: Math.pow(1024, 2) * 9,
-  maxRows: 300,
+  maxRows: 50000,
 };
 
 /**

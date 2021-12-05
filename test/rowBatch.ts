@@ -100,13 +100,12 @@ describe('RowBatch', () => {
 
   describe('isAtMax', () => {
     it('should return true if at max row limit', () => {
-      // tslint:disable-next-line ban
-      Array(1000)
+      Array(50000)
         .fill({
           data: Buffer.from('Hello!'),
         })
         .forEach(row => {
-          batch.add(row, sandbox.spy());
+          batch.add(row, () => {});
         });
 
       const isAtMax = batch.isAtMax();

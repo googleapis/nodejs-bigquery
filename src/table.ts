@@ -220,7 +220,6 @@ class Table extends ServiceObject {
   bigQuery: BigQuery;
   location?: string;
   rowQueue?: RowQueue;
-  createReadStream: (options?: GetRowsOptions) => ResourceStream<RowMetadata>;
   createReadStream(options?: GetRowsOptions): ResourceStream<RowMetadata> {
     // placeholder body, overwritten in constructor
     return new ResourceStream<RowMetadata>({}, () => {});
