@@ -151,6 +151,18 @@ declare namespace bigquery {
      */
     hasDrift?: boolean;
     /**
+     * If true, holiday_effect is a part of time series decomposition result.
+     */
+    hasHolidayEffect?: boolean;
+    /**
+     * If true, spikes_and_dips is a part of time series decomposition result.
+     */
+    hasSpikesAndDips?: boolean;
+    /**
+     * If true, step_changes is a part of time series decomposition result.
+     */
+    hasStepChanges?: boolean;
+    /**
      * Non-seasonal order.
      */
     nonSeasonalOrder?: IArimaOrder;
@@ -167,9 +179,13 @@ declare namespace bigquery {
       | 'YEARLY'
     >;
     /**
-     * The id to indicate different time series.
+     * The time_series_id value for this time series. It will be one of the unique values from the time_series_id_column specified during ARIMA model training. Only present when time_series_id_column training option was used.
      */
     timeSeriesId?: string;
+    /**
+     * The tuple of time_series_ids identifying this time series. It will be one of the unique tuples of values present in the time_series_id_columns specified during ARIMA model training. Only present when time_series_id_columns training option was used and the order of values here are same as the order of time_series_id_columns.
+     */
+    timeSeriesIds?: Array<string>;
   };
 
   /**
@@ -225,6 +241,18 @@ declare namespace bigquery {
      */
     hasDrift?: boolean;
     /**
+     * If true, holiday_effect is a part of time series decomposition result.
+     */
+    hasHolidayEffect?: boolean;
+    /**
+     * If true, spikes_and_dips is a part of time series decomposition result.
+     */
+    hasSpikesAndDips?: boolean;
+    /**
+     * If true, step_changes is a part of time series decomposition result.
+     */
+    hasStepChanges?: boolean;
+    /**
      * Non-seasonal order.
      */
     nonSeasonalOrder?: IArimaOrder;
@@ -241,9 +269,13 @@ declare namespace bigquery {
       | 'YEARLY'
     >;
     /**
-     * The id to indicate different time series.
+     * The time_series_id value for this time series. It will be one of the unique values from the time_series_id_column specified during ARIMA model training. Only present when time_series_id_column training option was used.
      */
     timeSeriesId?: string;
+    /**
+     * The tuple of time_series_ids identifying this time series. It will be one of the unique tuples of values present in the time_series_id_columns specified during ARIMA model training. Only present when time_series_id_columns training option was used and the order of values here are same as the order of time_series_id_columns.
+     */
+    timeSeriesIds?: Array<string>;
   };
 
   /**
@@ -276,6 +308,35 @@ declare namespace bigquery {
       | 'ADMIN_READ'
       | 'DATA_WRITE'
       | 'DATA_READ';
+  };
+
+  type IAvroOptions = {
+    /**
+     * [Optional] If sourceFormat is set to "AVRO", indicates whether to interpret logical types as the corresponding BigQuery data type (for example, TIMESTAMP), instead of using the raw type (for example, INTEGER).
+     */
+    useAvroLogicalTypes?: boolean;
+  };
+
+  type IBiEngineReason = {
+    /**
+     * [Output-only] High-level BI Engine reason for partial or disabled acceleration.
+     */
+    code?: string;
+    /**
+     * [Output-only] Free form human-readable reason for partial or disabled acceleration.
+     */
+    message?: string;
+  };
+
+  type IBiEngineStatistics = {
+    /**
+     * [Output-only] Specifies which mode of BI Engine acceleration was performed (if any).
+     */
+    biEngineMode?: string;
+    /**
+     * In case of DISABLED or PARTIAL bi_engine_mode, these contain the explanatory reasons as to why BI Engine could not accelerate. In case the full query was accelerated, this field is not populated.
+     */
+    biEngineReasons?: Array<IBiEngineReason>;
   };
 
   type IBigQueryModelTraining = {
@@ -416,19 +477,19 @@ declare namespace bigquery {
   };
 
   /**
-   * Associates `members` with a `role`.
+   * Associates `members`, or principals, with a `role`.
    */
   type IBinding = {
     /**
-     * The condition that is associated with this binding. If the condition evaluates to `true`, then this binding applies to the current request. If the condition evaluates to `false`, then this binding does not apply to the current request. However, a different role binding might grant the same role to one or more of the members in this binding. To learn which resources support conditions in their IAM policies, see the {@link https://cloud.google.com/iam/help/conditions/resource-policies| IAM documentation}.
+     * The condition that is associated with this binding. If the condition evaluates to `true`, then this binding applies to the current request. If the condition evaluates to `false`, then this binding does not apply to the current request. However, a different role binding might grant the same role to one or more of the principals in this binding. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
      */
     condition?: IExpr;
     /**
-     * Specifies the identities requesting access for a Cloud Platform resource. `members` can have the following values: * `allUsers`: A special identifier that represents anyone who is on the internet; with or without a Google account. * `allAuthenticatedUsers`: A special identifier that represents anyone who is authenticated with a Google account or a service account. * `user:{emailid}`: An email address that represents a specific Google account. For example, `alice@example.com` . * `serviceAccount:{emailid}`: An email address that represents a service account. For example, `my-other-app@appspot.gserviceaccount.com`. * `group:{emailid}`: An email address that represents a Google group. For example, `admins@example.com`. * `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a user that has been recently deleted. For example, `alice@example.com?uid=123456789012345678901`. If the user is recovered, this value reverts to `user:{emailid}` and the recovered user retains the role in the binding. * `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a service account that has been recently deleted. For example, `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`. If the service account is undeleted, this value reverts to `serviceAccount:{emailid}` and the undeleted service account retains the role in the binding. * `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a Google group that has been recently deleted. For example, `admins@example.com?uid=123456789012345678901`. If the group is recovered, this value reverts to `group:{emailid}` and the recovered group retains the role in the binding. * `domain:{domain}`: The G Suite domain (primary) that represents all the users of that domain. For example, `google.com` or `example.com`.
+     * Specifies the principals requesting access for a Cloud Platform resource. `members` can have the following values: * `allUsers`: A special identifier that represents anyone who is on the internet; with or without a Google account. * `allAuthenticatedUsers`: A special identifier that represents anyone who is authenticated with a Google account or a service account. * `user:{emailid}`: An email address that represents a specific Google account. For example, `alice@example.com` . * `serviceAccount:{emailid}`: An email address that represents a service account. For example, `my-other-app@appspot.gserviceaccount.com`. * `group:{emailid}`: An email address that represents a Google group. For example, `admins@example.com`. * `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a user that has been recently deleted. For example, `alice@example.com?uid=123456789012345678901`. If the user is recovered, this value reverts to `user:{emailid}` and the recovered user retains the role in the binding. * `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a service account that has been recently deleted. For example, `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`. If the service account is undeleted, this value reverts to `serviceAccount:{emailid}` and the undeleted service account retains the role in the binding. * `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a Google group that has been recently deleted. For example, `admins@example.com?uid=123456789012345678901`. If the group is recovered, this value reverts to `group:{emailid}` and the recovered group retains the role in the binding. * `domain:{domain}`: The G Suite domain (primary) that represents all the users of that domain. For example, `google.com` or `example.com`.
      */
     members?: Array<string>;
     /**
-     * Role that is assigned to `members`. For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
+     * Role that is assigned to the list of `members`, or principals. For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
      */
     role?: string;
   };
@@ -557,7 +618,7 @@ declare namespace bigquery {
    */
   type IClusteringMetrics = {
     /**
-     * [Beta] Information for all clusters.
+     * Information for all clusters.
      */
     clusters?: Array<ICluster>;
     /**
@@ -613,6 +674,10 @@ declare namespace bigquery {
      */
     fieldDelimiter?: string;
     /**
+     * [Optional] An custom string that will represent a NULL value in CSV import data.
+     */
+    null_marker?: string;
+    /**
      * [Optional] The value that is used to quote data sections in a CSV file. BigQuery converts the string to ISO-8859-1 encoding, and then uses the first byte of the encoded string to split the data in its raw, binary state. The default value is a double-quote ('"'). If your data does not contain quoted sections, set the property value to an empty string. If your data contains quoted newline characters, you must also set the allowQuotedNewlines property to true.
      */
     quote?: string;
@@ -641,6 +706,10 @@ declare namespace bigquery {
      * [Optional] An array of objects that define dataset access for one or more entities. You can set this property when inserting or updating a dataset in order to control who is allowed to access the data. If unspecified at dataset creation time, BigQuery adds default dataset access for the following entities: access.specialGroup: projectReaders; access.role: READER; access.specialGroup: projectWriters; access.role: WRITER; access.specialGroup: projectOwners; access.role: OWNER; access.userByEmail: [dataset creator email]; access.role: OWNER;
      */
     access?: Array<{
+      /**
+       * [Pick one] A grant authorizing all resources of a particular type in a particular dataset access to this dataset. Only views are supported for now. The role field is not required when this field is set. If that dataset is deleted and re-created, its access needs to be granted again via an update operation.
+       */
+      dataset?: IDatasetAccessEntry;
       /**
        * [Pick one] A domain to grant access to. Any users signed in with the domain specified will be granted the specified access. Example: "example.com". Maps to IAM policy member "domain:DOMAIN".
        */
@@ -682,6 +751,10 @@ declare namespace bigquery {
      * [Required] A reference that identifies the dataset.
      */
     datasetReference?: IDatasetReference;
+    /**
+     * [Output-only] The default collation of the dataset.
+     */
+    defaultCollation?: string;
     defaultEncryptionConfiguration?: IEncryptionConfiguration;
     /**
      * [Optional] The default partition expiration for all partitioned tables in the dataset, in milliseconds. Once this property is set, all newly-created partitioned tables in the dataset will have an expirationMs property in the timePartitioning settings set to this value, and changing the value will only affect new tables, not existing ones. The storage in a partition will have an expiration time of its partition time plus this value. Setting this property overrides the use of defaultTableExpirationMs for partitioned tables: only one of defaultTableExpirationMs and defaultPartitionExpirationMs will be used for any new partitioned table. If you provide an explicit timePartitioning.expirationMs when creating or updating a partitioned table, that value takes precedence over the default partition expiration time indicated by this property.
@@ -708,6 +781,10 @@ declare namespace bigquery {
      */
     id?: string;
     /**
+     * [Optional] Indicates if table names are case insensitive in the dataset.
+     */
+    isCaseInsensitive?: boolean;
+    /**
      * [Output-only] The resource type.
      */
     kind?: string;
@@ -731,6 +808,19 @@ declare namespace bigquery {
      * [Output-only] A URL that can be used to access the resource again. You can use this URL in Get or Update requests to the resource.
      */
     selfLink?: string;
+  };
+
+  type IDatasetAccessEntry = {
+    /**
+     * [Required] The dataset this entry applies to.
+     */
+    dataset?: IDatasetReference;
+    target_types?: Array<{
+      /**
+       * [Required] Which resources in the dataset this entry applies to. Currently, only views are supported, but additional target types may be added in the future. Possible values: VIEWS: This entry applies to all views in the dataset.
+       */
+      targetType?: string;
+    }>;
   };
 
   type IDatasetList = {
@@ -794,6 +884,10 @@ declare namespace bigquery {
      */
     description?: string;
     /**
+     * [Internal] This field is for Google internal use only.
+     */
+    expirationTime?: string;
+    /**
      * [Optional] The friendly name for the destination table. This will only be used if the destination table is newly created. If the table already exists and a value different than the current friendly name is provided, the job will fail.
      */
     friendlyName?: string;
@@ -801,6 +895,21 @@ declare namespace bigquery {
      * [Optional] The labels associated with this table. You can use these to organize and group your tables. This will only be used if the destination table is newly created. If the table already exists and labels are different than the current labels are provided, the job will fail.
      */
     labels?: {[key: string]: string};
+  };
+
+  type IDmlStatistics = {
+    /**
+     * Number of deleted Rows. populated by DML DELETE, MERGE and TRUNCATE statements.
+     */
+    deletedRowCount?: string;
+    /**
+     * Number of inserted Rows. Populated by DML INSERT and MERGE statements.
+     */
+    insertedRowCount?: string;
+    /**
+     * Number of updated Rows. Populated by DML UPDATE and MERGE statements.
+     */
+    updatedRowCount?: string;
   };
 
   type IEncryptionConfiguration = {
@@ -1008,20 +1117,6 @@ declare namespace bigquery {
   };
 
   /**
-   * Explanation for a single feature.
-   */
-  type IExplanation = {
-    /**
-     * Attribution of feature.
-     */
-    attribution?: number;
-    /**
-     * Full name of the feature. For non-numerical features, will be formatted like .. Overall size of feature name will always be truncated to first 120 characters.
-     */
-    featureName?: string;
-  };
-
-  /**
    * Represents a textual expression in the Common Expression Language (CEL) syntax. CEL is a C-like expression language. The syntax and semantics of CEL are documented at https://github.com/google/cel-spec. Example (Comparison): title: "Summary size limit" description: "Determines if a summary is less than 100 chars" expression: "document.summary.size() < 100" Example (Equality): title: "Requestor is owner" description: "Determines if requestor is the document owner" expression: "document.owner == request.auth.claims.email" Example (Logic): title: "Public documents" description: "Determine whether the document should be publicly visible" expression: "document.type != 'private' && document.type != 'internal'" Example (Data Manipulation): title: "Notification string" description: "Create a notification string with a timestamp." expression: "'New message received at ' + string(document.create_time)" The exact variables and functions that may be referenced within an expression are determined by the service that evaluates it. See the service documentation for additional information.
    */
   type IExpr = {
@@ -1049,6 +1144,10 @@ declare namespace bigquery {
      */
     autodetect?: boolean;
     /**
+     * Additional properties to set if sourceFormat is set to Avro.
+     */
+    avroOptions?: IAvroOptions;
+    /**
      * [Optional] Additional options if sourceFormat is set to BIGTABLE.
      */
     bigtableOptions?: IBigtableOptions;
@@ -1065,11 +1164,15 @@ declare namespace bigquery {
      */
     csvOptions?: ICsvOptions;
     /**
+     * [Optional] Defines the list of possible SQL data types to which the source decimal values are converted. This list and the precision and the scale parameters of the decimal field determine the target type. In the order of NUMERIC, BIGNUMERIC, and STRING, a type is picked if it is in the specified list and if it supports the precision and the scale. STRING supports all precision and scale values. If none of the listed types supports the precision and the scale, the type supporting the widest range in the specified list is picked, and if a value exceeds the supported range when reading the data, an error will be thrown. Example: Suppose the value of this field is ["NUMERIC", "BIGNUMERIC"]. If (precision,scale) is: (38,9) -> NUMERIC; (39,9) -> BIGNUMERIC (NUMERIC cannot hold 30 integer digits); (38,10) -> BIGNUMERIC (NUMERIC cannot hold 10 fractional digits); (76,38) -> BIGNUMERIC; (77,38) -> BIGNUMERIC (error if value exeeds supported range). This field cannot contain duplicate types. The order of the types in this field is ignored. For example, ["BIGNUMERIC", "NUMERIC"] is the same as ["NUMERIC", "BIGNUMERIC"] and NUMERIC always takes precedence over BIGNUMERIC. Defaults to ["NUMERIC", "STRING"] for ORC and ["NUMERIC"] for the other file formats.
+     */
+    decimalTargetTypes?: Array<string>;
+    /**
      * [Optional] Additional options if sourceFormat is set to GOOGLE_SHEETS.
      */
     googleSheetsOptions?: IGoogleSheetsOptions;
     /**
-     * [Optional, Trusted Tester] Options to configure hive partitioning support.
+     * [Optional] Options to configure hive partitioning support.
      */
     hivePartitioningOptions?: IHivePartitioningOptions;
     /**
@@ -1080,6 +1183,10 @@ declare namespace bigquery {
      * [Optional] The maximum number of bad records that BigQuery can ignore when reading data. If the number of bad records exceeds this value, an invalid error is returned in the job result. This is only valid for CSV, JSON, and Google Sheets. The default value is 0, which requires that all records are valid. This setting is ignored for Google Cloud Bigtable, Google Cloud Datastore backups and Avro formats.
      */
     maxBadRecords?: number;
+    /**
+     * Additional properties to set if sourceFormat is set to Parquet.
+     */
+    parquetOptions?: IParquetOptions;
     /**
      * [Optional] The schema for the data. Schema is required for CSV and JSON formats. Schema is disallowed for Google Cloud Bigtable, Cloud Datastore backups, and Avro formats.
      */
@@ -1127,7 +1234,7 @@ declare namespace bigquery {
    */
   type IGetPolicyOptions = {
     /**
-     * Optional. The policy format version to be returned. Valid values are 0, 1, and 3. Requests specifying an invalid value will be rejected. Requests for policies with any conditional bindings must specify version 3. Policies without any conditional bindings may specify any valid value or leave the field unset. To learn which resources support conditions in their IAM policies, see the {@link https://cloud.google.com/iam/help/conditions/resource-policies| IAM documentation}.
+     * Optional. The maximum policy version that will be used to format the policy. Valid values are 0, 1, and 3. Requests specifying an invalid value will be rejected. Requests for policies with any conditional role bindings must specify version 3. Policies with no conditional role bindings may specify any valid value or leave the field unset. The policy in the response might use the policy version that you specified, or it might use a lower policy version. For example, if you specify version 3, but the policy has no conditional role bindings, the response uses version 1. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
      */
     requestedPolicyVersion?: number;
   };
@@ -1194,20 +1301,6 @@ declare namespace bigquery {
     kind?: string;
   };
 
-  /**
-   * Global explanations containing the top most important features after training.
-   */
-  type IGlobalExplanation = {
-    /**
-     * Class label for this set of global explanations. Will be empty/null for binary logistic and linear regression models. Sorted alphabetically in descending order.
-     */
-    classLabel?: string;
-    /**
-     * A list of the top global explanations. Sorted by absolute value of attribution in descending order.
-     */
-    explanations?: Array<IExplanation>;
-  };
-
   type IGoogleSheetsOptions = {
     /**
      * [Optional] Range of a sheet to query from. Only used when non-empty. Typical format: sheet_name!top_left_cell_id:bottom_right_cell_id For example: sheet1!A1:B20
@@ -1234,15 +1327,7 @@ declare namespace bigquery {
     sourceUriPrefix?: string;
   };
 
-  /**
-   * Information about a single iteration of the training run.
-   */
   type IIterationResult = {
-    arimaResult?: IArimaResult;
-    /**
-     * Information about top clusters for clustering models.
-     */
-    clusterInfos?: Array<IClusterInfo>;
     /**
      * Time taken to run the iteration in milliseconds.
      */
@@ -1411,7 +1496,7 @@ declare namespace bigquery {
      */
     createDisposition?: string;
     /**
-     * [Trusted Tester] Defines the list of possible SQL data types to which the source decimal values are converted. This list and the precision and the scale parameters of the decimal field determine the target type. In the order of NUMERIC, BIGNUMERIC, and STRING, a type is picked if it is in the specified list and if it supports the precision and the scale. STRING supports all precision and scale values. If none of the listed types supports the precision and the scale, the type supporting the widest range in the specified list is picked, and if a value exceeds the supported range when reading the data, an error will be thrown. For example: suppose decimal_target_type = ["NUMERIC", "BIGNUMERIC"]. Then if (precision,scale) is: * (38,9) -> NUMERIC; * (39,9) -> BIGNUMERIC (NUMERIC cannot hold 30 integer digits); * (38,10) -> BIGNUMERIC (NUMERIC cannot hold 10 fractional digits); * (76,38) -> BIGNUMERIC; * (77,38) -> BIGNUMERIC (error if value exeeds supported range). For duplicated types in this field, only one will be considered and the rest will be ignored. The order of the types in this field is ignored. For example, ["BIGNUMERIC", "NUMERIC"] is the same as ["NUMERIC", "BIGNUMERIC"] and NUMERIC always takes precedence over BIGNUMERIC.
+     * [Optional] Defines the list of possible SQL data types to which the source decimal values are converted. This list and the precision and the scale parameters of the decimal field determine the target type. In the order of NUMERIC, BIGNUMERIC, and STRING, a type is picked if it is in the specified list and if it supports the precision and the scale. STRING supports all precision and scale values. If none of the listed types supports the precision and the scale, the type supporting the widest range in the specified list is picked, and if a value exceeds the supported range when reading the data, an error will be thrown. Example: Suppose the value of this field is ["NUMERIC", "BIGNUMERIC"]. If (precision,scale) is: (38,9) -> NUMERIC; (39,9) -> BIGNUMERIC (NUMERIC cannot hold 30 integer digits); (38,10) -> BIGNUMERIC (NUMERIC cannot hold 10 fractional digits); (76,38) -> BIGNUMERIC; (77,38) -> BIGNUMERIC (error if value exeeds supported range). This field cannot contain duplicate types. The order of the types in this field is ignored. For example, ["BIGNUMERIC", "NUMERIC"] is the same as ["NUMERIC", "BIGNUMERIC"] and NUMERIC always takes precedence over BIGNUMERIC. Defaults to ["NUMERIC", "STRING"] for ORC and ["NUMERIC"] for the other file formats.
      */
     decimalTargetTypes?: Array<string>;
     /**
@@ -1435,13 +1520,17 @@ declare namespace bigquery {
      */
     fieldDelimiter?: string;
     /**
-     * [Optional, Trusted Tester] Options to configure hive partitioning support.
+     * [Optional] Options to configure hive partitioning support.
      */
     hivePartitioningOptions?: IHivePartitioningOptions;
     /**
      * [Optional] Indicates if BigQuery should allow extra values that are not represented in the table schema. If true, the extra values are ignored. If false, records with extra columns are treated as bad records, and if there are too many bad records, an invalid error is returned in the job result. The default value is false. The sourceFormat property determines what BigQuery treats as an extra value: CSV: Trailing columns JSON: Named values that don't match any column names
      */
     ignoreUnknownValues?: boolean;
+    /**
+     * [Optional] If sourceFormat is set to newline-delimited JSON, indicates whether it should be processed as a JSON variant such as GeoJSON. For a sourceFormat other than JSON, omit this field. If the sourceFormat is newline-delimited JSON: - for newline-delimited GeoJSON: set to GEOJSON.
+     */
+    jsonExtension?: string;
     /**
      * [Optional] The maximum number of bad records that BigQuery can ignore when running the job. If the number of bad records exceeds this value, an invalid error is returned in the job result. This is only valid for CSV and JSON. The default value is 0, which requires that all records are valid.
      */
@@ -1450,6 +1539,10 @@ declare namespace bigquery {
      * [Optional] Specifies a string that represents a null value in a CSV file. For example, if you specify "\N", BigQuery interprets "\N" as a null value when loading a CSV file. The default value is the empty string. If you set this property to a custom value, BigQuery throws an error if an empty string is present for all data types except for STRING and BYTE. For STRING and BYTE columns, BigQuery interprets the empty string as an empty value.
      */
     nullMarker?: string;
+    /**
+     * [Optional] Options to configure parquet support.
+     */
+    parquetOptions?: IParquetOptions;
     /**
      * If sourceFormat is set to "DATASTORE_BACKUP", indicates which entity properties to load into BigQuery from a Cloud Datastore backup. Property names are case sensitive and must be top-level properties. If no properties are specified, BigQuery loads all properties. If any named property isn't found in the Cloud Datastore backup, an invalid error is returned in the job result.
      */
@@ -1495,7 +1588,7 @@ declare namespace bigquery {
      */
     timePartitioning?: ITimePartitioning;
     /**
-     * [Optional] If sourceFormat is set to "AVRO", indicates whether to enable interpreting logical types into their corresponding types (ie. TIMESTAMP), instead of only using their raw types (ie. INTEGER).
+     * [Optional] If sourceFormat is set to "AVRO", indicates whether to interpret logical types as the corresponding BigQuery data type (for example, TIMESTAMP), instead of using the raw type (for example, INTEGER).
      */
     useAvroLogicalTypes?: boolean;
     /**
@@ -1521,6 +1614,10 @@ declare namespace bigquery {
      * [Optional] Specifies whether the job is allowed to create new tables. The following values are supported: CREATE_IF_NEEDED: If the table does not exist, BigQuery creates the table. CREATE_NEVER: The table must already exist. If it does not, a 'notFound' error is returned in the job result. The default value is CREATE_IF_NEEDED. Creation, truncation and append actions occur as one atomic update upon job completion.
      */
     createDisposition?: string;
+    /**
+     * If true, creates a new session, where session id will be a server generated random id. If false, runs query with an existing session_id passed in ConnectionProperty, otherwise runs query in non-session mode.
+     */
+    createSession?: boolean;
     /**
      * [Optional] Specifies the default dataset to use for unqualified table names in the query. Note that this does not alter behavior of unqualified dataset names.
      */
@@ -1768,6 +1865,10 @@ declare namespace bigquery {
      */
     scriptStatistics?: IScriptStatistics;
     /**
+     * [Output-only] [Preview] Information of the session if this job is part of one.
+     */
+    sessionInfo?: ISessionInfo;
+    /**
      * [Output-only] Start time of this job, in milliseconds since the epoch. This field will be present when the job transitions from the PENDING state to either RUNNING or DONE.
      */
     startTime?: string;
@@ -1782,10 +1883,14 @@ declare namespace bigquery {
     /**
      * [Output-only] [Alpha] Information of the multi-statement transaction if this job is part of one.
      */
-    transactionInfoTemplate?: ITransactionInfo;
+    transactionInfo?: ITransactionInfo;
   };
 
   type IJobStatistics2 = {
+    /**
+     * BI Engine specific Statistics. [Output-only] BI Engine specific Statistics.
+     */
+    biEngineStatistics?: IBiEngineStatistics;
     /**
      * [Output-only] Billing tier for the job.
      */
@@ -1799,9 +1904,17 @@ declare namespace bigquery {
      */
     ddlAffectedRowAccessPolicyCount?: string;
     /**
+     * [Output-only] The DDL destination table. Present only for ALTER TABLE RENAME TO queries. Note that ddl_target_table is used just for its type information.
+     */
+    ddlDestinationTable?: ITableReference;
+    /**
      * The DDL operation performed, possibly dependent on the pre-existence of the DDL target. Possible values (new values might be added in the future): "CREATE": The query created the DDL target. "SKIP": No-op. Example cases: the query is CREATE TABLE IF NOT EXISTS while the table already exists, or the query is DROP TABLE IF EXISTS while the table does not exist. "REPLACE": The query replaced the DDL target. Example case: the query is CREATE OR REPLACE TABLE, and the table already exists. "DROP": The query deleted the DDL target.
      */
     ddlOperationPerformed?: string;
+    /**
+     * [Output-only] The DDL target dataset. Present only for CREATE/ALTER/DROP SCHEMA queries.
+     */
+    ddlTargetDataset?: IDatasetReference;
     /**
      * The DDL target routine. Present only for CREATE/DROP FUNCTION/PROCEDURE queries.
      */
@@ -1815,9 +1928,17 @@ declare namespace bigquery {
      */
     ddlTargetTable?: ITableReference;
     /**
+     * [Output-only] Detailed statistics for DML statements Present only for DML statements INSERT, UPDATE, DELETE or TRUNCATE.
+     */
+    dmlStats?: IDmlStatistics;
+    /**
      * [Output-only] The original estimate of bytes processed for the job.
      */
     estimatedBytesProcessed?: string;
+    /**
+     * [Output-only] Statistics of a BigQuery ML training job.
+     */
+    mlStatistics?: IMlStatistics;
     /**
      * [Output-only, Beta] Information about create model query job progress.
      */
@@ -2018,7 +2139,22 @@ declare namespace bigquery {
     refreshIntervalMs?: string;
   };
 
+  type IMlStatistics = {
+    /**
+     * Results for all completed iterations.
+     */
+    iterationResults?: Array<IIterationResult>;
+    /**
+     * Maximum number of iterations specified as max_iterations in the 'CREATE MODEL' query. The actual number of iterations may be less than this number due to early stop.
+     */
+    maxIterations?: string;
+  };
+
   type IModel = {
+    /**
+     * The best trial_id across all training runs.
+     */
+    bestTrialId?: string;
     /**
      * Output only. The time when this model was created, in millisecs since the epoch.
      */
@@ -2083,7 +2219,8 @@ declare namespace bigquery {
       | 'BOOSTED_TREE_CLASSIFIER'
       | 'ARIMA'
       | 'AUTOML_REGRESSOR'
-      | 'AUTOML_CLASSIFIER';
+      | 'AUTOML_CLASSIFIER'
+      | 'ARIMA_PLUS';
     /**
      * Output only. Information for all training runs in increasing order of start_time.
      */
@@ -2134,8 +2271,19 @@ declare namespace bigquery {
     confusionMatrixList?: Array<IConfusionMatrix>;
   };
 
+  type IParquetOptions = {
+    /**
+     * [Optional] Indicates whether to use schema inference specifically for Parquet LIST logical type.
+     */
+    enableListInference?: boolean;
+    /**
+     * [Optional] Indicates whether to infer Parquet ENUM logical type as STRING instead of BYTES by default.
+     */
+    enumAsString?: boolean;
+  };
+
   /**
-   * An Identity and Access Management (IAM) policy, which specifies access controls for Google Cloud resources. A `Policy` is a collection of `bindings`. A `binding` binds one or more `members` to a single `role`. Members can be user accounts, service accounts, Google groups, and domains (such as G Suite). A `role` is a named list of permissions; each `role` can be an IAM predefined role or a user-created custom role. For some types of Google Cloud resources, a `binding` can also specify a `condition`, which is a logical expression that allows access to a resource only if the expression evaluates to `true`. A condition can add constraints based on attributes of the request, the resource, or both. To learn which resources support conditions in their IAM policies, see the {@link https://cloud.google.com/iam/docs/| IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies). **JSON example:** { "bindings": [ { "role": "roles/resourcemanager.organizationAdmin", "members": [ "user:mike@example.com", "group:admins@example.com", "domain:google.com", "serviceAccount:my-project-id@appspot.gserviceaccount.com" ] }, { "role": "roles/resourcemanager.organizationViewer", "members": [ "user:eve@example.com" ], "condition": { "title": "expirable access", "description": "Does not grant access after Sep 2020", "expression": "request.time < timestamp('2020-10-01T00:00:00.000Z')", } } ], "etag": "BwWWja0YfJA=", "version": 3 } **YAML example:** bindings: - members: - user:mike@example.com - group:admins@example.com - domain:google.com - serviceAccount:my-project-id@appspot.gserviceaccount.com role: roles/resourcemanager.organizationAdmin - members: - user:eve@example.com role: roles/resourcemanager.organizationViewer condition: title: expirable access description: Does not grant access after Sep 2020 expression: request.time < timestamp('2020-10-01T00:00:00.000Z') - etag: BwWWja0YfJA= - version: 3 For a description of IAM and its features, see the [IAM documentation}.
+   * An Identity and Access Management (IAM) policy, which specifies access controls for Google Cloud resources. A `Policy` is a collection of `bindings`. A `binding` binds one or more `members`, or principals, to a single `role`. Principals can be user accounts, service accounts, Google groups, and domains (such as G Suite). A `role` is a named list of permissions; each `role` can be an IAM predefined role or a user-created custom role. For some types of Google Cloud resources, a `binding` can also specify a `condition`, which is a logical expression that allows access to a resource only if the expression evaluates to `true`. A condition can add constraints based on attributes of the request, the resource, or both. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies). **JSON example:** { "bindings": [ { "role": "roles/resourcemanager.organizationAdmin", "members": [ "user:mike@example.com", "group:admins@example.com", "domain:google.com", "serviceAccount:my-project-id@appspot.gserviceaccount.com" ] }, { "role": "roles/resourcemanager.organizationViewer", "members": [ "user:eve@example.com" ], "condition": { "title": "expirable access", "description": "Does not grant access after Sep 2020", "expression": "request.time < timestamp('2020-10-01T00:00:00.000Z')", } } ], "etag": "BwWWja0YfJA=", "version": 3 } **YAML example:** bindings: - members: - user:mike@example.com - group:admins@example.com - domain:google.com - serviceAccount:my-project-id@appspot.gserviceaccount.com role: roles/resourcemanager.organizationAdmin - members: - user:eve@example.com role: roles/resourcemanager.organizationViewer condition: title: expirable access description: Does not grant access after Sep 2020 expression: request.time < timestamp('2020-10-01T00:00:00.000Z') etag: BwWWja0YfJA= version: 3 For a description of IAM and its features, see the [IAM documentation](https://cloud.google.com/iam/docs/).
    */
   type IPolicy = {
     /**
@@ -2143,7 +2291,7 @@ declare namespace bigquery {
      */
     auditConfigs?: Array<IAuditConfig>;
     /**
-     * Associates a list of `members` to a `role`. Optionally, may specify a `condition` that determines how and when the `bindings` are applied. Each of the `bindings` must contain at least one member.
+     * Associates a list of `members`, or principals, with a `role`. Optionally, may specify a `condition` that determines how and when the `bindings` are applied. Each of the `bindings` must contain at least one principal. The `bindings` in a `Policy` can refer to up to 1,500 principals; up to 250 of these principals can be Google groups. Each occurrence of a principal counts towards these limits. For example, if the `bindings` grant 50 different roles to `user:alice@example.com`, and not to any other principal, then you can add another 1,450 principals to the `bindings` in the `Policy`.
      */
     bindings?: Array<IBinding>;
     /**
@@ -2151,7 +2299,7 @@ declare namespace bigquery {
      */
     etag?: string;
     /**
-     * Specifies the format of the policy. Valid values are `0`, `1`, and `3`. Requests that specify an invalid value are rejected. Any operation that affects conditional role bindings must specify version `3`. This requirement applies to the following operations: * Getting a policy that includes a conditional role binding * Adding a conditional role binding to a policy * Changing a conditional role binding in a policy * Removing any role binding, with or without a condition, from a policy that includes conditions **Important:** If you use IAM Conditions, you must include the `etag` field whenever you call `setIamPolicy`. If you omit this field, then IAM allows you to overwrite a version `3` policy with a version `1` policy, and all of the conditions in the version `3` policy are lost. If a policy does not include any conditions, operations on that policy may specify any valid version or leave the field unset. To learn which resources support conditions in their IAM policies, see the {@link https://cloud.google.com/iam/help/conditions/resource-policies| IAM documentation}.
+     * Specifies the format of the policy. Valid values are `0`, `1`, and `3`. Requests that specify an invalid value are rejected. Any operation that affects conditional role bindings must specify version `3`. This requirement applies to the following operations: * Getting a policy that includes a conditional role binding * Adding a conditional role binding to a policy * Changing a conditional role binding in a policy * Removing any role binding, with or without a condition, from a policy that includes conditions **Important:** If you use IAM Conditions, you must include the `etag` field whenever you call `setIamPolicy`. If you omit this field, then IAM allows you to overwrite a version `3` policy with a version `1` policy, and all of the conditions in the version `3` policy are lost. If a policy does not include any conditions, operations on that policy may specify any valid version or leave the field unset. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
      */
     version?: number;
   };
@@ -2271,6 +2419,10 @@ declare namespace bigquery {
      */
     connectionProperties?: Array<IConnectionProperty>;
     /**
+     * If true, creates a new session, where session id will be a server generated random id. If false, runs query with an existing session_id passed in ConnectionProperty, otherwise runs query in non-session mode.
+     */
+    createSession?: boolean;
+    /**
      * [Optional] Specifies the default datasetId and projectId to assume for any unqualified table names in the query. If not set, all table names in the query string must be qualified in the format 'datasetId.tableId'.
      */
     defaultDataset?: IDatasetReference;
@@ -2338,6 +2490,10 @@ declare namespace bigquery {
      */
     cacheHit?: boolean;
     /**
+     * [Output-only] Detailed statistics for DML statements Present only for DML statements INSERT, UPDATE, DELETE or TRUNCATE.
+     */
+    dmlStats?: IDmlStatistics;
+    /**
      * [Output-only] The first errors or warnings encountered during the running of the job. The final message includes the number of errors that caused the process to stop. Errors here do not necessarily mean that the job has completed or was unsuccessful.
      */
     errors?: Array<IErrorProto>;
@@ -2369,6 +2525,10 @@ declare namespace bigquery {
      * The schema of the results. Present only when the query completes successfully.
      */
     schema?: ITableSchema;
+    /**
+     * [Output-only] [Preview] Information of the session if this job is part of one.
+     */
+    sessionInfo?: ISessionInfo;
     /**
      * The total number of bytes processed for this query. If this query was a dry run, this is the number of bytes that would be processed if the query were run.
      */
@@ -2469,7 +2629,7 @@ declare namespace bigquery {
      */
     medianAbsoluteError?: number;
     /**
-     * R^2 score.
+     * R^2 score. This corresponds to r2_score in ML.EVALUATE.
      */
     rSquared?: number;
   };
@@ -2491,11 +2651,11 @@ declare namespace bigquery {
      */
     definitionBody?: string;
     /**
-     * Optional. [Experimental] The description of the routine if defined.
+     * Optional. The description of the routine, if defined.
      */
     description?: string;
     /**
-     * Optional. [Experimental] The determinism level of the JavaScript UDF if defined.
+     * Optional. The determinism level of the JavaScript UDF, if defined.
      */
     determinismLevel?:
       | 'DETERMINISM_LEVEL_UNSPECIFIED'
@@ -2518,7 +2678,11 @@ declare namespace bigquery {
      */
     lastModifiedTime?: string;
     /**
-     * Optional if language = "SQL"; required otherwise. If absent, the return type is inferred from definition_body at query time in each query that references this routine. If present, then the evaluated result will be cast to the specified returned type at query time. For example, for the functions created with the following statements: * `CREATE FUNCTION Add(x FLOAT64, y FLOAT64) RETURNS FLOAT64 AS (x + y);` * `CREATE FUNCTION Increment(x FLOAT64) AS (Add(x, 1));` * `CREATE FUNCTION Decrement(x FLOAT64) RETURNS FLOAT64 AS (Add(x, -1));` The return_type is `{type_kind: "FLOAT64"}` for `Add` and `Decrement`, and is absent for `Increment` (inferred as FLOAT64 at query time). Suppose the function `Add` is replaced by `CREATE OR REPLACE FUNCTION Add(x INT64, y INT64) AS (x + y);` Then the inferred return type of `Increment` is automatically changed to INT64 at query time, while the return type of `Decrement` remains FLOAT64.
+     * Optional. Can be set only if routine_type = "TABLE_VALUED_FUNCTION". If absent, the return table type is inferred from definition_body at query time in each query that references this routine. If present, then the columns in the evaluated table result will be cast to match the column types specificed in return table type, at query time.
+     */
+    returnTableType?: IStandardSqlTableType;
+    /**
+     * Optional if language = "SQL"; required otherwise. Cannot be set if routine_type = "TABLE_VALUED_FUNCTION". If absent, the return type is inferred from definition_body at query time in each query that references this routine. If present, then the evaluated result will be cast to the specified returned type at query time. For example, for the functions created with the following statements: * `CREATE FUNCTION Add(x FLOAT64, y FLOAT64) RETURNS FLOAT64 AS (x + y);` * `CREATE FUNCTION Increment(x FLOAT64) AS (Add(x, 1));` * `CREATE FUNCTION Decrement(x FLOAT64) RETURNS FLOAT64 AS (Add(x, -1));` The return_type is `{type_kind: "FLOAT64"}` for `Add` and `Decrement`, and is absent for `Increment` (inferred as FLOAT64 at query time). Suppose the function `Add` is replaced by `CREATE OR REPLACE FUNCTION Add(x INT64, y INT64) AS (x + y);` Then the inferred return type of `Increment` is automatically changed to INT64 at query time, while the return type of `Decrement` remains FLOAT64.
      */
     returnType?: IStandardSqlDataType;
     /**
@@ -2528,7 +2692,15 @@ declare namespace bigquery {
     /**
      * Required. The type of routine.
      */
-    routineType?: 'ROUTINE_TYPE_UNSPECIFIED' | 'SCALAR_FUNCTION' | 'PROCEDURE';
+    routineType?:
+      | 'ROUTINE_TYPE_UNSPECIFIED'
+      | 'SCALAR_FUNCTION'
+      | 'PROCEDURE'
+      | 'TABLE_VALUED_FUNCTION';
+    /**
+     * Optional. Can be set for procedures only. If true (default), the definition body will be validated in the creation and the updates of the procedure. For procedures with an argument of ANY TYPE, the definition body validtion is not supported at creation/update time, and thus this field must be set to false explicitly.
+     */
+    strictMode?: boolean;
   };
 
   type IRoutineReference = {
@@ -2650,6 +2822,13 @@ declare namespace bigquery {
     stackFrames?: Array<IScriptStackFrame>;
   };
 
+  type ISessionInfo = {
+    /**
+     * [Output-only] // [Preview] Id of the session.
+     */
+    sessionId?: string;
+  };
+
   /**
    * Request message for `SetIamPolicy` method.
    */
@@ -2666,11 +2845,11 @@ declare namespace bigquery {
 
   type ISnapshotDefinition = {
     /**
-     * [Required] Reference describing the ID of the table that is snapshotted.
+     * [Required] Reference describing the ID of the table that was snapshot.
      */
     baseTableReference?: ITableReference;
     /**
-     * [Required] The time at which the base table was snapshot.
+     * [Required] The time at which the base table was snapshot. This value is reported in the JSON response using RFC3339 format.
      */
     snapshotTime?: string;
   };
@@ -2701,9 +2880,11 @@ declare namespace bigquery {
       | 'DATE'
       | 'TIME'
       | 'DATETIME'
+      | 'INTERVAL'
       | 'GEOGRAPHY'
       | 'NUMERIC'
       | 'BIGNUMERIC'
+      | 'JSON'
       | 'ARRAY'
       | 'STRUCT';
   };
@@ -2723,6 +2904,16 @@ declare namespace bigquery {
   };
 
   type IStandardSqlStructType = {fields?: Array<IStandardSqlField>};
+
+  /**
+   * A table type
+   */
+  type IStandardSqlTableType = {
+    /**
+     * The columns in this table type
+     */
+    columns?: Array<IStandardSqlField>;
+  };
 
   type IStreamingbuffer = {
     /**
@@ -2748,6 +2939,10 @@ declare namespace bigquery {
      * [Output-only] The time when this table was created, in milliseconds since the epoch.
      */
     creationTime?: string;
+    /**
+     * [Output-only] The default collation of the table.
+     */
+    defaultCollation?: string;
     /**
      * [Optional] A user-friendly description of this table.
      */
@@ -2946,6 +3141,10 @@ declare namespace bigquery {
       names?: Array<string>;
     };
     /**
+     * Optional. Collation specification of the field. It only can be set on string type field.
+     */
+    collationSpec?: string;
+    /**
      * [Optional] The field description. The maximum length is 1,024 characters.
      */
     description?: string;
@@ -2954,11 +3153,15 @@ declare namespace bigquery {
      */
     fields?: Array<ITableFieldSchema>;
     /**
+     * [Optional] Maximum length of values of this field for STRINGS or BYTES. If max_length is not specified, no maximum length constraint is imposed on this field. If type = "STRING", then max_length represents the maximum UTF-8 length of strings in this field. If type = "BYTES", then max_length represents the maximum number of bytes in this field. It is invalid to set this field if type ≠ "STRING" and ≠ "BYTES".
+     */
+    maxLength?: string;
+    /**
      * [Optional] The field mode. Possible values include NULLABLE, REQUIRED and REPEATED. The default value is NULLABLE.
      */
     mode?: string;
     /**
-     * [Required] The field name. The name must contain only letters (a-z, A-Z), numbers (0-9), or underscores (_), and must start with a letter or underscore. The maximum length is 128 characters.
+     * [Required] The field name. The name must contain only letters (a-z, A-Z), numbers (0-9), or underscores (_), and must start with a letter or underscore. The maximum length is 300 characters.
      */
     name?: string;
     policyTags?: {
@@ -2968,7 +3171,15 @@ declare namespace bigquery {
       names?: Array<string>;
     };
     /**
-     * [Required] The field data type. Possible values include STRING, BYTES, INTEGER, INT64 (same as INTEGER), FLOAT, FLOAT64 (same as FLOAT), BOOLEAN, BOOL (same as BOOLEAN), TIMESTAMP, DATE, TIME, DATETIME, RECORD (where RECORD indicates that the field contains a nested schema) or STRUCT (same as RECORD).
+     * [Optional] Precision (maximum number of total digits in base 10) and scale (maximum number of digits in the fractional part in base 10) constraints for values of this field for NUMERIC or BIGNUMERIC. It is invalid to set precision or scale if type ≠ "NUMERIC" and ≠ "BIGNUMERIC". If precision and scale are not specified, no value range constraint is imposed on this field insofar as values are permitted by the type. Values of this NUMERIC or BIGNUMERIC field must be in this range when: - Precision (P) and scale (S) are specified: [-10P-S + 10-S, 10P-S - 10-S] - Precision (P) is specified but not scale (and thus scale is interpreted to be equal to zero): [-10P + 1, 10P - 1]. Acceptable values for precision and scale if both are specified: - If type = "NUMERIC": 1 ≤ precision - scale ≤ 29 and 0 ≤ scale ≤ 9. - If type = "BIGNUMERIC": 1 ≤ precision - scale ≤ 38 and 0 ≤ scale ≤ 38. Acceptable values for precision if only precision is specified but not scale (and thus scale is interpreted to be equal to zero): - If type = "NUMERIC": 1 ≤ precision ≤ 29. - If type = "BIGNUMERIC": 1 ≤ precision ≤ 38. If scale is specified but not precision, then it is invalid.
+     */
+    precision?: string;
+    /**
+     * [Optional] See documentation for precision.
+     */
+    scale?: string;
+    /**
+     * [Required] The field data type. Possible values include STRING, BYTES, INTEGER, INT64 (same as INTEGER), FLOAT, FLOAT64 (same as FLOAT), NUMERIC, BIGNUMERIC, BOOLEAN, BOOL (same as BOOLEAN), TIMESTAMP, DATE, TIME, DATETIME, INTERVAL, RECORD (where RECORD indicates that the field contains a nested schema) or STRUCT (same as RECORD).
      */
     type?: string;
   };
@@ -3084,7 +3295,7 @@ declare namespace bigquery {
    */
   type ITestIamPermissionsRequest = {
     /**
-     * The set of permissions to check for the `resource`. Permissions with wildcards (such as '*' or 'storage.*') are not allowed. For more information see {@link https://cloud.google.com/iam/docs/overview#permissions| IAM Overview}.
+     * The set of permissions to check for the `resource`. Permissions with wildcards (such as '*' or 'storage.*') are not allowed. For more information see [IAM Overview](https://cloud.google.com/iam/docs/overview#permissions).
      */
     permissions?: Array<string>;
   };
@@ -3115,7 +3326,14 @@ declare namespace bigquery {
     type?: string;
   };
 
+  /**
+   * Options used in model training.
+   */
   type ITrainingOptions = {
+    /**
+     * If true, detect step changes and make data adjustment in the input time series.
+     */
+    adjustStepChanges?: boolean;
     /**
      * Whether to enable auto ARIMA or not.
      */
@@ -3129,6 +3347,30 @@ declare namespace bigquery {
      */
     batchSize?: string;
     /**
+     * Booster type for boosted tree models.
+     */
+    boosterType?: 'BOOSTER_TYPE_UNSPECIFIED' | 'GBTREE' | 'DART';
+    /**
+     * If true, clean spikes and dips in the input time series.
+     */
+    cleanSpikesAndDips?: boolean;
+    /**
+     * Subsample ratio of columns for each level for boosted tree models.
+     */
+    colsampleBylevel?: number;
+    /**
+     * Subsample ratio of columns for each node(split) for boosted tree models.
+     */
+    colsampleBynode?: number;
+    /**
+     * Subsample ratio of columns when constructing each tree for boosted tree models.
+     */
+    colsampleBytree?: number;
+    /**
+     * Type of normalization algorithm for boosted tree models using dart booster.
+     */
+    dartNormalizeType?: 'DART_NORMALIZE_TYPE_UNSPECIFIED' | 'TREE' | 'FOREST';
+    /**
      * The data frequency of a time series.
      */
     dataFrequency?:
@@ -3139,7 +3381,8 @@ declare namespace bigquery {
       | 'MONTHLY'
       | 'WEEKLY'
       | 'DAILY'
-      | 'HOURLY';
+      | 'HOURLY'
+      | 'PER_MINUTE';
     /**
      * The column to split data with. This column won't be used as a feature. 1. When data_split_method is CUSTOM, the corresponding column should be boolean. The rows with true value tag are eval data, and the false are training data. 2. When data_split_method is SEQ, the first DATA_SPLIT_EVAL_FRACTION rows (from smallest to largest) in the corresponding column are used as training data, and the rest are eval data. It respects the order in Orderable data types: https://cloud.google.com/bigquery/docs/reference/standard-sql/data-types#data-type-properties
      */
@@ -3158,6 +3401,10 @@ declare namespace bigquery {
       | 'SEQUENTIAL'
       | 'NO_SPLIT'
       | 'AUTO_SPLIT';
+    /**
+     * If true, perform decompose time series and save the results.
+     */
+    decomposeTimeSeries?: boolean;
     /**
      * Distance type for clustering models.
      */
@@ -3327,7 +3574,11 @@ declare namespace bigquery {
      */
     minSplitLoss?: number;
     /**
-     * [Beta] Google Cloud Storage URI from which the model was imported. Only applicable for imported models.
+     * Minimum sum of instance weight needed in a child for boosted tree models.
+     */
+    minTreeChildWeight?: string;
+    /**
+     * Google Cloud Storage URI from which the model was imported. Only applicable for imported models.
      */
     modelUri?: string;
     /**
@@ -3342,6 +3593,10 @@ declare namespace bigquery {
      * Num factors specified for matrix factorization models.
      */
     numFactors?: string;
+    /**
+     * Number of parallel trees constructed during each iteration for boosted tree models.
+     */
+    numParallelTree?: string;
     /**
      * Optimization strategy for training linear regression models.
      */
@@ -3362,13 +3617,26 @@ declare namespace bigquery {
      */
     timeSeriesDataColumn?: string;
     /**
-     * The id column that will be used to indicate different time series to forecast in parallel.
+     * The time series id column that was used during ARIMA model training.
      */
     timeSeriesIdColumn?: string;
+    /**
+     * The time series id columns that were used during ARIMA model training.
+     */
+    timeSeriesIdColumns?: Array<string>;
     /**
      * Column to be designated as time series timestamp for ARIMA model.
      */
     timeSeriesTimestampColumn?: string;
+    /**
+     * Tree construction algorithm for boosted tree models.
+     */
+    treeMethod?:
+      | 'TREE_METHOD_UNSPECIFIED'
+      | 'AUTO'
+      | 'EXACT'
+      | 'APPROX'
+      | 'HIST';
     /**
      * User column specified for matrix factorization models.
      */
@@ -3395,10 +3663,6 @@ declare namespace bigquery {
      * The evaluation metrics over training/eval data that were computed at the end of training.
      */
     evaluationMetrics?: IEvaluationMetrics;
-    /**
-     * Global explanations for important features of the model. For multi-class models, there is one entry for each label class. For other models, there is only one entry in the list.
-     */
-    globalExplanations?: Array<IGlobalExplanation>;
     /**
      * Output of each iteration run, results.size() <= max_iterations.
      */
@@ -3439,6 +3703,10 @@ declare namespace bigquery {
      * [Required] A query that BigQuery executes when the view is referenced.
      */
     query?: string;
+    /**
+     * True if the column names are explicitly specified. For example by using the 'CREATE VIEW v(c1, c2) AS ...' syntax. Can only be set using BigQuery's standard SQL: https://cloud.google.com/bigquery/sql-reference/
+     */
+    useExplicitColumnNames?: boolean;
     /**
      * Specifies whether to use BigQuery's legacy SQL for this view. The default value is true. If set to false, the view will use BigQuery's standard SQL: https://cloud.google.com/bigquery/sql-reference/ Queries and views that reference this view must use the same flag value.
      */
@@ -3490,6 +3758,16 @@ declare namespace bigquery {
     type ICancelParams = {
       /**
        * The geographic location of the job. Required except for US and EU. See details at https://cloud.google.com/bigquery/docs/locations#specifying_your_location.
+       */
+      location?: string;
+    };
+
+    /**
+     * Requests the deletion of the metadata of a job. This call returns when the job's metadata is deleted.
+     */
+    type IDeleteParams = {
+      /**
+       * The geographic location of the job. Required. See details at: https://cloud.google.com/bigquery/docs/locations#specifying_your_location.
        */
       location?: string;
     };
@@ -3571,7 +3849,7 @@ declare namespace bigquery {
 
   namespace models {
     /**
-     * Lists all models in the specified dataset. Requires the READER dataset role.
+     * Lists all models in the specified dataset. Requires the READER dataset role. After retrieving the list of models, you can get information about a particular model by calling the models.get method.
      */
     type IListParams = {
       /**
@@ -3698,6 +3976,26 @@ declare namespace bigquery {
        * Page token, returned by a previous call, to request the next page of results
        */
       pageToken?: string;
+    };
+
+    /**
+     * Updates information in an existing table. The update method replaces the entire table resource, whereas the patch method only replaces fields that are provided in the submitted table resource. This method supports patch semantics.
+     */
+    type IPatchParams = {
+      /**
+       * When true will autodetect schema, else will keep original schema
+       */
+      autodetect_schema?: boolean;
+    };
+
+    /**
+     * Updates information in an existing table. The update method replaces the entire table resource, whereas the patch method only replaces fields that are provided in the submitted table resource.
+     */
+    type IUpdateParams = {
+      /**
+       * When true will autodetect schema, else will keep original schema
+       */
+      autodetect_schema?: boolean;
     };
   }
 }
