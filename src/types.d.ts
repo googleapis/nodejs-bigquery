@@ -791,7 +791,7 @@ declare namespace bigquery {
     /**
      * The labels associated with this dataset. You can use these to organize and group your datasets. You can set this property when inserting or updating a dataset. See Creating and Updating Dataset Labels for more information.
      */
-    labels?: { [key: string]: string };
+    labels?: {[key: string]: string};
     /**
      * [Output-only] The date when this dataset or any of its tables was last modified, in milliseconds since the epoch.
      */
@@ -847,7 +847,7 @@ declare namespace bigquery {
       /**
        * The labels associated with this dataset. You can use these to organize and group your datasets.
        */
-      labels?: { [key: string]: string };
+      labels?: {[key: string]: string};
       /**
        * The geographic location where the data resides.
        */
@@ -894,7 +894,7 @@ declare namespace bigquery {
     /**
      * [Optional] The labels associated with this table. You can use these to organize and group your tables. This will only be used if the destination table is newly created. If the table already exists and labels are different than the current labels are provided, the job will fail.
      */
-    labels?: { [key: string]: string };
+    labels?: {[key: string]: string};
   };
 
   type IDmlStatistics = {
@@ -1424,7 +1424,7 @@ declare namespace bigquery {
     /**
      * The labels associated with this job. You can use these to organize and group your jobs. Label keys and values can be no longer than 63 characters, can only contain lowercase letters, numeric characters, underscores and dashes. International characters are allowed. Label values are optional. Label keys must start with a letter and each label in the list must have a different key.
      */
-    labels?: { [key: string]: string };
+    labels?: {[key: string]: string};
     /**
      * [Pick one] Configures a load job.
      */
@@ -1673,7 +1673,7 @@ declare namespace bigquery {
     /**
      * [Optional] If querying an external data source outside of BigQuery, describes the data format, location and other properties of the data source. By defining these properties, the data source can then be queried as if it were a standard BigQuery table.
      */
-    tableDefinitions?: { [key: string]: IExternalDataConfiguration };
+    tableDefinitions?: {[key: string]: IExternalDataConfiguration};
     /**
      * Time-based partitioning specification for the destination table. Only one of timePartitioning and rangePartitioning should be specified.
      */
@@ -2070,7 +2070,7 @@ declare namespace bigquery {
   /**
    * Represents a single JSON object.
    */
-  type IJsonObject = { [key: string]: IJsonValue };
+  type IJsonObject = {[key: string]: IJsonValue};
 
   type IJsonValue = any;
 
@@ -2190,7 +2190,7 @@ declare namespace bigquery {
     /**
      * The labels associated with this model. You can use these to organize and group your models. Label keys and values can be no longer than 63 characters, can only contain lowercase letters, numeric characters, underscores and dashes. International characters are allowed. Label values are optional. Label keys must start with a letter and each label in the list must have a different key.
      */
-    labels?: { [key: string]: string };
+    labels?: {[key: string]: string};
     /**
      * Output only. The time when this model was last modified, in millisecs since the epoch.
      */
@@ -2406,7 +2406,7 @@ declare namespace bigquery {
     /**
      * [Optional] The struct field values, in order of the struct type's declaration.
      */
-    structValues?: { [key: string]: IQueryParameterValue };
+    structValues?: {[key: string]: IQueryParameterValue};
     /**
      * [Optional] The value of this value, if a simple scalar type.
      */
@@ -2437,7 +2437,7 @@ declare namespace bigquery {
     /**
      * The labels associated with this job. You can use these to organize and group your jobs. Label keys and values can be no longer than 63 characters, can only contain lowercase letters, numeric characters, underscores and dashes. International characters are allowed. Label values are optional. Label keys must start with a letter and each label in the list must have a different key.
      */
-    labels?: { [key: string]: string };
+    labels?: {[key: string]: string};
     /**
      * The geographic location where the job should run. See details at https://cloud.google.com/bigquery/docs/locations#specifying_your_location.
      */
@@ -2903,7 +2903,7 @@ declare namespace bigquery {
     type?: IStandardSqlDataType;
   };
 
-  type IStandardSqlStructType = { fields?: Array<IStandardSqlField> };
+  type IStandardSqlStructType = {fields?: Array<IStandardSqlField>};
 
   /**
    * A table type
@@ -2978,7 +2978,7 @@ declare namespace bigquery {
     /**
      * The labels associated with this table. You can use these to organize and group your tables. Label keys and values can be no longer than 63 characters, can only contain lowercase letters, numeric characters, underscores and dashes. International characters are allowed. Label values are optional. Label keys must start with a letter and each label in the list must have a different key.
      */
-    labels?: { [key: string]: string };
+    labels?: {[key: string]: string};
     /**
      * [Output-only] The time when this table was last modified, in milliseconds since the epoch.
      */
@@ -3053,7 +3053,7 @@ declare namespace bigquery {
     view?: IViewDefinition;
   };
 
-  type ITableCell = { v?: any };
+  type ITableCell = {v?: any};
 
   type ITableDataInsertAllRequest = {
     /**
@@ -3228,7 +3228,7 @@ declare namespace bigquery {
       /**
        * The labels associated with this table. You can use these to organize and group your tables.
        */
-      labels?: { [key: string]: string };
+      labels?: {[key: string]: string};
       /**
        * The range partitioning specification for this table, if configured.
        */
@@ -3541,7 +3541,7 @@ declare namespace bigquery {
     /**
      * Weights associated with each label class, for rebalancing the training data. Only applicable for classification models.
      */
-    labelClassWeights?: { [key: string]: number };
+    labelClassWeights?: {[key: string]: number};
     /**
      * Learning rate in training. Used only for iterative training algorithms.
      */
@@ -4001,4 +4001,3 @@ declare namespace bigquery {
 }
 
 export default bigquery;
-
