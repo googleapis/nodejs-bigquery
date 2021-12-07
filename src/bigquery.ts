@@ -2057,7 +2057,7 @@ export class BigQuery extends common.Service {
    */
   queryAsStream_(query: Query, callback?: SimpleQueryRowsCallback) {
     if (query.job) {
-      query.job!.getQueryResults(query, callback as QueryRowsCallback);
+      query.job.getQueryResults(query, callback as QueryRowsCallback);
       return;
     }
 
