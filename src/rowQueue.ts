@@ -153,9 +153,9 @@ export class RowQueue {
     callbacks: InsertRowsCallback[],
     cb?: InsertRowsCallback
   ): void {
-    // if (!cb) {
-    //   cb = () => {};
-    // }
+    if (!cb) {
+      cb = () => {};
+    }
 
     const json = extend(true, {}, this.insertRowsOptions, {rows});
 
