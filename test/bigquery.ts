@@ -2706,6 +2706,13 @@ describe('BigQuery', () => {
 
   describe('queryAsStream_', () => {
     let queryStub: SinonStub;
+    let defaultOpts = {
+      location: undefined,
+      maxResults: undefined,
+      pageToken: undefined,
+      wrapIntegers: undefined,
+      autoPaginate: false,
+    };
 
     beforeEach(() => {
       queryStub = sandbox.stub(bq, 'query').callsArgAsync(2);
@@ -2715,23 +2722,16 @@ describe('BigQuery', () => {
       const query = 'SELECT';
       bq.queryAsStream_(query, done);
       assert(
-        queryStub.calledOnceWithExactly(
-          query,
-          {autoPaginate: false},
-          sinon.match.func
-        )
+        queryStub.calledOnceWithExactly(query, defaultOpts, sinon.match.func)
       );
     });
 
     it('should call query correctly with a Query object', done => {
       const query = {query: 'SELECT', wrapIntegers: true};
       bq.queryAsStream_(query, done);
+      defaultOpts = extend(defaultOpts, {wrapIntegers: true});
       assert(
-        queryStub.calledOnceWithExactly(
-          query,
-          extend(query, {autoPaginate: false}),
-          sinon.match.func
-        )
+        queryStub.calledOnceWithExactly(query, defaultOpts, sinon.match.func)
       );
     });
 
@@ -2748,22 +2748,20 @@ describe('BigQuery', () => {
     });
 
     it('should pass wrapIntegers if supplied', done => {
-      const statement = 'SELECT';
+      const wrapIntegers = {
+        integerValue: 100,
+      };
       const query = {
-        query: statement,
+        query: 'SELECT',
+        wrapIntegers,
       };
-      const options = {
-        wrapIntegers: {
-          integerValue: 100,
-        },
-      };
-      bq.queryAsStream_(query, options, done);
+
+      bq.queryAsStream_(query, done);
+
+      defaultOpts = extend(defaultOpts, {wrapIntegers});
+
       assert(
-        queryStub.calledOnceWithExactly(
-          query,
-          {autoPaginate: false, wrapIntegers: options.wrapIntegers},
-          sinon.match.func
-        )
+        queryStub.calledOnceWithExactly(query, defaultOpts, sinon.match.func)
       );
     });
   });

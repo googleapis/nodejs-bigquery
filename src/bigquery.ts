@@ -2045,28 +2045,28 @@ export class BigQuery extends Service {
    *
    * @private
    */
-  queryAsStream_(
-    query: Query,
-    optionsOrCallback?: QueryStreamOptions,
-    cb?: SimpleQueryRowsCallback
-  ) {
-    let options =
-      // Default to using query as options to ensure the options set
-      // in a Query type are passed through to the query() method.
-      typeof optionsOrCallback === 'object' ? optionsOrCallback : query;
-    const callback =
-      typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
-
-    options = query.job
-      ? extend(query, options)
-      : extend(options, {autoPaginate: false});
-
+  queryAsStream_(query: Query, callback?: SimpleQueryRowsCallback) {
     if (query.job) {
-      query.job!.getQueryResults(options, callback as QueryRowsCallback);
+      query.job.getQueryResults(query, callback as QueryRowsCallback);
       return;
     }
 
-    this.query(query, options, callback);
+    const {location, maxResults, pageToken, wrapIntegers} = query;
+
+    const opts = {
+      location,
+      maxResults,
+      pageToken,
+      wrapIntegers,
+      autoPaginate: false,
+    };
+
+    delete query.location;
+    delete query.maxResults;
+    delete query.pageToken;
+    delete query.wrapIntegers;
+
+    this.query(query, opts, callback);
   }
 }
 
