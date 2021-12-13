@@ -4,6 +4,13 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+### [5.9.3](https://www.github.com/googleapis/nodejs-bigquery/compare/v5.9.2...v5.9.3) (2021-12-13)
+
+
+### Bug Fixes
+
+* refactor to extract options from query ([#1045](https://www.github.com/googleapis/nodejs-bigquery/issues/1045)) ([4afed77](https://www.github.com/googleapis/nodejs-bigquery/commit/4afed77c0e21568546bb6363936b10d15c9c93db))
+
 ### [5.9.2](https://www.github.com/googleapis/nodejs-bigquery/compare/v5.9.1...v5.9.2) (2021-11-16)
 
 
