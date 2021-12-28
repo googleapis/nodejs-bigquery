@@ -12,5 +12,5 @@
   "requires_billing": false,
   "codeowner_team": "@googleapis/api-bigquery",
   "api_shortname": "bigquery",
-  "library_type": ""
+  "library_type": "GAPIC_MANUAL"
 }
