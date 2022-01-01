@@ -20,14 +20,13 @@ import * as proxyquire from 'proxyquire';
 import * as sinon from 'sinon';
 import * as q from '../src/rowQueue';
 import * as t from '../src/table';
+const Table = require('../src/table').Table;
 import * as _root from '../src';
-import {GoogleErrorBody} from '@google-cloud/common/build/src/util';
-import {RowBatch} from '../src/rowBatch';
 
 class FakeRowBatch {
   batchOptions: t.RowBatchOptions;
   rows: _root.RowMetadata[];
-  callbacks: any[];
+  callbacks: _root.InsertRowsCallback[];
   created: number;
   bytes: number;
   constructor(options: t.RowBatchOptions) {
@@ -37,10 +36,10 @@ class FakeRowBatch {
     this.created = Date.now();
     this.bytes = 0;
   }
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  add(row: t.RowMetadata, callback: t.InsertRowsCallback): void {}
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  canFit(row: t.RowMetadata): boolean {
+
+  add(): void {}
+
+  canFit(): boolean {
     return true;
   }
   isAtMax(): boolean {
@@ -66,13 +65,10 @@ const DATASET = ({
 
 describe('Queues', () => {
   const sandbox = sinon.createSandbox();
-
-  const Table = require('../src/table').Table;
   let dup: Stream;
   let fakeTable: t.Table;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let RowQueue: any;
+  let RowQueue: typeof q.RowQueue;
 
   before(() => {
     const mocked = proxyquire('../src/rowQueue.js', {
@@ -134,18 +130,11 @@ describe('Queues', () => {
         queue.setOptions();
         assert.deepStrictEqual(queue.batchOptions, opts);
       });
-
-      // it('should use defaults if min', () => {
-      //   queue = new RowQueue(fakeTable, dup, [])
-      //   // const opts = {maxRows: q.defaultOptions.maxOutstandingRows, maxBytes: q.defaultOptions.maxOutstandingBytes, maxMilliseconds: q.defaultOptions.maxDelayMillis}
-      //   // queue.setOptions()
-      //   assert.deepStrictEqual(queue.batchOptions, {})
-      // });
     });
 
     describe('add', () => {
       const spy = sandbox.spy();
-      const fakeRowMetadata: q.RowMetadata = {name: 'Turing'};
+      const fakeRowMetadata: t.RowMetadata = {name: 'Turing'};
 
       it('should publish immediately if unable to fit message', done => {
         const clock = sandbox.useFakeTimers();
@@ -202,27 +191,18 @@ describe('Queues', () => {
         clock.restore();
       });
 
-      it('should noop if a timeout is already set', () => {
-        const clock = sandbox.useFakeTimers();
-        const stub = sandbox.stub(queue, 'insert');
-        const maxMilliseconds = 1234;
-        const maxRows = 123;
-        const maxBytes = 123;
-
-        queue.batchOptions = {maxMilliseconds, maxBytes, maxRows};
-        queue.pending = (1234 as unknown) as NodeJS.Timer;
-        queue.add(fakeRowMetadata, spy);
-
-        clock.tick(maxMilliseconds);
-        assert.strictEqual(stub.callCount, 0);
-        clock.restore();
-      });
-
       it('should set insert id', () => {
         const addStub = sandbox.stub(queue.batch, 'add');
         queue.insertRowsOptions.createInsertId = true;
         queue.add(fakeRowMetadata, spy);
         assert.ok(addStub.args[0][0].insertId);
+      });
+
+      it('should encode rows', () => {
+        const addStub = sandbox.stub(queue.batch, 'add');
+        queue.insertRowsOptions.raw = false;
+        queue.add(fakeRowMetadata, spy);
+        assert.deepStrictEqual(addStub.args[0][0].json, fakeRowMetadata);
       });
     });
 
@@ -238,8 +218,7 @@ describe('Queues', () => {
       });
 
       it('should cancel any pending insert calls', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const fakeHandle = (1234 as unknown) as any;
+        const fakeHandle = (1234 as unknown) as NodeJS.Timer;
         const stub = sandbox.stub(global, 'clearTimeout').withArgs(fakeHandle);
 
         queue.pending = fakeHandle;
@@ -350,74 +329,39 @@ describe('Queues', () => {
           return callback(error, config);
         });
 
-        queue._insert(rows, callbacks, (err: any) => {
+        queue._insert(rows, callbacks, err => {
           assert.strictEqual(err, error);
 
           callbacks.forEach(callback => {
             const [err] = callback.lastCall.args;
             assert.strictEqual(err, error);
           });
-
-          done();
         });
+        done();
       });
 
       it('should execute callback with API response', done => {
-        // const requestStub = sandbox.stub(fakeTable, 'request');
         const row0Error = {errors: [{message: 'Error.', reason: 'notFound'}]};
-        const row1Error = {message: 'Error.', reason: 'notFound'};
         const apiResponse = {insertErrors: [row0Error]};
-        const ok = 10;
+
         queue.stream.on('error', () => {
           assert(true);
-          // assert.strictEqual(ok,100)
           done();
         });
-        // requestStub.resolves([apiResponse]);
         sandbox.stub(fakeTable, 'request').callsFake((config, callback) => {
           return callback(error, apiResponse);
         });
 
-        queue._insert(rows, callbacks, (err: any, apiResponse_: any) => {
+        queue._insert(rows, callbacks, (err, apiResponse_) => {
           assert.strictEqual(err, error);
 
           callbacks.forEach(callback => {
             const [err] = callback.lastCall.args;
             assert.strictEqual(err, error);
           });
-          // assert.ifError(err);
           assert.strictEqual(apiResponse_, apiResponse);
-          // done();
         });
       });
-
-      // it('should return partial failures', async () => {
-      //   const row0Error = {message: 'Error.', reason: 'notFound'};
-      //   const row1Error = {message: 'Error.', reason: 'notFound'};
-      //   const requestStub = sandbox.stub(fakeTable, 'request');
-      //   requestStub.resolves([
-      //     {
-      //       insertErrors: [
-      //         {index: 0, errors: [row0Error]},
-      //         {index: 1, errors: [row1Error]},
-      //       ],
-      //     },
-      //   ]);
-
-      //   const reflection = await reflectAfterTimer(async () => queue._insert(rows, []));
-      //   assert(reflection.isRejected);
-      //   const {reason} = reflection;
-      //   assert.deepStrictEqual((reason as GoogleErrorBody).errors, [
-      //     {
-      //       row: dataApiFormat.rows[0].json,
-      //       errors: [row0Error],
-      //     },
-      //     {
-      //       row: dataApiFormat.rows[1].json,
-      //       errors: [row1Error],
-      //     },
-      //   ]);
-      // });
     });
   });
 });

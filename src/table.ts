@@ -2215,11 +2215,14 @@ class Table extends ServiceObject {
   createInsertStream(options?: InsertStreamOptions): Writable {
     options = typeof options === 'object' ? options : {};
     const dup = new Duplex({objectMode: true});
-    dup._write = (chunk: any, encoding: any, cb: any) => {
+    dup._write = (
+      chunk: RowMetadata,
+      encoding: BufferEncoding,
+      cb: Function
+    ) => {
       this.rowQueue!.add(chunk, () => {});
-      cb();
+      cb!();
     };
-    dup._read = function() {};
 
     this.rowQueue = new RowQueue(this, dup, options);
     return dup as Writable;

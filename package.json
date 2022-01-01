@@ -57,6 +57,7 @@
     "extend": "^3.0.2",
     "is": "^3.3.0",
     "p-event": "^4.1.0",
+    "readable-stream": "^3.6.0",
     "stream-events": "^1.0.5",
     "uuid": "^8.0.0"
   },

@@ -36,7 +36,6 @@ import {BigQuery, Query} from '../src/bigquery';
 import {Job, JobOptions} from '../src/job';
 import {
   CopyTableMetadata,
-  InsertStreamOptions,
   JobLoadMetadata,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   Table,
@@ -950,10 +949,9 @@ describe('BigQuery/Table', () => {
     it('should create a row queue with options', async () => {
       const opts = {insertRowsOptions: {raw: false}};
       await table.createInsertStream(opts);
-      const queue = table.rowQueue
+      const queue = table.rowQueue;
       assert.deepStrictEqual(queue.insertRowsOptions, opts.insertRowsOptions);
     });
-
 
     it('should return a stream', () => {
       const stream = table.createInsertStream();
@@ -961,12 +959,12 @@ describe('BigQuery/Table', () => {
     });
 
     it('should add a row to the queue', () => {
-      const cb = sinon.stub()
+      const cb = sinon.stub();
       const chunk = {name: 'turing'};
       const stream = table.createInsertStream();
-      let rowQueue = table.rowQueue
+      const rowQueue = table.rowQueue;
       const stub = sandbox.stub(rowQueue, 'add');
-      stream._write(chunk, {}, cb)
+      stream._write(chunk, {}, cb);
       assert.ok(stub.calledOnceWith(chunk));
       assert.strictEqual(cb.callCount, 1);
     });

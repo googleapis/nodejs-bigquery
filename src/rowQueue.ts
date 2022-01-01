@@ -22,25 +22,27 @@ import {GoogleErrorBody} from '@google-cloud/common/build/src/util';
 import bigquery from './types';
 import {BATCH_LIMITS, RowBatch} from './rowBatch';
 import {Stream} from 'stream';
-import {RowBatchOptions, InsertRowsOptions} from './table';
+import {RowBatchOptions, InsertRowsOptions, RowMetadata} from './table';
 
-export const defaultOptions = {
+export interface MaxInsertOptions {
+  maxOutstandingRows: number;
+  maxOutstandingBytes: number;
+  maxDelayMillis: number;
+}
+
+export const defaultOptions: MaxInsertOptions = {
   // The maximum number of rows we'll batch up for insert().
   maxOutstandingRows: 300,
 
   // The maximum size of the total batched up rows for insert().
-  maxOutstandingBytes: Math.pow(1024, 2) * 9,
+  maxOutstandingBytes: 9 * 1024 * 1024,
 
   // The maximum time we'll wait to send batched rows, in milliseconds.
   maxDelayMillis: 10000,
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type RowMetadata = any;
+export type InsertRowsStreamResponse = bigquery.ITableDataInsertAllResponse;
 
-export type InsertRowsResponse = [
-  bigquery.ITableDataInsertAllResponse | bigquery.ITable
-];
 export type InsertRowsCallback = RequestCallback<
   bigquery.ITableDataInsertAllResponse | bigquery.ITable
 >;
@@ -137,7 +139,7 @@ export class RowQueue {
       delete this.pending;
     }
     if (rows.length > 0) {
-      this._insert(rows, callbacks, callback!);
+      this._insert(rows, callbacks, callback);
     }
   }
 
@@ -153,10 +155,6 @@ export class RowQueue {
     callbacks: InsertRowsCallback[],
     cb?: InsertRowsCallback
   ): void {
-    if (!cb) {
-      cb = () => {};
-    }
-
     const json = extend(true, {}, this.insertRowsOptions, {rows});
 
     delete json.createInsertId;
@@ -169,7 +167,7 @@ export class RowQueue {
         uri: '/insertAll',
         json,
       },
-      (err: any, resp: any) => {
+      (err, resp) => {
         const partialFailures = (resp.insertErrors || []).map(
           (insertError: GoogleErrorBody) => {
             return {
@@ -196,6 +194,7 @@ export class RowQueue {
         } else {
           callbacks.forEach(callback => callback!(err, resp));
           this.stream.emit('response', resp);
+          cb!(err, resp);
         }
         cb!(err, resp);
       }
@@ -216,12 +215,14 @@ export class RowQueue {
     };
 
     // TODO: set individual defaults for any unset options
-    const opts = typeof options === 'object' ? options : defaults;
+    // const opts = typeof options === 'object' ? options : defaults;
+
+    const opts = Object.assign(defaults, options);
 
     this.batchOptions = {
       maxBytes: Math.min(opts.maxBytes, BATCH_LIMITS.maxBytes),
       maxRows: Math.min(opts.maxRows!, BATCH_LIMITS.maxRows),
-      maxMilliseconds: opts.maxMilliseconds!,
+      maxMilliseconds: opts.maxMilliseconds,
     };
   }
 }

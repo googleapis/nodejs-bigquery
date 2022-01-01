@@ -23,6 +23,7 @@ import {describe, it, before, after} from 'mocha';
 import Big from 'big.js';
 import * as fs from 'fs';
 import * as uuid from 'uuid';
+const {Readable} = require('stream');
 
 import {
   BigQuery,
@@ -827,6 +828,29 @@ describe('BigQuery', () => {
         id: 1,
         name: null,
       });
+    });
+
+
+    it('should insert rows via insert stream', done => {
+      const array = [];
+      for (let i = 1; i < 10; i++) {
+        array.push({name: 'foo', id: i});
+      }
+
+      const rs = Readable.from(array);
+      rs.pipe(table.createInsertStream())
+        // These events aren't being emitted, despite the
+        // response being received from the API call.
+        .on('error', (err: any) => {
+          assert.strictEqual(err, {});
+          console.log('error!')
+          done();
+        })
+        .on('response', (resp: any) => {
+          assert.strictEqual(resp, {});
+          console.log('response!')
+          done();
+        })
     });
 
     it('should set & get metadata', async () => {
