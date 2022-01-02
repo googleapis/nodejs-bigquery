@@ -23,7 +23,6 @@ import {describe, it, before, after} from 'mocha';
 import Big from 'big.js';
 import * as fs from 'fs';
 import * as uuid from 'uuid';
-// const {Readable} = require('readable-stream')
 const Readable = require('readable-stream').Readable;
 
 import {
