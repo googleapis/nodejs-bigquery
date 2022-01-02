@@ -107,6 +107,9 @@ describe('BigQuery', () => {
     // Remove datasets created for the tests.
     await deleteDatasets();
 
+    // Remove jobs created for the tests.
+    await deleteJobs();
+
     // Create the test dataset with a label tagging this as a test run.
     await dataset.create({labels: {[GCLOUD_TESTS_PREFIX]: ''}});
 
@@ -655,6 +658,7 @@ describe('BigQuery', () => {
           },
         },
         location: 'us-east1',
+        jobPrefix: GCLOUD_TESTS_PREFIX,
       };
 
       const [job] = await bigquery.createJob(opts);
@@ -1759,6 +1763,24 @@ describe('BigQuery', () => {
           await dataset.delete({force: true});
         } catch (e) {
           console.log(`dataset(${dataset.id}).delete() failed`);
+          console.log(e);
+        }
+      }
+    }
+  }
+
+  async function deleteJobs() {
+    const oneDayMs = 86400000;
+    const now = new Date();
+    const maxCreationTime = (now.getTime() - oneDayMs).toString();
+    const [jobs] = await bigquery.getJobs({maxCreationTime});
+
+    for (const job of jobs) {
+      if (job.metadata.id.includes(GCLOUD_TESTS_PREFIX)) {
+        try {
+          await job.delete();
+        } catch (e) {
+          console.log(`job(${job.id}).delete() failed`);
           console.log(e);
         }
       }
