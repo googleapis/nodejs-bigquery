@@ -23,7 +23,8 @@ import {describe, it, before, after} from 'mocha';
 import Big from 'big.js';
 import * as fs from 'fs';
 import * as uuid from 'uuid';
-const {Readable} = require('stream');
+// const {Readable} = require('readable-stream')
+const Readable = require('readable-stream').Readable;
 
 import {
   BigQuery,
@@ -33,6 +34,7 @@ import {
   RowMetadata,
   Routine,
   Table,
+  InsertRowsStreamResponse,
 } from '../src';
 
 const bigquery = new BigQuery();
@@ -830,27 +832,35 @@ describe('BigQuery', () => {
       });
     });
 
-
     it('should insert rows via insert stream', done => {
-      const array = [];
-      for (let i = 1; i < 10; i++) {
-        array.push({name: 'foo', id: i});
+      const stream = Readable({objectMode: true});
+      stream._read = () => {};
+
+      for (let i = 0; i < 10; i++) {
+        stream.push({name: 'foo', id: i});
       }
 
-      const rs = Readable.from(array);
-      rs.pipe(table.createInsertStream())
-        // These events aren't being emitted, despite the
-        // response being received from the API call.
-        .on('error', (err: any) => {
-          assert.strictEqual(err, {});
-          console.log('error!')
+      const expectedResponse = 'bigquery#tableDataInsertAllResponse';
+
+      stream
+        .pipe(table.createInsertStream())
+        .on('response', (response: InsertRowsStreamResponse) => {
+          console.log(response);
+          assert.deepStrictEqual(response.kind, expectedResponse);
           done();
-        })
-        .on('response', (resp: any) => {
-          assert.strictEqual(resp, {});
-          console.log('response!')
-          done();
-        })
+        });
+    });
+
+    it('should return errors from insert stream', done => {
+      const stream = Readable({objectMode: true});
+      stream._read = () => {};
+
+      stream.push({wrong_name: 'foo', id: 1});
+
+      stream.pipe(table.createInsertStream()).on('error', (err: Error) => {
+        assert.deepStrictEqual(err.name, 'PartialFailureError');
+        done();
+      });
     });
 
     it('should set & get metadata', async () => {
