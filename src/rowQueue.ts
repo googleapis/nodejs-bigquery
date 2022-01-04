@@ -73,7 +73,7 @@ export class RowQueue {
   batch: RowBatch;
   batchOptions?: RowBatchOptions;
   inFlight: boolean;
-  pending?: NodeJS.Timer;
+  pending?: ReturnType<typeof setTimeout>;
   constructor(table: Table, dup: Stream, options?: InsertStreamOptions) {
     this.table = table;
     this.stream = dup;
