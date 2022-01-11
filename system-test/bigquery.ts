@@ -648,6 +648,25 @@ describe('BigQuery', () => {
     });
   });
 
+  describe('BigQuery/Job', () => {
+    it('should delete a job', async () => {
+      const opts = {
+        configuration: {
+          query: {
+            query: 'SELECT 100 as foo',
+          },
+        },
+        location: 'us-east1',
+      };
+
+      const [job] = await bigquery.createJob(opts);
+      const [resp] = await job.delete();
+      const [exists] = await job.exists();
+      assert.deepStrictEqual(resp, {});
+      assert.strictEqual(exists, false);
+    });
+  });
+
   describe('BigQuery/Model', () => {
     let model: Model;
     const bucket = storage.bucket(generateName('bucket'));

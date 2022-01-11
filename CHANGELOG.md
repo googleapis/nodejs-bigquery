@@ -4,6 +4,13 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## [5.10.0](https://www.github.com/googleapis/nodejs-bigquery/compare/v5.9.3...v5.10.0) (2022-01-10)
+
+
+### Features
+
+* Add jobs.delete and update to latest discovery types ([#1023](https://www.github.com/googleapis/nodejs-bigquery/issues/1023)) ([12f7771](https://www.github.com/googleapis/nodejs-bigquery/commit/12f77710accfca8c512d021a1c75a732c6c666f7))
+
 ### [5.9.3](https://www.github.com/googleapis/nodejs-bigquery/compare/v5.9.2...v5.9.3) (2021-12-13)
 
 

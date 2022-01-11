@@ -123,6 +123,13 @@ describe('BigQuery/Job', () => {
       assert.strictEqual(calledWith.baseUrl, '/jobs');
       assert.strictEqual(calledWith.id, JOB_ID);
       assert.deepStrictEqual(calledWith.methods, {
+        delete: {
+          reqOpts: {
+            method: 'DELETE',
+            uri: '/delete',
+            qs: {location: undefined},
+          },
+        },
         exists: true,
         get: true,
         getMetadata: {
