@@ -135,6 +135,53 @@ class Job extends Operation {
 
     const methods = {
       /**
+       * @callback DeleteJobCallback
+       * @param {?Error} err Request error, if any.
+       * @param {object} apiResponse The full API response.
+       */
+      /**
+       * @typedef {array} DeleteJobResponse
+       * @property {object} 0 The full API response.
+       */
+      /**
+       * Delete the job.
+       *
+       * @see [Jobs: delete API Documentation]{@link https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs/delete}
+       *
+       * @method Job#delete
+       * @param {DeleteJobCallback} [callback] The callback function.
+       * @param {?error} callback.err An error returned while making this
+       *     request.
+       * @param {object} callback.apiResponse The full API response.
+       * @returns {Promise<DeleteJobResponse>}
+       *
+       * @example
+       * const {BigQuery} = require('@google-cloud/bigquery');
+       * const bigquery = new BigQuery();
+       *
+       * const job = bigquery.job(jobId);
+       * job.delete((err, apiResponse) => {
+       *   if (!err) {
+       *     // The job was deleted successfully.
+       *   }
+       * });
+       *
+       * @example If the callback is omitted a Promise will be returned
+       * const [apiResponse] = await job.delete();
+       */
+      delete: {
+        reqOpts: {
+          method: 'DELETE',
+          uri: '/delete',
+          qs: {
+            get location() {
+              return location;
+            },
+          },
+        },
+      },
+
+      /**
        * @callback JobExistsCallback
        * @param {?Error} err Request error, if any.
        * @param {boolean} exists Indicates if the job exists.
