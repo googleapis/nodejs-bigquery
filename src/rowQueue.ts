@@ -207,22 +207,29 @@ export class RowQueue {
    *
    * @param {RowBatchOptions} [options] The batching options.
    */
-  setOptions(options?: RowBatchOptions): void {
-    const defaults = {
+  setOptions(options = {} as RowBatchOptions): void {
+    const defaults = this.getOptionDefaults();
+
+    const {maxBytes, maxRows, maxMilliseconds} = extend(
+      true,
+      defaults,
+      options
+    );
+
+    this.batchOptions = {
+      maxBytes: Math.min(maxBytes, BATCH_LIMITS.maxBytes),
+      maxRows: Math.min(maxRows!, BATCH_LIMITS.maxRows),
+      maxMilliseconds: maxMilliseconds,
+    };
+  }
+
+  getOptionDefaults(): RowBatchOptions {
+    // Return a unique copy to avoid shenanigans.
+    const defaults: RowBatchOptions = {
       maxBytes: defaultOptions.maxOutstandingBytes,
       maxRows: defaultOptions.maxOutstandingRows,
       maxMilliseconds: defaultOptions.maxDelayMillis,
     };
-
-    // TODO: set individual defaults for any unset options
-    // const opts = typeof options === 'object' ? options : defaults;
-
-    const opts = Object.assign(defaults, options);
-
-    this.batchOptions = {
-      maxBytes: Math.min(opts.maxBytes, BATCH_LIMITS.maxBytes),
-      maxRows: Math.min(opts.maxRows!, BATCH_LIMITS.maxRows),
-      maxMilliseconds: opts.maxMilliseconds,
-    };
+    return defaults;
   }
 }
