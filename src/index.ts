@@ -100,6 +100,10 @@ export {
 
 export {Routine} from './routine';
 
+export {RowBatch} from './rowBatch';
+
+export {InsertRowsStreamResponse, RowQueue} from './rowQueue';
+
 export {
   CopyTableMetadata,
   CreateCopyJobMetadata,
@@ -110,6 +114,7 @@ export {
   InsertRowsCallback,
   InsertRowsOptions,
   InsertRowsResponse,
+  InsertStreamOptions,
   JobLoadMetadata,
   PartialInsertFailure,
   PermissionsCallback,

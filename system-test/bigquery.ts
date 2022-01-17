@@ -23,6 +23,7 @@ import {describe, it, before, after} from 'mocha';
 import Big from 'big.js';
 import * as fs from 'fs';
 import * as uuid from 'uuid';
+const Readable = require('readable-stream').Readable;
 
 import {
   BigQuery,
@@ -32,6 +33,7 @@ import {
   RowMetadata,
   Routine,
   Table,
+  InsertRowsStreamResponse,
 } from '../src';
 
 const bigquery = new BigQuery();
@@ -845,6 +847,37 @@ describe('BigQuery', () => {
       return table.insert({
         id: 1,
         name: null,
+      });
+    });
+
+    it('should insert rows via insert stream', done => {
+      const stream = Readable({objectMode: true});
+      stream._read = () => {};
+
+      for (let i = 0; i < 10; i++) {
+        stream.push({name: 'foo', id: i});
+      }
+
+      const expectedResponse = 'bigquery#tableDataInsertAllResponse';
+
+      stream
+        .pipe(table.createInsertStream())
+        .on('response', (response: InsertRowsStreamResponse) => {
+          console.log(response);
+          assert.deepStrictEqual(response.kind, expectedResponse);
+          done();
+        });
+    });
+
+    it('should return errors from insert stream', done => {
+      const stream = Readable({objectMode: true});
+      stream._read = () => {};
+
+      stream.push({wrong_name: 'foo', id: 1});
+
+      stream.pipe(table.createInsertStream()).on('error', (err: Error) => {
+        assert.deepStrictEqual(err.name, 'PartialFailureError');
+        done();
       });
     });
 

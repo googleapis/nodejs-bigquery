@@ -53,6 +53,7 @@ import {Duplex, Writable} from 'stream';
 import {JobMetadata} from './job';
 import bigquery from './types';
 import {IntegerTypeCastOptions} from './bigquery';
+import {RowQueue} from './rowQueue';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const duplexify = require('duplexify');
@@ -160,6 +161,16 @@ export type PolicyCallback = RequestCallback<PolicyResponse>;
 export type PermissionsResponse = [bigquery.ITestIamPermissionsResponse];
 export type PermissionsCallback = RequestCallback<PermissionsResponse>;
 
+export interface InsertStreamOptions {
+  insertRowsOptions?: InsertRowsOptions;
+  batchOptions?: RowBatchOptions;
+}
+export interface RowBatchOptions {
+  maxBytes: number;
+  maxRows: number;
+  maxMilliseconds: number;
+}
+
 /**
  * The file formats accepted by BigQuery.
  *
@@ -208,6 +219,7 @@ class Table extends ServiceObject {
   dataset: Dataset;
   bigQuery: BigQuery;
   location?: string;
+  rowQueue?: RowQueue;
   createReadStream(options?: GetRowsOptions): ResourceStream<RowMetadata> {
     // placeholder body, overwritten in constructor
     return new ResourceStream<RowMetadata>({}, () => {});
@@ -2200,6 +2212,32 @@ class Table extends ServiceObject {
     return resp;
   }
 
+  createInsertStream(options?: InsertStreamOptions): Writable {
+    options = typeof options === 'object' ? options : {};
+    const dup = new Duplex({objectMode: true});
+    dup._write = (
+      chunk: RowMetadata,
+      encoding: BufferEncoding,
+      cb: Function
+    ) => {
+      this.rowQueue!.add(chunk, () => {});
+      cb!();
+    };
+
+    this.rowQueue = new RowQueue(this, dup, options);
+    return dup as Writable;
+  }
+
+  load(
+    source: string | File,
+    metadata?: JobLoadMetadata
+  ): Promise<JobMetadataResponse>;
+  load(
+    source: string | File,
+    metadata: JobLoadMetadata,
+    callback: JobMetadataCallback
+  ): void;
+  load(source: string | File, callback: JobMetadataCallback): void;
   /**
    * Load data from a local file or Storage {@link
    * https://googleapis.dev/nodejs/storage/latest/File.html File}.

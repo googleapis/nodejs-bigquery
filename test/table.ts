@@ -42,6 +42,8 @@ import {
   ViewDefinition,
 } from '../src/table';
 import bigquery from '../src/types';
+import {Duplex, Stream} from 'stream';
+import {RowQueue} from '../src/rowQueue';
 
 interface CalledWithTable extends ServiceObject {
   calledWith_: Array<{
@@ -935,6 +937,36 @@ describe('BigQuery/Table', () => {
       };
 
       table.createCopyFromJob(SOURCE_TABLE, done);
+    });
+  });
+
+  describe('createInsertStream', () => {
+    it('should create a row queue', async () => {
+      await table.createInsertStream();
+      assert(table.rowQueue instanceof RowQueue);
+    });
+
+    it('should create a row queue with options', async () => {
+      const opts = {insertRowsOptions: {raw: false}};
+      await table.createInsertStream(opts);
+      const queue = table.rowQueue;
+      assert.deepStrictEqual(queue.insertRowsOptions, opts.insertRowsOptions);
+    });
+
+    it('should return a stream', () => {
+      const stream = table.createInsertStream();
+      assert(stream instanceof Duplex);
+    });
+
+    it('should add a row to the queue', () => {
+      const cb = sinon.stub();
+      const chunk = {name: 'turing'};
+      const stream = table.createInsertStream();
+      const rowQueue = table.rowQueue;
+      const stub = sandbox.stub(rowQueue, 'add');
+      stream._write(chunk, {}, cb);
+      assert.ok(stub.calledOnceWith(chunk));
+      assert.strictEqual(cb.callCount, 1);
     });
   });
 
