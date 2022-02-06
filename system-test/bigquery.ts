@@ -660,6 +660,9 @@ describe('BigQuery', () => {
       };
 
       const [job] = await bigquery.createJob(opts);
+      // Job must finish before we can delete.  Wait for results.
+      await job.getQueryResults();
+
       const [resp] = await job.delete();
       const [exists] = await job.exists();
       assert.deepStrictEqual(resp, {});
