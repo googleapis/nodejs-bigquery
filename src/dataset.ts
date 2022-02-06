@@ -53,6 +53,7 @@ export interface DatasetDeleteOptions {
 
 export interface DatasetOptions {
   location?: string;
+  projectId?: string;
 }
 
 export type CreateDatasetOptions = bigquery.IDataset;
