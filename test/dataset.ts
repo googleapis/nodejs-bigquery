@@ -149,11 +149,11 @@ describe('BigQuery/Dataset', () => {
     });
 
     it('should capture user provided projectId', () => {
-      const PROJECTY = 'abc';
-      const options = {projectId: PROJECTY};
+      const projectIdOverride = 'octavia';
+      const options = {projectId: projectIdOverride};
       const ds = new Dataset(BIGQUERY, DATASET_ID, options);
 
-      assert.strictEqual(ds.projectId, PROJECTY);
+      assert.strictEqual(ds.projectId, projectIdOverride);
     });
 
     describe('createMethod', () => {
