@@ -53,6 +53,7 @@ export interface DatasetDeleteOptions {
 
 export interface DatasetOptions {
   location?: string;
+  projectId?: string;
 }
 
 export type CreateDatasetOptions = bigquery.IDataset;
@@ -121,6 +122,7 @@ export type TableCallback = ResourceCallback<Table, bigquery.ITable>;
 class Dataset extends ServiceObject {
   bigQuery: BigQuery;
   location?: string;
+  projectId?: string;
   getModelsStream(options?: GetModelsOptions): ResourceStream<Model> {
     // placeholder body, overwritten in constructor
     return new ResourceStream<Model>({}, () => {});
@@ -379,6 +381,10 @@ class Dataset extends ServiceObject {
       this.location = options.location;
     }
 
+    if (options?.projectId) {
+      this.projectId = options.projectId;
+    }
+
     this.bigQuery = bigQuery;
 
     // Catch all for read-modify-write cycle
@@ -388,6 +394,14 @@ class Dataset extends ServiceObject {
         if (reqOpts.method === 'PATCH' && reqOpts.json.etag) {
           reqOpts.headers = reqOpts.headers || {};
           reqOpts.headers['If-Match'] = reqOpts.json.etag;
+        }
+
+        if (this.projectId) {
+          // Override projectId if provided
+          reqOpts.uri = reqOpts.uri.replace(
+            `/projects/${this.bigQuery.projectId}/`,
+            `/projects/${this.projectId}/`
+          );
         }
         return reqOpts;
       },

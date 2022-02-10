@@ -148,6 +148,14 @@ describe('BigQuery/Dataset', () => {
       assert.strictEqual(ds.location, LOCATION);
     });
 
+    it('should capture user provided projectId', () => {
+      const projectIdOverride = 'octavia';
+      const options = {projectId: projectIdOverride};
+      const ds = new Dataset(BIGQUERY, DATASET_ID, options);
+
+      assert.strictEqual(ds.projectId, projectIdOverride);
+    });
+
     describe('createMethod', () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let bq: any;
@@ -194,6 +202,25 @@ describe('BigQuery/Dataset', () => {
 
         ds.location = LOCATION;
         config.createMethod(DATASET_ID, done);
+      });
+    });
+
+    describe('projectId override interceptor', () => {
+      const projectIdOverride = 'DuBois';
+
+      it('should use projectId override uri', () => {
+        ds = new Dataset(BIGQUERY, DATASET_ID, {projectId: projectIdOverride});
+        const interceptor = ds.interceptors.pop();
+        const fakeReqOpts = {
+          method: 'PATCH',
+          json: {
+            etag: '',
+          },
+          uri: `/projects/${ds.bigQuery.projectId}/`,
+        };
+
+        const reqOpts = interceptor.request(fakeReqOpts);
+        assert.deepStrictEqual(reqOpts.uri, `/projects/${projectIdOverride}/`);
       });
     });
 
