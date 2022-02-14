@@ -4,6 +4,19 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## [5.11.0](https://github.com/googleapis/nodejs-bigquery/compare/v5.10.0...v5.11.0) (2022-02-10)
+
+
+### Features
+
+* add cross-project support ([#1079](https://github.com/googleapis/nodejs-bigquery/issues/1079)) ([f6a7456](https://github.com/googleapis/nodejs-bigquery/commit/f6a745682f2c25d6dfa676975d2af3d0984fe6c0))
+* add table.createInsertStream for native streaming inserts ([#997](https://github.com/googleapis/nodejs-bigquery/issues/997)) ([0ffe544](https://github.com/googleapis/nodejs-bigquery/commit/0ffe544d8961f294e520519a077b59838135699f))
+
+
+### Bug Fixes
+
+* wait for job finish before deletion ([#1071](https://github.com/googleapis/nodejs-bigquery/issues/1071)) ([5b77718](https://github.com/googleapis/nodejs-bigquery/commit/5b777181a2c05ca32aea84a1fc8c6fbc3f1252be))
+
 ## [5.10.0](https://www.github.com/googleapis/nodejs-bigquery/compare/v5.9.3...v5.10.0) (2022-01-10)
 
 
