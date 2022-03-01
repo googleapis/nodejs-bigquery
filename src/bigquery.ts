@@ -66,6 +66,7 @@ export type JobRequest<J> = J & {
   jobId?: string;
   jobPrefix?: string;
   location?: string;
+  projectId?: string;
 };
 
 export type PagedRequest<P> = P & {

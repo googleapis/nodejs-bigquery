@@ -147,6 +147,13 @@ describe('BigQuery/Job', () => {
       assert.strictEqual(job.location, options.location);
     });
 
+    it('should accept a projectId option', () => {
+      const options = {projectId: 'cool-project'};
+      const job = new Job(BIGQUERY, JOB_ID, options);
+
+      assert.strictEqual(job.projectId, options.projectId);
+    });
+
     it('should send the location via getMetadata', () => {
       const job = new Job(BIGQUERY, JOB_ID, {location: LOCATION});
       const calledWith = job.calledWith_[0];
