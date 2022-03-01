@@ -73,7 +73,7 @@ const fakePaginator = {
 
 const sandbox = sinon.createSandbox();
 
-describe.only('BigQuery/Job', () => {
+describe('BigQuery/Job', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const BIGQUERY: any = {
     projectId: 'my-project',
