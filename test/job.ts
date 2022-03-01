@@ -73,7 +73,7 @@ const fakePaginator = {
 
 const sandbox = sinon.createSandbox();
 
-describe('BigQuery/Job', () => {
+describe.only('BigQuery/Job', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const BIGQUERY: any = {
     projectId: 'my-project',
@@ -145,6 +145,13 @@ describe('BigQuery/Job', () => {
       const job = new Job(BIGQUERY, JOB_ID, options);
 
       assert.strictEqual(job.location, options.location);
+    });
+
+    it('should accept a projectId option', () => {
+      const options = {projectId: 'cool-project'};
+      const job = new Job(BIGQUERY, JOB_ID, options);
+
+      assert.strictEqual(job.projectId, options.projectId);
     });
 
     it('should send the location via getMetadata', () => {

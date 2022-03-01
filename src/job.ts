@@ -124,6 +124,7 @@ export type QueryResultsOptions = {
 class Job extends Operation {
   bigQuery: BigQuery;
   location?: string;
+  projectId?: string;
   getQueryResultsStream(
     options?: QueryResultsOptions
   ): ResourceStream<RowMetadata> {
@@ -342,6 +343,10 @@ class Job extends Operation {
 
     if (options && options.location) {
       this.location = options.location;
+    }
+
+    if (options?.projectId) {
+      this.projectId = options.projectId;
     }
 
     /**
