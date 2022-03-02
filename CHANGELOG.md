@@ -4,6 +4,13 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## [5.12.0](https://github.com/googleapis/nodejs-bigquery/compare/v5.11.0...v5.12.0) (2022-03-02)
+
+
+### Features
+
+* add support for accessing jobs cross-project ([#1083](https://github.com/googleapis/nodejs-bigquery/issues/1083)) ([9e5bae2](https://github.com/googleapis/nodejs-bigquery/commit/9e5bae22cecb8c012504f21d8d09df436dc3d978))
+
 ## [5.11.0](https://github.com/googleapis/nodejs-bigquery/compare/v5.10.0...v5.11.0) (2022-02-10)
 
 
