@@ -273,6 +273,25 @@ describe('BigQuery', () => {
       assert.deepStrictEqual(calledWith.scopes, expectedScopes);
     });
 
+    it('should pass autoRetry from options', () => {
+      const bq = new BigQuery({
+        autoRetry: false,
+      });
+
+      const calledWith = bq.calledWith_[0];
+      assert.deepStrictEqual(calledWith.autoRetry, false);
+    });
+
+    it('should pass maxRetries from options', () => {
+      const retryVal = 1;
+      const bq = new BigQuery({
+        maxRetries: retryVal,
+      });
+
+      const calledWith = bq.calledWith_[0];
+      assert.deepStrictEqual(calledWith.maxRetries, retryVal);
+    });
+
     it('should not modify options argument', () => {
       const options = {
         projectId: PROJECT_ID,

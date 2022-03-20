@@ -326,6 +326,9 @@ export class BigQuery extends Service {
       baseUrl,
       scopes: ['https://www.googleapis.com/auth/bigquery'],
       packageJson: require('../../package.json'),
+      autoRetry: options.autoRetry,
+      maxRetries: options.maxRetries,
+      // what if we pass in retryOptions.maxRetries, retryOptions.autoRetry
     };
 
     if (options.scopes) {
