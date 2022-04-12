@@ -77,7 +77,7 @@
     "@types/uuid": "^8.0.0",
     "c8": "^7.0.0",
     "codecov": "^3.5.0",
-    "discovery-tsd": "^0.2.0",
+    "discovery-tsd": "^0.3.0",
     "execa": "^5.0.0",
     "gts": "^3.0.0",
     "jsdoc": "^3.6.3",
