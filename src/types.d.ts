@@ -570,6 +570,17 @@ declare namespace bigquery {
     count?: string;
   };
 
+  type ICloneDefinition = {
+    /**
+     * [Required] Reference describing the ID of the table that was cloned.
+     */
+    baseTableReference?: ITableReference;
+    /**
+     * [Required] The time at which the base table was cloned. This value is reported in the JSON response using RFC3339 format.
+     */
+    cloneTime?: string;
+  };
+
   /**
    * Message containing the information about one cluster.
    */
@@ -696,6 +707,10 @@ declare namespace bigquery {
      */
     evaluationTable?: ITableReference;
     /**
+     * Table reference of the test data after split.
+     */
+    testTable?: ITableReference;
+    /**
      * Table reference of the training data after split.
      */
     trainingTable?: ITableReference;
@@ -801,6 +816,10 @@ declare namespace bigquery {
      */
     location?: string;
     /**
+     * [Optional] Number of hours for the max time travel for all tables in the dataset.
+     */
+    maxTimeTravelHours?: string;
+    /**
      * [Output-only] Reserved for future use.
      */
     satisfiesPZS?: boolean;
@@ -808,6 +827,19 @@ declare namespace bigquery {
      * [Output-only] A URL that can be used to access the resource again. You can use this URL in Get or Update requests to the resource.
      */
     selfLink?: string;
+    /**
+     * [Optional]The tags associated with this dataset. Tag keys are globally unique.
+     */
+    tags?: Array<{
+      /**
+       * [Required] The namespaced friendly name of the tag key, e.g. "12345/environment" where 12345 is org id.
+       */
+      tagKey?: string;
+      /**
+       * [Required] Friendly short name of the tag value, e.g. "production".
+       */
+      tagValue?: string;
+    }>;
   };
 
   type IDatasetAccessEntry = {
@@ -815,12 +847,7 @@ declare namespace bigquery {
      * [Required] The dataset this entry applies to.
      */
     dataset?: IDatasetReference;
-    target_types?: Array<{
-      /**
-       * [Required] Which resources in the dataset this entry applies to. Currently, only views are supported, but additional target types may be added in the future. Possible values: VIEWS: This entry applies to all views in the dataset.
-       */
-      targetType?: string;
-    }>;
+    targetTypes?: Array<'TARGET_TYPE_UNSPECIFIED' | 'VIEWS'>;
   };
 
   type IDatasetList = {
@@ -897,6 +924,16 @@ declare namespace bigquery {
     labels?: {[key: string]: string};
   };
 
+  /**
+   * Model evaluation metrics for dimensionality reduction models.
+   */
+  type IDimensionalityReductionMetrics = {
+    /**
+     * Total percentage of variance explained by the selected principal components.
+     */
+    totalExplainedVarianceRatio?: number;
+  };
+
   type IDmlStatistics = {
     /**
      * Number of deleted Rows. populated by DML DELETE, MERGE and TRUNCATE statements.
@@ -910,6 +947,44 @@ declare namespace bigquery {
      * Number of updated Rows. Populated by DML UPDATE and MERGE statements.
      */
     updatedRowCount?: string;
+  };
+
+  /**
+   * Discrete candidates of a double hyperparameter.
+   */
+  type IDoubleCandidates = {
+    /**
+     * Candidates for the double parameter in increasing order.
+     */
+    candidates?: Array<number>;
+  };
+
+  /**
+   * Search space for a double hyperparameter.
+   */
+  type IDoubleHparamSearchSpace = {
+    /**
+     * Candidates of the double hyperparameter.
+     */
+    candidates?: IDoubleCandidates;
+    /**
+     * Range of the double hyperparameter.
+     */
+    range?: IDoubleRange;
+  };
+
+  /**
+   * Range of a double hyperparameter.
+   */
+  type IDoubleRange = {
+    /**
+     * Max value of the double parameter.
+     */
+    max?: number;
+    /**
+     * Min value of the double parameter.
+     */
+    min?: number;
   };
 
   type IEncryptionConfiguration = {
@@ -968,6 +1043,10 @@ declare namespace bigquery {
      * Populated for clustering models.
      */
     clusteringMetrics?: IClusteringMetrics;
+    /**
+     * Evaluation metrics when the model is a dimensionality reduction model, which currently includes PCA.
+     */
+    dimensionalityReductionMetrics?: IDimensionalityReductionMetrics;
     /**
      * Populated for multi-class classification/classifier models.
      */
@@ -1114,6 +1193,20 @@ declare namespace bigquery {
      * Human-readable stage descriptions.
      */
     substeps?: Array<string>;
+  };
+
+  /**
+   * Explanation for a single feature.
+   */
+  type IExplanation = {
+    /**
+     * Attribution of feature.
+     */
+    attribution?: number;
+    /**
+     * The full feature name. For non-numerical features, will be formatted like `.`. Overall size of feature name will always be truncated to first 120 characters.
+     */
+    featureName?: string;
   };
 
   /**
@@ -1301,6 +1394,20 @@ declare namespace bigquery {
     kind?: string;
   };
 
+  /**
+   * Global explanations containing the top most important features after training.
+   */
+  type IGlobalExplanation = {
+    /**
+     * Class label for this set of global explanations. Will be empty/null for binary logistic and linear regression models. Sorted alphabetically in descending order.
+     */
+    classLabel?: string;
+    /**
+     * A list of the top global explanations. Sorted by absolute value of attribution in descending order.
+     */
+    explanations?: Array<IExplanation>;
+  };
+
   type IGoogleSheetsOptions = {
     /**
      * [Optional] Range of a sheet to query from. Only used when non-empty. Typical format: sheet_name!top_left_cell_id:bottom_right_cell_id For example: sheet1!A1:B20
@@ -1325,6 +1432,211 @@ declare namespace bigquery {
      * [Optional] When hive partition detection is requested, a common prefix for all source uris should be supplied. The prefix must end immediately before the partition key encoding begins. For example, consider files following this data layout. gs://bucket/path_to_table/dt=2019-01-01/country=BR/id=7/file.avro gs://bucket/path_to_table/dt=2018-12-31/country=CA/id=3/file.avro When hive partitioning is requested with either AUTO or STRINGS detection, the common prefix can be either of gs://bucket/path_to_table or gs://bucket/path_to_table/ (trailing slash does not matter).
      */
     sourceUriPrefix?: string;
+  };
+
+  /**
+   * Hyperparameter search spaces. These should be a subset of training_options.
+   */
+  type IHparamSearchSpaces = {
+    /**
+     * Activation functions of neural network models.
+     */
+    activationFn?: IStringHparamSearchSpace;
+    /**
+     * Mini batch sample size.
+     */
+    batchSize?: IIntHparamSearchSpace;
+    /**
+     * Booster type for boosted tree models.
+     */
+    boosterType?: IStringHparamSearchSpace;
+    /**
+     * Subsample ratio of columns for each level for boosted tree models.
+     */
+    colsampleBylevel?: IDoubleHparamSearchSpace;
+    /**
+     * Subsample ratio of columns for each node(split) for boosted tree models.
+     */
+    colsampleBynode?: IDoubleHparamSearchSpace;
+    /**
+     * Subsample ratio of columns when constructing each tree for boosted tree models.
+     */
+    colsampleBytree?: IDoubleHparamSearchSpace;
+    /**
+     * Dart normalization type for boosted tree models.
+     */
+    dartNormalizeType?: IStringHparamSearchSpace;
+    /**
+     * Dropout probability for dnn model training and boosted tree models using dart booster.
+     */
+    dropout?: IDoubleHparamSearchSpace;
+    /**
+     * Hidden units for neural network models.
+     */
+    hiddenUnits?: IIntArrayHparamSearchSpace;
+    /**
+     * L1 regularization coefficient.
+     */
+    l1Reg?: IDoubleHparamSearchSpace;
+    /**
+     * L2 regularization coefficient.
+     */
+    l2Reg?: IDoubleHparamSearchSpace;
+    /**
+     * Learning rate of training jobs.
+     */
+    learnRate?: IDoubleHparamSearchSpace;
+    /**
+     * Maximum depth of a tree for boosted tree models.
+     */
+    maxTreeDepth?: IIntHparamSearchSpace;
+    /**
+     * Minimum split loss for boosted tree models.
+     */
+    minSplitLoss?: IDoubleHparamSearchSpace;
+    /**
+     * Minimum sum of instance weight needed in a child for boosted tree models.
+     */
+    minTreeChildWeight?: IIntHparamSearchSpace;
+    /**
+     * Number of clusters for k-means.
+     */
+    numClusters?: IIntHparamSearchSpace;
+    /**
+     * Number of latent factors to train on.
+     */
+    numFactors?: IIntHparamSearchSpace;
+    /**
+     * Number of parallel trees for boosted tree models.
+     */
+    numParallelTree?: IIntHparamSearchSpace;
+    /**
+     * Optimizer of TF models.
+     */
+    optimizer?: IStringHparamSearchSpace;
+    /**
+     * Subsample the training data to grow tree to prevent overfitting for boosted tree models.
+     */
+    subsample?: IDoubleHparamSearchSpace;
+    /**
+     * Tree construction algorithm for boosted tree models.
+     */
+    treeMethod?: IStringHparamSearchSpace;
+    /**
+     * Hyperparameter for matrix factoration when implicit feedback type is specified.
+     */
+    walsAlpha?: IDoubleHparamSearchSpace;
+  };
+
+  /**
+   * Training info of a trial in [hyperparameter tuning](/bigquery-ml/docs/reference/standard-sql/bigqueryml-syntax-hp-tuning-overview) models.
+   */
+  type IHparamTuningTrial = {
+    /**
+     * Ending time of the trial.
+     */
+    endTimeMs?: string;
+    /**
+     * Error message for FAILED and INFEASIBLE trial.
+     */
+    errorMessage?: string;
+    /**
+     * Loss computed on the eval data at the end of trial.
+     */
+    evalLoss?: number;
+    /**
+     * Evaluation metrics of this trial calculated on the test data. Empty in Job API.
+     */
+    evaluationMetrics?: IEvaluationMetrics;
+    /**
+     * Hyperparameter tuning evaluation metrics of this trial calculated on the eval data. Unlike evaluation_metrics, only the fields corresponding to the hparam_tuning_objectives are set.
+     */
+    hparamTuningEvaluationMetrics?: IEvaluationMetrics;
+    /**
+     * The hyperprameters selected for this trial.
+     */
+    hparams?: ITrainingOptions;
+    /**
+     * Starting time of the trial.
+     */
+    startTimeMs?: string;
+    /**
+     * The status of the trial.
+     */
+    status?:
+      | 'TRIAL_STATUS_UNSPECIFIED'
+      | 'NOT_STARTED'
+      | 'RUNNING'
+      | 'SUCCEEDED'
+      | 'FAILED'
+      | 'INFEASIBLE'
+      | 'STOPPED_EARLY';
+    /**
+     * Loss computed on the training data at the end of trial.
+     */
+    trainingLoss?: number;
+    /**
+     * 1-based index of the trial.
+     */
+    trialId?: string;
+  };
+
+  /**
+   * An array of int.
+   */
+  type IIntArray = {
+    /**
+     * Elements in the int array.
+     */
+    elements?: Array<string>;
+  };
+
+  /**
+   * Search space for int array.
+   */
+  type IIntArrayHparamSearchSpace = {
+    /**
+     * Candidates for the int array parameter.
+     */
+    candidates?: Array<IIntArray>;
+  };
+
+  /**
+   * Discrete candidates of an int hyperparameter.
+   */
+  type IIntCandidates = {
+    /**
+     * Candidates for the int parameter in increasing order.
+     */
+    candidates?: Array<string>;
+  };
+
+  /**
+   * Search space for an int hyperparameter.
+   */
+  type IIntHparamSearchSpace = {
+    /**
+     * Candidates of the int hyperparameter.
+     */
+    candidates?: IIntCandidates;
+    /**
+     * Range of the int hyperparameter.
+     */
+    range?: IIntRange;
+  };
+
+  /**
+   * Range of an int hyperparameter.
+   */
+  type IIntRange = {
+    /**
+     * Max value of the int parameter.
+     */
+    max?: string;
+    /**
+     * Min value of the int parameter.
+     */
+    min?: string;
   };
 
   type IIterationResult = {
@@ -1543,6 +1855,10 @@ declare namespace bigquery {
      * [Optional] Options to configure parquet support.
      */
     parquetOptions?: IParquetOptions;
+    /**
+     * [Optional] Preserves the embedded ASCII control characters (the first 32 characters in the ASCII-table, from '\x00' to '\x1F') when loading from CSV. Only applicable to CSV, ignored for other formats.
+     */
+    preserveAsciiControlCharacters?: boolean;
     /**
      * If sourceFormat is set to "DATASTORE_BACKUP", indicates which entity properties to load into BigQuery from a Cloud Datastore backup. Property names are case sensitive and must be top-level properties. If no properties are specified, BigQuery loads all properties. If any named property isn't found in the Cloud Datastore backup, an invalid error is returned in the job result.
      */
@@ -1808,6 +2124,10 @@ declare namespace bigquery {
      */
     completionRatio?: number;
     /**
+     * [Output-only] Statistics for a copy job.
+     */
+    copy?: IJobStatistics5;
+    /**
      * [Output-only] Creation time of this job, in milliseconds since the epoch. This field will be present on all jobs.
      */
     creationTime?: string;
@@ -2052,6 +2372,17 @@ declare namespace bigquery {
     inputBytes?: string;
   };
 
+  type IJobStatistics5 = {
+    /**
+     * [Output-only] Number of logical bytes copied to the destination table.
+     */
+    copied_logical_bytes?: string;
+    /**
+     * [Output-only] Number of rows copied to the destination table.
+     */
+    copied_rows?: string;
+  };
+
   type IJobStatus = {
     /**
      * [Output-only] Final error result of the job. If present, indicates that the job has completed and was unsuccessful.
@@ -2160,6 +2491,10 @@ declare namespace bigquery {
      */
     creationTime?: string;
     /**
+     * Output only. The default trial_id to use in TVFs when the trial_id is not passed in. For single-objective [hyperparameter tuning](/bigquery-ml/docs/reference/standard-sql/bigqueryml-syntax-hp-tuning-overview) models, this is the best trial ID. For multi-objective [hyperparameter tuning](/bigquery-ml/docs/reference/standard-sql/bigqueryml-syntax-hp-tuning-overview) models, this is the smallest trial ID among all Pareto optimal trials.
+     */
+    defaultTrialId?: string;
+    /**
      * Optional. A user-friendly description of this model.
      */
     description?: string;
@@ -2183,6 +2518,14 @@ declare namespace bigquery {
      * Optional. A descriptive name for this model.
      */
     friendlyName?: string;
+    /**
+     * Output only. All hyperparameter search spaces in this model.
+     */
+    hparamSearchSpaces?: IHparamSearchSpaces;
+    /**
+     * Output only. Trials of a [hyperparameter tuning](/bigquery-ml/docs/reference/standard-sql/bigqueryml-syntax-hp-tuning-overview) model sorted by trial_id.
+     */
+    hparamTrials?: Array<IHparamTuningTrial>;
     /**
      * Output only. Label columns that were used to train this model. The output of the model will have a "predicted_" prefix to these columns.
      */
@@ -2220,7 +2563,13 @@ declare namespace bigquery {
       | 'ARIMA'
       | 'AUTOML_REGRESSOR'
       | 'AUTOML_CLASSIFIER'
+      | 'PCA'
+      | 'AUTOENCODER'
       | 'ARIMA_PLUS';
+    /**
+     * Output only. For single-objective [hyperparameter tuning](/bigquery-ml/docs/reference/standard-sql/bigqueryml-syntax-hp-tuning-overview) models, it only contains the best trial. For multi-objective [hyperparameter tuning](/bigquery-ml/docs/reference/standard-sql/bigqueryml-syntax-hp-tuning-overview) models, it contains all Pareto optimal trials sorted by trial_id.
+     */
+    optimalTrialIds?: Array<string>;
     /**
      * Output only. Information for all training runs in increasing order of start_time.
      */
@@ -2302,6 +2651,28 @@ declare namespace bigquery {
      * Specifies the format of the policy. Valid values are `0`, `1`, and `3`. Requests that specify an invalid value are rejected. Any operation that affects conditional role bindings must specify version `3`. This requirement applies to the following operations: * Getting a policy that includes a conditional role binding * Adding a conditional role binding to a policy * Changing a conditional role binding in a policy * Removing any role binding, with or without a condition, from a policy that includes conditions **Important:** If you use IAM Conditions, you must include the `etag` field whenever you call `setIamPolicy`. If you omit this field, then IAM allows you to overwrite a version `3` policy with a version `1` policy, and all of the conditions in the version `3` policy are lost. If a policy does not include any conditions, operations on that policy may specify any valid version or leave the field unset. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
      */
     version?: number;
+  };
+
+  /**
+   * Principal component infos, used only for eigen decomposition based models, e.g., PCA. Ordered by explained_variance in the descending order.
+   */
+  type IPrincipalComponentInfo = {
+    /**
+     * The explained_variance is pre-ordered in the descending order to compute the cumulative explained variance ratio.
+     */
+    cumulativeExplainedVarianceRatio?: number;
+    /**
+     * Explained variance by this principal component, which is simply the eigenvalue.
+     */
+    explainedVariance?: number;
+    /**
+     * Explained_variance over the total explained variance.
+     */
+    explainedVarianceRatio?: number;
+    /**
+     * Id of the principal component.
+     */
+    principalComponentId?: string;
   };
 
   type IProjectList = {
@@ -2855,7 +3226,7 @@ declare namespace bigquery {
   };
 
   /**
-   * The type of a variable, e.g., a function argument. Examples: INT64: {type_kind="INT64"} ARRAY: {type_kind="ARRAY", array_element_type="STRING"} STRUCT>: {type_kind="STRUCT", struct_type={fields=[ {name="x", type={type_kind="STRING"}}, {name="y", type={type_kind="ARRAY", array_element_type="DATE"}} ]}}
+   * The data type of a variable such as a function argument. Examples include: * INT64: `{"typeKind": "INT64"}` * ARRAY: { "typeKind": "ARRAY", "arrayElementType": {"typeKind": "STRING"} } * STRUCT>: { "typeKind": "STRUCT", "structType": { "fields": [ { "name": "x", "type": {"typeKind: "STRING"} }, { "name": "y", "type": { "typeKind": "ARRAY", "arrayElementType": {"typekind": "DATE"} } } ] } }
    */
   type IStandardSqlDataType = {
     /**
@@ -2930,7 +3301,21 @@ declare namespace bigquery {
     oldestEntryTime?: string;
   };
 
+  /**
+   * Search space for string and enum.
+   */
+  type IStringHparamSearchSpace = {
+    /**
+     * Canididates for the string or enum parameter in lower case.
+     */
+    candidates?: Array<string>;
+  };
+
   type ITable = {
+    /**
+     * [Output-only] Clone definition.
+     */
+    cloneDefinition?: ICloneDefinition;
     /**
      * [Beta] Clustering specification for the table. Must be specified with partitioning, data in the table will be first partitioned and subsequently clustered.
      */
@@ -3011,6 +3396,38 @@ declare namespace bigquery {
      * [Output-only] The number of rows of data in this table, excluding any data in the streaming buffer.
      */
     numRows?: string;
+    /**
+     * [Output-only] Number of logical bytes that are less than 90 days old.
+     */
+    num_active_logical_bytes?: string;
+    /**
+     * [Output-only] Number of physical bytes less than 90 days old. This data is not kept in real time, and might be delayed by a few seconds to a few minutes.
+     */
+    num_active_physical_bytes?: string;
+    /**
+     * [Output-only] Number of logical bytes that are more than 90 days old.
+     */
+    num_long_term_logical_bytes?: string;
+    /**
+     * [Output-only] Number of physical bytes more than 90 days old. This data is not kept in real time, and might be delayed by a few seconds to a few minutes.
+     */
+    num_long_term_physical_bytes?: string;
+    /**
+     * [Output-only] The number of partitions present in the table or materialized view. This data is not kept in real time, and might be delayed by a few seconds to a few minutes.
+     */
+    num_partitions?: string;
+    /**
+     * [Output-only] Number of physical bytes used by time travel storage (deleted or changed data). This data is not kept in real time, and might be delayed by a few seconds to a few minutes.
+     */
+    num_time_travel_physical_bytes?: string;
+    /**
+     * [Output-only] Total number of logical bytes in the table or materialized view.
+     */
+    num_total_logical_bytes?: string;
+    /**
+     * [Output-only] The physical size of this table in bytes. This also includes storage used for time travel. This data is not kept in real time, and might be delayed by a few seconds to a few minutes.
+     */
+    num_total_physical_bytes?: string;
     /**
      * [TrustedTester] Range partitioning specification for this table. Only one of timePartitioning and rangePartitioning should be specified.
      */
@@ -3351,6 +3768,10 @@ declare namespace bigquery {
      */
     boosterType?: 'BOOSTER_TYPE_UNSPECIFIED' | 'GBTREE' | 'DART';
     /**
+     * Whether or not p-value test should be computed for this model. Only available for linear and logistic regression models.
+     */
+    calculatePValues?: boolean;
+    /**
      * If true, clean spikes and dips in the input time series.
      */
     cleanSpikesAndDips?: boolean;
@@ -3417,6 +3838,10 @@ declare namespace bigquery {
      * Whether to stop early when the loss doesn't improve significantly any more (compared to min_relative_progress). Used only for iterative training algorithms.
      */
     earlyStop?: boolean;
+    /**
+     * If true, enable global explanation during training.
+     */
+    enableGlobalExplain?: boolean;
     /**
      * Feedback type that specifies which algorithm to run for matrix factorization.
      */
@@ -3503,6 +3928,28 @@ declare namespace bigquery {
      */
     horizon?: string;
     /**
+     * The target evaluation metrics to optimize the hyperparameters for.
+     */
+    hparamTuningObjectives?: Array<
+      | 'HPARAM_TUNING_OBJECTIVE_UNSPECIFIED'
+      | 'MEAN_ABSOLUTE_ERROR'
+      | 'MEAN_SQUARED_ERROR'
+      | 'MEAN_SQUARED_LOG_ERROR'
+      | 'MEDIAN_ABSOLUTE_ERROR'
+      | 'R_SQUARED'
+      | 'EXPLAINED_VARIANCE'
+      | 'PRECISION'
+      | 'RECALL'
+      | 'ACCURACY'
+      | 'F1_SCORE'
+      | 'LOG_LOSS'
+      | 'ROC_AUC'
+      | 'DAVIES_BOULDIN_INDEX'
+      | 'MEAN_AVERAGE_PRECISION'
+      | 'NORMALIZED_DISCOUNTED_CUMULATIVE_GAIN'
+      | 'AVERAGE_RANK'
+    >;
+    /**
      * Include drift when fitting an ARIMA model.
      */
     includeDrift?: boolean;
@@ -3514,6 +3961,10 @@ declare namespace bigquery {
      * Name of input label columns in training data.
      */
     inputLabelColumns?: Array<string>;
+    /**
+     * Number of integral steps for the integrated gradients explain method.
+     */
+    integratedGradientsNumSteps?: string;
     /**
      * Item column specified for matrix factorization models.
      */
@@ -3562,6 +4013,10 @@ declare namespace bigquery {
      */
     maxIterations?: string;
     /**
+     * Maximum number of trials to run in parallel.
+     */
+    maxParallelTrials?: string;
+    /**
      * Maximum depth of a tree for boosted tree models.
      */
     maxTreeDepth?: string;
@@ -3598,6 +4053,10 @@ declare namespace bigquery {
      */
     numParallelTree?: string;
     /**
+     * Number of trials to run this hyperparameter tuning job.
+     */
+    numTrials?: string;
+    /**
      * Optimization strategy for training linear regression models.
      */
     optimizationStrategy?:
@@ -3608,6 +4067,10 @@ declare namespace bigquery {
      * Whether to preserve the input structs in output feature names. Suppose there is a struct A with field b. When false (default), the output feature name is A_b. When true, the output feature name is A.b.
      */
     preserveInputStructs?: boolean;
+    /**
+     * Number of paths for the sampled shapley explain method.
+     */
+    sampledShapleyNumPaths?: string;
     /**
      * Subsample fraction of the training data to grow tree to prevent overfitting for boosted tree models.
      */
@@ -3656,6 +4119,10 @@ declare namespace bigquery {
    */
   type ITrainingRun = {
     /**
+     * Global explanation contains the explanation of top features on the class level. Applies to classification models only.
+     */
+    classLevelGlobalExplanations?: Array<IGlobalExplanation>;
+    /**
      * Data split result of the training run. Only set when the input data is actually split.
      */
     dataSplitResult?: IDataSplitResult;
@@ -3663,6 +4130,10 @@ declare namespace bigquery {
      * The evaluation metrics over training/eval data that were computed at the end of training.
      */
     evaluationMetrics?: IEvaluationMetrics;
+    /**
+     * Global explanation contains the explanation of top features on the model level. Applies to both regression and classification models.
+     */
+    modelLevelGlobalExplanation?: IGlobalExplanation;
     /**
      * Output of each iteration run, results.size() <= max_iterations.
      */
@@ -3675,6 +4146,14 @@ declare namespace bigquery {
      * Options that were used for this training run, includes user specified and default options that were used.
      */
     trainingOptions?: ITrainingOptions;
+    /**
+     * The model id in Vertex AI Model Registry for this training run
+     */
+    vertexAiModelId?: string;
+    /**
+     * The model version in Vertex AI Model Registry for this training run
+     */
+    vertexAiModelVersion?: string;
   };
 
   type ITransactionInfo = {
@@ -3843,7 +4322,7 @@ declare namespace bigquery {
       /**
        * Filter for job state
        */
-      stateFilter?: 'done' | 'pending' | 'running';
+      stateFilter?: Array<'done' | 'pending' | 'running'>;
     };
   }
 
