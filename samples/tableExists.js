@@ -21,7 +21,7 @@ function main(datasetId = 'my_dataset', tableId = 'my_table') {
   const bigquery = new BigQuery();
 
   async function tableExists() {
-    // Retrieves table named "my_table" in "my_dataset".
+    // Checks whether table named "my_table" in "my_dataset" exists.
 
     /**
      * TODO(developer): Uncomment the following lines before running the sample
