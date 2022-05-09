@@ -4,6 +4,13 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+### [5.12.1](https://github.com/googleapis/nodejs-bigquery/compare/v5.12.0...v5.12.1) (2022-05-09)
+
+
+### Bug Fixes
+
+* Fix Job#getQueryResultsStream when using startIndex ([#1100](https://github.com/googleapis/nodejs-bigquery/issues/1100)) ([2b7df52](https://github.com/googleapis/nodejs-bigquery/commit/2b7df52ff6bce5422d5d3724bd635606d584c2dc))
+
 ## [5.12.0](https://github.com/googleapis/nodejs-bigquery/compare/v5.11.0...v5.12.0) (2022-03-02)
 
 
