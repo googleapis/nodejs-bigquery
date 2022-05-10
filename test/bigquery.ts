@@ -52,6 +52,16 @@ class FakeApiError {
   }
 }
 
+interface InputObject {
+  year?: number;
+  month?: number;
+  day?: number;
+  hours?: number;
+  minutes?: number;
+  seconds?: number;
+  fractional?: number;
+}
+
 interface CalledWithService extends Service {
   calledWith_: Array<{
     baseUrl: string;
@@ -763,7 +773,7 @@ describe('BigQuery', () => {
     });
 
     it('should not include fractional digits if not provided', () => {
-      const input = Object.assign({}, INPUT_OBJ);
+      const input = Object.assign({}, INPUT_OBJ) as InputObject;
       delete input.fractional;
 
       const time = bq.time(input);
