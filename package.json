@@ -50,7 +50,7 @@
   "dependencies": {
     "@google-cloud/common": "^3.10.0",
     "@google-cloud/paginator": "^3.0.0",
-    "@google-cloud/promisify": "^2.0.0",
+    "@google-cloud/promisify": "^3.0.0",
     "arrify": "^2.0.1",
     "big.js": "^6.0.0",
     "duplexify": "^4.0.0",
