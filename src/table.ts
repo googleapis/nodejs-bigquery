@@ -2118,7 +2118,7 @@ class Table extends ServiceObject {
     options: InsertRowsOptions
   ): Promise<bigquery.ITableDataInsertAllResponse> {
     const {partialRetries = 3} = options;
-    let error: Error;
+    let error: GoogleErrorBody;
 
     const maxAttempts = Math.max(partialRetries, 0) + 1;
 
@@ -2126,8 +2126,8 @@ class Table extends ServiceObject {
       try {
         return await this._insert(rows, options);
       } catch (e) {
-        error = e;
-        rows = ((e.errors || []) as PartialInsertFailure[])
+        error = e as GoogleErrorBody;
+        rows = (((e as GoogleErrorBody).errors || []) as PartialInsertFailure[])
           .filter(err => !!err.row)
           .map(err => err.row);
 
