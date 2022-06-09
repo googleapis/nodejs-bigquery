@@ -52,6 +52,16 @@ class FakeApiError {
   }
 }
 
+interface InputObject {
+  year?: number;
+  month?: number;
+  day?: number;
+  hours?: number;
+  minutes?: number;
+  seconds?: number;
+  fractional?: number;
+}
+
 interface CalledWithService extends Service {
   calledWith_: Array<{
     baseUrl: string;
@@ -271,6 +281,26 @@ describe('BigQuery', () => {
 
       const calledWith = bq.calledWith_[0];
       assert.deepStrictEqual(calledWith.scopes, expectedScopes);
+    });
+
+    it('should pass autoRetry from options', () => {
+      const retry = false;
+      const bq = new BigQuery({
+        autoRetry: retry,
+      });
+
+      const calledWith = bq.calledWith_[0];
+      assert.deepStrictEqual(calledWith.autoRetry, retry);
+    });
+
+    it('should pass maxRetries from options', () => {
+      const retryVal = 1;
+      const bq = new BigQuery({
+        maxRetries: retryVal,
+      });
+
+      const calledWith = bq.calledWith_[0];
+      assert.deepStrictEqual(calledWith.maxRetries, retryVal);
     });
 
     it('should not modify options argument', () => {
@@ -763,7 +793,7 @@ describe('BigQuery', () => {
     });
 
     it('should not include fractional digits if not provided', () => {
-      const input = Object.assign({}, INPUT_OBJ);
+      const input = Object.assign({}, INPUT_OBJ) as InputObject;
       delete input.fractional;
 
       const time = bq.time(input);

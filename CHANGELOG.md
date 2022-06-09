@@ -4,6 +4,28 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## [6.0.0](https://github.com/googleapis/nodejs-bigquery/compare/v5.12.0...v6.0.0) (2022-05-20)
+
+
+### ⚠ BREAKING CHANGES
+
+* update library to use Node 12 (#1114)
+
+### Features
+
+* add custom retry options ([#1088](https://github.com/googleapis/nodejs-bigquery/issues/1088)) ([b7f29ed](https://github.com/googleapis/nodejs-bigquery/commit/b7f29ed4f748c8bd0b062bb68cf9de4b2925cace))
+
+
+### Bug Fixes
+
+* **deps:** update dependency @google-cloud/promisify to v3 ([#1112](https://github.com/googleapis/nodejs-bigquery/issues/1112)) ([cb0d601](https://github.com/googleapis/nodejs-bigquery/commit/cb0d601fa4f8693ffbf4f3eb3f40d2fa014dd8f5))
+* Fix Job#getQueryResultsStream when using startIndex ([#1100](https://github.com/googleapis/nodejs-bigquery/issues/1100)) ([2b7df52](https://github.com/googleapis/nodejs-bigquery/commit/2b7df52ff6bce5422d5d3724bd635606d584c2dc))
+
+
+### Build System
+
+* update library to use Node 12 ([#1114](https://github.com/googleapis/nodejs-bigquery/issues/1114)) ([b49fc4d](https://github.com/googleapis/nodejs-bigquery/commit/b49fc4d7a0f623da40f2d40e1d7e223ab23f1965))
+
 ## [5.12.0](https://github.com/googleapis/nodejs-bigquery/compare/v5.11.0...v5.12.0) (2022-03-02)
 
 

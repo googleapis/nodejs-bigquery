@@ -35,7 +35,7 @@ Promise.all(
 ).catch(console.error);
 
 async function doQuery(queryTxt: string) {
-  return new Promise((resolve, reject) => {
+  return new Promise<void>((resolve, reject) => {
     const startMilli = new Date().getTime();
     let numRows = 0;
     let numCols: number;

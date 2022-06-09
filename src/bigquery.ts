@@ -326,6 +326,8 @@ export class BigQuery extends Service {
       baseUrl,
       scopes: ['https://www.googleapis.com/auth/bigquery'],
       packageJson: require('../../package.json'),
+      autoRetry: options.autoRetry,
+      maxRetries: options.maxRetries,
     };
 
     if (options.scopes) {
@@ -2240,7 +2242,9 @@ export class BigQueryInt extends Number {
       try {
         return this.typeCastFunction!(this.value);
       } catch (error) {
-        error.message = `integerTypeCastFunction threw an error:\n\n  - ${error.message}`;
+        (error as Error).message = `integerTypeCastFunction threw an error:\n\n  - ${
+          (error as Error).message
+        }`;
         throw error;
       }
     } else {
