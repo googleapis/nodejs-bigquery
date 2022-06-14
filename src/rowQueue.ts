@@ -194,9 +194,9 @@ export class RowQueue {
         } else {
           callbacks.forEach(callback => callback!(err, resp));
           this.stream.emit('response', resp);
-          cb!(err, resp);
+          cb?.(err, resp);
         }
-        cb!(err, resp);
+        cb?.(err, resp);
       }
     );
   }
