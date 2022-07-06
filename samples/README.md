@@ -103,6 +103,7 @@
   * [Relax Column Query Append](#relax-column-query-append)
   * [Remove Table Clustering](#remove-table-clustering)
   * [Set User Agent](#set-user-agent)
+  * [Table Exists](#table-exists)
   * [Undelete Table](#undelete-table)
   * [Update Dataset Access](#update-dataset-access)
   * [Update Dataset Description](#update-dataset-description)
@@ -1687,6 +1688,23 @@ __Usage:__
 
 
 `node samples/setUserAgent.js`
+
+
+-----
+
+
+
+
+### Table Exists
+
+View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/main/samples/tableExists.js).
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/tableExists.js,samples/README.md)
+
+__Usage:__
+
+
+`node samples/tableExists.js`
 
 
 -----
