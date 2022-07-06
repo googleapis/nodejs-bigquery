@@ -4,6 +4,15 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## [6.0.1](https://github.com/googleapis/nodejs-bigquery/compare/v6.0.0...v6.0.1) (2022-06-17)
+
+
+### Bug Fixes
+
+* call rowQueue insert callback only if present ([#1128](https://github.com/googleapis/nodejs-bigquery/issues/1128)) ([17a0c0d](https://github.com/googleapis/nodejs-bigquery/commit/17a0c0ddee6e7c9ea03c839edbc162a7ecfa5b0e))
+* **deps:** update dependency @google-cloud/paginator to v4 ([#1116](https://github.com/googleapis/nodejs-bigquery/issues/1116)) ([073abc0](https://github.com/googleapis/nodejs-bigquery/commit/073abc0b22271627f79d6744995d820d3bd62631))
+* **deps:** update dependency @google-cloud/storage to v6 ([#1119](https://github.com/googleapis/nodejs-bigquery/issues/1119)) ([d607e5a](https://github.com/googleapis/nodejs-bigquery/commit/d607e5a657daa500049a279e79ed69086665ceff))
+
 ## [6.0.0](https://github.com/googleapis/nodejs-bigquery/compare/v5.12.0...v6.0.0) (2022-05-20)
 
 
