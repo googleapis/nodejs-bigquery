@@ -256,6 +256,16 @@ describe('Tables', () => {
     assert.include(output, tableId);
   });
 
+  it('should check whether a table exists', async () => {
+    const nonexistentTableId = 'foobar';
+    const output = execSync(
+      `node tableExists.js ${datasetId} ${nonexistentTableId}`
+    );
+    assert.include(output, 'Not found');
+    assert.include(output, datasetId);
+    assert.include(output, nonexistentTableId);
+  });
+
   it('should list tables', async () => {
     const output = execSync(`node listTables.js ${datasetId}`);
     assert.match(output, /Tables:/);

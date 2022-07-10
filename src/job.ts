@@ -566,7 +566,7 @@ class Job extends Operation {
           );
         }
 
-        let nextQuery: {} | null = null;
+        let nextQuery: QueryResultsOptions | null = null;
         if (resp.jobComplete === false) {
           // Query is still running.
           nextQuery = Object.assign({}, options);
@@ -584,6 +584,7 @@ class Job extends Operation {
           nextQuery = Object.assign({}, options, {
             pageToken: resp.pageToken,
           });
+          delete nextQuery.startIndex;
         }
 
         callback!(null, rows, nextQuery, resp);

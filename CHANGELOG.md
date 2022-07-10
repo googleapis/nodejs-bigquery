@@ -4,6 +4,37 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## [6.0.1](https://github.com/googleapis/nodejs-bigquery/compare/v6.0.0...v6.0.1) (2022-06-17)
+
+
+### Bug Fixes
+
+* call rowQueue insert callback only if present ([#1128](https://github.com/googleapis/nodejs-bigquery/issues/1128)) ([17a0c0d](https://github.com/googleapis/nodejs-bigquery/commit/17a0c0ddee6e7c9ea03c839edbc162a7ecfa5b0e))
+* **deps:** update dependency @google-cloud/paginator to v4 ([#1116](https://github.com/googleapis/nodejs-bigquery/issues/1116)) ([073abc0](https://github.com/googleapis/nodejs-bigquery/commit/073abc0b22271627f79d6744995d820d3bd62631))
+* **deps:** update dependency @google-cloud/storage to v6 ([#1119](https://github.com/googleapis/nodejs-bigquery/issues/1119)) ([d607e5a](https://github.com/googleapis/nodejs-bigquery/commit/d607e5a657daa500049a279e79ed69086665ceff))
+
+## [6.0.0](https://github.com/googleapis/nodejs-bigquery/compare/v5.12.0...v6.0.0) (2022-05-20)
+
+
+### ⚠ BREAKING CHANGES
+
+* update library to use Node 12 (#1114)
+
+### Features
+
+* add custom retry options ([#1088](https://github.com/googleapis/nodejs-bigquery/issues/1088)) ([b7f29ed](https://github.com/googleapis/nodejs-bigquery/commit/b7f29ed4f748c8bd0b062bb68cf9de4b2925cace))
+
+
+### Bug Fixes
+
+* **deps:** update dependency @google-cloud/promisify to v3 ([#1112](https://github.com/googleapis/nodejs-bigquery/issues/1112)) ([cb0d601](https://github.com/googleapis/nodejs-bigquery/commit/cb0d601fa4f8693ffbf4f3eb3f40d2fa014dd8f5))
+* Fix Job#getQueryResultsStream when using startIndex ([#1100](https://github.com/googleapis/nodejs-bigquery/issues/1100)) ([2b7df52](https://github.com/googleapis/nodejs-bigquery/commit/2b7df52ff6bce5422d5d3724bd635606d584c2dc))
+
+
+### Build System
+
+* update library to use Node 12 ([#1114](https://github.com/googleapis/nodejs-bigquery/issues/1114)) ([b49fc4d](https://github.com/googleapis/nodejs-bigquery/commit/b49fc4d7a0f623da40f2d40e1d7e223ab23f1965))
+
 ## [5.12.0](https://github.com/googleapis/nodejs-bigquery/compare/v5.11.0...v5.12.0) (2022-03-02)
 
 
