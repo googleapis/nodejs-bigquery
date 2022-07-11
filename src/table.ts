@@ -1327,15 +1327,15 @@ class Table extends ServiceObject {
    * ```
    */
   createLoadJob(
-    source: string | File,
+    source: string | File | File[],
     metadata?: JobLoadMetadata
   ): Promise<JobResponse>;
   createLoadJob(
-    source: string | File,
+    source: string | File | File[],
     metadata: JobLoadMetadata,
     callback: JobCallback
   ): void;
-  createLoadJob(source: string | File, callback: JobCallback): void;
+  createLoadJob(source: string | File | File[], callback: JobCallback): void;
   createLoadJob(
     source: string | File | File[],
     metadataOrCallback?: JobLoadMetadata | JobCallback,
@@ -2229,15 +2229,15 @@ class Table extends ServiceObject {
   }
 
   load(
-    source: string | File,
+    source: string | File | File[],
     metadata?: JobLoadMetadata
   ): Promise<JobMetadataResponse>;
   load(
-    source: string | File,
+    source: string | File | File[],
     metadata: JobLoadMetadata,
     callback: JobMetadataCallback
   ): void;
-  load(source: string | File, callback: JobMetadataCallback): void;
+  load(source: string | File | File[], callback: JobMetadataCallback): void;
   /**
    * Load data from a local file or Storage {@link
    * https://googleapis.dev/nodejs/storage/latest/File.html File}.
@@ -2319,17 +2319,17 @@ class Table extends ServiceObject {
    * ```
    */
   load(
-    source: string | File,
+    source: string | File | File[],
     metadata?: JobLoadMetadata
   ): Promise<JobMetadataResponse>;
   load(
-    source: string | File,
+    source: string | File | File[],
     metadata: JobLoadMetadata,
     callback: JobMetadataCallback
   ): void;
-  load(source: string | File, callback: JobMetadataCallback): void;
+  load(source: string | File | File[], callback: JobMetadataCallback): void;
   load(
-    source: string | File,
+    source: string | File | File[],
     metadataOrCallback?: JobLoadMetadata | JobMetadataCallback,
     cb?: JobMetadataCallback
   ): void | Promise<JobMetadataResponse> {
