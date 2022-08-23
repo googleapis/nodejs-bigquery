@@ -4,6 +4,13 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## [6.0.3](https://github.com/googleapis/nodejs-bigquery/compare/v6.0.2...v6.0.3) (2022-08-23)
+
+
+### Bug Fixes
+
+* remove pip install statements ([#1546](https://github.com/googleapis/nodejs-bigquery/issues/1546)) ([#1144](https://github.com/googleapis/nodejs-bigquery/issues/1144)) ([328f3c0](https://github.com/googleapis/nodejs-bigquery/commit/328f3c0215be3e6dbc1c4ff09af6475d7d34a8fe))
+
 ## [6.0.2](https://github.com/googleapis/nodejs-bigquery/compare/v6.0.1...v6.0.2) (2022-08-01)
 
 
