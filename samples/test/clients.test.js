@@ -27,11 +27,11 @@ describe('Client', () => {
     assert.match(output, /my-user-agent/);
   });
   it('should should set client endpoint', async () => {
-    let output = execSync(`node setClientEndpoint.js us-east4`);
+    let output = execSync('node setClientEndpoint.js us-east4');
     assert.match(output, /API Endpoint:/);
     assert.match(output, /https:\/\/us-east4-bigquery.googleapis.com/);
 
-    output = execSync(`node setClientEndpoint.js eu`);
+    output = execSync('node setClientEndpoint.js eu');
     assert.match(output, /API Endpoint:/);
     assert.match(output, /https:\/\/eu-bigquery.googleapis.com/);
   });

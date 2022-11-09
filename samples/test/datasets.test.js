@@ -50,28 +50,32 @@ describe('Datasets', () => {
   });
 
   it('should create a dataset using a regional endpoint', async () => {
-    const euBigquery = new BigQuery({apiEndpoint: 'eu-bigquery.googleapis.com'});
-    const euDatasetId = datasetId + "_eu";
+    const euBigquery = new BigQuery({
+      apiEndpoint: 'eu-bigquery.googleapis.com',
+    });
+    const euDatasetId = datasetId + '_eu';
     await euBigquery.createDataset(euDatasetId, {
-      location: "eu",
+      location: 'eu',
     });
     const [exists] = await euBigquery.dataset(euDatasetId).exists();
     assert.ok(exists);
   });
 
   it('should fail to create a dataset using a different region from the client endpoint', async () => {
-    const usEast4Bigquery = new BigQuery({apiEndpoint: 'us-east4-bigquery.googleapis.com'});
-    const usDatasetId = datasetId + "_us";
-    var error
+    const usEast4Bigquery = new BigQuery({
+      apiEndpoint: 'us-east4-bigquery.googleapis.com',
+    });
+    const usDatasetId = datasetId + '_us';
+    let error;
     try {
       await usEast4Bigquery.createDataset(usDatasetId, {
-        location: "us-central1",
+        location: 'us-central1',
       });
-    } catch(err){
-      error = err
+    } catch (err) {
+      error = err;
     }
-    assert.isNotNull(error)
-    assert.equal(error.message, "Invalid storage region")    
+    assert.isNotNull(error);
+    assert.equal(error.message, 'Invalid storage region');
   });
 
   it('should list datasets', async () => {
