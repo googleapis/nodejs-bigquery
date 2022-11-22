@@ -18,14 +18,23 @@ function main(region = 'us') {
   // [START bigquery_set_client_endpoint]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
-  
-  // Create a client and pointing to a specific endpoint
-  const bigquery = new BigQuery({
-    apiEndpoint: `${region}-bigquery.googleapis.com`,
-  });
 
-  console.log('API Endpoint:');
-  console.log(bigquery.apiEndpoint);
+  function setClientEndpoint() {
+    // Create a bigquery client pointing to a specific endpoint
+
+    /**
+     * TODO(developer): Uncomment the following lines before running the sample.
+     */
+    // const region = 'us';
+
+    const bigquery = new BigQuery({
+      apiEndpoint: `${region}-bigquery.googleapis.com`,
+    });
+
+    console.log('API Endpoint:');
+    console.log(bigquery.apiEndpoint);
+  }
   // [END bigquery_set_client_endpoint]
+  setClientEndpoint();
 }
 main(...process.argv.slice(2));
