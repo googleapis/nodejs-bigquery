@@ -4,6 +4,22 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## [6.0.3](https://github.com/googleapis/nodejs-bigquery/compare/v6.0.2...v6.0.3) (2022-08-23)
+
+
+### Bug Fixes
+
+* remove pip install statements ([#1546](https://github.com/googleapis/nodejs-bigquery/issues/1546)) ([#1144](https://github.com/googleapis/nodejs-bigquery/issues/1144)) ([328f3c0](https://github.com/googleapis/nodejs-bigquery/commit/328f3c0215be3e6dbc1c4ff09af6475d7d34a8fe))
+
+## [6.0.2](https://github.com/googleapis/nodejs-bigquery/compare/v6.0.1...v6.0.2) (2022-08-01)
+
+
+### Bug Fixes
+
+* adding missing links to bug_report template ([#1141](https://github.com/googleapis/nodejs-bigquery/issues/1141)) ([aa6388a](https://github.com/googleapis/nodejs-bigquery/commit/aa6388ac5cbfbcb4b3e622120de9cd53ec47a6ad))
+* **deps:** update dependency @google-cloud/common to v4 ([#1127](https://github.com/googleapis/nodejs-bigquery/issues/1127)) ([bea8b42](https://github.com/googleapis/nodejs-bigquery/commit/bea8b429894b3b710ac682ee57b0878b82ca29c1))
+* **deps:** update dependency readable-stream to v4 ([#1129](https://github.com/googleapis/nodejs-bigquery/issues/1129)) ([4a252d0](https://github.com/googleapis/nodejs-bigquery/commit/4a252d08ff6df7f61c793f5225e20709474694ae))
+
 ## [6.0.1](https://github.com/googleapis/nodejs-bigquery/compare/v6.0.0...v6.0.1) (2022-06-17)
 
 
