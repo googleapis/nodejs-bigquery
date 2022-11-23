@@ -20,7 +20,7 @@ function main(datasetId = 'my_dataset', tableId = 'my_table') {
   const {BigQuery} = require('@google-cloud/bigquery');
   const bigquery = new BigQuery();
 
-  async function instertingDataTypes() {
+  async function insertingDataTypes() {
     // Inserts data of various BigQuery-supported types into a table.
 
     /**
@@ -140,6 +140,6 @@ function main(datasetId = 'my_dataset', tableId = 'my_table') {
     console.log(`Inserted ${rows.length} rows`);
   }
   // [END bigquery_inserting_data_types]
-  instertingDataTypes();
+  insertingDataTypes();
 }
 main(...process.argv.slice(2));
