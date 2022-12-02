@@ -32,7 +32,7 @@ function main(
     /**
      * TODO(developer): Uncomment the following lines before running the sample.
      */
-    // const myDatasetId = "my_table"
+    // const myDatasetId = "my_dataset"
     // const myTableId = "my_table"
     // const projectId = "bigquery-public-data";
     // const sourceDatasetId = "usa_names"
