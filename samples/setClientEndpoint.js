@@ -14,7 +14,7 @@
 
 'use strict';
 
-function main(region = 'us') {
+function main(region = 'my-region') {
   // [START bigquery_set_client_endpoint]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
@@ -23,9 +23,9 @@ function main(region = 'us') {
     // Create a bigquery client pointing to a specific endpoint
 
     /**
-     * TODO(developer): Uncomment the following lines before running the sample.
+     * TODO(developer): Uncomment the following line of code and fill in your region before running the sample.
      */
-    // const region = 'us';
+    // const region = 'my-region';
 
     const bigquery = new BigQuery({
       apiEndpoint: `${region}-bigquery.googleapis.com`,
