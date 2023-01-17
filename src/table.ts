@@ -1860,6 +1860,7 @@ class Table extends ServiceObject {
           nextQuery = Object.assign({}, options, {
             pageToken: resp.pageToken,
           });
+          delete nextQuery.startIndex;
         }
 
         if (resp.rows && resp.rows.length > 0 && !this.metadata.schema) {
