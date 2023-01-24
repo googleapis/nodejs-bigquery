@@ -102,6 +102,7 @@
   * [Relax Column Load Append](#relax-column-load-append)
   * [Relax Column Query Append](#relax-column-query-append)
   * [Remove Table Clustering](#remove-table-clustering)
+  * [Set Client Endpoint](#set-client-endpoint)
   * [Set User Agent](#set-user-agent)
   * [Table Exists](#table-exists)
   * [Undelete Table](#undelete-table)
@@ -1671,6 +1672,23 @@ __Usage:__
 
 
 `node samples/removeTableClustering.js`
+
+
+-----
+
+
+
+
+### Set Client Endpoint
+
+View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/main/samples/setClientEndpoint.js).
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/setClientEndpoint.js,samples/README.md)
+
+__Usage:__
+
+
+`node samples/setClientEndpoint.js`
 
 
 -----
