@@ -4,6 +4,13 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## [6.1.0](https://github.com/googleapis/nodejs-bigquery/compare/v6.0.3...v6.1.0) (2023-01-25)
+
+
+### Features
+
+* Add set client endpoint sample ([#1170](https://github.com/googleapis/nodejs-bigquery/issues/1170)) ([df1dcd3](https://github.com/googleapis/nodejs-bigquery/commit/df1dcd3899dd10f20988b938b31ac571c997bffd))
+
 ## [6.0.3](https://github.com/googleapis/nodejs-bigquery/compare/v6.0.2...v6.0.3) (2022-08-23)
 
 
