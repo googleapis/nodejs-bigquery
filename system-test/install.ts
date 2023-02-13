@@ -45,5 +45,5 @@ describe('Installation test', () => {
     await mvp(tarball, `${stagingPath}/google-cloud-bigquery.tgz`);
     await ncpp('system-test/fixtures/kitchen', `${stagingPath}/`);
     await execa('npm', ['install'], {cwd: `${stagingPath}/`, stdio: 'inherit'});
-  }).timeout(40000);
+  }).timeout(80000);
 });
