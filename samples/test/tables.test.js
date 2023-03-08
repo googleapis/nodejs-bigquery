@@ -53,6 +53,7 @@ const exportJSONFileName = 'data.json';
 const importFileName = 'data.avro';
 const partialDataFileName = 'partialdata.csv';
 const localFilePath = path.join(__dirname, `../resources/${importFileName}`);
+const testExpirationTime = Date.now() + 2 * 60 * 60 * 1000; // Add two hours
 let projectId;
 let policyTag0;
 let policyTag1;
@@ -264,6 +265,47 @@ describe('Tables', () => {
     assert.include(output, 'Not found');
     assert.include(output, datasetId);
     assert.include(output, nonexistentTableId);
+  });
+
+  it('should create/update a table with default collation', async () => {
+    const collationTableId = tableId + '_collation_test';
+    const [table] = await bigquery
+      .dataset(datasetId)
+      .createTable(collationTableId, {
+        schema: [
+          {name: 'name', type: 'STRING'},
+          {name: 'nums', type: 'INTEGER'},
+        ],
+        defaultCollation: 'und:ci',
+        expirationTime: testExpirationTime,
+      });
+    let [md] = await table.getMetadata();
+    assert.equal(md.defaultCollation, 'und:ci');
+    for (const field of md.schema.fields) {
+      if (field.type === 'STRING') {
+        assert.equal(field.collation, 'und:ci');
+      }
+    }
+    // update table collation to case sensitive
+    md.defaultCollation = '';
+    await table.setMetadata(md);
+    [md] = await table.getMetadata();
+    assert.equal(md.defaultCollation, '');
+
+    // add field with different collation
+    md.schema.fields.push({
+      name: 'another_name',
+      type: 'STRING',
+      collation: 'und:ci',
+    });
+    await table.setMetadata(md);
+
+    [md] = await table.getMetadata();
+    for (const field of md.schema.fields) {
+      if (field.type === 'STRING') {
+        assert.equal(field.collation, 'und:ci');
+      }
+    }
   });
 
   it('should list tables', async () => {
