@@ -89,7 +89,7 @@ describe('Datasets', () => {
     assert.ok(exists);
     let [md] = await dataset.getMetadata();
     assert.equal(md.defaultCollation, 'und:ci');
-    md.defaultCollation = "";
+    md.defaultCollation = '';
     await dataset.setMetadata(md);
     [md] = await dataset.getMetadata();
     assert.equal(md.defaultCollation, '');
