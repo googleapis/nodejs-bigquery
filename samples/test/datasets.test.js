@@ -78,6 +78,23 @@ describe('Datasets', () => {
     assert.equal(error.message, 'Invalid storage region');
   });
 
+  it('should create/update a dataset with a different default collation', async () => {
+    const bigquery = new BigQuery({});
+    const collationDatasetId = datasetId + '_collation_test';
+    await bigquery.createDataset(collationDatasetId, {
+      defaultCollation: 'und:ci',
+    });
+    const dataset = await bigquery.dataset(collationDatasetId);
+    const [exists] = await dataset.exists();
+    assert.ok(exists);
+    let [md] = await dataset.getMetadata();
+    assert.equal(md.defaultCollation, 'und:ci');
+    md.defaultCollation = '';
+    await dataset.setMetadata(md);
+    [md] = await dataset.getMetadata();
+    assert.equal(md.defaultCollation, '');
+  });
+
   it('should list datasets', async () => {
     const output = execSync('node listDatasets.js');
     assert.match(output, /Datasets:/);
