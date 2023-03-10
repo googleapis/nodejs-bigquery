@@ -454,7 +454,7 @@ describe('BigQuery', () => {
             f: [
               {v: '3'},
               {v: 'Milo'},
-              {v: String(now.valueOf() / 1000)},
+              {v: now.valueOf() * 1000},
               {v: 'false'},
               {v: 'true'},
               {v: '5.222330009847'},
@@ -506,7 +506,7 @@ describe('BigQuery', () => {
             id: 3,
             name: 'Milo',
             dob: {
-              input: now,
+              input: now.valueOf() * 1000,
               type: 'fakeTimestamp',
             },
             has_claws: false,
