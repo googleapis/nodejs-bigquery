@@ -2146,7 +2146,8 @@ export class BigQueryTimestamp {
     } else {
       pd = this.fromFloatValue_(value);
     }
-    // to keep backward compatibility, only 
+    // to keep backward compatibility, only converts with microsecond
+    // precision if needed.
     if (pd.getMicroseconds() > 0) {
       this.value = pd.toISOString();
     } else {

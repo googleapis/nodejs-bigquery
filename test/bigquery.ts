@@ -42,7 +42,7 @@ import {
   TableField,
 } from '../src';
 import {SinonStub} from 'sinon';
-import { PreciseDate } from '@google-cloud/precise-date';
+import {PreciseDate} from '@google-cloud/precise-date';
 
 const fakeUuid = extend(true, {}, uuid);
 
