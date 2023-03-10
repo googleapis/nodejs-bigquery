@@ -927,7 +927,7 @@ export class BigQuery extends Service {
           'value ' +
           value.integerValue +
           " is out of bounds of 'Number.MAX_SAFE_INTEGER'.\n" +
-          "To prevent this error, please consider passing 'options.wrapNumbers' as\n" +
+          "To prevent this error, please consider passing 'options.wrapIntegers' as\n" +
           '{\n' +
           '  integerTypeCastFunction: provide <your_custom_function>\n' +
           '  fields: optionally specify field name(s) to be custom casted\n' +
@@ -2024,6 +2024,12 @@ export class BigQuery extends Service {
   ): void | Promise<SimpleQueryRowsResponse> | Promise<QueryRowsResponse> {
     let options =
       typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
+    const queryOpts =
+      typeof query === 'object'
+        ? {
+            wrapIntegers: query.wrapIntegers,
+          }
+        : {};
     const callback =
       typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
     this.createQueryJob(query, (err, job, resp) => {
@@ -2037,7 +2043,7 @@ export class BigQuery extends Service {
       }
       // The Job is important for the `queryAsStream_` method, so a new query
       // isn't created each time results are polled for.
-      options = extend({job}, options);
+      options = extend({job}, queryOpts, options);
       job!.getQueryResults(options, callback as QueryRowsCallback);
     });
   }
@@ -2248,7 +2254,6 @@ export class BigQueryInt extends Number {
         throw error;
       }
     } else {
-      // return this.value;
       return BigQuery.decodeIntegerValue_({
         integerValue: this.value,
         schemaFieldName: this._schemaFieldName,

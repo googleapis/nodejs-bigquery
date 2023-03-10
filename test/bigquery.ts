@@ -907,7 +907,7 @@ describe('BigQuery', () => {
               'value ' +
               opts.integerValue +
               " is out of bounds of 'Number.MAX_SAFE_INTEGER'.\n" +
-              "To prevent this error, please consider passing 'options.wrapNumbers' as\n" +
+              "To prevent this error, please consider passing 'options.wrapIntegers' as\n" +
               '{\n' +
               '  integerTypeCastFunction: provide <your_custom_function>\n' +
               '  fields: optionally specify field name(s) to be custom casted\n' +
@@ -2695,6 +2695,35 @@ describe('BigQuery', () => {
 
       bq.query(QUERY_STRING, (err: Error, rows: {}, resp: {}) => {
         assert.ifError(err);
+        assert.strictEqual(rows, FAKE_ROWS);
+        assert.strictEqual(resp, FAKE_RESPONSE);
+        done();
+      });
+    });
+
+    it('should call job#getQueryResults with query options', done => {
+      let queryResultsOpts = {};
+      const fakeJob = {
+        getQueryResults: (options: {}, callback: Function) => {
+          queryResultsOpts = options;
+          callback(null, FAKE_ROWS, FAKE_RESPONSE);
+        },
+      };
+
+      bq.createQueryJob = (query: {}, callback: Function) => {
+        callback(null, fakeJob, FAKE_RESPONSE);
+      };
+
+      const query = {
+        query: QUERY_STRING,
+        wrapIntegers: true,
+      };
+      bq.query(query, (err: Error, rows: {}, resp: {}) => {
+        assert.ifError(err);
+        assert.deepEqual(queryResultsOpts, {
+          job: fakeJob,
+          wrapIntegers: true,
+        });
         assert.strictEqual(rows, FAKE_ROWS);
         assert.strictEqual(resp, FAKE_RESPONSE);
         done();
