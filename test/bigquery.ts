@@ -42,6 +42,7 @@ import {
   TableField,
 } from '../src';
 import {SinonStub} from 'sinon';
+import { PreciseDate } from '@google-cloud/precise-date';
 
 const fakeUuid = extend(true, {}, uuid);
 
@@ -803,8 +804,11 @@ describe('BigQuery', () => {
 
   describe('timestamp', () => {
     const INPUT_STRING = '2016-12-06T12:00:00.000Z';
+    const INPUT_STRING_MICROS = '2016-12-06T12:00:00.123456Z';
     const INPUT_DATE = new Date(INPUT_STRING);
+    const INPUT_PRECISE_DATE = new PreciseDate(INPUT_STRING_MICROS);
     const EXPECTED_VALUE = INPUT_DATE.toJSON();
+    const EXPECTED_VALUE_MICROS = INPUT_PRECISE_DATE.toISOString();
 
     // tslint:disable-next-line ban
     it.skip('should expose static and instance constructors', () => {
@@ -827,9 +831,19 @@ describe('BigQuery', () => {
       assert.strictEqual(timestamp.value, EXPECTED_VALUE);
     });
 
+    it('should accept a string with microseconds', () => {
+      const timestamp = bq.timestamp(INPUT_STRING_MICROS);
+      assert.strictEqual(timestamp.value, EXPECTED_VALUE_MICROS);
+    });
+
     it('should accept a Date object', () => {
       const timestamp = bq.timestamp(INPUT_DATE);
       assert.strictEqual(timestamp.value, EXPECTED_VALUE);
+    });
+
+    it('should accept a PreciseDate object', () => {
+      const timestamp = bq.timestamp(INPUT_PRECISE_DATE);
+      assert.strictEqual(timestamp.value, EXPECTED_VALUE_MICROS);
     });
   });
 
