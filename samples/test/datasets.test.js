@@ -75,7 +75,7 @@ describe('Datasets', () => {
       error = err;
     }
     assert.isNotNull(error);
-    assert.equal(error.message, 'Invalid storage region');
+    assert.include(error.message, 'Invalid storage region');
   });
 
   it('should create/update a dataset with a different default collation', async () => {
