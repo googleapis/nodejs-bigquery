@@ -826,6 +826,11 @@ describe('BigQuery', () => {
       assert.strictEqual(timestamp.constructor.name, 'BigQueryTimestamp');
     });
 
+    it('should accept a NaN', () => {
+      const timestamp = bq.timestamp(NaN);
+      assert.strictEqual(timestamp.value, null);
+    });
+
     it('should accept a string', () => {
       const timestamp = bq.timestamp(INPUT_STRING);
       assert.strictEqual(timestamp.value, EXPECTED_VALUE);
