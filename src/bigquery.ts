@@ -23,6 +23,7 @@ import {
 } from '@google-cloud/common';
 import {paginator, ResourceStream} from '@google-cloud/paginator';
 import {promisifyAll} from '@google-cloud/promisify';
+import {PreciseDate} from '@google-cloud/precise-date';
 import arrify = require('arrify');
 import {Big} from 'big.js';
 import * as extend from 'extend';
@@ -585,7 +586,7 @@ export class BigQuery extends Service {
           break;
         }
         case 'TIMESTAMP': {
-          value = BigQuery.timestamp(new Date(value * 1000));
+          value = BigQuery.timestamp(value);
           break;
         }
         case 'GEOGRAPHY': {
@@ -844,11 +845,11 @@ export class BigQuery extends Service {
    * const timestamp = bigquery.timestamp(new Date());
    * ```
    */
-  static timestamp(value: Date | string) {
+  static timestamp(value: Date | PreciseDate | string | number) {
     return new BigQueryTimestamp(value);
   }
 
-  timestamp(value: Date | string) {
+  timestamp(value: Date | PreciseDate | string | number) {
     return BigQuery.timestamp(value);
   }
 
@@ -2131,8 +2132,42 @@ export class Geography {
  */
 export class BigQueryTimestamp {
   value: string;
-  constructor(value: Date | string) {
-    this.value = new Date(value).toJSON();
+  constructor(value: Date | PreciseDate | string | number) {
+    let pd: PreciseDate;
+    if (value instanceof PreciseDate) {
+      pd = value;
+    } else if (value instanceof Date) {
+      pd = new PreciseDate(value);
+    } else if (typeof value === 'string') {
+      if (/^\d{4}-\d{1,2}-\d{1,2}/.test(value)) {
+        pd = new PreciseDate(value);
+      } else {
+        const floatValue = Number.parseFloat(value);
+        if (!Number.isNaN(floatValue)) {
+          pd = this.fromFloatValue_(floatValue);
+        } else {
+          pd = new PreciseDate(value);
+        }
+      }
+    } else {
+      pd = this.fromFloatValue_(value);
+    }
+    // to keep backward compatibility, only converts with microsecond
+    // precision if needed.
+    if (pd.getMicroseconds() > 0) {
+      this.value = pd.toISOString();
+    } else {
+      this.value = new Date(pd.getTime()).toJSON();
+    }
+  }
+
+  fromFloatValue_(value: number): PreciseDate {
+    const secs = Math.trunc(value);
+    // Timestamps in BigQuery have microsecond precision, so we must
+    // return a round number of microseconds.
+    const micros = Math.trunc((value - secs) * 1e6 + 0.5);
+    const pd = new PreciseDate([secs, micros * 1000]);
+    return pd;
   }
 }
 
