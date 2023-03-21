@@ -1220,6 +1220,17 @@ describe('BigQuery', () => {
                     },
                   },
                 ],
+                types: [
+                  {
+                    b: 'BOOL',
+                    arr: ['INT64'],
+                    d: 'DATE',
+                    f: 'FLOAT64',
+                    nested: {
+                      a: 'INT64',
+                    },
+                  },
+                ],
               },
               (err, rows) => {
                 assert.ifError(err);
@@ -1331,6 +1342,9 @@ describe('BigQuery', () => {
                 ].join(' '),
                 params: {
                   owner: 'google',
+                },
+                types: {
+                  owner: 'STRING',
                 },
               },
               (err, rows) => {
@@ -1463,6 +1477,17 @@ describe('BigQuery', () => {
                     f: 3.14,
                     nested: {
                       a: 3,
+                    },
+                  },
+                },
+                types: {
+                  obj: {
+                    b: 'BOOL',
+                    arr: ['INT64'],
+                    d: 'DATE',
+                    f: 'FLOAT64',
+                    nested: {
+                      a: 'INT64',
                     },
                   },
                 },

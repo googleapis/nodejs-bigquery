@@ -113,7 +113,11 @@ export type QueryParamTypeStruct = {
     | QueryParamTypeStruct
     | QueryParamTypeStruct[];
 };
-export type QueryParamTypes = string[] | string[][] | QueryParamTypeStruct;
+export type QueryParamTypes =
+  | string[]
+  | string[][]
+  | QueryParamTypeStruct
+  | QueryParamTypeStruct[];
 
 export type QueryOptions = QueryResultsOptions;
 export type QueryStreamOptions = {
