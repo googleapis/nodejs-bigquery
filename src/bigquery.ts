@@ -107,7 +107,11 @@ export type Query = JobRequest<bigquery.IJobConfigurationQuery> & {
 };
 
 export type QueryParamTypeStruct = {
-  [type: string]: string | string[] | QueryParamTypeStruct | QueryParamTypeStruct[];
+  [type: string]:
+    | string
+    | string[]
+    | QueryParamTypeStruct
+    | QueryParamTypeStruct[];
 };
 export type QueryParamTypes = string[] | string[][] | QueryParamTypeStruct;
 
