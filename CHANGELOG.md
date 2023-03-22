@@ -4,6 +4,21 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## [6.2.0](https://github.com/googleapis/nodejs-bigquery/compare/v6.1.0...v6.2.0) (2023-03-22)
+
+
+### Features
+
+* Add collation feature tests ([#1188](https://github.com/googleapis/nodejs-bigquery/issues/1188)) ([80d86ba](https://github.com/googleapis/nodejs-bigquery/commit/80d86ba7d304e83c16c18e721aa50a2612233d14))
+* Add support for microseconds precision ([#1192](https://github.com/googleapis/nodejs-bigquery/issues/1192)) ([b5801a6](https://github.com/googleapis/nodejs-bigquery/commit/b5801a641ae62b1589670233d2c699114e00aa26))
+
+
+### Bug Fixes
+
+* Add typings for named parameter structs ([#1198](https://github.com/googleapis/nodejs-bigquery/issues/1198)) ([c7c2ba1](https://github.com/googleapis/nodejs-bigquery/commit/c7c2ba1bd3657dc4ad2e91c5b89ac35cf6fd97a9))
+* Client endpoint sample error msg ([#1193](https://github.com/googleapis/nodejs-bigquery/issues/1193)) ([e3ea8cd](https://github.com/googleapis/nodejs-bigquery/commit/e3ea8cded3c1d51f3da96a9974ac991828d9e9c8))
+* Pass Query.wrapIntegers to job.getQueryResults ([#1191](https://github.com/googleapis/nodejs-bigquery/issues/1191)) ([fb13510](https://github.com/googleapis/nodejs-bigquery/commit/fb13510d4ad0b2d3f82a306a7da72969d594cf11))
+
 ## [6.1.0](https://github.com/googleapis/nodejs-bigquery/compare/v6.0.3...v6.1.0) (2023-01-25)
 
 
