@@ -98,13 +98,26 @@ export type Query = JobRequest<bigquery.IJobConfigurationQuery> & {
   params?: any[] | {[param: string]: any};
   dryRun?: boolean;
   labels?: {[label: string]: string};
-  types?: string[] | string[][] | {[type: string]: string | string[]};
+  types?: QueryParamTypes;
   job?: Job;
   maxResults?: number;
   jobTimeoutMs?: number;
   pageToken?: string;
   wrapIntegers?: boolean | IntegerTypeCastOptions;
 };
+
+export type QueryParamTypeStruct = {
+  [type: string]:
+    | string
+    | string[]
+    | QueryParamTypeStruct
+    | QueryParamTypeStruct[];
+};
+export type QueryParamTypes =
+  | string[]
+  | string[][]
+  | QueryParamTypeStruct
+  | QueryParamTypeStruct[];
 
 export type QueryOptions = QueryResultsOptions;
 export type QueryStreamOptions = {
