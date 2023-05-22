@@ -16,7 +16,7 @@
 
 function main(
   myDatasetId = 'my_dataset', // Existing dataset
-  myTableId = 'my_new_view', // View to be created
+  myTableId = 'my_shared_view', // View to be created
   projectId = 'bigquery-public-data', // Source GCP project ID
   sourceDatasetId = 'usa_names', // Source dataset ID
   sourceTableId = 'usa_1910_current' //Source table ID
@@ -33,7 +33,7 @@ function main(
      * TODO(developer): Uncomment the following lines before running the sample.
      */
     // const myDatasetId = "my_dataset"
-    // const myTableId = "my_table"
+    // const myTableId = "my_shared_view"
     // const projectId = "bigquery-public-data";
     // const sourceDatasetId = "usa_names"
     // const sourceTableId = "usa_1910_current";
