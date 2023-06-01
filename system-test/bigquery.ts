@@ -23,7 +23,7 @@ import {describe, it, before, after} from 'mocha';
 import Big from 'big.js';
 import * as fs from 'fs';
 import * as uuid from 'uuid';
-import { Readable } from 'stream';
+import {Readable} from 'stream';
 
 import {
   BigQuery,
