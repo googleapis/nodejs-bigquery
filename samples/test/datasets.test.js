@@ -174,9 +174,15 @@ describe('Datasets', () => {
     );
 
     for (const dataset of datasets) {
-      const [metadata] = await dataset.getMetadata();
+      let metadata;
+      try {
+        [metadata] = await dataset.getMetadata();
+      } catch (e) {
+        console.log(`dataset(${dataset.id}).getMetadata() failed`);
+        console.log(e);
+        return;
+      }
       const creationTime = Number(metadata.creationTime);
-
       if (isResourceStale(creationTime)) {
         try {
           await dataset.delete({force: true});
