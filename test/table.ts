@@ -42,7 +42,7 @@ import {
   ViewDefinition,
 } from '../src/table';
 import bigquery from '../src/types';
-import {Duplex, Stream} from 'stream';
+import {Duplex} from 'stream';
 import {RowQueue} from '../src/rowQueue';
 
 interface CalledWithTable extends ServiceObject {

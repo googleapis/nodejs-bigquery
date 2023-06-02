@@ -23,7 +23,7 @@ import {describe, it, before, after} from 'mocha';
 import Big from 'big.js';
 import * as fs from 'fs';
 import * as uuid from 'uuid';
-const Readable = require('readable-stream').Readable;
+import {Readable} from 'stream';
 
 import {
   BigQuery,
@@ -854,7 +854,7 @@ describe('BigQuery', () => {
     });
 
     it('should insert rows via insert stream', done => {
-      const stream = Readable({objectMode: true});
+      const stream = new Readable({objectMode: true});
       stream._read = () => {};
 
       for (let i = 0; i < 10; i++) {
@@ -873,7 +873,7 @@ describe('BigQuery', () => {
     });
 
     it('should return errors from insert stream', done => {
-      const stream = Readable({objectMode: true});
+      const stream = new Readable({objectMode: true});
       stream._read = () => {};
 
       stream.push({wrong_name: 'foo', id: 1});
