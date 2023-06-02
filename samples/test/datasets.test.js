@@ -174,7 +174,7 @@ describe('Datasets', () => {
     );
 
     for (const dataset of datasets) {
-      let metadata
+      let metadata;
       try {
         [metadata] = await dataset.getMetadata();
       } catch (e) {
@@ -182,14 +182,14 @@ describe('Datasets', () => {
         console.log(e);
         return;
       }
-      try {
-        const creationTime = Number(metadata.creationTime);
-        if (isResourceStale(creationTime)) {
+      const creationTime = Number(metadata.creationTime);
+      if (isResourceStale(creationTime)) {
+        try {
           await dataset.delete({force: true});
+        } catch (e) {
+          console.log(`dataset(${dataset.id}).delete() failed`);
+          console.log(e);
         }
-      } catch (e) {
-        console.log(`dataset(${dataset.id}).delete() failed`);
-        console.log(e);
       }
     }
   }
