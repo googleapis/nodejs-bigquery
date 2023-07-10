@@ -570,7 +570,7 @@ class Table extends ServiceObject {
       'BigQueryTimestamp',
       'Geography',
     ];
-    const constructorName = value.constructor.name;
+    const constructorName = value.constructor?.name;
     const isCustomType =
       customTypeConstructorNames.indexOf(constructorName) > -1;
 
