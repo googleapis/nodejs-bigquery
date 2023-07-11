@@ -4,6 +4,14 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## [6.2.1](https://github.com/googleapis/nodejs-bigquery/compare/v6.2.0...v6.2.1) (2023-07-10)
+
+
+### Bug Fixes
+
+* Change view name to match sample comments ([#1207](https://github.com/googleapis/nodejs-bigquery/issues/1207)) ([1002dee](https://github.com/googleapis/nodejs-bigquery/commit/1002dee1ab31d912218e8d49296367b9785dfa5c))
+* Encode values with null prototype ([#1219](https://github.com/googleapis/nodejs-bigquery/issues/1219)) ([1b7a52e](https://github.com/googleapis/nodejs-bigquery/commit/1b7a52ed5b686899df5ab2b11d482a50a1ab19a2))
+
 ## [6.2.0](https://github.com/googleapis/nodejs-bigquery/compare/v6.1.0...v6.2.0) (2023-03-22)
 
 

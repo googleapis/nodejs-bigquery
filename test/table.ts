@@ -434,6 +434,14 @@ describe('BigQuery/Table', () => {
         '-99999999999999999999999999999.999999999'
       );
     });
+
+    it('should return properly encode objects with null prototype', () => {
+      const obj = Object.create(null);
+      obj['name'] = 'Test';
+      assert.deepStrictEqual(Table.encodeValue_(obj), {
+        name: 'Test',
+      });
+    });
   });
 
   describe('formatMetadata_', () => {

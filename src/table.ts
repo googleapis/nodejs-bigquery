@@ -28,7 +28,7 @@ import {promisifyAll} from '@google-cloud/promisify';
 import arrify = require('arrify');
 import Big from 'big.js';
 import * as extend from 'extend';
-import pEvent from 'p-event';
+import {once} from 'events';
 import * as fs from 'fs';
 import * as is from 'is';
 import * as path from 'path';
@@ -570,7 +570,7 @@ class Table extends ServiceObject {
       'BigQueryTimestamp',
       'Geography',
     ];
-    const constructorName = value.constructor.name;
+    const constructorName = value.constructor?.name;
     const isCustomType =
       customTypeConstructorNames.indexOf(constructorName) > -1;
 
@@ -1389,7 +1389,7 @@ class Table extends ServiceObject {
       const jobWritable = fs
         .createReadStream(source)
         .pipe(this.createWriteStream_(metadata));
-      const jobResponse = (await pEvent(jobWritable, 'job')) as Job;
+      const [jobResponse] = (await once(jobWritable, 'job')) as Job[];
       return [jobResponse, jobResponse.metadata];
     }
 
