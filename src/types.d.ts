@@ -279,7 +279,7 @@ declare namespace bigquery {
   };
 
   /**
-   * Specifies the audit configuration for a service. The configuration determines which permission types are logged, and what identities, if any, are exempted from logging. An AuditConfig must have one or more AuditLogConfigs. If there are AuditConfigs for both `allServices` and a specific service, the union of the two AuditConfigs is used for that service: the log_types specified in each AuditConfig are enabled, and the exempted_members in each AuditLogConfig are exempted. Example Policy with multiple AuditConfigs: { "audit_configs": [ { "service": "allServices", "audit_log_configs": [ { "log_type": "DATA_READ", "exempted_members": [ "user:jose@example.com" ] }, { "log_type": "DATA_WRITE" }, { "log_type": "ADMIN_READ" } ] }, { "service": "sampleservice.googleapis.com", "audit_log_configs": [ { "log_type": "DATA_READ" }, { "log_type": "DATA_WRITE", "exempted_members": [ "user:aliya@example.com" ] } ] } ] } For sampleservice, this policy enables DATA_READ, DATA_WRITE and ADMIN_READ logging. It also exempts jose@example.com from DATA_READ logging, and aliya@example.com from DATA_WRITE logging.
+   * Specifies the audit configuration for a service. The configuration determines which permission types are logged, and what identities, if any, are exempted from logging. An AuditConfig must have one or more AuditLogConfigs. If there are AuditConfigs for both `allServices` and a specific service, the union of the two AuditConfigs is used for that service: the log_types specified in each AuditConfig are enabled, and the exempted_members in each AuditLogConfig are exempted. Example Policy with multiple AuditConfigs: { "audit_configs": [ { "service": "allServices", "audit_log_configs": [ { "log_type": "DATA_READ", "exempted_members": [ "user:jose@example.com" ] }, { "log_type": "DATA_WRITE" }, { "log_type": "ADMIN_READ" } ] }, { "service": "sampleservice.googleapis.com", "audit_log_configs": [ { "log_type": "DATA_READ" }, { "log_type": "DATA_WRITE", "exempted_members": [ "user:aliya@example.com" ] } ] } ] } For sampleservice, this policy enables DATA_READ, DATA_WRITE and ADMIN_READ logging. It also exempts `jose@example.com` from DATA_READ logging, and `aliya@example.com` from DATA_WRITE logging.
    */
   type IAuditConfig = {
     /**
@@ -329,6 +329,10 @@ declare namespace bigquery {
   };
 
   type IBiEngineStatistics = {
+    /**
+     * [Output-only] Specifies which mode of BI Engine acceleration was performed (if any).
+     */
+    accelerationMode?: string;
     /**
      * [Output-only] Specifies which mode of BI Engine acceleration was performed (if any).
      */
@@ -485,7 +489,7 @@ declare namespace bigquery {
      */
     condition?: IExpr;
     /**
-     * Specifies the principals requesting access for a Cloud Platform resource. `members` can have the following values: * `allUsers`: A special identifier that represents anyone who is on the internet; with or without a Google account. * `allAuthenticatedUsers`: A special identifier that represents anyone who is authenticated with a Google account or a service account. * `user:{emailid}`: An email address that represents a specific Google account. For example, `alice@example.com` . * `serviceAccount:{emailid}`: An email address that represents a service account. For example, `my-other-app@appspot.gserviceaccount.com`. * `group:{emailid}`: An email address that represents a Google group. For example, `admins@example.com`. * `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a user that has been recently deleted. For example, `alice@example.com?uid=123456789012345678901`. If the user is recovered, this value reverts to `user:{emailid}` and the recovered user retains the role in the binding. * `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a service account that has been recently deleted. For example, `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`. If the service account is undeleted, this value reverts to `serviceAccount:{emailid}` and the undeleted service account retains the role in the binding. * `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a Google group that has been recently deleted. For example, `admins@example.com?uid=123456789012345678901`. If the group is recovered, this value reverts to `group:{emailid}` and the recovered group retains the role in the binding. * `domain:{domain}`: The G Suite domain (primary) that represents all the users of that domain. For example, `google.com` or `example.com`.
+     * Specifies the principals requesting access for a Google Cloud resource. `members` can have the following values: * `allUsers`: A special identifier that represents anyone who is on the internet; with or without a Google account. * `allAuthenticatedUsers`: A special identifier that represents anyone who is authenticated with a Google account or a service account. Does not include identities that come from external identity providers (IdPs) through identity federation. * `user:{emailid}`: An email address that represents a specific Google account. For example, `alice@example.com` . * `serviceAccount:{emailid}`: An email address that represents a Google service account. For example, `my-other-app@appspot.gserviceaccount.com`. * `serviceAccount:{projectid}.svc.id.goog[{namespace}/{kubernetes-sa}]`: An identifier for a [Kubernetes service account](https://cloud.google.com/kubernetes-engine/docs/how-to/kubernetes-service-accounts). For example, `my-project.svc.id.goog[my-namespace/my-kubernetes-sa]`. * `group:{emailid}`: An email address that represents a Google group. For example, `admins@example.com`. * `domain:{domain}`: The G Suite domain (primary) that represents all the users of that domain. For example, `google.com` or `example.com`. * `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a user that has been recently deleted. For example, `alice@example.com?uid=123456789012345678901`. If the user is recovered, this value reverts to `user:{emailid}` and the recovered user retains the role in the binding. * `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a service account that has been recently deleted. For example, `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`. If the service account is undeleted, this value reverts to `serviceAccount:{emailid}` and the undeleted service account retains the role in the binding. * `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a Google group that has been recently deleted. For example, `admins@example.com?uid=123456789012345678901`. If the group is recovered, this value reverts to `group:{emailid}` and the recovered group retains the role in the binding.
      */
     members?: Array<string>;
     /**
@@ -689,6 +693,10 @@ declare namespace bigquery {
      */
     null_marker?: string;
     /**
+     * [Optional] Preserves the embedded ASCII control characters (the first 32 characters in the ASCII-table, from '\x00' to '\x1F') when loading from CSV. Only applicable to CSV, ignored for other formats.
+     */
+    preserveAsciiControlCharacters?: boolean;
+    /**
      * [Optional] The value that is used to quote data sections in a CSV file. BigQuery converts the string to ISO-8859-1 encoding, and then uses the first byte of the encoded string to split the data in its raw, binary state. The default value is a double-quote ('"'). If your data does not contain quoted sections, set the property value to an empty string. If your data contains quoted newline characters, you must also set the allowQuotedNewlines property to true.
      */
     quote?: string;
@@ -696,6 +704,13 @@ declare namespace bigquery {
      * [Optional] The number of rows at the top of a CSV file that BigQuery will skip when reading the data. The default value is 0. This property is useful if you have header rows in the file that should be skipped. When autodetect is on, the behavior is the following: * skipLeadingRows unspecified - Autodetect tries to detect headers in the first row. If they are not detected, the row is read as data. Otherwise data is read starting from the second row. * skipLeadingRows is 0 - Instructs autodetect that there are no headers and data should be read starting from the first row. * skipLeadingRows = N > 0 - Autodetect skips N-1 rows and tries to detect headers in row N. If headers are not detected, row N is just skipped. Otherwise row N is used to extract column names for the detected schema.
      */
     skipLeadingRows?: string;
+  };
+
+  type IDataMaskingStatistics = {
+    /**
+     * [Output-only] [Preview] Whether any accessed data was protected by data masking. The actual evaluation is done by accessStats.masked_field_count > 0. Since this is only used for the discovery_doc generation purpose, as long as the type (boolean) matches, client library can leverage this. The actual evaluation of the variable is done else-where.
+     */
+    dataMaskingApplied?: boolean;
   };
 
   /**
@@ -776,6 +791,10 @@ declare namespace bigquery {
      */
     defaultPartitionExpirationMs?: string;
     /**
+     * [Output-only] The default rounding mode of the dataset.
+     */
+    defaultRoundingMode?: string;
+    /**
      * [Optional] The default lifetime of all tables in the dataset, in milliseconds. The minimum value is 3600000 milliseconds (one hour). Once this property is set, all newly-created tables in the dataset will have an expirationTime property set to the creation time plus the value in this property, and changing the value will only affect new tables, not existing ones. When the expirationTime for a given table is reached, that table will be deleted automatically. If a table's expirationTime is modified or removed before the table expires, or if you provide an explicit expirationTime when creating a table, that value takes precedence over the default expiration time indicated by this property.
      */
     defaultTableExpirationMs?: string;
@@ -806,7 +825,7 @@ declare namespace bigquery {
     /**
      * The labels associated with this dataset. You can use these to organize and group your datasets. You can set this property when inserting or updating a dataset. See Creating and Updating Dataset Labels for more information.
      */
-    labels?: {[key: string]: string};
+    labels?: { [key: string]: string };
     /**
      * [Output-only] The date when this dataset or any of its tables was last modified, in milliseconds since the epoch.
      */
@@ -822,11 +841,15 @@ declare namespace bigquery {
     /**
      * [Output-only] Reserved for future use.
      */
-    satisfiesPZS?: boolean;
+    satisfiesPzs?: boolean;
     /**
      * [Output-only] A URL that can be used to access the resource again. You can use this URL in Get or Update requests to the resource.
      */
     selfLink?: string;
+    /**
+     * [Optional] Storage billing model to be used for all tables in the dataset. Can be set to PHYSICAL. Default is LOGICAL.
+     */
+    storageBillingModel?: string;
     /**
      * [Optional]The tags associated with this dataset. Tag keys are globally unique.
      */
@@ -847,7 +870,7 @@ declare namespace bigquery {
      * [Required] The dataset this entry applies to.
      */
     dataset?: IDatasetReference;
-    targetTypes?: Array<'TARGET_TYPE_UNSPECIFIED' | 'VIEWS'>;
+    targetTypes?: Array<'TARGET_TYPE_UNSPECIFIED' | 'VIEWS' | 'ROUTINES'>;
   };
 
   type IDatasetList = {
@@ -874,7 +897,7 @@ declare namespace bigquery {
       /**
        * The labels associated with this dataset. You can use these to organize and group your datasets.
        */
-      labels?: {[key: string]: string};
+      labels?: { [key: string]: string };
       /**
        * The geographic location where the data resides.
        */
@@ -921,7 +944,7 @@ declare namespace bigquery {
     /**
      * [Optional] The labels associated with this table. You can use these to organize and group your tables. This will only be used if the destination table is newly created. If the table already exists and labels are different than the current labels are provided, the job will fail.
      */
-    labels?: {[key: string]: string};
+    labels?: { [key: string]: string };
   };
 
   /**
@@ -989,7 +1012,7 @@ declare namespace bigquery {
 
   type IEncryptionConfiguration = {
     /**
-     * [Optional] Describes the Cloud KMS encryption key that will be used to protect destination BigQuery table. The BigQuery Service Account associated with your project requires access to this encryption key.
+     * Optional. Describes the Cloud KMS encryption key that will be used to protect destination BigQuery table. The BigQuery Service Account associated with your project requires access to this encryption key.
      */
     kmsKeyName?: string;
   };
@@ -1261,6 +1284,10 @@ declare namespace bigquery {
      */
     decimalTargetTypes?: Array<string>;
     /**
+     * [Optional] Specifies how source URIs are interpreted for constructing the file set to load. By default source URIs are expanded against the underlying storage. Other options include specifying manifest files. Only applicable to object storage systems.
+     */
+    fileSetSpecType?: string;
+    /**
      * [Optional] Additional options if sourceFormat is set to GOOGLE_SHEETS.
      */
     googleSheetsOptions?: IGoogleSheetsOptions;
@@ -1273,13 +1300,29 @@ declare namespace bigquery {
      */
     ignoreUnknownValues?: boolean;
     /**
+     * Additional properties to set if `sourceFormat` is set to `NEWLINE_DELIMITED_JSON`.
+     */
+    jsonOptions?: IJsonOptions;
+    /**
      * [Optional] The maximum number of bad records that BigQuery can ignore when reading data. If the number of bad records exceeds this value, an invalid error is returned in the job result. This is only valid for CSV, JSON, and Google Sheets. The default value is 0, which requires that all records are valid. This setting is ignored for Google Cloud Bigtable, Google Cloud Datastore backups and Avro formats.
      */
     maxBadRecords?: number;
     /**
+     * [Optional] Metadata Cache Mode for the table. Set this to enable caching of metadata from external data source.
+     */
+    metadataCacheMode?: string;
+    /**
+     * ObjectMetadata is used to create Object Tables. Object Tables contain a listing of objects (with their metadata) found at the source_uris. If ObjectMetadata is set, source_format should be omitted. Currently SIMPLE is the only supported Object Metadata type.
+     */
+    objectMetadata?: string;
+    /**
      * Additional properties to set if sourceFormat is set to Parquet.
      */
     parquetOptions?: IParquetOptions;
+    /**
+     * [Optional] Provide a referencing file with the expected table schema. Enabled for the format: AVRO, PARQUET, ORC.
+     */
+    referenceFileSchemaUri?: string;
     /**
      * [Optional] The schema for the data. Schema is required for CSV and JSON formats. Schema is disallowed for Google Cloud Bigtable, Cloud Datastore backups, and Avro formats.
      */
@@ -1420,6 +1463,10 @@ declare namespace bigquery {
   };
 
   type IHivePartitioningOptions = {
+    /**
+     * [Output-only] For permanent external tables, this field is populated with the hive partition keys in the order they were inferred. The types of the partition keys can be deduced by checking the table schema (which will include the partition keys). Not every API will populate this field in the output. For example, Tables.Get will populate it, but Tables.List will not contain this field.
+     */
+    fields?: Array<string>;
     /**
      * [Optional] When set, what mode of hive partitioning to use when reading data. The following modes are supported. (1) AUTO: automatically infer partition key name(s) and type(s). (2) STRINGS: automatically infer partition key name(s). All types are interpreted as strings. (3) CUSTOM: partition key schema is encoded in the source URI prefix. Not all storage formats support hive partitioning. Requesting hive partitioning on an unsupported format will lead to an error. Currently supported types include: AVRO, CSV, JSON, ORC and Parquet.
      */
@@ -1581,6 +1628,25 @@ declare namespace bigquery {
     trialId?: string;
   };
 
+  type IIndexUnusedReason = {
+    /**
+     * [Output-only] Specifies the base table involved in the reason that no search index was used.
+     */
+    base_table?: ITableReference;
+    /**
+     * [Output-only] Specifies the high-level reason for the scenario when no search index was used.
+     */
+    code?: string;
+    /**
+     * [Output-only] Specifies the name of the unused search index, if available.
+     */
+    index_name?: string;
+    /**
+     * [Output-only] Free form human-readable reason for the scenario when no search index was used.
+     */
+    message?: string;
+  };
+
   /**
    * An array of int.
    */
@@ -1736,7 +1802,7 @@ declare namespace bigquery {
     /**
      * The labels associated with this job. You can use these to organize and group your jobs. Label keys and values can be no longer than 63 characters, can only contain lowercase letters, numeric characters, underscores and dashes. International characters are allowed. Label values are optional. Label keys must start with a letter and each label in the list must have a different key.
      */
-    labels?: {[key: string]: string};
+    labels?: { [key: string]: string };
     /**
      * [Pick one] Configures a load job.
      */
@@ -1804,9 +1870,17 @@ declare namespace bigquery {
      */
     clustering?: IClustering;
     /**
+     * Connection properties.
+     */
+    connectionProperties?: Array<IConnectionProperty>;
+    /**
      * [Optional] Specifies whether the job is allowed to create new tables. The following values are supported: CREATE_IF_NEEDED: If the table does not exist, BigQuery creates the table. CREATE_NEVER: The table must already exist. If it does not, a 'notFound' error is returned in the job result. The default value is CREATE_IF_NEEDED. Creation, truncation and append actions occur as one atomic update upon job completion.
      */
     createDisposition?: string;
+    /**
+     * If true, creates a new session, where session id will be a server generated random id. If false, runs query with an existing session_id passed in ConnectionProperty, otherwise runs the load job in non-session mode.
+     */
+    createSession?: boolean;
     /**
      * [Optional] Defines the list of possible SQL data types to which the source decimal values are converted. This list and the precision and the scale parameters of the decimal field determine the target type. In the order of NUMERIC, BIGNUMERIC, and STRING, a type is picked if it is in the specified list and if it supports the precision and the scale. STRING supports all precision and scale values. If none of the listed types supports the precision and the scale, the type supporting the widest range in the specified list is picked, and if a value exceeds the supported range when reading the data, an error will be thrown. Example: Suppose the value of this field is ["NUMERIC", "BIGNUMERIC"]. If (precision,scale) is: (38,9) -> NUMERIC; (39,9) -> BIGNUMERIC (NUMERIC cannot hold 30 integer digits); (38,10) -> BIGNUMERIC (NUMERIC cannot hold 10 fractional digits); (76,38) -> BIGNUMERIC; (77,38) -> BIGNUMERIC (error if value exeeds supported range). This field cannot contain duplicate types. The order of the types in this field is ignored. For example, ["BIGNUMERIC", "NUMERIC"] is the same as ["NUMERIC", "BIGNUMERIC"] and NUMERIC always takes precedence over BIGNUMERIC. Defaults to ["NUMERIC", "STRING"] for ORC and ["NUMERIC"] for the other file formats.
      */
@@ -1831,6 +1905,10 @@ declare namespace bigquery {
      * [Optional] The separator for fields in a CSV file. The separator can be any ISO-8859-1 single-byte character. To use a character in the range 128-255, you must encode the character as UTF8. BigQuery converts the string to ISO-8859-1 encoding, and then uses the first byte of the encoded string to split the data in its raw, binary state. BigQuery also supports the escape sequence "\t" to specify a tab separator. The default value is a comma (',').
      */
     fieldDelimiter?: string;
+    /**
+     * [Optional] Specifies how source URIs are interpreted for constructing the file set to load. By default source URIs are expanded against the underlying storage. Other options include specifying manifest files. Only applicable to object storage systems.
+     */
+    fileSetSpecType?: string;
     /**
      * [Optional] Options to configure hive partitioning support.
      */
@@ -1871,6 +1949,10 @@ declare namespace bigquery {
      * [TrustedTester] Range partitioning specification for this table. Only one of timePartitioning and rangePartitioning should be specified.
      */
     rangePartitioning?: IRangePartitioning;
+    /**
+     * User provided referencing file with the expected reader schema, Available for the format: AVRO, PARQUET, ORC.
+     */
+    referenceFileSchemaUri?: string;
     /**
      * [Optional] The schema for the destination table. The schema can be omitted if the destination table already exists, or if you're loading data from Google Cloud Datastore.
      */
@@ -1926,6 +2008,10 @@ declare namespace bigquery {
      * Connection properties.
      */
     connectionProperties?: Array<IConnectionProperty>;
+    /**
+     * [Optional] Specifies whether the query should be executed as a continuous query. The default value is false.
+     */
+    continuous?: boolean;
     /**
      * [Optional] Specifies whether the job is allowed to create new tables. The following values are supported: CREATE_IF_NEEDED: If the table does not exist, BigQuery creates the table. CREATE_NEVER: The table must already exist. If it does not, a 'notFound' error is returned in the job result. The default value is CREATE_IF_NEEDED. Creation, truncation and append actions occur as one atomic update upon job completion.
      */
@@ -1989,7 +2075,7 @@ declare namespace bigquery {
     /**
      * [Optional] If querying an external data source outside of BigQuery, describes the data format, location and other properties of the data source. By defining these properties, the data source can then be queried as if it were a standard BigQuery table.
      */
-    tableDefinitions?: {[key: string]: IExternalDataConfiguration};
+    tableDefinitions?: { [key: string]: IExternalDataConfiguration };
     /**
      * Time-based partitioning specification for the destination table. Only one of timePartitioning and rangePartitioning should be specified.
      */
@@ -2132,6 +2218,10 @@ declare namespace bigquery {
      */
     creationTime?: string;
     /**
+     * [Output-only] Statistics for data masking. Present only for query and extract jobs.
+     */
+    dataMaskingStatistics?: IDataMaskingStatistics;
+    /**
      * [Output-only] End time of this job, in milliseconds since the epoch. This field will be present whenever a job is in the DONE state.
      */
     endTime?: string;
@@ -2208,23 +2298,23 @@ declare namespace bigquery {
 
   type IJobStatistics2 = {
     /**
-     * BI Engine specific Statistics. [Output-only] BI Engine specific Statistics.
+     * BI Engine specific Statistics. [Output only] BI Engine specific Statistics.
      */
     biEngineStatistics?: IBiEngineStatistics;
     /**
-     * [Output-only] Billing tier for the job.
+     * [Output only] Billing tier for the job.
      */
     billingTier?: number;
     /**
-     * [Output-only] Whether the query result was fetched from the query cache.
+     * [Output only] Whether the query result was fetched from the query cache.
      */
     cacheHit?: boolean;
     /**
-     * [Output-only] [Preview] The number of row access policies affected by a DDL statement. Present only for DROP ALL ROW ACCESS POLICIES queries.
+     * [Output only] [Preview] The number of row access policies affected by a DDL statement. Present only for DROP ALL ROW ACCESS POLICIES queries.
      */
     ddlAffectedRowAccessPolicyCount?: string;
     /**
-     * [Output-only] The DDL destination table. Present only for ALTER TABLE RENAME TO queries. Note that ddl_target_table is used just for its type information.
+     * [Output only] The DDL destination table. Present only for ALTER TABLE RENAME TO queries. Note that ddl_target_table is used just for its type information.
      */
     ddlDestinationTable?: ITableReference;
     /**
@@ -2232,7 +2322,7 @@ declare namespace bigquery {
      */
     ddlOperationPerformed?: string;
     /**
-     * [Output-only] The DDL target dataset. Present only for CREATE/ALTER/DROP SCHEMA queries.
+     * [Output only] The DDL target dataset. Present only for CREATE/ALTER/DROP SCHEMA queries.
      */
     ddlTargetDataset?: IDatasetReference;
     /**
@@ -2240,98 +2330,110 @@ declare namespace bigquery {
      */
     ddlTargetRoutine?: IRoutineReference;
     /**
-     * [Output-only] [Preview] The DDL target row access policy. Present only for CREATE/DROP ROW ACCESS POLICY queries.
+     * [Output only] [Preview] The DDL target row access policy. Present only for CREATE/DROP ROW ACCESS POLICY queries.
      */
     ddlTargetRowAccessPolicy?: IRowAccessPolicyReference;
     /**
-     * [Output-only] The DDL target table. Present only for CREATE/DROP TABLE/VIEW and DROP ALL ROW ACCESS POLICIES queries.
+     * [Output only] The DDL target table. Present only for CREATE/DROP TABLE/VIEW and DROP ALL ROW ACCESS POLICIES queries.
      */
     ddlTargetTable?: ITableReference;
     /**
-     * [Output-only] Detailed statistics for DML statements Present only for DML statements INSERT, UPDATE, DELETE or TRUNCATE.
+     * [Output only] Detailed statistics for DML statements Present only for DML statements INSERT, UPDATE, DELETE or TRUNCATE.
      */
     dmlStats?: IDmlStatistics;
     /**
-     * [Output-only] The original estimate of bytes processed for the job.
+     * [Output only] The original estimate of bytes processed for the job.
      */
     estimatedBytesProcessed?: string;
     /**
-     * [Output-only] Statistics of a BigQuery ML training job.
+     * [Output only] Statistics of a BigQuery ML training job.
      */
     mlStatistics?: IMlStatistics;
     /**
-     * [Output-only, Beta] Information about create model query job progress.
+     * [Output only, Beta] Information about create model query job progress.
      */
     modelTraining?: IBigQueryModelTraining;
     /**
-     * [Output-only, Beta] Deprecated; do not use.
+     * [Output only, Beta] Deprecated; do not use.
      */
     modelTrainingCurrentIteration?: number;
     /**
-     * [Output-only, Beta] Deprecated; do not use.
+     * [Output only, Beta] Deprecated; do not use.
      */
     modelTrainingExpectedTotalIteration?: string;
     /**
-     * [Output-only] The number of rows affected by a DML statement. Present only for DML statements INSERT, UPDATE or DELETE.
+     * [Output only] The number of rows affected by a DML statement. Present only for DML statements INSERT, UPDATE or DELETE.
      */
     numDmlAffectedRows?: string;
     /**
-     * [Output-only] Describes execution plan for the query.
+     * [Output only] Describes execution plan for the query.
      */
     queryPlan?: Array<IExplainQueryStage>;
     /**
-     * [Output-only] Referenced routines (persistent user-defined functions and stored procedures) for the job.
+     * [Output only] Referenced routines (persistent user-defined functions and stored procedures) for the job.
      */
     referencedRoutines?: Array<IRoutineReference>;
     /**
-     * [Output-only] Referenced tables for the job. Queries that reference more than 50 tables will not have a complete list.
+     * [Output only] Referenced tables for the job. Queries that reference more than 50 tables will not have a complete list.
      */
     referencedTables?: Array<ITableReference>;
     /**
-     * [Output-only] Job resource usage breakdown by reservation.
+     * [Output only] Job resource usage breakdown by reservation.
      */
     reservationUsage?: Array<{
       /**
-       * [Output-only] Reservation name or "unreserved" for on-demand resources usage.
+       * [Output only] Reservation name or "unreserved" for on-demand resources usage.
        */
       name?: string;
       /**
-       * [Output-only] Slot-milliseconds the job spent in the given reservation.
+       * [Output only] Slot-milliseconds the job spent in the given reservation.
        */
       slotMs?: string;
     }>;
     /**
-     * [Output-only] The schema of the results. Present only for successful dry run of non-legacy SQL queries.
+     * [Output only] The schema of the results. Present only for successful dry run of non-legacy SQL queries.
      */
     schema?: ITableSchema;
+    /**
+     * [Output only] Search query specific statistics.
+     */
+    searchStatistics?: ISearchStatistics;
+    /**
+     * [Output only] Statistics of a Spark procedure job.
+     */
+    sparkStatistics?: ISparkStatistics;
     /**
      * The type of query statement, if valid. Possible values (new values might be added in the future): "SELECT": SELECT query. "INSERT": INSERT query; see https://cloud.google.com/bigquery/docs/reference/standard-sql/data-manipulation-language. "UPDATE": UPDATE query; see https://cloud.google.com/bigquery/docs/reference/standard-sql/data-manipulation-language. "DELETE": DELETE query; see https://cloud.google.com/bigquery/docs/reference/standard-sql/data-manipulation-language. "MERGE": MERGE query; see https://cloud.google.com/bigquery/docs/reference/standard-sql/data-manipulation-language. "ALTER_TABLE": ALTER TABLE query. "ALTER_VIEW": ALTER VIEW query. "ASSERT": ASSERT condition AS 'description'. "CREATE_FUNCTION": CREATE FUNCTION query. "CREATE_MODEL": CREATE [OR REPLACE] MODEL ... AS SELECT ... . "CREATE_PROCEDURE": CREATE PROCEDURE query. "CREATE_TABLE": CREATE [OR REPLACE] TABLE without AS SELECT. "CREATE_TABLE_AS_SELECT": CREATE [OR REPLACE] TABLE ... AS SELECT ... . "CREATE_VIEW": CREATE [OR REPLACE] VIEW ... AS SELECT ... . "DROP_FUNCTION" : DROP FUNCTION query. "DROP_PROCEDURE": DROP PROCEDURE query. "DROP_TABLE": DROP TABLE query. "DROP_VIEW": DROP VIEW query.
      */
     statementType?: string;
     /**
-     * [Output-only] [Beta] Describes a timeline of job execution.
+     * [Output only] [Beta] Describes a timeline of job execution.
      */
     timeline?: Array<IQueryTimelineSample>;
     /**
-     * [Output-only] Total bytes billed for the job.
+     * [Output only] Total bytes billed for the job.
      */
     totalBytesBilled?: string;
     /**
-     * [Output-only] Total bytes processed for the job.
+     * [Output only] Total bytes processed for the job.
      */
     totalBytesProcessed?: string;
     /**
-     * [Output-only] For dry-run jobs, totalBytesProcessed is an estimate and this field specifies the accuracy of the estimate. Possible values can be: UNKNOWN: accuracy of the estimate is unknown. PRECISE: estimate is precise. LOWER_BOUND: estimate is lower bound of what the query would cost. UPPER_BOUND: estimate is upper bound of what the query would cost.
+     * [Output only] For dry-run jobs, totalBytesProcessed is an estimate and this field specifies the accuracy of the estimate. Possible values can be: UNKNOWN: accuracy of the estimate is unknown. PRECISE: estimate is precise. LOWER_BOUND: estimate is lower bound of what the query would cost. UPPER_BOUND: estimate is upper bound of what the query would cost.
      */
     totalBytesProcessedAccuracy?: string;
     /**
-     * [Output-only] Total number of partitions processed from all partitioned tables referenced in the job.
+     * [Output only] Total number of partitions processed from all partitioned tables referenced in the job.
      */
     totalPartitionsProcessed?: string;
     /**
-     * [Output-only] Slot-milliseconds for the job.
+     * [Output only] Slot-milliseconds for the job.
      */
     totalSlotMs?: string;
+    /**
+     * [Output-only] Total bytes transferred for cross-cloud queries such as Cross Cloud Transfer and CREATE TABLE AS SELECT (CTAS).
+     */
+    transferredBytes?: string;
     /**
      * Standard SQL only: list of undeclared query parameters detected during a dry run validation.
      */
@@ -2401,7 +2503,14 @@ declare namespace bigquery {
   /**
    * Represents a single JSON object.
    */
-  type IJsonObject = {[key: string]: IJsonValue};
+  type IJsonObject = { [key: string]: IJsonValue };
+
+  type IJsonOptions = {
+    /**
+     * [Optional] The character encoding of the data. The supported values are UTF-8, UTF-16BE, UTF-16LE, UTF-32BE, and UTF-32LE. The default value is UTF-8.
+     */
+    encoding?: string;
+  };
 
   type IJsonValue = any;
 
@@ -2422,7 +2531,7 @@ declare namespace bigquery {
      */
     nextPageToken?: string;
     /**
-     * Routines in the requested dataset. Unless read_mask is set in the request, only the following fields are populated: etag, project_id, dataset_id, routine_id, routine_type, creation_time, last_modified_time, and language.
+     * Routines in the requested dataset. Unless read_mask is set in the request, only the following fields are populated: etag, project_id, dataset_id, routine_id, routine_type, creation_time, last_modified_time, language, and remote_function_options.
      */
     routines?: Array<IRoutine>;
   };
@@ -2453,6 +2562,10 @@ declare namespace bigquery {
 
   type IMaterializedViewDefinition = {
     /**
+     * [Optional] Allow non incremental materialized view definition. The default value is "false".
+     */
+    allow_non_incremental_definition?: boolean;
+    /**
      * [Optional] [TrustedTester] Enable automatic refresh of the materialized view when the base table is updated. The default value is "true".
      */
     enableRefresh?: boolean;
@@ -2460,6 +2573,10 @@ declare namespace bigquery {
      * [Output-only] [TrustedTester] The time when this materialized view was last modified, in milliseconds since the epoch.
      */
     lastRefreshTime?: string;
+    /**
+     * [Optional] Max staleness of data that could be returned when materizlized view is queried (formatted as Google SQL Interval type).
+     */
+    maxStaleness?: string;
     /**
      * [Required] A query whose result is persisted.
      */
@@ -2511,7 +2628,7 @@ declare namespace bigquery {
      */
     expirationTime?: string;
     /**
-     * Output only. Input feature columns that were used to train this model.
+     * Output only. Input feature columns for the model inference. If the model is trained with TRANSFORM clause, these are the input of the TRANSFORM clause.
      */
     featureColumns?: Array<IStandardSqlField>;
     /**
@@ -2533,7 +2650,7 @@ declare namespace bigquery {
     /**
      * The labels associated with this model. You can use these to organize and group your models. Label keys and values can be no longer than 63 characters, can only contain lowercase letters, numeric characters, underscores and dashes. International characters are allowed. Label values are optional. Label keys must start with a letter and each label in the list must have a different key.
      */
-    labels?: {[key: string]: string};
+    labels?: { [key: string]: string };
     /**
      * Output only. The time when this model was last modified, in millisecs since the epoch.
      */
@@ -2558,20 +2675,32 @@ declare namespace bigquery {
       | 'DNN_CLASSIFIER'
       | 'TENSORFLOW'
       | 'DNN_REGRESSOR'
+      | 'XGBOOST'
       | 'BOOSTED_TREE_REGRESSOR'
       | 'BOOSTED_TREE_CLASSIFIER'
       | 'ARIMA'
       | 'AUTOML_REGRESSOR'
       | 'AUTOML_CLASSIFIER'
       | 'PCA'
+      | 'DNN_LINEAR_COMBINED_CLASSIFIER'
+      | 'DNN_LINEAR_COMBINED_REGRESSOR'
       | 'AUTOENCODER'
-      | 'ARIMA_PLUS';
+      | 'ARIMA_PLUS'
+      | 'ARIMA_PLUS_XREG'
+      | 'RANDOM_FOREST_REGRESSOR'
+      | 'RANDOM_FOREST_CLASSIFIER'
+      | 'TENSORFLOW_LITE'
+      | 'ONNX';
     /**
      * Output only. For single-objective [hyperparameter tuning](/bigquery-ml/docs/reference/standard-sql/bigqueryml-syntax-hp-tuning-overview) models, it only contains the best trial. For multi-objective [hyperparameter tuning](/bigquery-ml/docs/reference/standard-sql/bigqueryml-syntax-hp-tuning-overview) models, it contains all Pareto optimal trials sorted by trial_id.
      */
     optimalTrialIds?: Array<string>;
     /**
-     * Output only. Information for all training runs in increasing order of start_time.
+     * Output only. Remote model info
+     */
+    remoteModelInfo?: IRemoteModelInfo;
+    /**
+     * Information for all training runs in increasing order of start_time.
      */
     trainingRuns?: Array<ITrainingRun>;
   };
@@ -2593,15 +2722,15 @@ declare namespace bigquery {
 
   type IModelReference = {
     /**
-     * [Required] The ID of the dataset containing this model.
+     * Required. The ID of the dataset containing this model.
      */
     datasetId?: string;
     /**
-     * [Required] The ID of the model. The ID must contain only letters (a-z, A-Z), numbers (0-9), or underscores (_). The maximum length is 1,024 characters.
+     * Required. The ID of the model. The ID must contain only letters (a-z, A-Z), numbers (0-9), or underscores (_). The maximum length is 1,024 characters.
      */
     modelId?: string;
     /**
-     * [Required] The ID of the project containing this model.
+     * Required. The ID of the project containing this model.
      */
     projectId?: string;
   };
@@ -2777,7 +2906,7 @@ declare namespace bigquery {
     /**
      * [Optional] The struct field values, in order of the struct type's declaration.
      */
-    structValues?: {[key: string]: IQueryParameterValue};
+    structValues?: { [key: string]: IQueryParameterValue };
     /**
      * [Optional] The value of this value, if a simple scalar type.
      */
@@ -2789,6 +2918,10 @@ declare namespace bigquery {
      * Connection properties.
      */
     connectionProperties?: Array<IConnectionProperty>;
+    /**
+     * [Optional] Specifies whether the query should be executed as a continuous query. The default value is false.
+     */
+    continuous?: boolean;
     /**
      * If true, creates a new session, where session id will be a server generated random id. If false, runs query with an existing session_id passed in ConnectionProperty, otherwise runs query in non-session mode.
      */
@@ -2808,7 +2941,7 @@ declare namespace bigquery {
     /**
      * The labels associated with this job. You can use these to organize and group your jobs. Label keys and values can be no longer than 63 characters, can only contain lowercase letters, numeric characters, underscores and dashes. International characters are allowed. Label values are optional. Label keys must start with a letter and each label in the list must have a different key.
      */
-    labels?: {[key: string]: string};
+    labels?: { [key: string]: string };
     /**
      * The geographic location where the job should run. See details at https://cloud.google.com/bigquery/docs/locations#specifying_your_location.
      */
@@ -2924,7 +3057,11 @@ declare namespace bigquery {
      */
     elapsedMs?: string;
     /**
-     * Total parallel units of work remaining for the active stages.
+     * Units of work that can be scheduled immediately. Providing additional slots for these units of work will speed up the query, provided no other query in the reservation needs additional slots.
+     */
+    estimatedRunnableUnits?: string;
+    /**
+     * Total units of work remaining for the query. This number can be revised (increased or decreased) while the query is running.
      */
     pendingUnits?: string;
     /**
@@ -3006,6 +3143,54 @@ declare namespace bigquery {
   };
 
   /**
+   * Options for a remote user-defined function.
+   */
+  type IRemoteFunctionOptions = {
+    /**
+     * Fully qualified name of the user-provided connection object which holds the authentication information to send requests to the remote service. Format: ```"projects/{projectId}/locations/{locationId}/connections/{connectionId}"```
+     */
+    connection?: string;
+    /**
+     * Endpoint of the user-provided remote service, e.g. ```https://us-east1-my_gcf_project.cloudfunctions.net/remote_add```
+     */
+    endpoint?: string;
+    /**
+     * Max number of rows in each batch sent to the remote service. If absent or if 0, BigQuery dynamically decides the number of rows in a batch.
+     */
+    maxBatchingRows?: string;
+    /**
+     * User-defined context as a set of key/value pairs, which will be sent as function invocation context together with batched arguments in the requests to the remote service. The total number of bytes of keys and values must be less than 8KB.
+     */
+    userDefinedContext?: { [key: string]: string };
+  };
+
+  /**
+   * Remote Model Info
+   */
+  type IRemoteModelInfo = {
+    /**
+     * Output only. Fully qualified name of the user-provided connection object of the remote model. Format: ```"projects/{project_id}/locations/{location_id}/connections/{connection_id}"```
+     */
+    connection?: string;
+    /**
+     * Output only. The endpoint for remote model.
+     */
+    endpoint?: string;
+    /**
+     * Output only. Max number of rows in each batch sent to the remote service. If unset, the number of rows in each batch is set dynamically.
+     */
+    maxBatchingRows?: string;
+    /**
+     * Output only. The remote service type for remote model.
+     */
+    remoteServiceType?:
+      | 'REMOTE_SERVICE_TYPE_UNSPECIFIED'
+      | 'CLOUD_AI_TRANSLATE_V3'
+      | 'CLOUD_AI_VISION_V1'
+      | 'CLOUD_AI_NATURAL_LANGUAGE_V1';
+  };
+
+  /**
    * A user-defined function or a stored procedure.
    */
   type IRoutine = {
@@ -3041,15 +3226,25 @@ declare namespace bigquery {
      */
     importedLibraries?: Array<string>;
     /**
-     * Optional. Defaults to "SQL".
+     * Optional. Defaults to "SQL" if remote_function_options field is absent, not set otherwise.
      */
-    language?: 'LANGUAGE_UNSPECIFIED' | 'SQL' | 'JAVASCRIPT';
+    language?:
+      | 'LANGUAGE_UNSPECIFIED'
+      | 'SQL'
+      | 'JAVASCRIPT'
+      | 'PYTHON'
+      | 'JAVA'
+      | 'SCALA';
     /**
      * Output only. The time when this routine was last modified, in milliseconds since the epoch.
      */
     lastModifiedTime?: string;
     /**
-     * Optional. Can be set only if routine_type = "TABLE_VALUED_FUNCTION". If absent, the return table type is inferred from definition_body at query time in each query that references this routine. If present, then the columns in the evaluated table result will be cast to match the column types specificed in return table type, at query time.
+     * Optional. Remote function specific options.
+     */
+    remoteFunctionOptions?: IRemoteFunctionOptions;
+    /**
+     * Optional. Can be set only if routine_type = "TABLE_VALUED_FUNCTION". If absent, the return table type is inferred from definition_body at query time in each query that references this routine. If present, then the columns in the evaluated table result will be cast to match the column types specified in return table type, at query time.
      */
     returnTableType?: IStandardSqlTableType;
     /**
@@ -3067,7 +3262,12 @@ declare namespace bigquery {
       | 'ROUTINE_TYPE_UNSPECIFIED'
       | 'SCALAR_FUNCTION'
       | 'PROCEDURE'
-      | 'TABLE_VALUED_FUNCTION';
+      | 'TABLE_VALUED_FUNCTION'
+      | 'AGGREGATE_FUNCTION';
+    /**
+     * Optional. Spark specific options.
+     */
+    sparkOptions?: ISparkOptions;
     /**
      * Optional. Can be set for procedures only. If true (default), the definition body will be validated in the creation and the updates of the procedure. For procedures with an argument of ANY TYPE, the definition body validtion is not supported at creation/update time, and thus this field must be set to false explicitly.
      */
@@ -3076,15 +3276,15 @@ declare namespace bigquery {
 
   type IRoutineReference = {
     /**
-     * [Required] The ID of the dataset containing this routine.
+     * Required. The ID of the dataset containing this routine.
      */
     datasetId?: string;
     /**
-     * [Required] The ID of the project containing this routine.
+     * Required. The ID of the project containing this routine.
      */
     projectId?: string;
     /**
-     * [Required] The ID of the routine. The ID must contain only letters (a-z, A-Z), numbers (0-9), or underscores (_). The maximum length is 256 characters.
+     * Required. The ID of the routine. The ID must contain only letters (a-z, A-Z), numbers (0-9), or underscores (_). The maximum length is 256 characters.
      */
     routineId?: string;
   };
@@ -3131,19 +3331,19 @@ declare namespace bigquery {
 
   type IRowAccessPolicyReference = {
     /**
-     * [Required] The ID of the dataset containing this row access policy.
+     * Required. The ID of the dataset containing this row access policy.
      */
     datasetId?: string;
     /**
-     * [Required] The ID of the row access policy. The ID must contain only letters (a-z, A-Z), numbers (0-9), or underscores (_). The maximum length is 256 characters.
+     * Required. The ID of the row access policy. The ID must contain only letters (a-z, A-Z), numbers (0-9), or underscores (_). The maximum length is 256 characters.
      */
     policyId?: string;
     /**
-     * [Required] The ID of the project containing this row access policy.
+     * Required. The ID of the project containing this row access policy.
      */
     projectId?: string;
     /**
-     * [Required] The ID of the table containing this row access policy.
+     * Required. The ID of the table containing this row access policy.
      */
     tableId?: string;
   };
@@ -3193,6 +3393,17 @@ declare namespace bigquery {
     stackFrames?: Array<IScriptStackFrame>;
   };
 
+  type ISearchStatistics = {
+    /**
+     * When index_usage_mode is UNUSED or PARTIALLY_USED, this field explains why index was not used in all or part of the search query. If index_usage_mode is FULLLY_USED, this field is not populated.
+     */
+    indexUnusedReason?: Array<IIndexUnusedReason>;
+    /**
+     * Specifies index usage mode for the query.
+     */
+    indexUsageMode?: string;
+  };
+
   type ISessionInfo = {
     /**
      * [Output-only] // [Preview] Id of the session.
@@ -3205,7 +3416,7 @@ declare namespace bigquery {
    */
   type ISetIamPolicyRequest = {
     /**
-     * REQUIRED: The complete policy to be applied to the `resource`. The size of the policy is limited to a few 10s of KB. An empty policy is a valid policy but certain Cloud Platform services (such as Projects) might reject them.
+     * REQUIRED: The complete policy to be applied to the `resource`. The size of the policy is limited to a few 10s of KB. An empty policy is a valid policy but certain Google Cloud services (such as Projects) might reject them.
      */
     policy?: IPolicy;
     /**
@@ -3225,8 +3436,84 @@ declare namespace bigquery {
     snapshotTime?: string;
   };
 
+  type ISparkLoggingInfo = {
+    /**
+     * [Output-only] Project ID used for logging
+     */
+    project_id?: string;
+    /**
+     * [Output-only] Resource type used for logging
+     */
+    resource_type?: string;
+  };
+
   /**
-   * The data type of a variable such as a function argument. Examples include: * INT64: `{"typeKind": "INT64"}` * ARRAY: { "typeKind": "ARRAY", "arrayElementType": {"typeKind": "STRING"} } * STRUCT>: { "typeKind": "STRUCT", "structType": { "fields": [ { "name": "x", "type": {"typeKind: "STRING"} }, { "name": "y", "type": { "typeKind": "ARRAY", "arrayElementType": {"typekind": "DATE"} } } ] } }
+   * Options for a user-defined Spark routine.
+   */
+  type ISparkOptions = {
+    /**
+     * Archive files to be extracted into the working directory of each executor. For more information about Apache Spark, see [Apache Spark](https://spark.apache.org/docs/latest/index.html).
+     */
+    archiveUris?: Array<string>;
+    /**
+     * Fully qualified name of the user-provided Spark connection object. Format: ```"projects/{project_id}/locations/{location_id}/connections/{connection_id}"```
+     */
+    connection?: string;
+    /**
+     * Custom container image for the runtime environment.
+     */
+    containerImage?: string;
+    /**
+     * Files to be placed in the working directory of each executor. For more information about Apache Spark, see [Apache Spark](https://spark.apache.org/docs/latest/index.html).
+     */
+    fileUris?: Array<string>;
+    /**
+     * JARs to include on the driver and executor CLASSPATH. For more information about Apache Spark, see [Apache Spark](https://spark.apache.org/docs/latest/index.html).
+     */
+    jarUris?: Array<string>;
+    /**
+     * The fully qualified name of a class in jar_uris, for example, com.example.wordcount. Exactly one of main_class and main_jar_uri field should be set for Java/Scala language type.
+     */
+    mainClass?: string;
+    /**
+     * The main file/jar URI of the Spark application. Exactly one of the definition_body field and the main_file_uri field must be set for Python. Exactly one of main_class and main_file_uri field should be set for Java/Scala language type.
+     */
+    mainFileUri?: string;
+    /**
+     * Configuration properties as a set of key/value pairs, which will be passed on to the Spark application. For more information, see [Apache Spark](https://spark.apache.org/docs/latest/index.html) and the [procedure option list](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#procedure_option_list).
+     */
+    properties?: { [key: string]: string };
+    /**
+     * Python files to be placed on the PYTHONPATH for PySpark application. Supported file types: `.py`, `.egg`, and `.zip`. For more information about Apache Spark, see [Apache Spark](https://spark.apache.org/docs/latest/index.html).
+     */
+    pyFileUris?: Array<string>;
+    /**
+     * Runtime version. If not specified, the default runtime version is used.
+     */
+    runtimeVersion?: string;
+  };
+
+  type ISparkStatistics = {
+    /**
+     * [Output-only] Endpoints generated for the Spark job.
+     */
+    endpoints?: { [key: string]: string };
+    /**
+     * [Output-only] Logging info is used to generate a link to Cloud Logging.
+     */
+    logging_info?: ISparkLoggingInfo;
+    /**
+     * [Output-only] Spark job id if a Spark job is created successfully.
+     */
+    spark_job_id?: string;
+    /**
+     * [Output-only] Location where the Spark job is executed.
+     */
+    spark_job_location?: string;
+  };
+
+  /**
+   * The data type of a variable such as a function argument. Examples include: * INT64: `{"typeKind": "INT64"}` * ARRAY: { "typeKind": "ARRAY", "arrayElementType": {"typeKind": "STRING"} } * STRUCT>: { "typeKind": "STRUCT", "structType": { "fields": [ { "name": "x", "type": {"typeKind": "STRING"} }, { "name": "y", "type": { "typeKind": "ARRAY", "arrayElementType": {"typeKind": "DATE"} } } ] } }
    */
   type IStandardSqlDataType = {
     /**
@@ -3238,7 +3525,7 @@ declare namespace bigquery {
      */
     structType?: IStandardSqlStructType;
     /**
-     * Required. The top level type of this field. Can be any standard SQL data type (e.g., "INT64", "DATE", "ARRAY").
+     * Required. The top level type of this field. Can be any GoogleSQL data type (e.g., "INT64", "DATE", "ARRAY").
      */
     typeKind?:
       | 'TYPE_KIND_UNSPECIFIED'
@@ -3274,7 +3561,7 @@ declare namespace bigquery {
     type?: IStandardSqlDataType;
   };
 
-  type IStandardSqlStructType = {fields?: Array<IStandardSqlField>};
+  type IStandardSqlStructType = { fields?: Array<IStandardSqlField> };
 
   /**
    * A table type
@@ -3329,6 +3616,10 @@ declare namespace bigquery {
      */
     defaultCollation?: string;
     /**
+     * [Output-only] The default rounding mode of the table.
+     */
+    defaultRoundingMode?: string;
+    /**
      * [Optional] A user-friendly description of this table.
      */
     description?: string;
@@ -3363,7 +3654,7 @@ declare namespace bigquery {
     /**
      * The labels associated with this table. You can use these to organize and group your tables. Label keys and values can be no longer than 63 characters, can only contain lowercase letters, numeric characters, underscores and dashes. International characters are allowed. Label values are optional. Label keys must start with a letter and each label in the list must have a different key.
      */
-    labels?: {[key: string]: string};
+    labels?: { [key: string]: string };
     /**
      * [Output-only] The time when this table was last modified, in milliseconds since the epoch.
      */
@@ -3377,9 +3668,21 @@ declare namespace bigquery {
      */
     materializedView?: IMaterializedViewDefinition;
     /**
+     * [Optional] Max staleness of data that could be returned when table or materialized view is queried (formatted as Google SQL Interval type).
+     */
+    maxStaleness?: string;
+    /**
      * [Output-only, Beta] Present iff this table represents a ML model. Describes the training information for the model, and it is required to run 'PREDICT' queries.
      */
     model?: IModelDefinition;
+    /**
+     * [Output-only] Number of logical bytes that are less than 90 days old.
+     */
+    numActiveLogicalBytes?: string;
+    /**
+     * [Output-only] Number of physical bytes less than 90 days old. This data is not kept in real time, and might be delayed by a few seconds to a few minutes.
+     */
+    numActivePhysicalBytes?: string;
     /**
      * [Output-only] The size of this table in bytes, excluding any data in the streaming buffer.
      */
@@ -3389,6 +3692,18 @@ declare namespace bigquery {
      */
     numLongTermBytes?: string;
     /**
+     * [Output-only] Number of logical bytes that are more than 90 days old.
+     */
+    numLongTermLogicalBytes?: string;
+    /**
+     * [Output-only] Number of physical bytes more than 90 days old. This data is not kept in real time, and might be delayed by a few seconds to a few minutes.
+     */
+    numLongTermPhysicalBytes?: string;
+    /**
+     * [Output-only] The number of partitions present in the table or materialized view. This data is not kept in real time, and might be delayed by a few seconds to a few minutes.
+     */
+    numPartitions?: string;
+    /**
      * [Output-only] [TrustedTester] The physical size of this table in bytes, excluding any data in the streaming buffer. This includes compression and storage used for time travel.
      */
     numPhysicalBytes?: string;
@@ -3397,37 +3712,17 @@ declare namespace bigquery {
      */
     numRows?: string;
     /**
-     * [Output-only] Number of logical bytes that are less than 90 days old.
-     */
-    num_active_logical_bytes?: string;
-    /**
-     * [Output-only] Number of physical bytes less than 90 days old. This data is not kept in real time, and might be delayed by a few seconds to a few minutes.
-     */
-    num_active_physical_bytes?: string;
-    /**
-     * [Output-only] Number of logical bytes that are more than 90 days old.
-     */
-    num_long_term_logical_bytes?: string;
-    /**
-     * [Output-only] Number of physical bytes more than 90 days old. This data is not kept in real time, and might be delayed by a few seconds to a few minutes.
-     */
-    num_long_term_physical_bytes?: string;
-    /**
-     * [Output-only] The number of partitions present in the table or materialized view. This data is not kept in real time, and might be delayed by a few seconds to a few minutes.
-     */
-    num_partitions?: string;
-    /**
      * [Output-only] Number of physical bytes used by time travel storage (deleted or changed data). This data is not kept in real time, and might be delayed by a few seconds to a few minutes.
      */
-    num_time_travel_physical_bytes?: string;
+    numTimeTravelPhysicalBytes?: string;
     /**
      * [Output-only] Total number of logical bytes in the table or materialized view.
      */
-    num_total_logical_bytes?: string;
+    numTotalLogicalBytes?: string;
     /**
      * [Output-only] The physical size of this table in bytes. This also includes storage used for time travel. This data is not kept in real time, and might be delayed by a few seconds to a few minutes.
      */
-    num_total_physical_bytes?: string;
+    numTotalPhysicalBytes?: string;
     /**
      * [TrustedTester] Range partitioning specification for this table. Only one of timePartitioning and rangePartitioning should be specified.
      */
@@ -3453,6 +3748,10 @@ declare namespace bigquery {
      */
     streamingBuffer?: IStreamingbuffer;
     /**
+     * [Optional] The table constraints on the table.
+     */
+    tableConstraints?: ITableConstraints;
+    /**
      * [Required] Reference describing the ID of this table.
      */
     tableReference?: ITableReference;
@@ -3470,7 +3769,29 @@ declare namespace bigquery {
     view?: IViewDefinition;
   };
 
-  type ITableCell = {v?: any};
+  type ITableCell = { v?: any };
+
+  type ITableConstraints = {
+    /**
+     * [Optional] The foreign keys of the tables.
+     */
+    foreignKeys?: Array<{
+      columnReferences?: Array<{
+        referencedColumn?: string;
+        referencingColumn?: string;
+      }>;
+      name?: string;
+      referencedTable?: {
+        datasetId?: string;
+        projectId?: string;
+        tableId?: string;
+      };
+    }>;
+    /**
+     * [Optional] The primary key of the table.
+     */
+    primaryKey?: { columns?: Array<string> };
+  };
 
   type ITableDataInsertAllRequest = {
     /**
@@ -3560,7 +3881,11 @@ declare namespace bigquery {
     /**
      * Optional. Collation specification of the field. It only can be set on string type field.
      */
-    collationSpec?: string;
+    collation?: string;
+    /**
+     * Optional. A SQL expression to specify the default value for this field. It can only be set for top level fields (columns). You can use struct or array expression to specify default value for the entire struct or array. The valid SQL expressions are: - Literals for all data types, including STRUCT and ARRAY. - Following functions: - CURRENT_TIMESTAMP - CURRENT_TIME - CURRENT_DATE - CURRENT_DATETIME - GENERATE_UUID - RAND - SESSION_USER - ST_GEOGPOINT - Struct or array composed with the above allowed functions, for example, [CURRENT_DATE(), DATE '2020-01-01']
+     */
+    defaultValueExpression?: string;
     /**
      * [Optional] The field description. The maximum length is 1,024 characters.
      */
@@ -3591,6 +3916,10 @@ declare namespace bigquery {
      * [Optional] Precision (maximum number of total digits in base 10) and scale (maximum number of digits in the fractional part in base 10) constraints for values of this field for NUMERIC or BIGNUMERIC. It is invalid to set precision or scale if type ≠ "NUMERIC" and ≠ "BIGNUMERIC". If precision and scale are not specified, no value range constraint is imposed on this field insofar as values are permitted by the type. Values of this NUMERIC or BIGNUMERIC field must be in this range when: - Precision (P) and scale (S) are specified: [-10P-S + 10-S, 10P-S - 10-S] - Precision (P) is specified but not scale (and thus scale is interpreted to be equal to zero): [-10P + 1, 10P - 1]. Acceptable values for precision and scale if both are specified: - If type = "NUMERIC": 1 ≤ precision - scale ≤ 29 and 0 ≤ scale ≤ 9. - If type = "BIGNUMERIC": 1 ≤ precision - scale ≤ 38 and 0 ≤ scale ≤ 38. Acceptable values for precision if only precision is specified but not scale (and thus scale is interpreted to be equal to zero): - If type = "NUMERIC": 1 ≤ precision ≤ 29. - If type = "BIGNUMERIC": 1 ≤ precision ≤ 38. If scale is specified but not precision, then it is invalid.
      */
     precision?: string;
+    /**
+     * Optional. Rounding Mode specification of the field. It only can be set on NUMERIC or BIGNUMERIC type fields.
+     */
+    roundingMode?: string;
     /**
      * [Optional] See documentation for precision.
      */
@@ -3645,7 +3974,7 @@ declare namespace bigquery {
       /**
        * The labels associated with this table. You can use these to organize and group your tables.
        */
-      labels?: {[key: string]: string};
+      labels?: { [key: string]: string };
       /**
        * The range partitioning specification for this table, if configured.
        */
@@ -3712,7 +4041,7 @@ declare namespace bigquery {
    */
   type ITestIamPermissionsRequest = {
     /**
-     * The set of permissions to check for the `resource`. Permissions with wildcards (such as '*' or 'storage.*') are not allowed. For more information see [IAM Overview](https://cloud.google.com/iam/docs/overview#permissions).
+     * The set of permissions to check for the `resource`. Permissions with wildcards (such as `*` or `storage.*`) are not allowed. For more information see [IAM Overview](https://cloud.google.com/iam/docs/overview#permissions).
      */
     permissions?: Array<string>;
   };
@@ -3748,17 +4077,33 @@ declare namespace bigquery {
    */
   type ITrainingOptions = {
     /**
+     * Activation function of the neural nets.
+     */
+    activationFn?: string;
+    /**
      * If true, detect step changes and make data adjustment in the input time series.
      */
     adjustStepChanges?: boolean;
+    /**
+     * Whether to use approximate feature contribution method in XGBoost model explanation for global explain.
+     */
+    approxGlobalFeatureContrib?: boolean;
     /**
      * Whether to enable auto ARIMA or not.
      */
     autoArima?: boolean;
     /**
-     * The max value of non-seasonal p and q.
+     * The max value of the sum of non-seasonal p and q.
      */
     autoArimaMaxOrder?: string;
+    /**
+     * The min value of the sum of non-seasonal p and q.
+     */
+    autoArimaMinOrder?: string;
+    /**
+     * Whether to calculate class weights automatically based on the popularity of each label.
+     */
+    autoClassWeights?: boolean;
     /**
      * Batch size for dnn models.
      */
@@ -3768,6 +4113,10 @@ declare namespace bigquery {
      */
     boosterType?: 'BOOSTER_TYPE_UNSPECIFIED' | 'GBTREE' | 'DART';
     /**
+     * Budget in hours for AutoML training.
+     */
+    budgetHours?: number;
+    /**
      * Whether or not p-value test should be computed for this model. Only available for linear and logistic regression models.
      */
     calculatePValues?: boolean;
@@ -3775,6 +4124,16 @@ declare namespace bigquery {
      * If true, clean spikes and dips in the input time series.
      */
     cleanSpikesAndDips?: boolean;
+    /**
+     * Enums for color space, used for processing images in Object Table. See more details at https://www.tensorflow.org/io/tutorials/colorspace.
+     */
+    colorSpace?:
+      | 'COLOR_SPACE_UNSPECIFIED'
+      | 'RGB'
+      | 'HSV'
+      | 'YIQ'
+      | 'YUV'
+      | 'GRAYSCALE';
     /**
      * Subsample ratio of columns for each level for boosted tree models.
      */
@@ -3846,6 +4205,10 @@ declare namespace bigquery {
      * Feedback type that specifies which algorithm to run for matrix factorization.
      */
     feedbackType?: 'FEEDBACK_TYPE_UNSPECIFIED' | 'IMPLICIT' | 'EXPLICIT';
+    /**
+     * Whether the model should include intercept during model training.
+     */
+    fitIntercept?: boolean;
     /**
      * Hidden units for dnn models.
      */
@@ -3962,6 +4325,10 @@ declare namespace bigquery {
      */
     inputLabelColumns?: Array<string>;
     /**
+     * Name of the instance weight column for training data. This column isn't be used as a feature.
+     */
+    instanceWeightColumn?: string;
+    /**
      * Number of integral steps for the integrated gradients explain method.
      */
     integratedGradientsNumSteps?: string;
@@ -3982,6 +4349,10 @@ declare namespace bigquery {
       | 'CUSTOM'
       | 'KMEANS_PLUS_PLUS';
     /**
+     * L1 regularization coefficient to activations.
+     */
+    l1RegActivation?: number;
+    /**
      * L1 regularization coefficient.
      */
     l1Regularization?: number;
@@ -3992,7 +4363,7 @@ declare namespace bigquery {
     /**
      * Weights associated with each label class, for rebalancing the training data. Only applicable for classification models.
      */
-    labelClassWeights?: {[key: string]: number};
+    labelClassWeights?: { [key: string]: number };
     /**
      * Learning rate in training. Used only for iterative training algorithms.
      */
@@ -4017,6 +4388,10 @@ declare namespace bigquery {
      */
     maxParallelTrials?: string;
     /**
+     * Get truncated length by last n points in time series. Use separately from time_series_length_fraction and min_time_series_length.
+     */
+    maxTimeSeriesLength?: string;
+    /**
      * Maximum depth of a tree for boosted tree models.
      */
     maxTreeDepth?: string;
@@ -4029,9 +4404,17 @@ declare namespace bigquery {
      */
     minSplitLoss?: number;
     /**
+     * Set fast trend ARIMA_PLUS model minimum training length. Use in pair with time_series_length_fraction.
+     */
+    minTimeSeriesLength?: string;
+    /**
      * Minimum sum of instance weight needed in a child for boosted tree models.
      */
     minTreeChildWeight?: string;
+    /**
+     * The model registry.
+     */
+    modelRegistry?: 'MODEL_REGISTRY_UNSPECIFIED' | 'VERTEX_AI';
     /**
      * Google Cloud Storage URI from which the model was imported. Only applicable for imported models.
      */
@@ -4053,6 +4436,10 @@ declare namespace bigquery {
      */
     numParallelTree?: string;
     /**
+     * Number of principal components to keep in the PCA model. Must be <= the number of features.
+     */
+    numPrincipalComponents?: string;
+    /**
      * Number of trials to run this hyperparameter tuning job.
      */
     numTrials?: string;
@@ -4064,17 +4451,37 @@ declare namespace bigquery {
       | 'BATCH_GRADIENT_DESCENT'
       | 'NORMAL_EQUATION';
     /**
-     * Whether to preserve the input structs in output feature names. Suppose there is a struct A with field b. When false (default), the output feature name is A_b. When true, the output feature name is A.b.
+     * Optimizer used for training the neural nets.
      */
-    preserveInputStructs?: boolean;
+    optimizer?: string;
     /**
-     * Number of paths for the sampled shapley explain method.
+     * The minimum ratio of cumulative explained variance that needs to be given by the PCA model.
+     */
+    pcaExplainedVarianceRatio?: number;
+    /**
+     * The solver for PCA.
+     */
+    pcaSolver?: 'UNSPECIFIED' | 'FULL' | 'RANDOMIZED' | 'AUTO';
+    /**
+     * Number of paths for the sampled Shapley explain method.
      */
     sampledShapleyNumPaths?: string;
+    /**
+     * If true, scale the feature values by dividing the feature standard deviation. Currently only apply to PCA.
+     */
+    scaleFeatures?: boolean;
+    /**
+     * Whether to standardize numerical features. Default to true.
+     */
+    standardizeFeatures?: boolean;
     /**
      * Subsample fraction of the training data to grow tree to prevent overfitting for boosted tree models.
      */
     subsample?: number;
+    /**
+     * Based on the selected TF version, the corresponding docker image is used to train external models.
+     */
+    tfVersion?: string;
     /**
      * Column to be designated as time series data for ARIMA model.
      */
@@ -4087,6 +4494,10 @@ declare namespace bigquery {
      * The time series id columns that were used during ARIMA model training.
      */
     timeSeriesIdColumns?: Array<string>;
+    /**
+     * Get truncated length by fraction in time series.
+     */
+    timeSeriesLengthFraction?: number;
     /**
      * Column to be designated as time series timestamp for ARIMA model.
      */
@@ -4101,9 +4512,17 @@ declare namespace bigquery {
       | 'APPROX'
       | 'HIST';
     /**
+     * The smoothing window size for the trend component of the time series.
+     */
+    trendSmoothingWindowSize?: string;
+    /**
      * User column specified for matrix factorization models.
      */
     userColumn?: string;
+    /**
+     * The version aliases to apply in Vertex AI model registry. Always overwrite if the version aliases exists in a existing model.
+     */
+    vertexAiModelVersionAliases?: Array<string>;
     /**
      * Hyperparameter for matrix factoration when implicit feedback type is specified.
      */
@@ -4112,6 +4531,10 @@ declare namespace bigquery {
      * Whether to train a model from the last checkpoint.
      */
     warmStart?: boolean;
+    /**
+     * User-selected XGBoost versions for training of XGBoost models.
+     */
+    xgboostVersion?: string;
   };
 
   /**
@@ -4119,39 +4542,43 @@ declare namespace bigquery {
    */
   type ITrainingRun = {
     /**
-     * Global explanation contains the explanation of top features on the class level. Applies to classification models only.
+     * Output only. Global explanation contains the explanation of top features on the class level. Applies to classification models only.
      */
     classLevelGlobalExplanations?: Array<IGlobalExplanation>;
     /**
-     * Data split result of the training run. Only set when the input data is actually split.
+     * Output only. Data split result of the training run. Only set when the input data is actually split.
      */
     dataSplitResult?: IDataSplitResult;
     /**
-     * The evaluation metrics over training/eval data that were computed at the end of training.
+     * Output only. The evaluation metrics over training/eval data that were computed at the end of training.
      */
     evaluationMetrics?: IEvaluationMetrics;
     /**
-     * Global explanation contains the explanation of top features on the model level. Applies to both regression and classification models.
+     * Output only. Global explanation contains the explanation of top features on the model level. Applies to both regression and classification models.
      */
     modelLevelGlobalExplanation?: IGlobalExplanation;
     /**
-     * Output of each iteration run, results.size() <= max_iterations.
+     * Output only. Output of each iteration run, results.size() <= max_iterations.
      */
     results?: Array<IIterationResult>;
     /**
-     * The start time of this training run.
+     * Output only. The start time of this training run.
      */
     startTime?: string;
     /**
-     * Options that were used for this training run, includes user specified and default options that were used.
+     * Output only. Options that were used for this training run, includes user specified and default options that were used.
      */
     trainingOptions?: ITrainingOptions;
     /**
-     * The model id in Vertex AI Model Registry for this training run
+     * Output only. The start time of this training run, in milliseconds since epoch.
+     */
+    trainingStartTime?: string;
+    /**
+     * The model id in the [Vertex AI Model Registry](https://cloud.google.com/vertex-ai/docs/model-registry/introduction) for this training run.
      */
     vertexAiModelId?: string;
     /**
-     * The model version in Vertex AI Model Registry for this training run
+     * Output only. The model version in the [Vertex AI Model Registry](https://cloud.google.com/vertex-ai/docs/model-registry/introduction) for this training run.
      */
     vertexAiModelVersion?: string;
   };
@@ -4374,7 +4801,7 @@ declare namespace bigquery {
      */
     type IListParams = {
       /**
-       * If set, then only the Routines matching this filter are returned. The current supported form is either "routine_type:" or "routineType:", where is a RoutineType enum. Example: "routineType:SCALAR_FUNCTION".
+       * If set, then only the Routines matching this filter are returned. The supported format is `routineType:{RoutineType}`, where `{RoutineType}` is a RoutineType enum. For example: `routineType:SCALAR_FUNCTION`.
        */
       filter?: string;
       /**
@@ -4441,6 +4868,14 @@ declare namespace bigquery {
        * List of fields to return (comma-separated). If unspecified, all fields are returned
        */
       selectedFields?: string;
+      /**
+       * Specifies the view that determines which table information is returned. By default, basic table information and storage statistics (STORAGE_STATS) are returned.
+       */
+      view?:
+        | 'BASIC'
+        | 'FULL'
+        | 'STORAGE_STATS'
+        | 'TABLE_METADATA_VIEW_UNSPECIFIED';
     };
 
     /**
@@ -4480,3 +4915,4 @@ declare namespace bigquery {
 }
 
 export default bigquery;
+
