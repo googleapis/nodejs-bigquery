@@ -222,11 +222,7 @@ describe('BigQuery/Job', () => {
         callback(null, RESPONSE);
       };
 
-      BIGQUERY.mergeSchemaWithRows_ = (
-        schema: {},
-        rows: {},
-        options: {}
-      ) => {
+      BIGQUERY.mergeSchemaWithRows_ = (schema: {}, rows: {}, options: {}) => {
         return rows;
       };
     });
