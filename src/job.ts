@@ -49,6 +49,7 @@ export type CancelResponse = [bigquery.IJobCancelResponse];
 export type QueryResultsOptions = {
   job?: Job;
   wrapIntegers?: boolean | IntegerTypeCastOptions;
+  parseJSON?: boolean;
 } & PagedRequest<bigquery.jobs.IGetQueryResultsParams>;
 
 /**
@@ -538,6 +539,8 @@ class Job extends Operation {
 
     const wrapIntegers = qs.wrapIntegers ? qs.wrapIntegers : false;
     delete qs.wrapIntegers;
+    const parseJSON = qs.parseJSON ? qs.parseJSON : false;
+    delete qs.parseJSON;
 
     delete qs.job;
 
@@ -559,11 +562,10 @@ class Job extends Operation {
         let rows: any = [];
 
         if (resp.schema && resp.rows) {
-          rows = BigQuery.mergeSchemaWithRows_(
-            resp.schema,
-            resp.rows,
-            wrapIntegers
-          );
+          rows = BigQuery.mergeSchemaWithRows_(resp.schema, resp.rows, {
+            wrapIntegers,
+            parseJSON,
+          });
         }
 
         let nextQuery: QueryResultsOptions | null = null;

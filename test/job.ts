@@ -225,7 +225,7 @@ describe('BigQuery/Job', () => {
       BIGQUERY.mergeSchemaWithRows_ = (
         schema: {},
         rows: {},
-        wrapIntegers: {}
+        options: {}
       ) => {
         return rows;
       };
@@ -321,7 +321,7 @@ describe('BigQuery/Job', () => {
 
       sandbox
         .stub(BigQuery, 'mergeSchemaWithRows_')
-        .callsFake((schema, rows, wrapIntegers) => {
+        .callsFake((schema, rows, {wrapIntegers}) => {
           assert.strictEqual(schema, response.schema);
           assert.strictEqual(rows, response.rows);
           assert.strictEqual(wrapIntegers, false);
@@ -353,10 +353,38 @@ describe('BigQuery/Job', () => {
 
       sandbox
         .stub(BigQuery, 'mergeSchemaWithRows_')
-        .callsFake((schema, rows, wrapIntegers) => {
+        .callsFake((schema, rows, {wrapIntegers}) => {
           assert.strictEqual(schema, response.schema);
           assert.strictEqual(rows, response.rows);
           assert.strictEqual(wrapIntegers, true);
+          return mergedRows;
+        });
+
+      job.getQueryResults(options, assert.ifError);
+    });
+
+    it('it should parse JSON', done => {
+      const response = {
+        schema: {},
+        rows: [],
+      };
+
+      const mergedRows: Array<{}> = [];
+
+      const options = {parseJSON: true};
+      const expectedOptions = Object.assign({location: undefined});
+
+      BIGQUERY.request = (reqOpts: DecorateRequestOptions) => {
+        assert.deepStrictEqual(reqOpts.qs, expectedOptions);
+        done();
+      };
+
+      sandbox
+        .stub(BigQuery, 'mergeSchemaWithRows_')
+        .callsFake((schema, rows, {parseJSON}) => {
+          assert.strictEqual(schema, response.schema);
+          assert.strictEqual(rows, response.rows);
+          assert.strictEqual(parseJSON, true);
           return mergedRows;
         });
 

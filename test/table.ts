@@ -2022,10 +2022,10 @@ describe('BigQuery/Table', () => {
         sandbox.restore();
         sandbox
           .stub(BigQuery, 'mergeSchemaWithRows_')
-          .callsFake((schema_, rows_, wrapIntegers_) => {
+          .callsFake((schema_, rows_, options_) => {
             assert.strictEqual(schema_, schema);
             assert.strictEqual(rows_, rows);
-            assert.strictEqual(wrapIntegers_, wrapIntegers);
+            assert.strictEqual(options_.wrapIntegers, wrapIntegers);
             return mergedRows;
           });
       });
@@ -2091,10 +2091,10 @@ describe('BigQuery/Table', () => {
       sandbox.restore();
       sandbox
         .stub(BigQuery, 'mergeSchemaWithRows_')
-        .callsFake((schema_, rows_, wrapIntegers_) => {
+        .callsFake((schema_, rows_, options_) => {
           assert.strictEqual(schema_, schema);
           assert.strictEqual(rows_, rows);
-          assert.strictEqual(wrapIntegers_, wrapIntegers);
+          assert.strictEqual(options_.wrapIntegers, wrapIntegers);
           return merged;
         });
 
@@ -2264,8 +2264,30 @@ describe('BigQuery/Table', () => {
       sandbox.restore();
       sandbox
         .stub(BigQuery, 'mergeSchemaWithRows_')
-        .callsFake((schema_, rows_, wrapIntegers_) => {
-          assert.strictEqual(wrapIntegers_, wrapIntegers);
+        .callsFake((schema_, rows_, options_) => {
+          assert.strictEqual(options_.wrapIntegers, wrapIntegers);
+          return merged;
+        });
+
+      table.getRows(options, done);
+    });
+
+    it('should parse json', done => {
+      const options = {
+        parseJSON: true,
+      };
+      const merged = [{name: 'stephen'}];
+
+      table.request = (reqOpts: DecorateRequestOptions, callback: Function) => {
+        assert.deepStrictEqual(reqOpts.qs, {});
+        callback(null, {});
+      };
+
+      sandbox.restore();
+      sandbox
+        .stub(BigQuery, 'mergeSchemaWithRows_')
+        .callsFake((schema_, rows_, options_) => {
+          assert.strictEqual(options_.parseJSON, true);
           return merged;
         });
 
