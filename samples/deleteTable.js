@@ -30,10 +30,7 @@ function main(datasetId = 'my_dataset', tableId = 'my_table') {
     // const tableId = "my_table";
 
     // Delete the table
-    await bigquery
-      .dataset(datasetId)
-      .table(tableId)
-      .delete();
+    await bigquery.dataset(datasetId).table(tableId).delete();
 
     console.log(`Table ${tableId} deleted.`);
   }

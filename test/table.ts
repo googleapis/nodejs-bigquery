@@ -2843,7 +2843,7 @@ describe('BigQuery/Table', () => {
         return formattedMetadata;
       };
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (FakeServiceObject.prototype as any).setMetadata = function(
+      (FakeServiceObject.prototype as any).setMetadata = function (
         metadata: {},
         callback: Function
       ) {

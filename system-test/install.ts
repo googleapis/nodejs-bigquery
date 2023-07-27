@@ -21,7 +21,7 @@ import {describe, it, before, after} from 'mocha';
 
 const RUNNING_IN_VPCSC = !!process.env['GOOGLE_CLOUD_TESTS_IN_VPCSC'];
 
-const mvp = (promisify(mv) as {}) as (...args: string[]) => Promise<void>;
+const mvp = promisify(mv) as {} as (...args: string[]) => Promise<void>;
 const ncpp = promisify(ncp);
 const stagingDir = tmp.dirSync({unsafeCleanup: true});
 const stagingPath = stagingDir.name;
@@ -29,7 +29,7 @@ const stagingPath = stagingDir.name;
 const pkg = require('../../package.json');
 
 describe('Installation test', () => {
-  before(function() {
+  before(function () {
     if (RUNNING_IN_VPCSC) this.skip();
   });
 

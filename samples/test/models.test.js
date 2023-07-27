@@ -26,7 +26,7 @@ const GCLOUD_TESTS_PREFIX = 'nodejs_samples_tests_models';
 
 const bigquery = new BigQuery();
 
-describe('Models', function() {
+describe('Models', function () {
   // Increase timeout to accommodate model creation.
   this.timeout(300000);
   const datasetId = `${GCLOUD_TESTS_PREFIX}_${uuid.v4()}`.replace(/-/gi, '_');
@@ -65,10 +65,7 @@ describe('Models', function() {
   });
 
   after(async () => {
-    await bigquery
-      .dataset(datasetId)
-      .delete({force: true})
-      .catch(console.warn);
+    await bigquery.dataset(datasetId).delete({force: true}).catch(console.warn);
   });
 
   it('should retrieve a model if it exists', async () => {
@@ -112,29 +109,20 @@ describe('Create/Delete Model', () => {
   });
 
   after(async () => {
-    await bigquery
-      .dataset(datasetId)
-      .delete({force: true})
-      .catch(console.warn);
+    await bigquery.dataset(datasetId).delete({force: true}).catch(console.warn);
   });
 
   it('should create a model', async () => {
     const output = execSync(`node createModel.js ${datasetId} ${modelId}`);
     assert.include(output, `Model ${modelId} created.`);
-    const [exists] = await bigquery
-      .dataset(datasetId)
-      .model(modelId)
-      .exists();
+    const [exists] = await bigquery.dataset(datasetId).model(modelId).exists();
     assert.strictEqual(exists, true);
   });
 
   it('should delete a model', async () => {
     const output = execSync(`node deleteModel.js ${datasetId} ${modelId}`);
     assert.include(output, `Model ${modelId} deleted.`);
-    const [exists] = await bigquery
-      .dataset(datasetId)
-      .model(modelId)
-      .exists();
+    const [exists] = await bigquery.dataset(datasetId).model(modelId).exists();
     assert.strictEqual(exists, false);
   });
 });
