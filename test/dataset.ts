@@ -203,6 +203,20 @@ describe('BigQuery/Dataset', () => {
         ds.location = LOCATION;
         config.createMethod(DATASET_ID, done);
       });
+
+      it('should pass the projectId', done => {
+        bq.createDataset = (
+          id: string,
+          options: DatasetOptions,
+          callback: Function
+        ) => {
+          assert.strictEqual(options.projectId, 'project-id');
+          callback(); // the done fn
+        };
+
+        ds.projectId = 'project-id';
+        config.createMethod(DATASET_ID, done);
+      });
     });
 
     describe('projectId override interceptor', () => {

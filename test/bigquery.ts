@@ -148,6 +148,7 @@ afterEach(() => sandbox.restore());
 describe('BigQuery', () => {
   const JOB_ID = 'JOB_ID';
   const PROJECT_ID = 'test-project';
+  const ANOTHER_PROJECT_ID = 'another-test-project';
   const LOCATION = 'asia-northeast1';
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -1558,6 +1559,30 @@ describe('BigQuery', () => {
       bq.createDataset(DATASET_ID, assert.ifError);
     });
 
+    it('should create a dataset on a different project', done => {
+      bq.makeAuthenticatedRequest = (reqOpts: DecorateRequestOptions) => {
+        assert.strictEqual(reqOpts.method, 'POST');
+        assert.strictEqual(reqOpts.projectId, ANOTHER_PROJECT_ID);
+        assert.strictEqual(
+          reqOpts.uri,
+          `https://bigquery.googleapis.com/bigquery/v2/projects/${ANOTHER_PROJECT_ID}/datasets`
+        );
+        assert.deepStrictEqual(reqOpts.json.datasetReference, {
+          datasetId: DATASET_ID,
+        });
+
+        done();
+      };
+
+      bq.createDataset(
+        DATASET_ID,
+        {
+          projectId: ANOTHER_PROJECT_ID,
+        },
+        assert.ifError
+      );
+    });
+
     it('should send the location if available', done => {
       const bq = new BigQuery({
         projectId: PROJECT_ID,
@@ -2479,6 +2504,20 @@ describe('BigQuery', () => {
         });
         done();
       });
+    });
+
+    it('should fetch datasets from a different project', done => {
+      const queryObject = {projectId: ANOTHER_PROJECT_ID};
+
+      bq.makeAuthenticatedRequest = (reqOpts: DecorateRequestOptions) => {
+        assert.strictEqual(
+          reqOpts.uri,
+          `https://bigquery.googleapis.com/bigquery/v2/projects/${ANOTHER_PROJECT_ID}/datasets`
+        );
+        done();
+      };
+
+      bq.getDatasets(queryObject, assert.ifError);
     });
   });
 

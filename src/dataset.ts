@@ -109,6 +109,7 @@ export type TableCallback = ResourceCallback<Table, bigquery.ITable>;
  * @param {BigQuery} bigQuery {@link BigQuery} instance.
  * @param {string} id The ID of the Dataset.
  * @param {object} [options] Dataset options.
+ * @param {string} [options.projectId] The GCP project ID.
  * @param {string} [options.location] The geographic location of the dataset.
  *      Defaults to US.
  *
@@ -372,7 +373,12 @@ class Dataset extends ServiceObject {
           typeof optionsOrCallback === 'function'
             ? (optionsOrCallback as DatasetCallback)
             : cb;
-        options = extend({}, options, {location: this.location});
+        if (this.location) {
+          options = extend({}, options, {location: this.location});
+        }
+        if (this.projectId) {
+          options = extend({}, options, {projectId: this.projectId});
+        }
         return bigQuery.createDataset(id, options, callback!);
       },
     });
