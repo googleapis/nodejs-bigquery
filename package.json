@@ -78,7 +78,7 @@
     "codecov": "^3.5.0",
     "discovery-tsd": "^0.3.0",
     "execa": "^5.0.0",
-    "gts": "^3.1.0",
+    "gts": "^5.0.0",
     "jsdoc": "^4.0.0",
     "jsdoc-fresh": "^2.0.0",
     "jsdoc-region-tag": "^2.0.0",
@@ -89,6 +89,6 @@
     "proxyquire": "^2.1.0",
     "sinon": "^15.0.0",
     "tmp": "0.2.1",
-    "typescript": "^4.6.4"
+    "typescript": "^5.1.6"
   }
 }
