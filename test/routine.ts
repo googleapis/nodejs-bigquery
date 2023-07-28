@@ -51,11 +51,11 @@ class FakeServiceObject extends ServiceObject {
 }
 
 describe('BigQuery/Routine', () => {
-  const DATASET = ({
+  const DATASET = {
     id: 'kittens',
     parent: {},
     createRoutine: util.noop,
-  } as {}) as _root.Dataset;
+  } as {} as _root.Dataset;
   const ROUTINE_ID = 'my_routine';
 
   // tslint:disable-next-line variable-name
@@ -107,7 +107,7 @@ describe('BigQuery/Routine', () => {
       const config = {a: 'b'};
 
       const dataset = extend(true, {}, DATASET, {
-        createRoutine: function(config_: {}, callback: Function) {
+        createRoutine: function (config_: {}, callback: Function) {
           assert.strictEqual(this, dataset);
           assert.deepStrictEqual(config_, config);
           callback(); // done()
@@ -132,7 +132,7 @@ describe('BigQuery/Routine', () => {
       };
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (FakeServiceObject.prototype as any).setMetadata = function(
+      (FakeServiceObject.prototype as any).setMetadata = function (
         metadata: {},
         callback: Function
       ) {

@@ -41,10 +41,7 @@ function main(
     ];
 
     // Get the existing table.
-    const [table] = await bigquery
-      .dataset(datasetId)
-      .table(tableId)
-      .get();
+    const [table] = await bigquery.dataset(datasetId).table(tableId).get();
 
     // Retreive the table metadata.
     const [metadata] = await table.getMetadata();

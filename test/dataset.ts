@@ -81,10 +81,10 @@ class FakeServiceObject extends ServiceObject {
 }
 
 describe('BigQuery/Dataset', () => {
-  const BIGQUERY = ({
+  const BIGQUERY = {
     projectId: 'my-project',
     createDataset: util.noop,
-  } as {}) as _root.BigQuery;
+  } as {} as _root.BigQuery;
   const DATASET_ID = 'kittens';
   const LOCATION = 'asia-northeast1';
 
@@ -456,7 +456,7 @@ describe('BigQuery/Dataset', () => {
 
       Table.formatMetadata_ = options => {
         assert.strictEqual(options, fakeOptions);
-        return (formatted as {}) as FormattedMetadata;
+        return formatted as {} as FormattedMetadata;
       };
 
       ds.request = (reqOpts: DecorateRequestOptions) => {

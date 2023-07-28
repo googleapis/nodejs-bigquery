@@ -132,10 +132,7 @@ function main(datasetId = 'my_dataset', tableId = 'my_table') {
     ];
 
     // Insert data into table
-    await bigquery
-      .dataset(datasetId)
-      .table(tableId)
-      .insert(rows);
+    await bigquery.dataset(datasetId).table(tableId).insert(rows);
 
     console.log(`Inserted ${rows.length} rows`);
   }

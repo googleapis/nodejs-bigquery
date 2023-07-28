@@ -32,10 +32,7 @@ function main(datasetId = 'my_dataset', tableId = 'my_table') {
     // const tableId = 'my_table';
 
     // Retrieve destination table reference
-    const [table] = await bigquery
-      .dataset(datasetId)
-      .table(tableId)
-      .get();
+    const [table] = await bigquery.dataset(datasetId).table(tableId).get();
     const destinationTableRef = table.metadata.tableReference;
 
     // In this example, the existing table contains only the 'name' column.
