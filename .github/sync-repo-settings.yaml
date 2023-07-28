@@ -9,6 +9,7 @@ branchProtectionRules:
       - "ci/kokoro: System test"
       - docs
       - lint
+      - test (12)
       - test (14)
       - test (16)
       - cla/google
