@@ -86,7 +86,7 @@ export type InsertRowsOptions = bigquery.ITableDataInsertAllRequest & {
 };
 
 export type InsertRowsResponse = [
-  bigquery.ITableDataInsertAllResponse | bigquery.ITable
+  bigquery.ITableDataInsertAllResponse | bigquery.ITable,
 ];
 export type InsertRowsCallback = RequestCallback<
   bigquery.ITableDataInsertAllResponse | bigquery.ITable
@@ -120,12 +120,11 @@ export type JobLoadMetadata = JobRequest<bigquery.IJobConfigurationLoad> & {
   format?: string;
 };
 
-export type CreateExtractJobOptions = JobRequest<
-  bigquery.IJobConfigurationExtract
-> & {
-  format?: 'CSV' | 'JSON' | 'AVRO' | 'PARQUET' | 'ORC';
-  gzip?: boolean;
-};
+export type CreateExtractJobOptions =
+  JobRequest<bigquery.IJobConfigurationExtract> & {
+    format?: 'CSV' | 'JSON' | 'AVRO' | 'PARQUET' | 'ORC';
+    gzip?: boolean;
+  };
 
 export type JobResponse = [Job, bigquery.IJob];
 export type JobCallback = ResourceCallback<Job, bigquery.IJob>;
@@ -604,7 +603,7 @@ class Table extends ServiceObject {
    * @private
    */
   static formatMetadata_(options: TableMetadata): FormattedMetadata {
-    const body = (extend(true, {}, options) as {}) as FormattedMetadata;
+    const body = extend(true, {}, options) as {} as FormattedMetadata;
 
     if (options.name) {
       body.friendlyName = options.name;
@@ -1179,10 +1178,7 @@ class Table extends ServiceObject {
         // If no explicit format was provided, attempt to find a match from the
         // file's extension. If no match, don't set, and default upstream to
         // CSV.
-        const format = path
-          .extname(dest.name)
-          .substr(1)
-          .toLowerCase();
+        const format = path.extname(dest.name).substr(1).toLowerCase();
         if (!options.destinationFormat && !options.format && FORMATS[format]) {
           options.destinationFormat = FORMATS[format];
         }
@@ -1375,12 +1371,7 @@ class Table extends ServiceObject {
       // A path to a file was given. If a sourceFormat wasn't specified, try to
       // find a match from the file's extension.
       const detectedFormat =
-        FORMATS[
-          path
-            .extname(source)
-            .substr(1)
-            .toLowerCase()
-        ];
+        FORMATS[path.extname(source).substr(1).toLowerCase()];
       if (!metadata.sourceFormat && detectedFormat) {
         metadata.sourceFormat = detectedFormat;
       }
@@ -1430,13 +1421,7 @@ class Table extends ServiceObject {
         // If no explicit format was provided, attempt to find a match from
         // the file's extension. If no match, don't set, and default upstream
         // to CSV.
-        const format =
-          FORMATS[
-            path
-              .extname(src.name)
-              .substr(1)
-              .toLowerCase()
-          ];
+        const format = FORMATS[path.extname(src.name).substr(1).toLowerCase()];
         if (!metadata.sourceFormat && format) {
           body.configuration.load.sourceFormat = format;
         }

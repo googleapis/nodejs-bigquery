@@ -885,10 +885,7 @@ describe('BigQuery', () => {
     it('should call through to the static method', () => {
       const fakeInt = new BigQueryInt(INPUT_STRING);
 
-      sandbox
-        .stub(BigQuery, 'int')
-        .withArgs(INPUT_STRING)
-        .returns(fakeInt);
+      sandbox.stub(BigQuery, 'int').withArgs(INPUT_STRING).returns(fakeInt);
 
       const int = bq.int(INPUT_STRING);
       assert.strictEqual(int, fakeInt);
@@ -974,14 +971,20 @@ describe('BigQuery', () => {
           const smallIntegerValue = Number.MIN_SAFE_INTEGER - 1;
 
           // should throw when Number is passed
-          assert.throws(() => {
-            new BigQueryInt(largeIntegerValue).valueOf();
-          }, expectedError({integerValue: largeIntegerValue}));
+          assert.throws(
+            () => {
+              new BigQueryInt(largeIntegerValue).valueOf();
+            },
+            expectedError({integerValue: largeIntegerValue})
+          );
 
           // should throw when string is passed
-          assert.throws(() => {
-            new BigQueryInt(smallIntegerValue.toString()).valueOf();
-          }, expectedError({integerValue: smallIntegerValue}));
+          assert.throws(
+            () => {
+              new BigQueryInt(smallIntegerValue.toString()).valueOf();
+            },
+            expectedError({integerValue: smallIntegerValue})
+          );
         });
 
         it('should not auto throw on initialization', () => {
@@ -991,9 +994,12 @@ describe('BigQuery', () => {
             integerValue: largeIntegerValue,
           };
 
-          assert.doesNotThrow(() => {
-            new BigQueryInt(valueObject);
-          }, new RegExp(`Integer value ${largeIntegerValue} is out of bounds.`));
+          assert.doesNotThrow(
+            () => {
+              new BigQueryInt(valueObject);
+            },
+            new RegExp(`Integer value ${largeIntegerValue} is out of bounds.`)
+          );
         });
 
         describe('integerTypeCastFunction is provided', () => {
@@ -2149,8 +2155,8 @@ describe('BigQuery', () => {
           const fakeQueryParameter = {fake: 'query parameter'};
 
           bq.createJob = (reqOpts: JobOptions) => {
-            const queryParameters = reqOpts.configuration!.query!
-              .queryParameters;
+            const queryParameters =
+              reqOpts.configuration!.query!.queryParameters;
             assert.deepStrictEqual(queryParameters, [fakeQueryParameter]);
             done();
           };

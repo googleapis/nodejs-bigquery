@@ -38,10 +38,7 @@ const bigquery = new BigQuery();
 
 describe('Authorized View Tutorial', () => {
   after(async () => {
-    await bigquery
-      .dataset(datasetId)
-      .delete({force: true})
-      .catch(console.warn);
+    await bigquery.dataset(datasetId).delete({force: true}).catch(console.warn);
     await bigquery
       .dataset(sourceDatasetId)
       .delete({force: true})

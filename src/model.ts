@@ -49,11 +49,10 @@ export type JobMetadataResponse = [JobMetadata];
 export type JobResponse = [Job, bigquery.IJob];
 export type JobCallback = ResourceCallback<Job, bigquery.IJob>;
 
-export type CreateExtractJobOptions = JobRequest<
-  bigquery.IJobConfigurationExtract
-> & {
-  format?: 'ML_TF_SAVED_MODEL' | 'ML_XGBOOST_BOOSTER';
-};
+export type CreateExtractJobOptions =
+  JobRequest<bigquery.IJobConfigurationExtract> & {
+    format?: 'ML_TF_SAVED_MODEL' | 'ML_XGBOOST_BOOSTER';
+  };
 
 /**
  * The model export formats accepted by BigQuery.
