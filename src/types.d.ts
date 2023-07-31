@@ -121,9 +121,7 @@ declare namespace bigquery {
     /**
      * Repeated as there can be many metric sets (one for each model) in auto-arima and the large-scale case.
      */
-    arimaSingleModelForecastingMetrics?: Array<
-      IArimaSingleModelForecastingMetrics
-    >;
+    arimaSingleModelForecastingMetrics?: Array<IArimaSingleModelForecastingMetrics>;
     /**
      * Whether Arima model fitted with drift or not. It is always false when d is not 1.
      */

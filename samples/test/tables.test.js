@@ -21,10 +21,8 @@ const uuid = require('uuid');
 const cp = require('child_process');
 const {Storage} = require('@google-cloud/storage');
 const {BigQuery} = require('@google-cloud/bigquery');
-const {
-  DataCatalogClient,
-  PolicyTagManagerClient,
-} = require('@google-cloud/datacatalog').v1;
+const {DataCatalogClient, PolicyTagManagerClient} =
+  require('@google-cloud/datacatalog').v1;
 const dataCatalog = new DataCatalogClient();
 const policyTagManager = new PolicyTagManagerClient();
 
@@ -109,10 +107,7 @@ describe('Tables', () => {
       .dataset(destDatasetId)
       .delete({force: true})
       .catch(console.warn);
-    await bigquery
-      .dataset(datasetId)
-      .delete({force: true})
-      .catch(console.warn);
+    await bigquery.dataset(datasetId).delete({force: true}).catch(console.warn);
     await storage
       .bucket(bucketName)
       .deleteFiles({force: true})
@@ -125,19 +120,13 @@ describe('Tables', () => {
       .dataset(srcDatasetId)
       .delete({force: true})
       .catch(console.warn);
-    await storage
-      .bucket(bucketName)
-      .delete()
-      .catch(console.warn);
+    await storage.bucket(bucketName).delete().catch(console.warn);
   });
 
   it('should create a table', async () => {
     const output = execSync(`node createTable.js ${datasetId} ${tableId}`);
     assert.include(output, `Table ${tableId} created.`);
-    const [exists] = await bigquery
-      .dataset(datasetId)
-      .table(tableId)
-      .exists();
+    const [exists] = await bigquery.dataset(datasetId).table(tableId).exists();
     assert.ok(exists);
   });
 
@@ -348,10 +337,7 @@ describe('Tables', () => {
       `node loadLocalFile.js ${datasetId} ${tableId} ${localFilePath}`
     );
     assert.match(output, /completed\./);
-    const [rows] = await bigquery
-      .dataset(datasetId)
-      .table(tableId)
-      .getRows();
+    const [rows] = await bigquery.dataset(datasetId).table(tableId).getRows();
     assert.strictEqual(rows.length, 1);
   });
 
@@ -407,10 +393,7 @@ describe('Tables', () => {
     const tableId = generateUuid();
     const output = execSync(`node loadTableGCSORC.js ${datasetId} ${tableId}`);
     assert.match(output, /completed\./);
-    const [rows] = await bigquery
-      .dataset(datasetId)
-      .table(tableId)
-      .getRows();
+    const [rows] = await bigquery.dataset(datasetId).table(tableId).getRows();
     assert.ok(rows.length > 0);
   });
 
@@ -420,10 +403,7 @@ describe('Tables', () => {
       `node loadTableGCSParquet.js ${datasetId} ${tableId}`
     );
     assert.match(output, /completed\./);
-    const [rows] = await bigquery
-      .dataset(datasetId)
-      .table(tableId)
-      .getRows();
+    const [rows] = await bigquery.dataset(datasetId).table(tableId).getRows();
     assert.ok(rows.length > 0);
   });
 
@@ -431,10 +411,7 @@ describe('Tables', () => {
     const tableId = generateUuid();
     const output = execSync(`node loadTableGCSAvro.js ${datasetId} ${tableId}`);
     assert.match(output, /completed\./);
-    const [rows] = await bigquery
-      .dataset(datasetId)
-      .table(tableId)
-      .getRows();
+    const [rows] = await bigquery.dataset(datasetId).table(tableId).getRows();
     assert.ok(rows.length > 0);
   });
 
@@ -444,10 +421,7 @@ describe('Tables', () => {
       `node loadTableURIFirestore.js ${datasetId} ${tableId}`
     );
     assert.match(output, /completed\./);
-    const [rows] = await bigquery
-      .dataset(datasetId)
-      .table(tableId)
-      .getRows();
+    const [rows] = await bigquery.dataset(datasetId).table(tableId).getRows();
     assert.ok(rows.length > 0);
   });
 
@@ -455,10 +429,7 @@ describe('Tables', () => {
     const tableId = generateUuid();
     const output = execSync(`node loadCSVFromGCS.js ${datasetId} ${tableId}`);
     assert.match(output, /completed\./);
-    const [rows] = await bigquery
-      .dataset(datasetId)
-      .table(tableId)
-      .getRows();
+    const [rows] = await bigquery.dataset(datasetId).table(tableId).getRows();
     assert.ok(rows.length > 0);
   });
 
@@ -466,10 +437,7 @@ describe('Tables', () => {
     const tableId = generateUuid();
     const output = execSync(`node loadJSONFromGCS.js ${datasetId} ${tableId}`);
     assert.match(output, /completed\./);
-    const [rows] = await bigquery
-      .dataset(datasetId)
-      .table(tableId)
-      .getRows();
+    const [rows] = await bigquery.dataset(datasetId).table(tableId).getRows();
     assert.ok(rows.length > 0);
   });
 
@@ -479,10 +447,7 @@ describe('Tables', () => {
       `node loadTablePartitioned.js ${datasetId} ${tableId}`
     );
     assert.match(output, /completed\./);
-    const [rows] = await bigquery
-      .dataset(datasetId)
-      .table(tableId)
-      .getRows();
+    const [rows] = await bigquery.dataset(datasetId).table(tableId).getRows();
     assert.ok(rows.length > 0);
   });
 
@@ -492,10 +457,7 @@ describe('Tables', () => {
       `node loadTableClustered.js ${datasetId} ${tableId}`
     );
     assert.match(output, /completed\./);
-    const [rows] = await bigquery
-      .dataset(datasetId)
-      .table(tableId)
-      .getRows();
+    const [rows] = await bigquery.dataset(datasetId).table(tableId).getRows();
     assert.ok(rows.length > 0);
   });
 
@@ -508,10 +470,7 @@ describe('Tables', () => {
       `node addColumnLoadAppend.js ${datasetId} ${destTableId} ${localFilePath}`
     );
     assert.match(output, /completed\./);
-    const [rows] = await bigquery
-      .dataset(datasetId)
-      .table(tableId)
-      .getRows();
+    const [rows] = await bigquery.dataset(datasetId).table(tableId).getRows();
     assert.ok(rows.length > 0);
   });
 
@@ -522,10 +481,7 @@ describe('Tables', () => {
       `node relaxColumnLoadAppend.js ${datasetId} ${destTableId} ${partialDataFilePath}`
     );
     assert.match(output, /completed\./);
-    const [rows] = await bigquery
-      .dataset(datasetId)
-      .table(tableId)
-      .getRows();
+    const [rows] = await bigquery.dataset(datasetId).table(tableId).getRows();
     assert.ok(rows.length > 0);
   });
 
@@ -535,10 +491,7 @@ describe('Tables', () => {
       `node loadCSVFromGCSAutodetect.js ${datasetId} ${tableId}`
     );
     assert.match(output, /completed\./);
-    const [rows] = await bigquery
-      .dataset(datasetId)
-      .table(tableId)
-      .getRows();
+    const [rows] = await bigquery.dataset(datasetId).table(tableId).getRows();
     assert.ok(rows.length > 0);
   });
 
@@ -548,10 +501,7 @@ describe('Tables', () => {
       `node loadJSONFromGCSAutodetect.js ${datasetId} ${tableId}`
     );
     assert.match(output, /completed\./);
-    const [rows] = await bigquery
-      .dataset(datasetId)
-      .table(tableId)
-      .getRows();
+    const [rows] = await bigquery.dataset(datasetId).table(tableId).getRows();
     assert.ok(rows.length > 0);
   });
 
@@ -562,10 +512,7 @@ describe('Tables', () => {
     );
     assert.match(output, /completed\./);
     assert.include(output, 'Write disposition used: WRITE_TRUNCATE.');
-    const [rows] = await bigquery
-      .dataset(datasetId)
-      .table(tableId)
-      .getRows();
+    const [rows] = await bigquery.dataset(datasetId).table(tableId).getRows();
     assert.ok(rows.length > 0);
   });
 
@@ -576,10 +523,7 @@ describe('Tables', () => {
     );
     assert.match(output, /completed\./);
     assert.include(output, 'Write disposition used: WRITE_TRUNCATE.');
-    const [rows] = await bigquery
-      .dataset(datasetId)
-      .table(tableId)
-      .getRows();
+    const [rows] = await bigquery.dataset(datasetId).table(tableId).getRows();
     assert.ok(rows.length > 0);
   });
 
@@ -590,10 +534,7 @@ describe('Tables', () => {
     );
     assert.match(output, /completed\./);
     assert.include(output, 'Write disposition used: WRITE_TRUNCATE.');
-    const [rows] = await bigquery
-      .dataset(datasetId)
-      .table(tableId)
-      .getRows();
+    const [rows] = await bigquery.dataset(datasetId).table(tableId).getRows();
     assert.ok(rows.length > 0);
   });
 
@@ -604,10 +545,7 @@ describe('Tables', () => {
     );
     assert.match(output, /completed\./);
     assert.include(output, 'Write disposition used: WRITE_TRUNCATE.');
-    const [rows] = await bigquery
-      .dataset(datasetId)
-      .table(tableId)
-      .getRows();
+    const [rows] = await bigquery.dataset(datasetId).table(tableId).getRows();
     assert.ok(rows.length > 0);
   });
 
@@ -618,10 +556,7 @@ describe('Tables', () => {
     );
     assert.match(output, /completed\./);
     assert.include(output, 'Write disposition used: WRITE_TRUNCATE.');
-    const [rows] = await bigquery
-      .dataset(datasetId)
-      .table(tableId)
-      .getRows();
+    const [rows] = await bigquery.dataset(datasetId).table(tableId).getRows();
     assert.ok(rows.length > 0);
   });
 
@@ -687,10 +622,7 @@ describe('Tables', () => {
     it('should create a view', async () => {
       const output = execSync(`node createView.js ${datasetId} ${viewId}`);
       assert.include(output, `View ${viewId} created.`);
-      const [exists] = await bigquery
-        .dataset(datasetId)
-        .table(viewId)
-        .exists();
+      const [exists] = await bigquery.dataset(datasetId).table(viewId).exists();
       assert.ok(exists);
     });
 

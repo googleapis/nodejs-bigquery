@@ -36,10 +36,7 @@ describe('Datasets', () => {
   });
 
   after(async () => {
-    await bigquery
-      .dataset(datasetId)
-      .delete({force: true})
-      .catch(console.warn);
+    await bigquery.dataset(datasetId).delete({force: true}).catch(console.warn);
   });
 
   it('should create a dataset', async () => {

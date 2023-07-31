@@ -42,10 +42,7 @@ function main(
     const snapshotEpoch = Date.now();
 
     // Delete the table
-    await bigquery
-      .dataset(datasetId)
-      .table(tableId)
-      .delete();
+    await bigquery.dataset(datasetId).table(tableId).delete();
 
     console.log(`Table ${tableId} deleted.`);
 

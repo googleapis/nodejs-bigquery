@@ -63,8 +63,9 @@ async function doQuery(queryTxt: string) {
       .on('end', () => {
         const timeTotalMilli = new Date().getTime() - startMilli;
         console.log(
-          `"${queryTxt}",${numRows},${numCols},${timeFirstByteMilli /
-            1000},${timeTotalMilli / 1000}`
+          `"${queryTxt}",${numRows},${numCols},${timeFirstByteMilli / 1000},${
+            timeTotalMilli / 1000
+          }`
         );
         resolve();
       });

@@ -517,9 +517,8 @@ export class BigQuery extends Service {
         .map(c => c.join('.'));
     }
 
-    return arrify(rows)
-      .map(mergeSchema)
-      .map(flattenRows);
+    return arrify(rows).map(mergeSchema).map(flattenRows);
+
     function mergeSchema(row: TableRow) {
       return row.f!.map((field: TableRowField, index: number) => {
         const schemaField = schema.fields![index];
@@ -2315,7 +2314,9 @@ export class BigQueryInt extends Number {
       try {
         return this.typeCastFunction!(this.value);
       } catch (error) {
-        (error as Error).message = `integerTypeCastFunction threw an error:\n\n  - ${
+        (
+          error as Error
+        ).message = `integerTypeCastFunction threw an error:\n\n  - ${
           (error as Error).message
         }`;
         throw error;

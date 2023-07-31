@@ -570,7 +570,7 @@ describe('BigQuery', () => {
               query: QUERY,
             },
             (e, job) => {
-              const err = (e as {}) as GoogleErrorBody;
+              const err = e as {} as GoogleErrorBody;
               assert.strictEqual(err.errors![0].reason, 'notFound');
               assert.strictEqual(job!.location, 'US');
               done();
@@ -896,7 +896,7 @@ describe('BigQuery', () => {
         data?: {tableId?: number};
         table: Table;
       }
-      const TABLES = ([{data: {tableId: 1}}, {}] as {}) as TableItem[];
+      const TABLES = [{data: {tableId: 1}}, {}] as {} as TableItem[];
 
       const SCHEMA = 'tableId:integer';
 
@@ -1027,7 +1027,7 @@ describe('BigQuery', () => {
         };
 
         table.insert([data, improperData], e => {
-          const err = (e as {}) as GoogleErrorBody;
+          const err = e as {} as GoogleErrorBody;
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           assert.strictEqual((err as any).name, 'PartialFailureError');
 

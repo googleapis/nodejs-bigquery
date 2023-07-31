@@ -4,6 +4,22 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## [7.0.0](https://github.com/googleapis/nodejs-bigquery/compare/v6.2.1...v7.0.0) (2023-07-31)
+
+
+### ⚠ BREAKING CHANGES
+
+* migrate to node 14 ([#1236](https://github.com/googleapis/nodejs-bigquery/issues/1236))
+
+### Bug Fixes
+
+* **deps:** Update dependency google-auth-library to v9 ([#1228](https://github.com/googleapis/nodejs-bigquery/issues/1228)) ([22cf786](https://github.com/googleapis/nodejs-bigquery/commit/22cf786579331e3cb7a3aa63dc2f71e448553e18))
+
+
+### Miscellaneous Chores
+
+* Migrate to node 14 ([#1236](https://github.com/googleapis/nodejs-bigquery/issues/1236)) ([73bf31f](https://github.com/googleapis/nodejs-bigquery/commit/73bf31f55c4fa9e384aa76e1a7af0603ebb0d11b))
+
 ## [6.2.1](https://github.com/googleapis/nodejs-bigquery/compare/v6.2.0...v6.2.1) (2023-07-10)
 
 
