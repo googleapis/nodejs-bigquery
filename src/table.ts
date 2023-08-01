@@ -114,6 +114,7 @@ export type TableRowValue = string | TableRow;
 
 export type GetRowsOptions = PagedRequest<bigquery.tabledata.IListParams> & {
   wrapIntegers?: boolean | IntegerTypeCastOptions;
+  parseJSON?: boolean;
 };
 
 export type JobLoadMetadata = JobRequest<bigquery.IJobConfigurationLoad> & {
@@ -1811,6 +1812,8 @@ class Table extends ServiceObject {
       typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
     const wrapIntegers = options.wrapIntegers ? options.wrapIntegers : false;
     delete options.wrapIntegers;
+    const parseJSON = options.parseJSON ? options.parseJSON : false;
+    delete options.parseJSON;
     const onComplete = (
       err: Error | null,
       rows: TableRow[] | null,
@@ -1821,12 +1824,13 @@ class Table extends ServiceObject {
         callback!(err, null, null, resp);
         return;
       }
-      rows = BigQuery.mergeSchemaWithRows_(
-        this.metadata.schema,
-        rows || [],
-        wrapIntegers,
-        options.selectedFields ? options.selectedFields!.split(',') : []
-      );
+      rows = BigQuery.mergeSchemaWithRows_(this.metadata.schema, rows || [], {
+        wrapIntegers: wrapIntegers,
+        selectedFields: options.selectedFields
+          ? options.selectedFields!.split(',')
+          : [],
+        parseJSON,
+      });
       callback!(null, rows, nextQuery, resp);
     };
 
