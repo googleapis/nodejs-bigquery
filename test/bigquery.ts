@@ -611,11 +611,9 @@ describe('BigQuery', () => {
       });
 
       const rawRows = rows.map(x => x.raw);
-      const mergedRows = BigQuery.mergeSchemaWithRows_(
-        schemaObject,
-        rawRows,
-        false
-      );
+      const mergedRows = BigQuery.mergeSchemaWithRows_(schemaObject, rawRows, {
+        wrapIntegers: false,
+      });
 
       mergedRows.forEach((mergedRow: {}, index: number) => {
         assert.deepStrictEqual(mergedRow, rows[index].expected);
@@ -645,22 +643,52 @@ describe('BigQuery', () => {
 
       sandbox.stub(BigQuery, 'int').returns(fakeInt);
 
-      let mergedRows = BigQuery.mergeSchemaWithRows_(
-        SCHEMA_OBJECT,
-        rows.raw,
-        wrapIntegersBoolean
-      );
+      let mergedRows = BigQuery.mergeSchemaWithRows_(SCHEMA_OBJECT, rows.raw, {
+        wrapIntegers: wrapIntegersBoolean,
+      });
       mergedRows.forEach((mergedRow: {}) => {
         assert.deepStrictEqual(mergedRow, rows.expectedBool);
       });
 
-      mergedRows = BigQuery.mergeSchemaWithRows_(
-        SCHEMA_OBJECT,
-        rows.raw,
-        wrapIntegersObject
-      );
+      mergedRows = BigQuery.mergeSchemaWithRows_(SCHEMA_OBJECT, rows.raw, {
+        wrapIntegers: wrapIntegersObject,
+      });
       mergedRows.forEach((mergedRow: {}) => {
         assert.deepStrictEqual(mergedRow, rows.expectedObj);
+      });
+    });
+
+    it('should parse json with option', () => {
+      const jsonValue = {name: 'John Doe'};
+
+      const SCHEMA_OBJECT = {
+        fields: [{name: 'json_field', type: 'JSON'}],
+      } as {fields: TableField[]};
+
+      const rows = {
+        raw: {
+          f: [{v: JSON.stringify(jsonValue)}],
+        },
+        expectedParsed: {
+          json_field: jsonValue,
+        },
+        expectedRaw: {
+          json_field: JSON.stringify(jsonValue),
+        },
+      };
+
+      let mergedRows = BigQuery.mergeSchemaWithRows_(SCHEMA_OBJECT, rows.raw, {
+        parseJSON: false,
+      });
+      mergedRows.forEach((mergedRow: {}) => {
+        assert.deepStrictEqual(mergedRow, rows.expectedRaw);
+      });
+
+      mergedRows = BigQuery.mergeSchemaWithRows_(SCHEMA_OBJECT, rows.raw, {
+        parseJSON: true,
+      });
+      mergedRows.forEach((mergedRow: {}) => {
+        assert.deepStrictEqual(mergedRow, rows.expectedParsed);
       });
     });
   });
@@ -2781,12 +2809,14 @@ describe('BigQuery', () => {
       const query = {
         query: QUERY_STRING,
         wrapIntegers: true,
+        parseJSON: true,
       };
       bq.query(query, (err: Error, rows: {}, resp: {}) => {
         assert.ifError(err);
         assert.deepEqual(queryResultsOpts, {
           job: fakeJob,
           wrapIntegers: true,
+          parseJSON: true,
         });
         assert.strictEqual(rows, FAKE_ROWS);
         assert.strictEqual(resp, FAKE_RESPONSE);
@@ -2829,11 +2859,12 @@ describe('BigQuery', () => {
 
   describe('queryAsStream_', () => {
     let queryStub: SinonStub;
-    let defaultOpts = {
+    const defaultOpts = {
       location: undefined,
       maxResults: undefined,
       pageToken: undefined,
       wrapIntegers: undefined,
+      parseJSON: undefined,
       autoPaginate: false,
     };
 
@@ -2850,12 +2881,14 @@ describe('BigQuery', () => {
     });
 
     it('should call query correctly with a Query object', done => {
-      const query = {query: 'SELECT', wrapIntegers: true};
+      const query = {query: 'SELECT', wrapIntegers: true, parseJSON: true};
       bq.queryAsStream_(query, done);
-      defaultOpts = extend(defaultOpts, {wrapIntegers: true});
-      assert(
-        queryStub.calledOnceWithExactly(query, defaultOpts, sinon.match.func)
-      );
+      const opts = {
+        ...defaultOpts,
+        wrapIntegers: true,
+        parseJSON: true,
+      };
+      assert(queryStub.calledOnceWithExactly(query, opts, sinon.match.func));
     });
 
     it('should query as job if supplied', done => {
@@ -2881,11 +2914,29 @@ describe('BigQuery', () => {
 
       bq.queryAsStream_(query, done);
 
-      defaultOpts = extend(defaultOpts, {wrapIntegers});
+      const opts = {
+        ...defaultOpts,
+        wrapIntegers,
+      };
 
-      assert(
-        queryStub.calledOnceWithExactly(query, defaultOpts, sinon.match.func)
-      );
+      assert(queryStub.calledOnceWithExactly(query, opts, sinon.match.func));
+    });
+
+    it('should pass parseJSON if supplied', done => {
+      const parseJSON = true;
+      const query = {
+        query: 'SELECT',
+        parseJSON,
+      };
+
+      bq.queryAsStream_(query, done);
+
+      const opts = {
+        ...defaultOpts,
+        parseJSON,
+      };
+
+      assert(queryStub.calledOnceWithExactly(query, opts, sinon.match.func));
     });
   });
 

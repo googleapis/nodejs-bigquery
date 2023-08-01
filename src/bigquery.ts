@@ -104,6 +104,7 @@ export type Query = JobRequest<bigquery.IJobConfigurationQuery> & {
   jobTimeoutMs?: number;
   pageToken?: string;
   wrapIntegers?: boolean | IntegerTypeCastOptions;
+  parseJSON?: boolean;
 };
 
 export type QueryParamTypeStruct = {
@@ -122,6 +123,7 @@ export type QueryParamTypes =
 export type QueryOptions = QueryResultsOptions;
 export type QueryStreamOptions = {
   wrapIntegers?: boolean | IntegerTypeCastOptions;
+  parseJSON?: boolean;
 };
 export type DatasetResource = bigquery.IDataset & {
   projectId?: string;
@@ -481,24 +483,29 @@ export class BigQuery extends Service {
    *
    * @param {object} schema
    * @param {array} rows
-   * @param {boolean|IntegerTypeCastOptions} wrapIntegers Wrap values of
+   * @param {object} options
+   * @param {boolean|IntegerTypeCastOptions} options.wrapIntegers Wrap values of
    *     'INT64' type in {@link BigQueryInt} objects.
    *     If a `boolean`, this will wrap values in {@link BigQueryInt} objects.
    *     If an `object`, this will return a value returned by
    *     `wrapIntegers.integerTypeCastFunction`.
    *     Please see {@link IntegerTypeCastOptions} for options descriptions.
-   * @param {array} selectedFields List of fields to return.
+   * @param {array} options.selectedFields List of fields to return.
    * If unspecified, all fields are returned.
+   * @param {array} options.parseJSON parse a 'JSON' field into a JSON object.
    * @returns Fields using their matching names from the table's schema.
    */
   static mergeSchemaWithRows_(
     schema: TableSchema | TableField,
     rows: TableRow[],
-    wrapIntegers: boolean | IntegerTypeCastOptions,
-    selectedFields?: string[]
+    options: {
+      wrapIntegers: boolean | IntegerTypeCastOptions;
+      selectedFields?: string[];
+      parseJSON?: boolean;
+    }
   ) {
-    if (selectedFields && selectedFields!.length > 0) {
-      const selectedFieldsArray = selectedFields!.map(c => {
+    if (options.selectedFields && options.selectedFields!.length > 0) {
+      const selectedFieldsArray = options.selectedFields!.map(c => {
         return c.split('.');
       });
 
@@ -510,7 +517,7 @@ export class BigQuery extends Service {
             .map(c => c!.toLowerCase())
             .indexOf(field.name!.toLowerCase()) >= 0
       );
-      selectedFields = selectedFieldsArray
+      options.selectedFields = selectedFieldsArray
         .filter(c => c.length > 0)
         .map(c => c.join('.'));
     }
@@ -523,10 +530,10 @@ export class BigQuery extends Service {
         let value = field.v;
         if (schemaField.mode === 'REPEATED') {
           value = (value as TableRowField[]).map(val => {
-            return convert(schemaField, val.v, wrapIntegers, selectedFields);
+            return convert(schemaField, val.v, options);
           });
         } else {
-          value = convert(schemaField, value, wrapIntegers, selectedFields);
+          value = convert(schemaField, value, options);
         }
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const fieldObject: any = {};
@@ -539,8 +546,11 @@ export class BigQuery extends Service {
       schemaField: TableField,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       value: any,
-      wrapIntegers: boolean | IntegerTypeCastOptions,
-      selectedFields?: string[]
+      options: {
+        wrapIntegers: boolean | IntegerTypeCastOptions;
+        selectedFields?: string[];
+        parseJSON?: boolean;
+      }
     ) {
       if (is.null(value)) {
         return value;
@@ -563,6 +573,7 @@ export class BigQuery extends Service {
         }
         case 'INTEGER':
         case 'INT64': {
+          const {wrapIntegers} = options;
           value = wrapIntegers
             ? typeof wrapIntegers === 'object'
               ? BigQuery.int(
@@ -585,8 +596,7 @@ export class BigQuery extends Service {
           value = BigQuery.mergeSchemaWithRows_(
             schemaField,
             value,
-            wrapIntegers,
-            selectedFields
+            options
           ).pop();
           break;
         }
@@ -608,6 +618,11 @@ export class BigQuery extends Service {
         }
         case 'GEOGRAPHY': {
           value = BigQuery.geography(value);
+          break;
+        }
+        case 'JSON': {
+          const {parseJSON} = options;
+          value = parseJSON ? JSON.parse(value) : value;
           break;
         }
         default:
@@ -1317,6 +1332,7 @@ export class BigQuery extends Service {
    *     the format of the {@link https://cloud.google.com/bigquery/docs/reference/rest/v2/datasets#DatasetReference| `DatasetReference`}
    * @param {boolean} [options.wrapIntegers] Optionally wrap INT64 in BigQueryInt
    *     or custom INT64 value type.
+   * @param {boolean} [options.parseJSON] Optionally parse JSON as a JSON Object.
    * @param {object|array} [options.params] Option to provide query prarameters.
    * @param {JobCallback} [callback] The callback function.
    * @param {?error} callback.err An error returned while making this request.
@@ -2054,6 +2070,7 @@ export class BigQuery extends Service {
       typeof query === 'object'
         ? {
             wrapIntegers: query.wrapIntegers,
+            parseJSON: query.parseJSON,
           }
         : {};
     const callback =
@@ -2086,13 +2103,14 @@ export class BigQuery extends Service {
       return;
     }
 
-    const {location, maxResults, pageToken, wrapIntegers} = query;
+    const {location, maxResults, pageToken, wrapIntegers, parseJSON} = query;
 
     const opts = {
       location,
       maxResults,
       pageToken,
       wrapIntegers,
+      parseJSON,
       autoPaginate: false,
     };
 
@@ -2100,6 +2118,7 @@ export class BigQuery extends Service {
     delete query.maxResults;
     delete query.pageToken;
     delete query.wrapIntegers;
+    delete query.parseJSON;
 
     this.query(query, opts, callback);
   }
