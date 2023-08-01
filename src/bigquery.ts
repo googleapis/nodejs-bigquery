@@ -125,10 +125,15 @@ export type QueryStreamOptions = {
   wrapIntegers?: boolean | IntegerTypeCastOptions;
   parseJSON?: boolean;
 };
-export type DatasetResource = bigquery.IDataset;
+export type DatasetResource = bigquery.IDataset & {
+  projectId?: string;
+};
 export type ValueType = bigquery.IQueryParameterType;
 
-export type GetDatasetsOptions = PagedRequest<bigquery.datasets.IListParams>;
+export type GetDatasetsOptions = PagedRequest<bigquery.datasets.IListParams> & {
+  projectId?: string;
+};
+
 export type DatasetsResponse = PagedResponse<
   Dataset,
   GetDatasetsOptions,
@@ -1257,35 +1262,36 @@ export class BigQuery extends Service {
     const callback =
       typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
 
-    this.request(
-      {
-        method: 'POST',
-        uri: '/datasets',
-        json: extend(
-          true,
-          {
-            location: this.location,
+    const reqOpts: DecorateRequestOptions = {
+      method: 'POST',
+      uri: '/datasets',
+      json: extend(
+        true,
+        {
+          location: this.location,
+        },
+        options,
+        {
+          datasetReference: {
+            datasetId: id,
           },
-          options,
-          {
-            datasetReference: {
-              datasetId: id,
-            },
-          }
-        ),
-      },
-      (err, resp) => {
-        if (err) {
-          callback!(err, null, resp);
-          return;
         }
-
-        const dataset = this.dataset(id);
-        dataset.metadata = resp;
-
-        callback!(null, dataset, resp);
+      ),
+    };
+    if (options.projectId) {
+      reqOpts.projectId = options.projectId;
+    }
+    this.request(reqOpts, (err, resp) => {
+      if (err) {
+        callback!(err, null, resp);
+        return;
       }
-    );
+
+      const dataset = this.dataset(id, options);
+      dataset.metadata = resp;
+
+      callback!(null, dataset, resp);
+    });
   }
 
   /**
@@ -1664,6 +1670,7 @@ export class BigQuery extends Service {
    *
    * @param {string} id ID of the dataset.
    * @param {object} [options] Dataset options.
+   * @param {string} [options.projectId] The GCP project ID.
    * @param {string} [options.location] The geographic location of the dataset.
    *      Required except for US and EU.
    *
@@ -1686,12 +1693,13 @@ export class BigQuery extends Service {
   }
 
   /**
-   * List all or some of the datasets in your project.
+   * List all or some of the datasets in a project.
    *
    * See {@link https://cloud.google.com/bigquery/docs/reference/v2/datasets/list| Datasets: list API Documentation}
    *
    * @param {object} [options] Configuration object.
    * @param {boolean} [options.all] List all datasets, including hidden ones.
+   * @param {string} [options.projectId] The GCP project ID.
    * @param {boolean} [options.autoPaginate] Have pagination handled automatically.
    *     Default: true.
    * @param {number} [options.maxApiCalls] Maximum number of API calls to make.
@@ -1746,40 +1754,45 @@ export class BigQuery extends Service {
     const callback =
       typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
 
-    this.request(
-      {
-        uri: '/datasets',
-        qs: options,
-      },
-      (err, resp) => {
-        if (err) {
-          callback!(err, null, null, resp);
-          return;
-        }
-
-        let nextQuery: GetDatasetsOptions | null = null;
-
-        if (resp.nextPageToken) {
-          nextQuery = Object.assign({}, options, {
-            pageToken: resp.nextPageToken,
-          });
-        }
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const datasets = (resp.datasets || []).map(
-          (dataset: bigquery.IDataset) => {
-            const ds = this.dataset(dataset.datasetReference!.datasetId!, {
-              location: dataset.location!,
-            });
-
-            ds.metadata = dataset!;
-            return ds;
-          }
-        );
-
-        callback!(null, datasets, nextQuery, resp);
+    const reqOpts: DecorateRequestOptions = {
+      uri: '/datasets',
+      qs: options,
+    };
+    if (options.projectId) {
+      reqOpts.projectId = options.projectId;
+    }
+    this.request(reqOpts, (err, resp) => {
+      if (err) {
+        callback!(err, null, null, resp);
+        return;
       }
-    );
+
+      let nextQuery: GetDatasetsOptions | null = null;
+
+      if (resp.nextPageToken) {
+        nextQuery = Object.assign({}, options, {
+          pageToken: resp.nextPageToken,
+        });
+      }
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const datasets = (resp.datasets || []).map(
+        (dataset: bigquery.IDataset) => {
+          const dsOpts: DatasetOptions = {
+            location: dataset.location!,
+          };
+          if (options.projectId) {
+            dsOpts.projectId = options.projectId;
+          }
+          const ds = this.dataset(dataset.datasetReference!.datasetId!, dsOpts);
+
+          ds.metadata = dataset!;
+          return ds;
+        }
+      );
+
+      callback!(null, datasets, nextQuery, resp);
+    });
   }
 
   /**

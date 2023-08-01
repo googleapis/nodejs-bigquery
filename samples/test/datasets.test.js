@@ -98,6 +98,12 @@ describe('Datasets', () => {
     assert.match(output, new RegExp(datasetId));
   });
 
+  it('should list datasets on a different project', async () => {
+    const output = execSync('node listDatasets.js bigquery-public-data');
+    assert.match(output, /Datasets:/);
+    assert.match(output, new RegExp('usa_names'));
+  });
+
   it('should retrieve a dataset if it exists', async () => {
     const output = execSync(`node getDataset.js ${datasetId}`);
     assert.include(output, 'Dataset:');
