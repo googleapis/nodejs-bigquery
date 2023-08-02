@@ -34,7 +34,9 @@ import {
   Routine,
   Table,
   InsertRowsStreamResponse,
+  SetTableMetadataOptions,
 } from '../src';
+import { SetMetadataOptions } from '@google-cloud/common/build/src/service-object';
 
 const bigquery = new BigQuery();
 const storage = new Storage();
@@ -486,6 +488,10 @@ describe('BigQuery', () => {
       };
       await table.create({schema});
       const [metadata] = await table.getMetadata();
+      console.log([metadata]); 
+      /*await table.setMetadata(metadataOptions);
+      const [partialMetadata] = await table.getMetadata();
+      console.log(`Basic View: ${[partialMetadata]}`);*/
       assert.deepStrictEqual(metadata.schema, schema);
     });
 

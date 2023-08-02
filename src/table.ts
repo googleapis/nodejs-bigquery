@@ -411,6 +411,7 @@ class Table extends ServiceObject {
        * @callback GetTableMetadataCallback
        * @param {?Error} err Request error, if any.
        * @param {object} metadata The table metadata.
+       * @param {TableMetadataView} view The chose projection of partial metadata.
        * @param {object} apiResponse The full API response.
        */
       /**
