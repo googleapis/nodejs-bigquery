@@ -25,7 +25,7 @@ import {paginator, ResourceStream} from '@google-cloud/paginator';
 import {promisifyAll} from '@google-cloud/promisify';
 import {PreciseDate} from '@google-cloud/precise-date';
 import arrify = require('arrify');
-import {Big} from 'big.js';
+import * as Big from 'big.js';
 import * as extend from 'extend';
 import * as is from 'is';
 import * as uuid from 'uuid';
