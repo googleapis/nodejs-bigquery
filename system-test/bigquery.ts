@@ -20,7 +20,7 @@ import {
 import {Storage} from '@google-cloud/storage';
 import * as assert from 'assert';
 import {describe, it, before, after} from 'mocha';
-import Big from 'big.js';
+import * as Big from 'big.js';
 import * as fs from 'fs';
 import * as uuid from 'uuid';
 import {Readable} from 'stream';
