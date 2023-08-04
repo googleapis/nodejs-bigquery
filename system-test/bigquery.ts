@@ -489,9 +489,6 @@ describe('BigQuery', () => {
       await table.create({schema});
       const [metadata] = await table.getMetadata();
       console.log([metadata]); 
-      /*await table.setMetadata(metadataOptions);
-      const [partialMetadata] = await table.getMetadata();
-      console.log(`Basic View: ${[partialMetadata]}`);*/
       assert.deepStrictEqual(metadata.schema, schema);
     });
 
@@ -895,6 +892,15 @@ describe('BigQuery', () => {
       await table.setMetadata({description});
       const [metadata] = await table.getMetadata();
       assert.strictEqual(metadata.description, description);
+    });
+
+    it('should set & get partial metadata', async () => {
+      const view = 'BASIC';
+      await table.setMetadata({view});
+      const [metadata] = await table.getMetadata();
+      assert.strictEqual(metadata.view, view);
+      console.log(`${metadata.view}`); 
+      // the issue here is that view is pulling from a different type than the table enum. May be a gax thing?
     });
 
     describe('copying', () => {

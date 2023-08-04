@@ -132,6 +132,8 @@ export type JobCallback = ResourceCallback<Job, bigquery.IJob>;
 
 export type CreateCopyJobMetadata = CopyTableMetadata;
 export type SetTableMetadataOptions = TableMetadata;
+// new type
+export type SetTablePartialMetadataOptions = TablePartialMetadata;
 export type CopyTableMetadata = JobRequest<bigquery.IJobConfigurationTableCopy>;
 
 export type TableMetadata = bigquery.ITable & {
@@ -141,7 +143,15 @@ export type TableMetadata = bigquery.ITable & {
   view?: string | ViewDefinition;
 };
 
+// new type
+export type TablePartialMetadata = bigquery.ITable & {
+  view?: string | TableMetadataView;
+}
+
 export type ViewDefinition = bigquery.IViewDefinition;
+// new type
+export type TableMetadataView = bigquery.ITable; //not complete
+// if can't find type to import from common, define enum from scratch
 export type FormattedMetadata = bigquery.ITable;
 export type TableSchema = bigquery.ITableSchema;
 export type TableField = bigquery.ITableFieldSchema;
@@ -2420,6 +2430,65 @@ class Table extends ServiceObject {
     const body = Table.formatMetadata_(metadata as TableMetadata);
     super.setMetadata(body, callback!);
   }
+
+   /**
+   * Set the view of metadata on the table. This is a helper function for getPartialMetadata();
+   *
+   * See {@link https://cloud.google.com/bigquery/docs/reference/v2/tables/patch| Tables: patch API Documentation}
+   *
+   * @param {object} metadata The metadata key/value object to set.
+   * @param {string} metadata.description A user-friendly description of the
+   *     table.
+   * @param {string} metadata.name A descriptive name for the table.
+   * @param {string|object} metadata.schema A comma-separated list of name:type
+   *     pairs. Valid types are "string", "integer", "float", "boolean",
+   * "bytes", "record", and "timestamp". If the type is omitted, it is assumed
+   * to be "string". Example: "name:string, age:integer". Schemas can also be
+   *     specified as a JSON array of fields, which allows for nested and
+   * repeated fields. See a {@link http://goo.gl/sl8Dmg| Table resource} for more
+   * detailed information.
+   * @param {string} metadata.view
+   * @param {function} [callback] The callback function.
+   * @param {?error} callback.err An error returned while making this request.
+   * @param {object} callback.apiResponse The full API response.
+   * @returns {Promise<common.SetMetadataResponse>}
+   *
+   * @example
+   * ```
+   * const {BigQuery} = require('@google-cloud/bigquery');
+   * const bigquery = new BigQuery();
+   * const dataset = bigquery.dataset('my-dataset');
+   * const table = dataset.table('my-table');
+   *
+   * const metadata = {
+   *   name: 'My recipes',
+   *   description: 'A table for storing my recipes.',
+   *   schema: 'name:string, servings:integer, cookingTime:float, quick:boolean'
+   * };
+   *
+   * table.setMetadata(metadata, (err, metadata, apiResponse) => {});
+   *
+   * //-
+   * // If the callback is omitted, we'll return a Promise.
+   * //-
+   * table.setMetadata(metadata).then((data) => {
+   *   const metadata = data[0];
+   *   const apiResponse = data[1];
+   * });
+   * ```
+   */
+   /* setTableMetadataView(metadata: SetTablePartialMetadaOptions): Promise<SetMetadataResponse>;
+   setTableMetadataView(
+     metadata: SetTableMetadataOptions,
+     callback: ResponseCallback
+   ): void;
+   setTableMetadataView(
+     metadata: SetTableMetadataOptions,
+     callback?: ResponseCallback
+   ): void | Promise<SetMetadataResponse> {
+     const body = Table.formatMetadata_(metadata as TableMetadataView);
+     super.setTableMetadataView(body, callback!);
+   }*/
 
   /**
    * Run a query scoped to your dataset.
