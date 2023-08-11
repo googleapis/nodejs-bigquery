@@ -37,7 +37,6 @@ import {Job, JobOptions} from '../src/job';
 import {
   CopyTableMetadata,
   JobLoadMetadata,
-  SetTableMetadataOptions,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   Table,
   ViewDefinition,

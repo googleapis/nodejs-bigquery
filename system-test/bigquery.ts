@@ -34,9 +34,7 @@ import {
   Routine,
   Table,
   InsertRowsStreamResponse,
-  SetTableMetadataOptions,
 } from '../src';
-import { SetMetadataOptions } from '@google-cloud/common/build/src/service-object';
 
 const bigquery = new BigQuery();
 const storage = new Storage();
@@ -488,7 +486,6 @@ describe('BigQuery', () => {
       };
       await table.create({schema});
       const [metadata] = await table.getMetadata();
-      console.log([metadata]); 
       assert.deepStrictEqual(metadata.schema, schema);
     });
 
@@ -869,7 +866,6 @@ describe('BigQuery', () => {
       stream
         .pipe(table.createInsertStream())
         .on('response', (response: InsertRowsStreamResponse) => {
-          console.log(response);
           assert.deepStrictEqual(response.kind, expectedResponse);
           done();
         });
@@ -891,16 +887,23 @@ describe('BigQuery', () => {
       const description = 'catsandstuff';
       await table.setMetadata({description});
       const [metadata] = await table.getMetadata();
+      const metadataProps = Object.values(metadata);
+      assert.strictEqual(metadataProps.length, 18);
       assert.strictEqual(metadata.description, description);
     });
 
     it('should set & get partial metadata', async () => {
-      const view = 'BASIC';
-      await table.setMetadata({view});
-      const [metadata] = await table.getMetadata();
-      assert.strictEqual(metadata.view, view);
-      console.log(`${metadata.view}`); 
-      // the issue here is that view is pulling from a different type than the table enum. May be a gax thing?
+      const options = {
+        view: 'BASIC',
+      };
+      const [basicMetadata] = await table.get(options);
+      const basicMetadataProps = Object.values(
+        Object.keys(basicMetadata.metadata)
+      );
+
+      assert.strictEqual(basicMetadataProps.length, 10);
+      assert.strictEqual(basicMetadataProps.includes('numBytes'), false);
+      assert.strictEqual(basicMetadata.metadata.numBytes, undefined);
     });
 
     describe('copying', () => {
