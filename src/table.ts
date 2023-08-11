@@ -26,9 +26,9 @@ import {
 import {paginator, ResourceStream} from '@google-cloud/paginator';
 import {promisifyAll} from '@google-cloud/promisify';
 import arrify = require('arrify');
-import Big from 'big.js';
+import * as Big from 'big.js';
 import * as extend from 'extend';
-import pEvent from 'p-event';
+import {once} from 'events';
 import * as fs from 'fs';
 import * as is from 'is';
 import * as path from 'path';
@@ -86,7 +86,7 @@ export type InsertRowsOptions = bigquery.ITableDataInsertAllRequest & {
 };
 
 export type InsertRowsResponse = [
-  bigquery.ITableDataInsertAllResponse | bigquery.ITable
+  bigquery.ITableDataInsertAllResponse | bigquery.ITable,
 ];
 export type InsertRowsCallback = RequestCallback<
   bigquery.ITableDataInsertAllResponse | bigquery.ITable
@@ -114,18 +114,18 @@ export type TableRowValue = string | TableRow;
 
 export type GetRowsOptions = PagedRequest<bigquery.tabledata.IListParams> & {
   wrapIntegers?: boolean | IntegerTypeCastOptions;
+  parseJSON?: boolean;
 };
 
 export type JobLoadMetadata = JobRequest<bigquery.IJobConfigurationLoad> & {
   format?: string;
 };
 
-export type CreateExtractJobOptions = JobRequest<
-  bigquery.IJobConfigurationExtract
-> & {
-  format?: 'CSV' | 'JSON' | 'AVRO' | 'PARQUET' | 'ORC';
-  gzip?: boolean;
-};
+export type CreateExtractJobOptions =
+  JobRequest<bigquery.IJobConfigurationExtract> & {
+    format?: 'CSV' | 'JSON' | 'AVRO' | 'PARQUET' | 'ORC';
+    gzip?: boolean;
+  };
 
 export type JobResponse = [Job, bigquery.IJob];
 export type JobCallback = ResourceCallback<Job, bigquery.IJob>;
@@ -570,7 +570,7 @@ class Table extends ServiceObject {
       'BigQueryTimestamp',
       'Geography',
     ];
-    const constructorName = value.constructor.name;
+    const constructorName = value.constructor?.name;
     const isCustomType =
       customTypeConstructorNames.indexOf(constructorName) > -1;
 
@@ -604,7 +604,7 @@ class Table extends ServiceObject {
    * @private
    */
   static formatMetadata_(options: TableMetadata): FormattedMetadata {
-    const body = (extend(true, {}, options) as {}) as FormattedMetadata;
+    const body = extend(true, {}, options) as {} as FormattedMetadata;
 
     if (options.name) {
       body.friendlyName = options.name;
@@ -1179,10 +1179,7 @@ class Table extends ServiceObject {
         // If no explicit format was provided, attempt to find a match from the
         // file's extension. If no match, don't set, and default upstream to
         // CSV.
-        const format = path
-          .extname(dest.name)
-          .substr(1)
-          .toLowerCase();
+        const format = path.extname(dest.name).substr(1).toLowerCase();
         if (!options.destinationFormat && !options.format && FORMATS[format]) {
           options.destinationFormat = FORMATS[format];
         }
@@ -1375,12 +1372,7 @@ class Table extends ServiceObject {
       // A path to a file was given. If a sourceFormat wasn't specified, try to
       // find a match from the file's extension.
       const detectedFormat =
-        FORMATS[
-          path
-            .extname(source)
-            .substr(1)
-            .toLowerCase()
-        ];
+        FORMATS[path.extname(source).substr(1).toLowerCase()];
       if (!metadata.sourceFormat && detectedFormat) {
         metadata.sourceFormat = detectedFormat;
       }
@@ -1389,7 +1381,7 @@ class Table extends ServiceObject {
       const jobWritable = fs
         .createReadStream(source)
         .pipe(this.createWriteStream_(metadata));
-      const jobResponse = (await pEvent(jobWritable, 'job')) as Job;
+      const [jobResponse] = (await once(jobWritable, 'job')) as Job[];
       return [jobResponse, jobResponse.metadata];
     }
 
@@ -1430,13 +1422,7 @@ class Table extends ServiceObject {
         // If no explicit format was provided, attempt to find a match from
         // the file's extension. If no match, don't set, and default upstream
         // to CSV.
-        const format =
-          FORMATS[
-            path
-              .extname(src.name)
-              .substr(1)
-              .toLowerCase()
-          ];
+        const format = FORMATS[path.extname(src.name).substr(1).toLowerCase()];
         if (!metadata.sourceFormat && format) {
           body.configuration.load.sourceFormat = format;
         }
@@ -1826,6 +1812,8 @@ class Table extends ServiceObject {
       typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
     const wrapIntegers = options.wrapIntegers ? options.wrapIntegers : false;
     delete options.wrapIntegers;
+    const parseJSON = options.parseJSON ? options.parseJSON : false;
+    delete options.parseJSON;
     const onComplete = (
       err: Error | null,
       rows: TableRow[] | null,
@@ -1836,12 +1824,13 @@ class Table extends ServiceObject {
         callback!(err, null, null, resp);
         return;
       }
-      rows = BigQuery.mergeSchemaWithRows_(
-        this.metadata.schema,
-        rows || [],
-        wrapIntegers,
-        options.selectedFields ? options.selectedFields!.split(',') : []
-      );
+      rows = BigQuery.mergeSchemaWithRows_(this.metadata.schema, rows || [], {
+        wrapIntegers: wrapIntegers,
+        selectedFields: options.selectedFields
+          ? options.selectedFields!.split(',')
+          : [],
+        parseJSON,
+      });
       callback!(null, rows, nextQuery, resp);
     };
 

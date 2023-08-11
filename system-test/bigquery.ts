@@ -20,10 +20,10 @@ import {
 import {Storage} from '@google-cloud/storage';
 import * as assert from 'assert';
 import {describe, it, before, after} from 'mocha';
-import Big from 'big.js';
+import * as Big from 'big.js';
 import * as fs from 'fs';
 import * as uuid from 'uuid';
-const Readable = require('readable-stream').Readable;
+import {Readable} from 'stream';
 
 import {
   BigQuery,
@@ -570,7 +570,7 @@ describe('BigQuery', () => {
               query: QUERY,
             },
             (e, job) => {
-              const err = (e as {}) as GoogleErrorBody;
+              const err = e as {} as GoogleErrorBody;
               assert.strictEqual(err.errors![0].reason, 'notFound');
               assert.strictEqual(job!.location, 'US');
               done();
@@ -854,7 +854,7 @@ describe('BigQuery', () => {
     });
 
     it('should insert rows via insert stream', done => {
-      const stream = Readable({objectMode: true});
+      const stream = new Readable({objectMode: true});
       stream._read = () => {};
 
       for (let i = 0; i < 10; i++) {
@@ -873,7 +873,7 @@ describe('BigQuery', () => {
     });
 
     it('should return errors from insert stream', done => {
-      const stream = Readable({objectMode: true});
+      const stream = new Readable({objectMode: true});
       stream._read = () => {};
 
       stream.push({wrong_name: 'foo', id: 1});
@@ -896,7 +896,7 @@ describe('BigQuery', () => {
         data?: {tableId?: number};
         table: Table;
       }
-      const TABLES = ([{data: {tableId: 1}}, {}] as {}) as TableItem[];
+      const TABLES = [{data: {tableId: 1}}, {}] as {} as TableItem[];
 
       const SCHEMA = 'tableId:integer';
 
@@ -1027,7 +1027,7 @@ describe('BigQuery', () => {
         };
 
         table.insert([data, improperData], e => {
-          const err = (e as {}) as GoogleErrorBody;
+          const err = e as {} as GoogleErrorBody;
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           assert.strictEqual((err as any).name, 'PartialFailureError');
 
@@ -1220,6 +1220,17 @@ describe('BigQuery', () => {
                     },
                   },
                 ],
+                types: [
+                  {
+                    b: 'BOOL',
+                    arr: ['INT64'],
+                    d: 'DATE',
+                    f: 'FLOAT64',
+                    nested: {
+                      a: 'INT64',
+                    },
+                  },
+                ],
               },
               (err, rows) => {
                 assert.ifError(err);
@@ -1331,6 +1342,9 @@ describe('BigQuery', () => {
                 ].join(' '),
                 params: {
                   owner: 'google',
+                },
+                types: {
+                  owner: 'STRING',
                 },
               },
               (err, rows) => {
@@ -1463,6 +1477,17 @@ describe('BigQuery', () => {
                     f: 3.14,
                     nested: {
                       a: 3,
+                    },
+                  },
+                },
+                types: {
+                  obj: {
+                    b: 'BOOL',
+                    arr: ['INT64'],
+                    d: 'DATE',
+                    f: 'FLOAT64',
+                    nested: {
+                      a: 'INT64',
                     },
                   },
                 },

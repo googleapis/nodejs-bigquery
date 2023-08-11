@@ -24,7 +24,7 @@ import {File} from '@google-cloud/storage';
 import arrify = require('arrify');
 import * as assert from 'assert';
 import {describe, it, afterEach, beforeEach, before, after} from 'mocha';
-import Big from 'big.js';
+import * as Big from 'big.js';
 import {EventEmitter} from 'events';
 import * as extend from 'extend';
 import * as proxyquire from 'proxyquire';
@@ -42,7 +42,7 @@ import {
   ViewDefinition,
 } from '../src/table';
 import bigquery from '../src/types';
-import {Duplex, Stream} from 'stream';
+import {Duplex} from 'stream';
 import {RowQueue} from '../src/rowQueue';
 
 interface CalledWithTable extends ServiceObject {
@@ -433,6 +433,14 @@ describe('BigQuery/Table', () => {
         Table.encodeValue_(new Big('-99999999999999999999999999999.999999999')),
         '-99999999999999999999999999999.999999999'
       );
+    });
+
+    it('should return properly encode objects with null prototype', () => {
+      const obj = Object.create(null);
+      obj['name'] = 'Test';
+      assert.deepStrictEqual(Table.encodeValue_(obj), {
+        name: 'Test',
+      });
     });
   });
 
@@ -2014,10 +2022,10 @@ describe('BigQuery/Table', () => {
         sandbox.restore();
         sandbox
           .stub(BigQuery, 'mergeSchemaWithRows_')
-          .callsFake((schema_, rows_, wrapIntegers_) => {
+          .callsFake((schema_, rows_, options_) => {
             assert.strictEqual(schema_, schema);
             assert.strictEqual(rows_, rows);
-            assert.strictEqual(wrapIntegers_, wrapIntegers);
+            assert.strictEqual(options_.wrapIntegers, wrapIntegers);
             return mergedRows;
           });
       });
@@ -2083,10 +2091,10 @@ describe('BigQuery/Table', () => {
       sandbox.restore();
       sandbox
         .stub(BigQuery, 'mergeSchemaWithRows_')
-        .callsFake((schema_, rows_, wrapIntegers_) => {
+        .callsFake((schema_, rows_, options_) => {
           assert.strictEqual(schema_, schema);
           assert.strictEqual(rows_, rows);
-          assert.strictEqual(wrapIntegers_, wrapIntegers);
+          assert.strictEqual(options_.wrapIntegers, wrapIntegers);
           return merged;
         });
 
@@ -2256,8 +2264,30 @@ describe('BigQuery/Table', () => {
       sandbox.restore();
       sandbox
         .stub(BigQuery, 'mergeSchemaWithRows_')
-        .callsFake((schema_, rows_, wrapIntegers_) => {
-          assert.strictEqual(wrapIntegers_, wrapIntegers);
+        .callsFake((schema_, rows_, options_) => {
+          assert.strictEqual(options_.wrapIntegers, wrapIntegers);
+          return merged;
+        });
+
+      table.getRows(options, done);
+    });
+
+    it('should parse json', done => {
+      const options = {
+        parseJSON: true,
+      };
+      const merged = [{name: 'stephen'}];
+
+      table.request = (reqOpts: DecorateRequestOptions, callback: Function) => {
+        assert.deepStrictEqual(reqOpts.qs, {});
+        callback(null, {});
+      };
+
+      sandbox.restore();
+      sandbox
+        .stub(BigQuery, 'mergeSchemaWithRows_')
+        .callsFake((schema_, rows_, options_) => {
+          assert.strictEqual(options_.parseJSON, true);
           return merged;
         });
 
@@ -2835,7 +2865,7 @@ describe('BigQuery/Table', () => {
         return formattedMetadata;
       };
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (FakeServiceObject.prototype as any).setMetadata = function(
+      (FakeServiceObject.prototype as any).setMetadata = function (
         metadata: {},
         callback: Function
       ) {

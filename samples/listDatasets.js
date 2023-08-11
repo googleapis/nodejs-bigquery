@@ -14,17 +14,22 @@
 
 'use strict';
 
-function main() {
+function main(projectId) {
   // [START bigquery_list_datasets]
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
   const bigquery = new BigQuery();
 
   async function listDatasets() {
-    // Lists all datasets in current GCP project.
+    /**
+     * TODO(developer): Uncomment the following lines before running the sample.
+     */
+    // const projectId = "my_project_id";
 
-    // Lists all datasets in the specified project
-    const [datasets] = await bigquery.getDatasets();
+    // Lists all datasets in the specified project.
+    // If projectId is not specified, this method will take
+    // the projectId from the authenticated BigQuery Client.
+    const [datasets] = await bigquery.getDatasets({projectId});
     console.log('Datasets:');
     datasets.forEach(dataset => console.log(dataset.id));
   }

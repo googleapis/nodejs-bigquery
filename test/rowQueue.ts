@@ -50,7 +50,7 @@ class FakeRowBatch {
   }
 }
 
-const DATASET = ({
+const DATASET = {
   id: 'dataset-id',
   createTable: util.noop,
   bigQuery: {
@@ -61,7 +61,7 @@ const DATASET = ({
     apiEndpoint: 'bigquery.googleapis.com',
     request: util.noop,
   },
-} as {}) as _root.Dataset;
+} as {} as _root.Dataset;
 
 describe('Queues', () => {
   const sandbox = sinon.createSandbox();
@@ -218,7 +218,7 @@ describe('Queues', () => {
       });
 
       it('should cancel any pending insert calls', () => {
-        const fakeHandle = (1234 as unknown) as NodeJS.Timer;
+        const fakeHandle = 1234 as unknown as NodeJS.Timer;
         const stub = sandbox.stub(global, 'clearTimeout').withArgs(fakeHandle);
 
         queue.pending = fakeHandle;
@@ -269,7 +269,7 @@ describe('Queues', () => {
           };
         }),
       };
-      const error = ({
+      const error = {
         errors: [
           {
             row: dataApiFormat.rows[0].json,
@@ -280,7 +280,7 @@ describe('Queues', () => {
             errors: [row1Error],
           },
         ],
-      } as unknown) as Error;
+      } as unknown as Error;
 
       it('should make the correct request', () => {
         const stub = sandbox.stub(fakeTable, 'request');

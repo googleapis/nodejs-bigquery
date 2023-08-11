@@ -23,8 +23,9 @@ import {
 } from '@google-cloud/common';
 import {paginator, ResourceStream} from '@google-cloud/paginator';
 import {promisifyAll} from '@google-cloud/promisify';
+import {PreciseDate} from '@google-cloud/precise-date';
 import arrify = require('arrify');
-import {Big} from 'big.js';
+import * as Big from 'big.js';
 import * as extend from 'extend';
 import * as is from 'is';
 import * as uuid from 'uuid';
@@ -97,22 +98,42 @@ export type Query = JobRequest<bigquery.IJobConfigurationQuery> & {
   params?: any[] | {[param: string]: any};
   dryRun?: boolean;
   labels?: {[label: string]: string};
-  types?: string[] | string[][] | {[type: string]: string | string[]};
+  types?: QueryParamTypes;
   job?: Job;
   maxResults?: number;
   jobTimeoutMs?: number;
   pageToken?: string;
   wrapIntegers?: boolean | IntegerTypeCastOptions;
+  parseJSON?: boolean;
 };
+
+export type QueryParamTypeStruct = {
+  [type: string]:
+    | string
+    | string[]
+    | QueryParamTypeStruct
+    | QueryParamTypeStruct[];
+};
+export type QueryParamTypes =
+  | string[]
+  | string[][]
+  | QueryParamTypeStruct
+  | QueryParamTypeStruct[];
 
 export type QueryOptions = QueryResultsOptions;
 export type QueryStreamOptions = {
   wrapIntegers?: boolean | IntegerTypeCastOptions;
+  parseJSON?: boolean;
 };
-export type DatasetResource = bigquery.IDataset;
+export type DatasetResource = bigquery.IDataset & {
+  projectId?: string;
+};
 export type ValueType = bigquery.IQueryParameterType;
 
-export type GetDatasetsOptions = PagedRequest<bigquery.datasets.IListParams>;
+export type GetDatasetsOptions = PagedRequest<bigquery.datasets.IListParams> & {
+  projectId?: string;
+};
+
 export type DatasetsResponse = PagedResponse<
   Dataset,
   GetDatasetsOptions,
@@ -462,24 +483,29 @@ export class BigQuery extends Service {
    *
    * @param {object} schema
    * @param {array} rows
-   * @param {boolean|IntegerTypeCastOptions} wrapIntegers Wrap values of
+   * @param {object} options
+   * @param {boolean|IntegerTypeCastOptions} options.wrapIntegers Wrap values of
    *     'INT64' type in {@link BigQueryInt} objects.
    *     If a `boolean`, this will wrap values in {@link BigQueryInt} objects.
    *     If an `object`, this will return a value returned by
    *     `wrapIntegers.integerTypeCastFunction`.
    *     Please see {@link IntegerTypeCastOptions} for options descriptions.
-   * @param {array} selectedFields List of fields to return.
+   * @param {array} options.selectedFields List of fields to return.
    * If unspecified, all fields are returned.
+   * @param {array} options.parseJSON parse a 'JSON' field into a JSON object.
    * @returns Fields using their matching names from the table's schema.
    */
   static mergeSchemaWithRows_(
     schema: TableSchema | TableField,
     rows: TableRow[],
-    wrapIntegers: boolean | IntegerTypeCastOptions,
-    selectedFields?: string[]
+    options: {
+      wrapIntegers: boolean | IntegerTypeCastOptions;
+      selectedFields?: string[];
+      parseJSON?: boolean;
+    }
   ) {
-    if (selectedFields && selectedFields!.length > 0) {
-      const selectedFieldsArray = selectedFields!.map(c => {
+    if (options.selectedFields && options.selectedFields!.length > 0) {
+      const selectedFieldsArray = options.selectedFields!.map(c => {
         return c.split('.');
       });
 
@@ -491,24 +517,23 @@ export class BigQuery extends Service {
             .map(c => c!.toLowerCase())
             .indexOf(field.name!.toLowerCase()) >= 0
       );
-      selectedFields = selectedFieldsArray
+      options.selectedFields = selectedFieldsArray
         .filter(c => c.length > 0)
         .map(c => c.join('.'));
     }
 
-    return arrify(rows)
-      .map(mergeSchema)
-      .map(flattenRows);
+    return arrify(rows).map(mergeSchema).map(flattenRows);
+
     function mergeSchema(row: TableRow) {
       return row.f!.map((field: TableRowField, index: number) => {
         const schemaField = schema.fields![index];
         let value = field.v;
         if (schemaField.mode === 'REPEATED') {
           value = (value as TableRowField[]).map(val => {
-            return convert(schemaField, val.v, wrapIntegers, selectedFields);
+            return convert(schemaField, val.v, options);
           });
         } else {
-          value = convert(schemaField, value, wrapIntegers, selectedFields);
+          value = convert(schemaField, value, options);
         }
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const fieldObject: any = {};
@@ -521,8 +546,11 @@ export class BigQuery extends Service {
       schemaField: TableField,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       value: any,
-      wrapIntegers: boolean | IntegerTypeCastOptions,
-      selectedFields?: string[]
+      options: {
+        wrapIntegers: boolean | IntegerTypeCastOptions;
+        selectedFields?: string[];
+        parseJSON?: boolean;
+      }
     ) {
       if (is.null(value)) {
         return value;
@@ -545,6 +573,7 @@ export class BigQuery extends Service {
         }
         case 'INTEGER':
         case 'INT64': {
+          const {wrapIntegers} = options;
           value = wrapIntegers
             ? typeof wrapIntegers === 'object'
               ? BigQuery.int(
@@ -567,8 +596,7 @@ export class BigQuery extends Service {
           value = BigQuery.mergeSchemaWithRows_(
             schemaField,
             value,
-            wrapIntegers,
-            selectedFields
+            options
           ).pop();
           break;
         }
@@ -585,11 +613,16 @@ export class BigQuery extends Service {
           break;
         }
         case 'TIMESTAMP': {
-          value = BigQuery.timestamp(new Date(value * 1000));
+          value = BigQuery.timestamp(value);
           break;
         }
         case 'GEOGRAPHY': {
           value = BigQuery.geography(value);
+          break;
+        }
+        case 'JSON': {
+          const {parseJSON} = options;
+          value = parseJSON ? JSON.parse(value) : value;
           break;
         }
         default:
@@ -844,11 +877,11 @@ export class BigQuery extends Service {
    * const timestamp = bigquery.timestamp(new Date());
    * ```
    */
-  static timestamp(value: Date | string) {
+  static timestamp(value: Date | PreciseDate | string | number) {
     return new BigQueryTimestamp(value);
   }
 
-  timestamp(value: Date | string) {
+  timestamp(value: Date | PreciseDate | string | number) {
     return BigQuery.timestamp(value);
   }
 
@@ -927,7 +960,7 @@ export class BigQuery extends Service {
           'value ' +
           value.integerValue +
           " is out of bounds of 'Number.MAX_SAFE_INTEGER'.\n" +
-          "To prevent this error, please consider passing 'options.wrapNumbers' as\n" +
+          "To prevent this error, please consider passing 'options.wrapIntegers' as\n" +
           '{\n' +
           '  integerTypeCastFunction: provide <your_custom_function>\n' +
           '  fields: optionally specify field name(s) to be custom casted\n' +
@@ -1229,35 +1262,36 @@ export class BigQuery extends Service {
     const callback =
       typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
 
-    this.request(
-      {
-        method: 'POST',
-        uri: '/datasets',
-        json: extend(
-          true,
-          {
-            location: this.location,
+    const reqOpts: DecorateRequestOptions = {
+      method: 'POST',
+      uri: '/datasets',
+      json: extend(
+        true,
+        {
+          location: this.location,
+        },
+        options,
+        {
+          datasetReference: {
+            datasetId: id,
           },
-          options,
-          {
-            datasetReference: {
-              datasetId: id,
-            },
-          }
-        ),
-      },
-      (err, resp) => {
-        if (err) {
-          callback!(err, null, resp);
-          return;
         }
-
-        const dataset = this.dataset(id);
-        dataset.metadata = resp;
-
-        callback!(null, dataset, resp);
+      ),
+    };
+    if (options.projectId) {
+      reqOpts.projectId = options.projectId;
+    }
+    this.request(reqOpts, (err, resp) => {
+      if (err) {
+        callback!(err, null, resp);
+        return;
       }
-    );
+
+      const dataset = this.dataset(id, options);
+      dataset.metadata = resp;
+
+      callback!(null, dataset, resp);
+    });
   }
 
   /**
@@ -1298,6 +1332,7 @@ export class BigQuery extends Service {
    *     the format of the {@link https://cloud.google.com/bigquery/docs/reference/rest/v2/datasets#DatasetReference| `DatasetReference`}
    * @param {boolean} [options.wrapIntegers] Optionally wrap INT64 in BigQueryInt
    *     or custom INT64 value type.
+   * @param {boolean} [options.parseJSON] Optionally parse JSON as a JSON Object.
    * @param {object|array} [options.params] Option to provide query prarameters.
    * @param {JobCallback} [callback] The callback function.
    * @param {?error} callback.err An error returned while making this request.
@@ -1635,6 +1670,7 @@ export class BigQuery extends Service {
    *
    * @param {string} id ID of the dataset.
    * @param {object} [options] Dataset options.
+   * @param {string} [options.projectId] The GCP project ID.
    * @param {string} [options.location] The geographic location of the dataset.
    *      Required except for US and EU.
    *
@@ -1657,12 +1693,13 @@ export class BigQuery extends Service {
   }
 
   /**
-   * List all or some of the datasets in your project.
+   * List all or some of the datasets in a project.
    *
    * See {@link https://cloud.google.com/bigquery/docs/reference/v2/datasets/list| Datasets: list API Documentation}
    *
    * @param {object} [options] Configuration object.
    * @param {boolean} [options.all] List all datasets, including hidden ones.
+   * @param {string} [options.projectId] The GCP project ID.
    * @param {boolean} [options.autoPaginate] Have pagination handled automatically.
    *     Default: true.
    * @param {number} [options.maxApiCalls] Maximum number of API calls to make.
@@ -1717,40 +1754,45 @@ export class BigQuery extends Service {
     const callback =
       typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
 
-    this.request(
-      {
-        uri: '/datasets',
-        qs: options,
-      },
-      (err, resp) => {
-        if (err) {
-          callback!(err, null, null, resp);
-          return;
-        }
-
-        let nextQuery: GetDatasetsOptions | null = null;
-
-        if (resp.nextPageToken) {
-          nextQuery = Object.assign({}, options, {
-            pageToken: resp.nextPageToken,
-          });
-        }
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const datasets = (resp.datasets || []).map(
-          (dataset: bigquery.IDataset) => {
-            const ds = this.dataset(dataset.datasetReference!.datasetId!, {
-              location: dataset.location!,
-            });
-
-            ds.metadata = dataset!;
-            return ds;
-          }
-        );
-
-        callback!(null, datasets, nextQuery, resp);
+    const reqOpts: DecorateRequestOptions = {
+      uri: '/datasets',
+      qs: options,
+    };
+    if (options.projectId) {
+      reqOpts.projectId = options.projectId;
+    }
+    this.request(reqOpts, (err, resp) => {
+      if (err) {
+        callback!(err, null, null, resp);
+        return;
       }
-    );
+
+      let nextQuery: GetDatasetsOptions | null = null;
+
+      if (resp.nextPageToken) {
+        nextQuery = Object.assign({}, options, {
+          pageToken: resp.nextPageToken,
+        });
+      }
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const datasets = (resp.datasets || []).map(
+        (dataset: bigquery.IDataset) => {
+          const dsOpts: DatasetOptions = {
+            location: dataset.location!,
+          };
+          if (options.projectId) {
+            dsOpts.projectId = options.projectId;
+          }
+          const ds = this.dataset(dataset.datasetReference!.datasetId!, dsOpts);
+
+          ds.metadata = dataset!;
+          return ds;
+        }
+      );
+
+      callback!(null, datasets, nextQuery, resp);
+    });
   }
 
   /**
@@ -2024,6 +2066,13 @@ export class BigQuery extends Service {
   ): void | Promise<SimpleQueryRowsResponse> | Promise<QueryRowsResponse> {
     let options =
       typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
+    const queryOpts =
+      typeof query === 'object'
+        ? {
+            wrapIntegers: query.wrapIntegers,
+            parseJSON: query.parseJSON,
+          }
+        : {};
     const callback =
       typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
     this.createQueryJob(query, (err, job, resp) => {
@@ -2037,7 +2086,7 @@ export class BigQuery extends Service {
       }
       // The Job is important for the `queryAsStream_` method, so a new query
       // isn't created each time results are polled for.
-      options = extend({job}, options);
+      options = extend({job}, queryOpts, options);
       job!.getQueryResults(options, callback as QueryRowsCallback);
     });
   }
@@ -2054,13 +2103,14 @@ export class BigQuery extends Service {
       return;
     }
 
-    const {location, maxResults, pageToken, wrapIntegers} = query;
+    const {location, maxResults, pageToken, wrapIntegers, parseJSON} = query;
 
     const opts = {
       location,
       maxResults,
       pageToken,
       wrapIntegers,
+      parseJSON,
       autoPaginate: false,
     };
 
@@ -2068,6 +2118,7 @@ export class BigQuery extends Service {
     delete query.maxResults;
     delete query.pageToken;
     delete query.wrapIntegers;
+    delete query.parseJSON;
 
     this.query(query, opts, callback);
   }
@@ -2125,8 +2176,42 @@ export class Geography {
  */
 export class BigQueryTimestamp {
   value: string;
-  constructor(value: Date | string) {
-    this.value = new Date(value).toJSON();
+  constructor(value: Date | PreciseDate | string | number) {
+    let pd: PreciseDate;
+    if (value instanceof PreciseDate) {
+      pd = value;
+    } else if (value instanceof Date) {
+      pd = new PreciseDate(value);
+    } else if (typeof value === 'string') {
+      if (/^\d{4}-\d{1,2}-\d{1,2}/.test(value)) {
+        pd = new PreciseDate(value);
+      } else {
+        const floatValue = Number.parseFloat(value);
+        if (!Number.isNaN(floatValue)) {
+          pd = this.fromFloatValue_(floatValue);
+        } else {
+          pd = new PreciseDate(value);
+        }
+      }
+    } else {
+      pd = this.fromFloatValue_(value);
+    }
+    // to keep backward compatibility, only converts with microsecond
+    // precision if needed.
+    if (pd.getMicroseconds() > 0) {
+      this.value = pd.toISOString();
+    } else {
+      this.value = new Date(pd.getTime()).toJSON();
+    }
+  }
+
+  fromFloatValue_(value: number): PreciseDate {
+    const secs = Math.trunc(value);
+    // Timestamps in BigQuery have microsecond precision, so we must
+    // return a round number of microseconds.
+    const micros = Math.trunc((value - secs) * 1e6 + 0.5);
+    const pd = new PreciseDate([secs, micros * 1000]);
+    return pd;
   }
 }
 
@@ -2242,13 +2327,14 @@ export class BigQueryInt extends Number {
       try {
         return this.typeCastFunction!(this.value);
       } catch (error) {
-        (error as Error).message = `integerTypeCastFunction threw an error:\n\n  - ${
+        (
+          error as Error
+        ).message = `integerTypeCastFunction threw an error:\n\n  - ${
           (error as Error).message
         }`;
         throw error;
       }
     } else {
-      // return this.value;
       return BigQuery.decodeIntegerValue_({
         integerValue: this.value,
         schemaFieldName: this._schemaFieldName,

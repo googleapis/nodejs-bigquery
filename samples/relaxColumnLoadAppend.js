@@ -41,10 +41,7 @@ function main(
     const schema = 'Age:INTEGER, Weight:FLOAT, IsMagic:BOOLEAN';
 
     // Retrieve destination table reference
-    const [table] = await bigquery
-      .dataset(datasetId)
-      .table(tableId)
-      .get();
+    const [table] = await bigquery.dataset(datasetId).table(tableId).get();
     const destinationTableRef = table.metadata.tableReference;
 
     // Set load job options

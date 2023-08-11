@@ -23,7 +23,7 @@ import * as pfy from '@google-cloud/promisify';
 import arrify = require('arrify');
 import * as assert from 'assert';
 import {describe, it, after, afterEach, before, beforeEach} from 'mocha';
-import Big from 'big.js';
+import * as Big from 'big.js';
 import * as extend from 'extend';
 import * as proxyquire from 'proxyquire';
 import * as sinon from 'sinon';
@@ -42,6 +42,7 @@ import {
   TableField,
 } from '../src';
 import {SinonStub} from 'sinon';
+import {PreciseDate} from '@google-cloud/precise-date';
 
 const fakeUuid = extend(true, {}, uuid);
 
@@ -147,6 +148,7 @@ afterEach(() => sandbox.restore());
 describe('BigQuery', () => {
   const JOB_ID = 'JOB_ID';
   const PROJECT_ID = 'test-project';
+  const ANOTHER_PROJECT_ID = 'another-test-project';
   const LOCATION = 'asia-northeast1';
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -453,7 +455,7 @@ describe('BigQuery', () => {
             f: [
               {v: '3'},
               {v: 'Milo'},
-              {v: String(now.valueOf() / 1000)},
+              {v: now.valueOf() * 1000},
               {v: 'false'},
               {v: 'true'},
               {v: '5.222330009847'},
@@ -505,7 +507,7 @@ describe('BigQuery', () => {
             id: 3,
             name: 'Milo',
             dob: {
-              input: now,
+              input: now.valueOf() * 1000,
               type: 'fakeTimestamp',
             },
             has_claws: false,
@@ -609,11 +611,9 @@ describe('BigQuery', () => {
       });
 
       const rawRows = rows.map(x => x.raw);
-      const mergedRows = BigQuery.mergeSchemaWithRows_(
-        schemaObject,
-        rawRows,
-        false
-      );
+      const mergedRows = BigQuery.mergeSchemaWithRows_(schemaObject, rawRows, {
+        wrapIntegers: false,
+      });
 
       mergedRows.forEach((mergedRow: {}, index: number) => {
         assert.deepStrictEqual(mergedRow, rows[index].expected);
@@ -643,22 +643,52 @@ describe('BigQuery', () => {
 
       sandbox.stub(BigQuery, 'int').returns(fakeInt);
 
-      let mergedRows = BigQuery.mergeSchemaWithRows_(
-        SCHEMA_OBJECT,
-        rows.raw,
-        wrapIntegersBoolean
-      );
+      let mergedRows = BigQuery.mergeSchemaWithRows_(SCHEMA_OBJECT, rows.raw, {
+        wrapIntegers: wrapIntegersBoolean,
+      });
       mergedRows.forEach((mergedRow: {}) => {
         assert.deepStrictEqual(mergedRow, rows.expectedBool);
       });
 
-      mergedRows = BigQuery.mergeSchemaWithRows_(
-        SCHEMA_OBJECT,
-        rows.raw,
-        wrapIntegersObject
-      );
+      mergedRows = BigQuery.mergeSchemaWithRows_(SCHEMA_OBJECT, rows.raw, {
+        wrapIntegers: wrapIntegersObject,
+      });
       mergedRows.forEach((mergedRow: {}) => {
         assert.deepStrictEqual(mergedRow, rows.expectedObj);
+      });
+    });
+
+    it('should parse json with option', () => {
+      const jsonValue = {name: 'John Doe'};
+
+      const SCHEMA_OBJECT = {
+        fields: [{name: 'json_field', type: 'JSON'}],
+      } as {fields: TableField[]};
+
+      const rows = {
+        raw: {
+          f: [{v: JSON.stringify(jsonValue)}],
+        },
+        expectedParsed: {
+          json_field: jsonValue,
+        },
+        expectedRaw: {
+          json_field: JSON.stringify(jsonValue),
+        },
+      };
+
+      let mergedRows = BigQuery.mergeSchemaWithRows_(SCHEMA_OBJECT, rows.raw, {
+        parseJSON: false,
+      });
+      mergedRows.forEach((mergedRow: {}) => {
+        assert.deepStrictEqual(mergedRow, rows.expectedRaw);
+      });
+
+      mergedRows = BigQuery.mergeSchemaWithRows_(SCHEMA_OBJECT, rows.raw, {
+        parseJSON: true,
+      });
+      mergedRows.forEach((mergedRow: {}) => {
+        assert.deepStrictEqual(mergedRow, rows.expectedParsed);
       });
     });
   });
@@ -803,8 +833,11 @@ describe('BigQuery', () => {
 
   describe('timestamp', () => {
     const INPUT_STRING = '2016-12-06T12:00:00.000Z';
+    const INPUT_STRING_MICROS = '2016-12-06T12:00:00.123456Z';
     const INPUT_DATE = new Date(INPUT_STRING);
+    const INPUT_PRECISE_DATE = new PreciseDate(INPUT_STRING_MICROS);
     const EXPECTED_VALUE = INPUT_DATE.toJSON();
+    const EXPECTED_VALUE_MICROS = INPUT_PRECISE_DATE.toISOString();
 
     // tslint:disable-next-line ban
     it.skip('should expose static and instance constructors', () => {
@@ -822,14 +855,29 @@ describe('BigQuery', () => {
       assert.strictEqual(timestamp.constructor.name, 'BigQueryTimestamp');
     });
 
+    it('should accept a NaN', () => {
+      const timestamp = bq.timestamp(NaN);
+      assert.strictEqual(timestamp.value, null);
+    });
+
     it('should accept a string', () => {
       const timestamp = bq.timestamp(INPUT_STRING);
       assert.strictEqual(timestamp.value, EXPECTED_VALUE);
     });
 
+    it('should accept a string with microseconds', () => {
+      const timestamp = bq.timestamp(INPUT_STRING_MICROS);
+      assert.strictEqual(timestamp.value, EXPECTED_VALUE_MICROS);
+    });
+
     it('should accept a Date object', () => {
       const timestamp = bq.timestamp(INPUT_DATE);
       assert.strictEqual(timestamp.value, EXPECTED_VALUE);
+    });
+
+    it('should accept a PreciseDate object', () => {
+      const timestamp = bq.timestamp(INPUT_PRECISE_DATE);
+      assert.strictEqual(timestamp.value, EXPECTED_VALUE_MICROS);
     });
   });
 
@@ -865,10 +913,7 @@ describe('BigQuery', () => {
     it('should call through to the static method', () => {
       const fakeInt = new BigQueryInt(INPUT_STRING);
 
-      sandbox
-        .stub(BigQuery, 'int')
-        .withArgs(INPUT_STRING)
-        .returns(fakeInt);
+      sandbox.stub(BigQuery, 'int').withArgs(INPUT_STRING).returns(fakeInt);
 
       const int = bq.int(INPUT_STRING);
       assert.strictEqual(int, fakeInt);
@@ -907,7 +952,7 @@ describe('BigQuery', () => {
               'value ' +
               opts.integerValue +
               " is out of bounds of 'Number.MAX_SAFE_INTEGER'.\n" +
-              "To prevent this error, please consider passing 'options.wrapNumbers' as\n" +
+              "To prevent this error, please consider passing 'options.wrapIntegers' as\n" +
               '{\n' +
               '  integerTypeCastFunction: provide <your_custom_function>\n' +
               '  fields: optionally specify field name(s) to be custom casted\n' +
@@ -954,14 +999,20 @@ describe('BigQuery', () => {
           const smallIntegerValue = Number.MIN_SAFE_INTEGER - 1;
 
           // should throw when Number is passed
-          assert.throws(() => {
-            new BigQueryInt(largeIntegerValue).valueOf();
-          }, expectedError({integerValue: largeIntegerValue}));
+          assert.throws(
+            () => {
+              new BigQueryInt(largeIntegerValue).valueOf();
+            },
+            expectedError({integerValue: largeIntegerValue})
+          );
 
           // should throw when string is passed
-          assert.throws(() => {
-            new BigQueryInt(smallIntegerValue.toString()).valueOf();
-          }, expectedError({integerValue: smallIntegerValue}));
+          assert.throws(
+            () => {
+              new BigQueryInt(smallIntegerValue.toString()).valueOf();
+            },
+            expectedError({integerValue: smallIntegerValue})
+          );
         });
 
         it('should not auto throw on initialization', () => {
@@ -971,9 +1022,12 @@ describe('BigQuery', () => {
             integerValue: largeIntegerValue,
           };
 
-          assert.doesNotThrow(() => {
-            new BigQueryInt(valueObject);
-          }, new RegExp(`Integer value ${largeIntegerValue} is out of bounds.`));
+          assert.doesNotThrow(
+            () => {
+              new BigQueryInt(valueObject);
+            },
+            new RegExp(`Integer value ${largeIntegerValue} is out of bounds.`)
+          );
         });
 
         describe('integerTypeCastFunction is provided', () => {
@@ -1537,6 +1591,30 @@ describe('BigQuery', () => {
       };
 
       bq.createDataset(DATASET_ID, assert.ifError);
+    });
+
+    it('should create a dataset on a different project', done => {
+      bq.makeAuthenticatedRequest = (reqOpts: DecorateRequestOptions) => {
+        assert.strictEqual(reqOpts.method, 'POST');
+        assert.strictEqual(reqOpts.projectId, ANOTHER_PROJECT_ID);
+        assert.strictEqual(
+          reqOpts.uri,
+          `https://bigquery.googleapis.com/bigquery/v2/projects/${ANOTHER_PROJECT_ID}/datasets`
+        );
+        assert.deepStrictEqual(reqOpts.json.datasetReference, {
+          datasetId: DATASET_ID,
+        });
+
+        done();
+      };
+
+      bq.createDataset(
+        DATASET_ID,
+        {
+          projectId: ANOTHER_PROJECT_ID,
+        },
+        assert.ifError
+      );
     });
 
     it('should send the location if available', done => {
@@ -2105,8 +2183,8 @@ describe('BigQuery', () => {
           const fakeQueryParameter = {fake: 'query parameter'};
 
           bq.createJob = (reqOpts: JobOptions) => {
-            const queryParameters = reqOpts.configuration!.query!
-              .queryParameters;
+            const queryParameters =
+              reqOpts.configuration!.query!.queryParameters;
             assert.deepStrictEqual(queryParameters, [fakeQueryParameter]);
             done();
           };
@@ -2461,6 +2539,20 @@ describe('BigQuery', () => {
         done();
       });
     });
+
+    it('should fetch datasets from a different project', done => {
+      const queryObject = {projectId: ANOTHER_PROJECT_ID};
+
+      bq.makeAuthenticatedRequest = (reqOpts: DecorateRequestOptions) => {
+        assert.strictEqual(
+          reqOpts.uri,
+          `https://bigquery.googleapis.com/bigquery/v2/projects/${ANOTHER_PROJECT_ID}/datasets`
+        );
+        done();
+      };
+
+      bq.getDatasets(queryObject, assert.ifError);
+    });
   });
 
   describe('getJobs', () => {
@@ -2701,6 +2793,37 @@ describe('BigQuery', () => {
       });
     });
 
+    it('should call job#getQueryResults with query options', done => {
+      let queryResultsOpts = {};
+      const fakeJob = {
+        getQueryResults: (options: {}, callback: Function) => {
+          queryResultsOpts = options;
+          callback(null, FAKE_ROWS, FAKE_RESPONSE);
+        },
+      };
+
+      bq.createQueryJob = (query: {}, callback: Function) => {
+        callback(null, fakeJob, FAKE_RESPONSE);
+      };
+
+      const query = {
+        query: QUERY_STRING,
+        wrapIntegers: true,
+        parseJSON: true,
+      };
+      bq.query(query, (err: Error, rows: {}, resp: {}) => {
+        assert.ifError(err);
+        assert.deepEqual(queryResultsOpts, {
+          job: fakeJob,
+          wrapIntegers: true,
+          parseJSON: true,
+        });
+        assert.strictEqual(rows, FAKE_ROWS);
+        assert.strictEqual(resp, FAKE_RESPONSE);
+        done();
+      });
+    });
+
     it('should assign Job on the options', done => {
       const fakeJob = {
         getQueryResults: (options: {}) => {
@@ -2736,11 +2859,12 @@ describe('BigQuery', () => {
 
   describe('queryAsStream_', () => {
     let queryStub: SinonStub;
-    let defaultOpts = {
+    const defaultOpts = {
       location: undefined,
       maxResults: undefined,
       pageToken: undefined,
       wrapIntegers: undefined,
+      parseJSON: undefined,
       autoPaginate: false,
     };
 
@@ -2757,12 +2881,14 @@ describe('BigQuery', () => {
     });
 
     it('should call query correctly with a Query object', done => {
-      const query = {query: 'SELECT', wrapIntegers: true};
+      const query = {query: 'SELECT', wrapIntegers: true, parseJSON: true};
       bq.queryAsStream_(query, done);
-      defaultOpts = extend(defaultOpts, {wrapIntegers: true});
-      assert(
-        queryStub.calledOnceWithExactly(query, defaultOpts, sinon.match.func)
-      );
+      const opts = {
+        ...defaultOpts,
+        wrapIntegers: true,
+        parseJSON: true,
+      };
+      assert(queryStub.calledOnceWithExactly(query, opts, sinon.match.func));
     });
 
     it('should query as job if supplied', done => {
@@ -2788,11 +2914,29 @@ describe('BigQuery', () => {
 
       bq.queryAsStream_(query, done);
 
-      defaultOpts = extend(defaultOpts, {wrapIntegers});
+      const opts = {
+        ...defaultOpts,
+        wrapIntegers,
+      };
 
-      assert(
-        queryStub.calledOnceWithExactly(query, defaultOpts, sinon.match.func)
-      );
+      assert(queryStub.calledOnceWithExactly(query, opts, sinon.match.func));
+    });
+
+    it('should pass parseJSON if supplied', done => {
+      const parseJSON = true;
+      const query = {
+        query: 'SELECT',
+        parseJSON,
+      };
+
+      bq.queryAsStream_(query, done);
+
+      const opts = {
+        ...defaultOpts,
+        parseJSON,
+      };
+
+      assert(queryStub.calledOnceWithExactly(query, opts, sinon.match.func));
     });
   });
 

@@ -36,10 +36,7 @@ const bigquery = new BigQuery();
 
 describe('Routines', () => {
   after(async () => {
-    await bigquery
-      .dataset(datasetId)
-      .delete({force: true})
-      .catch(console.warn);
+    await bigquery.dataset(datasetId).delete({force: true}).catch(console.warn);
   });
 
   before(async () => {

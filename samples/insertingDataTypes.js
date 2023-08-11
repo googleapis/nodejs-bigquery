@@ -46,6 +46,10 @@ function main(datasetId = 'my_dataset', tableId = 'my_table') {
         type: 'BYTES',
       },
       {
+        name: 'metadata',
+        type: 'JSON',
+      },
+      {
         name: 'location',
         type: 'GEOGRAPHY',
       },
@@ -108,7 +112,11 @@ function main(datasetId = 'my_dataset', tableId = 'my_table') {
     const bqTimestamp = bigquery.timestamp('2020-04-27T18:07:25.356Z');
     const bqGeography = bigquery.geography('POINT(1 2)');
     const schoolBuffer = Buffer.from('Test University');
-
+    // a JSON field needs to be converted to a string
+    const metadata = JSON.stringify({
+      owner: 'John Doe',
+      contact: 'johndoe@example.com',
+    });
     // Rows to be inserted into table
     const rows = [
       {
@@ -116,6 +124,7 @@ function main(datasetId = 'my_dataset', tableId = 'my_table') {
         age: '30',
         location: bqGeography,
         school: schoolBuffer,
+        metadata: metadata,
         measurements: [50.05, 100.5],
         datesTimes: {
           day: bqDate,
@@ -132,10 +141,7 @@ function main(datasetId = 'my_dataset', tableId = 'my_table') {
     ];
 
     // Insert data into table
-    await bigquery
-      .dataset(datasetId)
-      .table(tableId)
-      .insert(rows);
+    await bigquery.dataset(datasetId).table(tableId).insert(rows);
 
     console.log(`Inserted ${rows.length} rows`);
   }

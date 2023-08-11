@@ -4,6 +4,68 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## [7.1.1](https://github.com/googleapis/nodejs-bigquery/compare/v7.1.0...v7.1.1) (2023-08-03)
+
+
+### Bug Fixes
+
+* Node release schedule link ([#1241](https://github.com/googleapis/nodejs-bigquery/issues/1241)) ([3bcb08a](https://github.com/googleapis/nodejs-bigquery/commit/3bcb08a20d53eeb9ac4deeb86d495185438bf77b))
+* Update @types/big.js ([8d16fae](https://github.com/googleapis/nodejs-bigquery/commit/8d16fae555591e9b406d63bd5cb2818be778ebdc))
+
+## [7.1.0](https://github.com/googleapis/nodejs-bigquery/compare/v7.0.0...v7.1.0) (2023-08-01)
+
+
+### Features
+
+* Support and optionally parse JSON field ([#1229](https://github.com/googleapis/nodejs-bigquery/issues/1229)) ([cd11447](https://github.com/googleapis/nodejs-bigquery/commit/cd114470150cd58dffd4a7c511021eac19ab94d5))
+* Support create/list datasets on a different project ([#1230](https://github.com/googleapis/nodejs-bigquery/issues/1230)) ([86c63fb](https://github.com/googleapis/nodejs-bigquery/commit/86c63fb7079b2fb5b70bae13ed20267cebb3c99d))
+
+## [7.0.0](https://github.com/googleapis/nodejs-bigquery/compare/v6.2.1...v7.0.0) (2023-07-31)
+
+
+### ⚠ BREAKING CHANGES
+
+* migrate to node 14 ([#1236](https://github.com/googleapis/nodejs-bigquery/issues/1236))
+
+### Bug Fixes
+
+* **deps:** Update dependency google-auth-library to v9 ([#1228](https://github.com/googleapis/nodejs-bigquery/issues/1228)) ([22cf786](https://github.com/googleapis/nodejs-bigquery/commit/22cf786579331e3cb7a3aa63dc2f71e448553e18))
+
+
+### Miscellaneous Chores
+
+* Migrate to node 14 ([#1236](https://github.com/googleapis/nodejs-bigquery/issues/1236)) ([73bf31f](https://github.com/googleapis/nodejs-bigquery/commit/73bf31f55c4fa9e384aa76e1a7af0603ebb0d11b))
+
+## [6.2.1](https://github.com/googleapis/nodejs-bigquery/compare/v6.2.0...v6.2.1) (2023-07-10)
+
+
+### Bug Fixes
+
+* Change view name to match sample comments ([#1207](https://github.com/googleapis/nodejs-bigquery/issues/1207)) ([1002dee](https://github.com/googleapis/nodejs-bigquery/commit/1002dee1ab31d912218e8d49296367b9785dfa5c))
+* Encode values with null prototype ([#1219](https://github.com/googleapis/nodejs-bigquery/issues/1219)) ([1b7a52e](https://github.com/googleapis/nodejs-bigquery/commit/1b7a52ed5b686899df5ab2b11d482a50a1ab19a2))
+
+## [6.2.0](https://github.com/googleapis/nodejs-bigquery/compare/v6.1.0...v6.2.0) (2023-03-22)
+
+
+### Features
+
+* Add collation feature tests ([#1188](https://github.com/googleapis/nodejs-bigquery/issues/1188)) ([80d86ba](https://github.com/googleapis/nodejs-bigquery/commit/80d86ba7d304e83c16c18e721aa50a2612233d14))
+* Add support for microseconds precision ([#1192](https://github.com/googleapis/nodejs-bigquery/issues/1192)) ([b5801a6](https://github.com/googleapis/nodejs-bigquery/commit/b5801a641ae62b1589670233d2c699114e00aa26))
+
+
+### Bug Fixes
+
+* Add typings for named parameter structs ([#1198](https://github.com/googleapis/nodejs-bigquery/issues/1198)) ([c7c2ba1](https://github.com/googleapis/nodejs-bigquery/commit/c7c2ba1bd3657dc4ad2e91c5b89ac35cf6fd97a9))
+* Client endpoint sample error msg ([#1193](https://github.com/googleapis/nodejs-bigquery/issues/1193)) ([e3ea8cd](https://github.com/googleapis/nodejs-bigquery/commit/e3ea8cded3c1d51f3da96a9974ac991828d9e9c8))
+* Pass Query.wrapIntegers to job.getQueryResults ([#1191](https://github.com/googleapis/nodejs-bigquery/issues/1191)) ([fb13510](https://github.com/googleapis/nodejs-bigquery/commit/fb13510d4ad0b2d3f82a306a7da72969d594cf11))
+
+## [6.1.0](https://github.com/googleapis/nodejs-bigquery/compare/v6.0.3...v6.1.0) (2023-01-25)
+
+
+### Features
+
+* Add set client endpoint sample ([#1170](https://github.com/googleapis/nodejs-bigquery/issues/1170)) ([df1dcd3](https://github.com/googleapis/nodejs-bigquery/commit/df1dcd3899dd10f20988b938b31ac571c997bffd))
+
 ## [6.0.3](https://github.com/googleapis/nodejs-bigquery/compare/v6.0.2...v6.0.3) (2022-08-23)
 
 
