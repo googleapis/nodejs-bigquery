@@ -1818,7 +1818,15 @@ describe('BigQuery', () => {
     });
 
     const deleteBucketPromises = buckets
-      .filter(bucket => isResourceStale(bucket.metadata.timeCreated))
+      .filter(bucket => {
+        try {
+          if (typeof bucket.metadata.timeCreated === 'string') {
+            isResourceStale(bucket.metadata.timeCreated);
+          }
+        } catch {
+          throw Error('timeCreated on type BucketMetadata cannot be undefined');
+        }
+      })
       .map(async b => {
         const [files] = await b.getFiles();
         await Promise.all(files.map(f => f.delete()));
