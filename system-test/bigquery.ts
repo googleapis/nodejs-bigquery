@@ -866,7 +866,6 @@ describe('BigQuery', () => {
       stream
         .pipe(table.createInsertStream())
         .on('response', (response: InsertRowsStreamResponse) => {
-          console.log(response);
           assert.deepStrictEqual(response.kind, expectedResponse);
           done();
         });
@@ -888,7 +887,30 @@ describe('BigQuery', () => {
       const description = 'catsandstuff';
       await table.setMetadata({description});
       const [metadata] = await table.getMetadata();
+      const metadataProps = Object.keys(metadata);
+      assert.strictEqual(metadataProps.includes('numBytes'), true);
+      assert.notStrictEqual(metadata.numBytes, undefined);
+      assert.strictEqual(metadataProps.includes('lastModifiedTime'), true);
+      assert.notStrictEqual(metadata.lastModifiedTime, undefined);
       assert.strictEqual(metadata.description, description);
+    });
+
+    it('should set & get partial metadata', async () => {
+      const options = {
+        view: 'BASIC',
+      };
+      const [basicMetadata] = await table.get(options);
+      const basicMetadataProps = Object.values(
+        Object.keys(basicMetadata.metadata)
+      );
+
+      assert.strictEqual(basicMetadataProps.includes('numBytes'), false);
+      assert.strictEqual(basicMetadata.metadata.numBytes, undefined);
+      assert.strictEqual(
+        basicMetadataProps.includes('lastModifiedTime'),
+        false
+      );
+      assert.strictEqual(basicMetadata.metadata.lastModifiedTime, undefined);
     });
 
     describe('copying', () => {

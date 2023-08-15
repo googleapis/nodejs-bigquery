@@ -373,6 +373,12 @@ class Table extends ServiceObject {
        * is normally required for the `create` method must be contained within
        * this object as well.
        *
+       * If you wish to get a selection of metadata instead of the full table metadata
+       * (retrieved by both Table#get by default and by Table#getMetadata), use
+       * the `options` parameter to set the `view` and/or `selectedFields` query parameters.
+       *
+       * See {@link https://cloud.google.com/bigquery/docs/reference/rest/v2/tables/get#TableMetadataView| Tables.get and TableMetadataView }
+       *
        * @method Table#get
        * @param {options} [options] Configuration object.
        * @param {boolean} [options.autoCreate=false] Automatically create the
@@ -392,9 +398,17 @@ class Table extends ServiceObject {
        *
        * const table = dataset.table('my-table');
        *
+       * const options = {
+       *   view: "BASIC"
+       * }
+       *
        * table.get((err, table, apiResponse) => {
        *   // `table.metadata` has been populated.
        * });
+       *
+       * table.get(options, (err, table, apiResponse) => {
+       *   // A selection of `table.metadata` has been populated
+       * })
        *
        * //-
        * // If the callback is omitted, we'll return a Promise.
