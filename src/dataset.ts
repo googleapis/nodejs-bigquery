@@ -120,7 +120,7 @@ export type TableCallback = ResourceCallback<Table, bigquery.ITable>;
  * const dataset = bigquery.dataset('institutions');
  * ```
  */
-class Dataset extends ServiceObject {
+class Dataset extends ServiceObject<Dataset> {
   bigQuery: BigQuery;
   location?: string;
   projectId?: string;

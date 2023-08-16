@@ -79,7 +79,7 @@ const FORMATS = ['ML_TF_SAVED_MODEL', 'ML_XGBOOST_BOOSTER'];
  * const model = dataset.model('my-model');
  * ```
  */
-class Model extends ServiceObject {
+class Model extends ServiceObject<Model> {
   dataset: Dataset;
   bigQuery: BigQuery;
 
