@@ -103,9 +103,8 @@ function main(
     sharedMetadata.access = sharedAccessEntries;
 
     // Make API request to update dataset metadata
-    const [updatedSharedMetadata] = await sharedDataset.setMetadata(
-      sharedMetadata
-    );
+    const [updatedSharedMetadata] =
+      await sharedDataset.setMetadata(sharedMetadata);
 
     console.log(`Dataset ${updatedSharedMetadata.id} updated.`);
     // [END bigquery_avt_shared_dataset_access]
@@ -129,9 +128,8 @@ function main(
     sourceMetadata.access = sourceAccessEntries;
 
     // Make API request to update source dataset metadata
-    const [updatedSourceMetadata] = await sourceDataset.setMetadata(
-      sourceMetadata
-    );
+    const [updatedSourceMetadata] =
+      await sourceDataset.setMetadata(sourceMetadata);
 
     console.log(`Dataset ${updatedSourceMetadata.id} updated.`);
     // [END bigquery_avt_source_dataset_access]
