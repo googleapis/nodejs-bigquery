@@ -4,6 +4,22 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## [7.2.0](https://github.com/googleapis/nodejs-bigquery/compare/v7.1.1...v7.2.0) (2023-08-17)
+
+
+### Features
+
+* Partial metadata projection ([#1258](https://github.com/googleapis/nodejs-bigquery/issues/1258)) ([b70d3a4](https://github.com/googleapis/nodejs-bigquery/commit/b70d3a4300d8efdea45f89766155110ead392f12))
+
+
+### Bug Fixes
+
+* **deps:** Update dependency @google-cloud/common to v5 ([#1253](https://github.com/googleapis/nodejs-bigquery/issues/1253)) ([0cbfdcd](https://github.com/googleapis/nodejs-bigquery/commit/0cbfdcd45870c7e41b748883a6780422e091376b))
+* **deps:** Update dependency @google-cloud/paginator to v5 ([#1254](https://github.com/googleapis/nodejs-bigquery/issues/1254)) ([658ff1a](https://github.com/googleapis/nodejs-bigquery/commit/658ff1aa8ac47393aed48422538a8cda1747a4e7))
+* **deps:** Update dependency @google-cloud/precise-date to v4 ([#1261](https://github.com/googleapis/nodejs-bigquery/issues/1261)) ([7f12f7d](https://github.com/googleapis/nodejs-bigquery/commit/7f12f7dd027b6f511df664d5607af0d78be2bf2b))
+* **deps:** Update dependency @google-cloud/promisify to v4 ([#1252](https://github.com/googleapis/nodejs-bigquery/issues/1252)) ([6f04f39](https://github.com/googleapis/nodejs-bigquery/commit/6f04f39747a085cd370fbef35ab0afd578b26c94))
+* Manual update for renovate-bot google cloud storage v7 ([#1262](https://github.com/googleapis/nodejs-bigquery/issues/1262)) ([b58fc29](https://github.com/googleapis/nodejs-bigquery/commit/b58fc292349a25e3a88ebc1a37f45cbd0987fd7d))
+
 ## [7.1.1](https://github.com/googleapis/nodejs-bigquery/compare/v7.1.0...v7.1.1) (2023-08-03)
 
 
