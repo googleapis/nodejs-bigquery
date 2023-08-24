@@ -17,6 +17,7 @@
 import {
   DecorateRequestOptions,
   DeleteCallback,
+  InstanceResponseCallback,
   Metadata,
   ServiceObject,
 } from '@google-cloud/common';
@@ -46,6 +47,8 @@ import {
 import {Model} from './model';
 import {Routine} from './routine';
 import bigquery from './types';
+import { GetResponse } from '@google-cloud/common/build/src/service-object';
+import { GetOrCreateOptions } from '@google-cloud/storage/build/src/nodejs-common/service-object';
 
 export interface DatasetDeleteOptions {
   force?: boolean;
@@ -69,7 +72,10 @@ export type GetModelsCallback = PagedCallback<
   GetModelsOptions,
   bigquery.IListModelsResponse
 >;
-
+// new
+export type GetOptions = {
+  type?: string
+}
 export type GetRoutinesOptions = PagedRequest<bigquery.routines.IListParams>;
 export type GetRoutinesResponse = PagedResponse<
   Routine,
@@ -120,7 +126,7 @@ export type TableCallback = ResourceCallback<Table, bigquery.ITable>;
  * const dataset = bigquery.dataset('institutions');
  * ```
  */
-class Dataset extends ServiceObject<Dataset> {
+class Dataset extends ServiceObject {
   bigQuery: BigQuery;
   location?: string;
   projectId?: string;
@@ -837,6 +843,49 @@ class Dataset extends ServiceObject<Dataset> {
     );
   }
 
+  /**
+     * Get the object if it exists. Optionally have the object created if an
+     * options object is provided with `autoCreate: true`.
+     *
+     * @param {object=} options - The configuration object that will be used to
+     *     create the object if necessary.
+     * @param {boolean} options.autoCreate - Create the object if it doesn't already exist.
+     * @param {function} callback - The callback function.
+     * @param {?error} callback.err - An error returned while making this request.
+     * @param {object} callback.instance - The instance.
+     * @param {object} callback.apiResponse - The full API response.
+     */
+  get(options?: GetOrCreateOptions): Promise<GetResponse<T>>;
+  get(callback: InstanceResponseCallback<T>): void;
+  get(options: GetOrCreateOptions, callback: InstanceResponseCallback<T>): void;
+  get(options: GetOptions): Promise<GetResponse<Dataset>> {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    const self = this;
+
+    const [opts, callback] = util.maybeOptionsOrCallback<
+      GetOrCreateOptions,
+      InstanceResponseCallback<T>
+    >(optionsOrCallback, cb);
+    const options = Object.assign({}, opts);
+
+    const autoCreate = options.autoCreate && typeof this.create === 'function';
+    delete options.autoCreate;
+
+    function onCreate(
+      err: ApiError | null,
+      instance: T,
+      apiResponse: r.Response
+    ) {
+      if (err) {
+        if (err.code === 409) {
+          self.get(options, callback!);
+          return;
+        }
+        callback!(err, null, apiResponse);
+        return;
+      }
+      callback!(null, instance, apiResponse);
+  };
   /**
    * @typedef {object} GetModelsOptions
    * @property {boolean} [autoPaginate=true] Have pagination handled
