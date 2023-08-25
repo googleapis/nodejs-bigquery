@@ -40,7 +40,7 @@ function main(datasetId = 'my_dataset', modelId = 'my_existing_model') {
      * To narrow type from "any", cast the result of this method.
      * const [model]: Model = await dataset.model(modelId).get();
      * const model: Promise<GetResponse<Model>> = dataset.model(modelId).get();
-    */
+     */
 
     console.log('Model:');
     console.log(model.metadata.modelReference);

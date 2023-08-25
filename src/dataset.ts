@@ -17,7 +17,6 @@
 import {
   DecorateRequestOptions,
   DeleteCallback,
-  InstanceResponseCallback,
   Metadata,
   ServiceObject,
 } from '@google-cloud/common';
@@ -47,8 +46,6 @@ import {
 import {Model} from './model';
 import {Routine} from './routine';
 import bigquery from './types';
-import { GetResponse } from '@google-cloud/common/build/src/service-object';
-import { GetOrCreateOptions } from '@google-cloud/storage/build/src/nodejs-common/service-object';
 
 export interface DatasetDeleteOptions {
   force?: boolean;
@@ -72,10 +69,7 @@ export type GetModelsCallback = PagedCallback<
   GetModelsOptions,
   bigquery.IListModelsResponse
 >;
-// new
-export type GetOptions = {
-  type?: string
-}
+
 export type GetRoutinesOptions = PagedRequest<bigquery.routines.IListParams>;
 export type GetRoutinesResponse = PagedResponse<
   Routine,
