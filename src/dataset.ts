@@ -842,50 +842,6 @@ class Dataset extends ServiceObject {
       callback!
     );
   }
-
-  /**
-     * Get the object if it exists. Optionally have the object created if an
-     * options object is provided with `autoCreate: true`.
-     *
-     * @param {object=} options - The configuration object that will be used to
-     *     create the object if necessary.
-     * @param {boolean} options.autoCreate - Create the object if it doesn't already exist.
-     * @param {function} callback - The callback function.
-     * @param {?error} callback.err - An error returned while making this request.
-     * @param {object} callback.instance - The instance.
-     * @param {object} callback.apiResponse - The full API response.
-     */
-  get(options?: GetOrCreateOptions): Promise<GetResponse<T>>;
-  get(callback: InstanceResponseCallback<T>): void;
-  get(options: GetOrCreateOptions, callback: InstanceResponseCallback<T>): void;
-  get(options: GetOptions): Promise<GetResponse<Dataset>> {
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
-    const self = this;
-
-    const [opts, callback] = util.maybeOptionsOrCallback<
-      GetOrCreateOptions,
-      InstanceResponseCallback<T>
-    >(optionsOrCallback, cb);
-    const options = Object.assign({}, opts);
-
-    const autoCreate = options.autoCreate && typeof this.create === 'function';
-    delete options.autoCreate;
-
-    function onCreate(
-      err: ApiError | null,
-      instance: T,
-      apiResponse: r.Response
-    ) {
-      if (err) {
-        if (err.code === 409) {
-          self.get(options, callback!);
-          return;
-        }
-        callback!(err, null, apiResponse);
-        return;
-      }
-      callback!(null, instance, apiResponse);
-  };
   /**
    * @typedef {object} GetModelsOptions
    * @property {boolean} [autoPaginate=true] Have pagination handled

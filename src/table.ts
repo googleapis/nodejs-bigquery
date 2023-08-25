@@ -215,7 +215,7 @@ export interface TableOptions {
  * const table = dataset.table('my-table');
  * ```
  */
-class Table extends ServiceObject<Table> {
+class Table extends ServiceObject {
   dataset: Dataset;
   bigQuery: BigQuery;
   location?: string;

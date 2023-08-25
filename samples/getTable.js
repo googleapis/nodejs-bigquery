@@ -37,6 +37,11 @@ function main(datasetId = 'my_dataset', tableId = 'my_table') {
     // Retrieve table reference
     const dataset = bigquery.dataset(datasetId);
     const [table] = await dataset.table(tableId).get();
+    /**Typescript Note:
+     * To narrow type from "any", cast the result of this method.
+     * const [table]: Dataset = await dataset.table(tableId).get();
+     * const table: Promise<GetResponse<Table>> = dataset.table(tableId).get();
+    */
 
     console.log('Table:');
     console.log(table.metadata.tableReference);

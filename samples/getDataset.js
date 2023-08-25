@@ -30,7 +30,11 @@ function main(datasetId = 'my_dataset') {
 
     // Retrieve dataset reference
     const [dataset] = await bigquery.dataset(datasetId).get();
-
+    /**Typescript Note:
+     * To narrow type from "any", cast the result of this method.
+     * const [dataset]: Dataset = await bigquery.dataset(datasetId).get();
+     * const dataset: Promise<GetResponse<Dataset>> = bigquery.dataset(datasetId).get();
+    */
     console.log('Dataset:');
     console.log(dataset.metadata.datasetReference);
   }
