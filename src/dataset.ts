@@ -836,7 +836,7 @@ class Dataset extends ServiceObject {
       callback!
     );
   }
-  
+
   /**
    * @typedef {object} GetModelsOptions
    * @property {boolean} [autoPaginate=true] Have pagination handled
