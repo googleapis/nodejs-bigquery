@@ -168,7 +168,7 @@ export class RowQueue {
         json,
       },
       (err, resp) => {
-        const partialFailures = (resp.insertErrors || []).map(
+        const partialFailures = (resp?.insertErrors || []).map(
           (insertError: GoogleErrorBody) => {
             return {
               errors: insertError.errors!.map(error => {
