@@ -25,6 +25,7 @@ export {
   BigQueryTime,
   BigQueryTimeOptions,
   BigQueryTimestamp,
+  common,
   DatasetCallback,
   DatasetResource,
   DatasetResponse,

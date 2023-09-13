@@ -21,6 +21,7 @@ import {
   GoogleAuthOptions,
   util,
 } from '@google-cloud/common';
+import * as common from '@google-cloud/common';
 import {paginator, ResourceStream} from '@google-cloud/paginator';
 import {promisifyAll} from '@google-cloud/promisify';
 import {PreciseDate} from '@google-cloud/precise-date';
@@ -44,6 +45,10 @@ import {
 } from './table';
 import {GoogleErrorBody} from '@google-cloud/common/build/src/util';
 import bigquery from './types';
+
+
+// Third-Party Re-exports
+export {common};
 
 export interface RequestCallback<T> {
   (err: Error | null, response?: T | null): void;
