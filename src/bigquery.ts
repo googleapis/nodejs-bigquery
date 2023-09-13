@@ -46,7 +46,6 @@ import {
 import {GoogleErrorBody} from '@google-cloud/common/build/src/util';
 import bigquery from './types';
 
-
 // Third-Party Re-exports
 export {common};
 
