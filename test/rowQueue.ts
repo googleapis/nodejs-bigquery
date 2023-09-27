@@ -218,7 +218,7 @@ describe('Queues', () => {
       });
 
       it('should cancel any pending insert calls', () => {
-        const fakeHandle = 1234 as unknown as NodeJS.Timer;
+        const fakeHandle = 1234 as unknown as NodeJS.Timeout;
         const stub = sandbox.stub(global, 'clearTimeout').withArgs(fakeHandle);
 
         queue.pending = fakeHandle;
