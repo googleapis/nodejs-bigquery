@@ -1,18 +1,16 @@
-/*!
- * Copyright 2023 Google LLC. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2023 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * BigQuery API
@@ -355,6 +353,25 @@ declare namespace bigquery {
      * In case of DISABLED or PARTIAL bi_engine_mode, these contain the explanatory reasons as to why BI Engine could not accelerate. In case the full query was accelerated, this field is not populated.
      */
     biEngineReasons?: Array<IBiEngineReason>;
+  };
+
+  type IBigLakeConfiguration = {
+    /**
+     * [Required] Required and immutable. Credential reference for accessing external storage system. Normalized as project_id.location_id.connection_id.
+     */
+    connectionId?: string;
+    /**
+     * [Required] Required and immutable. Open source file format that the table data is stored in. Currently only PARQUET is supported.
+     */
+    fileFormat?: string;
+    /**
+     * [Required] Required and immutable. Fully qualified location prefix of the external folder where data is stored. Normalized to standard format: "gs:////". Starts with "gs://" rather than "/bigstore/". Ends with "/". Does not contain "*". See also BigLakeStorageMetadata on how it is used.
+     */
+    storageUri?: string;
+    /**
+     * [Required] Required and immutable. Open source file format that the table data is stored in. Currently only PARQUET is supported.
+     */
+    tableFormat?: string;
   };
 
   type IBigQueryModelTraining = {
@@ -820,6 +837,10 @@ declare namespace bigquery {
      * [Output-only] A hash of the resource.
      */
     etag?: string;
+    /**
+     * [Optional] Information about the external metadata storage where the dataset is defined. Filled out when the dataset type is EXTERNAL.
+     */
+    externalDatasetReference?: IExternalDatasetReference;
     /**
      * [Optional] A descriptive name for the dataset.
      */
@@ -1351,6 +1372,17 @@ declare namespace bigquery {
     sourceUris?: Array<string>;
   };
 
+  type IExternalDatasetReference = {
+    /**
+     * [Required] The connection id that is used to access the external_source. Format: projects/{project_id}/locations/{location_id}/connections/{connection_id}
+     */
+    connection?: string;
+    /**
+     * [Required] External source that backs this dataset.
+     */
+    externalSource?: string;
+  };
+
   /**
    * Representative value of a single feature within the cluster.
    */
@@ -1646,7 +1678,7 @@ declare namespace bigquery {
     /**
      * [Output-only] Specifies the base table involved in the reason that no search index was used.
      */
-    base_table?: ITableReference;
+    baseTable?: ITableReference;
     /**
      * [Output-only] Specifies the high-level reason for the scenario when no search index was used.
      */
@@ -1654,7 +1686,7 @@ declare namespace bigquery {
     /**
      * [Output-only] Specifies the name of the unused search index, if available.
      */
-    index_name?: string;
+    indexName?: string;
     /**
      * [Output-only] Free form human-readable reason for the scenario when no search index was used.
      */
@@ -2492,11 +2524,11 @@ declare namespace bigquery {
     /**
      * [Output-only] Number of logical bytes copied to the destination table.
      */
-    copied_logical_bytes?: string;
+    copiedLogicalBytes?: string;
     /**
      * [Output-only] Number of rows copied to the destination table.
      */
-    copied_rows?: string;
+    copiedRows?: string;
   };
 
   type IJobStatus = {
@@ -2578,7 +2610,7 @@ declare namespace bigquery {
     /**
      * [Optional] Allow non incremental materialized view definition. The default value is "false".
      */
-    allow_non_incremental_definition?: boolean;
+    allowNonIncrementalDefinition?: boolean;
     /**
      * [Optional] [TrustedTester] Enable automatic refresh of the materialized view when the base table is updated. The default value is "true".
      */
@@ -2717,6 +2749,10 @@ declare namespace bigquery {
      * Information for all training runs in increasing order of start_time.
      */
     trainingRuns?: Array<ITrainingRun>;
+    /**
+     * Output only. This field will be populated if a TRANSFORM clause was used to train a model. TRANSFORM clause (if used) takes feature_columns as input and outputs transform_columns. transform_columns then are used to train the model.
+     */
+    transformColumns?: Array<ITransformColumn>;
   };
 
   type IModelDefinition = {
@@ -2775,7 +2811,7 @@ declare namespace bigquery {
   };
 
   /**
-   * An Identity and Access Management (IAM) policy, which specifies access controls for Google Cloud resources. A `Policy` is a collection of `bindings`. A `binding` binds one or more `members`, or principals, to a single `role`. Principals can be user accounts, service accounts, Google groups, and domains (such as G Suite). A `role` is a named list of permissions; each `role` can be an IAM predefined role or a user-created custom role. For some types of Google Cloud resources, a `binding` can also specify a `condition`, which is a logical expression that allows access to a resource only if the expression evaluates to `true`. A condition can add constraints based on attributes of the request, the resource, or both. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies). **JSON example:** { "bindings": [ { "role": "roles/resourcemanager.organizationAdmin", "members": [ "user:mike@example.com", "group:admins@example.com", "domain:google.com", "serviceAccount:my-project-id@appspot.gserviceaccount.com" ] }, { "role": "roles/resourcemanager.organizationViewer", "members": [ "user:eve@example.com" ], "condition": { "title": "expirable access", "description": "Does not grant access after Sep 2020", "expression": "request.time < timestamp('2020-10-01T00:00:00.000Z')", } } ], "etag": "BwWWja0YfJA=", "version": 3 } **YAML example:** bindings: - members: - user:mike@example.com - group:admins@example.com - domain:google.com - serviceAccount:my-project-id@appspot.gserviceaccount.com role: roles/resourcemanager.organizationAdmin - members: - user:eve@example.com role: roles/resourcemanager.organizationViewer condition: title: expirable access description: Does not grant access after Sep 2020 expression: request.time < timestamp('2020-10-01T00:00:00.000Z') etag: BwWWja0YfJA= version: 3 For a description of IAM and its features, see the [IAM documentation](https://cloud.google.com/iam/docs/).
+   * An Identity and Access Management (IAM) policy, which specifies access controls for Google Cloud resources. A `Policy` is a collection of `bindings`. A `binding` binds one or more `members`, or principals, to a single `role`. Principals can be user accounts, service accounts, Google groups, and domains (such as G Suite). A `role` is a named list of permissions; each `role` can be an IAM predefined role or a user-created custom role. For some types of Google Cloud resources, a `binding` can also specify a `condition`, which is a logical expression that allows access to a resource only if the expression evaluates to `true`. A condition can add constraints based on attributes of the request, the resource, or both. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies). **JSON example:** ``` { "bindings": [ { "role": "roles/resourcemanager.organizationAdmin", "members": [ "user:mike@example.com", "group:admins@example.com", "domain:google.com", "serviceAccount:my-project-id@appspot.gserviceaccount.com" ] }, { "role": "roles/resourcemanager.organizationViewer", "members": [ "user:eve@example.com" ], "condition": { "title": "expirable access", "description": "Does not grant access after Sep 2020", "expression": "request.time < timestamp('2020-10-01T00:00:00.000Z')", } } ], "etag": "BwWWja0YfJA=", "version": 3 } ``` **YAML example:** ``` bindings: - members: - user:mike@example.com - group:admins@example.com - domain:google.com - serviceAccount:my-project-id@appspot.gserviceaccount.com role: roles/resourcemanager.organizationAdmin - members: - user:eve@example.com role: roles/resourcemanager.organizationViewer condition: title: expirable access description: Does not grant access after Sep 2020 expression: request.time < timestamp('2020-10-01T00:00:00.000Z') etag: BwWWja0YfJA= version: 3 ``` For a description of IAM and its features, see the [IAM documentation](https://cloud.google.com/iam/docs/).
    */
   type IPolicy = {
     /**
@@ -3195,6 +3231,10 @@ declare namespace bigquery {
      */
     maxBatchingRows?: string;
     /**
+     * Output only. The model version for LLM.
+     */
+    remoteModelVersion?: string;
+    /**
      * Output only. The remote service type for remote model.
      */
     remoteServiceType?:
@@ -3216,6 +3256,10 @@ declare namespace bigquery {
      * Output only. The time when this routine was created, in milliseconds since the epoch.
      */
     creationTime?: string;
+    /**
+     * Optional. Data governance specific option, if the value is DATA_MASKING, the function will be validated as masking functions.
+     */
+    dataGovernanceType?: 'DATA_GOVERNANCE_TYPE_UNSPECIFIED' | 'DATA_MASKING';
     /**
      * Required. The body of the routine. For functions, this is the expression in the AS clause. If language=SQL, it is the substring inside (but excluding) the parentheses. For example, for the function created with the following statement: `CREATE FUNCTION JoinLines(x string, y string) as (concat(x, "\n", y))` The definition_body is `concat(x, "\n", y)` (\n is not replaced with linebreak). If language=JAVASCRIPT, it is the evaluated string in the AS clause. For example, for the function created with the following statement: `CREATE FUNCTION f() RETURNS STRING LANGUAGE js AS 'return "\n";\n'` The definition_body is `return "\n";\n` Note that both \n are replaced with linebreaks.
      */
@@ -3411,7 +3455,7 @@ declare namespace bigquery {
     /**
      * When index_usage_mode is UNUSED or PARTIALLY_USED, this field explains why index was not used in all or part of the search query. If index_usage_mode is FULLLY_USED, this field is not populated.
      */
-    indexUnusedReason?: Array<IIndexUnusedReason>;
+    indexUnusedReasons?: Array<IIndexUnusedReason>;
     /**
      * Specifies index usage mode for the query.
      */
@@ -3515,15 +3559,15 @@ declare namespace bigquery {
     /**
      * [Output-only] Logging info is used to generate a link to Cloud Logging.
      */
-    logging_info?: ISparkLoggingInfo;
+    loggingInfo?: ISparkLoggingInfo;
     /**
      * [Output-only] Spark job id if a Spark job is created successfully.
      */
-    spark_job_id?: string;
+    sparkJobId?: string;
     /**
      * [Output-only] Location where the Spark job is executed.
      */
-    spark_job_location?: string;
+    sparkJobLocation?: string;
   };
 
   /**
@@ -3534,6 +3578,10 @@ declare namespace bigquery {
      * The type of the array's elements, if type_kind = "ARRAY".
      */
     arrayElementType?: IStandardSqlDataType;
+    /**
+     * The type of the range's elements, if type_kind = "RANGE".
+     */
+    rangeElementType?: IStandardSqlDataType;
     /**
      * The fields of this struct, in order, if type_kind = "STRUCT".
      */
@@ -3558,7 +3606,8 @@ declare namespace bigquery {
       | 'BIGNUMERIC'
       | 'JSON'
       | 'ARRAY'
-      | 'STRUCT';
+      | 'STRUCT'
+      | 'RANGE';
   };
 
   /**
@@ -3613,6 +3662,10 @@ declare namespace bigquery {
   };
 
   type ITable = {
+    /**
+     * [Optional] Specifies the configuration of a BigLake managed table.
+     */
+    biglakeConfiguration?: IBigLakeConfiguration;
     /**
      * [Output-only] Clone definition.
      */
@@ -3931,6 +3984,15 @@ declare namespace bigquery {
      */
     precision?: string;
     /**
+     * Optional. The subtype of the RANGE, if the type of this field is RANGE. If the type is RANGE, this field is required. Possible values for the field element type of a RANGE include: - DATE - DATETIME - TIMESTAMP
+     */
+    rangeElementType?: {
+      /**
+       * The field element type of a RANGE
+       */
+      type?: string;
+    };
+    /**
      * Optional. Rounding Mode specification of the field. It only can be set on NUMERIC or BIGNUMERIC type fields.
      */
     roundingMode?: string;
@@ -4135,6 +4197,14 @@ declare namespace bigquery {
      */
     calculatePValues?: boolean;
     /**
+     * Categorical feature encoding method.
+     */
+    categoryEncodingMethod?:
+      | 'ENCODING_METHOD_UNSPECIFIED'
+      | 'ONE_HOT_ENCODING'
+      | 'LABEL_ENCODING'
+      | 'DUMMY_ENCODING';
+    /**
      * If true, clean spikes and dips in the input time series.
      */
     cleanSpikesAndDips?: boolean;
@@ -4301,6 +4371,80 @@ declare namespace bigquery {
       | 'VN'
       | 'ZA';
     /**
+     * A list of geographical regions that are used for time series modeling.
+     */
+    holidayRegions?: Array<
+      | 'HOLIDAY_REGION_UNSPECIFIED'
+      | 'GLOBAL'
+      | 'NA'
+      | 'JAPAC'
+      | 'EMEA'
+      | 'LAC'
+      | 'AE'
+      | 'AR'
+      | 'AT'
+      | 'AU'
+      | 'BE'
+      | 'BR'
+      | 'CA'
+      | 'CH'
+      | 'CL'
+      | 'CN'
+      | 'CO'
+      | 'CS'
+      | 'CZ'
+      | 'DE'
+      | 'DK'
+      | 'DZ'
+      | 'EC'
+      | 'EE'
+      | 'EG'
+      | 'ES'
+      | 'FI'
+      | 'FR'
+      | 'GB'
+      | 'GR'
+      | 'HK'
+      | 'HU'
+      | 'ID'
+      | 'IE'
+      | 'IL'
+      | 'IN'
+      | 'IR'
+      | 'IT'
+      | 'JP'
+      | 'KR'
+      | 'LV'
+      | 'MA'
+      | 'MX'
+      | 'MY'
+      | 'NG'
+      | 'NL'
+      | 'NO'
+      | 'NZ'
+      | 'PE'
+      | 'PH'
+      | 'PK'
+      | 'PL'
+      | 'PT'
+      | 'RO'
+      | 'RS'
+      | 'RU'
+      | 'SA'
+      | 'SE'
+      | 'SG'
+      | 'SI'
+      | 'SK'
+      | 'TH'
+      | 'TR'
+      | 'TW'
+      | 'UA'
+      | 'US'
+      | 'VE'
+      | 'VN'
+      | 'ZA'
+    >;
+    /**
      * The number of periods ahead that need to be forecasted.
      */
     horizon?: string;
@@ -4402,7 +4546,7 @@ declare namespace bigquery {
      */
     maxParallelTrials?: string;
     /**
-     * Get truncated length by last n points in time series. Use separately from time_series_length_fraction and min_time_series_length.
+     * The maximum number of time points in a time series that can be used in modeling the trend component of the time series. Don't use this option with the `timeSeriesLengthFraction` or `minTimeSeriesLength` options.
      */
     maxTimeSeriesLength?: string;
     /**
@@ -4418,7 +4562,7 @@ declare namespace bigquery {
      */
     minSplitLoss?: number;
     /**
-     * Set fast trend ARIMA_PLUS model minimum training length. Use in pair with time_series_length_fraction.
+     * The minimum number of time points in a time series that are used in modeling the trend component of the time series. If you use this option you must also set the `timeSeriesLengthFraction` option. This training option ensures that enough time points are available when you use `timeSeriesLengthFraction` in trend modeling. This is particularly important when forecasting multiple time series in a single query using `timeSeriesIdColumn`. If the total number of time points is less than the `minTimeSeriesLength` value, then the query uses all available time points.
      */
     minTimeSeriesLength?: string;
     /**
@@ -4509,7 +4653,7 @@ declare namespace bigquery {
      */
     timeSeriesIdColumns?: Array<string>;
     /**
-     * Get truncated length by fraction in time series.
+     * The fraction of the interpolated length of the time series that's used to model the time series trend component. All of the time points of the time series are used to model the non-trend component. This training option accelerates modeling training without sacrificing much forecasting accuracy. You can use this option with `minTimeSeriesLength` but not with `maxTimeSeriesLength`.
      */
     timeSeriesLengthFraction?: number;
     /**
@@ -4526,7 +4670,7 @@ declare namespace bigquery {
       | 'APPROX'
       | 'HIST';
     /**
-     * The smoothing window size for the trend component of the time series.
+     * Smoothing window size for the trend component. When a positive value is specified, a center moving average smoothing is applied on the history trend. When the smoothing window is out of the boundary at the beginning or the end of the trend, the first element or the last element is padded to fill the smoothing window before the average is applied.
      */
     trendSmoothingWindowSize?: string;
     /**
@@ -4602,6 +4746,24 @@ declare namespace bigquery {
      * [Output-only] // [Alpha] Id of the transaction.
      */
     transactionId?: string;
+  };
+
+  /**
+   * Information about a single transform column.
+   */
+  type ITransformColumn = {
+    /**
+     * Output only. Name of the column.
+     */
+    name?: string;
+    /**
+     * Output only. The SQL expression used in the column transform.
+     */
+    transformSql?: string;
+    /**
+     * Output only. Data type of the column after the transform.
+     */
+    type?: IStandardSqlDataType;
   };
 
   /**
