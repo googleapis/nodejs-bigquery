@@ -1,0 +1,11 @@
+<%= title %>declare namespace <%= name %> {
+  <% schemas.forEach(schema => { %>
+    <%= schema %>
+  <% }); %>
+
+  <% resources.forEach(resource => { %>
+    <%= resource %>
+  <% }); %>
+}
+
+export default <%= name %>;

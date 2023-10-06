@@ -1,0 +1,32 @@
+{
+  "name": "nested",
+  "resources": {
+    "shallow": {
+      "methods": {
+        "delete": {},
+        "create": {
+          "parameters": {
+            "name": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "deep": {
+      "resources": {
+        "deeper": {
+          "methods": {
+            "list": {
+              "parameters": {
+                "token": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,121 @@
+{
+  "name": "complex",
+  "title": "A Complex API Schema",
+  "schemas": {
+    "Schema": {
+      "id": "Schema",
+      "description": "A complex schema!",
+      "type": "object",
+      "properties": {
+        "custom": {
+          "$ref": "OtherSchema"
+        },
+        "literalUnion": {
+          "type": "string",
+          "enum": ["a", "b", "c"]
+        },
+        "integer": {
+          "type": "integer"
+        },
+        "doc": {
+          "type": "string",
+          "description": "A description"
+        },
+        "multilineDoc": {
+          "type": "string",
+          "description": "A much longer description.\nOn multiple lines!"
+        },
+        "required": {
+          "type": "string",
+          "required": true
+        },
+        "readOnly": {
+          "type": "string",
+          "readonly": true
+        },
+        "array": {
+          "type": "array",
+          "items": {
+            "$ref": "OtherSchema"
+          }
+        },
+        "tuple": {
+          "type": "array",
+          "items": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "number"
+            }
+          ]
+        },
+        "obj": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "nested": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "nestedProp": {
+                "description": "A nested property",
+                "$ref": "ExtendedSchema"
+              }
+            }
+          }
+        },
+        "repeated": {
+          "repeated": true,
+          "type": "string",
+          "enum": [
+            "done",
+            "pending",
+            "running"
+          ]
+        },
+        "nestedRepeated": {
+          "repeated": true,
+          "type": "object",
+          "properties": {
+            "nestedRepeatedProp": {
+              "repeated": true,
+              "type": "string",
+              "enum": [
+                "foo",
+                "bar"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "OtherSchema": {
+      "id": "OtherSchema",
+      "type": "object",
+      "properties": {
+        "prop": {
+          "type": "string"
+        }
+      }
+    },
+    "ExtendedSchema": {
+      "id": "ExtendedSchema",
+      "type": "object",
+      "extends": "OtherSchema",
+      "properties": {
+        "id": {
+          "type": "number"
+        }
+      }
+    }
+  }
+}

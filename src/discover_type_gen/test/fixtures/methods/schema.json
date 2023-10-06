@@ -1,0 +1,27 @@
+{
+  "name": "methods",
+  "resources": {
+    "things": {
+      "methods": {
+        "create": {
+          "parameters": {
+            "name": {
+              "type": "string"
+            }
+          }
+        },
+        "delete": {
+          "parameters": {
+            "force": {
+              "type": "boolean"
+            },
+            "path": {
+              "type": "string",
+              "location": "path"
+            }
+          }
+        }
+      }
+    }
+  }
+}

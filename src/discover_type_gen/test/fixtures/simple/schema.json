@@ -1,0 +1,11 @@
+{
+  "name": "simple",
+  "title": "A Simple API Schema",
+  "schemas": {
+    "Schema": {
+      "id": "Schema",
+      "description": "A simple schema!",
+      "type": "any"
+    }
+  }
+}
