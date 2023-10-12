@@ -1,7 +1,9 @@
 'use strict';
 
+import {TypeGenerator} from './generator.ts';
+// import * as common from '@google-cloud/common'
 import got from 'got';
-import {TypeGenerator} from './generator.js';
+//const got = require('got');
 
 export async function fetch(api, version) {
   const url = `https://www.googleapis.com/discovery/v1/apis/${api}/${version}/rest`;

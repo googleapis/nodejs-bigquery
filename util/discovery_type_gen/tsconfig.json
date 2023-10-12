@@ -7,7 +7,14 @@
       "lib": [
         "es2018",
         "dom"
-      ]
+      ],
+      "esModuleInterop": true,
+      "noImplicitAny": false,
+      "allowImportingTsExtensions": true,
+      "noEmit": true,
+      "module": "ES6",
+      "moduleResolution": "Node",
+      "types": ["mocha", "node"]
     },
     "include": [
       "./src/**/*",

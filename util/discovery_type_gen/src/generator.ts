@@ -1,7 +1,7 @@
 'use strict';
 
 import isEmpty from 'lodash.isempty';
-import {prettier} from 'prettier';
+import prettier from 'prettier';
 
 import {Converter} from './converter.js';
 import template from 'lodash.template';

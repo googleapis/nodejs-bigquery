@@ -1,11 +1,12 @@
 {
   "name": "discovery-tsd",
+  "type": "module",
   "description": "Generates TypeScript declaration files from Google's Discovery API",
   "version": "0.3.0",
   "license": "ISC",
   "author": "Dave Gramlich <callmehiphop@gmail.com>",
   "engines": {
-    "node": ">= 8.0.0"
+    "node": ">=14.0.0"
   },
   "repository": "callmehiphop/discovery-tsd",
   "main": "src/index.js",
@@ -26,18 +27,36 @@
   "scripts": {
     "lint": "eslint ./{src,test}/*.js",
     "prettier": "prettier --write ./{src,test}/*.js",
-    "test": "ava test/*.js --verbose"
+    "compile": "tsc -p .",
+    "test": "c8 mocha build/test"
   },
   "dependencies": {
     "got": "^13.0.0",
     "lodash.isempty": "^4.4.0",
     "lodash.template": "^4.4.0",
     "meow": "^12.1.1",
-    "gts": "^5.0.0",
     "prettier": "^1.19.1"
   },
   "devDependencies": {
-    "ava": "^5.3.1",
-    "eslint": "^5.15.3"
+    "@ava/typescript": "^4.1.0",
+    "@google-cloud/common": "^5.0.0",
+    "@types/got": "^9.6.12",
+    "assert": "^2.1.0",
+    "c8": "^8.0.1",
+    "eslint": "^5.15.3",
+    "gts": "^5.2.0",
+    "mocha": "^10.2.0",
+    "typescript": "^5.2.2"
+  },
+  "ava": {
+    "typescript": {
+      "rewritePaths": {
+        "src/": "build/"
+      },
+      "extensions": [
+        "ts"
+      ],
+      "compile": false
+    }
   }
 }

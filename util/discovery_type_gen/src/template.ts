@@ -6,7 +6,7 @@ import template from 'lodash.template';
 
 const cache = new Map();
 
-module.exports = src => {
+export const src = (src?: string) => {
   if (!cache.has(src)) {
     const fullPath = path.join(__dirname, src);
     const tmpl = fs.readFileSync(fullPath, 'utf8');
