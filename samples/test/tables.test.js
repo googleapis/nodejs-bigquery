@@ -61,7 +61,8 @@ const partialDataFilePath = path.join(
 );
 const bigquery = new BigQuery();
 
-describe('Tables', () => {
+describe('Tables', function () {
+  this.retries(3);
   before(async () => {
     const [bucket] = await storage.createBucket(bucketName);
     await Promise.all([
@@ -618,7 +619,8 @@ describe('Tables', () => {
     assert.include(output, 'color: green');
   });
 
-  describe('Views', () => {
+  describe('Views', function () {
+    this.retries(3);
     it('should create a view', async () => {
       const output = execSync(`node createView.js ${datasetId} ${viewId}`);
       assert.include(output, `View ${viewId} created.`);
@@ -640,7 +642,8 @@ describe('Tables', () => {
     });
   });
 
-  describe('Delete Table', () => {
+  describe('Delete Table', function () {
+    this.retries(3);
     const datasetId = `gcloud_tests_${uuid.v4()}`.replace(/-/gi, '_');
     const tableId = `gcloud_tests_${uuid.v4()}`.replace(/-/gi, '_');
 

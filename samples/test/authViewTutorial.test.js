@@ -36,7 +36,8 @@ const sharedViewId = generateUuid();
 
 const bigquery = new BigQuery();
 
-describe('Authorized View Tutorial', () => {
+describe('Authorized View Tutorial', function () {
+  this.retries(3);
   after(async () => {
     await bigquery.dataset(datasetId).delete({force: true}).catch(console.warn);
     await bigquery

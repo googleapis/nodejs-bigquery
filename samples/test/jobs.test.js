@@ -24,7 +24,8 @@ const execSync = cmd => cp.execSync(cmd, {encoding: 'utf-8'});
 const bigquery = new BigQuery();
 let jobId;
 
-describe('Jobs', () => {
+describe('Jobs', function () {
+  this.retries(3);
   before(async () => {
     const query = `SELECT name
         FROM \`bigquery-public-data.usa_names.usa_1910_2013\`

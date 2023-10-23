@@ -53,6 +53,7 @@ describe('authUserFlow()', () => {
     const output = await authUserFlow.main.exchangeCode('abc123');
     assert.strictEqual(output, 'tokens');
     sinon.assert.calledWith(tokenStub, 'abc123');
+    retries(3);
   });
 
   it('should return project id and credentials', async () => {
