@@ -25,7 +25,7 @@ const execSync = cmd => cp.execSync(cmd, {encoding: 'utf-8'});
 const bigquery = new BigQuery();
 
 describe('Quickstart', function () {
-  this.retries(3);
+  this.retries(2);
   const datasetName = `nodejs_samples_tests_quickstart_${uuid.v4()}`.replace(
     /-/gi,
     '_'

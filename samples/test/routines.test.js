@@ -35,7 +35,7 @@ const newRoutineId = generateUuid();
 const bigquery = new BigQuery();
 
 describe('Routines', function () {
-  this.retries(3);
+  this.retries(2);
   after(async () => {
     await bigquery.dataset(datasetId).delete({force: true}).catch(console.warn);
   });
@@ -86,7 +86,7 @@ describe('Routines', function () {
   });
 
   describe('Delete Routine', function () {
-    this.retries(3);
+    this.retries(2);
     const datasetId = `gcloud_tests_${uuid.v4()}`.replace(/-/gi, '_');
     const routineId = `gcloud_tests_${uuid.v4()}`.replace(/-/gi, '_');
 

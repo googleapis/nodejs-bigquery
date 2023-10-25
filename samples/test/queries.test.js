@@ -37,7 +37,7 @@ let projectId;
 const bigquery = new BigQuery();
 
 describe('Queries', function () {
-  this.retries(3);
+  this.retries(2);
   before(async () => {
     const schema = [{name: 'age', type: 'STRING', mode: 'REQUIRED'}];
     const options = {

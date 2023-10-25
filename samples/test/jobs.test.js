@@ -25,7 +25,7 @@ const bigquery = new BigQuery();
 let jobId;
 
 describe('Jobs', function () {
-  this.retries(3);
+  this.retries(2);
   before(async () => {
     const query = `SELECT name
         FROM \`bigquery-public-data.usa_names.usa_1910_2013\`

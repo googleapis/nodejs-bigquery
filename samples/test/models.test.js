@@ -27,7 +27,7 @@ const GCLOUD_TESTS_PREFIX = 'nodejs_samples_tests_models';
 const bigquery = new BigQuery();
 
 describe('Models', function () {
-  this.retries(3);
+  this.retries(2);
   // Increase timeout to accommodate model creation.
   this.timeout(300000);
   const datasetId = `${GCLOUD_TESTS_PREFIX}_${uuid.v4()}`.replace(/-/gi, '_');
@@ -93,7 +93,7 @@ describe('Models', function () {
 });
 
 describe('Create/Delete Model', function () {
-  this.retries(3);
+  this.retries(2);
   const datasetId = `${GCLOUD_TESTS_PREFIX}_delete_${uuid.v4()}`.replace(
     /-/gi,
     '_'
