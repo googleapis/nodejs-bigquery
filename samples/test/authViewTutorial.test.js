@@ -15,7 +15,7 @@
 'use strict';
 
 const {assert} = require('chai');
-const {describe, it, before, after} = require('mocha');
+const {describe, it, before, beforeEach, after} = require('mocha');
 const cp = require('child_process');
 const uuid = require('uuid');
 
@@ -36,8 +36,7 @@ const sharedViewId = generateUuid();
 
 const bigquery = new BigQuery();
 
-describe('Authorized View Tutorial', function () {
-  this.retries(2);
+describe('Authorized View Tutorial', () => {
   after(async () => {
     await bigquery.dataset(datasetId).delete({force: true}).catch(console.warn);
     await bigquery
@@ -54,6 +53,10 @@ describe('Authorized View Tutorial', function () {
     await bigquery.createDataset(datasetId);
     const [tableData] = await bigquery.dataset(datasetId).createTable(tableId);
     projectId = tableData.metadata.tableReference.projectId;
+  });
+
+  beforeEach(async function () {
+    this.currentTest.retries(2);
   });
 
   it('should create an authorized view', async () => {

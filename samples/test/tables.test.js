@@ -61,8 +61,7 @@ const partialDataFilePath = path.join(
 );
 const bigquery = new BigQuery();
 
-describe('Tables', function () {
-  this.retries(2);
+describe('Tables', () => {
   before(async () => {
     const [bucket] = await storage.createBucket(bucketName);
     await Promise.all([
@@ -97,7 +96,10 @@ describe('Tables', function () {
   });
 
   // to avoid getting rate limited
-  beforeEach(done => setTimeout(done, 500));
+  beforeEach(async function (done) {
+    setTimeout(done, 500);
+    this.currentTest.retries(2);
+  });
 
   after(async () => {
     await bigquery
@@ -619,8 +621,11 @@ describe('Tables', function () {
     assert.include(output, 'color: green');
   });
 
-  describe('Views', function () {
-    this.retries(2);
+  describe('Views', () => {
+    beforeEach(async function () {
+      this.currentTest.retries(2);
+    });
+
     it('should create a view', async () => {
       const output = execSync(`node createView.js ${datasetId} ${viewId}`);
       assert.include(output, `View ${viewId} created.`);
@@ -642,8 +647,7 @@ describe('Tables', function () {
     });
   });
 
-  describe('Delete Table', function () {
-    this.retries(2);
+  describe('Delete Table', () => {
     const datasetId = `gcloud_tests_${uuid.v4()}`.replace(/-/gi, '_');
     const tableId = `gcloud_tests_${uuid.v4()}`.replace(/-/gi, '_');
 
@@ -658,6 +662,10 @@ describe('Tables', function () {
       await bigquery.createDataset(datasetId, datasetOptions);
       // Create a new table in the dataset
       await bigquery.dataset(datasetId).createTable(tableId, tableOptions);
+    });
+
+    beforeEach(async function () {
+      this.currentTest.retries(2);
     });
 
     after(async () => {

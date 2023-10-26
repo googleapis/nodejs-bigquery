@@ -16,7 +16,7 @@
 
 const {BigQuery} = require('@google-cloud/bigquery');
 const {assert} = require('chai');
-const {describe, it, before, after} = require('mocha');
+const {describe, it, before, beforeEach, after} = require('mocha');
 const cp = require('child_process');
 const uuid = require('uuid');
 
@@ -26,8 +26,7 @@ const GCLOUD_TESTS_PREFIX = 'nodejs_samples_tests_models';
 
 const bigquery = new BigQuery();
 
-describe('Models', function () {
-  this.retries(2);
+describe('Models', () => {
   // Increase timeout to accommodate model creation.
   this.timeout(300000);
   const datasetId = `${GCLOUD_TESTS_PREFIX}_${uuid.v4()}`.replace(/-/gi, '_');
@@ -65,6 +64,10 @@ describe('Models', function () {
     await job.getQueryResults();
   });
 
+  beforeEach(async function () {
+    this.currentTest.retries(2);
+  });
+
   after(async () => {
     await bigquery.dataset(datasetId).delete({force: true}).catch(console.warn);
   });
@@ -92,8 +95,7 @@ describe('Models', function () {
   });
 });
 
-describe('Create/Delete Model', function () {
-  this.retries(2);
+describe('Create/Delete Model', () => {
   const datasetId = `${GCLOUD_TESTS_PREFIX}_delete_${uuid.v4()}`.replace(
     /-/gi,
     '_'
@@ -108,6 +110,10 @@ describe('Create/Delete Model', function () {
       location: 'US',
     };
     await bigquery.createDataset(datasetId, datasetOptions);
+  });
+
+  beforeEach(async function () {
+    this.currentTest.retries(2);
   });
 
   after(async () => {

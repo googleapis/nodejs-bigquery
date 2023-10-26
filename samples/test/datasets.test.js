@@ -16,7 +16,7 @@
 
 const {BigQuery} = require('@google-cloud/bigquery');
 const {assert} = require('chai');
-const {describe, it, after, before} = require('mocha');
+const {describe, it, after, before, beforeEach} = require('mocha');
 const cp = require('child_process');
 const uuid = require('uuid');
 
@@ -29,11 +29,14 @@ const datasetId = `${GCLOUD_TESTS_PREFIX}_datasets_${uuid.v4()}`.replace(
 
 const bigquery = new BigQuery();
 
-describe('Datasets', function () {
-  this.retries(2);
+describe('Datasets', () => {
   before(async () => {
     // Delete any stale datasets from samples tests
     await deleteDatasets();
+  });
+
+  beforeEach(async function () {
+    this.currentTest.retries(2);
   });
 
   after(async () => {

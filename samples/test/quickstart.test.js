@@ -15,7 +15,7 @@
 'use strict';
 
 const {assert} = require('chai');
-const {describe, it, after} = require('mocha');
+const {describe, it, after, beforeEach} = require('mocha');
 const uuid = require('uuid');
 const cp = require('child_process');
 const {BigQuery} = require('@google-cloud/bigquery');
@@ -24,13 +24,14 @@ const execSync = cmd => cp.execSync(cmd, {encoding: 'utf-8'});
 
 const bigquery = new BigQuery();
 
-describe('Quickstart', function () {
-  this.retries(2);
+describe('Quickstart', () => {
   const datasetName = `nodejs_samples_tests_quickstart_${uuid.v4()}`.replace(
     /-/gi,
     '_'
   );
-
+  beforeEach(async function () {
+    this.currentTest.retries(2);
+  });
   after(async () => {
     await bigquery.dataset(datasetName).delete({force: true});
   });

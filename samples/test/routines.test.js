@@ -15,7 +15,7 @@
 'use strict';
 
 const {assert} = require('chai');
-const {describe, it, before, after} = require('mocha');
+const {describe, it, before, beforeEach, after} = require('mocha');
 const cp = require('child_process');
 const uuid = require('uuid');
 
@@ -34,8 +34,7 @@ const newRoutineId = generateUuid();
 
 const bigquery = new BigQuery();
 
-describe('Routines', function () {
-  this.retries(2);
+describe('Routines', () => {
   after(async () => {
     await bigquery.dataset(datasetId).delete({force: true}).catch(console.warn);
   });
@@ -62,6 +61,10 @@ describe('Routines', function () {
     await routine.create(config);
   });
 
+  beforeEach(async function () {
+    this.currentTest.retries(2);
+  });
+
   it('should create a routine', async () => {
     const output = execSync(
       `node createRoutine.js ${datasetId} ${newRoutineId}`
@@ -85,8 +88,7 @@ describe('Routines', function () {
     assert.include(output, 'Routine description: New description');
   });
 
-  describe('Delete Routine', function () {
-    this.retries(2);
+  describe('Delete Routine', () => {
     const datasetId = `gcloud_tests_${uuid.v4()}`.replace(/-/gi, '_');
     const routineId = `gcloud_tests_${uuid.v4()}`.replace(/-/gi, '_');
 
@@ -111,6 +113,10 @@ describe('Routines', function () {
         },
       };
       await routine.create(config);
+    });
+
+    beforeEach(async function () {
+      this.currentTest.retries(2);
     });
 
     after(async () => {
