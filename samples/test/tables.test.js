@@ -97,7 +97,9 @@ describe('Tables', () => {
 
   // to avoid getting rate limited
   beforeEach(async function (done) {
-    setTimeout(done, 500);
+    setTimeout(() => {
+      done();
+    }, 500);
     this.currentTest.retries(2);
   });
 
