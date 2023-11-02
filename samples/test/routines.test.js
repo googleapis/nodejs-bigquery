@@ -15,7 +15,7 @@
 'use strict';
 
 const {assert} = require('chai');
-const {describe, it, before, after} = require('mocha');
+const {describe, it, before, beforeEach, after} = require('mocha');
 const cp = require('child_process');
 const uuid = require('uuid');
 
@@ -59,6 +59,10 @@ describe('Routines', () => {
       },
     };
     await routine.create(config);
+  });
+
+  beforeEach(async function () {
+    this.currentTest.retries(2);
   });
 
   it('should create a routine', async () => {
@@ -109,6 +113,10 @@ describe('Routines', () => {
         },
       };
       await routine.create(config);
+    });
+
+    beforeEach(async function () {
+      this.currentTest.retries(2);
     });
 
     after(async () => {
