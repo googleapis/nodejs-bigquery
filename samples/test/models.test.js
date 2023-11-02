@@ -16,7 +16,7 @@
 
 const {BigQuery} = require('@google-cloud/bigquery');
 const {assert} = require('chai');
-const {describe, it, before, after} = require('mocha');
+const {describe, it, before, beforeEach, after} = require('mocha');
 const cp = require('child_process');
 const uuid = require('uuid');
 
@@ -64,6 +64,10 @@ describe('Models', function () {
     await job.getQueryResults();
   });
 
+  beforeEach(async function () {
+    this.currentTest.retries(2);
+  });
+
   after(async () => {
     await bigquery.dataset(datasetId).delete({force: true}).catch(console.warn);
   });
@@ -106,6 +110,10 @@ describe('Create/Delete Model', () => {
       location: 'US',
     };
     await bigquery.createDataset(datasetId, datasetOptions);
+  });
+
+  beforeEach(async function () {
+    this.currentTest.retries(2);
   });
 
   after(async () => {

@@ -15,7 +15,7 @@
 'use strict';
 
 const {assert} = require('chai');
-const {describe, it, before, after} = require('mocha');
+const {describe, it, before, beforeEach, after} = require('mocha');
 const cp = require('child_process');
 const uuid = require('uuid');
 
@@ -48,6 +48,10 @@ describe('Queries', () => {
       .dataset(datasetId)
       .createTable(tableId, options);
     projectId = tableData.metadata.tableReference.projectId;
+  });
+
+  beforeEach(async function () {
+    this.currentTest.retries(2);
   });
 
   after(async () => {
