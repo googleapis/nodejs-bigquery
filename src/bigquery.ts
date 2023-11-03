@@ -129,6 +129,12 @@ export type QueryStreamOptions = {
   wrapIntegers?: boolean | IntegerTypeCastOptions;
   parseJSON?: boolean;
 };
+
+//new types for fast-path
+export type QueryPathOptions = bigquery.IQueryRequest;
+export type QueryPathResponse = bigquery.IQueryResponse;
+export type QueryPathCallback = RequestCallback<bigquery.IQueryResponse>
+
 export type DatasetResource = bigquery.IDataset & {
   projectId?: string;
 };
@@ -1668,6 +1674,30 @@ export class BigQuery extends Service {
       }
     );
   }
+
+  /**
+   * Create a query without a job
+   */
+  createQuery(options: QueryPathOptions): Promise<QueryPathResponse>;
+  createQuery(options: QueryPathOptions, callback: QueryPathCallback): void;
+  createQuery(options: QueryPathOptions, callback?: QueryPathCallback): Promise<QueryPathResponse> | void
+  {
+    //process reqOptions to be acceptable to run
+    const reqOpts = Object.assign({}, options);
+    // required:
+      // kind
+      // query
+      // useLegacySql
+        // parameterMode if useLegacySql = false
+        // queryParameters if useLegacySql = false
+      // location
+    // error handling
+
+    // make the request
+    // this.request({})
+      // execute callback or return Promise for response
+      // error handling 
+    }
 
   /**
    * Create a reference to a dataset.
