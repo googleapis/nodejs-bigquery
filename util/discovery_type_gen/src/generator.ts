@@ -4,7 +4,7 @@ import isEmpty from 'lodash.isempty';
 import prettier from 'prettier';
 
 import {Converter} from './converter.js';
-import template from 'lodash.template';
+import {typeTemplate} from './template.js';
 
 export class TypeGenerator {
   converter: Converter;
@@ -15,7 +15,7 @@ export class TypeGenerator {
   resources: any;
   constructor(json, options) {
     this.converter = new Converter(options);
-    this.template = template('./templates/types.tmpl');
+    this.template = typeTemplate('./templates/types.tmpl');
     this.name = json.name;
     this.title = json.title;
     this.schemas = Object.keys(json.schemas || {})
@@ -46,7 +46,7 @@ export class Resource {
   resources: any;
   constructor(name, {methods, resources}, generator) {
     this.generator = generator;
-    this.template = template('./templates/resource.tmpl');
+    this.template = typeTemplate('./templates/resource.tmpl')
     this.name = name;
     this.methods = Method.createMethodList(methods, generator);
     this.resources = Resource.createResourceList(resources, generator);
@@ -83,7 +83,7 @@ export class Method {
   docs: any;
   constructor(name, {description, parameters, title}, generator) {
     this.generator = generator;
-    this.template = template('./templates/method.tmpl');
+    this.template = typeTemplate('./templates/method.tmpl')
     this.name = name.replace(/^./, $0 => $0.toUpperCase());
     this.params = Method.getQueryParams(parameters);
     this.docs = description || title;

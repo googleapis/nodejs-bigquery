@@ -27,7 +27,7 @@
   "scripts": {
     "lint": "eslint ./{src,test}/*.js",
     "prettier": "prettier --write ./{src,test}/*.js",
-    "compile": "tsc -p . && cp ./src/templates/*.tmpl ./build/src/templates/ && cp ./test/fixtures/**/*.{json,d.ts} ./build/test/fixtures/",
+    "compile": "tsc -p . && cp ./src/templates/*.tmpl ./build/src/templates/ && cp ./test/fixtures/complex/* ./build/test/fixtures/complex/ && cp ./test/fixtures/methods/* ./build/test/fixtures/methods/ && cp ./test/fixtures/nested/* ./build/test/fixtures/nested/ && cp ./test/fixtures/simple/* ./build/test/fixtures/simple/",
     "test": "c8 mocha build/test"
   },
   "dependencies": {
@@ -45,7 +45,6 @@
     "eslint": "^5.15.3",
     "gts": "^5.2.0",
     "mocha": "^10.2.0",
-    "requirejs": "^2.3.6",
     "typescript": "^5.2.2"
   }
 }

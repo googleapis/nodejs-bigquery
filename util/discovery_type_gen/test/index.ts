@@ -37,16 +37,8 @@ describe('fetch', async () => {
   assert.strictEqual(json.name, 'bigquery');
 })
 
-/*test('fetch', async t => {
-  t.plan(1);
-
-  const json = await fetch('bigquery', 'v2');
-  t.is(json.name, 'bigquery');
-});*/
-
 describe('render', async () => {
   it('render - simple', async () => {
-    // const json = requirejs('./fixtures/simple/schema.json');
     const types = path.join(__dirname, './fixtures/simple/types.d.ts');
     const expected = readFile(types, 'utf8');
 
@@ -54,7 +46,6 @@ describe('render', async () => {
   })
 
   it('render - complex', async () => {
-    //const json = requirejs('./fixtures/complex/schema.json');
     const types = path.join(__dirname, './fixtures/complex/types.d.ts');
     const expected = readFile(types, 'utf8');
 
@@ -62,7 +53,6 @@ describe('render', async () => {
   })
 
   it('render - methods', async () => {
-    // const json = requirejs('./fixtures/methods/schema.json');
     const types = path.join(__dirname, './fixtures/methods/types.d.ts');
     const expected = readFile(types, 'utf8');
 
@@ -70,7 +60,6 @@ describe('render', async () => {
   })
 
   it('render - nested methods', async () => {
-    // const json = requirejs('./fixtures/nested/schema.json');
     const types = path.join(__dirname, './fixtures/nested/types.d.ts');
     const expected = readFile(types, 'utf8');
 
