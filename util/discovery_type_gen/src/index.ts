@@ -1,6 +1,6 @@
 'use strict';
 
-import {TypeGenerator} from './generator.ts';
+import {TypeGenerator} from './generator.js';
 // import * as common from '@google-cloud/common'
 import got from 'got';
 //const got = require('got');

@@ -7,7 +7,7 @@ import {Converter} from './converter.js';
 import template from 'lodash.template';
 
 export class TypeGenerator {
-  converter: any;
+  converter: Converter;
   template: any;
   name: string;
   title: string;

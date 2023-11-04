@@ -10,14 +10,15 @@
       ],
       "esModuleInterop": true,
       "noImplicitAny": false,
-      "allowImportingTsExtensions": true,
-      "noEmit": true,
-      "module": "ES6",
+      "module": "ESNext",
       "moduleResolution": "Node",
       "types": ["mocha", "node"]
     },
     "include": [
-      "./src/**/*",
-      "./test/**/*"
-    ]
+      "src/**/*",
+      "src/*",
+      "test/*",
+      "test/**/*"
+    ],
+    "incremental": true 
 }

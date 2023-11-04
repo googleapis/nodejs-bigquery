@@ -1,18 +1,22 @@
-/*const fs = require('fs');
-const path = require('path');
-const util = require('util');
-const testAva = require('ava');*/
 import fs from 'fs';
 import path from 'path';
-// const pify = require('util').promisify;
 import util from 'util';
 import {describe, it} from 'mocha';
 import * as assert from 'assert';
+// import requirejs from 'requirejs';
 
-import {fetch, render} from '../src/index.ts';
-/*const fetchTest = require('../src/index.ts');
-const renderTest = require('../src/index.ts')
-const createTypesTest = require('../src/index.ts');*/
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+import {fetch, render} from '../src/index.js';
+import * as simple from './fixtures/simple/schema.json' assert {type: "json"};
+import * as complex from './fixtures/complex/schema.json' assert {type: "json"};
+import * as methods from './fixtures/methods/schema.json' assert {type: "json"};
+import * as nested from './fixtures/nested/schema.json' assert {type: "json"}
+
+
+
 const readFile = util.promisify(fs.readFile);
 
 // just doing a very simple test here since the render tests should provide
@@ -42,74 +46,34 @@ describe('fetch', async () => {
 
 describe('render', async () => {
   it('render - simple', async () => {
-    const json = require('./fixtures/simple/schema.json');
+    // const json = requirejs('./fixtures/simple/schema.json');
     const types = path.join(__dirname, './fixtures/simple/types.d.ts');
     const expected = readFile(types, 'utf8');
 
-    assert.strictEqual(render(json), expected)
+    assert.strictEqual(render(simple), expected)
   })
 
   it('render - complex', async () => {
-    const json = require('./fixtures/complex/schema.json');
+    //const json = requirejs('./fixtures/complex/schema.json');
     const types = path.join(__dirname, './fixtures/complex/types.d.ts');
     const expected = readFile(types, 'utf8');
 
-    assert.strictEqual(render(json), expected)
+    assert.strictEqual(render(complex), expected)
   })
 
   it('render - methods', async () => {
-    const json = require('./fixtures/methods/schema.json');
+    // const json = requirejs('./fixtures/methods/schema.json');
     const types = path.join(__dirname, './fixtures/methods/types.d.ts');
     const expected = readFile(types, 'utf8');
 
-    assert.strictEqual(render(json), expected)
+    assert.strictEqual(render(methods), expected)
   })
 
   it('render - nested methods', async () => {
-    const json = require('./fixtures/nested/schema.json');
+    // const json = requirejs('./fixtures/nested/schema.json');
     const types = path.join(__dirname, './fixtures/nested/types.d.ts');
     const expected = readFile(types, 'utf8');
 
-    assert.strictEqual(render(json), expected)
+    assert.strictEqual(render(nested), expected)
   })
 })
-
-/*test('render - simple', async t => {
-  t.plan(1);
-
-  const json = require('./fixtures/simple/schema.json');
-  const types = path.join(__dirname, './fixtures/simple/types.d.ts');
-  const expected = readFile(types, 'utf8');
-
-  t.is(render(json), expected);
-});*/
-
-/*test('render - complex', async t => {
-  t.plan(1);
-
-  const json = require('./fixtures/complex/schema.json');
-  const types = path.join(__dirname, './fixtures/complex/types.d.ts');
-  const expected = readFile(types, 'utf8');
-
-  t.is(render(json), expected);
-});*/
-
-/*test('render - methods', async t => {
-  t.plan(1);
-
-  const json = require('./fixtures/methods/schema.json');
-  const types = path.join(__dirname, './fixtures/methods/types.d.ts');
-  const expected = readFile(types, 'utf8');
-
-  t.is(render(json), expected);
-});*/
-
-/*test('render - nested methods', async t => {
-  t.plan(1);
-
-  const json = require('./fixtures/nested/schema.json');
-  const types = path.join(__dirname, './fixtures/nested/types.d.ts');
-  const expected = readFile(types, 'utf8');
-
-  t.is(render(json), expected);
-});*/

@@ -27,7 +27,7 @@
   "scripts": {
     "lint": "eslint ./{src,test}/*.js",
     "prettier": "prettier --write ./{src,test}/*.js",
-    "compile": "tsc -p .",
+    "compile": "tsc -p . && cp ./src/templates/*.tmpl ./build/src/templates/ && cp ./test/fixtures/**/*.{json,d.ts} ./build/test/fixtures/",
     "test": "c8 mocha build/test"
   },
   "dependencies": {
@@ -38,7 +38,6 @@
     "prettier": "^1.19.1"
   },
   "devDependencies": {
-    "@ava/typescript": "^4.1.0",
     "@google-cloud/common": "^5.0.0",
     "@types/got": "^9.6.12",
     "assert": "^2.1.0",
@@ -46,17 +45,7 @@
     "eslint": "^5.15.3",
     "gts": "^5.2.0",
     "mocha": "^10.2.0",
+    "requirejs": "^2.3.6",
     "typescript": "^5.2.2"
-  },
-  "ava": {
-    "typescript": {
-      "rewritePaths": {
-        "src/": "build/"
-      },
-      "extensions": [
-        "ts"
-      ],
-      "compile": false
-    }
   }
 }
