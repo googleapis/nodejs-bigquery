@@ -25,26 +25,27 @@
     "typescript"
   ],
   "scripts": {
-    "lint": "eslint ./{src,test}/*.js",
-    "prettier": "prettier --write ./{src,test}/*.js",
-    "compile": "tsc -p . && cp ./src/templates/*.tmpl ./build/src/templates/ && cp ./test/fixtures/complex/* ./build/test/fixtures/complex/ && cp ./test/fixtures/methods/* ./build/test/fixtures/methods/ && cp ./test/fixtures/nested/* ./build/test/fixtures/nested/ && cp ./test/fixtures/simple/* ./build/test/fixtures/simple/",
+    "lint": "gts lint",
+    "fix": "gts fix",
+    "compile": "gts clean && tsc -p . && mkdir -p ./build/src/templates/ && cp ./src/templates/*.tmpl ./build/src/templates/ && mkdir -p ./build/test/fixtures/complex/ && cp ./test/fixtures/complex/* ./build/test/fixtures/complex/ && mkdir -p ./build/test/fixtures/methods/ && cp ./test/fixtures/methods/* ./build/test/fixtures/methods/ && mkdir -p ./build/test/fixtures/nested/ && cp ./test/fixtures/nested/* ./build/test/fixtures/nested/ && mkdir -p ./build/test/fixtures/simple/ && cp ./test/fixtures/simple/* ./build/test/fixtures/simple/",
+    "clean": "gts clean",
     "test": "c8 mocha build/test"
   },
   "dependencies": {
+    "eslint": "^8.53.0",
     "got": "^13.0.0",
     "lodash.isempty": "^4.4.0",
     "lodash.template": "^4.4.0",
-    "meow": "^12.1.1",
-    "prettier": "^1.19.1"
+    "meow": "^12.1.1"
   },
   "devDependencies": {
     "@google-cloud/common": "^5.0.0",
     "@types/got": "^9.6.12",
     "assert": "^2.1.0",
-    "c8": "^8.0.1",
-    "eslint": "^5.15.3",
-    "gts": "^5.2.0",
-    "mocha": "^10.2.0",
-    "typescript": "^5.2.2"
+    "c8": "^8.0.0",
+    "gts": "^5.0.0",
+    "mocha": "^9.2.2",
+    "prettier": "^3.0.0",
+    "typescript": "^5.1.6"
   }
 }

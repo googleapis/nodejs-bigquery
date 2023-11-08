@@ -14,6 +14,7 @@ import * as simple from './fixtures/simple/schema.json' assert {type: "json"};
 import * as complex from './fixtures/complex/schema.json' assert {type: "json"};
 import * as methods from './fixtures/methods/schema.json' assert {type: "json"};
 import * as nested from './fixtures/nested/schema.json' assert {type: "json"}
+import exp from 'constants';
 
 
 
@@ -33,8 +34,10 @@ const readFile = util.promisify(fs.readFile);
 });*/
 
 describe('fetch', async () => {
-  const json = await(fetch('bigquery', 'v2'))
-  assert.strictEqual(json.name, 'bigquery');
+  it('should fetch an API discovery doc', async () => {
+    const json = await(fetch('bigquery', 'v2'))
+    assert.deepEqual(json.name, 'bigquery');
+  })
 })
 
 describe('render', async () => {
@@ -42,27 +45,27 @@ describe('render', async () => {
     const types = path.join(__dirname, './fixtures/simple/types.d.ts');
     const expected = readFile(types, 'utf8');
 
-    assert.strictEqual(render(simple), expected)
+    assert.deepEqual(render(simple), expected)
   })
 
   it('render - complex', async () => {
     const types = path.join(__dirname, './fixtures/complex/types.d.ts');
     const expected = readFile(types, 'utf8');
 
-    assert.strictEqual(render(complex), expected)
+    assert.deepEqual(render(complex), expected)
   })
 
   it('render - methods', async () => {
     const types = path.join(__dirname, './fixtures/methods/types.d.ts');
     const expected = readFile(types, 'utf8');
 
-    assert.strictEqual(render(methods), expected)
+    assert.deepEqual(render(methods), expected)
   })
 
   it('render - nested methods', async () => {
     const types = path.join(__dirname, './fixtures/nested/types.d.ts');
     const expected = readFile(types, 'utf8');
 
-    assert.strictEqual(render(nested), expected)
+    assert.deepEqual(render(nested), expected)
   })
 })
