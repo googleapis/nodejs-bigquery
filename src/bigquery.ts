@@ -2126,6 +2126,61 @@ export class BigQuery extends Service {
   }
 
   /**
+   * New version of bigquery.query()
+   */
+  /* query(query: string, options?: QueryOptions): Promise<QueryRowsResponse>;
+  query(query: Query, options?: QueryOptions): Promise<SimpleQueryRowsResponse>;
+  query(
+    query: string,
+    options: QueryOptions,
+    callback?: QueryRowsCallback
+  ): void;
+  query(
+    query: Query,
+    options: QueryOptions,
+    callback?: SimpleQueryRowsCallback
+  ): void;
+  query(query: string, callback?: QueryRowsCallback): void;
+  query(query: Query, callback?: SimpleQueryRowsCallback): void;
+  query(
+    query: string | Query,
+    optionsOrCallback?:
+      | QueryOptions
+      | SimpleQueryRowsCallback
+      | QueryRowsCallback,
+    cb?: SimpleQueryRowsCallback | QueryRowsCallback
+  ): void | Promise<SimpleQueryRowsResponse> | Promise<QueryRowsResponse> {
+    let options =
+      typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
+    const queryOpts =
+      typeof query === 'object'
+        ? {
+            wrapIntegers: query.wrapIntegers,
+            parseJSON: query.parseJSON,
+          }
+        : {};
+    const callback =
+      typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
+    this.createQueryJob(query, (err, job, resp) => {
+      if (err) {
+        (callback as SimpleQueryRowsCallback)(err, null, resp);
+        return;
+      }
+      if (typeof query === 'object' && query.dryRun) {
+        (callback as SimpleQueryRowsCallback)(null, [], resp);
+        return;
+      }
+      // The Job is important for the `queryAsStream_` method, so a new query
+      // isn't created each time results are polled for.
+      options = extend({job}, queryOpts, options);
+      job!.getQueryResults(options, callback as QueryRowsCallback);
+    });
+
+    //createQuery logic
+    // get results and invoke callback
+  }*/
+
+  /**
    * This method will be called by `createQueryStream()`. It is required to
    * properly set the `autoPaginate` option value.
    *
