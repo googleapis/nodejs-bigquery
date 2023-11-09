@@ -12,7 +12,7 @@ const {input, flags} = meow(
     $ dtsd bigquery v2 > bigquery.d.ts
 `,
   {
-    flags: {}
+    flags: {},
   }
 );
 

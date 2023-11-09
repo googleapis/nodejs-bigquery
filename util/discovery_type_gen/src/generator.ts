@@ -11,8 +11,8 @@ export class TypeGenerator {
   template: any;
   name: string;
   title: string;
-  schemas: any;
-  resources: any;
+  schemas: any[];
+  resources: Resource[];
   constructor(json, options) {
     this.converter = new Converter(options);
     this.template = typeTemplate('./templates/types.tmpl');
@@ -28,25 +28,25 @@ export class TypeGenerator {
       title: this.title ? this.converter.toJSDoc(this.title) : '',
       name: this.name,
       schemas: this.schemas.map(schema => this.converter.createType(schema)),
-      resources: this.resources.map(resource => resource.render())
+      resources: this.resources.map(resource => resource.render()),
     });
 
     return prettier.format(source, {
       parser: 'typescript',
-      singleQuote: true
+      singleQuote: true,
     });
   }
 }
 
 export class Resource {
-  generator: any;
+  generator: TypeGenerator;
   template: any;
   name: string;
-  methods: any;
-  resources: any;
-  constructor(name, {methods, resources}, generator) {
+  methods: any[];
+  resources: any[];
+  constructor(name: string, {methods, resources}, generator) {
     this.generator = generator;
-    this.template = typeTemplate('./templates/resource.tmpl')
+    this.template = typeTemplate('./templates/resource.tmpl');
     this.name = name;
     this.methods = Method.createMethodList(methods, generator);
     this.resources = Resource.createResourceList(resources, generator);
@@ -55,7 +55,7 @@ export class Resource {
     return this.template({
       name: this.name,
       methods: this.methods.map(method => method.render()),
-      resources: this.resources.map(resource => resource.render())
+      resources: this.resources.map(resource => resource.render()),
     });
   }
   static createResourceList(resources = {}, generator) {
@@ -76,14 +76,14 @@ export class Resource {
 }
 
 export class Method {
-  generator: any;
+  generator: TypeGenerator;
   template: any;
   name: string;
   params: any;
-  docs: any;
+  docs: string;
   constructor(name, {description, parameters, title}, generator) {
     this.generator = generator;
-    this.template = typeTemplate('./templates/method.tmpl')
+    this.template = typeTemplate('./templates/method.tmpl');
     this.name = name.replace(/^./, $0 => $0.toUpperCase());
     this.params = Method.getQueryParams(parameters);
     this.docs = description || title;
@@ -94,7 +94,7 @@ export class Method {
     return this.template({
       docs: this.docs ? converter.toJSDoc(this.docs) : '',
       name: converter.toTypeName(this.name),
-      params: converter.toObject(this.params)
+      params: converter.toObject(this.params),
     });
   }
   static createMethodList(methods = {}, generator) {
@@ -127,5 +127,3 @@ export class Method {
     return queryParams;
   }
 }
-
-// module.exports = TypeGenerator;

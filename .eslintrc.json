@@ -1,3 +1,11 @@
 {
-  "extends": "./node_modules/gts"
+  "extends": "./node_modules/gts",
+  "rules": {
+    "node/no-unpublished-import": ["error", {
+      "allowModules": ["prettier", "node-fetch"]
+  }],
+    "node/no-extraneous-import": ["error", {
+      "allowModules": ["is"]
+}]
+    }
 }

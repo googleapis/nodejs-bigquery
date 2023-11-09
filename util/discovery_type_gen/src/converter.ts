@@ -1,6 +1,6 @@
 'use strict';
 
-import { any } from "is";
+import {any} from 'is';
 
 export class Converter {
   options: any;
@@ -24,7 +24,7 @@ export class Converter {
     return [type, ...refs].join('&');
   }
   getType(schema) {
-    let {repeated, ...schemaCopy} = schema;
+    const {repeated, ...schemaCopy} = schema;
 
     if (repeated) {
       return `Array<${this.getType(schemaCopy)}>`;
@@ -66,10 +66,7 @@ export class Converter {
     return this.toUnion(types);
   }
   toJSDoc(str) {
-    const docs = str
-      .split('\n')
-      .join('\n * ')
-      .replace(/\*\//g, '*\\/');
+    const docs = str.split('\n').join('\n * ').replace(/\*\//g, '*\\/');
     return `\n/**\n * ${docs}\n */\n`;
   }
   toObject(props = {}, additional: false | any = false) {

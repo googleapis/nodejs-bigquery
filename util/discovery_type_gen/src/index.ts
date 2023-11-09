@@ -1,13 +1,14 @@
 'use strict';
 
 import {TypeGenerator} from './generator.js';
-import got from 'got';
+import fetch from 'node-fetch';
 
-export async function fetch(api, version) {
-  const url = `https://www.${api}.googleapis.com/discovery/v1/apis/${api}/${version}/rest`;
-  // for some reason this isn't working despite updates to the got package
-  const response = await got(url).json();
-  return response.body;
+export async function fetchDiscoDoc(api, version) {
+  const url = `https://www.googleapis.com/discovery/v1/apis/${api}/${version}/rest`;
+
+  const response = await fetch(url);
+  const json = (await response.json()) as any;
+  return json;
 }
 
 export function render(json?, options?) {
@@ -15,6 +16,6 @@ export function render(json?, options?) {
 }
 
 export async function createTypes(api, version) {
-  const json = await fetch(api, version);
+  const json = await fetchDiscoDoc(api, version);
   return render(json);
 }

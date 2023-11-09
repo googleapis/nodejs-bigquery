@@ -2,9 +2,9 @@
  * A Complex API Schema
  */
 declare namespace complex {
-  type IExtendedSchema = { id?: number } & IOtherSchema;
+  type IExtendedSchema = {id?: number} & IOtherSchema;
 
-  type IOtherSchema = { prop?: string };
+  type IOtherSchema = {prop?: string};
 
   /**
    * A complex schema!
@@ -29,8 +29,8 @@ declare namespace complex {
        */
       nestedProp?: IExtendedSchema;
     }>;
-    nestedRepeated?: Array<{ nestedRepeatedProp?: Array<'foo' | 'bar'> }>;
-    obj?: { key: string; [key: string]: string };
+    nestedRepeated?: Array<{nestedRepeatedProp?: Array<'foo' | 'bar'>}>;
+    obj?: {key: string; [key: string]: string};
     readonly readOnly?: string;
     repeated?: Array<'done' | 'pending' | 'running'>;
     required: string;

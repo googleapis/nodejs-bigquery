@@ -1,8 +1,8 @@
 declare namespace methods {
   namespace things {
-    type ICreateParams = { name?: string };
+    type ICreateParams = {name?: string};
 
-    type IDeleteParams = { force?: boolean };
+    type IDeleteParams = {force?: boolean};
   }
 }
 
