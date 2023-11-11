@@ -47,6 +47,7 @@ import {
   PagedCallback,
   JobRequest,
   PagedRequest,
+  TableCallback,
 } from '.';
 import {GoogleErrorBody} from '@google-cloud/common/build/src/util';
 import {Duplex, Writable} from 'stream';
@@ -188,6 +189,7 @@ const FORMATS = {
 
 export interface TableOptions {
   location?: string;
+  projectId?: string;
 }
 
 /**
@@ -199,6 +201,7 @@ export interface TableOptions {
  * @param {Dataset} dataset {@link Dataset} instance.
  * @param {string} id The ID of the table.
  * @param {object} [options] Table options.
+ * @param {object} [options.projectId] The GCP projectId used.
  * @param {string} [options.location] The geographic location of the table, by
  *      default this value is inherited from the dataset. This can be used to
  *      configure the location of all jobs created through a table instance. It
@@ -471,12 +474,29 @@ class Table extends ServiceObject {
       parent: dataset,
       baseUrl: '/tables',
       id,
-      createMethod: dataset.createTable.bind(dataset),
-      methods,
+      createMethod: (id: string, optionsOrCallback?: TableOptions | TableCallback, cb?: TableCallback) => {
+        let options = typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
+        if (this.location) {
+          options = extend({}, options, {location: this.location});
+        }
+        if (this.projectId) {
+          options = extend({}, options, {projectId: this.projectId})
+        }
+
+        let callback = typeof optionsOrCallback === 'function' ? (optionsOrCallback as TableCallback) : (cb as TableCallback);
+        
+        return dataset.createTable(id, options, callback);
+        
+      }, 
+      methods
     });
 
     if (options && options.location) {
       this.location = options.location;
+    }
+
+    if (options?.projectId) {
+      this.projectId = options.projectId;
     }
 
     this.bigQuery = dataset.bigQuery;
@@ -489,6 +509,11 @@ class Table extends ServiceObject {
         if (reqOpts.method === 'PATCH' && reqOpts.json.etag) {
           reqOpts.headers = reqOpts.headers || {};
           reqOpts.headers['If-Match'] = reqOpts.json.etag;
+        }
+
+        if (this.projectId) {
+          // Override projectId if provided
+          reqOpts.uri = reqOpts.uri.replace(`/projects/${this.dataset.projectId}/`, `/projects/${this.projectId}/`)
         }
         return reqOpts;
       },
