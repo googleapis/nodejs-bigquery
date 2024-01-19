@@ -644,7 +644,7 @@ class Dataset extends ServiceObject {
       routineReference: {
         routineId: id,
         datasetId: this.id,
-        projectId: this.bigQuery.projectId,
+        projectId: this.projectId,
       },
     });
 
