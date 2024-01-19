@@ -123,7 +123,7 @@ export type TableCallback = ResourceCallback<Table, bigquery.ITable>;
 class Dataset extends ServiceObject {
   bigQuery: BigQuery;
   location?: string;
-  projectId?: string;
+  projectId: string;
   getModelsStream(options?: GetModelsOptions): ResourceStream<Model> {
     // placeholder body, overwritten in constructor
     return new ResourceStream<Model>({}, () => {});
@@ -389,6 +389,8 @@ class Dataset extends ServiceObject {
 
     if (options?.projectId) {
       this.projectId = options.projectId;
+    } else {
+      this.projectId = bigQuery.projectId;
     }
 
     this.bigQuery = bigQuery;
@@ -740,7 +742,7 @@ class Dataset extends ServiceObject {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (body as any).tableReference = {
       datasetId: this.id,
-      projectId: this.bigQuery.projectId,
+      projectId: this.projectId,
       tableId: id,
     };
 
@@ -1303,6 +1305,7 @@ class Dataset extends ServiceObject {
     options = extend(
       {
         location: this.location,
+        projectId: this.projectId,
       },
       options
     );
