@@ -1,0 +1,25 @@
+on:
+  schedule:
+    - cron: '0 12 * * TUE'
+name: Update Discovery Generated Types
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3 
+        with:
+          node-version: 14
+      # Install all deps, including dev dependencies.
+      - run: npm install
+      # Generate types
+      - run: npm run types
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with: 
+          add-paths: src/types.d.ts
+          commit-message: "chore: update types from Discovery"
+          title: "chore: update types from Discovery"
+          body: |
+            Automated pull-request to keep BigQuery Discovery types up-to-date.
+      
