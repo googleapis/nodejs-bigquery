@@ -43,7 +43,7 @@
     "pretest": "npm run compile",
     "docs-test": "linkinator docs",
     "predocs-test": "npm run docs",
-    "types": "dtsd bigquery v2 > ./src/types.d.ts",
+    "types": "head -n 14 ./src/types.d.ts > /tmp/license && cat /tmp/license > ./src/types.d.ts && dtsd bigquery v2 >> ./src/types.d.ts",
     "prelint": "cd samples; npm link ../; npm install",
     "precompile": "gts clean"
   },
