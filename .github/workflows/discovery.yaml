@@ -19,6 +19,7 @@ jobs:
         uses: peter-evans/create-pull-request@v5
         with: 
           base: main
+          branch: update-discovery/patch
           add-paths: src/types.d.ts
           commit-message: "chore: update types from Discovery"
           title: "chore: update types from Discovery"
