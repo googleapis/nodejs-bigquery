@@ -2331,11 +2331,9 @@ export class BigQueryInt extends Number {
       try {
         return this.typeCastFunction!(this.value);
       } catch (error) {
-        (
-          error as Error
-        ).message = `integerTypeCastFunction threw an error:\n\n  - ${
-          (error as Error).message
-        }`;
+        if (error instanceof Error) {
+          error.message = `integerTypeCastFunction threw an error:\n\n  - ${error.message}`;
+        }
         throw error;
       }
     } else {
