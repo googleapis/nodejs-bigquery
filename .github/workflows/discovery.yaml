@@ -1,6 +1,7 @@
 on:
   schedule:
     - cron: '0 12 * * TUE'
+  pull_request:
 name: Update Discovery Generated Types
 jobs:
   sync:
