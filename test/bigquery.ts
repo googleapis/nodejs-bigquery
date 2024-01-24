@@ -1977,7 +1977,7 @@ describe('BigQuery', () => {
             reqOpts.json.configuration.query.destinationTable,
             {
               datasetId: dataset.id,
-              projectId: dataset.bigQuery.projectId,
+              projectId: dataset.projectId,
               tableId: TABLE_ID,
             }
           );

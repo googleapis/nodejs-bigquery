@@ -1420,7 +1420,7 @@ export class BigQuery extends Service {
 
       query.destinationTable = {
         datasetId: options.destination.dataset.id,
-        projectId: options.destination.dataset.bigQuery.projectId,
+        projectId: options.destination.dataset.projectId,
         tableId: options.destination.id,
       };
 
