@@ -1525,8 +1525,8 @@ describe('BigQuery', () => {
       const typeName = 'JSON';
       const value = {
         foo: 'bar',
-      }
-      const strValue = JSON.stringify(value)
+      };
+      const strValue = JSON.stringify(value);
       assert.deepStrictEqual(BigQuery.valueToQueryParameter_(value, typeName), {
         parameterType: {
           type: typeName,
@@ -1535,14 +1535,17 @@ describe('BigQuery', () => {
           value: strValue,
         },
       });
-      assert.deepStrictEqual(BigQuery.valueToQueryParameter_(strValue, typeName), {
-        parameterType: {
-          type: typeName,
-        },
-        parameterValue: {
-          value: strValue,
-        },
-      });
+      assert.deepStrictEqual(
+        BigQuery.valueToQueryParameter_(strValue, typeName),
+        {
+          parameterType: {
+            type: typeName,
+          },
+          parameterValue: {
+            value: strValue,
+          },
+        }
+      );
     });
 
     it('should format all other types', () => {

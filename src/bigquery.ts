@@ -1184,7 +1184,7 @@ export class BigQuery extends Service {
         },
         {}
       );
-    } else if (typeName === 'JSON' && is.object(value)) {      
+    } else if (typeName === 'JSON' && is.object(value)) {
       queryParameter.parameterValue!.value = JSON.stringify(value);
     } else {
       queryParameter.parameterValue!.value = BigQuery._getValue(
