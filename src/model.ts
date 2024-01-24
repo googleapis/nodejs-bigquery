@@ -430,7 +430,7 @@ class Model extends ServiceObject {
         extract: extend(true, options, {
           sourceModel: {
             datasetId: this.dataset.id,
-            projectId: this.bigQuery.projectId,
+            projectId: this.dataset.projectId,
             modelId: this.id,
           },
         }),

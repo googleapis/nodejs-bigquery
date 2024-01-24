@@ -56,9 +56,9 @@ describe('BigQuery/Model', () => {
 
   const DATASET = {
     id: 'dataset-id',
+    projectId: 'project-id',
     createTable: util.noop,
     bigQuery: {
-      projectId: 'project-id',
       job: (id: string) => {
         return {id};
       },
@@ -137,7 +137,7 @@ describe('BigQuery/Model', () => {
       model.bigQuery.createJob = (reqOpts: JobOptions) => {
         assert.deepStrictEqual(reqOpts.configuration!.extract!.sourceModel, {
           datasetId: model.dataset.id,
-          projectId: model.bigQuery.projectId,
+          projectId: model.dataset.projectId,
           modelId: model.id,
         });
 
