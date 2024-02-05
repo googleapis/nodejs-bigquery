@@ -96,7 +96,9 @@ describe('Tables', () => {
   });
 
   // to avoid getting rate limited
-  beforeEach(done => setTimeout(done, 500));
+  beforeEach(async function () {
+    this.currentTest.retries(2);
+  });
 
   after(async () => {
     await bigquery
@@ -619,6 +621,10 @@ describe('Tables', () => {
   });
 
   describe('Views', () => {
+    beforeEach(async function () {
+      this.currentTest.retries(2);
+    });
+
     it('should create a view', async () => {
       const output = execSync(`node createView.js ${datasetId} ${viewId}`);
       assert.include(output, `View ${viewId} created.`);
@@ -655,6 +661,10 @@ describe('Tables', () => {
       await bigquery.createDataset(datasetId, datasetOptions);
       // Create a new table in the dataset
       await bigquery.dataset(datasetId).createTable(tableId, tableOptions);
+    });
+
+    beforeEach(async function () {
+      this.currentTest.retries(2);
     });
 
     after(async () => {

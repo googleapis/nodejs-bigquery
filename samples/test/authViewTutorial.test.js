@@ -15,7 +15,7 @@
 'use strict';
 
 const {assert} = require('chai');
-const {describe, it, before, after} = require('mocha');
+const {describe, it, before, beforeEach, after} = require('mocha');
 const cp = require('child_process');
 const uuid = require('uuid');
 
@@ -53,6 +53,10 @@ describe('Authorized View Tutorial', () => {
     await bigquery.createDataset(datasetId);
     const [tableData] = await bigquery.dataset(datasetId).createTable(tableId);
     projectId = tableData.metadata.tableReference.projectId;
+  });
+
+  beforeEach(async function () {
+    this.currentTest.retries(2);
   });
 
   it('should create an authorized view', async () => {

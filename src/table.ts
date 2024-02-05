@@ -929,12 +929,12 @@ class Table extends ServiceObject {
         copy: extend(true, metadata, {
           destinationTable: {
             datasetId: destination.dataset.id,
-            projectId: destination.bigQuery.projectId,
+            projectId: destination.dataset.projectId,
             tableId: destination.id,
           },
           sourceTable: {
             datasetId: this.dataset.id,
-            projectId: this.bigQuery.projectId,
+            projectId: this.dataset.projectId,
             tableId: this.id,
           },
         }),
@@ -1051,14 +1051,14 @@ class Table extends ServiceObject {
         copy: extend(true, metadata, {
           destinationTable: {
             datasetId: this.dataset.id,
-            projectId: this.bigQuery.projectId,
+            projectId: this.dataset.projectId,
             tableId: this.id,
           },
 
           sourceTables: sourceTables.map(sourceTable => {
             return {
               datasetId: sourceTable.dataset.id,
-              projectId: sourceTable.bigQuery.projectId,
+              projectId: sourceTable.dataset.projectId,
               tableId: sourceTable.id,
             };
           }),
@@ -1224,7 +1224,7 @@ class Table extends ServiceObject {
         extract: extend(true, options, {
           sourceTable: {
             datasetId: this.dataset.id,
-            projectId: this.bigQuery.projectId,
+            projectId: this.dataset.projectId,
             tableId: this.id,
           },
         }),
@@ -1404,7 +1404,7 @@ class Table extends ServiceObject {
       configuration: {
         load: {
           destinationTable: {
-            projectId: this.bigQuery.projectId,
+            projectId: this.dataset.projectId,
             datasetId: this.dataset.id,
             tableId: this.id,
           },
@@ -1510,7 +1510,7 @@ class Table extends ServiceObject {
       true,
       {
         destinationTable: {
-          projectId: this.bigQuery.projectId,
+          projectId: this.dataset.projectId,
           datasetId: this.dataset.id,
           tableId: this.id,
         },
@@ -1542,12 +1542,12 @@ class Table extends ServiceObject {
             },
             jobReference: {
               jobId,
-              projectId: this.bigQuery.projectId,
+              projectId: this.dataset.projectId,
               location: this.location,
             },
           } as {},
           request: {
-            uri: `${this.bigQuery.apiEndpoint}/upload/bigquery/v2/projects/${this.bigQuery.projectId}/jobs`,
+            uri: `${this.bigQuery.apiEndpoint}/upload/bigquery/v2/projects/${this.dataset.projectId}/jobs`,
           },
         },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

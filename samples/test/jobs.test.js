@@ -16,7 +16,7 @@
 
 const {BigQuery} = require('@google-cloud/bigquery');
 const {assert} = require('chai');
-const {describe, it, before} = require('mocha');
+const {describe, it, before, beforeEach} = require('mocha');
 const cp = require('child_process');
 
 const execSync = cmd => cp.execSync(cmd, {encoding: 'utf-8'});
@@ -34,6 +34,9 @@ describe('Jobs', () => {
     const queryOptions = {
       query: query,
     };
+    beforeEach(async function () {
+      this.currentTest.retries(2);
+    });
 
     const [job] = await bigquery.createQueryJob(queryOptions);
     jobId = job.metadata.jobReference.jobId;

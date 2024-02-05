@@ -4,6 +4,20 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## [7.3.0](https://github.com/googleapis/nodejs-bigquery/compare/v7.2.0...v7.3.0) (2023-09-28)
+
+
+### Features
+
+* Re-exporting types for google-common ([#1271](https://github.com/googleapis/nodejs-bigquery/issues/1271)) ([cdf960a](https://github.com/googleapis/nodejs-bigquery/commit/cdf960a5cd7aaa1d9aeeff8001308b1fb89a6c6b))
+
+
+### Bug Fixes
+
+* Avoid TypeError if resp is undefined ([#1273](https://github.com/googleapis/nodejs-bigquery/issues/1273)) ([ff51c1d](https://github.com/googleapis/nodejs-bigquery/commit/ff51c1d61ff461e238aa9c72bb6817a3bdbee16e))
+* Updated types from API discovery doc ([#1284](https://github.com/googleapis/nodejs-bigquery/issues/1284)) ([1d8a2b7](https://github.com/googleapis/nodejs-bigquery/commit/1d8a2b7059fa53725bdedb525d5b19ff6121de3b))
+* Updating type for test blocking dependency updates ([#1282](https://github.com/googleapis/nodejs-bigquery/issues/1282)) ([1dbe0fe](https://github.com/googleapis/nodejs-bigquery/commit/1dbe0feb9aac90b775ec30e832915f23d488ac3a))
+
 ## [7.2.0](https://github.com/googleapis/nodejs-bigquery/compare/v7.1.1...v7.2.0) (2023-08-17)
 
 

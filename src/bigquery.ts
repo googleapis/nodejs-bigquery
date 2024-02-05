@@ -1005,6 +1005,8 @@ export class BigQuery extends Service {
       'GEOGRAPHY',
       'ARRAY',
       'STRUCT',
+      'JSON',
+      'RANGE',
     ];
 
     if (is.array(providedType)) {
@@ -1182,6 +1184,8 @@ export class BigQuery extends Service {
         },
         {}
       );
+    } else if (typeName === 'JSON' && is.object(value)) {
+      queryParameter.parameterValue!.value = JSON.stringify(value);
     } else {
       queryParameter.parameterValue!.value = BigQuery._getValue(
         value,
@@ -1420,7 +1424,7 @@ export class BigQuery extends Service {
 
       query.destinationTable = {
         datasetId: options.destination.dataset.id,
-        projectId: options.destination.dataset.bigQuery.projectId,
+        projectId: options.destination.dataset.projectId,
         tableId: options.destination.id,
       };
 
@@ -2331,11 +2335,9 @@ export class BigQueryInt extends Number {
       try {
         return this.typeCastFunction!(this.value);
       } catch (error) {
-        (
-          error as Error
-        ).message = `integerTypeCastFunction threw an error:\n\n  - ${
-          (error as Error).message
-        }`;
+        if (error instanceof Error) {
+          error.message = `integerTypeCastFunction threw an error:\n\n  - ${error.message}`;
+        }
         throw error;
       }
     } else {
