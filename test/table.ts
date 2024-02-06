@@ -173,9 +173,9 @@ describe('BigQuery/Table', () => {
 
   const DATASET = {
     id: 'dataset-id',
+    projectId: 'project-id',
     createTable: util.noop,
     bigQuery: {
-      projectId: 'project-id',
       job: (id: string) => {
         return {id};
       },
@@ -721,12 +721,12 @@ describe('BigQuery/Table', () => {
               c: 'd',
               destinationTable: {
                 datasetId: DEST_TABLE.dataset.id,
-                projectId: DEST_TABLE.bigQuery.projectId,
+                projectId: DEST_TABLE.dataset.projectId,
                 tableId: DEST_TABLE.id,
               },
               sourceTable: {
                 datasetId: table.dataset.id,
-                projectId: table.bigQuery.projectId,
+                projectId: table.dataset.projectId,
                 tableId: table.id,
               },
             },
@@ -842,13 +842,13 @@ describe('BigQuery/Table', () => {
               c: 'd',
               destinationTable: {
                 datasetId: table.dataset.id,
-                projectId: table.bigQuery.projectId,
+                projectId: table.dataset.projectId,
                 tableId: table.id,
               },
               sourceTables: [
                 {
                   datasetId: SOURCE_TABLE.dataset.id,
-                  projectId: SOURCE_TABLE.bigQuery.projectId,
+                  projectId: SOURCE_TABLE.dataset.projectId,
                   tableId: SOURCE_TABLE.id,
                 },
               ],
@@ -867,12 +867,12 @@ describe('BigQuery/Table', () => {
         assert.deepStrictEqual(reqOpts.configuration!.copy!.sourceTables, [
           {
             datasetId: SOURCE_TABLE.dataset.id,
-            projectId: SOURCE_TABLE.bigQuery.projectId,
+            projectId: SOURCE_TABLE.dataset.projectId,
             tableId: SOURCE_TABLE.id,
           },
           {
             datasetId: SOURCE_TABLE.dataset.id,
-            projectId: SOURCE_TABLE.bigQuery.projectId,
+            projectId: SOURCE_TABLE.dataset.projectId,
             tableId: SOURCE_TABLE.id,
           },
         ]);
@@ -1002,7 +1002,7 @@ describe('BigQuery/Table', () => {
       table.bigQuery.createJob = (reqOpts: JobOptions) => {
         assert.deepStrictEqual(reqOpts.configuration!.extract!.sourceTable, {
           datasetId: table.dataset.id,
-          projectId: table.bigQuery.projectId,
+          projectId: table.dataset.projectId,
           tableId: table.id,
         });
 
@@ -1685,14 +1685,14 @@ describe('BigQuery/Table', () => {
                 a: 'b',
                 c: 'd',
                 destinationTable: {
-                  projectId: table.bigQuery.projectId,
+                  projectId: table.dataset.projectId,
                   datasetId: table.dataset.id,
                   tableId: table.id,
                 },
               },
             },
             jobReference: {
-              projectId: table.bigQuery.projectId,
+              projectId: table.dataset.projectId,
               jobId: fakeJobId,
               location: undefined,
             },
@@ -1711,7 +1711,7 @@ describe('BigQuery/Table', () => {
           const uri =
             table.bigQuery.apiEndpoint +
             '/upload/bigquery/v2/projects/' +
-            table.bigQuery.projectId +
+            table.dataset.projectId +
             '/jobs';
           assert.strictEqual(options.request.uri, uri);
           done();

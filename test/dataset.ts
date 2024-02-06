@@ -87,6 +87,7 @@ describe('BigQuery/Dataset', () => {
   } as {} as _root.BigQuery;
   const DATASET_ID = 'kittens';
   const LOCATION = 'asia-northeast1';
+  const ANOTHER_PROJECT_ID = 'another-test-project';
 
   // tslint:disable-next-line variable-name
   let Dataset: typeof _root.Dataset;
@@ -148,6 +149,12 @@ describe('BigQuery/Dataset', () => {
       assert.strictEqual(ds.location, LOCATION);
     });
 
+    it('should set the client projectId by default', () => {
+      const ds = new Dataset(BIGQUERY, DATASET_ID);
+
+      assert.strictEqual(ds.projectId, BIGQUERY.projectId);
+    });
+
     it('should capture user provided projectId', () => {
       const projectIdOverride = 'octavia';
       const options = {projectId: projectIdOverride};
@@ -171,7 +178,9 @@ describe('BigQuery/Dataset', () => {
       });
 
       it('should call through to BigQuery#createDataset', done => {
-        const OPTIONS = {};
+        const OPTIONS = {
+          projectId: BIGQUERY.projectId,
+        };
 
         bq.createDataset = (id: string, options: {}, callback: Function) => {
           assert.strictEqual(id, DATASET_ID);
@@ -249,6 +258,7 @@ describe('BigQuery/Dataset', () => {
           json: {
             etag: FAKE_ETAG,
           },
+          uri: `/projects/${BIGQUERY.projectId}/`,
         };
 
         const reqOpts = interceptor.request(fakeReqOpts);
@@ -266,6 +276,7 @@ describe('BigQuery/Dataset', () => {
           json: {
             etag: FAKE_ETAG,
           },
+          uri: `/projects/${BIGQUERY.projectId}/`,
         };
 
         const expectedHeaders = Object.assign({}, fakeReqOpts.headers, {
@@ -284,6 +295,7 @@ describe('BigQuery/Dataset', () => {
           json: {
             etag: FAKE_ETAG,
           },
+          uri: `/projects/${BIGQUERY.projectId}/`,
         };
 
         const reqOpts = interceptor.request(fakeReqOpts);
@@ -428,6 +440,7 @@ describe('BigQuery/Dataset', () => {
     const API_RESPONSE = {
       tableReference: {
         tableId: TABLE_ID,
+        projectId: BIGQUERY.projectId,
       },
     };
 
@@ -443,16 +456,38 @@ describe('BigQuery/Dataset', () => {
         const body = reqOpts.json;
         assert.deepStrictEqual(body.schema, SCHEMA_OBJECT);
         assert.strictEqual(body.tableReference.datasetId, DATASET_ID);
-        assert.strictEqual(
-          body.tableReference.projectId,
-          ds.bigQuery.projectId
-        );
+        assert.strictEqual(body.tableReference.projectId, ds.projectId);
         assert.strictEqual(body.tableReference.tableId, TABLE_ID);
 
         done();
       };
 
       ds.createTable(TABLE_ID, options, assert.ifError);
+    });
+
+    it('should create a table on a different project', done => {
+      const options = {
+        schema: SCHEMA_OBJECT,
+      };
+      const anotherDs = new Dataset(BIGQUERY, DATASET_ID, {
+        projectId: ANOTHER_PROJECT_ID,
+      }) as any;
+      anotherDs.request = (reqOpts: DecorateRequestOptions) => {
+        assert.strictEqual(reqOpts.method, 'POST');
+        assert.strictEqual(reqOpts.uri, '/tables');
+
+        const body = reqOpts.json;
+        assert.deepStrictEqual(body.schema, SCHEMA_OBJECT);
+        assert.strictEqual(body.tableReference.datasetId, DATASET_ID);
+        assert.strictEqual(body.tableReference.projectId, ANOTHER_PROJECT_ID);
+        assert.strictEqual(body.tableReference.tableId, TABLE_ID);
+
+        done();
+      };
+
+      // Under the hood dataset.createTable is called
+      const table = anotherDs.table(TABLE_ID);
+      table.create(options, assert.ifError);
     });
 
     it('should not require options', done => {
@@ -562,6 +597,22 @@ describe('BigQuery/Dataset', () => {
     });
 
     it('should pass the location to the Table', done => {
+      const response = Object.assign({location: LOCATION}, API_RESPONSE);
+
+      ds.request = (reqOpts: DecorateRequestOptions, callback: Function) => {
+        callback(null, response);
+      };
+
+      ds.table = (id: string, options: TableOptions) => {
+        assert.strictEqual(options.location, LOCATION);
+        setImmediate(done);
+        return {};
+      };
+
+      ds.createTable(TABLE_ID, {schema: SCHEMA_OBJECT}, assert.ifError);
+    });
+
+    it('should pass the projectId to the Table', done => {
       const response = Object.assign({location: LOCATION}, API_RESPONSE);
 
       ds.request = (reqOpts: DecorateRequestOptions, callback: Function) => {
