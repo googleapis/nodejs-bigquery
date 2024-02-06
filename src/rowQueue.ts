@@ -19,7 +19,7 @@ import * as extend from 'extend';
 import * as uuid from 'uuid';
 import {RequestCallback, Table, InsertStreamOptions} from '.';
 import {GoogleErrorBody} from '@google-cloud/common/build/src/util';
-import bigquery from './types';
+import {bigquery_v2} from '@googleapis/bigquery';
 import {BATCH_LIMITS, RowBatch} from './rowBatch';
 import {Stream} from 'stream';
 import {RowBatchOptions, InsertRowsOptions, RowMetadata} from './table';
@@ -41,17 +41,18 @@ export const defaultOptions: MaxInsertOptions = {
   maxDelayMillis: 10000,
 };
 
-export type InsertRowsStreamResponse = bigquery.ITableDataInsertAllResponse;
+export type InsertRowsStreamResponse =
+  bigquery_v2.Schema$TableDataInsertAllResponse;
 
 export type InsertRowsCallback = RequestCallback<
-  bigquery.ITableDataInsertAllResponse | bigquery.ITable
+  bigquery_v2.Schema$TableDataInsertAllResponse | bigquery_v2.Schema$Table
 >;
 export interface InsertRow {
   insertId?: string;
-  json?: bigquery.IJsonObject;
+  json?: bigquery_v2.Schema$JsonObject;
 }
 
-export type TableRow = bigquery.ITableRow;
+export type TableRow = bigquery_v2.Schema$TableRow;
 export interface PartialInsertFailure {
   message: string;
   reason: string;

@@ -44,7 +44,7 @@ import {
   RowMetadata,
 } from './table';
 import {GoogleErrorBody} from '@google-cloud/common/build/src/util';
-import bigquery from './types';
+import {bigquery_v2} from '@googleapis/bigquery';
 
 // Third-Party Re-exports
 export {common};
@@ -82,21 +82,21 @@ export type PagedRequest<P> = P & {
 export type QueryRowsResponse = PagedResponse<
   RowMetadata,
   Query,
-  bigquery.IGetQueryResultsResponse
+  bigquery_v2.Schema$GetQueryResultsResponse
 >;
 export type QueryRowsCallback = PagedCallback<
   RowMetadata,
   Query,
-  bigquery.IGetQueryResultsResponse
+  bigquery_v2.Schema$GetQueryResultsResponse
 >;
 
-export type SimpleQueryRowsResponse = [RowMetadata[], bigquery.IJob];
+export type SimpleQueryRowsResponse = [RowMetadata[], bigquery_v2.Schema$Job];
 export type SimpleQueryRowsCallback = ResourceCallback<
   RowMetadata[],
-  bigquery.IJob
+  bigquery_v2.Schema$Job
 >;
 
-export type Query = JobRequest<bigquery.IJobConfigurationQuery> & {
+export type Query = JobRequest<bigquery_v2.Schema$JobConfigurationQuery> & {
   destination?: Table;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   params?: any[] | {[param: string]: any};
@@ -129,39 +129,44 @@ export type QueryStreamOptions = {
   wrapIntegers?: boolean | IntegerTypeCastOptions;
   parseJSON?: boolean;
 };
-export type DatasetResource = bigquery.IDataset & {
+export type DatasetResource = bigquery_v2.Schema$Dataset & {
   projectId?: string;
 };
-export type ValueType = bigquery.IQueryParameterType;
+export type ValueType = bigquery_v2.Schema$QueryParameterType;
 
-export type GetDatasetsOptions = PagedRequest<bigquery.datasets.IListParams> & {
-  projectId?: string;
-};
+export type GetDatasetsOptions =
+  PagedRequest<bigquery_v2.Params$Resource$Datasets$List> & {
+    projectId?: string;
+  };
 
 export type DatasetsResponse = PagedResponse<
   Dataset,
   GetDatasetsOptions,
-  bigquery.IDatasetList
+  bigquery_v2.Schema$DatasetList
 >;
 export type DatasetsCallback = PagedCallback<
   Dataset,
   GetDatasetsOptions,
-  bigquery.IDatasetList
+  bigquery_v2.Schema$DatasetList
 >;
 
-export type DatasetResponse = [Dataset, bigquery.IDataset];
-export type DatasetCallback = ResourceCallback<Dataset, bigquery.IDataset>;
+export type DatasetResponse = [Dataset, bigquery_v2.Schema$Dataset];
+export type DatasetCallback = ResourceCallback<
+  Dataset,
+  bigquery_v2.Schema$Dataset
+>;
 
-export type GetJobsOptions = PagedRequest<bigquery.jobs.IListParams>;
+export type GetJobsOptions =
+  PagedRequest<bigquery_v2.Params$Resource$Jobs$List>;
 export type GetJobsResponse = PagedResponse<
   Job,
   GetJobsOptions,
-  bigquery.IJobList
+  bigquery_v2.Schema$JobList
 >;
 export type GetJobsCallback = PagedCallback<
   Job,
   GetJobsOptions,
-  bigquery.IJobList
+  bigquery_v2.Schema$JobList
 >;
 
 export interface BigQueryTimeOptions {
@@ -193,7 +198,7 @@ export interface ProvidedTypeStruct {
   [key: string]: string | ProvidedTypeArray | ProvidedTypeStruct;
 }
 
-export type QueryParameter = bigquery.IQueryParameter;
+export type QueryParameter = bigquery_v2.Schema$QueryParameter;
 
 export interface BigQueryOptions extends GoogleAuthOptions {
   /**
@@ -236,7 +241,7 @@ export interface IntegerTypeCastOptions {
 
 export type IntegerTypeCastValue = {
   integerValue: string | number;
-  schemaFieldName?: string;
+  schemaFieldName?: string | null;
 };
 
 export const PROTOCOL_REGEX = /^(\w*):\/\//;
@@ -989,7 +994,7 @@ export class BigQuery extends Service {
   static getTypeDescriptorFromProvidedType_(
     providedType: string | ProvidedTypeStruct | ProvidedTypeArray
   ): ValueType {
-    // The list of types can be found in src/types.d.ts
+    // The list of types can be found in @googleapis/bigquery package.
     const VALID_TYPES = [
       'DATE',
       'DATETIME',
@@ -1141,7 +1146,7 @@ export class BigQuery extends Service {
     if (is.date(value)) {
       value = BigQuery.timestamp(value as Date);
     }
-    let parameterType: bigquery.IQueryParameterType;
+    let parameterType: bigquery_v2.Schema$QueryParameterType;
     if (providedType) {
       parameterType = BigQuery.getTypeDescriptorFromProvidedType_(providedType);
     } else {
@@ -1163,7 +1168,7 @@ export class BigQuery extends Service {
               return BigQuery.valueToQueryParameter_(value).parameterValue!;
             }
           }
-          return {value} as bigquery.IQueryParameterValue;
+          return {value} as bigquery_v2.Schema$QueryParameterValue;
         }
       );
     } else if (typeName === 'STRUCT') {
@@ -1627,7 +1632,7 @@ export class BigQuery extends Service {
     }
 
     const job = this.job(jobId!, {
-      location: reqOpts.jobReference.location,
+      location: reqOpts.jobReference.location ?? undefined,
     });
 
     this.request(
@@ -1785,7 +1790,7 @@ export class BigQuery extends Service {
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const datasets = (resp.datasets || []).map(
-        (dataset: bigquery.IDataset) => {
+        (dataset: bigquery_v2.Schema$Dataset) => {
           const dsOpts: DatasetOptions = {
             location: dataset.location!,
           };
@@ -1899,13 +1904,15 @@ export class BigQuery extends Service {
             pageToken: resp.nextPageToken,
           });
         }
-        const jobs = (resp.jobs || []).map((jobObject: bigquery.IJob) => {
-          const job = this.job(jobObject.jobReference!.jobId!, {
-            location: jobObject.jobReference!.location!,
-          });
-          job.metadata = jobObject!;
-          return job;
-        });
+        const jobs = (resp.jobs || []).map(
+          (jobObject: bigquery_v2.Schema$Job) => {
+            const job = this.job(jobObject.jobReference!.jobId!, {
+              location: jobObject.jobReference!.location!,
+            });
+            job.metadata = jobObject!;
+            return job;
+          }
+        );
         callback!(null, jobs, nextQuery, resp);
       }
     );
@@ -2287,7 +2294,7 @@ export class BigQueryInt extends Number {
   type: string;
   value: string;
   typeCastFunction?: Function;
-  private _schemaFieldName: string | undefined;
+  private _schemaFieldName: string | undefined | null;
   constructor(
     value: string | number | IntegerTypeCastValue,
     typeCastOptions?: IntegerTypeCastOptions

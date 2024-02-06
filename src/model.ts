@@ -27,7 +27,7 @@ import {
   JobRequest,
 } from '.';
 import {JobMetadata} from './job';
-import bigquery from './types';
+import {bigquery_v2} from '@googleapis/bigquery';
 
 // This is supposed to be a @google-cloud/storage `File` type. The storage npm
 // module includes these types, but is currently installed as a devDependency.
@@ -46,11 +46,11 @@ export interface File {
 export type JobMetadataCallback = RequestCallback<JobMetadata>;
 export type JobMetadataResponse = [JobMetadata];
 
-export type JobResponse = [Job, bigquery.IJob];
-export type JobCallback = ResourceCallback<Job, bigquery.IJob>;
+export type JobResponse = [Job, bigquery_v2.Schema$Job];
+export type JobCallback = ResourceCallback<Job, bigquery_v2.Schema$Job>;
 
 export type CreateExtractJobOptions =
-  JobRequest<bigquery.IJobConfigurationExtract> & {
+  JobRequest<bigquery_v2.Schema$JobConfigurationExtract> & {
     format?: 'ML_TF_SAVED_MODEL' | 'ML_XGBOOST_BOOSTER';
   };
 

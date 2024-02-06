@@ -45,61 +45,67 @@ import {
 } from './table';
 import {Model} from './model';
 import {Routine} from './routine';
-import bigquery from './types';
+import {bigquery_v2} from '@googleapis/bigquery';
 
 export interface DatasetDeleteOptions {
   force?: boolean;
 }
 
 export interface DatasetOptions {
-  location?: string;
+  location?: string | null;
   projectId?: string;
 }
 
-export type CreateDatasetOptions = bigquery.IDataset;
+export type CreateDatasetOptions = bigquery_v2.Schema$Dataset;
 
-export type GetModelsOptions = PagedRequest<bigquery.models.IListParams>;
+export type GetModelsOptions =
+  PagedRequest<bigquery_v2.Params$Resource$Models$List>;
 export type GetModelsResponse = PagedResponse<
   Model,
   GetModelsOptions,
-  bigquery.IListModelsResponse
+  bigquery_v2.Schema$ListModelsResponse
 >;
 export type GetModelsCallback = PagedCallback<
   Model,
   GetModelsOptions,
-  bigquery.IListModelsResponse
+  bigquery_v2.Schema$ListModelsResponse
 >;
 
-export type GetRoutinesOptions = PagedRequest<bigquery.routines.IListParams>;
+export type GetRoutinesOptions =
+  PagedRequest<bigquery_v2.Params$Resource$Routines$List>;
 export type GetRoutinesResponse = PagedResponse<
   Routine,
   GetRoutinesOptions,
-  bigquery.IListRoutinesResponse
+  bigquery_v2.Schema$ListRoutinesResponse
 >;
 export type GetRoutinesCallback = PagedCallback<
   Routine,
   GetRoutinesOptions,
-  bigquery.IListRoutinesResponse
+  bigquery_v2.Schema$ListRoutinesResponse
 >;
 
-export type GetTablesOptions = PagedRequest<bigquery.tables.IListParams>;
+export type GetTablesOptions =
+  PagedRequest<bigquery_v2.Params$Resource$Tables$List>;
 export type GetTablesResponse = PagedResponse<
   Table,
   GetTablesOptions,
-  bigquery.ITableList
+  bigquery_v2.Schema$TableList
 >;
 export type GetTablesCallback = PagedCallback<
   Table,
   GetTablesOptions,
-  bigquery.ITableList
+  bigquery_v2.Schema$TableList
 >;
 
-export type RoutineMetadata = bigquery.IRoutine;
-export type RoutineResponse = [Routine, bigquery.IRoutine];
-export type RoutineCallback = ResourceCallback<Routine, bigquery.IRoutine>;
+export type RoutineMetadata = bigquery_v2.Schema$Routine;
+export type RoutineResponse = [Routine, bigquery_v2.Schema$Routine];
+export type RoutineCallback = ResourceCallback<
+  Routine,
+  bigquery_v2.Schema$Routine
+>;
 
-export type TableResponse = [Table, bigquery.ITable];
-export type TableCallback = ResourceCallback<Table, bigquery.ITable>;
+export type TableResponse = [Table, bigquery_v2.Schema$Table];
+export type TableCallback = ResourceCallback<Table, bigquery_v2.Schema$Table>;
 
 /**
  * Interact with your BigQuery dataset. Create a Dataset instance with
@@ -931,7 +937,7 @@ class Dataset extends ServiceObject {
         uri: '/models',
         qs: options,
       },
-      (err: null | Error, resp: bigquery.IListModelsResponse) => {
+      (err: null | Error, resp: bigquery_v2.Schema$ListModelsResponse) => {
         if (err) {
           callback!(err, null, null, resp);
           return;
@@ -1045,7 +1051,7 @@ class Dataset extends ServiceObject {
         uri: '/routines',
         qs: options,
       },
-      (err: Error | null, resp: bigquery.IListRoutinesResponse) => {
+      (err: Error | null, resp: bigquery_v2.Schema$ListRoutinesResponse) => {
         if (err) {
           callback!(err, null, null, resp);
           return;
