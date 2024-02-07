@@ -529,10 +529,10 @@ class Job extends Operation {
       typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
     const callback =
       typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
-
     const qs = extend(
       {
         location: this.location,
+        'formatOptions.useInt64Timestamp': true,
       },
       options
     );
