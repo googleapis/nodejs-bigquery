@@ -263,6 +263,16 @@ describe('BigQuery', () => {
       assert.strictEqual(calledWith.apiEndpoint, 'https://some.fake.endpoint');
     });
 
+    it('should allow overriding TPC universe', () => {
+      const universeDomain = 'apis-tpclp.goog/';
+      bq = new BigQuery({
+        universeDomain: universeDomain,
+      });
+      const calledWith = bq.calledWith_[0];
+      assert.strictEqual(calledWith.baseUrl, `https://bigquery.apis-tpclp.goog/bigquery/v2`);
+      assert.strictEqual(calledWith.apiEndpoint, `https://bigquery.apis-tpclp.goog`);
+    })
+
     it('should capture any user specified location', () => {
       const bq = new BigQuery({
         projectId: PROJECT_ID,

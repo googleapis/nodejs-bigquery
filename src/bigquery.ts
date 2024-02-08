@@ -227,6 +227,12 @@ export interface BigQueryOptions extends GoogleAuthOptions {
    * Defaults to `bigquery.googleapis.com`.
    */
   apiEndpoint?: string;
+
+  /**
+   * The Trusted Cloud Domain (TPC) DNS of the service used to make requests.
+   * Defaults to `googleapis.com`.
+   */
+  universeDomain?: string;
 }
 
 export interface IntegerTypeCastOptions {
@@ -311,6 +317,7 @@ export const PROTOCOL_REGEX = /^(\w*):\/\//;
  */
 export class BigQuery extends Service {
   location?: string;
+  private _universeDomain: string;
 
   createQueryStream(options?: Query | string): ResourceStream<RowMetadata> {
     // placeholder body, overwritten in constructor
@@ -328,10 +335,17 @@ export class BigQuery extends Service {
   }
 
   constructor(options: BigQueryOptions = {}) {
-    let apiEndpoint = 'https://bigquery.googleapis.com';
+    let universeDomain = "googleapis.com";
+    const servicePath = "bigquery";    
+
+    if (options.universeDomain) {
+      universeDomain = BigQuery.sanitizeDomain(options.universeDomain);
+    }
 
     const EMULATOR_HOST = process.env.BIGQUERY_EMULATOR_HOST;
 
+    let apiEndpoint = `https://${servicePath}.${universeDomain}`;    
+    
     if (typeof EMULATOR_HOST === 'string') {
       apiEndpoint = BigQuery.sanitizeEndpoint(EMULATOR_HOST);
     }
@@ -361,6 +375,7 @@ export class BigQuery extends Service {
 
     super(config, options);
 
+    this._universeDomain = universeDomain;
     this.location = options.location;
     /**
      * Run a query scoped to your project as a readable object stream.
@@ -473,10 +488,18 @@ export class BigQuery extends Service {
     });
   }
 
+  get universeDomain(){
+    return this._universeDomain;
+  }
+
   private static sanitizeEndpoint(url: string) {
     if (!PROTOCOL_REGEX.test(url)) {
       url = `https://${url}`;
     }
+    return this.sanitizeDomain(url);
+  }
+
+  private static sanitizeDomain(url: string) {    
     return url.replace(/\/+$/, ''); // Remove trailing slashes
   }
 
