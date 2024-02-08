@@ -335,8 +335,8 @@ export class BigQuery extends Service {
   }
 
   constructor(options: BigQueryOptions = {}) {
-    let universeDomain = "googleapis.com";
-    const servicePath = "bigquery";    
+    let universeDomain = 'googleapis.com';
+    const servicePath = 'bigquery';
 
     if (options.universeDomain) {
       universeDomain = BigQuery.sanitizeDomain(options.universeDomain);
@@ -344,8 +344,8 @@ export class BigQuery extends Service {
 
     const EMULATOR_HOST = process.env.BIGQUERY_EMULATOR_HOST;
 
-    let apiEndpoint = `https://${servicePath}.${universeDomain}`;    
-    
+    let apiEndpoint = `https://${servicePath}.${universeDomain}`;
+
     if (typeof EMULATOR_HOST === 'string') {
       apiEndpoint = BigQuery.sanitizeEndpoint(EMULATOR_HOST);
     }
@@ -488,7 +488,7 @@ export class BigQuery extends Service {
     });
   }
 
-  get universeDomain(){
+  get universeDomain() {
     return this._universeDomain;
   }
 
@@ -499,7 +499,7 @@ export class BigQuery extends Service {
     return this.sanitizeDomain(url);
   }
 
-  private static sanitizeDomain(url: string) {    
+  private static sanitizeDomain(url: string) {
     return url.replace(/\/+$/, ''); // Remove trailing slashes
   }
 

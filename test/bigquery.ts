@@ -269,9 +269,15 @@ describe('BigQuery', () => {
         universeDomain: universeDomain,
       });
       const calledWith = bq.calledWith_[0];
-      assert.strictEqual(calledWith.baseUrl, `https://bigquery.apis-tpclp.goog/bigquery/v2`);
-      assert.strictEqual(calledWith.apiEndpoint, `https://bigquery.apis-tpclp.goog`);
-    })
+      assert.strictEqual(
+        calledWith.baseUrl,
+        'https://bigquery.apis-tpclp.goog/bigquery/v2'
+      );
+      assert.strictEqual(
+        calledWith.apiEndpoint,
+        'https://bigquery.apis-tpclp.goog'
+      );
+    });
 
     it('should capture any user specified location', () => {
       const bq = new BigQuery({
