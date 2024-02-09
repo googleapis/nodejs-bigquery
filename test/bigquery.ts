@@ -264,18 +264,18 @@ describe('BigQuery', () => {
     });
 
     it('should allow overriding TPC universe', () => {
-      const universeDomain = 'apis-tpclp.goog/';
+      const universeDomain = 'fake-tpc-env.example.com/';
       bq = new BigQuery({
         universeDomain: universeDomain,
       });
       const calledWith = bq.calledWith_[0];
       assert.strictEqual(
         calledWith.baseUrl,
-        'https://bigquery.apis-tpclp.goog/bigquery/v2'
+        'https://bigquery.fake-tpc-env.example.com/bigquery/v2'
       );
       assert.strictEqual(
         calledWith.apiEndpoint,
-        'https://bigquery.apis-tpclp.goog'
+        'https://bigquery.fake-tpc-env.example.com'
       );
     });
 
