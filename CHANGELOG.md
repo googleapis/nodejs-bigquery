@@ -4,6 +4,19 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## [7.4.0](https://github.com/googleapis/nodejs-bigquery/compare/v7.3.0...v7.4.0) (2024-02-06)
+
+
+### Features
+
+* Implementing mocha retries ([#1295](https://github.com/googleapis/nodejs-bigquery/issues/1295)) ([6cda9e1](https://github.com/googleapis/nodejs-bigquery/commit/6cda9e192c0dd224194f44ebd632a64b845c59b6))
+* Support JSON query param ([#1329](https://github.com/googleapis/nodejs-bigquery/issues/1329)) ([e9f133b](https://github.com/googleapis/nodejs-bigquery/commit/e9f133bec0c1420396ff25d30baf1fba74e1ab04))
+
+
+### Bug Fixes
+
+* Prefer usage of projectId from the Dataset ([#1326](https://github.com/googleapis/nodejs-bigquery/issues/1326)) ([9e85219](https://github.com/googleapis/nodejs-bigquery/commit/9e85219afa074c6804adac79cb4f28a944f5957a))
+
 ## [7.3.0](https://github.com/googleapis/nodejs-bigquery/compare/v7.2.0...v7.3.0) (2023-09-28)
 
 
