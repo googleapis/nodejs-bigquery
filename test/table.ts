@@ -41,7 +41,7 @@ import {
   Table,
   ViewDefinition,
 } from '../src/table';
-import bigquery from '../src/types';
+import {bigquery_v2} from '@googleapis/bigquery';
 import {Duplex} from 'stream';
 import {RowQueue} from '../src/rowQueue';
 
@@ -123,7 +123,7 @@ class FakeServiceObject extends ServiceObject {
 }
 
 interface MakeWritableStreamOptions {
-  metadata: bigquery.IJob;
+  metadata: bigquery_v2.Schema$Job;
   request: {uri: string};
 }
 

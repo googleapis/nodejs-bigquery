@@ -51,7 +51,7 @@ import {
 import {GoogleErrorBody} from '@google-cloud/common/build/src/util';
 import {Duplex, Writable} from 'stream';
 import {JobMetadata} from './job';
-import bigquery from './types';
+import {bigquery_v2} from '@googleapis/bigquery';
 import {IntegerTypeCastOptions} from './bigquery';
 import {RowQueue} from './rowQueue';
 
@@ -78,7 +78,7 @@ export type JobMetadataResponse = [JobMetadata];
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type RowMetadata = any;
 
-export type InsertRowsOptions = bigquery.ITableDataInsertAllRequest & {
+export type InsertRowsOptions = bigquery_v2.Schema$TableDataInsertAllRequest & {
   createInsertId?: boolean;
   partialRetries?: number;
   raw?: boolean;
@@ -86,65 +86,68 @@ export type InsertRowsOptions = bigquery.ITableDataInsertAllRequest & {
 };
 
 export type InsertRowsResponse = [
-  bigquery.ITableDataInsertAllResponse | bigquery.ITable,
+  bigquery_v2.Schema$TableDataInsertAllResponse | bigquery_v2.Schema$Table,
 ];
 export type InsertRowsCallback = RequestCallback<
-  bigquery.ITableDataInsertAllResponse | bigquery.ITable
+  bigquery_v2.Schema$TableDataInsertAllResponse | bigquery_v2.Schema$Table
 >;
 
 export type RowsResponse = PagedResponse<
   RowMetadata,
   GetRowsOptions,
-  bigquery.ITableDataList | bigquery.ITable
+  bigquery_v2.Schema$TableDataList | bigquery_v2.Schema$Table
 >;
 export type RowsCallback = PagedCallback<
   RowMetadata,
   GetRowsOptions,
-  bigquery.ITableDataList | bigquery.ITable
+  bigquery_v2.Schema$TableDataList | bigquery_v2.Schema$Table
 >;
 
 export interface InsertRow {
   insertId?: string;
-  json?: bigquery.IJsonObject;
+  json?: bigquery_v2.Schema$JsonObject;
 }
 
-export type TableRow = bigquery.ITableRow;
-export type TableRowField = bigquery.ITableCell;
+export type TableRow = bigquery_v2.Schema$TableRow;
+export type TableRowField = bigquery_v2.Schema$TableCell;
 export type TableRowValue = string | TableRow;
 
-export type GetRowsOptions = PagedRequest<bigquery.tabledata.IListParams> & {
-  wrapIntegers?: boolean | IntegerTypeCastOptions;
-  parseJSON?: boolean;
-};
+export type GetRowsOptions =
+  PagedRequest<bigquery_v2.Params$Resource$Tabledata$List> & {
+    wrapIntegers?: boolean | IntegerTypeCastOptions;
+    parseJSON?: boolean;
+  };
 
-export type JobLoadMetadata = JobRequest<bigquery.IJobConfigurationLoad> & {
-  format?: string;
-};
+export type JobLoadMetadata =
+  JobRequest<bigquery_v2.Schema$JobConfigurationLoad> & {
+    format?: string;
+  };
 
 export type CreateExtractJobOptions =
-  JobRequest<bigquery.IJobConfigurationExtract> & {
+  JobRequest<bigquery_v2.Schema$JobConfigurationExtract> & {
     format?: 'CSV' | 'JSON' | 'AVRO' | 'PARQUET' | 'ORC';
     gzip?: boolean;
   };
 
-export type JobResponse = [Job, bigquery.IJob];
-export type JobCallback = ResourceCallback<Job, bigquery.IJob>;
+export type JobResponse = [Job, bigquery_v2.Schema$Job];
+export type JobCallback = ResourceCallback<Job, bigquery_v2.Schema$Job>;
 
 export type CreateCopyJobMetadata = CopyTableMetadata;
 export type SetTableMetadataOptions = TableMetadata;
-export type CopyTableMetadata = JobRequest<bigquery.IJobConfigurationTableCopy>;
+export type CopyTableMetadata =
+  JobRequest<bigquery_v2.Schema$JobConfigurationTableCopy>;
 
-export type TableMetadata = bigquery.ITable & {
+export type TableMetadata = bigquery_v2.Schema$Table & {
   name?: string;
   schema?: string | TableField[] | TableSchema;
   partitioning?: string;
   view?: string | ViewDefinition;
 };
 
-export type ViewDefinition = bigquery.IViewDefinition;
-export type FormattedMetadata = bigquery.ITable;
-export type TableSchema = bigquery.ITableSchema;
-export type TableField = bigquery.ITableFieldSchema;
+export type ViewDefinition = bigquery_v2.Schema$ViewDefinition;
+export type FormattedMetadata = bigquery_v2.Schema$Table;
+export type TableSchema = bigquery_v2.Schema$TableSchema;
+export type TableField = bigquery_v2.Schema$TableFieldSchema;
 
 export interface PartialInsertFailure {
   message: string;
@@ -152,13 +155,18 @@ export interface PartialInsertFailure {
   row: RowMetadata;
 }
 
-export type Policy = bigquery.IPolicy;
-export type GetPolicyOptions = bigquery.IGetPolicyOptions;
-export type SetPolicyOptions = Omit<bigquery.ISetIamPolicyRequest, 'policy'>;
-export type PolicyRequest = bigquery.IGetIamPolicyRequest;
+export type Policy = bigquery_v2.Schema$Policy;
+export type GetPolicyOptions = bigquery_v2.Schema$GetPolicyOptions;
+export type SetPolicyOptions = Omit<
+  bigquery_v2.Schema$SetIamPolicyRequest,
+  'policy'
+>;
+export type PolicyRequest = bigquery_v2.Schema$GetIamPolicyRequest;
 export type PolicyResponse = [Policy];
 export type PolicyCallback = RequestCallback<PolicyResponse>;
-export type PermissionsResponse = [bigquery.ITestIamPermissionsResponse];
+export type PermissionsResponse = [
+  bigquery_v2.Schema$TestIamPermissionsResponse,
+];
 export type PermissionsCallback = RequestCallback<PermissionsResponse>;
 
 export interface InsertStreamOptions {
@@ -1832,7 +1840,7 @@ class Table extends ServiceObject {
       err: Error | null,
       rows: TableRow[] | null,
       nextQuery: GetRowsOptions | null,
-      resp: bigquery.ITableList
+      resp: bigquery_v2.Schema$TableList
     ) => {
       if (err) {
         callback!(err, null, null, resp);
@@ -1868,7 +1876,11 @@ class Table extends ServiceObject {
         if (resp.rows && resp.rows.length > 0 && !this.metadata.schema) {
           // We don't know the schema for this table yet. Do a quick stat.
           this.getMetadata(
-            (err: Error, metadata: Metadata, apiResponse: bigquery.ITable) => {
+            (
+              err: Error,
+              metadata: Metadata,
+              apiResponse: bigquery_v2.Schema$Table
+            ) => {
               if (err) {
                 onComplete(err, null, null, apiResponse!);
                 return;
@@ -2072,13 +2084,15 @@ class Table extends ServiceObject {
    *
    * @param {RowMetadata | RowMetadata[]} rows
    * @param {InsertRowsOptions} options
-   * @returns {Promise<bigquery.ITableDataInsertAllResponse | bigquery.ITable>}
+   * @returns {Promise<bigquery_v2.Schema$TableDataInsertAllResponse | bigquery_v2.Schema$Table>}
    * @private
    */
   private async _insertAndCreateTable(
     rows: RowMetadata | RowMetadata[],
     options: InsertRowsOptions
-  ): Promise<bigquery.ITableDataInsertAllResponse | bigquery.ITable> {
+  ): Promise<
+    bigquery_v2.Schema$TableDataInsertAllResponse | bigquery_v2.Schema$Table
+  > {
     const {schema} = options;
     const delay = 60000;
 
@@ -2114,12 +2128,12 @@ class Table extends ServiceObject {
    *
    * @param {RowMetadata|RowMetadata[]} rows The rows to insert.
    * @param {InsertRowsOptions} options Insert options.
-   * @returns {Promise<bigquery.ITableDataInsertAllResponse>}
+   * @returns {Promise<bigquery_v2.Schema$TableDataInsertAllResponse>}
    */
   private async _insertWithRetry(
     rows: RowMetadata | RowMetadata[],
     options: InsertRowsOptions
-  ): Promise<bigquery.ITableDataInsertAllResponse> {
+  ): Promise<bigquery_v2.Schema$TableDataInsertAllResponse> {
     const {partialRetries = 3} = options;
     let error: GoogleErrorBody;
 
@@ -2151,12 +2165,12 @@ class Table extends ServiceObject {
    *
    * @param {RowMetadata|RowMetadata[]} rows The rows to insert.
    * @param {InsertRowsOptions} options Insert options.
-   * @returns {Promise<bigquery.ITableDataInsertAllResponse>}
+   * @returns {Promise<bigquery_v2.Schema$TableDataInsertAllResponse>}
    */
   private async _insert(
     rows: RowMetadata | RowMetadata[],
     options: InsertRowsOptions
-  ): Promise<bigquery.ITableDataInsertAllResponse> {
+  ): Promise<bigquery_v2.Schema$TableDataInsertAllResponse> {
     rows = arrify(rows) as RowMetadata[];
 
     if (!rows.length) {

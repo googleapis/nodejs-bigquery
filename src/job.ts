@@ -38,19 +38,20 @@ import {
   RequestCallback,
 } from './bigquery';
 import {RowMetadata} from './table';
-import bigquery from './types';
+import {bigquery_v2} from '@googleapis/bigquery';
 
-export type JobMetadata = bigquery.IJob;
+export type JobMetadata = bigquery_v2.Schema$Job;
 export type JobOptions = JobRequest<JobMetadata>;
 
-export type CancelCallback = RequestCallback<bigquery.IJobCancelResponse>;
-export type CancelResponse = [bigquery.IJobCancelResponse];
+export type CancelCallback =
+  RequestCallback<bigquery_v2.Schema$JobCancelResponse>;
+export type CancelResponse = [bigquery_v2.Schema$JobCancelResponse];
 
 export type QueryResultsOptions = {
   job?: Job;
   wrapIntegers?: boolean | IntegerTypeCastOptions;
   parseJSON?: boolean;
-} & PagedRequest<bigquery.jobs.IGetQueryResultsParams>;
+} & PagedRequest<bigquery_v2.Params$Resource$Jobs$Getqueryresults>;
 
 /**
  * @callback QueryResultsCallback
