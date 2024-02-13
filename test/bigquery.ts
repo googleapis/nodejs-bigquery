@@ -263,6 +263,22 @@ describe('BigQuery', () => {
       assert.strictEqual(calledWith.apiEndpoint, 'https://some.fake.endpoint');
     });
 
+    it('should allow overriding TPC universe', () => {
+      const universeDomain = 'fake-tpc-env.example.com/';
+      bq = new BigQuery({
+        universeDomain: universeDomain,
+      });
+      const calledWith = bq.calledWith_[0];
+      assert.strictEqual(
+        calledWith.baseUrl,
+        'https://bigquery.fake-tpc-env.example.com/bigquery/v2'
+      );
+      assert.strictEqual(
+        calledWith.apiEndpoint,
+        'https://bigquery.fake-tpc-env.example.com'
+      );
+    });
+
     it('should capture any user specified location', () => {
       const bq = new BigQuery({
         projectId: PROJECT_ID,
