@@ -39,6 +39,7 @@ import {
 } from './bigquery';
 import {RowMetadata} from './table';
 import bigquery from './types';
+import {logger} from './logger';
 
 export type JobMetadata = bigquery.IJob;
 export type JobOptions = JobRequest<JobMetadata>;
@@ -50,6 +51,7 @@ export type QueryResultsOptions = {
   job?: Job;
   wrapIntegers?: boolean | IntegerTypeCastOptions;
   parseJSON?: boolean;
+  cachedRows?: any[];
 } & PagedRequest<bigquery.jobs.IGetQueryResultsParams>;
 
 /**
@@ -379,6 +381,11 @@ class Job extends Operation {
     );
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private trace(msg: string, ...otherArgs: any[]) {
+    logger(`[job][${this.id}]`, msg, ...otherArgs);
+  }
+
   /**
    * @callback CancelCallback
    * @param {?Error} err Request error, if any.
@@ -536,6 +543,12 @@ class Job extends Operation {
       },
       options
     );
+    this.trace(
+      '[getQueryResults]',
+      this.id,
+      options.pageToken,
+      options.startIndex
+    );
 
     const wrapIntegers = qs.wrapIntegers ? qs.wrapIntegers : false;
     delete qs.wrapIntegers;
@@ -546,6 +559,15 @@ class Job extends Operation {
 
     const timeoutOverride =
       typeof qs.timeoutMs === 'number' ? qs.timeoutMs : false;
+
+    if (options.cachedRows) {
+      const nextQuery = Object.assign({}, options, {
+        pageToken: options.pageToken,
+      });
+      delete nextQuery.cachedRows;
+      callback!(null, options.cachedRows, nextQuery);
+      return;
+    }
 
     this.bigQuery.request(
       {
@@ -582,6 +604,7 @@ class Job extends Operation {
             return;
           }
         } else if (resp.pageToken) {
+          this.trace('[getQueryResults] has more pages', resp.pageToken);
           // More results exist.
           nextQuery = Object.assign({}, options, {
             pageToken: resp.pageToken,

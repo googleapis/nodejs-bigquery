@@ -2985,6 +2985,13 @@ declare namespace bigquery {
      */
     dryRun?: boolean;
     /**
+     * Optional. If not set, jobs are always required. If set, the query request will follow the behavior described JobCreationMode. This feature is not yet available. Jobs will always be created.
+     */
+    jobCreationMode?:
+      | 'JOB_CREATION_MODE_UNSPECIFIED'
+      | 'JOB_CREATION_REQUIRED'
+      | 'JOB_CREATION_OPTIONAL';
+    /**
      * The resource type of the request.
      */
     kind?: string;

@@ -45,6 +45,7 @@ import {
 } from './table';
 import {GoogleErrorBody} from '@google-cloud/common/build/src/util';
 import bigquery from './types';
+import {logger, setLogFunction} from './logger';
 
 // Third-Party Re-exports
 export {common};
@@ -163,6 +164,9 @@ export type GetJobsCallback = PagedCallback<
   GetJobsOptions,
   bigquery.IJobList
 >;
+
+export type JobsQueryResponse = [Job, bigquery.IQueryResponse];
+export type JobsQueryCallback = ResourceCallback<Job, bigquery.IQueryResponse>;
 
 export interface BigQueryTimeOptions {
   hours?: number | string;
@@ -486,6 +490,11 @@ export class BigQuery extends Service {
         return extend(true, {}, reqOpts, {qs: {prettyPrint: false}});
       },
     });
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private trace(msg: string, ...otherArgs: any[]) {
+    logger('[bigquery]', msg, ...otherArgs);
   }
 
   get universeDomain() {
@@ -1439,6 +1448,7 @@ export class BigQuery extends Service {
       },
       options
     );
+    this.trace('[createQueryJob]', query);
 
     if (options.destination) {
       if (!(options.destination instanceof Table)) {
@@ -2106,20 +2116,130 @@ export class BigQuery extends Service {
         : {};
     const callback =
       typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
-    this.createQueryJob(query, (err, job, resp) => {
+
+    this.trace('[query]', query, options);
+    const queryReq = this.probeFastPath_(query, options);
+    if (!queryReq) {
+      this.createQueryJob(query, (err, job, resp) => {
+        if (err) {
+          (callback as SimpleQueryRowsCallback)(err, null, resp);
+          return;
+        }
+        if (typeof query === 'object' && query.dryRun) {
+          (callback as SimpleQueryRowsCallback)(null, [], resp);
+          return;
+        }
+        // The Job is important for the `queryAsStream_` method, so a new query
+        // isn't created each time results are polled for.
+        options = extend({job}, queryOpts, options);
+        job!.getQueryResults(options, callback as QueryRowsCallback);
+      });
+      return;
+    }
+
+    this.syncQuery(queryReq, options, (err, job, res) => {
       if (err) {
-        (callback as SimpleQueryRowsCallback)(err, null, resp);
+        (callback as SimpleQueryRowsCallback)(err, null, res);
         return;
       }
-      if (typeof query === 'object' && query.dryRun) {
-        (callback as SimpleQueryRowsCallback)(null, [], resp);
-        return;
+
+      let nextQuery = extend({job}, options);
+      if (res && res.jobComplete) {
+        let rows: any = [];
+        if (res.schema && res.rows) {
+          rows = BigQuery.mergeSchemaWithRows_(res.schema, res.rows, {
+            wrapIntegers: options.wrapIntegers!, // TODO: fix default value
+            parseJSON: options.parseJSON,
+          });
+        }
+        this.trace('[syncQuery] job complete');
+        if (res.pageToken) {
+          this.trace('[syncQuery] has more pages');
+          nextQuery = extend({job}, options, {
+            pageToken: res.pageToken,
+            cachedRows: rows,
+          });
+          job!.getQueryResults(nextQuery, callback as QueryRowsCallback);
+          return;
+        } else {
+          this.trace('[syncQuery] no more pages');
+          (callback as SimpleQueryRowsCallback)(err, rows, res);
+          return;
+        }
       }
-      // The Job is important for the `queryAsStream_` method, so a new query
-      // isn't created each time results are polled for.
-      options = extend({job}, queryOpts, options);
+      this.trace('[syncQuery] job not complete');
       job!.getQueryResults(options, callback as QueryRowsCallback);
     });
+  }
+
+  private probeFastPath_(
+    query: string | Query,
+    options: QueryOptions
+  ): bigquery.IQueryRequest | undefined {
+    this.trace('[probeFastPath_]', query, options);
+    if (process.env.FAST_QUERY_PATH === 'DISABLED') {
+      return undefined;
+    }
+    if (typeof query === 'string') {
+      if (!options.job) {
+        const req: bigquery.IQueryRequest = {
+          ...options,
+          useQueryCache: false,
+          jobCreationMode: 'JOB_CREATION_OPTIONAL',
+          useLegacySql: false,
+          requestId: uuid.v4(),
+          query: query,
+        };
+        return req;
+      }
+      return undefined;
+    }
+    // TODO: non string query and convert to QueryRequest
+    return undefined;
+  }
+
+  syncQuery(
+    req: bigquery.IQueryRequest,
+    options?: QueryResultsOptions
+  ): Promise<JobsQueryResponse>;
+  syncQuery(
+    req: bigquery.IQueryRequest,
+    options: QueryResultsOptions,
+    callback: JobsQueryCallback
+  ): void;
+  syncQuery(
+    req: bigquery.IQueryRequest,
+    optionsOrCallback?: QueryResultsOptions | JobsQueryCallback,
+    cb?: JobsQueryCallback
+  ): void | Promise<JobsQueryResponse> {
+    const options =
+      typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
+    const callback =
+      typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
+
+    this.trace('[syncQuery]', req, options, callback);
+    this.request(
+      {
+        method: 'POST',
+        uri: '/queries',
+        json: req,
+      },
+      async (err, res: bigquery.IQueryResponse) => {
+        if (err) {
+          callback!(err, null, res);
+          return;
+        }
+        this.trace('jobs.query res:', res);
+        let job: Job | null = null;
+        if (res.jobReference) {
+          const jobRef = res.jobReference!;
+          job = this.job(jobRef.jobId!, {
+            location: jobRef.location,
+          });
+        }
+        callback!(null, job, res);
+      }
+    );
   }
 
   /**
@@ -2153,6 +2273,8 @@ export class BigQuery extends Service {
 
     this.query(query, opts, callback);
   }
+
+  static setLogFunction = setLogFunction;
 }
 
 /*! Developer Documentation
