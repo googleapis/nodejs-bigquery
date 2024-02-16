@@ -881,6 +881,17 @@ describe('BigQuery', () => {
       assert.strictEqual(timestamp.value, EXPECTED_VALUE);
     });
 
+    it('should accept a number in microseconds', () => {
+      const ms = INPUT_PRECISE_DATE.valueOf(); // milliseconds
+      const us = (ms*1000) + INPUT_PRECISE_DATE.getMicroseconds(); // microseconds
+      let timestamp = bq.timestamp(us);
+      assert.strictEqual(timestamp.value, EXPECTED_VALUE_MICROS);
+
+      const usStr = `${us}`;
+      timestamp = bq.timestamp(usStr);
+      assert.strictEqual(timestamp.value, EXPECTED_VALUE_MICROS);
+    });
+
     it('should accept a string with microseconds', () => {
       const timestamp = bq.timestamp(INPUT_STRING_MICROS);
       assert.strictEqual(timestamp.value, EXPECTED_VALUE_MICROS);

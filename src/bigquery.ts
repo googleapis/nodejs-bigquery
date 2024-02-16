@@ -2219,7 +2219,10 @@ export class BigQueryTimestamp {
       } else {
         pd = new PreciseDate(BigInt(value) * BigInt(1000));
       }
+    } else if (value > 0) {
+      pd = new PreciseDate(BigInt(value) * BigInt(1000));
     } else {
+      // Nan or negative values - invalid dates
       pd = new PreciseDate(value);
     }
     // to keep backward compatibility, only converts with microsecond
