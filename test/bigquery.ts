@@ -883,7 +883,7 @@ describe('BigQuery', () => {
 
     it('should accept a number in microseconds', () => {
       const ms = INPUT_PRECISE_DATE.valueOf(); // milliseconds
-      const us = (ms*1000) + INPUT_PRECISE_DATE.getMicroseconds(); // microseconds
+      const us = ms * 1000 + INPUT_PRECISE_DATE.getMicroseconds(); // microseconds
       let timestamp = bq.timestamp(us);
       assert.strictEqual(timestamp.value, EXPECTED_VALUE_MICROS);
 
