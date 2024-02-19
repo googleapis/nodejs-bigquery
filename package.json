@@ -43,7 +43,7 @@
     "pretest": "npm run compile",
     "docs-test": "linkinator docs",
     "predocs-test": "npm run docs",
-    "types": "dtsd bigquery v2 > ./src/types.d.ts",
+    "types": "node scripts/gen-types.js",
     "prelint": "cd samples; npm link ../; npm install",
     "precompile": "gts clean"
   },
