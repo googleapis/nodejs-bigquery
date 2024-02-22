@@ -2118,7 +2118,7 @@ export class BigQuery extends Service {
       typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
 
     this.trace('[query]', query, options);
-    const queryReq = this.probeFastPath_(query, options);
+    const queryReq = this.buildQueryRequest(query, options);
     if (!queryReq) {
       this.createQueryJob(query, (err, job, resp) => {
         if (err) {
@@ -2137,7 +2137,7 @@ export class BigQuery extends Service {
       return;
     }
 
-    this.syncQuery(queryReq, options, (err, job, res) => {
+    this.runJobsQuery(queryReq, options, (err, job, res) => {
       if (err) {
         (callback as SimpleQueryRowsCallback)(err, null, res);
         return;
@@ -2152,9 +2152,9 @@ export class BigQuery extends Service {
             parseJSON: options.parseJSON,
           });
         }
-        this.trace('[syncQuery] job complete');
+        this.trace('[runJobsQuery] job complete');
         if (res.pageToken) {
-          this.trace('[syncQuery] has more pages');
+          this.trace('[runJobsQuery] has more pages');
           nextQuery = extend({job}, options, {
             pageToken: res.pageToken,
             cachedRows: rows,
@@ -2162,17 +2162,26 @@ export class BigQuery extends Service {
           job!.getQueryResults(nextQuery, callback as QueryRowsCallback);
           return;
         } else {
-          this.trace('[syncQuery] no more pages');
+          this.trace('[runJobsQuery] no more pages');
           (callback as SimpleQueryRowsCallback)(err, rows, res);
           return;
         }
       }
-      this.trace('[syncQuery] job not complete');
+      this.trace('[runJobsQuery] job not complete');
       job!.getQueryResults(options, callback as QueryRowsCallback);
     });
   }
 
-  private probeFastPath_(
+  /**
+   * Check if the given Query can run using the `jobs.query` endpoint.
+   * Returns a bigquery.IQueryRequest that can be used to call `jobs.query`.
+   * Return undefined if is not possible to convert to a bigquery.IQueryRequest.
+   * 
+   * @param query string | Query 
+   * @param options QueryOptions
+   * @returns bigquery.IQueryRequest | undefined
+   */
+  private buildQueryRequest(
     query: string | Query,
     options: QueryOptions
   ): bigquery.IQueryRequest | undefined {
@@ -2198,16 +2207,16 @@ export class BigQuery extends Service {
     return undefined;
   }
 
-  syncQuery(
+  private runJobsQuery(
     req: bigquery.IQueryRequest,
     options?: QueryResultsOptions
   ): Promise<JobsQueryResponse>;
-  syncQuery(
+  private runJobsQuery(
     req: bigquery.IQueryRequest,
     options: QueryResultsOptions,
     callback: JobsQueryCallback
   ): void;
-  syncQuery(
+  private runJobsQuery(
     req: bigquery.IQueryRequest,
     optionsOrCallback?: QueryResultsOptions | JobsQueryCallback,
     cb?: JobsQueryCallback
@@ -2217,7 +2226,7 @@ export class BigQuery extends Service {
     const callback =
       typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
 
-    this.trace('[syncQuery]', req, options, callback);
+    this.trace('[runJobsQuery]', req, options, callback);
     this.request(
       {
         method: 'POST',
