@@ -4,6 +4,15 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## [7.5.0](https://github.com/googleapis/nodejs-bigquery/compare/v7.4.0...v7.5.0) (2024-02-21)
+
+
+### Features
+
+* Add support for TPC Universes ([#1333](https://github.com/googleapis/nodejs-bigquery/issues/1333)) ([f67a841](https://github.com/googleapis/nodejs-bigquery/commit/f67a841c29f1f546187e4b670f5e5a4df50b4926))
+* Switch timestamp representation to int64 usec ([#1332](https://github.com/googleapis/nodejs-bigquery/issues/1332)) ([fb10f03](https://github.com/googleapis/nodejs-bigquery/commit/fb10f036234dd5e69052ae724281d0e186f961be))
+* Update types and generation script ([#1336](https://github.com/googleapis/nodejs-bigquery/issues/1336)) ([496f52c](https://github.com/googleapis/nodejs-bigquery/commit/496f52c3816d6a11d17d82bceb47bb8a47522e2b))
+
 ## [7.4.0](https://github.com/googleapis/nodejs-bigquery/compare/v7.3.0...v7.4.0) (2024-02-06)
 
 
