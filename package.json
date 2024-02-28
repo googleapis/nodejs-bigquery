@@ -1,7 +1,7 @@
 {
   "name": "@google-cloud/bigquery",
   "description": "Google BigQuery Client Library for Node.js",
-  "version": "7.4.0",
+  "version": "7.5.0",
   "license": "Apache-2.0",
   "author": "Google LLC",
   "engines": {
@@ -43,7 +43,7 @@
     "pretest": "npm run compile",
     "docs-test": "linkinator docs",
     "predocs-test": "npm run docs",
-    "types": "dtsd bigquery v2 > ./src/types.d.ts",
+    "types": "node scripts/gen-types.js",
     "prelint": "cd samples; npm link ../; npm install",
     "precompile": "gts clean"
   },
