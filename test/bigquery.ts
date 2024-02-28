@@ -2812,6 +2812,10 @@ describe('BigQuery', () => {
         callback(error, null, FAKE_RESPONSE);
       };
 
+      bq.buildQueryRequest_ = (query: {}, options: {}) => {
+        return undefined;
+      };
+
       bq.query(QUERY_STRING, (err: Error, rows: {}, resp: {}) => {
         assert.strictEqual(err, error);
         assert.strictEqual(rows, null);
@@ -2848,6 +2852,10 @@ describe('BigQuery', () => {
 
       bq.createQueryJob = (query: {}, callback: Function) => {
         callback(null, fakeJob, FAKE_RESPONSE);
+      };
+
+      bq.buildQueryRequest_ = (query: {}, options: {}) => {
+        return undefined;
       };
 
       bq.query(QUERY_STRING, (err: Error, rows: {}, resp: {}) => {
@@ -2901,6 +2909,10 @@ describe('BigQuery', () => {
         callback(null, fakeJob, FAKE_RESPONSE);
       };
 
+      bq.buildQueryRequest_ = (query: {}, opts: {}) => {
+        return undefined;
+      };
+
       bq.query(QUERY_STRING, assert.ifError);
     });
 
@@ -2916,6 +2928,10 @@ describe('BigQuery', () => {
 
       bq.createQueryJob = (query: {}, callback: Function) => {
         callback(null, fakeJob, FAKE_RESPONSE);
+      };
+
+      bq.buildQueryRequest_ = (query: {}, opts: {}) => {
+        return undefined;
       };
 
       bq.query(QUERY_STRING, fakeOptions, assert.ifError);

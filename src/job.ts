@@ -561,10 +561,13 @@ class Job extends Operation {
       typeof qs.timeoutMs === 'number' ? qs.timeoutMs : false;
 
     if (options.cachedRows) {
-      const nextQuery = Object.assign({}, options, {
-        pageToken: options.pageToken,
-      });
-      delete nextQuery.cachedRows;
+      let nextQuery: QueryResultsOptions | null = null;
+      if (options.pageToken) {
+        nextQuery = Object.assign({}, options, {
+          pageToken: options.pageToken,
+        });
+        delete nextQuery.cachedRows;
+      }
       callback!(null, options.cachedRows, nextQuery);
       return;
     }

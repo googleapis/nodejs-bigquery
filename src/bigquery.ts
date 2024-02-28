@@ -1436,6 +1436,7 @@ export class BigQuery extends Service {
     callback?: JobCallback
   ): void | Promise<JobResponse> {
     const options = typeof opts === 'object' ? opts : {query: opts};
+    this.trace('[createQueryJob]', options, callback);
     if ((!options || !options.query) && !options.pageToken) {
       throw new Error('A SQL query string is required.');
     }
@@ -2143,7 +2144,7 @@ export class BigQuery extends Service {
         return;
       }
 
-      let nextQuery = extend({job}, options);
+      options = extend({job}, queryOpts, options);
       if (res && res.jobComplete) {
         let rows: any = [];
         if (res.schema && res.rows) {
@@ -2152,20 +2153,16 @@ export class BigQuery extends Service {
             parseJSON: options.parseJSON,
           });
         }
+        options.cachedRows = rows;
         this.trace('[runJobsQuery] job complete');
         if (res.pageToken) {
           this.trace('[runJobsQuery] has more pages');
-          nextQuery = extend({job}, options, {
-            pageToken: res.pageToken,
-            cachedRows: rows,
-          });
-          job!.getQueryResults(nextQuery, callback as QueryRowsCallback);
-          return;
+          options.pageToken = res.pageToken;
         } else {
           this.trace('[runJobsQuery] no more pages');
-          (callback as SimpleQueryRowsCallback)(err, rows, res);
-          return;
         }
+        job!.getQueryResults(options, callback as QueryRowsCallback);
+        return;
       }
       this.trace('[runJobsQuery] job not complete');
       job!.getQueryResults(options, callback as QueryRowsCallback);
@@ -2176,8 +2173,8 @@ export class BigQuery extends Service {
    * Check if the given Query can run using the `jobs.query` endpoint.
    * Returns a bigquery.IQueryRequest that can be used to call `jobs.query`.
    * Return undefined if is not possible to convert to a bigquery.IQueryRequest.
-   * 
-   * @param query string | Query 
+   *
+   * @param query string | Query
    * @param options QueryOptions
    * @returns bigquery.IQueryRequest | undefined
    */
@@ -2245,6 +2242,8 @@ export class BigQuery extends Service {
           job = this.job(jobRef.jobId!, {
             location: jobRef.location,
           });
+        } else {
+          job = this.job(res.queryId!); // stateless query
         }
         callback!(null, job, res);
       }
