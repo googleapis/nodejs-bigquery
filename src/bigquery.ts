@@ -2118,7 +2118,7 @@ export class BigQuery extends Service {
       typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
 
     this.trace('[query]', query, options);
-    const queryReq = this.buildQueryRequest(query, options);
+    const queryReq = this.buildQueryRequest_(query, options);
     if (!queryReq) {
       this.createQueryJob(query, (err, job, resp) => {
         if (err) {
@@ -2181,11 +2181,11 @@ export class BigQuery extends Service {
    * @param options QueryOptions
    * @returns bigquery.IQueryRequest | undefined
    */
-  private buildQueryRequest(
+  private buildQueryRequest_(
     query: string | Query,
     options: QueryOptions
   ): bigquery.IQueryRequest | undefined {
-    this.trace('[probeFastPath_]', query, options);
+    this.trace('[buildQueryRequest]', query, options);
     if (process.env.FAST_QUERY_PATH === 'DISABLED') {
       return undefined;
     }
