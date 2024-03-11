@@ -887,10 +887,10 @@ describe('BigQuery', () => {
       const d = new Date();
       const f = d.valueOf() / 1000; // float seconds
       let timestamp = bq.timestamp(f);
-      assert.strictEqual(timestamp.value, d.toJSON());      
+      assert.strictEqual(timestamp.value, d.toJSON());
 
       timestamp = bq.timestamp(f.toString());
-      assert.strictEqual(timestamp.value, d.toJSON());      
+      assert.strictEqual(timestamp.value, d.toJSON());
     });
 
     it('should accept a number in microseconds', () => {
