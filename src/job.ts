@@ -382,7 +382,7 @@ class Job extends Operation {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private trace(msg: string, ...otherArgs: any[]) {
+  private trace_(msg: string, ...otherArgs: any[]) {
     logger(`[job][${this.id}]`, msg, ...otherArgs);
   }
 
@@ -543,7 +543,7 @@ class Job extends Operation {
       },
       options
     );
-    this.trace(
+    this.trace_(
       '[getQueryResults]',
       this.id,
       options.pageToken,
@@ -607,7 +607,7 @@ class Job extends Operation {
             return;
           }
         } else if (resp.pageToken) {
-          this.trace('[getQueryResults] has more pages', resp.pageToken);
+          this.trace_('[getQueryResults] has more pages', resp.pageToken);
           // More results exist.
           nextQuery = Object.assign({}, options, {
             pageToken: resp.pageToken,

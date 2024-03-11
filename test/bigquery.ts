@@ -40,6 +40,8 @@ import {
   Table,
   JobOptions,
   TableField,
+  Query,
+  QueryResultsOptions,
 } from '../src';
 import {SinonStub} from 'sinon';
 import {PreciseDate} from '@google-cloud/precise-date';
@@ -2117,10 +2119,10 @@ describe('BigQuery', () => {
         it('should set the correct query parameters', done => {
           const queryParameter = {};
 
-          BigQuery.valueToQueryParameter_ = (value: {}) => {
+          sandbox.replace(BigQuery, 'valueToQueryParameter_', (value: {}) => {
             assert.strictEqual(value, NAMED_PARAMS.key);
             return queryParameter;
-          };
+          });
 
           bq.createJob = (reqOpts: JobOptions) => {
             const query = reqOpts.configuration!.query!;
@@ -2141,14 +2143,14 @@ describe('BigQuery', () => {
         it('should allow for optional parameter types', () => {
           const queryParameter = {};
 
-          BigQuery.valueToQueryParameter_ = (
+          sandbox.replace(BigQuery, 'valueToQueryParameter_', (
             value: {},
             providedType: string
           ) => {
             assert.strictEqual(value, NAMED_PARAMS.key);
             assert.strictEqual(providedType, NAMED_TYPES.key);
             return queryParameter;
-          };
+          });
           bq.createJob = (reqOpts: JobOptions) => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             assert.strictEqual((reqOpts as any).params, undefined);
@@ -2167,10 +2169,10 @@ describe('BigQuery', () => {
         it('should allow for providing only some parameter types', () => {
           const queryParameter = {};
 
-          BigQuery.valueToQueryParameter_ = (value: {}) => {
+          sandbox.replace(BigQuery, 'valueToQueryParameter_', (value: {}) => {
             assert.strictEqual(value, NAMED_PARAMS.key);
             return queryParameter;
-          };
+          });
 
           bq.createJob = (reqOpts: JobOptions) => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -2202,9 +2204,9 @@ describe('BigQuery', () => {
         it('should set the correct parameter mode', done => {
           const queryParameter = {};
 
-          BigQuery.valueToQueryParameter_ = () => {
+          sandbox.replace(BigQuery, 'valueToQueryParameter_', (value: {}) => {
             return queryParameter;
-          };
+          });
 
           bq.createJob = (reqOpts: JobOptions) => {
             const query = reqOpts.configuration!.query!;
@@ -2224,10 +2226,10 @@ describe('BigQuery', () => {
         it('should set the correct query parameters', done => {
           const queryParameter = {};
 
-          BigQuery.valueToQueryParameter_ = (value: {}) => {
+          sandbox.replace(BigQuery, 'valueToQueryParameter_', (value: {}) => {
             assert.strictEqual(value, POSITIONAL_PARAMS[0]);
             return queryParameter;
-          };
+          });
 
           bq.createJob = (reqOpts: JobOptions) => {
             const query = reqOpts.configuration!.query!;
@@ -2417,7 +2419,7 @@ describe('BigQuery', () => {
         );
         assert.strictEqual(
           reqOpts.configuration!.jobTimeoutMs,
-          options.jobTimeoutMs
+          `${options.jobTimeoutMs}`
         );
         done();
       };
@@ -2824,6 +2826,21 @@ describe('BigQuery', () => {
       });
     });
 
+    it('should return any errors from jobs.query', done => {
+      const error = new Error('err');
+
+      bq.runJobsQuery = (query: {}, callback: Function) => {
+        callback(error, null, FAKE_RESPONSE);
+      };
+
+      bq.query(QUERY_STRING, (err: Error, rows: {}, resp: {}) => {
+        assert.strictEqual(err, error);
+        assert.strictEqual(rows, null);
+        assert.strictEqual(resp, FAKE_RESPONSE);
+        done();
+      });
+    });
+
     it('should exit early if dryRun is set', done => {
       const options = {
         query: QUERY_STRING,
@@ -2833,6 +2850,10 @@ describe('BigQuery', () => {
       bq.createQueryJob = (query: {}, callback: Function) => {
         assert.strictEqual(query, options);
         callback(null, null, FAKE_RESPONSE);
+      };
+
+      bq.buildQueryRequest_ = (query: {}, options: {}) => {
+        return undefined;
       };
 
       bq.query(options, (err: Error, rows: {}, resp: {}) => {
@@ -2866,6 +2887,43 @@ describe('BigQuery', () => {
       });
     });
 
+    it('should call job#getQueryResults with cached rows from jobs.query', done => {
+      const fakeJob = {
+        getQueryResults: (options: QueryResultsOptions, callback: Function) => {
+          callback(null, options.cachedRows, FAKE_RESPONSE);
+        },
+      };
+
+      bq.runJobsQuery = (query: {}, callback: Function) => {
+        callback(null, fakeJob, {
+          jobComplete: true,
+          schema: {
+            fields: [
+              {name: 'value', type: 'INT64'}
+            ]
+          },
+          rows: [
+            {f: [{v: 1}]},
+            {f: [{v: 2}]},
+            {f: [{v: 3}]},
+          ],
+        });
+      };
+
+      bq.query(QUERY_STRING, (err: Error, rows: {}, resp: {}) => {
+        assert.ifError(err);
+        assert.deepStrictEqual(rows, [{
+          value: 1,
+        },{
+          value: 2
+        },{
+          value: 3
+        }]);
+        assert.strictEqual(resp, FAKE_RESPONSE);
+        done();
+      });
+    });
+
     it('should call job#getQueryResults with query options', done => {
       let queryResultsOpts = {};
       const fakeJob = {
@@ -2877,6 +2935,10 @@ describe('BigQuery', () => {
 
       bq.createQueryJob = (query: {}, callback: Function) => {
         callback(null, fakeJob, FAKE_RESPONSE);
+      };
+
+      bq.buildQueryRequest_ = (query: {}, options: {}) => {
+        return undefined;
       };
 
       const query = {
@@ -2935,6 +2997,143 @@ describe('BigQuery', () => {
       };
 
       bq.query(QUERY_STRING, fakeOptions, assert.ifError);
+    });
+  });
+
+  describe('buildQueryRequest_', () => {
+    const DATASET_ID = 'dataset-id';
+    const TABLE_ID = 'table-id';
+    const QUERY_STRING = 'SELECT * FROM [dataset.table]';
+
+    it('should create a QueryRequest from a Query interface', () => {
+      const q: Query = {
+        query: QUERY_STRING,
+        maxResults: 10,
+        defaultDataset: {
+          projectId: PROJECT_ID,
+          datasetId: DATASET_ID,
+        },
+        priority: 'INTERACTIVE',
+        params: {
+          key: 'value',
+        },
+        maximumBytesBilled: '1024',
+        labels: {
+          key: 'value',
+        },
+      };
+      const req = bq.buildQueryRequest_(q, {});
+      for (let key in req) {
+        if (req[key] === undefined) {
+          delete req[key];
+        }
+      }
+      const expectedReq = {
+        query: QUERY_STRING,
+        useLegacySql: false,
+        requestId: req.requestId,
+        maxResults: 10,
+        defaultDataset: {
+          projectId: PROJECT_ID,
+          datasetId: DATASET_ID,
+        },
+        parameterMode: 'named',
+        queryParameters: [
+          {
+            name: 'key',
+            parameterType: {
+              type: 'STRING',
+            },
+            parameterValue: {
+              value: 'value',
+            },
+          },
+        ],
+        maximumBytesBilled: '1024',
+        labels: {
+          key: 'value',
+        },
+        jobCreationMode: 'JOB_CREATION_REQUIRED', // due to maxResults set
+        formatOptions: {
+          useInt64Timestamp: true,
+        },
+      };
+      assert.deepStrictEqual(req, expectedReq);
+    });
+
+    it('should create a QueryRequest from a SQL string', () => {
+      const req = bq.buildQueryRequest_(QUERY_STRING, {});
+      for (let key in req) {
+        if (req[key] === undefined) {
+          delete req[key];
+        }
+      }
+      const expectedReq = {
+        query: QUERY_STRING,
+        useLegacySql: false,
+        requestId: req.requestId,
+        jobCreationMode: 'JOB_CREATION_OPTIONAL',
+        formatOptions: {
+          useInt64Timestamp: true,
+        },
+      };
+      assert.deepStrictEqual(req, expectedReq);
+    });
+
+    it('should not create a QueryRequest when config is not accepted by jobs.query', () => {
+      const dataset: any = {
+        bigQuery: bq,
+        id: 'dataset-id',
+        createTable: util.noop,
+      };
+      const table = new FakeTable(dataset, TABLE_ID);
+      const testCases: Query[] = [
+        {
+          query: QUERY_STRING,
+          dryRun: true,
+        },
+        {
+          query: QUERY_STRING,
+          destination: table,
+        },
+        {
+          query: QUERY_STRING,
+          clustering: {
+            fields: ['date'],
+          },
+        },
+        {
+          query: QUERY_STRING,
+          clustering: {},
+        },
+        {
+          query: QUERY_STRING,
+          timePartitioning: {},
+        },
+        {
+          query: QUERY_STRING,
+          rangePartitioning: {},
+        },
+        {
+          query: QUERY_STRING,
+          jobId: 'fixed-job-id'
+        },
+        {
+          query: QUERY_STRING,
+          createDisposition: 'CREATED_IF_NEEDED',
+          writeDisposition: 'WRITE_APPEND',
+        },
+        {
+          query: QUERY_STRING,
+          schemaUpdateOptions: ['update']
+        }
+      ];
+
+      for (let index in testCases) {
+        const testCase = testCases[index];
+        const req = bq.buildQueryRequest_(testCase, {});
+        assert.equal(req, undefined);
+      }
     });
   });
 

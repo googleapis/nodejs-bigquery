@@ -493,7 +493,7 @@ export class BigQuery extends Service {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private trace(msg: string, ...otherArgs: any[]) {
+  private trace_(msg: string, ...otherArgs: any[]) {
     logger('[bigquery]', msg, ...otherArgs);
   }
 
@@ -1436,20 +1436,19 @@ export class BigQuery extends Service {
     callback?: JobCallback
   ): void | Promise<JobResponse> {
     const options = typeof opts === 'object' ? opts : {query: opts};
-    this.trace('[createQueryJob]', options, callback);
+    this.trace_('[createQueryJob]', options, callback);
     if ((!options || !options.query) && !options.pageToken) {
       throw new Error('A SQL query string is required.');
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const query: any = extend(
+    const query: Query = extend(
       true,
       {
         useLegacySql: false,
       },
       options
     );
-    this.trace('[createQueryJob]', query);
+    this.trace_('[createQueryJob]', query);
 
     if (options.destination) {
       if (!(options.destination instanceof Table)) {
@@ -1465,78 +1464,21 @@ export class BigQuery extends Service {
       delete query.destination;
     }
 
-    if (query.params) {
-      query.parameterMode = is.array(query.params) ? 'positional' : 'named';
+    const {parameterMode, params} = this.buildQueryParams_(
+      query.params,
+      query.types
+    );
+    query.parameterMode = parameterMode;
+    query.queryParameters = params;
+    delete query.params;
 
-      if (query.parameterMode === 'named') {
-        query.queryParameters = [];
-
-        // tslint:disable-next-line forin
-        for (const namedParameter in query.params) {
-          const value = query.params[namedParameter];
-          let queryParameter;
-
-          if (query.types) {
-            if (!is.object(query.types)) {
-              throw new Error(
-                'Provided types must match the value type passed to `params`'
-              );
-            }
-
-            if (query.types[namedParameter]) {
-              queryParameter = BigQuery.valueToQueryParameter_(
-                value,
-                query.types[namedParameter]
-              );
-            } else {
-              queryParameter = BigQuery.valueToQueryParameter_(value);
-            }
-          } else {
-            queryParameter = BigQuery.valueToQueryParameter_(value);
-          }
-
-          queryParameter.name = namedParameter;
-          query.queryParameters.push(queryParameter);
-        }
-      } else {
-        query.queryParameters = [];
-
-        if (query.types) {
-          if (!is.array(query.types)) {
-            throw new Error(
-              'Provided types must match the value type passed to `params`'
-            );
-          }
-
-          if (query.params.length !== query.types.length) {
-            throw new Error('Incorrect number of parameter types provided.');
-          }
-          query.params.forEach((value: {}, i: number) => {
-            const queryParameter = BigQuery.valueToQueryParameter_(
-              value,
-              query.types[i]
-            );
-            query.queryParameters.push(queryParameter);
-          });
-        } else {
-          query.params.forEach((value: {}) => {
-            const queryParameter = BigQuery.valueToQueryParameter_(value);
-            query.queryParameters.push(queryParameter);
-          });
-        }
-      }
-      delete query.params;
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const reqOpts: any = {
-      configuration: {
-        query,
-      },
+    const reqOpts: JobOptions = {};
+    reqOpts.configuration = {
+      query,
     };
 
     if (typeof query.jobTimeoutMs === 'number') {
-      reqOpts.configuration.jobTimeoutMs = query.jobTimeoutMs;
+      reqOpts.configuration.jobTimeoutMs = query.jobTimeoutMs.toString();
       delete query.jobTimeoutMs;
     }
 
@@ -1566,6 +1508,85 @@ export class BigQuery extends Service {
     }
 
     this.createJob(reqOpts, callback!);
+  }
+
+  private buildQueryParams_(
+    params: Query['params'],
+    types: Query['types']
+  ): {
+    parameterMode: 'positional' | 'named' | undefined;
+    params: bigquery.IQueryParameter[] | undefined;
+  } {
+    if (!params) {
+      return {
+        parameterMode: undefined,
+        params: undefined,
+      };
+    }
+    const parameterMode = is.array(params) ? 'positional' : 'named';
+    const queryParameters: bigquery.IQueryParameter[] = [];
+    if (parameterMode === 'named') {
+      const namedParams = params as {[param: string]: any};
+      for (const namedParameter in namedParams) {
+        const value = namedParams[namedParameter];
+        let queryParameter;
+
+        if (types) {
+          if (!is.object(types)) {
+            throw new Error(
+              'Provided types must match the value type passed to `params`'
+            );
+          }
+
+          const namedTypes = types as QueryParamTypeStruct;
+
+          if (namedTypes[namedParameter]) {
+            queryParameter = BigQuery.valueToQueryParameter_(
+              value,
+              namedTypes[namedParameter]
+            );
+          } else {
+            queryParameter = BigQuery.valueToQueryParameter_(value);
+          }
+        } else {
+          queryParameter = BigQuery.valueToQueryParameter_(value);
+        }
+
+        queryParameter.name = namedParameter;
+        queryParameters.push(queryParameter);
+      }
+    } else {
+      if (types) {
+        if (!is.array(types)) {
+          throw new Error(
+            'Provided types must match the value type passed to `params`'
+          );
+        }
+
+        const positionalTypes = types as QueryParamTypeStruct[];
+
+        if (params.length !== types.length) {
+          throw new Error('Incorrect number of parameter types provided.');
+        }
+        params.forEach((value: {}, i: number) => {
+          const queryParameter = BigQuery.valueToQueryParameter_(
+            value,
+            positionalTypes[i]
+          );
+          queryParameters.push(queryParameter);
+        });
+      } else {
+        params.forEach((value: {}) => {
+          const queryParameter = BigQuery.valueToQueryParameter_(value);
+          queryParameters.push(queryParameter);
+        });
+      }
+    }
+
+    return {
+      parameterMode,
+      params: queryParameters,
+    };
   }
 
   /**
@@ -2118,8 +2139,9 @@ export class BigQuery extends Service {
     const callback =
       typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
 
-    this.trace('[query]', query, options);
+    this.trace_('[query]', query, options);
     const queryReq = this.buildQueryRequest_(query, options);
+    this.trace_('[query] queryReq', queryReq);
     if (!queryReq) {
       this.createQueryJob(query, (err, job, resp) => {
         if (err) {
@@ -2138,7 +2160,8 @@ export class BigQuery extends Service {
       return;
     }
 
-    this.runJobsQuery(queryReq, options, (err, job, res) => {
+    this.runJobsQuery(queryReq, (err, job, res) => {
+      this.trace_('[runJobsQuery callback]: ', query, err, job, res);
       if (err) {
         (callback as SimpleQueryRowsCallback)(err, null, res);
         return;
@@ -2154,17 +2177,17 @@ export class BigQuery extends Service {
           });
         }
         options.cachedRows = rows;
-        this.trace('[runJobsQuery] job complete');
+        this.trace_('[runJobsQuery] job complete');
         if (res.pageToken) {
-          this.trace('[runJobsQuery] has more pages');
+          this.trace_('[runJobsQuery] has more pages');
           options.pageToken = res.pageToken;
         } else {
-          this.trace('[runJobsQuery] no more pages');
+          this.trace_('[runJobsQuery] no more pages');
         }
         job!.getQueryResults(options, callback as QueryRowsCallback);
         return;
       }
-      this.trace('[runJobsQuery] job not complete');
+      this.trace_('[runJobsQuery] job not complete');
       job!.getQueryResults(options, callback as QueryRowsCallback);
     });
   }
@@ -2182,48 +2205,84 @@ export class BigQuery extends Service {
     query: string | Query,
     options: QueryOptions
   ): bigquery.IQueryRequest | undefined {
-    this.trace('[buildQueryRequest]', query, options);
     if (process.env.FAST_QUERY_PATH === 'DISABLED') {
       return undefined;
     }
-    if (typeof query === 'string') {
-      if (!options.job) {
-        const req: bigquery.IQueryRequest = {
-          ...options,
-          useQueryCache: false,
-          jobCreationMode: 'JOB_CREATION_OPTIONAL',
-          useLegacySql: false,
-          requestId: uuid.v4(),
-          query: query,
-        };
-        return req;
-      }
+    const queryObj: Query =
+      typeof query === 'string'
+        ? {
+            query: query,
+          }
+        : query;
+    this.trace_('[buildQueryRequest]', query, options, queryObj);
+    // This is a denylist of settings which prevent us from composing an equivalent
+    // bq.QueryRequest due to differences between configuration parameters accepted
+    // by jobs.insert vs jobs.query.
+    if (
+      !!queryObj.destination ||
+      !!queryObj.tableDefinitions ||
+      !!queryObj.createDisposition ||
+      !!queryObj.writeDisposition ||
+      (!!queryObj.priority && queryObj.priority !== 'INTERACTIVE') ||
+      queryObj.useLegacySql ||
+      !!queryObj.maximumBillingTier ||
+      !!queryObj.timePartitioning ||
+      !!queryObj.rangePartitioning ||
+      !!queryObj.clustering ||
+      !!queryObj.destinationEncryptionConfiguration ||
+      !!queryObj.schemaUpdateOptions ||
+      !!queryObj.jobTimeoutMs ||
+      // User has defined the jobID generation behavior
+      !!queryObj.jobId
+    ) {
       return undefined;
     }
-    // TODO: non string query and convert to QueryRequest
-    return undefined;
+
+    if (queryObj.dryRun) {
+      return undefined;
+    }
+
+    if (options.job) {
+      return undefined;
+    }
+    const req: bigquery.IQueryRequest = {
+      useQueryCache: queryObj.useQueryCache,
+      labels: queryObj.labels,
+      defaultDataset: queryObj.defaultDataset,
+      createSession: queryObj.createSession,
+      maximumBytesBilled: queryObj.maximumBytesBilled,
+      timeoutMs: options.timeoutMs,
+      location: queryObj.location || options.location,
+      formatOptions: {
+        useInt64Timestamp: true,
+      },
+      maxResults: queryObj.maxResults || options.maxResults,
+      query: queryObj.query,
+      useLegacySql: false,
+      requestId: uuid.v4(),
+      jobCreationMode: 'JOB_CREATION_OPTIONAL',
+    };
+    if (req.maxResults) {
+      req.jobCreationMode = 'JOB_CREATION_REQUIRED';
+    }
+    const {parameterMode, params} = this.buildQueryParams_(
+      queryObj.params,
+      queryObj.types
+    );
+    if (params) {
+      req.queryParameters = params;
+    }
+    if (parameterMode) {
+      req.parameterMode = parameterMode;
+    }
+    return req;
   }
 
   private runJobsQuery(
     req: bigquery.IQueryRequest,
-    options?: QueryResultsOptions
-  ): Promise<JobsQueryResponse>;
-  private runJobsQuery(
-    req: bigquery.IQueryRequest,
-    options: QueryResultsOptions,
-    callback: JobsQueryCallback
-  ): void;
-  private runJobsQuery(
-    req: bigquery.IQueryRequest,
-    optionsOrCallback?: QueryResultsOptions | JobsQueryCallback,
-    cb?: JobsQueryCallback
+    callback?: JobsQueryCallback
   ): void | Promise<JobsQueryResponse> {
-    const options =
-      typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
-    const callback =
-      typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
-
-    this.trace('[runJobsQuery]', req, options, callback);
+    this.trace_('[runJobsQuery]', req, callback);
     this.request(
       {
         method: 'POST',
@@ -2231,19 +2290,19 @@ export class BigQuery extends Service {
         json: req,
       },
       async (err, res: bigquery.IQueryResponse) => {
+        this.trace_('jobs.query res:', res, err);
         if (err) {
           callback!(err, null, res);
           return;
         }
-        this.trace('jobs.query res:', res);
         let job: Job | null = null;
         if (res.jobReference) {
           const jobRef = res.jobReference!;
           job = this.job(jobRef.jobId!, {
             location: jobRef.location,
           });
-        } else {
-          job = this.job(res.queryId!); // stateless query
+        } else if (res.queryId) {
+          job = this.job(res.queryId); // stateless query
         }
         callback!(null, job, res);
       }
