@@ -2217,10 +2217,10 @@ export class BigQueryTimestamp {
       if (/^\d{4}-\d{1,2}-\d{1,2}/.test(value)) {
         pd = new PreciseDate(value);
       } else {
-        pd = new PreciseDate(BigInt(value) * BigInt(1000));
+        pd = this.fromNumber_(value);
       }
     } else if (value) {
-      pd = new PreciseDate(BigInt(value) * BigInt(1000));
+      pd = this.fromNumber_(value);
     } else {
       // Nan or 0 - invalid dates
       pd = new PreciseDate(value);
@@ -2232,6 +2232,31 @@ export class BigQueryTimestamp {
     } else {
       this.value = new Date(pd.getTime()).toJSON();
     }
+  }
+
+  fromNumber_(value: number | string): PreciseDate {
+    let numValue;
+    if (typeof value === 'string') {
+      numValue = Number.parseFloat(value);
+      if (Number.isNaN(numValue)) {
+        return new PreciseDate(numValue); // invalid date
+      }
+    } else {
+      numValue = value;
+    }
+    if (Number.isInteger(numValue)) {
+      return new PreciseDate(BigInt(numValue) * BigInt(1000));
+    }
+    return this.fromFloatValue_(numValue);
+  }
+
+  fromFloatValue_(value: number): PreciseDate {
+    const secs = Math.trunc(value);
+    // Timestamps in BigQuery have microsecond precision, so we must
+    // return a round number of microseconds.
+    const micros = Math.trunc((value - secs) * 1e6 + 0.5);
+    const pd = new PreciseDate([secs, micros * 1000]);
+    return pd;
   }
 }
 
