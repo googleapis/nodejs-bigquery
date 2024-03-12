@@ -2143,14 +2143,15 @@ describe('BigQuery', () => {
         it('should allow for optional parameter types', () => {
           const queryParameter = {};
 
-          sandbox.replace(BigQuery, 'valueToQueryParameter_', (
-            value: {},
-            providedType: string
-          ) => {
-            assert.strictEqual(value, NAMED_PARAMS.key);
-            assert.strictEqual(providedType, NAMED_TYPES.key);
-            return queryParameter;
-          });
+          sandbox.replace(
+            BigQuery,
+            'valueToQueryParameter_',
+            (value: {}, providedType: string) => {
+              assert.strictEqual(value, NAMED_PARAMS.key);
+              assert.strictEqual(providedType, NAMED_TYPES.key);
+              return queryParameter;
+            }
+          );
           bq.createJob = (reqOpts: JobOptions) => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             assert.strictEqual((reqOpts as any).params, undefined);
@@ -2898,27 +2899,25 @@ describe('BigQuery', () => {
         callback(null, fakeJob, {
           jobComplete: true,
           schema: {
-            fields: [
-              {name: 'value', type: 'INT64'}
-            ]
+            fields: [{name: 'value', type: 'INT64'}],
           },
-          rows: [
-            {f: [{v: 1}]},
-            {f: [{v: 2}]},
-            {f: [{v: 3}]},
-          ],
+          rows: [{f: [{v: 1}]}, {f: [{v: 2}]}, {f: [{v: 3}]}],
         });
       };
 
       bq.query(QUERY_STRING, (err: Error, rows: {}, resp: {}) => {
         assert.ifError(err);
-        assert.deepStrictEqual(rows, [{
-          value: 1,
-        },{
-          value: 2
-        },{
-          value: 3
-        }]);
+        assert.deepStrictEqual(rows, [
+          {
+            value: 1,
+          },
+          {
+            value: 2,
+          },
+          {
+            value: 3,
+          },
+        ]);
         assert.strictEqual(resp, FAKE_RESPONSE);
         done();
       });
@@ -3023,7 +3022,7 @@ describe('BigQuery', () => {
         },
       };
       const req = bq.buildQueryRequest_(q, {});
-      for (let key in req) {
+      for (const key in req) {
         if (req[key] === undefined) {
           delete req[key];
         }
@@ -3063,7 +3062,7 @@ describe('BigQuery', () => {
 
     it('should create a QueryRequest from a SQL string', () => {
       const req = bq.buildQueryRequest_(QUERY_STRING, {});
-      for (let key in req) {
+      for (const key in req) {
         if (req[key] === undefined) {
           delete req[key];
         }
@@ -3116,7 +3115,7 @@ describe('BigQuery', () => {
         },
         {
           query: QUERY_STRING,
-          jobId: 'fixed-job-id'
+          jobId: 'fixed-job-id',
         },
         {
           query: QUERY_STRING,
@@ -3125,11 +3124,11 @@ describe('BigQuery', () => {
         },
         {
           query: QUERY_STRING,
-          schemaUpdateOptions: ['update']
-        }
+          schemaUpdateOptions: ['update'],
+        },
       ];
 
-      for (let index in testCases) {
+      for (const index in testCases) {
         const testCase = testCases[index];
         const req = bq.buildQueryRequest_(testCase, {});
         assert.equal(req, undefined);
