@@ -1979,10 +1979,7 @@ describe('BigQuery/Table', () => {
 
       table.request = (reqOpts: DecorateRequestOptions, callback: Function) => {
         assert.strictEqual(reqOpts.uri, '/data');
-        assert.deepStrictEqual(reqOpts.qs, {
-          ...options,
-          'formatOptions.useInt64Timestamp': true,
-        });
+        assert.strictEqual(reqOpts.qs, options);
         callback(null, {});
       };
 
@@ -2132,10 +2129,7 @@ describe('BigQuery/Table', () => {
       table.metadata = {schema: {}};
 
       table.request = (reqOpts: DecorateRequestOptions, callback: Function) => {
-        callback(null, {
-          'formatOptions.useInt64Timestamp': true,
-          pageToken,
-        });
+        callback(null, {pageToken});
       };
 
       table.getRows(options, (err: Error, rows: {}, nextQuery: {}) => {
@@ -2143,7 +2137,6 @@ describe('BigQuery/Table', () => {
         assert.deepStrictEqual(nextQuery, {
           a: 'b',
           c: 'd',
-          'formatOptions.useInt64Timestamp': true,
           pageToken,
         });
         // Original object isn't affected.
@@ -2264,9 +2257,7 @@ describe('BigQuery/Table', () => {
       const merged = [{name: 'stephen'}];
 
       table.request = (reqOpts: DecorateRequestOptions, callback: Function) => {
-        assert.deepStrictEqual(reqOpts.qs, {
-          'formatOptions.useInt64Timestamp': true,
-        });
+        assert.deepStrictEqual(reqOpts.qs, {});
         callback(null, {});
       };
 
@@ -2288,9 +2279,7 @@ describe('BigQuery/Table', () => {
       const merged = [{name: 'stephen'}];
 
       table.request = (reqOpts: DecorateRequestOptions, callback: Function) => {
-        assert.deepStrictEqual(reqOpts.qs, {
-          'formatOptions.useInt64Timestamp': true,
-        });
+        assert.deepStrictEqual(reqOpts.qs, {});
         callback(null, {});
       };
 

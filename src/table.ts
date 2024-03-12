@@ -1848,17 +1848,10 @@ class Table extends ServiceObject {
       callback!(null, rows, nextQuery, resp);
     };
 
-    const qs = extend(
-      {
-        'formatOptions.useInt64Timestamp': true,
-      },
-      options
-    );
-
     this.request(
       {
         uri: '/data',
-        qs,
+        qs: options,
       },
       (err, resp) => {
         if (err) {
@@ -1867,7 +1860,7 @@ class Table extends ServiceObject {
         }
         let nextQuery: GetRowsOptions | null = null;
         if (resp.pageToken) {
-          nextQuery = Object.assign({}, qs, {
+          nextQuery = Object.assign({}, options, {
             pageToken: resp.pageToken,
           });
         }
