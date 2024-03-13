@@ -882,6 +882,10 @@ export class BigQuery extends Service {
    * A timestamp represents an absolute point in time, independent of any time
    * zone or convention such as Daylight Savings Time.
    *
+   * The recommended input here is a `Date` or `PreciseDate` class.
+   * If passing as a `string`, it should be Timestamp literals: https://cloud.google.com/bigquery/docs/reference/standard-sql/lexical#timestamp_literals.
+   * When passing a `number` input, it should be epoch seconds in float representation.
+   *
    * @method BigQuery.timestamp
    * @param {Date|string} value The time.
    *
@@ -891,12 +895,19 @@ export class BigQuery extends Service {
    * const timestamp = BigQuery.timestamp(new Date());
    * ```
    */
+  static timestamp(value: Date | PreciseDate | string | number) {
+    return new BigQueryTimestamp(value);
+  }
 
   /**
    * A timestamp represents an absolute point in time, independent of any time
    * zone or convention such as Daylight Savings Time.
    *
-   * @param {Date|string} value The time.
+   * The recommended input here is a `Date` or `PreciseDate` class.
+   * If passing as a `string`, it should be Timestamp literals: https://cloud.google.com/bigquery/docs/reference/standard-sql/lexical#timestamp_literals.
+   * When passing a `number` input, it should be epoch seconds in float representation.
+   *
+   * @param {Date|string|string|number} value The time.
    *
    * @example
    * ```
@@ -905,10 +916,6 @@ export class BigQuery extends Service {
    * const timestamp = bigquery.timestamp(new Date());
    * ```
    */
-  static timestamp(value: Date | PreciseDate | string | number) {
-    return new BigQueryTimestamp(value);
-  }
-
   timestamp(value: Date | PreciseDate | string | number) {
     return BigQuery.timestamp(value);
   }
@@ -2205,6 +2212,11 @@ export class Geography {
 
 /**
  * Timestamp class for BigQuery.
+ *
+ * The recommended input here is a `Date` or `PreciseDate` class.
+ * If passing as a `string`, it should be Timestamp literals: https://cloud.google.com/bigquery/docs/reference/standard-sql/lexical#timestamp_literals.
+ * When passing a `number` input, it should be epoch seconds in float representation.
+ *
  */
 export class BigQueryTimestamp {
   value: string;
