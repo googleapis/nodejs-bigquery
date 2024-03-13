@@ -471,7 +471,7 @@ describe('BigQuery', () => {
             f: [
               {v: '3'},
               {v: 'Milo'},
-              {v: now.valueOf() * 1000},
+              {v: now.valueOf() * 1000}, // int64 microseconds
               {v: 'false'},
               {v: 'true'},
               {v: '5.222330009847'},
@@ -523,7 +523,7 @@ describe('BigQuery', () => {
             id: 3,
             name: 'Milo',
             dob: {
-              input: now.valueOf() * 1000,
+              input: new PreciseDate(BigInt(now.valueOf()) * BigInt(1_000_000)),
               type: 'fakeTimestamp',
             },
             has_claws: false,
@@ -850,10 +850,8 @@ describe('BigQuery', () => {
   describe('timestamp', () => {
     const INPUT_STRING = '2016-12-06T12:00:00.000Z';
     const INPUT_STRING_MICROS = '2016-12-06T12:00:00.123456Z';
-    const INPUT_STRING_NEGATIVE = '1969-12-25T00:00:00.000Z';
     const INPUT_DATE = new Date(INPUT_STRING);
     const INPUT_PRECISE_DATE = new PreciseDate(INPUT_STRING_MICROS);
-    const INPUT_PRECISE_NEGATIVE_DATE = new PreciseDate(INPUT_STRING_NEGATIVE);
     const EXPECTED_VALUE = INPUT_DATE.toJSON();
     const EXPECTED_VALUE_MICROS = INPUT_PRECISE_DATE.toISOString();
 
@@ -891,31 +889,6 @@ describe('BigQuery', () => {
 
       timestamp = bq.timestamp(f.toString());
       assert.strictEqual(timestamp.value, d.toJSON());
-    });
-
-    it('should accept a number in microseconds', () => {
-      let ms = INPUT_PRECISE_DATE.valueOf(); // milliseconds
-      let us = ms * 1000 + INPUT_PRECISE_DATE.getMicroseconds(); // microseconds
-      let timestamp = bq.timestamp(us);
-      assert.strictEqual(timestamp.value, EXPECTED_VALUE_MICROS);
-
-      let usStr = `${us}`;
-      timestamp = bq.timestamp(usStr);
-      assert.strictEqual(timestamp.value, EXPECTED_VALUE_MICROS);
-
-      ms = INPUT_PRECISE_NEGATIVE_DATE.valueOf();
-      us = ms * 1000;
-      timestamp = bq.timestamp(us);
-      assert.strictEqual(timestamp.value, INPUT_STRING_NEGATIVE);
-
-      usStr = `${us}`;
-      timestamp = bq.timestamp(usStr);
-      assert.strictEqual(timestamp.value, INPUT_STRING_NEGATIVE);
-    });
-
-    it('should accept a string with microseconds', () => {
-      const timestamp = bq.timestamp(INPUT_STRING_MICROS);
-      assert.strictEqual(timestamp.value, EXPECTED_VALUE_MICROS);
     });
 
     it('should accept a Date object', () => {

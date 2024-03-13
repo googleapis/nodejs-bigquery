@@ -640,7 +640,8 @@ export class BigQuery extends Service {
           break;
         }
         case 'TIMESTAMP': {
-          value = BigQuery.timestamp(value);
+          const pd = new PreciseDate(BigInt(value) * BigInt(1000));
+          value = BigQuery.timestamp(pd);
           break;
         }
         case 'GEOGRAPHY': {
@@ -2217,13 +2218,15 @@ export class BigQueryTimestamp {
       if (/^\d{4}-\d{1,2}-\d{1,2}/.test(value)) {
         pd = new PreciseDate(value);
       } else {
-        pd = this.fromNumber_(value);
+        const floatValue = Number.parseFloat(value);
+        if (!Number.isNaN(floatValue)) {
+          pd = this.fromFloatValue_(floatValue);
+        } else {
+          pd = new PreciseDate(value);
+        }
       }
-    } else if (value) {
-      pd = this.fromNumber_(value);
     } else {
-      // Nan or 0 - invalid dates
-      pd = new PreciseDate(value);
+      pd = this.fromFloatValue_(value);
     }
     // to keep backward compatibility, only converts with microsecond
     // precision if needed.
@@ -2232,22 +2235,6 @@ export class BigQueryTimestamp {
     } else {
       this.value = new Date(pd.getTime()).toJSON();
     }
-  }
-
-  fromNumber_(value: number | string): PreciseDate {
-    let numValue;
-    if (typeof value === 'string') {
-      numValue = Number.parseFloat(value);
-      if (Number.isNaN(numValue)) {
-        return new PreciseDate(numValue); // invalid date
-      }
-    } else {
-      numValue = value;
-    }
-    if (Number.isInteger(numValue)) {
-      return new PreciseDate(BigInt(numValue) * BigInt(1000));
-    }
-    return this.fromFloatValue_(numValue);
   }
 
   fromFloatValue_(value: number): PreciseDate {
