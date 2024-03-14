@@ -4,6 +4,15 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## [7.5.1](https://github.com/googleapis/nodejs-bigquery/compare/v7.5.0...v7.5.1) (2024-03-14)
+
+
+### Bug Fixes
+
+* Add better documentation around usage of BigQueryTimestamp class and .timestamp method. ([2b2c3e0](https://github.com/googleapis/nodejs-bigquery/commit/2b2c3e0b8e9c13d23aa54e7a85a861c61410bd4b))
+* BigQueryTimestamp should keep accepting floats [#1339](https://github.com/googleapis/nodejs-bigquery/issues/1339) ([2b2c3e0](https://github.com/googleapis/nodejs-bigquery/commit/2b2c3e0b8e9c13d23aa54e7a85a861c61410bd4b))
+* Restores BigQueryTimestamp behavior to accept a numeric value in the constructor representing epoch-seconds. The affected 7.5.0 version would parse a numeric value as epoch-microseconds. ([2b2c3e0](https://github.com/googleapis/nodejs-bigquery/commit/2b2c3e0b8e9c13d23aa54e7a85a861c61410bd4b))
+
 ## [7.5.0](https://github.com/googleapis/nodejs-bigquery/compare/v7.4.0...v7.5.0) (2024-02-21)
 
 
