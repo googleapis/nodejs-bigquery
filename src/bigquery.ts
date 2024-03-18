@@ -649,7 +649,8 @@ export class BigQuery extends Service {
           break;
         }
         case 'TIMESTAMP': {
-          value = BigQuery.timestamp(value);
+          const pd = new PreciseDate(BigInt(value) * BigInt(1000));
+          value = BigQuery.timestamp(pd);
           break;
         }
         case 'GEOGRAPHY': {
@@ -890,6 +891,10 @@ export class BigQuery extends Service {
    * A timestamp represents an absolute point in time, independent of any time
    * zone or convention such as Daylight Savings Time.
    *
+   * The recommended input here is a `Date` or `PreciseDate` class.
+   * If passing as a `string`, it should be Timestamp literals: https://cloud.google.com/bigquery/docs/reference/standard-sql/lexical#timestamp_literals.
+   * When passing a `number` input, it should be epoch seconds in float representation.
+   *
    * @method BigQuery.timestamp
    * @param {Date|string} value The time.
    *
@@ -899,12 +904,19 @@ export class BigQuery extends Service {
    * const timestamp = BigQuery.timestamp(new Date());
    * ```
    */
+  static timestamp(value: Date | PreciseDate | string | number) {
+    return new BigQueryTimestamp(value);
+  }
 
   /**
    * A timestamp represents an absolute point in time, independent of any time
    * zone or convention such as Daylight Savings Time.
    *
-   * @param {Date|string} value The time.
+   * The recommended input here is a `Date` or `PreciseDate` class.
+   * If passing as a `string`, it should be Timestamp literals: https://cloud.google.com/bigquery/docs/reference/standard-sql/lexical#timestamp_literals.
+   * When passing a `number` input, it should be epoch seconds in float representation.
+   *
+   * @param {Date|string|string|number} value The time.
    *
    * @example
    * ```
@@ -913,10 +925,6 @@ export class BigQuery extends Service {
    * const timestamp = bigquery.timestamp(new Date());
    * ```
    */
-  static timestamp(value: Date | PreciseDate | string | number) {
-    return new BigQueryTimestamp(value);
-  }
-
   timestamp(value: Date | PreciseDate | string | number) {
     return BigQuery.timestamp(value);
   }
@@ -2393,6 +2401,11 @@ export class Geography {
 
 /**
  * Timestamp class for BigQuery.
+ *
+ * The recommended input here is a `Date` or `PreciseDate` class.
+ * If passing as a `string`, it should be Timestamp literals: https://cloud.google.com/bigquery/docs/reference/standard-sql/lexical#timestamp_literals.
+ * When passing a `number` input, it should be epoch seconds in float representation.
+ *
  */
 export class BigQueryTimestamp {
   value: string;
@@ -2406,13 +2419,15 @@ export class BigQueryTimestamp {
       if (/^\d{4}-\d{1,2}-\d{1,2}/.test(value)) {
         pd = new PreciseDate(value);
       } else {
-        pd = new PreciseDate(BigInt(value) * BigInt(1000));
+        const floatValue = Number.parseFloat(value);
+        if (!Number.isNaN(floatValue)) {
+          pd = this.fromFloatValue_(floatValue);
+        } else {
+          pd = new PreciseDate(value);
+        }
       }
-    } else if (value) {
-      pd = new PreciseDate(BigInt(value) * BigInt(1000));
     } else {
-      // Nan or 0 - invalid dates
-      pd = new PreciseDate(value);
+      pd = this.fromFloatValue_(value);
     }
     // to keep backward compatibility, only converts with microsecond
     // precision if needed.
@@ -2421,6 +2436,15 @@ export class BigQueryTimestamp {
     } else {
       this.value = new Date(pd.getTime()).toJSON();
     }
+  }
+
+  fromFloatValue_(value: number): PreciseDate {
+    const secs = Math.trunc(value);
+    // Timestamps in BigQuery have microsecond precision, so we must
+    // return a round number of microseconds.
+    const micros = Math.trunc((value - secs) * 1e6 + 0.5);
+    const pd = new PreciseDate([secs, micros * 1000]);
+    return pd;
   }
 }
 
