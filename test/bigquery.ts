@@ -189,6 +189,7 @@ describe('BigQuery', () => {
     Object.assign(fakeUtil, originalFakeUtil);
     BigQuery = Object.assign(BigQuery, BigQueryCached);
     bq = new BigQuery({projectId: PROJECT_ID});
+    bq._enableQueryPreview = true;
   });
 
   after(() => {

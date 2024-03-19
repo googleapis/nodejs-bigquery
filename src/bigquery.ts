@@ -286,6 +286,12 @@ export const PROTOCOL_REGEX = /^(\w*):\/\//;
  * We will create a table with the correct schema, import the public CSV file
  * into that table, and query it for data.
  *
+ * This client supports enabling query-related preview features via environmental
+ * variables.  By setting the environment variable QUERY_PREVIEW_ENABLED to the string
+ * "TRUE", the client will enable preview features, though behavior may still be
+ * controlled via the bigquery service as well.  Currently, the feature(s) in scope
+ * include: stateless queries (query execution without corresponding job metadata).
+ *
  * @class
  *
  * See {@link https://cloud.google.com/bigquery/what-is-bigquery| What is BigQuery?}
@@ -322,6 +328,7 @@ export const PROTOCOL_REGEX = /^(\w*):\/\//;
 export class BigQuery extends Service {
   location?: string;
   private _universeDomain: string;
+  private _enableQueryPreview: boolean;
 
   createQueryStream(options?: Query | string): ResourceStream<RowMetadata> {
     // placeholder body, overwritten in constructor
@@ -378,6 +385,14 @@ export class BigQuery extends Service {
     }
 
     super(config, options);
+
+    const QUERY_PREVIEW_ENABLED = process.env.QUERY_PREVIEW_ENABLED;
+    this._enableQueryPreview = false;
+    if (typeof QUERY_PREVIEW_ENABLED === 'string') {
+      if (QUERY_PREVIEW_ENABLED.toUpperCase() === 'TRUE') {
+        this._enableQueryPreview = true;
+      }
+    }
 
     this._universeDomain = universeDomain;
     this.location = options.location;
@@ -2195,6 +2210,9 @@ export class BigQuery extends Service {
         job!.getQueryResults(options, callback as QueryRowsCallback);
         return;
       }
+      if (options.timeoutMs) {
+        delete options.timeoutMs;
+      }
       this.trace_('[runJobsQuery] job not complete');
       job!.getQueryResults(options, callback as QueryRowsCallback);
     });
@@ -2272,6 +2290,9 @@ export class BigQuery extends Service {
     };
     if (req.maxResults) {
       req.jobCreationMode = 'JOB_CREATION_REQUIRED';
+    }
+    if (!this._enableQueryPreview) {
+      delete req.jobCreationMode;
     }
     const {parameterMode, params} = this.buildQueryParams_(
       queryObj.params,
