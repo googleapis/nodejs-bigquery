@@ -51,8 +51,12 @@ export type QueryResultsOptions = {
   job?: Job;
   wrapIntegers?: boolean | IntegerTypeCastOptions;
   parseJSON?: boolean;
-  cachedRows?: any[];
-} & PagedRequest<bigquery.jobs.IGetQueryResultsParams>;
+} & PagedRequest<bigquery.jobs.IGetQueryResultsParams> & {
+    /**
+     * internal properties
+     */
+    _cachedRows?: any[];
+  };
 
 /**
  * @callback QueryResultsCallback
@@ -560,15 +564,15 @@ class Job extends Operation {
     const timeoutOverride =
       typeof qs.timeoutMs === 'number' ? qs.timeoutMs : false;
 
-    if (options.cachedRows) {
+    if (options._cachedRows) {
       let nextQuery: QueryResultsOptions | null = null;
       if (options.pageToken) {
         nextQuery = Object.assign({}, options, {
           pageToken: options.pageToken,
         });
-        delete nextQuery.cachedRows;
+        delete nextQuery._cachedRows;
       }
-      callback!(null, options.cachedRows, nextQuery);
+      callback!(null, options._cachedRows, nextQuery);
       return;
     }
 

@@ -198,6 +198,7 @@ export interface ProvidedTypeStruct {
 }
 
 export type QueryParameter = bigquery.IQueryParameter;
+export type ParameterMode = bigquery.IJobConfigurationQuery['parameterMode'];
 
 export interface BigQueryOptions extends GoogleAuthOptions {
   /**
@@ -1537,7 +1538,7 @@ export class BigQuery extends Service {
     params: Query['params'],
     types: Query['types']
   ): {
-    parameterMode: 'positional' | 'named' | undefined;
+    parameterMode: ParameterMode;
     params: bigquery.IQueryParameter[] | undefined;
   } {
     if (!params) {
@@ -1550,7 +1551,7 @@ export class BigQuery extends Service {
     const queryParameters: bigquery.IQueryParameter[] = [];
     if (parameterMode === 'named') {
       const namedParams = params as {[param: string]: any};
-      for (const namedParameter in namedParams) {
+      for (const namedParameter of Object.getOwnPropertyNames(namedParams)) {
         const value = namedParams[namedParameter];
         let queryParameter;
 
@@ -2195,12 +2196,12 @@ export class BigQuery extends Service {
         let rows: any = [];
         if (res.schema && res.rows) {
           rows = BigQuery.mergeSchemaWithRows_(res.schema, res.rows, {
-            wrapIntegers: options.wrapIntegers!, // TODO: fix default value
+            wrapIntegers: options.wrapIntegers || false,
             parseJSON: options.parseJSON,
           });
         }
-        options.cachedRows = rows;
         this.trace_('[runJobsQuery] job complete');
+        options._cachedRows = rows;
         if (res.pageToken) {
           this.trace_('[runJobsQuery] has more pages');
           options.pageToken = res.pageToken;
@@ -2210,9 +2211,7 @@ export class BigQuery extends Service {
         job!.getQueryResults(options, callback as QueryRowsCallback);
         return;
       }
-      if (options.timeoutMs) {
-        delete options.timeoutMs;
-      }
+      delete options.timeoutMs;
       this.trace_('[runJobsQuery] job not complete');
       job!.getQueryResults(options, callback as QueryRowsCallback);
     });
@@ -2288,9 +2287,6 @@ export class BigQuery extends Service {
       requestId: uuid.v4(),
       jobCreationMode: 'JOB_CREATION_OPTIONAL',
     };
-    if (req.maxResults) {
-      req.jobCreationMode = 'JOB_CREATION_REQUIRED';
-    }
     if (!this._enableQueryPreview) {
       delete req.jobCreationMode;
     }
@@ -2326,7 +2322,7 @@ export class BigQuery extends Service {
         }
         let job: Job | null = null;
         if (res.jobReference) {
-          const jobRef = res.jobReference!;
+          const jobRef = res.jobReference;
           job = this.job(jobRef.jobId!, {
             location: jobRef.location,
           });

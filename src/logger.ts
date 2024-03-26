@@ -37,7 +37,7 @@ export function logger(source: string, msg: string, ...otherArgs: any[]) {
 }
 
 /**
- * Sets or disables the log function for all active Firestore instances.
+ * Sets or disables the log function for all active BigQuery instances.
  *
  * @param logger A log function that takes a message (such as `console.log`) or
  * `null` to turn off logging.

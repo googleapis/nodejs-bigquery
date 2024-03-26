@@ -2880,7 +2880,7 @@ describe('BigQuery', () => {
     it('should call job#getQueryResults with cached rows from jobs.query', done => {
       const fakeJob = {
         getQueryResults: (options: QueryResultsOptions, callback: Function) => {
-          callback(null, options.cachedRows, FAKE_RESPONSE);
+          callback(null, options._cachedRows, FAKE_RESPONSE);
         },
       };
 
@@ -3041,7 +3041,7 @@ describe('BigQuery', () => {
         labels: {
           key: 'value',
         },
-        jobCreationMode: 'JOB_CREATION_REQUIRED', // due to maxResults set
+        jobCreationMode: 'JOB_CREATION_OPTIONAL',
         formatOptions: {
           useInt64Timestamp: true,
         },
