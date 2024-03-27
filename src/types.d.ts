@@ -1,4 +1,4 @@
-// Copyright 2023 Google LLC
+// Copyright 2024 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -931,7 +931,7 @@ declare namespace bigquery {
      */
     etag?: string;
     /**
-     * Optional. Information about the external metadata storage where the dataset is defined. Filled out when the dataset type is EXTERNAL.
+     * Optional. Reference to a read-only external dataset defined in data catalogs outside of BigQuery. Filled out when the dataset type is EXTERNAL.
      */
     externalDatasetReference?: IExternalDatasetReference;
     /**
@@ -970,6 +970,10 @@ declare namespace bigquery {
      * Optional. Defines the time travel window in hours. The value can be from 48 to 168 hours (2 to 7 days). The default value is 168 hours if this is not set.
      */
     maxTimeTravelHours?: string;
+    /**
+     * Output only. Reserved for future use.
+     */
+    satisfiesPzi?: boolean;
     /**
      * Output only. Reserved for future use.
      */
@@ -1927,8 +1931,8 @@ declare namespace bigquery {
       | 'ESTIMATED_PERFORMANCE_GAIN_TOO_LOW'
       | 'NOT_SUPPORTED_IN_STANDARD_EDITION'
       | 'INDEX_SUPPRESSED_BY_FUNCTION_OPTION'
-      | 'INTERNAL_ERROR'
       | 'QUERY_CACHE_HIT'
+      | 'INTERNAL_ERROR'
       | 'OTHER_REASON';
     /**
      * Specifies the name of the unused search index, if available.
@@ -2212,6 +2216,10 @@ declare namespace bigquery {
      * Optional. Connection properties which can modify the load job behavior. Currently, only the 'session_id' connection property is supported, and is used to resolve _SESSION appearing as the dataset id.
      */
     connectionProperties?: Array<IConnectionProperty>;
+    /**
+     * Optional. [Experimental] Configures the load job to only copy files to the destination BigLake managed table with an external storage_uri, without reading file content and writing them to new files. Copying files only is supported when: * source_uris are in the same external storage system as the destination table but they do not overlap with storage_uri of the destination table. * source_format is the same file format as the destination table. * destination_table is an existing BigLake managed table. Its schema does not have default value expression. It schema does not have type parameters other than precision and scale. * No options other than the above are specified.
+     */
+    copyFilesOnly?: boolean;
     /**
      * Optional. Specifies whether the job is allowed to create new tables. The following values are supported: * CREATE_IF_NEEDED: If the table does not exist, BigQuery creates the table. * CREATE_NEVER: The table must already exist. If it does not, a 'notFound' error is returned in the job result. The default value is CREATE_IF_NEEDED. Creation, truncation and append actions occur as one atomic update upon job completion.
      */
@@ -2880,7 +2888,7 @@ declare namespace bigquery {
      */
     undeclaredQueryParameters?: Array<IQueryParameter>;
     /**
-     * Output only. Search query specific statistics.
+     * Output only. Vector Search query specific statistics.
      */
     vectorSearchStatistics?: IVectorSearchStatistics;
   };

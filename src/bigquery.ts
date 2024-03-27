@@ -45,6 +45,7 @@ import {
 } from './table';
 import {GoogleErrorBody} from '@google-cloud/common/build/src/util';
 import bigquery from './types';
+import {logger, setLogFunction} from './logger';
 
 // Third-Party Re-exports
 export {common};
@@ -164,6 +165,9 @@ export type GetJobsCallback = PagedCallback<
   bigquery.IJobList
 >;
 
+export type JobsQueryResponse = [Job, bigquery.IQueryResponse];
+export type JobsQueryCallback = ResourceCallback<Job, bigquery.IQueryResponse>;
+
 export interface BigQueryTimeOptions {
   hours?: number | string;
   minutes?: number | string;
@@ -194,6 +198,7 @@ export interface ProvidedTypeStruct {
 }
 
 export type QueryParameter = bigquery.IQueryParameter;
+export type ParameterMode = bigquery.IJobConfigurationQuery['parameterMode'];
 
 export interface BigQueryOptions extends GoogleAuthOptions {
   /**
@@ -282,6 +287,12 @@ export const PROTOCOL_REGEX = /^(\w*):\/\//;
  * We will create a table with the correct schema, import the public CSV file
  * into that table, and query it for data.
  *
+ * This client supports enabling query-related preview features via environmental
+ * variables.  By setting the environment variable QUERY_PREVIEW_ENABLED to the string
+ * "TRUE", the client will enable preview features, though behavior may still be
+ * controlled via the bigquery service as well.  Currently, the feature(s) in scope
+ * include: stateless queries (query execution without corresponding job metadata).
+ *
  * @class
  *
  * See {@link https://cloud.google.com/bigquery/what-is-bigquery| What is BigQuery?}
@@ -318,6 +329,7 @@ export const PROTOCOL_REGEX = /^(\w*):\/\//;
 export class BigQuery extends Service {
   location?: string;
   private _universeDomain: string;
+  private _enableQueryPreview: boolean;
 
   createQueryStream(options?: Query | string): ResourceStream<RowMetadata> {
     // placeholder body, overwritten in constructor
@@ -374,6 +386,14 @@ export class BigQuery extends Service {
     }
 
     super(config, options);
+
+    const QUERY_PREVIEW_ENABLED = process.env.QUERY_PREVIEW_ENABLED;
+    this._enableQueryPreview = false;
+    if (typeof QUERY_PREVIEW_ENABLED === 'string') {
+      if (QUERY_PREVIEW_ENABLED.toUpperCase() === 'TRUE') {
+        this._enableQueryPreview = true;
+      }
+    }
 
     this._universeDomain = universeDomain;
     this.location = options.location;
@@ -486,6 +506,11 @@ export class BigQuery extends Service {
         return extend(true, {}, reqOpts, {qs: {prettyPrint: false}});
       },
     });
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private trace_(msg: string, ...otherArgs: any[]) {
+    logger('[bigquery]', msg, ...otherArgs);
   }
 
   get universeDomain() {
@@ -1435,18 +1460,19 @@ export class BigQuery extends Service {
     callback?: JobCallback
   ): void | Promise<JobResponse> {
     const options = typeof opts === 'object' ? opts : {query: opts};
+    this.trace_('[createQueryJob]', options, callback);
     if ((!options || !options.query) && !options.pageToken) {
       throw new Error('A SQL query string is required.');
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const query: any = extend(
+    const query: Query = extend(
       true,
       {
         useLegacySql: false,
       },
       options
     );
+    this.trace_('[createQueryJob]', query);
 
     if (options.destination) {
       if (!(options.destination instanceof Table)) {
@@ -1462,78 +1488,21 @@ export class BigQuery extends Service {
       delete query.destination;
     }
 
-    if (query.params) {
-      query.parameterMode = is.array(query.params) ? 'positional' : 'named';
+    const {parameterMode, params} = this.buildQueryParams_(
+      query.params,
+      query.types
+    );
+    query.parameterMode = parameterMode;
+    query.queryParameters = params;
+    delete query.params;
 
-      if (query.parameterMode === 'named') {
-        query.queryParameters = [];
-
-        // tslint:disable-next-line forin
-        for (const namedParameter in query.params) {
-          const value = query.params[namedParameter];
-          let queryParameter;
-
-          if (query.types) {
-            if (!is.object(query.types)) {
-              throw new Error(
-                'Provided types must match the value type passed to `params`'
-              );
-            }
-
-            if (query.types[namedParameter]) {
-              queryParameter = BigQuery.valueToQueryParameter_(
-                value,
-                query.types[namedParameter]
-              );
-            } else {
-              queryParameter = BigQuery.valueToQueryParameter_(value);
-            }
-          } else {
-            queryParameter = BigQuery.valueToQueryParameter_(value);
-          }
-
-          queryParameter.name = namedParameter;
-          query.queryParameters.push(queryParameter);
-        }
-      } else {
-        query.queryParameters = [];
-
-        if (query.types) {
-          if (!is.array(query.types)) {
-            throw new Error(
-              'Provided types must match the value type passed to `params`'
-            );
-          }
-
-          if (query.params.length !== query.types.length) {
-            throw new Error('Incorrect number of parameter types provided.');
-          }
-          query.params.forEach((value: {}, i: number) => {
-            const queryParameter = BigQuery.valueToQueryParameter_(
-              value,
-              query.types[i]
-            );
-            query.queryParameters.push(queryParameter);
-          });
-        } else {
-          query.params.forEach((value: {}) => {
-            const queryParameter = BigQuery.valueToQueryParameter_(value);
-            query.queryParameters.push(queryParameter);
-          });
-        }
-      }
-      delete query.params;
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const reqOpts: any = {
-      configuration: {
-        query,
-      },
+    const reqOpts: JobOptions = {};
+    reqOpts.configuration = {
+      query,
     };
 
     if (typeof query.jobTimeoutMs === 'number') {
-      reqOpts.configuration.jobTimeoutMs = query.jobTimeoutMs;
+      reqOpts.configuration.jobTimeoutMs = query.jobTimeoutMs.toString();
       delete query.jobTimeoutMs;
     }
 
@@ -1563,6 +1532,85 @@ export class BigQuery extends Service {
     }
 
     this.createJob(reqOpts, callback!);
+  }
+
+  private buildQueryParams_(
+    params: Query['params'],
+    types: Query['types']
+  ): {
+    parameterMode: ParameterMode;
+    params: bigquery.IQueryParameter[] | undefined;
+  } {
+    if (!params) {
+      return {
+        parameterMode: undefined,
+        params: undefined,
+      };
+    }
+    const parameterMode = is.array(params) ? 'positional' : 'named';
+    const queryParameters: bigquery.IQueryParameter[] = [];
+    if (parameterMode === 'named') {
+      const namedParams = params as {[param: string]: any};
+      for (const namedParameter of Object.getOwnPropertyNames(namedParams)) {
+        const value = namedParams[namedParameter];
+        let queryParameter;
+
+        if (types) {
+          if (!is.object(types)) {
+            throw new Error(
+              'Provided types must match the value type passed to `params`'
+            );
+          }
+
+          const namedTypes = types as QueryParamTypeStruct;
+
+          if (namedTypes[namedParameter]) {
+            queryParameter = BigQuery.valueToQueryParameter_(
+              value,
+              namedTypes[namedParameter]
+            );
+          } else {
+            queryParameter = BigQuery.valueToQueryParameter_(value);
+          }
+        } else {
+          queryParameter = BigQuery.valueToQueryParameter_(value);
+        }
+
+        queryParameter.name = namedParameter;
+        queryParameters.push(queryParameter);
+      }
+    } else {
+      if (types) {
+        if (!is.array(types)) {
+          throw new Error(
+            'Provided types must match the value type passed to `params`'
+          );
+        }
+
+        const positionalTypes = types as QueryParamTypeStruct[];
+
+        if (params.length !== types.length) {
+          throw new Error('Incorrect number of parameter types provided.');
+        }
+        params.forEach((value: {}, i: number) => {
+          const queryParameter = BigQuery.valueToQueryParameter_(
+            value,
+            positionalTypes[i]
+          );
+          queryParameters.push(queryParameter);
+        });
+      } else {
+        params.forEach((value: {}) => {
+          const queryParameter = BigQuery.valueToQueryParameter_(value);
+          queryParameters.push(queryParameter);
+        });
+      }
+    }
+
+    return {
+      parameterMode,
+      params: queryParameters,
+    };
   }
 
   /**
@@ -2114,20 +2162,176 @@ export class BigQuery extends Service {
         : {};
     const callback =
       typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
-    this.createQueryJob(query, (err, job, resp) => {
+
+    this.trace_('[query]', query, options);
+    const queryReq = this.buildQueryRequest_(query, options);
+    this.trace_('[query] queryReq', queryReq);
+    if (!queryReq) {
+      this.createQueryJob(query, (err, job, resp) => {
+        if (err) {
+          (callback as SimpleQueryRowsCallback)(err, null, resp);
+          return;
+        }
+        if (typeof query === 'object' && query.dryRun) {
+          (callback as SimpleQueryRowsCallback)(null, [], resp);
+          return;
+        }
+        // The Job is important for the `queryAsStream_` method, so a new query
+        // isn't created each time results are polled for.
+        options = extend({job}, queryOpts, options);
+        job!.getQueryResults(options, callback as QueryRowsCallback);
+      });
+      return;
+    }
+
+    this.runJobsQuery(queryReq, (err, job, res) => {
+      this.trace_('[runJobsQuery callback]: ', query, err, job, res);
       if (err) {
-        (callback as SimpleQueryRowsCallback)(err, null, resp);
+        (callback as SimpleQueryRowsCallback)(err, null, res);
         return;
       }
-      if (typeof query === 'object' && query.dryRun) {
-        (callback as SimpleQueryRowsCallback)(null, [], resp);
-        return;
-      }
-      // The Job is important for the `queryAsStream_` method, so a new query
-      // isn't created each time results are polled for.
+
       options = extend({job}, queryOpts, options);
+      if (res && res.jobComplete) {
+        let rows: any = [];
+        if (res.schema && res.rows) {
+          rows = BigQuery.mergeSchemaWithRows_(res.schema, res.rows, {
+            wrapIntegers: options.wrapIntegers || false,
+            parseJSON: options.parseJSON,
+          });
+        }
+        this.trace_('[runJobsQuery] job complete');
+        options._cachedRows = rows;
+        if (res.pageToken) {
+          this.trace_('[runJobsQuery] has more pages');
+          options.pageToken = res.pageToken;
+        } else {
+          this.trace_('[runJobsQuery] no more pages');
+        }
+        job!.getQueryResults(options, callback as QueryRowsCallback);
+        return;
+      }
+      delete options.timeoutMs;
+      this.trace_('[runJobsQuery] job not complete');
       job!.getQueryResults(options, callback as QueryRowsCallback);
     });
+  }
+
+  /**
+   * Check if the given Query can run using the `jobs.query` endpoint.
+   * Returns a bigquery.IQueryRequest that can be used to call `jobs.query`.
+   * Return undefined if is not possible to convert to a bigquery.IQueryRequest.
+   *
+   * @param query string | Query
+   * @param options QueryOptions
+   * @returns bigquery.IQueryRequest | undefined
+   */
+  private buildQueryRequest_(
+    query: string | Query,
+    options: QueryOptions
+  ): bigquery.IQueryRequest | undefined {
+    if (process.env.FAST_QUERY_PATH === 'DISABLED') {
+      return undefined;
+    }
+    const queryObj: Query =
+      typeof query === 'string'
+        ? {
+            query: query,
+          }
+        : query;
+    this.trace_('[buildQueryRequest]', query, options, queryObj);
+    // This is a denylist of settings which prevent us from composing an equivalent
+    // bq.QueryRequest due to differences between configuration parameters accepted
+    // by jobs.insert vs jobs.query.
+    if (
+      !!queryObj.destination ||
+      !!queryObj.tableDefinitions ||
+      !!queryObj.createDisposition ||
+      !!queryObj.writeDisposition ||
+      (!!queryObj.priority && queryObj.priority !== 'INTERACTIVE') ||
+      queryObj.useLegacySql ||
+      !!queryObj.maximumBillingTier ||
+      !!queryObj.timePartitioning ||
+      !!queryObj.rangePartitioning ||
+      !!queryObj.clustering ||
+      !!queryObj.destinationEncryptionConfiguration ||
+      !!queryObj.schemaUpdateOptions ||
+      !!queryObj.jobTimeoutMs ||
+      // User has defined the jobID generation behavior
+      !!queryObj.jobId
+    ) {
+      return undefined;
+    }
+
+    if (queryObj.dryRun) {
+      return undefined;
+    }
+
+    if (options.job) {
+      return undefined;
+    }
+    const req: bigquery.IQueryRequest = {
+      useQueryCache: queryObj.useQueryCache,
+      labels: queryObj.labels,
+      defaultDataset: queryObj.defaultDataset,
+      createSession: queryObj.createSession,
+      maximumBytesBilled: queryObj.maximumBytesBilled,
+      timeoutMs: options.timeoutMs,
+      location: queryObj.location || options.location,
+      formatOptions: {
+        useInt64Timestamp: true,
+      },
+      maxResults: queryObj.maxResults || options.maxResults,
+      query: queryObj.query,
+      useLegacySql: false,
+      requestId: uuid.v4(),
+      jobCreationMode: 'JOB_CREATION_OPTIONAL',
+    };
+    if (!this._enableQueryPreview) {
+      delete req.jobCreationMode;
+    }
+    const {parameterMode, params} = this.buildQueryParams_(
+      queryObj.params,
+      queryObj.types
+    );
+    if (params) {
+      req.queryParameters = params;
+    }
+    if (parameterMode) {
+      req.parameterMode = parameterMode;
+    }
+    return req;
+  }
+
+  private runJobsQuery(
+    req: bigquery.IQueryRequest,
+    callback?: JobsQueryCallback
+  ): void | Promise<JobsQueryResponse> {
+    this.trace_('[runJobsQuery]', req, callback);
+    this.request(
+      {
+        method: 'POST',
+        uri: '/queries',
+        json: req,
+      },
+      async (err, res: bigquery.IQueryResponse) => {
+        this.trace_('jobs.query res:', res, err);
+        if (err) {
+          callback!(err, null, res);
+          return;
+        }
+        let job: Job | null = null;
+        if (res.jobReference) {
+          const jobRef = res.jobReference;
+          job = this.job(jobRef.jobId!, {
+            location: jobRef.location,
+          });
+        } else if (res.queryId) {
+          job = this.job(res.queryId); // stateless query
+        }
+        callback!(null, job, res);
+      }
+    );
   }
 
   /**
@@ -2161,6 +2365,8 @@ export class BigQuery extends Service {
 
     this.query(query, opts, callback);
   }
+
+  static setLogFunction = setLogFunction;
 }
 
 /*! Developer Documentation
