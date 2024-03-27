@@ -2197,7 +2197,6 @@ class Table extends ServiceObject {
 
     const partialFailures = (resp.insertErrors || []).map(
       (insertError: GoogleErrorBody) => {
-        insertError.index;
         return {
           errors: insertError.errors!.map(error => {
             return {
@@ -2205,7 +2204,8 @@ class Table extends ServiceObject {
               reason: error.reason,
             };
           }),
-          row: rows[insertError.index],
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          row: rows[(insertError as any).index],
         };
       }
     );
