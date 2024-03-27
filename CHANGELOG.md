@@ -4,6 +4,13 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## [7.6.0](https://github.com/googleapis/nodejs-bigquery/compare/v7.5.2...v7.6.0) (2024-03-27)
+
+
+### Features
+
+* Integrate jobs.query and stateless query for faster queries ([#1337](https://github.com/googleapis/nodejs-bigquery/issues/1337)) ([74aa150](https://github.com/googleapis/nodejs-bigquery/commit/74aa1501452c36af7969bb4a46b996485d9ca91b))
+
 ## [7.5.2](https://github.com/googleapis/nodejs-bigquery/compare/v7.5.1...v7.5.2) (2024-03-27)
 
 
