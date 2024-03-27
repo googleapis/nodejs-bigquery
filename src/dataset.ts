@@ -739,8 +739,7 @@ class Dataset extends ServiceObject {
     const callback =
       typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
     const body = Table.formatMetadata_(options as TableMetadata);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (body as any).tableReference = {
+    body.tableReference = {
       datasetId: this.id,
       projectId: this.projectId,
       tableId: id,
@@ -1163,7 +1162,7 @@ class Dataset extends ServiceObject {
         uri: '/tables',
         qs: options,
       },
-      (err, resp) => {
+      (err, resp: bigquery.ITableList) => {
         if (err) {
           callback!(err, null, null, resp);
           return;
@@ -1176,10 +1175,10 @@ class Dataset extends ServiceObject {
           });
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const tables = (resp.tables || []).map((tableObject: any) => {
-          const table = this.table(tableObject.tableReference.tableId, {
-            location: tableObject.location,
+        const tables = (resp.tables || []).map(tableObject => {
+          const tableRef = tableObject.tableReference!;
+          const table = this.table(tableRef.tableId!, {
+            location: this.location,
           });
           table.metadata = tableObject;
           return table;

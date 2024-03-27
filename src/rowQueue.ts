@@ -177,8 +177,7 @@ export class RowQueue {
                   reason: error.reason,
                 };
               }),
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              row: rows[(insertError as any).index],
+              row: rows[insertError.index],
             };
           }
         );
