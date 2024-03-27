@@ -1177,9 +1177,7 @@ class Dataset extends ServiceObject {
 
         const tables = (resp.tables || []).map(tableObject => {
           const tableRef = tableObject.tableReference!;
-          const table = this.table(tableRef.tableId!, {
-            location: this.location,
-          });
+          const table = this.table(tableRef.tableId!);
           table.metadata = tableObject;
           return table;
         });

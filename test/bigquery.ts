@@ -150,6 +150,7 @@ describe('BigQuery', () => {
   const PROJECT_ID = 'test-project';
   const ANOTHER_PROJECT_ID = 'another-test-project';
   const LOCATION = 'asia-northeast1';
+  const ANOTHER_LOCATION = 'us-central1';
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let BigQueryCached: any;
@@ -2667,6 +2668,7 @@ describe('BigQuery', () => {
               jobReference: {
                 jobId: JOB_ID,
                 location: LOCATION,
+                projectId: PROJECT_ID,
               },
             },
           ],
@@ -2682,7 +2684,10 @@ describe('BigQuery', () => {
         assert(job instanceof FakeJob);
         assert.strictEqual(args[0], bq);
         assert.strictEqual(args[1], JOB_ID);
-        assert.deepStrictEqual(args[2], {location: LOCATION});
+        assert.deepStrictEqual(args[2], {
+          location: LOCATION,
+          projectId: PROJECT_ID,
+        });
         done();
       });
     });
@@ -2766,19 +2771,27 @@ describe('BigQuery', () => {
 
     it('should pass the options object', () => {
       const options = {a: 'b'};
+      const expectedOptions = extend({projectId: PROJECT_ID}, options);
       const job = bq.job(JOB_ID, options);
 
-      assert.strictEqual(job.calledWith_[2], options);
+      assert.deepStrictEqual(job.calledWith_[2], expectedOptions);
     });
 
-    it('should pass in the user specified location', () => {
+    it('should pass in the user specified location and project', () => {
       const bq = new BigQuery({
         projectId: PROJECT_ID,
         location: LOCATION,
       });
 
-      const options = {a: 'b'};
-      const expectedOptions = Object.assign({location: LOCATION}, options);
+      const options = {
+        a: 'b',
+        location: ANOTHER_LOCATION,
+        projectId: ANOTHER_PROJECT_ID,
+      };
+      const expectedOptions = Object.assign(
+        {location: ANOTHER_LOCATION, projectId: ANOTHER_PROJECT_ID},
+        options
+      );
 
       const job = bq.job(JOB_ID, options);
       const args = job.calledWith_;

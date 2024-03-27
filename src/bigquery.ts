@@ -1935,7 +1935,8 @@ export class BigQuery extends Service {
         }
         const jobs = (resp.jobs || []).map((jobObject: bigquery.IJob) => {
           const job = this.job(jobObject.jobReference!.jobId!, {
-            location: jobObject.jobReference!.location!,
+            location: jobObject.jobReference?.location,
+            projectId: jobObject.jobReference?.projectId,
           });
           job.metadata = jobObject!;
           return job;
@@ -1965,9 +1966,7 @@ export class BigQuery extends Service {
     if (this.location) {
       options = extend({location: this.location}, options);
     }
-    if (this.projectId) {
-      options = extend({projectId: this.projectId}, options);
-    }
+    options = extend({projectId: this.projectId}, options);
     return new Job(this, id, options);
   }
 
