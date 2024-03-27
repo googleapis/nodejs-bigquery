@@ -4,6 +4,13 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## [7.5.2](https://github.com/googleapis/nodejs-bigquery/compare/v7.5.1...v7.5.2) (2024-03-27)
+
+
+### Bug Fixes
+
+* Set projectId in jobs emitted by load streams ([#1346](https://github.com/googleapis/nodejs-bigquery/issues/1346)) ([bd8254c](https://github.com/googleapis/nodejs-bigquery/commit/bd8254c05b33831b0610233fcc793bd5e3bb20ff))
+
 ## [7.5.1](https://github.com/googleapis/nodejs-bigquery/compare/v7.5.0...v7.5.1) (2024-03-14)
 
 
