@@ -1554,6 +1554,7 @@ class Table extends ServiceObject {
         (data: any) => {
           const job = this.bigQuery.job(data.jobReference.jobId, {
             location: data.jobReference.location,
+            projectId: data.jobReference.projectId,
           });
           job.metadata = data;
           dup.emit('job', job);
