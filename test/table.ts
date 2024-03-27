@@ -1783,6 +1783,7 @@ describe('BigQuery/Table', () => {
           jobReference: {
             jobId: 'job-id',
             location: 'location',
+            projectId: 'project-id',
           },
           a: 'b',
           c: 'd',
@@ -1792,6 +1793,7 @@ describe('BigQuery/Table', () => {
           assert.strictEqual(id, metadata.jobReference!.jobId);
           assert.deepStrictEqual(options, {
             location: metadata.jobReference!.location,
+            projectId: metadata.jobReference!.projectId,
           });
           return fakeJob;
         };

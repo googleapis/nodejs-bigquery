@@ -4,6 +4,22 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## [7.5.2](https://github.com/googleapis/nodejs-bigquery/compare/v7.5.1...v7.5.2) (2024-03-27)
+
+
+### Bug Fixes
+
+* Set projectId in jobs emitted by load streams ([#1346](https://github.com/googleapis/nodejs-bigquery/issues/1346)) ([bd8254c](https://github.com/googleapis/nodejs-bigquery/commit/bd8254c05b33831b0610233fcc793bd5e3bb20ff))
+
+## [7.5.1](https://github.com/googleapis/nodejs-bigquery/compare/v7.5.0...v7.5.1) (2024-03-14)
+
+
+### Bug Fixes
+
+* Add better documentation around usage of BigQueryTimestamp class and .timestamp method. ([2b2c3e0](https://github.com/googleapis/nodejs-bigquery/commit/2b2c3e0b8e9c13d23aa54e7a85a861c61410bd4b))
+* BigQueryTimestamp should keep accepting floats [#1339](https://github.com/googleapis/nodejs-bigquery/issues/1339) ([2b2c3e0](https://github.com/googleapis/nodejs-bigquery/commit/2b2c3e0b8e9c13d23aa54e7a85a861c61410bd4b))
+* Restores BigQueryTimestamp behavior to accept a numeric value in the constructor representing epoch-seconds. The affected 7.5.0 version would parse a numeric value as epoch-microseconds. ([2b2c3e0](https://github.com/googleapis/nodejs-bigquery/commit/2b2c3e0b8e9c13d23aa54e7a85a861c61410bd4b))
+
 ## [7.5.0](https://github.com/googleapis/nodejs-bigquery/compare/v7.4.0...v7.5.0) (2024-02-21)
 
 
