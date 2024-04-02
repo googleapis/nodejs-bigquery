@@ -5900,7 +5900,7 @@ declare namespace bigquery {
       /**
        * Zero-based index of the starting row.
        */
-      startIndex?: string;
+      startIndex?: number;
       /**
        * Optional: Specifies the maximum amount of time, in milliseconds, that the client is willing to wait for the query to complete. By default, this limit is 10 seconds (10,000 milliseconds). If the query is complete, the jobComplete field in the response is true. If the query has not yet completed, jobComplete is false. You can request a longer timeout period in the timeoutMs field. However, the call is not guaranteed to wait for the specified timeout; it typically returns after around 200 seconds (200,000 milliseconds), even if the query is not complete. If jobComplete is false, you can continue to wait for the query to complete by calling the getQueryResults method until the jobComplete field in the getQueryResults response is true.
        */
@@ -6052,7 +6052,7 @@ declare namespace bigquery {
       /**
        * Start row index of the table.
        */
-      startIndex?: string;
+      startIndex?: number;
     };
   }
 
