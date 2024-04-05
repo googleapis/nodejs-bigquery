@@ -346,6 +346,15 @@ describe('BigQuery/Table', () => {
 
       const date = new Date();
       assert.strictEqual(Table.encodeValue_(date), date.toJSON());
+
+      const range = BigQuery.range(
+        '[2020-10-01 12:00:00+08, 2020-12-31 12:00:00+08)',
+        'TIMESTAMP'
+      );
+      assert.deepEqual(Table.encodeValue_(range), {
+        start: '2020-10-01T04:00:00.000Z',
+        end: '2020-12-31T04:00:00.000Z',
+      });
     });
 
     it('should properly encode custom types', () => {
@@ -373,13 +382,6 @@ describe('BigQuery/Table', () => {
           this.value = value;
         }
       }
-
-      class BigQueryRange {
-        value: {};
-        constructor(value: {}) {
-          this.value = value;
-        }
-      }
       class BigQueryInt {
         value: {};
         constructor(value: {}) {
@@ -392,14 +394,12 @@ describe('BigQuery/Table', () => {
       const time = new BigQueryTime('time');
       const timestamp = new BigQueryTimestamp('timestamp');
       const integer = new BigQueryInt('integer');
-      const range = new BigQueryRange('range');
 
       assert.strictEqual(Table.encodeValue_(date), 'date');
       assert.strictEqual(Table.encodeValue_(datetime), 'datetime');
       assert.strictEqual(Table.encodeValue_(time), 'time');
       assert.strictEqual(Table.encodeValue_(timestamp), 'timestamp');
       assert.strictEqual(Table.encodeValue_(integer), 'integer');
-      assert.strictEqual(Table.encodeValue_(range), 'range');
     });
 
     it('should properly encode arrays', () => {
