@@ -191,6 +191,11 @@ export interface BigQueryDatetimeOptions {
   fractional?: string | number;
 }
 
+export interface BigQueryRangeOptions {
+  start?: BigQueryDate | BigQueryDatetime | BigQueryTimestamp | string;
+  end?: BigQueryDate | BigQueryDatetime | BigQueryTimestamp | string;
+}
+
 export type ProvidedTypeArray = Array<ProvidedTypeStruct | string | []>;
 
 export interface ProvidedTypeStruct {
@@ -582,107 +587,16 @@ export class BigQuery extends Service {
         let value = field.v;
         if (schemaField.mode === 'REPEATED') {
           value = (value as TableRowField[]).map(val => {
-            return convert(schemaField, val.v, options);
+            return convertSchemaFieldValue(schemaField, val.v, options);
           });
         } else {
-          value = convert(schemaField, value, options);
+          value = convertSchemaFieldValue(schemaField, value, options);
         }
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const fieldObject: any = {};
         fieldObject[schemaField.name!] = value;
         return fieldObject;
       });
-    }
-
-    function convert(
-      schemaField: TableField,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      value: any,
-      options: {
-        wrapIntegers: boolean | IntegerTypeCastOptions;
-        selectedFields?: string[];
-        parseJSON?: boolean;
-      }
-    ) {
-      if (is.null(value)) {
-        return value;
-      }
-
-      switch (schemaField.type) {
-        case 'BOOLEAN':
-        case 'BOOL': {
-          value = value.toLowerCase() === 'true';
-          break;
-        }
-        case 'BYTES': {
-          value = Buffer.from(value, 'base64');
-          break;
-        }
-        case 'FLOAT':
-        case 'FLOAT64': {
-          value = Number(value);
-          break;
-        }
-        case 'INTEGER':
-        case 'INT64': {
-          const {wrapIntegers} = options;
-          value = wrapIntegers
-            ? typeof wrapIntegers === 'object'
-              ? BigQuery.int(
-                  {integerValue: value, schemaFieldName: schemaField.name},
-                  wrapIntegers
-                ).valueOf()
-              : BigQuery.int(value)
-            : Number(value);
-          break;
-        }
-        case 'NUMERIC': {
-          value = new Big(value);
-          break;
-        }
-        case 'BIGNUMERIC': {
-          value = new Big(value);
-          break;
-        }
-        case 'RECORD': {
-          value = BigQuery.mergeSchemaWithRows_(
-            schemaField,
-            value,
-            options
-          ).pop();
-          break;
-        }
-        case 'DATE': {
-          value = BigQuery.date(value);
-          break;
-        }
-        case 'DATETIME': {
-          value = BigQuery.datetime(value);
-          break;
-        }
-        case 'TIME': {
-          value = BigQuery.time(value);
-          break;
-        }
-        case 'TIMESTAMP': {
-          const pd = new PreciseDate(BigInt(value) * BigInt(1000));
-          value = BigQuery.timestamp(pd);
-          break;
-        }
-        case 'GEOGRAPHY': {
-          value = BigQuery.geography(value);
-          break;
-        }
-        case 'JSON': {
-          const {parseJSON} = options;
-          value = parseJSON ? JSON.parse(value) : value;
-          break;
-        }
-        default:
-          break;
-      }
-
-      return value;
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -943,6 +857,42 @@ export class BigQuery extends Service {
    */
   timestamp(value: Date | PreciseDate | string | number) {
     return BigQuery.timestamp(value);
+  }
+
+  /**
+   * A range represents contiguous range between two dates, datetimes, or timestamps.
+   * The lower and upper bound for the range are optional.
+   * The lower bound is inclusive and the upper bound is exclusive.
+   *
+   * @method BigQuery.range
+   * @param {string|BigQueryRangeOptions} value The range literal or start/end with dates/datetimes/timestamp ranges.
+   *
+   * @example
+   * ```
+   * const {BigQuery} = require('@google-cloud/bigquery');
+   * const timestampRange = BigQuery.range('[2020-10-01 12:00:00+08, 2020-12-31 12:00:00+08)', 'TIMESTAMP');
+   * ```
+   */
+  static range(value: string | BigQueryRangeOptions, elementType: string) {
+    return new BigQueryRange(value, elementType);
+  }
+
+  /**
+   * A range represents contiguous range between two dates, datetimes, or timestamps.
+   * The lower and upper bound for the range are optional.
+   * The lower bound is inclusive and the upper bound is exclusive.
+   *
+   * @param {string|BigQueryRangeOptions} value The range literal or start/end with dates/datetimes/timestamp ranges.
+   *
+   * @example
+   * ```
+   * const {BigQuery} = require('@google-cloud/bigquery');
+   * const bigquery = new BigQuery();
+   * const timestampRange = bigquery.range('[2020-10-01 12:00:00+08, 2020-12-31 12:00:00+08)', 'TIMESTAMP');
+   * ```
+   */
+  range(value: string, elementType: string) {
+    return BigQuery.range(value, elementType);
   }
 
   /**
@@ -2390,8 +2340,217 @@ promisifyAll(BigQuery, {
     'job',
     'time',
     'timestamp',
+    'range',
   ],
 });
+
+function convertSchemaFieldValue(
+  schemaField: TableField,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  value: any,
+  options: {
+    wrapIntegers: boolean | IntegerTypeCastOptions;
+    selectedFields?: string[];
+    parseJSON?: boolean;
+  }
+) {
+  if (is.null(value)) {
+    return value;
+  }
+
+  switch (schemaField.type) {
+    case 'BOOLEAN':
+    case 'BOOL': {
+      value = value.toLowerCase() === 'true';
+      break;
+    }
+    case 'BYTES': {
+      value = Buffer.from(value, 'base64');
+      break;
+    }
+    case 'FLOAT':
+    case 'FLOAT64': {
+      value = Number(value);
+      break;
+    }
+    case 'INTEGER':
+    case 'INT64': {
+      const {wrapIntegers} = options;
+      value = wrapIntegers
+        ? typeof wrapIntegers === 'object'
+          ? BigQuery.int(
+              {integerValue: value, schemaFieldName: schemaField.name},
+              wrapIntegers
+            ).valueOf()
+          : BigQuery.int(value)
+        : Number(value);
+      break;
+    }
+    case 'NUMERIC': {
+      value = new Big(value);
+      break;
+    }
+    case 'BIGNUMERIC': {
+      value = new Big(value);
+      break;
+    }
+    case 'RECORD': {
+      value = BigQuery.mergeSchemaWithRows_(schemaField, value, options).pop();
+      break;
+    }
+    case 'DATE': {
+      value = BigQuery.date(value);
+      break;
+    }
+    case 'DATETIME': {
+      value = BigQuery.datetime(value);
+      break;
+    }
+    case 'TIME': {
+      value = BigQuery.time(value);
+      break;
+    }
+    case 'TIMESTAMP': {
+      const pd = new PreciseDate(BigInt(value) * BigInt(1000));
+      value = BigQuery.timestamp(pd);
+      break;
+    }
+    case 'GEOGRAPHY': {
+      value = BigQuery.geography(value);
+      break;
+    }
+    case 'JSON': {
+      const {parseJSON} = options;
+      value = parseJSON ? JSON.parse(value) : value;
+      break;
+    }
+    case 'RANGE': {
+      value = BigQueryRange.fromSchemaValue_(
+        value,
+        schemaField.rangeElementType!.type!
+      );
+      break;
+    }
+    default:
+      break;
+  }
+
+  return value;
+}
+
+/**
+ * Range class for BigQuery.
+ * A range represents contiguous range between two dates, datetimes, or timestamps.
+ * The lower and upper bound for the range are optional.
+ * The lower bound is inclusive and the upper bound is exclusive.
+ * See https://cloud.google.com/bigquery/docs/reference/standard-sql/lexical#range_literals
+ */
+export class BigQueryRange {
+  elementType?: string;
+  start?: BigQueryTimestamp | BigQueryDate | BigQueryDatetime;
+  end?: BigQueryTimestamp | BigQueryDate | BigQueryDatetime;
+  value: string;
+  constructor(value: string | BigQueryRangeOptions, elementType?: string) {
+    if (typeof value === 'string') {
+      if (!elementType) {
+        throw new Error(
+          'invalid RANGE. Element type required when using RANGE literal string.'
+        );
+      }
+      let cleanedValue = value;
+      if (cleanedValue.startsWith('[') || cleanedValue.startsWith('(')) {
+        cleanedValue = cleanedValue.substring(1);
+      }
+      if (cleanedValue.endsWith(')') || cleanedValue.endsWith(']')) {
+        cleanedValue = cleanedValue.substring(0, cleanedValue.length - 1);
+      }
+      const parts = cleanedValue.split(',');
+      if (parts.length !== 2) {
+        throw new Error(
+          'invalid RANGE. See RANGE literal format docs for more information.'
+        );
+      }
+
+      const [start, end] = parts.map((s: string) => s.trim());
+      this.start = this.convertElement_(start, elementType);
+      this.end = this.convertElement_(end, elementType);
+      this.elementType = elementType;
+    } else {
+      const {start, end} = value;
+      if (start && end) {
+        if (typeof start !== typeof end) {
+          throw Error(
+            'upper and lower bound on a RANGE should be of the same type.'
+          );
+        }
+      }
+      const inferredType =
+        {
+          BigQueryDate: 'DATE',
+          BigQueryDatetime: 'DATETIME',
+          BigQueryTimestamp: 'TIMESTAMP',
+        }[(start || end || Object).constructor.name] || elementType;
+      this.start = this.convertElement_(start, inferredType);
+      this.end = this.convertElement_(end, inferredType);
+      this.elementType = inferredType;
+    }
+    this.value = `[${this.start ? this.start.value : 'UNBOUNDED'}, ${this.end ? this.end.value : 'UNBOUNDED'})`;
+  }
+
+  static fromSchemaValue_(value: string, elementType: string): BigQueryRange {
+    let cleanedValue = value;
+    if (cleanedValue.startsWith('[') || cleanedValue.startsWith('(')) {
+      cleanedValue = cleanedValue.substring(1);
+    }
+    if (cleanedValue.endsWith(')') || cleanedValue.endsWith(']')) {
+      cleanedValue = cleanedValue.substring(0, cleanedValue.length - 1);
+    }
+    const parts = cleanedValue.split(',');
+    if (parts.length !== 2) {
+      throw new Error(
+        'invalid RANGE. See RANGE literal format docs for more information.'
+      );
+    }
+
+    const [start, end] = parts.map((s: string) => s.trim());
+    const convertRangeSchemaValue = (value: string) => {
+      if (value === 'UNBOUNDED' || value === 'NULL') {
+        return null;
+      }
+      return convertSchemaFieldValue({type: elementType}, value, {
+        wrapIntegers: false,
+      });
+    };
+    return BigQuery.range(
+      {
+        start: convertRangeSchemaValue(start),
+        end: convertRangeSchemaValue(end),
+      },
+      elementType
+    );
+  }
+
+  convertElement_(
+    value?: string | BigQueryDate | BigQueryDatetime | BigQueryTimestamp,
+    elementType?: string
+  ) {
+    if (typeof value === 'string') {
+      if (value === 'UNBOUNDED' || value === 'NULL') {
+        return undefined;
+      }
+      switch (elementType) {
+        case 'DATE':
+          return new BigQueryDate(value);
+        case 'DATETIME':
+          return new BigQueryDatetime(value);
+        case 'TIMESTAMP':
+          return new BigQueryTimestamp(value);
+      }
+      return undefined;
+    }
+    return value;
+  }
+}
 
 /**
  * Date class for BigQuery.
