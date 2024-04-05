@@ -1315,6 +1315,15 @@ describe('BigQuery', () => {
         BigQuery.getTypeDescriptorFromValue_(bq.geography('POINT (1 1')).type,
         'GEOGRAPHY'
       );
+      assert.strictEqual(
+        BigQuery.getTypeDescriptorFromValue_(
+          bq.range(
+            '[2020-10-01 12:00:00+08, 2020-12-31 12:00:00+08)',
+            'TIMESTAMP'
+          )
+        ).type,
+        'RANGE'
+      );
     });
 
     it('should return correct type for an array', () => {
@@ -1755,10 +1764,12 @@ describe('BigQuery', () => {
         const time = {type: 'TIME'};
         const date = {type: 'DATE'};
         const geo = {type: 'GEOGRAPHY'};
+        const range = {type: 'RANGE'};
 
         assert.strictEqual(BigQuery._isCustomType(time), true);
         assert.strictEqual(BigQuery._isCustomType(date), true);
         assert.strictEqual(BigQuery._isCustomType(geo), true);
+        assert.strictEqual(BigQuery._isCustomType(range), true);
       });
     });
   });

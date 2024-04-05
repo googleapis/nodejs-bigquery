@@ -866,6 +866,7 @@ export class BigQuery extends Service {
    *
    * @method BigQuery.range
    * @param {string|BigQueryRangeOptions} value The range literal or start/end with dates/datetimes/timestamp ranges.
+   * @param {string} elementType The range element type - DATE|DATETIME|TIMESTAMP
    *
    * @example
    * ```
@@ -873,7 +874,10 @@ export class BigQuery extends Service {
    * const timestampRange = BigQuery.range('[2020-10-01 12:00:00+08, 2020-12-31 12:00:00+08)', 'TIMESTAMP');
    * ```
    */
-  static range(value: string | BigQueryRangeOptions, elementType: string) {
+  static range(
+    value: string | BigQueryRangeOptions,
+    elementType?: string
+  ): BigQueryRange {
     return new BigQueryRange(value, elementType);
   }
 
@@ -883,6 +887,7 @@ export class BigQuery extends Service {
    * The lower bound is inclusive and the upper bound is exclusive.
    *
    * @param {string|BigQueryRangeOptions} value The range literal or start/end with dates/datetimes/timestamp ranges.
+   * @param {string} elementType The range element type - DATE|DATETIME|TIMESTAMP
    *
    * @example
    * ```
@@ -891,7 +896,7 @@ export class BigQuery extends Service {
    * const timestampRange = bigquery.range('[2020-10-01 12:00:00+08, 2020-12-31 12:00:00+08)', 'TIMESTAMP');
    * ```
    */
-  range(value: string, elementType: string) {
+  range(value: string, elementType?: string): BigQueryRange {
     return BigQuery.range(value, elementType);
   }
 
@@ -1084,6 +1089,13 @@ export class BigQuery extends Service {
       typeName = 'INT64';
     } else if (value instanceof Geography) {
       typeName = 'GEOGRAPHY';
+    } else if (value instanceof BigQueryRange) {
+      return {
+        type: 'RANGE',
+        rangeElementType: {
+          type: value.elementType,
+        },
+      };
     } else if (Array.isArray(value)) {
       if (value.length === 0) {
         throw new Error(
@@ -1190,6 +1202,24 @@ export class BigQuery extends Service {
         },
         {}
       );
+    } else if (typeName === 'RANGE') {
+      let rangeValue: bigquery.IRangeValue;
+      if (value instanceof BigQueryRange) {
+        rangeValue = value;
+      } else {
+        rangeValue = BigQuery.range(
+          value,
+          queryParameter.parameterType?.rangeElementType?.type
+        );
+      }
+      queryParameter.parameterValue!.rangeValue = {
+        start: {
+          value: rangeValue.start && rangeValue.start.value,
+        },
+        end: {
+          value: rangeValue.end && rangeValue.end.value,
+        },
+      };
     } else if (typeName === 'JSON' && is.object(value)) {
       queryParameter.parameterValue!.value = JSON.stringify(value);
     } else {
@@ -1216,6 +1246,7 @@ export class BigQuery extends Service {
       type!.indexOf('TIME') > -1 ||
       type!.indexOf('DATE') > -1 ||
       type!.indexOf('GEOGRAPHY') > -1 ||
+      type!.indexOf('RANGE') > -1 ||
       type!.indexOf('BigQueryInt') > -1
     );
   }

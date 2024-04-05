@@ -373,6 +373,13 @@ describe('BigQuery/Table', () => {
           this.value = value;
         }
       }
+
+      class BigQueryRange {
+        value: {};
+        constructor(value: {}) {
+          this.value = value;
+        }
+      }
       class BigQueryInt {
         value: {};
         constructor(value: {}) {
@@ -385,12 +392,14 @@ describe('BigQuery/Table', () => {
       const time = new BigQueryTime('time');
       const timestamp = new BigQueryTimestamp('timestamp');
       const integer = new BigQueryInt('integer');
+      const range = new BigQueryRange('range');
 
       assert.strictEqual(Table.encodeValue_(date), 'date');
       assert.strictEqual(Table.encodeValue_(datetime), 'datetime');
       assert.strictEqual(Table.encodeValue_(time), 'time');
       assert.strictEqual(Table.encodeValue_(timestamp), 'timestamp');
       assert.strictEqual(Table.encodeValue_(integer), 'integer');
+      assert.strictEqual(Table.encodeValue_(range), 'range');
     });
 
     it('should properly encode arrays', () => {

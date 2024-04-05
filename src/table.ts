@@ -52,7 +52,7 @@ import {GoogleErrorBody} from '@google-cloud/common/build/src/util';
 import {Duplex, Writable} from 'stream';
 import {JobMetadata} from './job';
 import bigquery from './types';
-import {IntegerTypeCastOptions} from './bigquery';
+import {BigQueryRange, IntegerTypeCastOptions} from './bigquery';
 import {RowQueue} from './rowQueue';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -574,6 +574,13 @@ class Table extends ServiceObject {
 
     if (value instanceof Big) {
       return value.toFixed();
+    }
+
+    if (value instanceof BigQueryRange) {
+      return {
+        start: value.start && value.start.value,
+        end: value.end && value.end.value,
+      };
     }
 
     const customTypeConstructorNames = [
