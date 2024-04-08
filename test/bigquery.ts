@@ -661,7 +661,7 @@ describe('BigQuery', () => {
         ],
       };
 
-      let mergedRows = BigQuery.mergeSchemaWithRows_(
+      const mergedRows = BigQuery.mergeSchemaWithRows_(
         SCHEMA_OBJECT,
         rows.raw,
         {}
