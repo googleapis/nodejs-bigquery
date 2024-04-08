@@ -665,7 +665,8 @@ export class BigQuery extends Service {
           break;
         }
         case 'TIMESTAMP': {
-          const pd = new PreciseDate(BigInt(value) * BigInt(1000));
+          const pd = new PreciseDate();
+          pd.setFullTime(PreciseDate.parseFull(BigInt(value) * BigInt(1000)));
           value = BigQuery.timestamp(pd);
           break;
         }

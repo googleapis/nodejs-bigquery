@@ -639,6 +639,38 @@ describe('BigQuery', () => {
       });
     });
 
+    it('should parse uint64 timestamps with nanosecond precision', () => {
+      const SCHEMA_OBJECT = {
+        fields: [{name: 'ts', type: 'TIMESTAMP'}],
+      } as {fields: TableField[]};
+
+      sandbox.restore(); // restore BigQuery.timestamp call
+
+      const rows = {
+        raw: [
+          {f: [{v: '-604800000000'}]}, // negative value
+          {f: [{v: '0'}]}, // 0 value
+          {f: [{v: '1000000'}]}, // 1 sec after epoch
+          {f: [{v: '1712609904434123'}]}, // recent time
+        ],
+        expectedParsed: [
+          {ts: BigQuery.timestamp('1969-12-25T00:00:00.000Z')},
+          {ts: BigQuery.timestamp('1970-01-01T00:00:00Z')},
+          {ts: BigQuery.timestamp('1970-01-01T00:00:01Z')},
+          {ts: BigQuery.timestamp('2024-04-08T20:58:24.434123Z')},
+        ],
+      };
+
+      let mergedRows = BigQuery.mergeSchemaWithRows_(
+        SCHEMA_OBJECT,
+        rows.raw,
+        {}
+      );
+      mergedRows.forEach((mergedRow: {}, i: number) => {
+        assert.deepStrictEqual(mergedRow, rows.expectedParsed[i]);
+      });
+    });
+
     it('should wrap integers with option', () => {
       const wrapIntegersBoolean = true;
       const wrapIntegersObject = {};
