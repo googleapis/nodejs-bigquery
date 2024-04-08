@@ -576,19 +576,13 @@ class Table extends ServiceObject {
       return value.toFixed();
     }
 
-    if (value instanceof BigQueryRange) {
-      return {
-        start: value.start && value.start.value,
-        end: value.end && value.end.value,
-      };
-    }
-
     const customTypeConstructorNames = [
       'BigQueryDate',
       'BigQueryDatetime',
       'BigQueryInt',
       'BigQueryTime',
       'BigQueryTimestamp',
+      'BigQueryRange',
       'Geography',
     ];
     const constructorName = value.constructor?.name;

@@ -1203,7 +1203,7 @@ export class BigQuery extends Service {
         {}
       );
     } else if (typeName === 'RANGE') {
-      let rangeValue: bigquery.IRangeValue;
+      let rangeValue: BigQueryRange;
       if (value instanceof BigQueryRange) {
         rangeValue = value;
       } else {
@@ -1211,13 +1211,13 @@ export class BigQuery extends Service {
           value,
           queryParameter.parameterType?.rangeElementType?.type
         );
-      }
+      }      
       queryParameter.parameterValue!.rangeValue = {
         start: {
-          value: rangeValue.start && rangeValue.start.value,
+          value: rangeValue.value.start,
         },
         end: {
-          value: rangeValue.end && rangeValue.end.value,
+          value: rangeValue.value.end,
         },
       };
     } else if (typeName === 'JSON' && is.object(value)) {
@@ -2479,8 +2479,7 @@ function convertSchemaFieldValue(
 export class BigQueryRange {
   elementType?: string;
   start?: BigQueryTimestamp | BigQueryDate | BigQueryDatetime;
-  end?: BigQueryTimestamp | BigQueryDate | BigQueryDatetime;
-  value: string;
+  end?: BigQueryTimestamp | BigQueryDate | BigQueryDatetime;  
   constructor(value: string | BigQueryRangeOptions, elementType?: string) {
     if (typeof value === 'string') {
       if (!elementType) {
@@ -2525,7 +2524,17 @@ export class BigQueryRange {
       this.end = this.convertElement_(end, inferredType);
       this.elementType = inferredType;
     }
-    this.value = `[${this.start ? this.start.value : 'UNBOUNDED'}, ${this.end ? this.end.value : 'UNBOUNDED'})`;
+  }
+
+  public get literalValue() {
+    return `[${this.start ? this.start.value : 'UNBOUNDED'}, ${this.end ? this.end.value : 'UNBOUNDED'})`;
+  }
+
+  public get value(){
+    return {
+      start: this.start ? this.start.value : 'UNBOUNDED',
+      end: this.end ? this.end.value : 'UNBOUNDED'
+    }
   }
 
   static fromSchemaValue_(value: string, elementType: string): BigQueryRange {
