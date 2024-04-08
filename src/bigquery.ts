@@ -2433,7 +2433,10 @@ export class BigQueryTimestamp {
     } else if (value instanceof Date) {
       pd = new PreciseDate(value);
     } else if (typeof value === 'string') {
-      if (/^\d{4}-\d{1,2}-\d{1,2}/.test(value)) {
+      if (value === '0') {
+        pd = new PreciseDate(0);
+      }
+      else if (/^\d{4}-\d{1,2}-\d{1,2}/.test(value)) {
         pd = new PreciseDate(value);
       } else {
         const floatValue = Number.parseFloat(value);
