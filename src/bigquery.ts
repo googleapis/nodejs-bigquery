@@ -1211,7 +1211,7 @@ export class BigQuery extends Service {
           value,
           queryParameter.parameterType?.rangeElementType?.type
         );
-      }      
+      }
       queryParameter.parameterValue!.rangeValue = {
         start: {
           value: rangeValue.value.start,
@@ -2479,7 +2479,7 @@ function convertSchemaFieldValue(
 export class BigQueryRange {
   elementType?: string;
   start?: BigQueryTimestamp | BigQueryDate | BigQueryDatetime;
-  end?: BigQueryTimestamp | BigQueryDate | BigQueryDatetime;  
+  end?: BigQueryTimestamp | BigQueryDate | BigQueryDatetime;
   constructor(value: string | BigQueryRangeOptions, elementType?: string) {
     if (typeof value === 'string') {
       if (!elementType) {
@@ -2530,11 +2530,11 @@ export class BigQueryRange {
     return `[${this.start ? this.start.value : 'UNBOUNDED'}, ${this.end ? this.end.value : 'UNBOUNDED'})`;
   }
 
-  public get value(){
+  public get value() {
     return {
       start: this.start ? this.start.value : 'UNBOUNDED',
-      end: this.end ? this.end.value : 'UNBOUNDED'
-    }
+      end: this.end ? this.end.value : 'UNBOUNDED',
+    };
   }
 
   static fromSchemaValue_(value: string, elementType: string): BigQueryRange {
