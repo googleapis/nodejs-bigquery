@@ -1122,6 +1122,36 @@ describe('BigQuery', () => {
       );
       assert.strictEqual(timestampRange.elementType, 'TIMESTAMP');
     });
+
+    it('should accept a Range with start and/or end missing', () => {
+      const dateRange = bq.range(
+        {
+          start: '2020-01-01',
+        },
+        'DATE'
+      );
+      assert.strictEqual(
+        dateRange.literalValue,
+        'RANGE<DATE> [2020-01-01, UNBOUNDED)'
+      );
+
+      const datetimeRange = bq.range(
+        {
+          end: '2020-12-31 12:00:00',
+        },
+        'DATETIME'
+      );
+      assert.strictEqual(
+        datetimeRange.literalValue,
+        'RANGE<DATETIME> [UNBOUNDED, 2020-12-31 12:00:00)'
+      );
+
+      const timestampRange = bq.range({}, 'TIMESTAMP');
+      assert.strictEqual(
+        timestampRange.literalValue,
+        'RANGE<TIMESTAMP> [UNBOUNDED, UNBOUNDED)'
+      );
+    });
   });
 
   describe('geography', () => {
