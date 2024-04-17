@@ -865,7 +865,7 @@ export class BigQuery extends Service {
    * The lower bound is inclusive and the upper bound is exclusive.
    *
    * @method BigQuery.range
-   * @param {string|BigQueryRangeOptions} value The range literal or start/end with dates/datetimes/timestamp ranges.
+   * @param {string|BigQueryRangeOptions} value The range API string or start/end with dates/datetimes/timestamp ranges.
    * @param {string} elementType The range element type - DATE|DATETIME|TIMESTAMP
    *
    * @example
@@ -886,7 +886,7 @@ export class BigQuery extends Service {
    * The lower and upper bound for the range are optional.
    * The lower bound is inclusive and the upper bound is exclusive.
    *
-   * @param {string|BigQueryRangeOptions} value The range literal or start/end with dates/datetimes/timestamp ranges.
+   * @param {string|BigQueryRangeOptions} value The range API string or start/end with dates/datetimes/timestamp ranges.
    * @param {string} elementType The range element type - DATE|DATETIME|TIMESTAMP
    *
    * @example
@@ -2481,28 +2481,16 @@ export class BigQueryRange {
   elementType?: string;
   start?: BigQueryTimestamp | BigQueryDate | BigQueryDatetime;
   end?: BigQueryTimestamp | BigQueryDate | BigQueryDatetime;
+
   constructor(value: string | BigQueryRangeOptions, elementType?: string) {
     if (typeof value === 'string') {
       if (!elementType) {
         throw new Error(
-          'invalid RANGE. Element type required when using RANGE literal string.'
-        );
-      }
-      let cleanedValue = value;
-      if (cleanedValue.startsWith('[') || cleanedValue.startsWith('(')) {
-        cleanedValue = cleanedValue.substring(1);
-      }
-      if (cleanedValue.endsWith(')') || cleanedValue.endsWith(']')) {
-        cleanedValue = cleanedValue.substring(0, cleanedValue.length - 1);
-      }
-      const parts = cleanedValue.split(',');
-      if (parts.length !== 2) {
-        throw new Error(
-          'invalid RANGE. See RANGE literal format docs for more information.'
+          'invalid RANGE. Element type required when using RANGE API string.'
         );
       }
 
-      const [start, end] = parts.map((s: string) => s.trim());
+      const [start, end] = BigQueryRange.fromStringValue_(value);
       this.start = this.convertElement_(start, elementType);
       this.end = this.convertElement_(end, elementType);
       this.elementType = elementType;
@@ -2527,8 +2515,19 @@ export class BigQueryRange {
     }
   }
 
-  public get literalValue() {
+  /*
+   * Get Range string representation used by the BigQuery API.
+   */
+  public get apiValue() {
     return `[${this.start ? this.start.value : 'UNBOUNDED'}, ${this.end ? this.end.value : 'UNBOUNDED'})`;
+  }
+
+  /*
+   * Get Range literal representation accordingly to
+   * https://cloud.google.com/bigquery/docs/reference/standard-sql/lexical#range_literals
+   */
+  public get literalValue() {
+    return `RANGE<${this.elementType}> ${this.apiValue}`;
   }
 
   public get value() {
@@ -2538,7 +2537,7 @@ export class BigQueryRange {
     };
   }
 
-  static fromSchemaValue_(value: string, elementType: string): BigQueryRange {
+  private static fromStringValue_(value: string): [start: string, end: string] {
     let cleanedValue = value;
     if (cleanedValue.startsWith('[') || cleanedValue.startsWith('(')) {
       cleanedValue = cleanedValue.substring(1);
@@ -2554,6 +2553,11 @@ export class BigQueryRange {
     }
 
     const [start, end] = parts.map((s: string) => s.trim());
+    return [start, end];
+  }
+
+  static fromSchemaValue_(value: string, elementType: string): BigQueryRange {
+    const [start, end] = BigQueryRange.fromStringValue_(value);
     const convertRangeSchemaValue = (value: string) => {
       if (value === 'UNBOUNDED' || value === 'NULL') {
         return null;
@@ -2571,7 +2575,7 @@ export class BigQueryRange {
     );
   }
 
-  convertElement_(
+  private convertElement_(
     value?: string | BigQueryDate | BigQueryDatetime | BigQueryTimestamp,
     elementType?: string
   ) {

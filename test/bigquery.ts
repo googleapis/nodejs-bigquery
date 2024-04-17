@@ -987,7 +987,11 @@ describe('BigQuery', () => {
 
     it('should accept a string literal', () => {
       const dateRange = bq.range(INPUT_DATE_RANGE, 'DATE');
-      assert.strictEqual(dateRange.literalValue, '[2020-01-01, 2020-12-31)');
+      assert.strictEqual(dateRange.apiValue, '[2020-01-01, 2020-12-31)');
+      assert.strictEqual(
+        dateRange.literalValue,
+        'RANGE<DATE> [2020-01-01, 2020-12-31)'
+      );
       assert.deepStrictEqual(dateRange.value, {
         start: '2020-01-01',
         end: '2020-12-31',
@@ -995,8 +999,12 @@ describe('BigQuery', () => {
 
       const datetimeRange = bq.range(INPUT_DATETIME_RANGE, 'DATETIME');
       assert.strictEqual(
-        datetimeRange.literalValue,
+        datetimeRange.apiValue,
         '[2020-01-01 12:00:00, 2020-12-31 12:00:00)'
+      );
+      assert.strictEqual(
+        datetimeRange.literalValue,
+        'RANGE<DATETIME> [2020-01-01 12:00:00, 2020-12-31 12:00:00)'
       );
       assert.deepStrictEqual(datetimeRange.value, {
         start: '2020-01-01 12:00:00',
@@ -1005,8 +1013,12 @@ describe('BigQuery', () => {
 
       const timestampRange = bq.range(INPUT_TIMESTAMP_RANGE, 'TIMESTAMP');
       assert.strictEqual(
-        timestampRange.literalValue,
+        timestampRange.apiValue,
         '[2020-10-01T04:00:00.000Z, 2020-12-31T04:00:00.000Z)'
+      );
+      assert.strictEqual(
+        timestampRange.literalValue,
+        'RANGE<TIMESTAMP> [2020-10-01T04:00:00.000Z, 2020-12-31T04:00:00.000Z)'
       );
       assert.deepStrictEqual(timestampRange.value, {
         start: '2020-10-01T04:00:00.000Z',
@@ -1019,7 +1031,11 @@ describe('BigQuery', () => {
         start: bq.date('2020-01-01'),
         end: bq.date('2020-12-31'),
       });
-      assert.strictEqual(dateRange.literalValue, INPUT_DATE_RANGE);
+      assert.strictEqual(dateRange.apiValue, INPUT_DATE_RANGE);
+      assert.strictEqual(
+        dateRange.literalValue,
+        `RANGE<DATE> ${INPUT_DATE_RANGE}`
+      );
       assert.strictEqual(dateRange.elementType, 'DATE');
       assert.deepStrictEqual(dateRange.value, {
         start: '2020-01-01',
@@ -1030,7 +1046,11 @@ describe('BigQuery', () => {
         start: bq.datetime('2020-01-01 12:00:00'),
         end: bq.datetime('2020-12-31 12:00:00'),
       });
-      assert.strictEqual(datetimeRange.literalValue, INPUT_DATETIME_RANGE);
+      assert.strictEqual(datetimeRange.apiValue, INPUT_DATETIME_RANGE);
+      assert.strictEqual(
+        datetimeRange.literalValue,
+        `RANGE<DATETIME> ${INPUT_DATETIME_RANGE}`
+      );
       assert.strictEqual(datetimeRange.elementType, 'DATETIME');
       assert.deepStrictEqual(datetimeRange.value, {
         start: '2020-01-01 12:00:00',
@@ -1042,8 +1062,12 @@ describe('BigQuery', () => {
         end: bq.timestamp('2020-12-31 12:00:00+08'),
       });
       assert.strictEqual(
-        timestampRange.literalValue,
+        timestampRange.apiValue,
         '[2020-10-01T04:00:00.000Z, 2020-12-31T04:00:00.000Z)'
+      );
+      assert.strictEqual(
+        timestampRange.literalValue,
+        'RANGE<TIMESTAMP> [2020-10-01T04:00:00.000Z, 2020-12-31T04:00:00.000Z)'
       );
       assert.strictEqual(timestampRange.elementType, 'TIMESTAMP');
       assert.deepStrictEqual(timestampRange.value, {
@@ -1060,7 +1084,11 @@ describe('BigQuery', () => {
         },
         'DATE'
       );
-      assert.strictEqual(dateRange.literalValue, INPUT_DATE_RANGE);
+      assert.strictEqual(dateRange.apiValue, INPUT_DATE_RANGE);
+      assert.strictEqual(
+        dateRange.literalValue,
+        `RANGE<DATE> ${INPUT_DATE_RANGE}`
+      );
       assert.strictEqual(dateRange.elementType, 'DATE');
 
       const datetimeRange = bq.range(
@@ -1070,7 +1098,11 @@ describe('BigQuery', () => {
         },
         'DATETIME'
       );
-      assert.strictEqual(datetimeRange.literalValue, INPUT_DATETIME_RANGE);
+      assert.strictEqual(datetimeRange.apiValue, INPUT_DATETIME_RANGE);
+      assert.strictEqual(
+        datetimeRange.literalValue,
+        `RANGE<DATETIME> ${INPUT_DATETIME_RANGE}`
+      );
       assert.strictEqual(datetimeRange.elementType, 'DATETIME');
 
       const timestampRange = bq.range(
@@ -1081,8 +1113,12 @@ describe('BigQuery', () => {
         'TIMESTAMP'
       );
       assert.strictEqual(
-        timestampRange.literalValue,
+        timestampRange.apiValue,
         '[2020-10-01T04:00:00.000Z, 2020-12-31T04:00:00.000Z)'
+      );
+      assert.strictEqual(
+        timestampRange.literalValue,
+        'RANGE<TIMESTAMP> [2020-10-01T04:00:00.000Z, 2020-12-31T04:00:00.000Z)'
       );
       assert.strictEqual(timestampRange.elementType, 'TIMESTAMP');
     });
