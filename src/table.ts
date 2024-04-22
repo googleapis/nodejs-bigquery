@@ -52,7 +52,7 @@ import {GoogleErrorBody} from '@google-cloud/common/build/src/util';
 import {Duplex, Writable} from 'stream';
 import {JobMetadata} from './job';
 import bigquery from './types';
-import {IntegerTypeCastOptions} from './bigquery';
+import {BigQueryRange, IntegerTypeCastOptions} from './bigquery';
 import {RowQueue} from './rowQueue';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -582,6 +582,7 @@ class Table extends ServiceObject {
       'BigQueryInt',
       'BigQueryTime',
       'BigQueryTimestamp',
+      'BigQueryRange',
       'Geography',
     ];
     const constructorName = value.constructor?.name;
