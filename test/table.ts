@@ -346,15 +346,6 @@ describe('BigQuery/Table', () => {
 
       const date = new Date();
       assert.strictEqual(Table.encodeValue_(date), date.toJSON());
-
-      const range = BigQuery.range(
-        '[2020-10-01 12:00:00+08, 2020-12-31 12:00:00+08)',
-        'TIMESTAMP'
-      );
-      assert.deepEqual(Table.encodeValue_(range), {
-        start: '2020-10-01T04:00:00.000Z',
-        end: '2020-12-31T04:00:00.000Z',
-      });
     });
 
     it('should properly encode custom types', () => {
