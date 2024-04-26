@@ -4,6 +4,13 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## [7.6.1](https://github.com/googleapis/nodejs-bigquery/compare/v7.6.0...v7.6.1) (2024-04-26)
+
+
+### Bug Fixes
+
+* Should not override queryParameters if params not informed ([#1359](https://github.com/googleapis/nodejs-bigquery/issues/1359)) ([2b66d1e](https://github.com/googleapis/nodejs-bigquery/commit/2b66d1e5d57d754d188e8b45d8f58de0beff39b3))
+
 ## [7.6.0](https://github.com/googleapis/nodejs-bigquery/compare/v7.5.2...v7.6.0) (2024-04-09)
 
 
