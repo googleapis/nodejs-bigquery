@@ -2343,6 +2343,26 @@ describe('BigQuery', () => {
         );
       });
 
+      it('should not modify queryParameters if params is not informed', done => {
+        bq.createJob = (reqOpts: JobOptions) => {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          assert.strictEqual((reqOpts as any).params, undefined);
+          assert.deepStrictEqual(
+            reqOpts.configuration?.query?.queryParameters,
+            NAMED_PARAMS
+          );
+          done();
+        };
+
+        bq.createQueryJob(
+          {
+            query: QUERY_STRING,
+            queryParameters: NAMED_PARAMS,
+          },
+          assert.ifError
+        );
+      });
+
       describe('named', () => {
         it('should set the correct parameter mode', done => {
           bq.createJob = (reqOpts: JobOptions) => {
