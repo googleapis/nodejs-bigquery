@@ -1489,13 +1489,15 @@ export class BigQuery extends Service {
       delete query.destination;
     }
 
-    const {parameterMode, params} = this.buildQueryParams_(
-      query.params,
-      query.types
-    );
-    query.parameterMode = parameterMode;
-    query.queryParameters = params;
-    delete query.params;
+    if (query.params) {
+      const {parameterMode, params} = this.buildQueryParams_(
+        query.params,
+        query.types
+      );
+      query.parameterMode = parameterMode;
+      query.queryParameters = params;
+      delete query.params;
+    }
 
     const reqOpts: JobOptions = {};
     reqOpts.configuration = {
