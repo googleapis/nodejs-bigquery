@@ -89,6 +89,7 @@ const fakePfy = Object.assign({}, pfy, {
       'job',
       'time',
       'timestamp',
+      'range',
     ]);
   },
 });
@@ -462,6 +463,14 @@ describe('BigQuery', () => {
           input,
         };
       });
+
+      sandbox.stub(BigQuery, 'range').callsFake((input, elementType) => {
+        return {
+          type: 'fakeRange',
+          input,
+          elementType,
+        };
+      });
     });
 
     it('should merge the schema and flatten the rows', () => {
@@ -520,6 +529,7 @@ describe('BigQuery', () => {
               {v: 'datetime-input'},
               {v: 'time-input'},
               {v: 'geography-input'},
+              {v: '[2020-10-01 12:00:00+08, 2020-12-31 12:00:00+08)'},
             ],
           },
           expected: {
@@ -561,6 +571,20 @@ describe('BigQuery', () => {
             geography: {
               input: 'geography-input',
               type: 'fakeGeography',
+            },
+            range: {
+              type: 'fakeRange',
+              input: {
+                end: {
+                  input: '2020-12-31 12:00:00+08',
+                  type: 'fakeDatetime',
+                },
+                start: {
+                  input: '2020-10-01 12:00:00+08',
+                  type: 'fakeDatetime',
+                },
+              },
+              elementType: 'DATETIME',
             },
           },
         },
@@ -627,6 +651,14 @@ describe('BigQuery', () => {
       schemaObject.fields.push({
         name: 'geography',
         type: 'GEOGRAPHY',
+      });
+
+      schemaObject.fields.push({
+        name: 'range',
+        type: 'RANGE',
+        rangeElementType: {
+          type: 'DATETIME',
+        },
       });
 
       const rawRows = rows.map(x => x.raw);
@@ -942,6 +974,186 @@ describe('BigQuery', () => {
     });
   });
 
+  describe('range', () => {
+    const INPUT_DATE_RANGE = '[2020-01-01, 2020-12-31)';
+    const INPUT_DATETIME_RANGE = '[2020-01-01 12:00:00, 2020-12-31 12:00:00)';
+    const INPUT_TIMESTAMP_RANGE =
+      '[2020-10-01 12:00:00+08, 2020-12-31 12:00:00+08)';
+
+    it('should have the correct constructor name', () => {
+      const range = bq.range(INPUT_DATE_RANGE, 'DATE');
+      assert.strictEqual(range.constructor.name, 'BigQueryRange');
+    });
+
+    it('should accept a string literal', () => {
+      const dateRange = bq.range(INPUT_DATE_RANGE, 'DATE');
+      assert.strictEqual(dateRange.apiValue, '[2020-01-01, 2020-12-31)');
+      assert.strictEqual(
+        dateRange.literalValue,
+        'RANGE<DATE> [2020-01-01, 2020-12-31)'
+      );
+      assert.deepStrictEqual(dateRange.value, {
+        start: '2020-01-01',
+        end: '2020-12-31',
+      });
+
+      const datetimeRange = bq.range(INPUT_DATETIME_RANGE, 'DATETIME');
+      assert.strictEqual(
+        datetimeRange.apiValue,
+        '[2020-01-01 12:00:00, 2020-12-31 12:00:00)'
+      );
+      assert.strictEqual(
+        datetimeRange.literalValue,
+        'RANGE<DATETIME> [2020-01-01 12:00:00, 2020-12-31 12:00:00)'
+      );
+      assert.deepStrictEqual(datetimeRange.value, {
+        start: '2020-01-01 12:00:00',
+        end: '2020-12-31 12:00:00',
+      });
+
+      const timestampRange = bq.range(INPUT_TIMESTAMP_RANGE, 'TIMESTAMP');
+      assert.strictEqual(
+        timestampRange.apiValue,
+        '[2020-10-01T04:00:00.000Z, 2020-12-31T04:00:00.000Z)'
+      );
+      assert.strictEqual(
+        timestampRange.literalValue,
+        'RANGE<TIMESTAMP> [2020-10-01T04:00:00.000Z, 2020-12-31T04:00:00.000Z)'
+      );
+      assert.deepStrictEqual(timestampRange.value, {
+        start: '2020-10-01T04:00:00.000Z',
+        end: '2020-12-31T04:00:00.000Z',
+      });
+    });
+
+    it('should accept a BigQueryDate|BigQueryDatetime|BigQueryTimestamp objects', () => {
+      const dateRange = bq.range({
+        start: bq.date('2020-01-01'),
+        end: bq.date('2020-12-31'),
+      });
+      assert.strictEqual(dateRange.apiValue, INPUT_DATE_RANGE);
+      assert.strictEqual(
+        dateRange.literalValue,
+        `RANGE<DATE> ${INPUT_DATE_RANGE}`
+      );
+      assert.strictEqual(dateRange.elementType, 'DATE');
+      assert.deepStrictEqual(dateRange.value, {
+        start: '2020-01-01',
+        end: '2020-12-31',
+      });
+
+      const datetimeRange = bq.range({
+        start: bq.datetime('2020-01-01 12:00:00'),
+        end: bq.datetime('2020-12-31 12:00:00'),
+      });
+      assert.strictEqual(datetimeRange.apiValue, INPUT_DATETIME_RANGE);
+      assert.strictEqual(
+        datetimeRange.literalValue,
+        `RANGE<DATETIME> ${INPUT_DATETIME_RANGE}`
+      );
+      assert.strictEqual(datetimeRange.elementType, 'DATETIME');
+      assert.deepStrictEqual(datetimeRange.value, {
+        start: '2020-01-01 12:00:00',
+        end: '2020-12-31 12:00:00',
+      });
+
+      const timestampRange = bq.range({
+        start: bq.timestamp('2020-10-01 12:00:00+08'),
+        end: bq.timestamp('2020-12-31 12:00:00+08'),
+      });
+      assert.strictEqual(
+        timestampRange.apiValue,
+        '[2020-10-01T04:00:00.000Z, 2020-12-31T04:00:00.000Z)'
+      );
+      assert.strictEqual(
+        timestampRange.literalValue,
+        'RANGE<TIMESTAMP> [2020-10-01T04:00:00.000Z, 2020-12-31T04:00:00.000Z)'
+      );
+      assert.strictEqual(timestampRange.elementType, 'TIMESTAMP');
+      assert.deepStrictEqual(timestampRange.value, {
+        start: '2020-10-01T04:00:00.000Z',
+        end: '2020-12-31T04:00:00.000Z',
+      });
+    });
+
+    it('should accept a start/end as string with element type', () => {
+      const dateRange = bq.range(
+        {
+          start: '2020-01-01',
+          end: '2020-12-31',
+        },
+        'DATE'
+      );
+      assert.strictEqual(dateRange.apiValue, INPUT_DATE_RANGE);
+      assert.strictEqual(
+        dateRange.literalValue,
+        `RANGE<DATE> ${INPUT_DATE_RANGE}`
+      );
+      assert.strictEqual(dateRange.elementType, 'DATE');
+
+      const datetimeRange = bq.range(
+        {
+          start: '2020-01-01 12:00:00',
+          end: '2020-12-31 12:00:00',
+        },
+        'DATETIME'
+      );
+      assert.strictEqual(datetimeRange.apiValue, INPUT_DATETIME_RANGE);
+      assert.strictEqual(
+        datetimeRange.literalValue,
+        `RANGE<DATETIME> ${INPUT_DATETIME_RANGE}`
+      );
+      assert.strictEqual(datetimeRange.elementType, 'DATETIME');
+
+      const timestampRange = bq.range(
+        {
+          start: '2020-10-01 12:00:00+08',
+          end: '2020-12-31 12:00:00+08',
+        },
+        'TIMESTAMP'
+      );
+      assert.strictEqual(
+        timestampRange.apiValue,
+        '[2020-10-01T04:00:00.000Z, 2020-12-31T04:00:00.000Z)'
+      );
+      assert.strictEqual(
+        timestampRange.literalValue,
+        'RANGE<TIMESTAMP> [2020-10-01T04:00:00.000Z, 2020-12-31T04:00:00.000Z)'
+      );
+      assert.strictEqual(timestampRange.elementType, 'TIMESTAMP');
+    });
+
+    it('should accept a Range with start and/or end missing', () => {
+      const dateRange = bq.range(
+        {
+          start: '2020-01-01',
+        },
+        'DATE'
+      );
+      assert.strictEqual(
+        dateRange.literalValue,
+        'RANGE<DATE> [2020-01-01, UNBOUNDED)'
+      );
+
+      const datetimeRange = bq.range(
+        {
+          end: '2020-12-31 12:00:00',
+        },
+        'DATETIME'
+      );
+      assert.strictEqual(
+        datetimeRange.literalValue,
+        'RANGE<DATETIME> [UNBOUNDED, 2020-12-31 12:00:00)'
+      );
+
+      const timestampRange = bq.range({}, 'TIMESTAMP');
+      assert.strictEqual(
+        timestampRange.literalValue,
+        'RANGE<TIMESTAMP> [UNBOUNDED, UNBOUNDED)'
+      );
+    });
+  });
+
   describe('geography', () => {
     const INPUT_STRING = 'POINT(1 2)';
 
@@ -1215,6 +1427,15 @@ describe('BigQuery', () => {
       assert.strictEqual(
         BigQuery.getTypeDescriptorFromValue_(bq.geography('POINT (1 1')).type,
         'GEOGRAPHY'
+      );
+      assert.strictEqual(
+        BigQuery.getTypeDescriptorFromValue_(
+          bq.range(
+            '[2020-10-01 12:00:00+08, 2020-12-31 12:00:00+08)',
+            'TIMESTAMP'
+          )
+        ).type,
+        'RANGE'
       );
     });
 
@@ -1656,10 +1877,12 @@ describe('BigQuery', () => {
         const time = {type: 'TIME'};
         const date = {type: 'DATE'};
         const geo = {type: 'GEOGRAPHY'};
+        const range = {type: 'RANGE'};
 
         assert.strictEqual(BigQuery._isCustomType(time), true);
         assert.strictEqual(BigQuery._isCustomType(date), true);
         assert.strictEqual(BigQuery._isCustomType(geo), true);
+        assert.strictEqual(BigQuery._isCustomType(range), true);
       });
     });
   });

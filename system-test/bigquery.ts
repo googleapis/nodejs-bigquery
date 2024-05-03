@@ -1332,6 +1332,25 @@ describe('BigQuery', () => {
             );
           });
 
+          it('should work with RANGE types', done => {
+            bigquery.query(
+              {
+                query: 'SELECT ? r',
+                params: [
+                  bigquery.range(
+                    '[2020-10-01 12:00:00+08, 2020-12-31 12:00:00+08)',
+                    'TIMESTAMP'
+                  ),
+                ],
+              },
+              (err, rows) => {
+                assert.ifError(err);
+                assert.strictEqual(rows!.length, 1);
+                done();
+              }
+            );
+          });
+
           it('should work with multiple types', done => {
             bigquery.query(
               {
@@ -1602,6 +1621,25 @@ describe('BigQuery', () => {
             );
           });
 
+          it('should work with RANGE types', done => {
+            bigquery.query(
+              {
+                query: 'SELECT @r r',
+                params: {
+                  r: bigquery.range(
+                    '[2020-10-01 12:00:00+08, 2020-12-31 12:00:00+08)',
+                    'TIMESTAMP'
+                  ),
+                },
+              },
+              (err, rows) => {
+                assert.ifError(err);
+                assert.strictEqual(rows!.length, 1);
+                done();
+              }
+            );
+          });
+
           it('should work with multiple types', done => {
             bigquery.query(
               {
@@ -1659,18 +1697,27 @@ describe('BigQuery', () => {
     const TIMESTAMP = bigquery.timestamp(new Date());
     const NUMERIC = new Big('123.456');
     const GEOGRAPHY = bigquery.geography('POINT(1 2)');
+    const RANGE = bigquery.range(
+      '[2020-10-01 12:00:00+08, 2020-12-31 12:00:00+08)',
+      'TIMESTAMP'
+    );
 
     before(() => {
       table = dataset.table(generateName('table'));
       return table.create({
         schema: [
-          'date:DATE',
-          'datetime:DATETIME',
-          'time:TIME',
-          'timestamp:TIMESTAMP',
-          'numeric:NUMERIC',
-          'geography:GEOGRAPHY',
-        ].join(', '),
+          {name: 'date', type: 'DATE'},
+          {name: 'datetime', type: 'DATETIME'},
+          {name: 'time', type: 'TIME'},
+          {name: 'timestamp', type: 'TIMESTAMP'},
+          {name: 'numeric', type: 'NUMERIC'},
+          {name: 'geography', type: 'GEOGRAPHY'},
+          {
+            name: 'range',
+            type: 'RANGE',
+            rangeElementType: {type: 'TIMESTAMP'},
+          },
+        ],
       });
     });
 
@@ -1682,6 +1729,7 @@ describe('BigQuery', () => {
         timestamp: TIMESTAMP,
         numeric: NUMERIC,
         geography: GEOGRAPHY,
+        range: RANGE,
       });
     });
   });
