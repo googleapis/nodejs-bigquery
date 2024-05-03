@@ -4,6 +4,13 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## [7.7.0](https://github.com/googleapis/nodejs-bigquery/compare/v7.6.1...v7.7.0) (2024-05-03)
+
+
+### Features
+
+* Add support for RANGE type ([#1352](https://github.com/googleapis/nodejs-bigquery/issues/1352)) ([#1360](https://github.com/googleapis/nodejs-bigquery/issues/1360)) ([961a802](https://github.com/googleapis/nodejs-bigquery/commit/961a802725808a556d4b861360d77dcd24ff7e16))
+
 ## [7.6.1](https://github.com/googleapis/nodejs-bigquery/compare/v7.6.0...v7.6.1) (2024-04-26)
 
 
