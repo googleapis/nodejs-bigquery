@@ -40,6 +40,8 @@ import {
   Table,
   JobOptions,
   TableField,
+  Query,
+  QueryResultsOptions,
 } from '../src';
 import {SinonStub} from 'sinon';
 import {PreciseDate} from '@google-cloud/precise-date';
@@ -187,6 +189,7 @@ describe('BigQuery', () => {
     Object.assign(fakeUtil, originalFakeUtil);
     BigQuery = Object.assign(BigQuery, BigQueryCached);
     bq = new BigQuery({projectId: PROJECT_ID});
+    bq._enableQueryPreview = true;
   });
 
   after(() => {
@@ -261,6 +264,22 @@ describe('BigQuery', () => {
       const calledWith = bq.calledWith_[0];
       assert.strictEqual(calledWith.baseUrl, `${apiEndpoint}bigquery/v2`);
       assert.strictEqual(calledWith.apiEndpoint, 'https://some.fake.endpoint');
+    });
+
+    it('should allow overriding TPC universe', () => {
+      const universeDomain = 'fake-tpc-env.example.com/';
+      bq = new BigQuery({
+        universeDomain: universeDomain,
+      });
+      const calledWith = bq.calledWith_[0];
+      assert.strictEqual(
+        calledWith.baseUrl,
+        'https://bigquery.fake-tpc-env.example.com/bigquery/v2'
+      );
+      assert.strictEqual(
+        calledWith.apiEndpoint,
+        'https://bigquery.fake-tpc-env.example.com'
+      );
     });
 
     it('should capture any user specified location', () => {
@@ -455,7 +474,7 @@ describe('BigQuery', () => {
             f: [
               {v: '3'},
               {v: 'Milo'},
-              {v: now.valueOf() * 1000},
+              {v: now.valueOf() * 1000}, // int64 microseconds
               {v: 'false'},
               {v: 'true'},
               {v: '5.222330009847'},
@@ -507,7 +526,7 @@ describe('BigQuery', () => {
             id: 3,
             name: 'Milo',
             dob: {
-              input: now.valueOf() * 1000,
+              input: new PreciseDate(BigInt(now.valueOf()) * BigInt(1_000_000)),
               type: 'fakeTimestamp',
             },
             has_claws: false,
@@ -617,6 +636,38 @@ describe('BigQuery', () => {
 
       mergedRows.forEach((mergedRow: {}, index: number) => {
         assert.deepStrictEqual(mergedRow, rows[index].expected);
+      });
+    });
+
+    it('should parse uint64 timestamps with nanosecond precision', () => {
+      const SCHEMA_OBJECT = {
+        fields: [{name: 'ts', type: 'TIMESTAMP'}],
+      } as {fields: TableField[]};
+
+      sandbox.restore(); // restore BigQuery.timestamp call
+
+      const rows = {
+        raw: [
+          {f: [{v: '-604800000000'}]}, // negative value
+          {f: [{v: '0'}]}, // 0 value
+          {f: [{v: '1000000'}]}, // 1 sec after epoch
+          {f: [{v: '1712609904434123'}]}, // recent time
+        ],
+        expectedParsed: [
+          {ts: BigQuery.timestamp('1969-12-25T00:00:00.000Z')},
+          {ts: BigQuery.timestamp('1970-01-01T00:00:00Z')},
+          {ts: BigQuery.timestamp('1970-01-01T00:00:01Z')},
+          {ts: BigQuery.timestamp('2024-04-08T20:58:24.434123Z')},
+        ],
+      };
+
+      const mergedRows = BigQuery.mergeSchemaWithRows_(
+        SCHEMA_OBJECT,
+        rows.raw,
+        {}
+      );
+      mergedRows.forEach((mergedRow: {}, i: number) => {
+        assert.deepStrictEqual(mergedRow, rows.expectedParsed[i]);
       });
     });
 
@@ -868,6 +919,16 @@ describe('BigQuery', () => {
     it('should accept a string with microseconds', () => {
       const timestamp = bq.timestamp(INPUT_STRING_MICROS);
       assert.strictEqual(timestamp.value, EXPECTED_VALUE_MICROS);
+    });
+
+    it('should accept a float number', () => {
+      const d = new Date();
+      const f = d.valueOf() / 1000; // float seconds
+      let timestamp = bq.timestamp(f);
+      assert.strictEqual(timestamp.value, d.toJSON());
+
+      timestamp = bq.timestamp(f.toString());
+      assert.strictEqual(timestamp.value, d.toJSON());
     });
 
     it('should accept a Date object', () => {
@@ -1521,6 +1582,33 @@ describe('BigQuery', () => {
       assert.deepStrictEqual(param, expectedParam);
     });
 
+    it('should format JSON types', () => {
+      const typeName = 'JSON';
+      const value = {
+        foo: 'bar',
+      };
+      const strValue = JSON.stringify(value);
+      assert.deepStrictEqual(BigQuery.valueToQueryParameter_(value, typeName), {
+        parameterType: {
+          type: typeName,
+        },
+        parameterValue: {
+          value: strValue,
+        },
+      });
+      assert.deepStrictEqual(
+        BigQuery.valueToQueryParameter_(strValue, typeName),
+        {
+          parameterType: {
+            type: typeName,
+          },
+          parameterValue: {
+            value: strValue,
+          },
+        }
+      );
+    });
+
     it('should format all other types', () => {
       const typeName = 'ANY-TYPE';
       sandbox.stub(BigQuery, 'getTypeDescriptorFromValue_').returns({
@@ -1977,7 +2065,7 @@ describe('BigQuery', () => {
             reqOpts.json.configuration.query.destinationTable,
             {
               datasetId: dataset.id,
-              projectId: dataset.bigQuery.projectId,
+              projectId: dataset.projectId,
               tableId: TABLE_ID,
             }
           );
@@ -2032,6 +2120,26 @@ describe('BigQuery', () => {
         );
       });
 
+      it('should not modify queryParameters if params is not informed', done => {
+        bq.createJob = (reqOpts: JobOptions) => {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          assert.strictEqual((reqOpts as any).params, undefined);
+          assert.deepStrictEqual(
+            reqOpts.configuration?.query?.queryParameters,
+            NAMED_PARAMS
+          );
+          done();
+        };
+
+        bq.createQueryJob(
+          {
+            query: QUERY_STRING,
+            queryParameters: NAMED_PARAMS,
+          },
+          assert.ifError
+        );
+      });
+
       describe('named', () => {
         it('should set the correct parameter mode', done => {
           bq.createJob = (reqOpts: JobOptions) => {
@@ -2052,10 +2160,10 @@ describe('BigQuery', () => {
         it('should set the correct query parameters', done => {
           const queryParameter = {};
 
-          BigQuery.valueToQueryParameter_ = (value: {}) => {
+          sandbox.replace(BigQuery, 'valueToQueryParameter_', (value: {}) => {
             assert.strictEqual(value, NAMED_PARAMS.key);
             return queryParameter;
-          };
+          });
 
           bq.createJob = (reqOpts: JobOptions) => {
             const query = reqOpts.configuration!.query!;
@@ -2076,14 +2184,15 @@ describe('BigQuery', () => {
         it('should allow for optional parameter types', () => {
           const queryParameter = {};
 
-          BigQuery.valueToQueryParameter_ = (
-            value: {},
-            providedType: string
-          ) => {
-            assert.strictEqual(value, NAMED_PARAMS.key);
-            assert.strictEqual(providedType, NAMED_TYPES.key);
-            return queryParameter;
-          };
+          sandbox.replace(
+            BigQuery,
+            'valueToQueryParameter_',
+            (value: {}, providedType: string) => {
+              assert.strictEqual(value, NAMED_PARAMS.key);
+              assert.strictEqual(providedType, NAMED_TYPES.key);
+              return queryParameter;
+            }
+          );
           bq.createJob = (reqOpts: JobOptions) => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             assert.strictEqual((reqOpts as any).params, undefined);
@@ -2102,10 +2211,10 @@ describe('BigQuery', () => {
         it('should allow for providing only some parameter types', () => {
           const queryParameter = {};
 
-          BigQuery.valueToQueryParameter_ = (value: {}) => {
+          sandbox.replace(BigQuery, 'valueToQueryParameter_', (value: {}) => {
             assert.strictEqual(value, NAMED_PARAMS.key);
             return queryParameter;
-          };
+          });
 
           bq.createJob = (reqOpts: JobOptions) => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -2137,9 +2246,9 @@ describe('BigQuery', () => {
         it('should set the correct parameter mode', done => {
           const queryParameter = {};
 
-          BigQuery.valueToQueryParameter_ = () => {
+          sandbox.replace(BigQuery, 'valueToQueryParameter_', (value: {}) => {
             return queryParameter;
-          };
+          });
 
           bq.createJob = (reqOpts: JobOptions) => {
             const query = reqOpts.configuration!.query!;
@@ -2159,10 +2268,10 @@ describe('BigQuery', () => {
         it('should set the correct query parameters', done => {
           const queryParameter = {};
 
-          BigQuery.valueToQueryParameter_ = (value: {}) => {
+          sandbox.replace(BigQuery, 'valueToQueryParameter_', (value: {}) => {
             assert.strictEqual(value, POSITIONAL_PARAMS[0]);
             return queryParameter;
-          };
+          });
 
           bq.createJob = (reqOpts: JobOptions) => {
             const query = reqOpts.configuration!.query!;
@@ -2352,7 +2461,7 @@ describe('BigQuery', () => {
         );
         assert.strictEqual(
           reqOpts.configuration!.jobTimeoutMs,
-          options.jobTimeoutMs
+          `${options.jobTimeoutMs}`
         );
         done();
       };
@@ -2747,6 +2856,25 @@ describe('BigQuery', () => {
         callback(error, null, FAKE_RESPONSE);
       };
 
+      bq.buildQueryRequest_ = (query: {}, options: {}) => {
+        return undefined;
+      };
+
+      bq.query(QUERY_STRING, (err: Error, rows: {}, resp: {}) => {
+        assert.strictEqual(err, error);
+        assert.strictEqual(rows, null);
+        assert.strictEqual(resp, FAKE_RESPONSE);
+        done();
+      });
+    });
+
+    it('should return any errors from jobs.query', done => {
+      const error = new Error('err');
+
+      bq.runJobsQuery = (query: {}, callback: Function) => {
+        callback(error, null, FAKE_RESPONSE);
+      };
+
       bq.query(QUERY_STRING, (err: Error, rows: {}, resp: {}) => {
         assert.strictEqual(err, error);
         assert.strictEqual(rows, null);
@@ -2764,6 +2892,10 @@ describe('BigQuery', () => {
       bq.createQueryJob = (query: {}, callback: Function) => {
         assert.strictEqual(query, options);
         callback(null, null, FAKE_RESPONSE);
+      };
+
+      bq.buildQueryRequest_ = (query: {}, options: {}) => {
+        return undefined;
       };
 
       bq.query(options, (err: Error, rows: {}, resp: {}) => {
@@ -2785,9 +2917,48 @@ describe('BigQuery', () => {
         callback(null, fakeJob, FAKE_RESPONSE);
       };
 
+      bq.buildQueryRequest_ = (query: {}, options: {}) => {
+        return undefined;
+      };
+
       bq.query(QUERY_STRING, (err: Error, rows: {}, resp: {}) => {
         assert.ifError(err);
         assert.strictEqual(rows, FAKE_ROWS);
+        assert.strictEqual(resp, FAKE_RESPONSE);
+        done();
+      });
+    });
+
+    it('should call job#getQueryResults with cached rows from jobs.query', done => {
+      const fakeJob = {
+        getQueryResults: (options: QueryResultsOptions, callback: Function) => {
+          callback(null, options._cachedRows, FAKE_RESPONSE);
+        },
+      };
+
+      bq.runJobsQuery = (query: {}, callback: Function) => {
+        callback(null, fakeJob, {
+          jobComplete: true,
+          schema: {
+            fields: [{name: 'value', type: 'INT64'}],
+          },
+          rows: [{f: [{v: 1}]}, {f: [{v: 2}]}, {f: [{v: 3}]}],
+        });
+      };
+
+      bq.query(QUERY_STRING, (err: Error, rows: {}, resp: {}) => {
+        assert.ifError(err);
+        assert.deepStrictEqual(rows, [
+          {
+            value: 1,
+          },
+          {
+            value: 2,
+          },
+          {
+            value: 3,
+          },
+        ]);
         assert.strictEqual(resp, FAKE_RESPONSE);
         done();
       });
@@ -2804,6 +2975,10 @@ describe('BigQuery', () => {
 
       bq.createQueryJob = (query: {}, callback: Function) => {
         callback(null, fakeJob, FAKE_RESPONSE);
+      };
+
+      bq.buildQueryRequest_ = (query: {}, options: {}) => {
+        return undefined;
       };
 
       const query = {
@@ -2836,6 +3011,10 @@ describe('BigQuery', () => {
         callback(null, fakeJob, FAKE_RESPONSE);
       };
 
+      bq.buildQueryRequest_ = (query: {}, opts: {}) => {
+        return undefined;
+      };
+
       bq.query(QUERY_STRING, assert.ifError);
     });
 
@@ -2853,7 +3032,148 @@ describe('BigQuery', () => {
         callback(null, fakeJob, FAKE_RESPONSE);
       };
 
+      bq.buildQueryRequest_ = (query: {}, opts: {}) => {
+        return undefined;
+      };
+
       bq.query(QUERY_STRING, fakeOptions, assert.ifError);
+    });
+  });
+
+  describe('buildQueryRequest_', () => {
+    const DATASET_ID = 'dataset-id';
+    const TABLE_ID = 'table-id';
+    const QUERY_STRING = 'SELECT * FROM [dataset.table]';
+
+    it('should create a QueryRequest from a Query interface', () => {
+      const q: Query = {
+        query: QUERY_STRING,
+        maxResults: 10,
+        defaultDataset: {
+          projectId: PROJECT_ID,
+          datasetId: DATASET_ID,
+        },
+        priority: 'INTERACTIVE',
+        params: {
+          key: 'value',
+        },
+        maximumBytesBilled: '1024',
+        labels: {
+          key: 'value',
+        },
+      };
+      const req = bq.buildQueryRequest_(q, {});
+      for (const key in req) {
+        if (req[key] === undefined) {
+          delete req[key];
+        }
+      }
+      const expectedReq = {
+        query: QUERY_STRING,
+        useLegacySql: false,
+        requestId: req.requestId,
+        maxResults: 10,
+        defaultDataset: {
+          projectId: PROJECT_ID,
+          datasetId: DATASET_ID,
+        },
+        parameterMode: 'named',
+        queryParameters: [
+          {
+            name: 'key',
+            parameterType: {
+              type: 'STRING',
+            },
+            parameterValue: {
+              value: 'value',
+            },
+          },
+        ],
+        maximumBytesBilled: '1024',
+        labels: {
+          key: 'value',
+        },
+        jobCreationMode: 'JOB_CREATION_OPTIONAL',
+        formatOptions: {
+          useInt64Timestamp: true,
+        },
+      };
+      assert.deepStrictEqual(req, expectedReq);
+    });
+
+    it('should create a QueryRequest from a SQL string', () => {
+      const req = bq.buildQueryRequest_(QUERY_STRING, {});
+      for (const key in req) {
+        if (req[key] === undefined) {
+          delete req[key];
+        }
+      }
+      const expectedReq = {
+        query: QUERY_STRING,
+        useLegacySql: false,
+        requestId: req.requestId,
+        jobCreationMode: 'JOB_CREATION_OPTIONAL',
+        formatOptions: {
+          useInt64Timestamp: true,
+        },
+      };
+      assert.deepStrictEqual(req, expectedReq);
+    });
+
+    it('should not create a QueryRequest when config is not accepted by jobs.query', () => {
+      const dataset: any = {
+        bigQuery: bq,
+        id: 'dataset-id',
+        createTable: util.noop,
+      };
+      const table = new FakeTable(dataset, TABLE_ID);
+      const testCases: Query[] = [
+        {
+          query: QUERY_STRING,
+          dryRun: true,
+        },
+        {
+          query: QUERY_STRING,
+          destination: table,
+        },
+        {
+          query: QUERY_STRING,
+          clustering: {
+            fields: ['date'],
+          },
+        },
+        {
+          query: QUERY_STRING,
+          clustering: {},
+        },
+        {
+          query: QUERY_STRING,
+          timePartitioning: {},
+        },
+        {
+          query: QUERY_STRING,
+          rangePartitioning: {},
+        },
+        {
+          query: QUERY_STRING,
+          jobId: 'fixed-job-id',
+        },
+        {
+          query: QUERY_STRING,
+          createDisposition: 'CREATED_IF_NEEDED',
+          writeDisposition: 'WRITE_APPEND',
+        },
+        {
+          query: QUERY_STRING,
+          schemaUpdateOptions: ['update'],
+        },
+      ];
+
+      for (const index in testCases) {
+        const testCase = testCases[index];
+        const req = bq.buildQueryRequest_(testCase, {});
+        assert.equal(req, undefined);
+      }
     });
   });
 

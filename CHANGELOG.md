@@ -4,6 +4,63 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## [7.6.1](https://github.com/googleapis/nodejs-bigquery/compare/v7.6.0...v7.6.1) (2024-04-26)
+
+
+### Bug Fixes
+
+* Should not override queryParameters if params not informed ([#1359](https://github.com/googleapis/nodejs-bigquery/issues/1359)) ([2b66d1e](https://github.com/googleapis/nodejs-bigquery/commit/2b66d1e5d57d754d188e8b45d8f58de0beff39b3))
+
+## [7.6.0](https://github.com/googleapis/nodejs-bigquery/compare/v7.5.2...v7.6.0) (2024-04-09)
+
+
+### Features
+
+* Integrate jobs.query and stateless query for faster queries ([#1337](https://github.com/googleapis/nodejs-bigquery/issues/1337)) ([74aa150](https://github.com/googleapis/nodejs-bigquery/commit/74aa1501452c36af7969bb4a46b996485d9ca91b))
+
+
+### Bug Fixes
+
+* Parsing zero value timestamp ([#1355](https://github.com/googleapis/nodejs-bigquery/issues/1355)) ([d433711](https://github.com/googleapis/nodejs-bigquery/commit/d4337118bf5708e2cb3e0036028a6d0dc5abf22f))
+
+## [7.5.2](https://github.com/googleapis/nodejs-bigquery/compare/v7.5.1...v7.5.2) (2024-03-27)
+
+
+### Bug Fixes
+
+* Set projectId in jobs emitted by load streams ([#1346](https://github.com/googleapis/nodejs-bigquery/issues/1346)) ([bd8254c](https://github.com/googleapis/nodejs-bigquery/commit/bd8254c05b33831b0610233fcc793bd5e3bb20ff))
+
+## [7.5.1](https://github.com/googleapis/nodejs-bigquery/compare/v7.5.0...v7.5.1) (2024-03-14)
+
+
+### Bug Fixes
+
+* Add better documentation around usage of BigQueryTimestamp class and .timestamp method. ([2b2c3e0](https://github.com/googleapis/nodejs-bigquery/commit/2b2c3e0b8e9c13d23aa54e7a85a861c61410bd4b))
+* BigQueryTimestamp should keep accepting floats [#1339](https://github.com/googleapis/nodejs-bigquery/issues/1339) ([2b2c3e0](https://github.com/googleapis/nodejs-bigquery/commit/2b2c3e0b8e9c13d23aa54e7a85a861c61410bd4b))
+* Restores BigQueryTimestamp behavior to accept a numeric value in the constructor representing epoch-seconds. The affected 7.5.0 version would parse a numeric value as epoch-microseconds. ([2b2c3e0](https://github.com/googleapis/nodejs-bigquery/commit/2b2c3e0b8e9c13d23aa54e7a85a861c61410bd4b))
+
+## [7.5.0](https://github.com/googleapis/nodejs-bigquery/compare/v7.4.0...v7.5.0) (2024-02-21)
+
+
+### Features
+
+* Add support for TPC Universes ([#1333](https://github.com/googleapis/nodejs-bigquery/issues/1333)) ([f67a841](https://github.com/googleapis/nodejs-bigquery/commit/f67a841c29f1f546187e4b670f5e5a4df50b4926))
+* Switch timestamp representation to int64 usec ([#1332](https://github.com/googleapis/nodejs-bigquery/issues/1332)) ([fb10f03](https://github.com/googleapis/nodejs-bigquery/commit/fb10f036234dd5e69052ae724281d0e186f961be))
+* Update types and generation script ([#1336](https://github.com/googleapis/nodejs-bigquery/issues/1336)) ([496f52c](https://github.com/googleapis/nodejs-bigquery/commit/496f52c3816d6a11d17d82bceb47bb8a47522e2b))
+
+## [7.4.0](https://github.com/googleapis/nodejs-bigquery/compare/v7.3.0...v7.4.0) (2024-02-06)
+
+
+### Features
+
+* Implementing mocha retries ([#1295](https://github.com/googleapis/nodejs-bigquery/issues/1295)) ([6cda9e1](https://github.com/googleapis/nodejs-bigquery/commit/6cda9e192c0dd224194f44ebd632a64b845c59b6))
+* Support JSON query param ([#1329](https://github.com/googleapis/nodejs-bigquery/issues/1329)) ([e9f133b](https://github.com/googleapis/nodejs-bigquery/commit/e9f133bec0c1420396ff25d30baf1fba74e1ab04))
+
+
+### Bug Fixes
+
+* Prefer usage of projectId from the Dataset ([#1326](https://github.com/googleapis/nodejs-bigquery/issues/1326)) ([9e85219](https://github.com/googleapis/nodejs-bigquery/commit/9e85219afa074c6804adac79cb4f28a944f5957a))
+
 ## [7.3.0](https://github.com/googleapis/nodejs-bigquery/compare/v7.2.0...v7.3.0) (2023-09-28)
 
 

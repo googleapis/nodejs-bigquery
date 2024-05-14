@@ -238,7 +238,10 @@ describe('BigQuery/Job', () => {
 
     it('should optionally accept options', done => {
       const options = {a: 'b'};
-      const expectedOptions = Object.assign({location: undefined}, options);
+      const expectedOptions = Object.assign(
+        {location: undefined, 'formatOptions.useInt64Timestamp': true},
+        options
+      );
 
       BIGQUERY.request = (reqOpts: DecorateRequestOptions) => {
         assert.deepStrictEqual(reqOpts.qs, expectedOptions);
@@ -252,7 +255,10 @@ describe('BigQuery/Job', () => {
       const job = new Job(BIGQUERY, JOB_ID, {location: LOCATION});
 
       BIGQUERY.request = (reqOpts: DecorateRequestOptions) => {
-        assert.deepStrictEqual(reqOpts.qs, {location: LOCATION});
+        assert.deepStrictEqual(reqOpts.qs, {
+          location: LOCATION,
+          'formatOptions.useInt64Timestamp': true,
+        });
         done();
       };
 
@@ -261,7 +267,11 @@ describe('BigQuery/Job', () => {
 
     it('should delete any cached jobs', done => {
       const options = {job: {}, a: 'b'};
-      const expectedOptions = {location: undefined, a: 'b'};
+      const expectedOptions = {
+        location: undefined,
+        a: 'b',
+        'formatOptions.useInt64Timestamp': true,
+      };
 
       BIGQUERY.request = (reqOpts: DecorateRequestOptions) => {
         assert.deepStrictEqual(reqOpts.qs, expectedOptions);
@@ -340,7 +350,10 @@ describe('BigQuery/Job', () => {
       const mergedRows: Array<{}> = [];
 
       const options = {wrapIntegers: true};
-      const expectedOptions = Object.assign({location: undefined});
+      const expectedOptions = Object.assign({
+        location: undefined,
+        'formatOptions.useInt64Timestamp': true,
+      });
 
       BIGQUERY.request = (reqOpts: DecorateRequestOptions) => {
         assert.deepStrictEqual(reqOpts.qs, expectedOptions);
@@ -368,7 +381,10 @@ describe('BigQuery/Job', () => {
       const mergedRows: Array<{}> = [];
 
       const options = {parseJSON: true};
-      const expectedOptions = Object.assign({location: undefined});
+      const expectedOptions = Object.assign({
+        location: undefined,
+        'formatOptions.useInt64Timestamp': true,
+      });
 
       BIGQUERY.request = (reqOpts: DecorateRequestOptions) => {
         assert.deepStrictEqual(reqOpts.qs, expectedOptions);
