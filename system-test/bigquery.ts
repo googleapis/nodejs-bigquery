@@ -34,7 +34,9 @@ import {
   Routine,
   Table,
   InsertRowsStreamResponse,
+  Query,
 } from '../src';
+import bq from '../src/types';
 
 const bigquery = new BigQuery();
 const storage = new Storage();
@@ -339,6 +341,32 @@ describe('BigQuery', () => {
       assert.strictEqual(rows!.length, 100);
       done();
     });
+  });
+
+  it('should query with jobs.query and return all PagedResponse as positional parameters', async () => {
+    const [rows, q, response] = await bigquery.query(query);
+    const res: bq.IQueryResponse = response!;
+    assert.strictEqual(rows!.length, 100);
+    assert.notEqual(q?.job?.id, undefined);
+    assert.notEqual(res, undefined);
+    assert.strictEqual(res.kind, 'bigquery#queryResponse');
+    assert.notEqual(res.queryId, undefined);
+    assert.strictEqual(res.totalRows, '100');
+  });
+
+  it('should query withouth jobs.query and return all PagedResponse as positional parameters', async () => {
+    // force getQueryResult instead of fast query path
+    const jobId = generateName('job');
+    const [rows, q, response] = await bigquery.query({
+      query,
+      jobId,
+    });
+    const res: bq.IGetQueryResultsResponse = response!;
+    assert.strictEqual(rows!.length, 100);
+    assert.strictEqual((q as Query).job?.id, jobId);
+    assert.notEqual(res, undefined);
+    assert.strictEqual(res.kind, 'bigquery#getQueryResultsResponse');
+    assert.strictEqual(res.totalRows, '100');
   });
 
   it('should allow querying in series', done => {

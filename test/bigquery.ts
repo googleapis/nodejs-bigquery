@@ -3152,24 +3152,26 @@ describe('BigQuery', () => {
       });
     });
 
-    it('should call job#getQueryResults with cached rows from jobs.query', done => {
+    it('should call job#getQueryResults with cached rows and response from jobs.query', done => {
       const fakeJob = {
         getQueryResults: (options: QueryResultsOptions, callback: Function) => {
-          callback(null, options._cachedRows, FAKE_RESPONSE);
+          callback(null, options._cachedRows, null, options._cachedResponse);
         },
       };
 
-      bq.runJobsQuery = (query: {}, callback: Function) => {
-        callback(null, fakeJob, {
-          jobComplete: true,
-          schema: {
-            fields: [{name: 'value', type: 'INT64'}],
-          },
-          rows: [{f: [{v: 1}]}, {f: [{v: 2}]}, {f: [{v: 3}]}],
-        });
+      const fakeResponse = {
+        jobComplete: true,
+        schema: {
+          fields: [{name: 'value', type: 'INT64'}],
+        },
+        rows: [{f: [{v: 1}]}, {f: [{v: 2}]}, {f: [{v: 3}]}],
       };
 
-      bq.query(QUERY_STRING, (err: Error, rows: {}, resp: {}) => {
+      bq.runJobsQuery = (query: {}, callback: Function) => {
+        callback(null, fakeJob, fakeResponse);
+      };
+
+      bq.query(QUERY_STRING, (err: Error, rows: {}, query: {}, resp: {}) => {
         assert.ifError(err);
         assert.deepStrictEqual(rows, [
           {
@@ -3182,7 +3184,7 @@ describe('BigQuery', () => {
             value: 3,
           },
         ]);
-        assert.strictEqual(resp, FAKE_RESPONSE);
+        assert.strictEqual(resp, fakeResponse);
         done();
       });
     });

@@ -80,15 +80,18 @@ export type PagedRequest<P> = P & {
   maxApiCalls?: number;
 };
 
+export type QueryResultsResponse = bigquery.IGetQueryResultsResponse &
+  bigquery.IQueryResponse;
+
 export type QueryRowsResponse = PagedResponse<
   RowMetadata,
   Query,
-  bigquery.IGetQueryResultsResponse
+  QueryResultsResponse
 >;
 export type QueryRowsCallback = PagedCallback<
   RowMetadata,
   Query,
-  bigquery.IGetQueryResultsResponse
+  QueryResultsResponse
 >;
 
 export type SimpleQueryRowsResponse = [RowMetadata[], bigquery.IJob];
@@ -165,8 +168,8 @@ export type GetJobsCallback = PagedCallback<
   bigquery.IJobList
 >;
 
-export type JobsQueryResponse = [Job, bigquery.IQueryResponse];
-export type JobsQueryCallback = ResourceCallback<Job, bigquery.IQueryResponse>;
+export type JobsQueryResponse = [Job, QueryResultsResponse];
+export type JobsQueryCallback = ResourceCallback<Job, QueryResultsResponse>;
 
 export interface BigQueryTimeOptions {
   hours?: number | string;
@@ -2113,7 +2116,10 @@ export class BigQuery extends Service {
    * ```
    */
   query(query: string, options?: QueryOptions): Promise<QueryRowsResponse>;
-  query(query: Query, options?: QueryOptions): Promise<SimpleQueryRowsResponse>;
+  query(
+    query: Query,
+    options?: QueryOptions
+  ): Promise<SimpleQueryRowsResponse> | Promise<QueryRowsResponse>;
   query(
     query: string,
     options: QueryOptions,
@@ -2185,6 +2191,7 @@ export class BigQuery extends Service {
         }
         this.trace_('[runJobsQuery] job complete');
         options._cachedRows = rows;
+        options._cachedResponse = res;
         if (res.pageToken) {
           this.trace_('[runJobsQuery] has more pages');
           options.pageToken = res.pageToken;
