@@ -354,7 +354,7 @@ describe('BigQuery', () => {
     assert.strictEqual(res.totalRows, '100');
   });
 
-  it('should query withouth jobs.query and return all PagedResponse as positional parameters', async () => {
+  it('should query without jobs.query and return all PagedResponse as positional parameters', async () => {
     // force getQueryResult instead of fast query path
     const jobId = generateName('job');
     const [rows, q, response] = await bigquery.query({
