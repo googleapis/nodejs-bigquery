@@ -34,7 +34,7 @@ import {
   Routine,
   Table,
   InsertRowsStreamResponse,
-  Query,
+  QueryOptions,
 } from '../src';
 import bq from '../src/types';
 
@@ -355,15 +355,15 @@ describe('BigQuery', () => {
   });
 
   it('should query without jobs.query and return all PagedResponse as positional parameters', async () => {
-    // force getQueryResult instead of fast query path
+    // force jobs.getQueryResult instead of fast query path
     const jobId = generateName('job');
-    const [rows, q, response] = await bigquery.query({
-      query,
-      jobId,
-    });
+    const qOpts: QueryOptions = {
+      job: bigquery.job(jobId),
+    };
+    const [rows, q, response] = await bigquery.query(query, qOpts);
     const res: bq.IGetQueryResultsResponse = response!;
     assert.strictEqual(rows!.length, 100);
-    assert.strictEqual((q as Query).job?.id, jobId);
+    assert.strictEqual(q?.job?.id, jobId);
     assert.notEqual(res, undefined);
     assert.strictEqual(res.kind, 'bigquery#getQueryResultsResponse');
     assert.strictEqual(res.totalRows, '100');
