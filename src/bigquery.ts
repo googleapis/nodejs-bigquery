@@ -46,6 +46,7 @@ import {
 import {GoogleErrorBody} from '@google-cloud/common/build/src/util';
 import bigquery from './types';
 import {logger, setLogFunction} from './logger';
+import {StorageReadClient} from './storage';
 
 // Third-Party Re-exports
 export {common};
@@ -243,6 +244,11 @@ export interface BigQueryOptions extends GoogleAuthOptions {
    * Defaults to `googleapis.com`.
    */
   universeDomain?: string;
+
+  /**
+   * Storage Reader
+   */
+  storageReadClient?: StorageReadClient;
 }
 
 export interface IntegerTypeCastOptions {
@@ -335,6 +341,7 @@ export class BigQuery extends Service {
   location?: string;
   private _universeDomain: string;
   private _enableQueryPreview: boolean;
+  private _storageClient?: StorageReadClient;
 
   createQueryStream(options?: Query | string): ResourceStream<RowMetadata> {
     // placeholder body, overwritten in constructor
@@ -398,6 +405,10 @@ export class BigQuery extends Service {
       if (QUERY_PREVIEW_ENABLED.toUpperCase() === 'TRUE') {
         this._enableQueryPreview = true;
       }
+    }
+
+    if (options.storageReadClient) {
+      this._storageClient = options.storageReadClient;
     }
 
     this._universeDomain = universeDomain;
@@ -2150,7 +2161,7 @@ export class BigQuery extends Service {
     const queryReq = this.buildQueryRequest_(query, options);
     this.trace_('[query] queryReq', queryReq);
     if (!queryReq) {
-      this.createQueryJob(query, (err, job, resp) => {
+      this.createQueryJob(query, async (err, job, resp) => {
         if (err) {
           (callback as SimpleQueryRowsCallback)(err, null, resp);
           return;
@@ -2158,6 +2169,15 @@ export class BigQuery extends Service {
         if (typeof query === 'object' && query.dryRun) {
           (callback as SimpleQueryRowsCallback)(null, [], resp);
           return;
+        }
+        if (job && this._storageClient) {
+          try {
+            const rows = await this.acceleratedFetchDataFromJob_(job, options);
+            (callback as QueryRowsCallback)(null, rows, null);
+            return;
+          } catch (err) {
+            this.trace_('failed to fetch using Storage Reader', err);
+          }
         }
         // The Job is important for the `queryAsStream_` method, so a new query
         // isn't created each time results are polled for.
@@ -2167,7 +2187,7 @@ export class BigQuery extends Service {
       return;
     }
 
-    this.runJobsQuery(queryReq, (err, job, res) => {
+    this.runJobsQuery(queryReq, async (err, job, res) => {
       this.trace_('[runJobsQuery callback]: ', query, err, job, res);
       if (err) {
         (callback as SimpleQueryRowsCallback)(err, null, res);
@@ -2176,6 +2196,17 @@ export class BigQuery extends Service {
 
       options = extend({job}, queryOpts, options);
       if (res && res.jobComplete) {
+        if (job && res.pageToken && this._storageClient) {
+          try {
+            const rows = await this.acceleratedFetchDataFromJob_(job, options, res.schema);
+            (callback as QueryRowsCallback)(null, rows, null);
+            return;
+          } catch (err) {
+            console.log('failed to fetch using storage reader', err);
+            this.trace_('failed to fetch using Storage Reader', err);
+          }
+        }
+
         let rows: any = [];
         if (res.schema && res.rows) {
           rows = BigQuery.mergeSchemaWithRows_(res.schema, res.rows, {
@@ -2198,6 +2229,51 @@ export class BigQuery extends Service {
       this.trace_('[runJobsQuery] job not complete');
       job!.getQueryResults(options, callback as QueryRowsCallback);
     });
+  }
+
+  private async acceleratedFetchDataFromJob_(
+    job: Job,
+    opts: QueryOptions,
+    schema?: bigquery.ITableSchema,
+  ): Promise<any[]> {
+    if (!this._storageClient) {
+      return Promise.reject('storage client not available');
+    }
+    console.time('fetchMetadata');    
+    const [metadata] = (await job.getMetadata()) as bigquery.IJob[];
+    this.trace_('[job metadata]', metadata.configuration?.query);
+    const qconfig = metadata.configuration?.query;
+    if (!qconfig) {
+      return Promise.reject('job is not a query type');
+    }
+    const dstTableRef = qconfig.destinationTable!;
+    const table = this.dataset(dstTableRef.datasetId!, {
+      projectId: dstTableRef.projectId,
+    }).table(dstTableRef.tableId!);
+    let tableSchema = schema;
+    if (!tableSchema) {
+      const [md] = (await table.getMetadata({
+        view: 'BASIC',
+      })) as bigquery.ITable[];
+      tableSchema = md.schema;
+    }
+    console.timeEnd('fetchMetadata');
+
+    const tableReader = await this._storageClient.createTableReader({
+      table: dstTableRef,
+    });
+    console.time('fetchStorageAPI');
+    this.trace_('fetching with Storage API');
+    const [rawRows] = await tableReader.getRows();
+    this.trace_('finished fetching with Storage API');
+    console.timeEnd('fetchStorageAPI');
+    console.time('mergeSchemaStorage');
+    const rows = BigQuery.mergeSchemaWithRows_(tableSchema!, rawRows, {
+      wrapIntegers: opts.wrapIntegers || false,
+      parseJSON: opts.parseJSON || false,
+    });
+    console.timeEnd('mergeSchemaStorage');
+    return rows;
   }
 
   /**
