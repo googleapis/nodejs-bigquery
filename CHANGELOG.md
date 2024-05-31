@@ -4,6 +4,13 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## [7.7.1](https://github.com/googleapis/nodejs-bigquery/compare/v7.7.0...v7.7.1) (2024-05-31)
+
+
+### Bug Fixes
+
+* Return extra args when autoPaginate is on ([#1365](https://github.com/googleapis/nodejs-bigquery/issues/1365)) ([9d77cd8](https://github.com/googleapis/nodejs-bigquery/commit/9d77cd85cf43a4cef535c5a1424e3cfb59fa8431)), closes [#1362](https://github.com/googleapis/nodejs-bigquery/issues/1362)
+
 ## [7.7.0](https://github.com/googleapis/nodejs-bigquery/compare/v7.6.1...v7.7.0) (2024-05-03)
 
 
