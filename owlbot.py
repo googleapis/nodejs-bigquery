@@ -15,5 +15,11 @@
 """This script is used to synthesize generated parts of this library."""
 
 import synthtool.languages.node as node
+from synthtool import shell
+
+# Regenerate Discovery types.
+shell.run(('npm','install'), hide_output = True)
+shell.run(('npm','run','types'), hide_output = True)
+node.fix()
 
 node.owlbot_main(templates_excludes=['.github/bug-report.md'])
