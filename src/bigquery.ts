@@ -80,15 +80,19 @@ export type PagedRequest<P> = P & {
   maxApiCalls?: number;
 };
 
+export type QueryResultsResponse =
+  | bigquery.IGetQueryResultsResponse
+  | bigquery.IQueryResponse;
+
 export type QueryRowsResponse = PagedResponse<
   RowMetadata,
   Query,
-  bigquery.IGetQueryResultsResponse
+  QueryResultsResponse
 >;
 export type QueryRowsCallback = PagedCallback<
   RowMetadata,
   Query,
-  bigquery.IGetQueryResultsResponse
+  QueryResultsResponse
 >;
 
 export type SimpleQueryRowsResponse = [RowMetadata[], bigquery.IJob];
@@ -2185,6 +2189,7 @@ export class BigQuery extends Service {
         }
         this.trace_('[runJobsQuery] job complete');
         options._cachedRows = rows;
+        options._cachedResponse = res;
         if (res.pageToken) {
           this.trace_('[runJobsQuery] has more pages');
           options.pageToken = res.pageToken;
