@@ -17,7 +17,7 @@ import {Transform} from 'stream';
 import {BigQuery, QueryRowsResponse, RowMetadata} from '.';
 import bigquery from './types';
 
-// Minimal interface for a BigQuery Storage Read API client 
+// Minimal interface for a BigQuery Storage Read API client
 // that can read data from tables.
 export interface StorageReadClient {
   createTableReader(req: {
@@ -25,7 +25,7 @@ export interface StorageReadClient {
   }): Promise<TableReader>;
 }
 
-// Interface for fetching data from a BigQuery table using 
+// Interface for fetching data from a BigQuery table using
 // the BigQuery Storage Read API.
 export interface TableReader {
   getRows(): Promise<QueryRowsResponse>;

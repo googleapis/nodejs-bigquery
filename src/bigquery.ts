@@ -2198,7 +2198,11 @@ export class BigQuery extends Service {
       if (res && res.jobComplete) {
         if (job && res.pageToken && this._storageClient) {
           try {
-            const rows = await this.acceleratedFetchDataFromJob_(job, options, res.schema);
+            const rows = await this.acceleratedFetchDataFromJob_(
+              job,
+              options,
+              res.schema
+            );
             (callback as QueryRowsCallback)(null, rows, null);
             return;
           } catch (err) {
@@ -2234,12 +2238,12 @@ export class BigQuery extends Service {
   private async acceleratedFetchDataFromJob_(
     job: Job,
     opts: QueryOptions,
-    schema?: bigquery.ITableSchema,
+    schema?: bigquery.ITableSchema
   ): Promise<any[]> {
     if (!this._storageClient) {
       return Promise.reject('storage client not available');
     }
-    console.time('fetchMetadata');    
+    console.time('fetchMetadata');
     const [metadata] = (await job.getMetadata()) as bigquery.IJob[];
     this.trace_('[job metadata]', metadata.configuration?.query);
     const qconfig = metadata.configuration?.query;
