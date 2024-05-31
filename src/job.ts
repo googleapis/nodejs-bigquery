@@ -56,6 +56,7 @@ export type QueryResultsOptions = {
      * internal properties
      */
     _cachedRows?: any[];
+    _cachedResponse?: bigquery.IQueryResponse;
   };
 
 /**
@@ -571,8 +572,9 @@ class Job extends Operation {
           pageToken: options.pageToken,
         });
         delete nextQuery._cachedRows;
+        delete nextQuery._cachedResponse;
       }
-      callback!(null, options._cachedRows, nextQuery);
+      callback!(null, options._cachedRows, nextQuery, options._cachedResponse);
       return;
     }
 
