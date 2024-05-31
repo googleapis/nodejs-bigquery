@@ -41,7 +41,7 @@ export class MergeSchemaTransform extends Transform {
           wrapIntegers: false,
           parseJSON: false,
         });
-        if (rows.length == 0) {
+        if (rows.length === 0) {
           callback(new Error('failed to convert row'), null);
           return;
         }
