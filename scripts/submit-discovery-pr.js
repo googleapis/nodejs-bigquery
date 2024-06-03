@@ -87,7 +87,6 @@ async function submitDiscoveryPR() {
       throw err;
     }
   }
-  await execa('git', ['checkout', 'main']);
 }
 
 submitDiscoveryPR();
