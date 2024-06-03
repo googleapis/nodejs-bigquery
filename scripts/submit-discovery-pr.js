@@ -15,7 +15,7 @@
 const execa = require('execa');
 const gaxios = require('gaxios');
 
-const REPO = 'alvarowolfx/nodejs-bigquery';
+const REPO = 'googleapis/nodejs-bigquery';
 const BRANCH = 'update-discovery/patch';
 const TRACK_PATHS = ['src/types.d.ts'];
 const COMMIT_MESSAGE = 'chore: update types from Discovery';
