@@ -81,6 +81,7 @@ async function submitDiscoveryPR() {
         if (!exists) {
           throw err;
         }
+        console.log('PR already exists');
       }
     } else {
       throw err;
