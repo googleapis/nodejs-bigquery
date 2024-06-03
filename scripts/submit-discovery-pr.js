@@ -71,8 +71,20 @@ async function submitDiscoveryPR() {
       },
     });
   } catch (err) {
-    console.error('failed to submit Pull Request', err);
-    throw err;
+    console.error('failed to submit Pull Request:', err);
+    if (err.response && err.response.data) {
+      if (err.response.data.errors) {
+        const errors = err.response.data.errors;
+        const exists = errors.some(err =>
+          err.message.includes('already exists')
+        );
+        if (!exists) {
+          throw err;
+        }
+      }
+    } else {
+      throw err;
+    }
   }
   await execa('git', ['checkout', 'main']);
 }
