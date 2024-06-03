@@ -56,7 +56,9 @@
     "arrify": "^2.0.1",
     "big.js": "^6.0.0",
     "duplexify": "^4.0.0",
+    "execa": "^9.1.0",
     "extend": "^3.0.2",
+    "gaxios": "^6.6.0",
     "is": "^3.3.0",
     "stream-events": "^1.0.5",
     "uuid": "^9.0.0"

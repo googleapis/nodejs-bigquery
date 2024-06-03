@@ -13,8 +13,6 @@
 // limitations under the License.
 
 const execa = require('execa');
-const path = require('path');
-const fs = require('fs');
 const gaxios = require('gaxios');
 
 const REPO = 'googleapis/bigquery-nodejs';
