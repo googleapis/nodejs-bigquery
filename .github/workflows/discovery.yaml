@@ -1,6 +1,6 @@
 on:
   schedule:
-    - cron: '0 12 * * TUE'
+    - cron: '0 12 * * *'
 name: Update Discovery Generated Types
 jobs:
   sync:
