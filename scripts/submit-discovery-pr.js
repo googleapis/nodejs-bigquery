@@ -38,6 +38,11 @@ async function submitDiscoveryPR() {
     return;
   }
 
+  if (process.env.GITHUB_ACTIONS) {
+    await execa('git', ['config', 'user.email', 'yoshi-automation@google.com']);
+    await execa('git', ['config', 'user.name', 'Yoshi Automation']);
+  }
+
   await execa('git', ['checkout', '-B', BRANCH]);
   for (const filename of foundChanges) {
     await execa('git', ['add', filename]);
@@ -48,11 +53,6 @@ async function submitDiscoveryPR() {
   const githubToken = process.env.GITHUB_TOKEN;
   if (!githubToken) {
     throw new Error('please include a GITHUB_TOKEN');
-  }
-
-  if (process.env.GITHUB_ACTIONS) {
-    await execa('git', ['config', 'user.email', 'yoshi-automation@google.com']);
-    await execa('git', ['config', 'user.name', 'Yoshi Automation']);
   }
 
   try {
