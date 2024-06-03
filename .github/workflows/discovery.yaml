@@ -1,6 +1,7 @@
 on:
   schedule:
     - cron: '0 12 * * *'
+  workflow_dispatch:    
 name: Update Discovery Generated Types
 jobs:
   sync:
@@ -14,14 +15,8 @@ jobs:
       - run: npm install
       # Generate types
       - run: npm run types
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@6d6857d36972b65feb161a90e484f2984215f83e # v6.0.5
-        with: 
-          base: main
-          branch: update-discovery/patch
-          add-paths: src/types.d.ts
-          commit-message: "chore: update types from Discovery"
-          title: "chore: update types from Discovery"
-          body: |
-            Automated pull-request to keep BigQuery Discovery types up-to-date.
+      # Submit pull request
+      - run: npm run submit-discovery-pr
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
