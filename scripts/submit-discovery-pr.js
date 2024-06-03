@@ -15,7 +15,7 @@
 const execa = require('execa');
 const gaxios = require('gaxios');
 
-const REPO = 'googleapis/bigquery-nodejs';
+const REPO = 'alvarowolfx/nodejs-bigquery';
 const BRANCH = 'update-discovery/patch';
 const TRACK_PATHS = ['src/types.d.ts'];
 const COMMIT_MESSAGE = 'chore: update types from Discovery';
@@ -56,7 +56,7 @@ async function submitDiscoveryPR() {
   }
 
   try {
-    // Open the pull request with the YOSHI_CODE_BOT_TOKEN
+    // Open the pull request with the GITHUB_TOKEN
     await gaxios.request({
       method: 'POST',
       headers: {
