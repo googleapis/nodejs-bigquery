@@ -61,7 +61,7 @@ async function submitDiscoveryPR() {
     await gaxios.request({
       method: 'POST',
       headers: {
-        Authorization: `token ${githubToken}`,
+        Authorization: `Bearer ${githubToken}`,
       },
       url: `https://api.github.com/repos/${REPO}/pulls`,
       data: {
