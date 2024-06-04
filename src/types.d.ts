@@ -794,7 +794,7 @@ declare namespace bigquery {
      */
     fieldDelimiter?: string;
     /**
-     * [Optional] A custom string that will represent a NULL value in CSV import data.
+     * Optional. Specifies a string that represents a null value in a CSV file. For example, if you specify "\N", BigQuery interprets "\N" as a null value when querying a CSV file. The default value is the empty string. If you set this property to a custom value, BigQuery throws an error if an empty string is present for all data types except for STRING and BYTE. For STRING and BYTE columns, BigQuery interprets the empty string as an empty value.
      */
     nullMarker?: string;
     /**
@@ -931,6 +931,10 @@ declare namespace bigquery {
      */
     etag?: string;
     /**
+     * Optional. Options defining open source compatible datasets living in the BigQuery catalog. Contains metadata of open source database, schema or namespace represented by the current dataset.
+     */
+    externalCatalogDatasetOptions?: IExternalCatalogDatasetOptions;
+    /**
      * Optional. Reference to a read-only external dataset defined in data catalogs outside of BigQuery. Filled out when the dataset type is EXTERNAL.
      */
     externalDatasetReference?: IExternalDatasetReference;
@@ -953,11 +957,15 @@ declare namespace bigquery {
     /**
      * The labels associated with this dataset. You can use these to organize and group your datasets. You can set this property when inserting or updating a dataset. See Creating and Updating Dataset Labels for more information.
      */
-    labels?: {[key: string]: string};
+    labels?: { [key: string]: string };
     /**
      * Output only. The date when this dataset was last modified, in milliseconds since the epoch.
      */
     lastModifiedTime?: string;
+    /**
+     * Output only. Metadata about the LinkedDataset. Filled out when the dataset type is LINKED.
+     */
+    linkedDatasetMetadata?: ILinkedDatasetMetadata;
     /**
      * Optional. The source dataset reference when the dataset is of type LINKED. For all other dataset types it is not set. This field cannot be updated once it is set. Any attempt to update this field using Update and Patch API Operations will be ignored.
      */
@@ -970,6 +978,10 @@ declare namespace bigquery {
      * Optional. Defines the time travel window in hours. The value can be from 48 to 168 hours (2 to 7 days). The default value is 168 hours if this is not set.
      */
     maxTimeTravelHours?: string;
+    /**
+     * Optional. Output only. Restriction config for all tables and dataset. If set, restrict certain accesses on the dataset and all its tables based on the config. See [Data egress](/bigquery/docs/analytics-hub-introduction#data_egress) for more details.
+     */
+    restrictions?: IRestrictionConfig;
     /**
      * Output only. Reserved for future use.
      */
@@ -1003,7 +1015,7 @@ declare namespace bigquery {
       tagValue?: string;
     }>;
     /**
-     * Output only. Same as `type` in `ListFormatDataset`. The type of the dataset, one of: * DEFAULT - only accessible by owner and authorized accounts, * PUBLIC - accessible by everyone, * LINKED - linked dataset, * EXTERNAL - dataset with definition in external metadata catalog. -- *BIGLAKE_METASTORE - dataset that references a database created in BigLakeMetastore service. --
+     * Output only. Same as `type` in `ListFormatDataset`. The type of the dataset, one of: * DEFAULT - only accessible by owner and authorized accounts, * PUBLIC - accessible by everyone, * LINKED - linked dataset, * EXTERNAL - dataset with definition in external metadata catalog.
      */
     type?: string;
   };
@@ -1049,7 +1061,7 @@ declare namespace bigquery {
       /**
        * The labels associated with this dataset. You can use these to organize and group your datasets.
        */
-      labels?: {[key: string]: string};
+      labels?: { [key: string]: string };
       /**
        * The geographic location where the dataset resides.
        */
@@ -1103,7 +1115,45 @@ declare namespace bigquery {
     /**
      * Optional. The labels associated with this table. You can use these to organize and group your tables. This will only be used if the destination table is newly created. If the table already exists and labels are different than the current labels are provided, the job will fail.
      */
-    labels?: {[key: string]: string};
+    labels?: { [key: string]: string };
+  };
+
+  /**
+   * Represents privacy policy associated with "differential privacy" method.
+   */
+  type IDifferentialPrivacyPolicy = {
+    /**
+     * Optional. The total delta budget for all queries against the privacy-protected view. Each subscriber query against this view charges the amount of delta that is pre-defined by the contributor through the privacy policy delta_per_query field. If there is sufficient budget, then the subscriber query attempts to complete. It might still fail due to other reasons, in which case the charge is refunded. If there is insufficient budget the query is rejected. There might be multiple charge attempts if a single query references multiple views. In this case there must be sufficient budget for all charges or the query is rejected and charges are refunded in best effort. The budget does not have a refresh policy and can only be updated via ALTER VIEW or circumvented by creating a new view that can be queried with a fresh budget.
+     */
+    deltaBudget?: number;
+    /**
+     * Output only. The delta budget remaining. If budget is exhausted, no more queries are allowed. Note that the budget for queries that are in progress is deducted before the query executes. If the query fails or is cancelled then the budget is refunded. In this case the amount of budget remaining can increase.
+     */
+    deltaBudgetRemaining?: number;
+    /**
+     * Optional. The delta value that is used per query. Delta represents the probability that any row will fail to be epsilon differentially private. Indicates the risk associated with exposing aggregate rows in the result of a query.
+     */
+    deltaPerQuery?: number;
+    /**
+     * Optional. The total epsilon budget for all queries against the privacy-protected view. Each subscriber query against this view charges the amount of epsilon they request in their query. If there is sufficient budget, then the subscriber query attempts to complete. It might still fail due to other reasons, in which case the charge is refunded. If there is insufficient budget the query is rejected. There might be multiple charge attempts if a single query references multiple views. In this case there must be sufficient budget for all charges or the query is rejected and charges are refunded in best effort. The budget does not have a refresh policy and can only be updated via ALTER VIEW or circumvented by creating a new view that can be queried with a fresh budget.
+     */
+    epsilonBudget?: number;
+    /**
+     * Output only. The epsilon budget remaining. If budget is exhausted, no more queries are allowed. Note that the budget for queries that are in progress is deducted before the query executes. If the query fails or is cancelled then the budget is refunded. In this case the amount of budget remaining can increase.
+     */
+    epsilonBudgetRemaining?: number;
+    /**
+     * Optional. The maximum epsilon value that a query can consume. If the subscriber specifies epsilon as a parameter in a SELECT query, it must be less than or equal to this value. The epsilon parameter controls the amount of noise that is added to the groups — a higher epsilon means less noise.
+     */
+    maxEpsilonPerQuery?: number;
+    /**
+     * Optional. The maximum groups contributed value that is used per query. Represents the maximum number of groups to which each protected entity can contribute. Changing this value does not improve or worsen privacy. The best value for accuracy and utility depends on the query and data.
+     */
+    maxGroupsContributed?: string;
+    /**
+     * Optional. The privacy unit column associated with this policy. Differential privacy policies can only have one privacy unit column per data source object (table, view).
+     */
+    privacyUnitColumn?: string;
   };
 
   /**
@@ -1443,6 +1493,38 @@ declare namespace bigquery {
     title?: string;
   };
 
+  /**
+   * Options defining open source compatible datasets living in the BigQuery catalog. Contains metadata of open source database, schema or namespace represented by the current dataset.
+   */
+  type IExternalCatalogDatasetOptions = {
+    /**
+     * Optional. The storage location URI for all tables in the dataset. Equivalent to hive metastore's database locationUri. Maximum length of 1024 characters.
+     */
+    defaultStorageLocationUri?: string;
+    /**
+     * Optional. A map of key value pairs defining the parameters and properties of the open source schema. Maximum size of 2Mib.
+     */
+    parameters?: { [key: string]: string };
+  };
+
+  /**
+   * Metadata about open source compatible table. The fields contained in these options correspond to hive metastore's table level properties.
+   */
+  type IExternalCatalogTableOptions = {
+    /**
+     * Optional. The connection specifying the credentials to be used to read external storage, such as Azure Blob, Cloud Storage, or S3. The connection is needed to read the open source table from BigQuery Engine. The connection_id can have the form `..` or `projects//locations//connections/`.
+     */
+    connectionId?: string;
+    /**
+     * Optional. A map of key value pairs defining the parameters and properties of the open source table. Corresponds with hive meta store table parameters. Maximum size of 4Mib.
+     */
+    parameters?: { [key: string]: string };
+    /**
+     * Optional. A storage descriptor containing information about the physical storage of this table.
+     */
+    storageDescriptor?: IStorageDescriptor;
+  };
+
   type IExternalDataConfiguration = {
     /**
      * Try to detect schema and format options automatically. Any option specified explicitly will be honored.
@@ -1593,6 +1675,16 @@ declare namespace bigquery {
      * The numerical feature value. This is the centroid value for this feature.
      */
     numericalValue?: number;
+  };
+
+  /**
+   * Metadata about the foreign data type definition such as the system in which the type is defined.
+   */
+  type IForeignTypeInfo = {
+    /**
+     * Required. Specifies the system which defines the foreign data type.
+     */
+    typeSystem?: 'TYPE_SYSTEM_UNSPECIFIED' | 'HIVE';
   };
 
   /**
@@ -2135,7 +2227,7 @@ declare namespace bigquery {
     /**
      * The labels associated with this job. You can use these to organize and group your jobs. Label keys and values can be no longer than 63 characters, can only contain lowercase letters, numeric characters, underscores and dashes. International characters are allowed. Label values are optional. Label keys must start with a letter and each label in the list must have a different key.
      */
-    labels?: {[key: string]: string};
+    labels?: { [key: string]: string };
     /**
      * [Pick one] Configures a load job.
      */
@@ -2217,7 +2309,7 @@ declare namespace bigquery {
      */
     connectionProperties?: Array<IConnectionProperty>;
     /**
-     * Optional. [Experimental] Configures the load job to only copy files to the destination BigLake managed table with an external storage_uri, without reading file content and writing them to new files. Copying files only is supported when: * source_uris are in the same external storage system as the destination table but they do not overlap with storage_uri of the destination table. * source_format is the same file format as the destination table. * destination_table is an existing BigLake managed table. Its schema does not have default value expression. It schema does not have type parameters other than precision and scale. * No options other than the above are specified.
+     * Optional. [Experimental] Configures the load job to copy files directly to the destination BigLake managed table, bypassing file content reading and rewriting. Copying files only is supported when all the following are true: * `source_uris` are located in the same Cloud Storage location as the destination table's `storage_uri` location. * `source_format` is `PARQUET`. * `destination_table` is an existing BigLake managed table. The table's schema does not have flexible column names. The table's columns do not have type parameters other than precision and scale. * No options other than the above are specified.
      */
     copyFilesOnly?: boolean;
     /**
@@ -2437,7 +2529,7 @@ declare namespace bigquery {
     /**
      * Optional. You can specify external table definitions, which operate as ephemeral tables that can be queried. These definitions are configured using a JSON map, where the string key represents the table identifier, and the value is the corresponding external data configuration object.
      */
-    tableDefinitions?: {[key: string]: IExternalDataConfiguration};
+    tableDefinitions?: { [key: string]: IExternalDataConfiguration };
     /**
      * Time-based partitioning specification for the destination table. Only one of timePartitioning and rangePartitioning should be specified.
      */
@@ -2660,7 +2752,7 @@ declare namespace bigquery {
      */
     reservationUsage?: Array<{
       /**
-       * Reservation name or "unreserved" for on-demand resources usage.
+       * Reservation name or "unreserved" for on-demand resource usage and multi-statement queries.
        */
       name?: string;
       /**
@@ -2831,7 +2923,7 @@ declare namespace bigquery {
      */
     reservationUsage?: Array<{
       /**
-       * Reservation name or "unreserved" for on-demand resources usage.
+       * Reservation name or "unreserved" for on-demand resource usage and multi-statement queries.
        */
       name?: string;
       /**
@@ -2971,9 +3063,28 @@ declare namespace bigquery {
   };
 
   /**
+   * Represents privacy policy associated with "join restrictions". Join restriction gives data providers the ability to enforce joins on the 'join_allowed_columns' when data is queried from a privacy protected view.
+   */
+  type IJoinRestrictionPolicy = {
+    /**
+     * Optional. The only columns that joins are allowed on. This field is must be specified for join_conditions JOIN_ANY and JOIN_ALL and it cannot be set for JOIN_BLOCKED.
+     */
+    joinAllowedColumns?: Array<string>;
+    /**
+     * Optional. Specifies if a join is required or not on queries for the view. Default is JOIN_CONDITION_UNSPECIFIED.
+     */
+    joinCondition?:
+      | 'JOIN_CONDITION_UNSPECIFIED'
+      | 'JOIN_ANY'
+      | 'JOIN_ALL'
+      | 'JOIN_NOT_REQUIRED'
+      | 'JOIN_BLOCKED';
+  };
+
+  /**
    * Represents a single JSON object.
    */
-  type IJsonObject = {[key: string]: IJsonValue};
+  type IJsonObject = { [key: string]: IJsonValue };
 
   /**
    * Json Options for load and make external tables.
@@ -2986,6 +3097,16 @@ declare namespace bigquery {
   };
 
   type IJsonValue = any;
+
+  /**
+   * Metadata about the Linked Dataset.
+   */
+  type ILinkedDatasetMetadata = {
+    /**
+     * Output only. Specifies whether Linked Dataset is currently in a linked state or not.
+     */
+    linkState?: 'LINK_STATE_UNSPECIFIED' | 'LINKED' | 'UNLINKED';
+  };
 
   /**
    * A dataset source type which refers to another BigQuery dataset.
@@ -3118,7 +3239,7 @@ declare namespace bigquery {
    */
   type IMaterializedViewDefinition = {
     /**
-     * Optional. This option declares authors intention to construct a materialized view that will not be refreshed incrementally.
+     * Optional. This option declares the intention to construct a materialized view that isn't refreshed incrementally.
      */
     allowNonIncrementalDefinition?: boolean;
     /**
@@ -3220,7 +3341,8 @@ declare namespace bigquery {
       | 'RANDOM_FOREST_REGRESSOR'
       | 'RANDOM_FOREST_CLASSIFIER'
       | 'TENSORFLOW_LITE'
-      | 'ONNX';
+      | 'ONNX'
+      | 'TRANSFORM_ONLY';
     /**
      * Output only. Training type of the job.
      */
@@ -3282,7 +3404,7 @@ declare namespace bigquery {
     /**
      * The labels associated with this model. You can use these to organize and group your models. Label keys and values can be no longer than 63 characters, can only contain lowercase letters, numeric characters, underscores and dashes. International characters are allowed. Label values are optional. Label keys must start with a letter and each label in the list must have a different key.
      */
-    labels?: {[key: string]: string};
+    labels?: { [key: string]: string };
     /**
      * Output only. The time when this model was last modified, in millisecs since the epoch.
      */
@@ -3322,7 +3444,8 @@ declare namespace bigquery {
       | 'RANDOM_FOREST_REGRESSOR'
       | 'RANDOM_FOREST_CLASSIFIER'
       | 'TENSORFLOW_LITE'
-      | 'ONNX';
+      | 'ONNX'
+      | 'TRANSFORM_ONLY';
     /**
      * Output only. For single-objective [hyperparameter tuning](/bigquery-ml/docs/reference/standard-sql/bigqueryml-syntax-hp-tuning-overview) models, it only contains the best trial. For multi-objective [hyperparameter tuning](/bigquery-ml/docs/reference/standard-sql/bigqueryml-syntax-hp-tuning-overview) models, it contains all Pareto optimal trials sorted by trial_id.
      */
@@ -3410,6 +3533,40 @@ declare namespace bigquery {
      * Optional. Indicates whether to infer Parquet ENUM logical type as STRING instead of BYTES by default.
      */
     enumAsString?: boolean;
+    /**
+     * Optional. Will indicate how to represent a parquet map if present.
+     */
+    mapTargetType?: 'MAP_TARGET_TYPE_UNSPECIFIED' | 'ARRAY_OF_STRUCT';
+  };
+
+  /**
+   * Partition skew detailed information.
+   */
+  type IPartitionSkew = {
+    /**
+     * Output only. Source stages which produce skewed data.
+     */
+    skewSources?: Array<ISkewSource>;
+  };
+
+  /**
+   * The partitioning column information.
+   */
+  type IPartitionedColumn = {
+    /**
+     * Output only. The name of the partition column.
+     */
+    field?: string;
+  };
+
+  /**
+   * The partitioning information, which includes managed table and external table partition information.
+   */
+  type IPartitioningDefinition = {
+    /**
+     * Output only. Details about each partitioning column. BigQuery native tables only support 1 partitioning column. Other table types may support 0, 1 or more partitioning columns.
+     */
+    partitionedColumn?: Array<IPartitionedColumn>;
   };
 
   /**
@@ -3482,6 +3639,14 @@ declare namespace bigquery {
      * Optional. Policy used for aggregation thresholds.
      */
     aggregationThresholdPolicy?: IAggregationThresholdPolicy;
+    /**
+     * Optional. Policy used for differential privacy.
+     */
+    differentialPrivacyPolicy?: IDifferentialPrivacyPolicy;
+    /**
+     * Optional. Join restriction policy is outside of the one of policies, since this policy can be set along with other policies. This policy gives data providers the ability to enforce joins on the 'join_allowed_columns' when data is queried from a privacy protected view.
+     */
+    joinRestrictionPolicy?: IJoinRestrictionPolicy;
   };
 
   /**
@@ -3548,7 +3713,7 @@ declare namespace bigquery {
     /**
      * Output only. Information about query optimizations.
      */
-    optimizationDetails?: {[key: string]: any};
+    optimizationDetails?: { [key: string]: any };
   };
 
   /**
@@ -3619,7 +3784,7 @@ declare namespace bigquery {
     /**
      * The struct field values.
      */
-    structValues?: {[key: string]: IQueryParameterValue};
+    structValues?: { [key: string]: IQueryParameterValue };
     /**
      * Optional. The value of this value, if a simple scalar type.
      */
@@ -3668,7 +3833,7 @@ declare namespace bigquery {
     /**
      * Optional. The labels associated with this query. Labels can be used to organize and group query jobs. Label keys and values can be no longer than 63 characters, can only contain lowercase letters, numeric characters, underscores and dashes. International characters are allowed. Label keys must start with a letter and each label in the list must have a different key.
      */
-    labels?: {[key: string]: string};
+    labels?: { [key: string]: string };
     /**
      * The geographic location where the job should run. See details at https://cloud.google.com/bigquery/docs/locations#specifying_your_location.
      */
@@ -3913,7 +4078,7 @@ declare namespace bigquery {
     /**
      * User-defined context as a set of key/value pairs, which will be sent as function invocation context together with batched arguments in the requests to the remote service. The total number of bytes of keys and values must be less than 8KB.
      */
-    userDefinedContext?: {[key: string]: string};
+    userDefinedContext?: { [key: string]: string };
   };
 
   /**
@@ -3949,6 +4114,13 @@ declare namespace bigquery {
      * Output only. The name of the speech recognizer to use for speech recognition. The expected format is `projects/{project}/locations/{location}/recognizers/{recognizer}`. Customers can specify this field at model creation. If not specified, a default recognizer `projects/{model project}/locations/global/recognizers/_` will be used. See more details at [recognizers](https://cloud.google.com/speech-to-text/v2/docs/reference/rest/v2/projects.locations.recognizers)
      */
     speechRecognizer?: string;
+  };
+
+  type IRestrictionConfig = {
+    /**
+     * Output only. Specifies the type of dataset/table restriction.
+     */
+    type?: 'RESTRICTION_TYPE_UNSPECIFIED' | 'RESTRICTED_DATA_EGRESS';
   };
 
   /**
@@ -4217,6 +4389,24 @@ declare namespace bigquery {
   };
 
   /**
+   * Serializer and deserializer information.
+   */
+  type ISerDeInfo = {
+    /**
+     * Optional. Name of the SerDe. The maximum length is 256 characters.
+     */
+    name?: string;
+    /**
+     * Optional. Key-value pairs that define the initialization parameters for the serialization library. Maximum size 10 Kib.
+     */
+    parameters?: { [key: string]: string };
+    /**
+     * Required. Specifies a fully-qualified class name of the serialization library that is responsible for the translation of data between table representation and the underlying low-level input and output format structures. The maximum length is 256 characters.
+     */
+    serializationLibrary?: string;
+  };
+
+  /**
    * [Preview] Information related to sessions.
    */
   type ISessionInfo = {
@@ -4238,6 +4428,16 @@ declare namespace bigquery {
      * OPTIONAL: A FieldMask specifying which fields of the policy to modify. Only the fields in the mask will be modified. If no mask is provided, the following default mask is used: `paths: "bindings, etag"`
      */
     updateMask?: string;
+  };
+
+  /**
+   * Details about source stages which produce skewed data.
+   */
+  type ISkewSource = {
+    /**
+     * Output only. Stage id of the skew source stage.
+     */
+    stageId?: string;
   };
 
   /**
@@ -4303,7 +4503,7 @@ declare namespace bigquery {
     /**
      * Configuration properties as a set of key/value pairs, which will be passed on to the Spark application. For more information, see [Apache Spark](https://spark.apache.org/docs/latest/index.html) and the [procedure option list](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#procedure_option_list).
      */
-    properties?: {[key: string]: string};
+    properties?: { [key: string]: string };
     /**
      * Python files to be placed on the PYTHONPATH for PySpark application. Supported file types: `.py`, `.egg`, and `.zip`. For more information about Apache Spark, see [Apache Spark](https://spark.apache.org/docs/latest/index.html).
      */
@@ -4321,13 +4521,13 @@ declare namespace bigquery {
     /**
      * Output only. Endpoints returned from Dataproc. Key list: - history_server_endpoint: A link to Spark job UI.
      */
-    endpoints?: {[key: string]: string};
+    endpoints?: { [key: string]: string };
     /**
-     * Output only. The Google Cloud Storage bucket that is used as the default filesystem by the Spark application. This fields is only filled when the Spark procedure uses the INVOKER security mode. It is inferred from the system variable @@spark_proc_properties.staging_bucket if it is provided. Otherwise, BigQuery creates a default staging bucket for the job and returns the bucket name in this field. Example: * `gs://[bucket_name]`
+     * Output only. The Google Cloud Storage bucket that is used as the default file system by the Spark application. This field is only filled when the Spark procedure uses the invoker security mode. The `gcsStagingBucket` bucket is inferred from the `@@spark_proc_properties.staging_bucket` system variable (if it is provided). Otherwise, BigQuery creates a default staging bucket for the job and returns the bucket name in this field. Example: * `gs://[bucket_name]`
      */
     gcsStagingBucket?: string;
     /**
-     * Output only. The Cloud KMS encryption key that is used to protect the resources created by the Spark job. If the Spark procedure uses DEFINER security mode, the Cloud KMS key is inferred from the Spark connection associated with the procedure if it is provided. Otherwise the key is inferred from the default key of the Spark connection's project if the CMEK organization policy is enforced. If the Spark procedure uses INVOKER security mode, the Cloud KMS encryption key is inferred from the system variable @@spark_proc_properties.kms_key_name if it is provided. Otherwise, the key is inferred fromt he default key of the BigQuery job's project if the CMEK organization policy is enforced. Example: * `projects/[kms_project_id]/locations/[region]/keyRings/[key_region]/cryptoKeys/[key]`
+     * Output only. The Cloud KMS encryption key that is used to protect the resources created by the Spark job. If the Spark procedure uses the invoker security mode, the Cloud KMS encryption key is either inferred from the provided system variable, `@@spark_proc_properties.kms_key_name`, or the default key of the BigQuery job's project (if the CMEK organization policy is enforced). Otherwise, the Cloud KMS key is either inferred from the Spark connection associated with the procedure (if it is provided), or from the default key of the Spark connection's project if the CMEK organization policy is enforced. Example: * `projects/[kms_project_id]/locations/[region]/keyRings/[key_region]/cryptoKeys/[key]`
      */
     kmsKeyName?: string;
     /**
@@ -4374,6 +4574,10 @@ declare namespace bigquery {
      * Output only. True if the stage has insufficient shuffle quota.
      */
     insufficientShuffleQuota?: boolean;
+    /**
+     * Output only. Partition skew in the stage.
+     */
+    partitionSkew?: IPartitionSkew;
     /**
      * Output only. True if the stage has a slot contention issue.
      */
@@ -4458,6 +4662,28 @@ declare namespace bigquery {
     columns?: Array<IStandardSqlField>;
   };
 
+  /**
+   * Contains information about how a table's data is stored and accessed by open source query engines.
+   */
+  type IStorageDescriptor = {
+    /**
+     * Optional. Specifies the fully qualified class name of the InputFormat (e.g. "org.apache.hadoop.hive.ql.io.orc.OrcInputFormat"). The maximum length is 128 characters.
+     */
+    inputFormat?: string;
+    /**
+     * Optional. The physical location of the table (e.g. 'gs://spark-dataproc-data/pangea-data/case_sensitive/' or 'gs://spark-dataproc-data/pangea-data/*'). The maximum length is 2056 bytes.
+     */
+    locationUri?: string;
+    /**
+     * Optional. Specifies the fully qualified class name of the OutputFormat (e.g. "org.apache.hadoop.hive.ql.io.orc.OrcOutputFormat"). The maximum length is 128 characters.
+     */
+    outputFormat?: string;
+    /**
+     * Optional. Serializer and deserializer information.
+     */
+    serdeInfo?: ISerDeInfo;
+  };
+
   type IStreamingbuffer = {
     /**
      * Output only. A lower-bound estimate of the number of bytes currently in the streaming buffer.
@@ -4490,11 +4716,11 @@ declare namespace bigquery {
     /**
      * Output only. Data type for each system variable.
      */
-    types?: {[key: string]: IStandardSqlDataType};
+    types?: { [key: string]: IStandardSqlDataType };
     /**
      * Output only. Value for each system variable.
      */
-    values?: {[key: string]: any};
+    values?: { [key: string]: any };
   };
 
   type ITable = {
@@ -4542,6 +4768,10 @@ declare namespace bigquery {
      */
     expirationTime?: string;
     /**
+     * Optional. Options defining open source compatible table.
+     */
+    externalCatalogTableOptions?: IExternalCatalogTableOptions;
+    /**
      * Optional. Describes the data format, location, and other properties of a table stored outside of BigQuery. By defining these properties, the data source can then be queried as if it were a standard BigQuery table.
      */
     externalDataConfiguration?: IExternalDataConfiguration;
@@ -4560,7 +4790,7 @@ declare namespace bigquery {
     /**
      * The labels associated with this table. You can use these to organize and group your tables. Label keys and values can be no longer than 63 characters, can only contain lowercase letters, numeric characters, underscores and dashes. International characters are allowed. Label values are optional. Label keys must start with a letter and each label in the list must have a different key.
      */
-    labels?: {[key: string]: string};
+    labels?: { [key: string]: string };
     /**
      * Output only. The time when this table was last modified, in milliseconds since the epoch.
      */
@@ -4634,6 +4864,10 @@ declare namespace bigquery {
      */
     numTotalPhysicalBytes?: string;
     /**
+     * Output only. The partition information for all table formats, including managed partitioned tables, hive partitioned tables, and iceberg partitioned tables.
+     */
+    partitionDefinition?: IPartitioningDefinition;
+    /**
      * If specified, configures range partitioning for this table.
      */
     rangePartitioning?: IRangePartitioning;
@@ -4648,7 +4882,11 @@ declare namespace bigquery {
     /**
      * [Optional] The tags associated with this table. Tag keys are globally unique. See additional information on [tags](https://cloud.google.com/iam/docs/tags-access-control#definitions). An object containing a list of "key": value pairs. The key is the namespaced friendly name of the tag key, e.g. "12345/environment" where 12345 is parent id. The value is the friendly short name of the tag value, e.g. "production".
      */
-    resourceTags?: {[key: string]: string};
+    resourceTags?: { [key: string]: string };
+    /**
+     * Optional. Output only. Restriction config for table. If set, restrict certain accesses on the table based on the config. See [Data egress](/bigquery/docs/analytics-hub-introduction#data_egress) for more details.
+     */
+    restrictions?: IRestrictionConfig;
     /**
      * Optional. Describes the schema of this table.
      */
@@ -4691,7 +4929,7 @@ declare namespace bigquery {
     view?: IViewDefinition;
   };
 
-  type ITableCell = {v?: any};
+  type ITableCell = { v?: any };
 
   /**
    * The TableConstraints defines the primary key and foreign key.
@@ -4847,6 +5085,10 @@ declare namespace bigquery {
      */
     fields?: Array<ITableFieldSchema>;
     /**
+     * Optional. Definition of the foreign data type. Only valid for top-level schema fields (not nested fields). If the type is FOREIGN, this field is required.
+     */
+    foreignTypeDefinition?: string;
+    /**
      * Optional. Maximum length of values of this field for STRINGS or BYTES. If max_length is not specified, no maximum length constraint is imposed on this field. If type = "STRING", then max_length represents the maximum UTF-8 length of strings in this field. If type = "BYTES", then max_length represents the maximum number of bytes in this field. It is invalid to set this field if type ≠ "STRING" and ≠ "BYTES".
      */
     maxLength?: string;
@@ -4876,7 +5118,7 @@ declare namespace bigquery {
      */
     rangeElementType?: {
       /**
-       * Required. The type of a field element. See TableFieldSchema.type.
+       * Required. The type of a field element. For more information, see TableFieldSchema.type.
        */
       type?: string;
     };
@@ -4892,7 +5134,7 @@ declare namespace bigquery {
      */
     scale?: string;
     /**
-     * Required. The field data type. Possible values include: * STRING * BYTES * INTEGER (or INT64) * FLOAT (or FLOAT64) * BOOLEAN (or BOOL) * TIMESTAMP * DATE * TIME * DATETIME * GEOGRAPHY * NUMERIC * BIGNUMERIC * JSON * RECORD (or STRUCT) Use of RECORD/STRUCT indicates that the field contains a nested schema.
+     * Required. The field data type. Possible values include: * STRING * BYTES * INTEGER (or INT64) * FLOAT (or FLOAT64) * BOOLEAN (or BOOL) * TIMESTAMP * DATE * TIME * DATETIME * GEOGRAPHY * NUMERIC * BIGNUMERIC * JSON * RECORD (or STRUCT) * RANGE ([Preview](/products/#product-launch-stages)) Use of RECORD/STRUCT indicates that the field contains a nested schema.
      */
     type?: string;
   };
@@ -4944,7 +5186,7 @@ declare namespace bigquery {
       /**
        * The labels associated with this table. You can use these to organize and group your tables.
        */
-      labels?: {[key: string]: string};
+      labels?: { [key: string]: string };
       /**
        * The range partitioning for this table.
        */
@@ -5072,6 +5314,10 @@ declare namespace bigquery {
      * Describes the fields in a table.
      */
     fields?: Array<ITableFieldSchema>;
+    /**
+     * Optional. Specifies metadata of the foreign data type definition in field schema (TableFieldSchema.foreign_type_definition).
+     */
+    foreignTypeInfo?: IForeignTypeInfo;
   };
 
   /**
@@ -5486,7 +5732,7 @@ declare namespace bigquery {
     /**
      * Weights associated with each label class, for rebalancing the training data. Only applicable for classification models.
      */
-    labelClassWeights?: {[key: string]: number};
+    labelClassWeights?: { [key: string]: number };
     /**
      * Learning rate in training. Used only for iterative training algorithms.
      */
@@ -5739,7 +5985,7 @@ declare namespace bigquery {
    */
   type IUndeleteDatasetRequest = {
     /**
-     * Optional. The exact time when the dataset was deleted. If not specified, it will undelete the most recently deleted version.
+     * Optional. The exact time when the dataset was deleted. If not specified, the most recently deleted version is undeleted.
      */
     deletionTime?: string;
   };
@@ -5832,7 +6078,7 @@ declare namespace bigquery {
        */
       all?: boolean;
       /**
-       * An expression for filtering the results of the request by label. The syntax is \"labels.<name>[:<value>]\". Multiple filters can be ANDed together by connecting with a space. Example: \"labels.department:receiving labels.active\". See [Filtering datasets using labels](/bigquery/docs/labeling-datasets#filtering_datasets_using_labels) for details.
+       * An expression for filtering the results of the request by label. The syntax is \"labels.<name>[:<value>]\". Multiple filters can be ANDed together by connecting with a space. Example: \"labels.department:receiving labels.active\". See [Filtering datasets using labels](/bigquery/docs/filtering-labels#filtering_datasets_using_labels) for details.
        */
       filter?: string;
       /**
