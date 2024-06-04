@@ -54,10 +54,6 @@ async function submitDiscoveryPR() {
   if (!githubToken) {
     throw new Error('please include a GITHUB_TOKEN');
   }
-  const codeBotToken = process.env.CODE_BOT_TOKEN;
-  if (!codeBotToken) {
-    throw new Error('please include a CODE_BOT_TOKEN');
-  }
 
   try {
     // Open the pull request with the GITHUB_TOKEN
