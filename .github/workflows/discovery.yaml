@@ -27,6 +27,6 @@ jobs:
           description: 'Automated pull-request to keep BigQuery Discovery types up-to-date.'
           title: 'chore: update types from Discovery'
           message: 'chore: update types from Discovery'
-          branch: update-discovery/patch
+          branch: update-discovery-patch
           git_dir: '.'
           fork: true
