@@ -1,8 +1,7 @@
 on:
   schedule:
     - cron: '0 12 * * TUE'
-  workflow_dispatch:
-  pull_request: # REMOVE BEFORE MERGING    
+  workflow_dispatch:  
 name: Update Discovery Generated Types
 jobs:
   sync:
