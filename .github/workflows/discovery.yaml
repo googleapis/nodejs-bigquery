@@ -1,12 +1,13 @@
 on:
   schedule:
     - cron: '0 12 * * TUE'
-  pull_request: # REMOVE BEFORE MERGING
   workflow_dispatch:
 name: Update Discovery Generated Types
 jobs:
   sync:
     runs-on: ubuntu-latest
+    env:
+      ACCESS_TOKEN: ${{ secrets.YOSHI_CODE_BOT_TOKEN }}
     steps:
       - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
       - uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
@@ -17,6 +18,14 @@ jobs:
       # Generate types
       - run: npm run types
       # Submit pull request
-      - run: npm run submit-discovery-pr
-        env:
-          GITHUB_TOKEN: ${{ secrets.YOSHI_CODE_BOT_TOKEN }}
+      - uses: googleapis/code-suggester@v2
+        with:
+          command: pr
+          upstream_owner: googleapis
+          upstream_repo: nodejs-bigquery
+          description: 'Automated pull-request to keep BigQuery Discovery types up-to-date.'
+          title: 'chore: update types from Discovery'
+          message: 'chore: update types from Discovery'
+          branch: update-discovery/patch
+          git_dir: '.'
+          fork: true
