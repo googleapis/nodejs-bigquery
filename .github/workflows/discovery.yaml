@@ -2,7 +2,7 @@ on:
   schedule:
     - cron: '0 12 * * TUE'
   pull_request: # REMOVE BEFORE MERGING
-  workflow_dispatch:    
+  workflow_dispatch:
 name: Update Discovery Generated Types
 jobs:
   sync:
@@ -20,5 +20,4 @@ jobs:
       - run: npm run submit-discovery-pr
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CODE_BOT_TOKEN: ${{ secrets.APIARY_GEN_SECRET }}
-      
+          GITHUB_ACTIONS: true
