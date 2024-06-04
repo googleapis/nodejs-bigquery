@@ -34,3 +34,4 @@ jobs:
           branch: update-discovery-patch
           git_dir: '.'
           fork: true
+          force: true
