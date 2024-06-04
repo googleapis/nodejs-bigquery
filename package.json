@@ -44,6 +44,7 @@
     "docs-test": "linkinator docs",
     "predocs-test": "npm run docs",
     "types": "node scripts/gen-types.js",
+    "submit-discovery-pr": "node scripts/submit-discovery-pr.js",
     "prelint": "cd samples; npm link ../; npm install",
     "precompile": "gts clean"
   },
@@ -84,6 +85,8 @@
     "prettier": "^3.0.0",
     "proxyquire": "^2.1.0",
     "sinon": "^18.0.0",
-    "typescript": "^5.1.6"
+    "typescript": "^5.1.6",
+    "gaxios": "^6.0.3",
+    "execa": "^5.0.0"
   }
 }
