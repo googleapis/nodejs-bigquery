@@ -56,9 +56,7 @@
     "arrify": "^2.0.1",
     "big.js": "^6.0.0",
     "duplexify": "^4.0.0",
-    "execa": "^5.0.0",
     "extend": "^3.0.2",
-    "gaxios": "^6.0.3",
     "is": "^3.3.0",
     "stream-events": "^1.0.5",
     "uuid": "^9.0.0"
@@ -87,6 +85,8 @@
     "prettier": "^3.0.0",
     "proxyquire": "^2.1.0",
     "sinon": "^18.0.0",
-    "typescript": "^5.1.6"
+    "typescript": "^5.1.6",
+    "gaxios": "^6.0.3",
+    "execa": "^5.0.0"
   }
 }
