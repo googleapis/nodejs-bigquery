@@ -17,6 +17,7 @@ const gaxios = require('gaxios');
 
 const REPO = 'googleapis/nodejs-bigquery';
 const BRANCH = 'update-discovery/patch';
+const BASE_BRANCH = 'main';
 const TRACK_PATHS = ['src/types.d.ts'];
 const COMMIT_MESSAGE = 'chore: update types from Discovery';
 const COMMIT_BODY =
@@ -43,7 +44,7 @@ async function submitDiscoveryPR() {
     await execa('git', ['config', 'user.name', 'Yoshi Automation']);
   }
 
-  await execa('git', ['checkout', '-B', BRANCH]);
+  await execa('git', ['checkout', '-B', BRANCH, BASE_BRANCH]);
   for (const filename of foundChanges) {
     await execa('git', ['add', filename]);
   }
@@ -56,7 +57,7 @@ async function submitDiscoveryPR() {
   }
 
   try {
-    // Open the pull request with the GITHUB_TOKEN
+    // Open the pull request
     await gaxios.request({
       method: 'POST',
       headers: {
@@ -66,7 +67,7 @@ async function submitDiscoveryPR() {
       data: {
         title: COMMIT_MESSAGE,
         head: BRANCH,
-        base: 'main',
+        base: BASE_BRANCH,
         body: COMMIT_BODY,
       },
     });
