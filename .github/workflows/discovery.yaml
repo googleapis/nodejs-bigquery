@@ -19,5 +19,5 @@ jobs:
       # Submit pull request
       - run: npm run submit-discovery-pr
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CODE_BOT_TOKEN: ${{ secrets.APIARY_GEN_SECRET }}
       
