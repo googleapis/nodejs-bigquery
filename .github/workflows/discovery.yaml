@@ -19,5 +19,4 @@ jobs:
       # Submit pull request
       - run: npm run submit-discovery-pr
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_ACTIONS: true
+          GITHUB_TOKEN: ${{ secrets.YOSHI_CODE_BOT_TOKEN }}

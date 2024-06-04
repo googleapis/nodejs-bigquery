@@ -44,7 +44,7 @@ async function submitDiscoveryPR() {
     await execa('git', ['config', 'user.name', 'Yoshi Automation']);
   }
 
-  await execa('git', ['checkout', '-B', BRANCH, BASE_BRANCH]);
+  await execa('git', ['checkout', '-B', BRANCH]);
   for (const filename of foundChanges) {
     await execa('git', ['add', filename]);
   }
