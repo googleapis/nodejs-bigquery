@@ -50,6 +50,10 @@ async function submitDiscoveryPR() {
   await execa('git', ['commit', '-m', COMMIT_MESSAGE, '-m', COMMIT_BODY]);
   await execa('git', ['push', 'origin', BRANCH, '--force']);
 
+  const githubToken = process.env.GITHUB_TOKEN;
+  if (!githubToken) {
+    throw new Error('please include a GITHUB_TOKEN');
+  }
   const codeBotToken = process.env.CODE_BOT_TOKEN;
   if (!codeBotToken) {
     throw new Error('please include a CODE_BOT_TOKEN');
