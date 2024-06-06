@@ -908,7 +908,7 @@ declare namespace bigquery {
      */
     defaultCollation?: string;
     /**
-     * The default encryption key for all tables in the dataset. Once this property is set, all newly-created partitioned tables in the dataset will have encryption key set to this value, unless table creation request (or query) overrides the key.
+     * The default encryption key for all tables in the dataset. After this property is set, the encryption key of all newly-created tables in the dataset is set to this value unless the table creation request or query explicitly overrides the key.
      */
     defaultEncryptionConfiguration?: IEncryptionConfiguration;
     /**
@@ -982,6 +982,10 @@ declare namespace bigquery {
      * Optional. Defines the time travel window in hours. The value can be from 48 to 168 hours (2 to 7 days). The default value is 168 hours if this is not set.
      */
     maxTimeTravelHours?: string;
+    /**
+     * Optional. The [tags](/bigquery/docs/tags) attached to this dataset. Tag keys are globally unique. Tag key is expected to be in the namespaced format, for example "123456789012/environment" where 123456789012 is the ID of the parent organization or project resource for this tag key. Tag value is expected to be the short name, for example "Production". See [Tag definitions](/iam/docs/tags-access-control#definitions) for more details.
+     */
+    resourceTags?: {[key: string]: string};
     /**
      * Optional. Output only. Restriction config for all tables and dataset. If set, restrict certain accesses on the dataset and all its tables based on the config. See [Data egress](/bigquery/docs/analytics-hub-introduction#data_egress) for more details.
      */
@@ -1692,6 +1696,20 @@ declare namespace bigquery {
   };
 
   /**
+   * A view can be represented in multiple ways. Each representation has its own dialect. This message stores the metadata required for these representations.
+   */
+  type IForeignViewDefinition = {
+    /**
+     * Optional. Represents the dialect of the query.
+     */
+    dialect?: string;
+    /**
+     * Required. The query that defines the view.
+     */
+    query?: string;
+  };
+
+  /**
    * Request message for `GetIamPolicy` method.
    */
   type IGetIamPolicyRequest = {
@@ -2221,7 +2239,7 @@ declare namespace bigquery {
      */
     extract?: IJobConfigurationExtract;
     /**
-     * Optional. Job timeout in milliseconds. If this time limit is exceeded, BigQuery might attempt to stop the job.
+     * Optional. Job timeout in milliseconds. If this time limit is exceeded, BigQuery will attempt to stop a longer job, but may not always succeed in canceling it before the job completes. For example, a job that takes more than 60 seconds to complete has a better chance of being stopped than a job that takes 10 seconds to complete.
      */
     jobTimeoutMs?: string;
     /**
@@ -2308,6 +2326,14 @@ declare namespace bigquery {
      * Clustering specification for the destination table.
      */
     clustering?: IClustering;
+    /**
+     * Optional. Character map supported for column names in CSV/Parquet loads. Defaults to STRICT and can be overridden by Project Config Service. Using this option with unsupporting load formats will result in an error.
+     */
+    columnNameCharacterMap?:
+      | 'COLUMN_NAME_CHARACTER_MAP_UNSPECIFIED'
+      | 'STRICT'
+      | 'V1'
+      | 'V2';
     /**
      * Optional. Connection properties which can modify the load job behavior. Currently, only the 'session_id' connection property is supported, and is used to resolve _SESSION appearing as the dataset id.
      */
@@ -3538,7 +3564,7 @@ declare namespace bigquery {
      */
     enumAsString?: boolean;
     /**
-     * Optional. Will indicate how to represent a parquet map if present.
+     * Optional. Indicates how to represent a Parquet map if present.
      */
     mapTargetType?: 'MAP_TARGET_TYPE_UNSPECIFIED' | 'ARRAY_OF_STRUCT';
   };
@@ -4832,6 +4858,10 @@ declare namespace bigquery {
      */
     numBytes?: string;
     /**
+     * Output only. Number of physical bytes used by current live data storage. This data is not kept in real time, and might be delayed by a few seconds to a few minutes.
+     */
+    numCurrentPhysicalBytes?: string;
+    /**
      * Output only. The number of logical bytes in the table that are considered "long-term storage".
      */
     numLongTermBytes?: string;
@@ -5285,7 +5315,7 @@ declare namespace bigquery {
      */
     replicationError?: IErrorProto;
     /**
-     * Required. Specifies the interval at which the source table is polled for updates.
+     * Optional. Specifies the interval at which the source table is polled for updates. It's Optional. If not specified, default replication interval would be applied.
      */
     replicationIntervalMs?: string;
     /**
@@ -5989,7 +6019,7 @@ declare namespace bigquery {
    */
   type IUndeleteDatasetRequest = {
     /**
-     * Optional. The exact time when the dataset was deleted. If not specified, the most recently deleted version is undeleted.
+     * Optional. The exact time when the dataset was deleted. If not specified, the most recently deleted version is undeleted. Undeleting a dataset using deletion time is not supported.
      */
     deletionTime?: string;
   };
@@ -6030,6 +6060,10 @@ declare namespace bigquery {
    * Describes the definition of a logical view.
    */
   type IViewDefinition = {
+    /**
+     * Optional. Foreign view representations.
+     */
+    foreignDefinitions?: Array<IForeignViewDefinition>;
     /**
      * Optional. Specifices the privacy policy for the view.
      */
