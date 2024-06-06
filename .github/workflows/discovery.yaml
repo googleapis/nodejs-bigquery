@@ -22,7 +22,7 @@ jobs:
       # Fix formatting
       - run: npm run fix
       # Submit pull request
-      - uses: googleapis/code-suggester@v2
+      - uses: googleapis/code-suggester@v4
         with:
           command: pr
           upstream_owner: googleapis
