@@ -13,6 +13,10 @@
 // limitations under the License.
 
 /**
+ * Discovery Revision: 20240526
+ */
+
+/**
  * BigQuery API
  */
 declare namespace bigquery {
