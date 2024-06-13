@@ -1,0 +1,36 @@
+on:
+  schedule:
+    - cron: '0 12 * * TUE'
+  workflow_dispatch:
+name: Update Discovery Generated Types
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    env:
+      ACCESS_TOKEN: ${{ secrets.YOSHI_CODE_BOT_TOKEN }}
+    steps:
+      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+      - uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
+        with:
+          node-version: 16
+      # Install all deps, including dev dependencies.
+      - run: npm install
+      # Generate types
+      - run: npm run types
+      # Install samples deps
+      - run: cd samples/ && npm install && cd ../
+      # Fix formatting
+      - run: npm run fix
+      # Submit pull request
+      - uses: googleapis/code-suggester@v4
+        with:
+          command: pr
+          upstream_owner: googleapis
+          upstream_repo: nodejs-bigquery
+          description: 'Automated pull-request to keep BigQuery Discovery types up-to-date.'
+          title: 'chore: update types from Discovery'
+          message: 'chore: update types from Discovery'
+          branch: update-discovery-patch
+          git_dir: '.'
+          fork: true
+          force: true

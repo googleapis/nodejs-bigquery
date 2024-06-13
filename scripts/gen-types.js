@@ -34,6 +34,8 @@ const LICENSE = `// Copyright 2024 Google LLC
 // See the License for the specific language governing permissions and
 // limitations under the License.`;
 
+let discoveryRevision;
+
 function overridedRender() {
   const source = this.template({
     title: this.title ? this.converter.toJSDoc(this.title) : '',
@@ -42,13 +44,18 @@ function overridedRender() {
     resources: this.resources.map(resource => resource.render()),
   });
 
+  let header = LICENSE + '\n';
+  if (discoveryRevision) {
+    header =
+      header + `\n/**\n * Discovery Revision: ${discoveryRevision} \n */\n`;
+  }
   const patched = source.replaceAll(
     'formatOptions.useInt64Timestamp',
     "'formatOptions.useInt64Timestamp'"
   );
-  const sourceWithLicense = LICENSE + '\n' + patched;
+  const fullSource = header + patched;
 
-  return prettier.format(sourceWithLicense, {
+  return prettier.format(fullSource, {
     parser: 'typescript',
     singleQuote: true,
   });
@@ -56,6 +63,7 @@ function overridedRender() {
 
 async function genTypes() {
   const json = await fetch('bigquery', 'v2');
+  discoveryRevision = json['revision'];
   const generator = new TypeGenerator(json);
   generator.render = overridedRender.bind(generator);
   const types = await generator.render();
