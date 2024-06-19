@@ -4,6 +4,13 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## [7.8.0](https://github.com/googleapis/nodejs-bigquery/compare/v7.7.1...v7.8.0) (2024-06-19)
+
+
+### Features
+
+* Update types from Discovery ([#1374](https://github.com/googleapis/nodejs-bigquery/issues/1374)) ([e416b6e](https://github.com/googleapis/nodejs-bigquery/commit/e416b6e888a435cd487e90932d2597bf4e4ddb72))
+
 ## [7.7.1](https://github.com/googleapis/nodejs-bigquery/compare/v7.7.0...v7.7.1) (2024-05-31)
 
 
