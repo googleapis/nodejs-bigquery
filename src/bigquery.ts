@@ -43,7 +43,10 @@ import {
   JobResponse,
   RowMetadata,
 } from './table';
-import {GoogleErrorBody} from '@google-cloud/common/build/src/util';
+import {
+  GoogleErrorBody,
+  RetryOptions,
+} from '@google-cloud/common/build/src/util';
 import bigquery from './types';
 import {logger, setLogFunction} from './logger';
 
@@ -216,6 +219,8 @@ export interface BigQueryOptions extends GoogleAuthOptions {
    * We will exponentially backoff subsequent requests by default.
    *
    * Defaults to `true`.
+   *
+   * @deprecated Use retryOptions.
    */
   autoRetry?: boolean;
   /**
@@ -223,8 +228,15 @@ export interface BigQueryOptions extends GoogleAuthOptions {
    * attempted before returning the error.
    *
    * Defaults to 3.
+   *
+   * @deprecated Use retryOptions.
    */
   maxRetries?: number;
+
+  /**
+   * Retry Options
+   */
+  retryOptions?: RetryOptions;
 
   /**
    * The geographic location of all datasets and
@@ -388,6 +400,7 @@ export class BigQuery extends Service {
       packageJson: require('../../package.json'),
       autoRetry: options.autoRetry,
       maxRetries: options.maxRetries,
+      retryOptions: options.retryOptions,
     };
 
     if (options.scopes) {
