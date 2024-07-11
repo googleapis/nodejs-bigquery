@@ -234,7 +234,13 @@ export interface BigQueryOptions extends GoogleAuthOptions {
   maxRetries?: number;
 
   /**
-   * Retry Options
+   * Customize retry configuration for all requests in the SDK.
+   * If the response is related to rate limits or certain intermittent server errors.
+   * We will exponentially backoff subsequent requests by default.
+   *
+   * Defaults:
+   * - retryOptions.autoRetry: true
+   * - retryOptions.maxRetries: 3
    */
   retryOptions?: RetryOptions;
 
