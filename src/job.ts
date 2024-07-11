@@ -565,16 +565,19 @@ class Job extends Operation {
     const timeoutOverride =
       typeof qs.timeoutMs === 'number' ? qs.timeoutMs : false;
 
-    if (options._cachedRows) {
+    const cachedRows = options._cachedRows;
+    const cachedResponse = options._cachedResponse;
+    delete options._cachedRows;
+    delete options._cachedResponse;
+    if (cachedRows) {
       let nextQuery: QueryResultsOptions | null = null;
       if (options.pageToken) {
         nextQuery = Object.assign({}, options, {
           pageToken: options.pageToken,
         });
-        delete nextQuery._cachedRows;
-        delete nextQuery._cachedResponse;
       }
-      callback!(null, options._cachedRows, nextQuery, options._cachedResponse);
+      delete cachedResponse?.rows;
+      callback!(null, cachedRows, nextQuery, cachedResponse);
       return;
     }
 
@@ -620,7 +623,7 @@ class Job extends Operation {
           });
           delete nextQuery.startIndex;
         }
-
+        delete resp.rows;
         callback!(null, rows, nextQuery, resp);
       }
     );
