@@ -235,8 +235,12 @@ export interface BigQueryOptions extends GoogleAuthOptions {
 
   /**
    * Customize retry configuration for all requests in the SDK.
-   * If the response is related to rate limits or certain intermittent server errors.
+   * By default, a request is retried if the response is related to rate limits
+   * or certain intermittent server errors.
    * We will exponentially backoff subsequent requests by default.
+   *
+   * More on the default retry predicate on the `shouldRetryRequest` method:
+   * https://github.com/googleapis/nodejs-common/blob/main/src/util.ts
    *
    * Defaults:
    * - retryOptions.autoRetry: true
