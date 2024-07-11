@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * Discovery Revision: 20240526
+ * Discovery Revision: 20240623
  */
 
 /**
@@ -407,7 +407,7 @@ declare namespace bigquery {
    */
   type IBigLakeConfiguration = {
     /**
-     * Required. The connection specifying the credentials to be used to read and write to external storage, such as Cloud Storage. The connection_id can have the form "<project\_id>.<location\_id>.<connection\_id>" or "projects/<project\_id>/locations/<location\_id>/connections/<connection\_id>".
+     * Required. The connection specifying the credentials to be used to read and write to external storage, such as Cloud Storage. The connection_id can have the form `{project}.{location}.{connection_id}` or `projects/{project}/locations/{location}/connections/{connection_id}".
      */
     connectionId?: string;
     /**
@@ -415,7 +415,7 @@ declare namespace bigquery {
      */
     fileFormat?: 'FILE_FORMAT_UNSPECIFIED' | 'PARQUET';
     /**
-     * Required. The fully qualified location prefix of the external folder where table data is stored. The '*' wildcard character is not allowed. The URI should be in the format "gs://bucket/path_to_table/"
+     * Required. The fully qualified location prefix of the external folder where table data is stored. The '*' wildcard character is not allowed. The URI should be in the format `gs://bucket/path_to_table/`
      */
     storageUri?: string;
     /**
@@ -452,7 +452,7 @@ declare namespace bigquery {
      */
     onlyReadLatest?: boolean;
     /**
-     * [Required] Qualifier of the column. Columns in the parent column family that has this exact qualifier are exposed as . field. If the qualifier is valid UTF-8 string, it can be specified in the qualifier_string field. Otherwise, a base-64 encoded value must be set to qualifier_encoded. The column field name is the same as the column qualifier. However, if the qualifier is not a valid BigQuery field identifier i.e. does not match a-zA-Z*, a valid identifier must be provided as field_name.
+     * [Required] Qualifier of the column. Columns in the parent column family that has this exact qualifier are exposed as `.` field. If the qualifier is valid UTF-8 string, it can be specified in the qualifier_string field. Otherwise, a base-64 encoded value must be set to qualifier_encoded. The column field name is the same as the column qualifier. However, if the qualifier is not a valid BigQuery field identifier i.e. does not match a-zA-Z*, a valid identifier must be provided as field_name.
      */
     qualifierEncoded?: string;
     /**
@@ -470,7 +470,7 @@ declare namespace bigquery {
    */
   type IBigtableColumnFamily = {
     /**
-     * Optional. Lists of columns that should be exposed as individual fields as opposed to a list of (column name, value) pairs. All columns whose qualifier matches a qualifier in this list can be accessed as .. Other columns can be accessed as a list through .Column field.
+     * Optional. Lists of columns that should be exposed as individual fields as opposed to a list of (column name, value) pairs. All columns whose qualifier matches a qualifier in this list can be accessed as `.`. Other columns can be accessed as a list through `.Column` field.
      */
     columns?: Array<IBigtableColumn>;
     /**
@@ -764,7 +764,7 @@ declare namespace bigquery {
   };
 
   /**
-   * A connection-level property to customize query behavior. Under JDBC, these correspond directly to connection properties passed to the DriverManager. Under ODBC, these correspond to properties in the connection string. Currently supported connection properties: * **dataset_project_id**: represents the default project for datasets that are used in the query. Setting the system variable `@@dataset_project_id` achieves the same behavior. For more information about system variables, see: https://cloud.google.com/bigquery/docs/reference/system-variables * **time_zone**: represents the default timezone used to run the query. * **session_id**: associates the query with a given session. * **query_label**: associates the query with a given job label. If set, all subsequent queries in a script or session will have this label. For the format in which a you can specify a query label, see labels in the JobConfiguration resource type: https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#jobconfiguration Additional properties are allowed, but ignored. Specifying multiple connection properties with the same key returns an error.
+   * A connection-level property to customize query behavior. Under JDBC, these correspond directly to connection properties passed to the DriverManager. Under ODBC, these correspond to properties in the connection string. Currently supported connection properties: * **dataset_project_id**: represents the default project for datasets that are used in the query. Setting the system variable `@@dataset_project_id` achieves the same behavior. For more information about system variables, see: https://cloud.google.com/bigquery/docs/reference/system-variables * **time_zone**: represents the default timezone used to run the query. * **session_id**: associates the query with a given session. * **query_label**: associates the query with a given job label. If set, all subsequent queries in a script or session will have this label. For the format in which a you can specify a query label, see labels in the JobConfiguration resource type: https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#jobconfiguration * **service_account**: indicates the service account to use to run a continuous query. If set, the query job uses the service account to access Google Cloud resources. Service account access is bounded by the IAM permissions that you have granted to the service account. Additional properties are allowed, but ignored. Specifying multiple connection properties with the same key returns an error.
    */
   type IConnectionProperty = {
     /**
@@ -853,6 +853,9 @@ declare namespace bigquery {
     trainingTable?: ITableReference;
   };
 
+  /**
+   * Represents a BigQuery dataset.
+   */
   type IDataset = {
     /**
      * Optional. An array of objects that define dataset access for one or more entities. You can set this property when inserting or updating a dataset in order to control who is allowed to access the data. If unspecified at dataset creation time, BigQuery adds default dataset access for the following entities: access.specialGroup: projectReaders; access.role: READER; access.specialGroup: projectWriters; access.role: WRITER; access.specialGroup: projectOwners; access.role: OWNER; access.userByEmail: [dataset creator email]; access.role: OWNER;
@@ -875,7 +878,7 @@ declare namespace bigquery {
        */
       iamMember?: string;
       /**
-       * An IAM role ID that should be granted to the user, group, or domain specified in this access entry. The following legacy mappings will be applied: OWNER <=> roles/bigquery.dataOwner WRITER <=> roles/bigquery.dataEditor READER <=> roles/bigquery.dataViewer This field will accept any of the above formats, but will return only the legacy format. For example, if you set this field to "roles/bigquery.dataOwner", it will be returned back as "OWNER".
+       * An IAM role ID that should be granted to the user, group, or domain specified in this access entry. The following legacy mappings will be applied: * OWNER <=> roles/bigquery.dataOwner * WRITER <=> roles/bigquery.dataEditor * READER <=> roles/bigquery.dataViewer This field will accept any of the above formats, but will return only the legacy format. For example, if you set this field to "roles/bigquery.dataOwner", it will be returned back as "OWNER".
        */
       role?: string;
       /**
@@ -959,7 +962,7 @@ declare namespace bigquery {
      */
     kind?: string;
     /**
-     * The labels associated with this dataset. You can use these to organize and group your datasets. You can set this property when inserting or updating a dataset. See Creating and Updating Dataset Labels for more information.
+     * The labels associated with this dataset. You can use these to organize and group your datasets. You can set this property when inserting or updating a dataset. See [Creating and Updating Dataset Labels](https://cloud.google.com/bigquery/docs/creating-managing-labels#creating_and_updating_dataset_labels) for more information.
      */
     labels?: {[key: string]: string};
     /**
@@ -1093,6 +1096,9 @@ declare namespace bigquery {
     unreachable?: Array<string>;
   };
 
+  /**
+   * Identifier for a dataset.
+   */
   type IDatasetReference = {
     /**
      * Required. A unique ID for this dataset, without the project name. The ID must contain only letters (a-z, A-Z), numbers (0-9), or underscores (_). The maximum length is 1,024 characters.
@@ -1230,6 +1236,9 @@ declare namespace bigquery {
     min?: number;
   };
 
+  /**
+   * Configuration for Cloud KMS encryption settings.
+   */
   type IEncryptionConfiguration = {
     /**
      * Optional. Describes the Cloud KMS encryption key that will be used to protect destination BigQuery table. The BigQuery Service Account associated with your project requires access to this encryption key.
@@ -1551,7 +1560,7 @@ declare namespace bigquery {
      */
     compression?: string;
     /**
-     * Optional. The connection specifying the credentials to be used to read external storage, such as Azure Blob, Cloud Storage, or S3. The connection_id can have the form "<project\_id>.<location\_id>.<connection\_id>" or "projects/<project\_id>/locations/<location\_id>/connections/<connection\_id>".
+     * Optional. The connection specifying the credentials to be used to read external storage, such as Azure Blob, Cloud Storage, or S3. The connection_id can have the form `{project_id}.{location_id};{connection_id}` or `projects/{project_id}/locations/{location_id}/connections/{connection_id}`.
      */
     connectionId?: string;
     /**
@@ -3584,17 +3593,17 @@ declare namespace bigquery {
    */
   type IPartitionedColumn = {
     /**
-     * Output only. The name of the partition column.
+     * Required. The name of the partition column.
      */
     field?: string;
   };
 
   /**
-   * The partitioning information, which includes managed table and external table partition information.
+   * The partitioning information, which includes managed table, external table and metastore partitioned table partition information.
    */
   type IPartitioningDefinition = {
     /**
-     * Output only. Details about each partitioning column. BigQuery native tables only support 1 partitioning column. Other table types may support 0, 1 or more partitioning columns.
+     * Optional. Details about each partitioning column. This field is output only for all partitioning types other than metastore partitioned tables. BigQuery native tables only support 1 partitioning column. Other table types may support 0, 1 or more partitioning columns. For metastore partitioned tables, the order must match the definition order in the Hive Metastore, where it must match the physical layout of the table. For example, CREATE TABLE a_table(id BIGINT, name STRING) PARTITIONED BY (city STRING, state STRING). In this case the values must be ['city', 'state'] in that order.
      */
     partitionedColumn?: Array<IPartitionedColumn>;
   };
@@ -4005,7 +4014,7 @@ declare namespace bigquery {
 
   type IRangePartitioning = {
     /**
-     * Required. [Experimental] The table is partitioned by this field. The field must be a top-level NULLABLE/REQUIRED field. The only supported type is INTEGER/INT64.
+     * Required. The name of the column to partition the table on. It must be a top-level, INT64 column whose mode is NULLABLE or REQUIRED.
      */
     field?: string;
     /**
@@ -4898,7 +4907,7 @@ declare namespace bigquery {
      */
     numTotalPhysicalBytes?: string;
     /**
-     * Output only. The partition information for all table formats, including managed partitioned tables, hive partitioned tables, and iceberg partitioned tables.
+     * Optional. The partition information for all table formats, including managed partitioned tables, hive partitioned tables, iceberg partitioned, and metastore partitioned tables. This field is only populated for metastore partitioned tables. For other table formats, this is an output only field.
      */
     partitionDefinition?: IPartitioningDefinition;
     /**
@@ -5269,6 +5278,10 @@ declare namespace bigquery {
      * Free form human-readable reason metadata caching was unused for the job.
      */
     explanation?: string;
+    /**
+     * Duration since last refresh as of this job for managed tables (indicates metadata cache staleness as seen by this job).
+     */
+    staleness?: string;
     /**
      * Metadata caching eligible table referenced in the query.
      */
@@ -6116,7 +6129,7 @@ declare namespace bigquery {
        */
       all?: boolean;
       /**
-       * An expression for filtering the results of the request by label. The syntax is \"labels.<name>[:<value>]\". Multiple filters can be ANDed together by connecting with a space. Example: \"labels.department:receiving labels.active\". See [Filtering datasets using labels](/bigquery/docs/filtering-labels#filtering_datasets_using_labels) for details.
+       * An expression for filtering the results of the request by label. The syntax is `labels.[:]`. Multiple filters can be ANDed together by connecting with a space. Example: `labels.department:receiving labels.active`. See [Filtering datasets using labels](https://cloud.google.com/bigquery/docs/filtering-labels#filtering_datasets_using_labels) for details.
        */
       filter?: string;
       /**
@@ -6136,7 +6149,7 @@ declare namespace bigquery {
      */
     type ICancelParams = {
       /**
-       * The geographic location of the job. You must specify the location to run the job for the following scenarios: - If the location to run a job is not in the `us` or the `eu` multi-regional location - If the job's location is in a single region (for example, `us-central1`) For more information, see https://cloud.google.com/bigquery/docs/locations#specifying_your_location.
+       * The geographic location of the job. You must specify the location to run the job for the following scenarios: * If the location to run a job is not in the `us` or the `eu` multi-regional location * If the job's location is in a single region (for example, `us-central1`) For more information, see https://cloud.google.com/bigquery/docs/locations#specifying_your_location.
        */
       location?: string;
     };
@@ -6156,7 +6169,7 @@ declare namespace bigquery {
      */
     type IGetParams = {
       /**
-       * The geographic location of the job. You must specify the location to run the job for the following scenarios: - If the location to run a job is not in the `us` or the `eu` multi-regional location - If the job's location is in a single region (for example, `us-central1`) For more information, see https://cloud.google.com/bigquery/docs/locations#specifying_your_location.
+       * The geographic location of the job. You must specify the location to run the job for the following scenarios: * If the location to run a job is not in the `us` or the `eu` multi-regional location * If the job's location is in a single region (for example, `us-central1`) For more information, see https://cloud.google.com/bigquery/docs/locations#specifying_your_location.
        */
       location?: string;
     };
@@ -6170,7 +6183,7 @@ declare namespace bigquery {
        */
       'formatOptions.useInt64Timestamp'?: boolean;
       /**
-       * The geographic location of the job. You must specify the location to run the job for the following scenarios: - If the location to run a job is not in the `us` or the `eu` multi-regional location - If the job's location is in a single region (for example, `us-central1`) For more information, see https://cloud.google.com/bigquery/docs/locations#specifying_your_location.
+       * The geographic location of the job. You must specify the location to run the job for the following scenarios: * If the location to run a job is not in the `us` or the `eu` multi-regional location * If the job's location is in a single region (for example, `us-central1`) For more information, see https://cloud.google.com/bigquery/docs/locations#specifying_your_location.
        */
       location?: string;
       /**
