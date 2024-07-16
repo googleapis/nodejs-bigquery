@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * Discovery Revision: 20240623
+ * Discovery Revision: 20240629
  */
 
 /**
@@ -470,7 +470,7 @@ declare namespace bigquery {
    */
   type IBigtableColumnFamily = {
     /**
-     * Optional. Lists of columns that should be exposed as individual fields as opposed to a list of (column name, value) pairs. All columns whose qualifier matches a qualifier in this list can be accessed as `.`. Other columns can be accessed as a list through `.Column` field.
+     * Optional. Lists of columns that should be exposed as individual fields as opposed to a list of (column name, value) pairs. All columns whose qualifier matches a qualifier in this list can be accessed as `.`. Other columns can be accessed as a list through the `.Column` field.
      */
     columns?: Array<IBigtableColumn>;
     /**
@@ -878,7 +878,7 @@ declare namespace bigquery {
        */
       iamMember?: string;
       /**
-       * An IAM role ID that should be granted to the user, group, or domain specified in this access entry. The following legacy mappings will be applied: * OWNER <=> roles/bigquery.dataOwner * WRITER <=> roles/bigquery.dataEditor * READER <=> roles/bigquery.dataViewer This field will accept any of the above formats, but will return only the legacy format. For example, if you set this field to "roles/bigquery.dataOwner", it will be returned back as "OWNER".
+       * An IAM role ID that should be granted to the user, group, or domain specified in this access entry. The following legacy mappings will be applied: * `OWNER`: `roles/bigquery.dataOwner` * `WRITER`: `roles/bigquery.dataEditor` * `READER`: `roles/bigquery.dataViewer` This field will accept any of the above formats, but will return only the legacy format. For example, if you set this field to "roles/bigquery.dataOwner", it will be returned back as "OWNER".
        */
       role?: string;
       /**
@@ -886,7 +886,7 @@ declare namespace bigquery {
        */
       routine?: IRoutineReference;
       /**
-       * [Pick one] A special group to grant access to. Possible values include: projectOwners: Owners of the enclosing project. projectReaders: Readers of the enclosing project. projectWriters: Writers of the enclosing project. allAuthenticatedUsers: All authenticated BigQuery users. Maps to similarly-named IAM members.
+       * [Pick one] A special group to grant access to. Possible values include: * projectOwners: Owners of the enclosing project. * projectReaders: Readers of the enclosing project. * projectWriters: Writers of the enclosing project. * allAuthenticatedUsers: All authenticated BigQuery users. Maps to similarly-named IAM members.
        */
       specialGroup?: string;
       /**
