@@ -325,6 +325,19 @@ describe('BigQuery', () => {
       assert.deepStrictEqual(calledWith.maxRetries, retryVal);
     });
 
+    it('should pass retryOptions from options', () => {
+      const retryOptions = {
+        autoRetry: true,
+        maxRetries: 3,
+      };
+      const bq = new BigQuery({
+        retryOptions: retryOptions,
+      });
+
+      const calledWith = bq.calledWith_[0];
+      assert.deepStrictEqual(calledWith.retryOptions, retryOptions);
+    });
+
     it('should not modify options argument', () => {
       const options = {
         projectId: PROJECT_ID,
