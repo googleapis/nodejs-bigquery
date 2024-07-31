@@ -2218,6 +2218,7 @@ export class BigQuery extends Service {
             wrapIntegers: options.wrapIntegers || false,
             parseJSON: options.parseJSON,
           });
+          delete res.rows;
         }
         this.trace_('[runJobsQuery] job complete');
         options._cachedRows = rows;

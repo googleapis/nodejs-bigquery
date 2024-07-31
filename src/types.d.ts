@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * Discovery Revision: 20240629
+ * Discovery Revision: 20240714
  */
 
 /**
@@ -858,7 +858,7 @@ declare namespace bigquery {
    */
   type IDataset = {
     /**
-     * Optional. An array of objects that define dataset access for one or more entities. You can set this property when inserting or updating a dataset in order to control who is allowed to access the data. If unspecified at dataset creation time, BigQuery adds default dataset access for the following entities: access.specialGroup: projectReaders; access.role: READER; access.specialGroup: projectWriters; access.role: WRITER; access.specialGroup: projectOwners; access.role: OWNER; access.userByEmail: [dataset creator email]; access.role: OWNER;
+     * Optional. An array of objects that define dataset access for one or more entities. You can set this property when inserting or updating a dataset in order to control who is allowed to access the data. If unspecified at dataset creation time, BigQuery adds default dataset access for the following entities: access.specialGroup: projectReaders; access.role: READER; access.specialGroup: projectWriters; access.role: WRITER; access.specialGroup: projectOwners; access.role: OWNER; access.userByEmail: [dataset creator email]; access.role: OWNER; If you patch a dataset, then this field is overwritten by the patched dataset's access field. To add entities, you must supply the entire existing access array in addition to any new entities that you want to add.
      */
     access?: Array<{
       /**
@@ -1013,7 +1013,7 @@ declare namespace bigquery {
       | 'LOGICAL'
       | 'PHYSICAL';
     /**
-     * Output only. Tags for the Dataset.
+     * Output only. Tags for the dataset. To provide tags as inputs, use the `resourceTags` field.
      */
     tags?: Array<{
       /**
@@ -2754,6 +2754,14 @@ declare namespace bigquery {
      * Output only. Statistics for data-masking. Present only for query and extract jobs.
      */
     dataMaskingStatistics?: IDataMaskingStatistics;
+    /**
+     * Output only. Name of edition corresponding to the reservation for this job at the time of this update.
+     */
+    edition?:
+      | 'RESERVATION_EDITION_UNSPECIFIED'
+      | 'STANDARD'
+      | 'ENTERPRISE'
+      | 'ENTERPRISE_PLUS';
     /**
      * Output only. End time of this job, in milliseconds since the epoch. This field will be present whenever a job is in the DONE state.
      */
