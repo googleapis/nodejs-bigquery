@@ -70,6 +70,12 @@ describe('Queries', () => {
     assert.match(output, /name/);
   });
 
+  it('should run a query in short mode', async () => {
+    const output = execSync('node queryShortMode.js');
+    assert.match(output, /Rows:/);
+    assert.match(output, /name/);
+  });
+
   it('should run a query as a dry run', async () => {
     const output = execSync('node queryDryRun.js');
     assert.match(output, /Status:/);
