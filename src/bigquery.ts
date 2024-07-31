@@ -46,7 +46,7 @@ import {
 import {GoogleErrorBody} from '@google-cloud/common/build/src/util';
 import bigquery from './types';
 import {logger, setLogFunction} from './logger';
-import {StorageReadClient} from './storage';
+import {MergeSchemaTransform, StorageReadClient} from './storage';
 
 // Third-Party Re-exports
 export {common};
@@ -345,7 +345,7 @@ export class BigQuery extends Service {
   location?: string;
   private _universeDomain: string;
   private _enableQueryPreview: boolean;
-  private _storageClient?: StorageReadClient;
+  _storageClient?: StorageReadClient;
 
   createQueryStream(options?: Query | string): ResourceStream<RowMetadata> {
     // placeholder body, overwritten in constructor
@@ -2174,15 +2174,6 @@ export class BigQuery extends Service {
           (callback as SimpleQueryRowsCallback)(null, [], resp);
           return;
         }
-        if (job && this._storageClient) {
-          try {
-            const rows = await this.acceleratedFetchDataFromJob_(job, options);
-            (callback as QueryRowsCallback)(null, rows, null);
-            return;
-          } catch (err) {
-            this.trace_('failed to fetch using Storage Reader', err);
-          }
-        }
         // The Job is important for the `queryAsStream_` method, so a new query
         // isn't created each time results are polled for.
         options = extend({job}, queryOpts, options);
@@ -2200,21 +2191,6 @@ export class BigQuery extends Service {
 
       options = extend({job}, queryOpts, options);
       if (res && res.jobComplete) {
-        if (job && res.pageToken && this._storageClient) {
-          try {
-            const rows = await this.acceleratedFetchDataFromJob_(
-              job,
-              options,
-              res.schema
-            );
-            (callback as QueryRowsCallback)(null, rows, null);
-            return;
-          } catch (err) {
-            console.log('failed to fetch using storage reader', err);
-            this.trace_('failed to fetch using Storage Reader', err);
-          }
-        }
-
         let rows: any = [];
         if (res.schema && res.rows) {
           rows = BigQuery.mergeSchemaWithRows_(res.schema, res.rows, {
@@ -2240,11 +2216,12 @@ export class BigQuery extends Service {
     });
   }
 
-  private async acceleratedFetchDataFromJob_(
+  async acceleratedFetchDataFromJob_(
     job: Job,
     opts: QueryOptions,
+    callback: QueryRowsCallback,
     schema?: bigquery.ITableSchema
-  ): Promise<any[]> {
+  ): Promise<void> {
     if (!this._storageClient) {
       return Promise.reject('storage client not available');
     }
@@ -2273,16 +2250,33 @@ export class BigQuery extends Service {
     });
     console.time('fetchStorageAPI');
     this.trace_('fetching with Storage API');
+    if (opts._asStream) {
+      const stream = await tableReader.getRowStream();
+      const rowStream = stream.pipe(
+        new MergeSchemaTransform(tableSchema!)
+      ) as ResourceStream<any>;
+      rowStream.on('data', data => {
+        callback(null, [data], {
+          _streaming: true,
+        } as any);
+      });
+      rowStream.on('end', () => {
+        callback(null, [], null);
+      });
+      console.timeEnd('fetchStorageAPI');
+      return;
+    }
     const [rawRows] = await tableReader.getRows();
-    this.trace_('finished fetching with Storage API');
     console.timeEnd('fetchStorageAPI');
+    this.trace_('finished fetching with Storage API');
     console.time('mergeSchemaStorage');
     const rows = BigQuery.mergeSchemaWithRows_(tableSchema!, rawRows, {
       wrapIntegers: opts.wrapIntegers || false,
       parseJSON: opts.parseJSON || false,
     });
+
     console.timeEnd('mergeSchemaStorage');
-    return rows;
+    callback(null, rows, null);
   }
 
   /**
@@ -2394,8 +2388,10 @@ export class BigQuery extends Service {
           job = this.job(jobRef.jobId!, {
             location: jobRef.location,
           });
+          job.metadata = res;
         } else if (res.queryId) {
           job = this.job(res.queryId); // stateless query
+          job.metadata = res;
         }
         callback!(null, job, res);
       }
@@ -2409,8 +2405,18 @@ export class BigQuery extends Service {
    * @private
    */
   queryAsStream_(query: Query, callback?: SimpleQueryRowsCallback) {
+    this.trace_('queryAsStream_');
+    if ((query as QueryResultsOptions)._streaming) {
+      return;
+    }
     if (query.job) {
-      query.job.getQueryResults(query, callback as QueryRowsCallback);
+      query.job.getQueryResults(
+        {
+          ...query,
+          _asStream: true,
+        },
+        callback as QueryRowsCallback
+      );
       return;
     }
 
@@ -2423,6 +2429,7 @@ export class BigQuery extends Service {
       wrapIntegers,
       parseJSON,
       autoPaginate: false,
+      _asStream: true,
     };
 
     delete query.location;

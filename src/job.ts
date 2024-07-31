@@ -57,6 +57,8 @@ export type QueryResultsOptions = {
      */
     _cachedRows?: any[];
     _cachedResponse?: bigquery.IQueryResponse;
+    _asStream?: boolean;
+    _streaming?: boolean;
   };
 
 /**
@@ -453,6 +455,49 @@ class Job extends Operation {
     );
   }
 
+  async wait(): Promise<void> {
+    let metadata: JobMetadata | undefined = this.metadata;
+    if (!metadata) {
+      [metadata] = await this.getMetadata();
+    }
+    const jobState = metadata?.status?.state;
+    this.trace_('wait status', jobState);
+    if (jobState === 'DONE') {
+      return Promise.resolve();
+    }
+    const isQuery = !!metadata?.configuration?.query;
+    if (isQuery) {
+      const stream = this.getQueryResultsStream({
+        maxResults: 0,
+      });
+      return new Promise((resolve, reject) => {
+        stream.on('data', data => {
+          this.trace_('data arrived on wait', data);
+        });
+        stream.on('error', err => {
+          this.trace_('error on wait', err);
+          reject(err);
+        });
+        stream.on('end', () => {
+          this.trace_('end on wait');
+          resolve();
+        });
+      });
+    }
+    while (true) {
+      let newMetadata: JobMetadata | undefined;
+      [newMetadata] = await this.getMetadata();
+      const newJobState = metadata?.status?.state;
+      if (newJobState === 'DONE') {
+        return Promise.resolve();
+      }
+      // TODO: exponential backoff
+      await new Promise(resolve => {
+        setTimeout(resolve, 100);
+      });
+    }
+  }
+
   /**
    * Get the results of a job.
    *
@@ -565,6 +610,12 @@ class Job extends Operation {
     const timeoutOverride =
       typeof qs.timeoutMs === 'number' ? qs.timeoutMs : false;
 
+    if (this.metadata.jobComplete && this.bigQuery._storageClient) {
+      this.trace_('job complete and storage available');
+      this.bigQuery.acceleratedFetchDataFromJob_(this, options, callback!);
+      return;
+    }
+
     if (options._cachedRows) {
       let nextQuery: QueryResultsOptions | null = null;
       if (options.pageToken) {
@@ -636,7 +687,16 @@ class Job extends Operation {
     options: QueryResultsOptions,
     callback: QueryRowsCallback
   ): void {
-    options = extend({autoPaginate: false}, options);
+    if (options._streaming) {
+      return;
+    }
+    options = extend(
+      {
+        autoPaginate: false,
+        _asStream: true,
+      },
+      options
+    );
     this.getQueryResults(options, callback);
   }
 
@@ -683,7 +743,9 @@ paginator.extend(Job, ['getQueryResults']);
  * All async methods (except for streams) will return a Promise in the event
  * that a callback is omitted.
  */
-promisifyAll(Job);
+promisifyAll(Job, {
+  exclude: ['wait'],
+});
 
 /**
  * Reference to the {@link Job} class.

@@ -29,7 +29,7 @@ export interface StorageReadClient {
 // the BigQuery Storage Read API.
 export interface TableReader {
   getRows(): Promise<QueryRowsResponse>;
-  getRowsAsStream(): Promise<ResourceStream<RowMetadata>>;
+  getRowStream(): Promise<ResourceStream<RowMetadata>>;
 }
 
 export class MergeSchemaTransform extends Transform {
