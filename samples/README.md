@@ -96,6 +96,7 @@
   * [Query Params Positional Types](#query-params-positional-types)
   * [Query Params Structs](#query-params-structs)
   * [Query Params Timestamps](#query-params-timestamps)
+  * [Query Short Mode](#query-short-mode)
   * [Query Stack Overflow](#query-stack-overflow)
   * [Quickstart](#quickstart)
   * [Relax Column](#relax-column)
@@ -1570,6 +1571,23 @@ __Usage:__
 
 
 `node samples/queryParamsTimestamps.js`
+
+
+-----
+
+
+
+
+### Query Short Mode
+
+View the [source code](https://github.com/googleapis/nodejs-bigquery/blob/main/samples/queryShortMode.js).
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-bigquery&page=editor&open_in_editor=samples/queryShortMode.js,samples/README.md)
+
+__Usage:__
+
+
+`node samples/queryShortMode.js`
 
 
 -----
