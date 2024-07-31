@@ -43,7 +43,10 @@ import {
   JobResponse,
   RowMetadata,
 } from './table';
-import {GoogleErrorBody} from '@google-cloud/common/build/src/util';
+import {
+  GoogleErrorBody,
+  RetryOptions,
+} from '@google-cloud/common/build/src/util';
 import bigquery from './types';
 import {logger, setLogFunction} from './logger';
 
@@ -216,6 +219,8 @@ export interface BigQueryOptions extends GoogleAuthOptions {
    * We will exponentially backoff subsequent requests by default.
    *
    * Defaults to `true`.
+   *
+   * @deprecated Use retryOptions.
    */
   autoRetry?: boolean;
   /**
@@ -223,8 +228,25 @@ export interface BigQueryOptions extends GoogleAuthOptions {
    * attempted before returning the error.
    *
    * Defaults to 3.
+   *
+   * @deprecated Use retryOptions.
    */
   maxRetries?: number;
+
+  /**
+   * Customize retry configuration for all requests in the SDK.
+   * By default, a request is retried if the response is related to rate limits
+   * or certain intermittent server errors.
+   * We will exponentially backoff subsequent requests by default.
+   *
+   * More on the default retry predicate on the `shouldRetryRequest` method:
+   * https://github.com/googleapis/nodejs-common/blob/main/src/util.ts
+   *
+   * Defaults:
+   * - retryOptions.autoRetry: true
+   * - retryOptions.maxRetries: 3
+   */
+  retryOptions?: RetryOptions;
 
   /**
    * The geographic location of all datasets and
@@ -388,6 +410,7 @@ export class BigQuery extends Service {
       packageJson: require('../../package.json'),
       autoRetry: options.autoRetry,
       maxRetries: options.maxRetries,
+      retryOptions: options.retryOptions,
     };
 
     if (options.scopes) {
@@ -1012,10 +1035,19 @@ export class BigQuery extends Service {
       'TIMESTAMP',
       'BYTES',
       'NUMERIC',
+      'DECIMAL',
       'BIGNUMERIC',
+      'BIGDECIMAL',
       'BOOL',
       'INT64',
+      'INT',
+      'SMALLINT',
+      'INTEGER',
+      'BIGINT',
+      'TINYINT',
+      'BYTEINT',
       'FLOAT64',
+      'FLOAT',
       'STRING',
       'GEOGRAPHY',
       'ARRAY',
@@ -2186,6 +2218,7 @@ export class BigQuery extends Service {
             wrapIntegers: options.wrapIntegers || false,
             parseJSON: options.parseJSON,
           });
+          delete res.rows;
         }
         this.trace_('[runJobsQuery] job complete');
         options._cachedRows = rows;
