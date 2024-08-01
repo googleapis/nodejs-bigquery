@@ -4,6 +4,19 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## [7.9.0](https://github.com/googleapis/nodejs-bigquery/compare/v7.8.0...v7.9.0) (2024-08-01)
+
+
+### Features
+
+* Add retryOptions passing to underlying Service class ([#1390](https://github.com/googleapis/nodejs-bigquery/issues/1390)) ([a7cd3af](https://github.com/googleapis/nodejs-bigquery/commit/a7cd3af419a1bf2f9ef3b67bf0d4460892fba03d))
+* Clean cached rows and responses after conversion ([#1393](https://github.com/googleapis/nodejs-bigquery/issues/1393)) ([3fd28b8](https://github.com/googleapis/nodejs-bigquery/commit/3fd28b8a0db415c0e5f19a6763f7ad44350e27b1))
+
+
+### Bug Fixes
+
+* Add missing alias for valid types ([#1388](https://github.com/googleapis/nodejs-bigquery/issues/1388)) ([7195951](https://github.com/googleapis/nodejs-bigquery/commit/719595166b71908d994b8eee970bd66758a12516))
+
 ## [7.8.0](https://github.com/googleapis/nodejs-bigquery/compare/v7.7.1...v7.8.0) (2024-06-19)
 
 
