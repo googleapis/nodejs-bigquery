@@ -6,8 +6,6 @@ name: Update Discovery Generated Types
 jobs:
   sync:
     runs-on: ubuntu-latest
-    env:
-      ACCESS_TOKEN: ${{ secrets.YOSHI_CODE_BOT_TOKEN }}
     steps:
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
       - uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b # v4.0.3
@@ -23,6 +21,8 @@ jobs:
       - run: npm run fix
       # Submit pull request
       - uses: googleapis/code-suggester@v4
+        env:
+          ACCESS_TOKEN: ${{ secrets.YOSHI_CODE_BOT_TOKEN }}
         with:
           command: pr
           upstream_owner: googleapis
