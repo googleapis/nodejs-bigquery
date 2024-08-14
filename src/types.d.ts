@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * Discovery Revision: 20240714
+ * Discovery Revision: 20240727
  */
 
 /**
@@ -2023,6 +2023,27 @@ declare namespace bigquery {
      * 1-based index of the trial.
      */
     trialId?: string;
+  };
+
+  /**
+   * Metadata for value generation for an identity column.
+   */
+  type IIdentityColumnInfo = {
+    /**
+     * Optional. Dictates when system generated values are used to populate the field.
+     */
+    generatedMode?:
+      | 'GENERATED_MODE_UNSPECIFIED'
+      | 'GENERATED_ALWAYS'
+      | 'GENERATED_BY_DEFAULT';
+    /**
+     * Optional. The minimum difference between two successive generated values. Should be INTEGER compatible. Can be negative or positive but not 0. The default value is 1 if the field is not specified.
+     */
+    increment?: string;
+    /**
+     * Optional. The first generated value. Should be INTEGER compatible. The default value is 1 if the field is not specified.
+     */
+    start?: string;
   };
 
   /**
@@ -5139,6 +5160,10 @@ declare namespace bigquery {
      * Optional. Definition of the foreign data type. Only valid for top-level schema fields (not nested fields). If the type is FOREIGN, this field is required.
      */
     foreignTypeDefinition?: string;
+    /**
+     * Optional. Definition of how values are generated for the field. Setting this option means that the field is an identity column. Only valid for top-level schema INTEGER fields (not nested fields).
+     */
+    identityColumnInfo?: IIdentityColumnInfo;
     /**
      * Optional. Maximum length of values of this field for STRINGS or BYTES. If max_length is not specified, no maximum length constraint is imposed on this field. If type = "STRING", then max_length represents the maximum UTF-8 length of strings in this field. If type = "BYTES", then max_length represents the maximum number of bytes in this field. It is invalid to set this field if type ≠ "STRING" and ≠ "BYTES".
      */
