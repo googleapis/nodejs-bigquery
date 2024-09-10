@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * Discovery Revision: 20240803
+ * Discovery Revision: 20240815
  */
 
 /**
@@ -2197,7 +2197,7 @@ declare namespace bigquery {
      */
     id?: string;
     /**
-     * Output only. If set, it provides the reason why a Job was created. If not set, it should be treated as the default: REQUESTED. This feature is not yet available. Jobs will always be created.
+     * Output only. The reason why a Job was created. [Preview](/products/#product-launch-stages)
      */
     jobCreationReason?: IJobCreationReason;
     /**
@@ -2645,7 +2645,7 @@ declare namespace bigquery {
   };
 
   /**
-   * Reason about why a Job was created from a [`jobs.query`](https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs/query) method when used with `JOB_CREATION_OPTIONAL` Job creation mode. For [`jobs.insert`](https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs/insert) method calls it will always be `REQUESTED`. This feature is not yet available. Jobs will always be created.
+   * Reason about why a Job was created from a [`jobs.query`](https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs/query) method when used with `JOB_CREATION_OPTIONAL` Job creation mode. For [`jobs.insert`](https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs/insert) method calls it will always be `REQUESTED`. [Preview](/products/#product-launch-stages)
    */
   type IJobCreationReason = {
     /**
@@ -3877,7 +3877,7 @@ declare namespace bigquery {
      */
     formatOptions?: IDataFormatOptions;
     /**
-     * Optional. If not set, jobs are always required. If set, the query request will follow the behavior described JobCreationMode. This feature is not yet available. Jobs will always be created.
+     * Optional. If not set, jobs are always required. If set, the query request will follow the behavior described JobCreationMode. [Preview](/products/#product-launch-stages)
      */
     jobCreationMode?:
       | 'JOB_CREATION_MODE_UNSPECIFIED'
@@ -3955,11 +3955,11 @@ declare namespace bigquery {
      */
     jobComplete?: boolean;
     /**
-     * Optional. Only relevant when a job_reference is present in the response. If job_reference is not present it will always be unset. When job_reference is present, this field should be interpreted as follows: If set, it will provide the reason of why a Job was created. If not set, it should be treated as the default: REQUESTED. This feature is not yet available. Jobs will always be created.
+     * Optional. The reason why a Job was created. Only relevant when a job_reference is present in the response. If job_reference is not present it will always be unset. [Preview](/products/#product-launch-stages)
      */
     jobCreationReason?: IJobCreationReason;
     /**
-     * Reference to the Job that was created to run the query. This field will be present even if the original request timed out, in which case GetQueryResults can be used to read the results once the query has completed. Since this API only returns the first page of results, subsequent pages can be fetched via the same mechanism (GetQueryResults).
+     * Reference to the Job that was created to run the query. This field will be present even if the original request timed out, in which case GetQueryResults can be used to read the results once the query has completed. Since this API only returns the first page of results, subsequent pages can be fetched via the same mechanism (GetQueryResults). If job_creation_mode was set to `JOB_CREATION_OPTIONAL` and the query completes without creating a job, this field will be empty.
      */
     jobReference?: IJobReference;
     /**
@@ -3975,7 +3975,7 @@ declare namespace bigquery {
      */
     pageToken?: string;
     /**
-     * Query ID for the completed query. This ID will be auto-generated. This field is not yet available and it is currently not guaranteed to be populated.
+     * Auto-generated ID for the query. [Preview](/products/#product-launch-stages)
      */
     queryId?: string;
     /**
@@ -4646,7 +4646,7 @@ declare namespace bigquery {
   };
 
   /**
-   * The data type of a variable such as a function argument. Examples include: * INT64: `{"typeKind": "INT64"}` * ARRAY: { "typeKind": "ARRAY", "arrayElementType": {"typeKind": "STRING"} } * STRUCT>: { "typeKind": "STRUCT", "structType": { "fields": [ { "name": "x", "type": {"typeKind": "STRING"} }, { "name": "y", "type": { "typeKind": "ARRAY", "arrayElementType": {"typeKind": "DATE"} } } ] } }
+   * The data type of a variable such as a function argument. Examples include: * INT64: `{"typeKind": "INT64"}` * ARRAY: { "typeKind": "ARRAY", "arrayElementType": {"typeKind": "STRING"} } * STRUCT>: { "typeKind": "STRUCT", "structType": { "fields": [ { "name": "x", "type": {"typeKind": "STRING"} }, { "name": "y", "type": { "typeKind": "ARRAY", "arrayElementType": {"typeKind": "DATE"} } } ] } } * RANGE: { "typeKind": "RANGE", "rangeElementType": {"typeKind": "DATE"} }
    */
   type IStandardSqlDataType = {
     /**
@@ -5199,7 +5199,7 @@ declare namespace bigquery {
      */
     scale?: string;
     /**
-     * Required. The field data type. Possible values include: * STRING * BYTES * INTEGER (or INT64) * FLOAT (or FLOAT64) * BOOLEAN (or BOOL) * TIMESTAMP * DATE * TIME * DATETIME * GEOGRAPHY * NUMERIC * BIGNUMERIC * JSON * RECORD (or STRUCT) * RANGE ([Preview](/products/#product-launch-stages)) Use of RECORD/STRUCT indicates that the field contains a nested schema.
+     * Required. The field data type. Possible values include: * STRING * BYTES * INTEGER (or INT64) * FLOAT (or FLOAT64) * BOOLEAN (or BOOL) * TIMESTAMP * DATE * TIME * DATETIME * GEOGRAPHY * NUMERIC * BIGNUMERIC * JSON * RECORD (or STRUCT) * RANGE Use of RECORD/STRUCT indicates that the field contains a nested schema.
      */
     type?: string;
   };
