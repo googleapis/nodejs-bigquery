@@ -369,6 +369,43 @@ describe('BigQuery', () => {
     assert.strictEqual(res.totalRows, '100');
   });
 
+  describe('Query timeout', () => {
+    let longRunningQuery = '';
+
+    beforeEach(() => {
+      const tableId = generateName('table');
+      longRunningQuery = `CREATE TABLE ${dataset.projectId}.${dataset.id}.${tableId} AS SELECT num FROM UNNEST(GENERATE_ARRAY(1,1000000)) as num`;
+    });
+
+    it('should throw a timeout error with jobs.query', async () => {
+      const qOpts: QueryOptions = {
+        timeoutMs: 1000,
+      };
+      let foundError: Error | null = null;
+      try {
+        await bigquery.query(longRunningQuery, qOpts);
+      } catch (error: unknown) {
+        foundError = error as Error;
+      }
+      assert.notEqual(foundError, null);
+    });
+
+    it('should throw a timeout error without jobs.query', async () => {
+      const jobId = generateName('job');
+      const qOpts: QueryOptions = {
+        job: bigquery.job(jobId),
+        timeoutMs: 1000,
+      };
+      let foundError: Error | null = null;
+      try {
+        await bigquery.query(longRunningQuery, qOpts);
+      } catch (error: unknown) {
+        foundError = error as Error;
+      }
+      assert.notEqual(foundError, null);
+    });
+  });
+
   it('should allow querying in series', done => {
     bigquery.query(
       query,
