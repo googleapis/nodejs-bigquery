@@ -388,6 +388,10 @@ describe('BigQuery', () => {
         foundError = error as Error;
       }
       assert.notEqual(foundError, null);
+      assert.equal(
+        foundError?.message,
+        'The query did not complete before 1000ms'
+      );
     });
 
     it('should throw a timeout error without jobs.query', async () => {
@@ -403,6 +407,10 @@ describe('BigQuery', () => {
         foundError = error as Error;
       }
       assert.notEqual(foundError, null);
+      assert.equal(
+        foundError?.message,
+        'The query did not complete before 1000ms'
+      );
     });
   });
 
