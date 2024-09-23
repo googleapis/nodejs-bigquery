@@ -3108,7 +3108,7 @@ describe('BigQuery', () => {
       const error = new Error('err');
 
       bq.runJobsQuery = (query: {}, callback: Function) => {
-        callback(error, null, FAKE_RESPONSE);
+        callback(error, FAKE_RESPONSE, {});
       };
 
       bq.query(QUERY_STRING, (err: Error, rows: {}, resp: {}) => {
@@ -3117,6 +3117,31 @@ describe('BigQuery', () => {
         assert.strictEqual(resp, FAKE_RESPONSE);
         done();
       });
+    });
+
+    it('should return throw error when jobs.query times out', done => {
+      const fakeJob = {};
+
+      bq.runJobsQuery = (query: {}, callback: Function) => {
+        callback(null, fakeJob, {
+          queryId: uuid.v1(),
+          jobComplete: false,
+        });
+      };
+
+      bq.query(
+        QUERY_STRING,
+        {timeoutMs: 1000},
+        (err: Error, rows: {}, resp: {}) => {
+          assert.strictEqual(
+            err.message,
+            'The query did not complete before 1000ms'
+          );
+          assert.strictEqual(rows, null);
+          assert.strictEqual(resp, fakeJob);
+          done();
+        }
+      );
     });
 
     it('should exit early if dryRun is set', done => {

@@ -2206,7 +2206,7 @@ export class BigQuery extends Service {
     this.runJobsQuery(queryReq, (err, job, res) => {
       this.trace_('[runJobsQuery callback]: ', query, err, job, res);
       if (err) {
-        (callback as SimpleQueryRowsCallback)(err, null, res);
+        (callback as SimpleQueryRowsCallback)(err, null, job);
         return;
       }
 
@@ -2230,6 +2230,14 @@ export class BigQuery extends Service {
           this.trace_('[runJobsQuery] no more pages');
         }
         job!.getQueryResults(options, callback as QueryRowsCallback);
+        return;
+      }
+      // If timeout override was provided, return error.
+      if (queryReq.timeoutMs) {
+        const err = new Error(
+          `The query did not complete before ${queryReq.timeoutMs}ms`
+        );
+        (callback as SimpleQueryRowsCallback)(err, null, job);
         return;
       }
       delete options.timeoutMs;
