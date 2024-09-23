@@ -4,6 +4,13 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## [7.9.1](https://github.com/googleapis/nodejs-bigquery/compare/v7.9.0...v7.9.1) (2024-09-23)
+
+
+### Bug Fixes
+
+* Throw timeout error when using jobs.query ([#1402](https://github.com/googleapis/nodejs-bigquery/issues/1402)) ([cf962a5](https://github.com/googleapis/nodejs-bigquery/commit/cf962a5a94ec3df465871d8e4a2f64521a8d6ce0))
+
 ## [7.9.0](https://github.com/googleapis/nodejs-bigquery/compare/v7.8.0...v7.9.0) (2024-08-01)
 
 
