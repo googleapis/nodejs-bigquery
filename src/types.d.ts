@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * Discovery Revision: 20240919
+ * Discovery Revision: 20240905
  */
 
 /**
@@ -3400,8 +3400,7 @@ declare namespace bigquery {
       | 'RANDOM_FOREST_CLASSIFIER'
       | 'TENSORFLOW_LITE'
       | 'ONNX'
-      | 'TRANSFORM_ONLY'
-      | 'CONTRIBUTION_ANALYSIS';
+      | 'TRANSFORM_ONLY';
     /**
      * Output only. Training type of the job.
      */
@@ -3504,8 +3503,7 @@ declare namespace bigquery {
       | 'RANDOM_FOREST_CLASSIFIER'
       | 'TENSORFLOW_LITE'
       | 'ONNX'
-      | 'TRANSFORM_ONLY'
-      | 'CONTRIBUTION_ANALYSIS';
+      | 'TRANSFORM_ONLY';
     /**
      * Output only. For single-objective [hyperparameter tuning](https://cloud.google.com/bigquery-ml/docs/reference/standard-sql/bigqueryml-syntax-hp-tuning-overview) models, it only contains the best trial. For multi-objective [hyperparameter tuning](https://cloud.google.com/bigquery-ml/docs/reference/standard-sql/bigqueryml-syntax-hp-tuning-overview) models, it contains all Pareto optimal trials sorted by trial_id.
      */
@@ -5514,10 +5512,6 @@ declare namespace bigquery {
      */
     colsampleBytree?: number;
     /**
-     * The contribution metric. Applies to contribution analysis models. Allowed formats supported are for summable and summable ratio contribution metrics. These include expressions such as "SUM(x)" or "SUM(x)/SUM(y)", where x and y are column names from the base table.
-     */
-    contributionMetric?: string;
-    /**
      * Type of normalization algorithm for boosted tree models using dart booster.
      */
     dartNormalizeType?: 'DART_NORMALIZE_TYPE_UNSPECIFIED' | 'TREE' | 'FOREST';
@@ -5556,10 +5550,6 @@ declare namespace bigquery {
      * If true, perform decompose time series and save the results.
      */
     decomposeTimeSeries?: boolean;
-    /**
-     * Optional. Names of the columns to slice on. Applies to contribution analysis models.
-     */
-    dimensionIdColumns?: Array<string>;
     /**
      * Distance type for clustering models.
      */
@@ -5782,10 +5772,6 @@ declare namespace bigquery {
      */
     integratedGradientsNumSteps?: string;
     /**
-     * Name of the column used to determine the rows corresponding to control and test. Applies to contribution analysis models.
-     */
-    isTestColumn?: string;
-    /**
      * Item column specified for matrix factorization models.
      */
     itemColumn?: string;
@@ -5848,10 +5834,6 @@ declare namespace bigquery {
      * Maximum depth of a tree for boosted tree models.
      */
     maxTreeDepth?: string;
-    /**
-     * The apriori support minimum. Applies to contribution analysis models.
-     */
-    minAprioriSupport?: number;
     /**
      * When early_stop is true, stops training when accuracy improvement is less than 'min_relative_progress'. Used only for iterative training algorithms.
      */
