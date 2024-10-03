@@ -909,6 +909,7 @@ describe('BigQuery/Dataset', () => {
       };
 
       beforeEach(() => {
+        ds = new Dataset(BIGQUERY, DATASET_ID, {location: LOCATION});
         ds.request = (reqOpts: DecorateRequestOptions, callback: Function) => {
           callback(null, apiResponse);
         };
@@ -929,6 +930,7 @@ describe('BigQuery/Dataset', () => {
             assert(table instanceof Table);
             assert.strictEqual(table.id, tableId);
             assert.strictEqual(table.location, LOCATION);
+            assert.strictEqual(table.projectId, BIGQUERY.location);
             assert.strictEqual(apiResponse_, apiResponse);
             done();
           }
