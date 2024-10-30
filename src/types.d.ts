@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * Discovery Revision: 20241013
+ * Discovery Revision: 20241027
  */
 
 /**
@@ -77,7 +77,7 @@ declare namespace bigquery {
      */
     argumentKind?: 'ARGUMENT_KIND_UNSPECIFIED' | 'FIXED_TYPE' | 'ANY_TYPE';
     /**
-     * Required unless argument_kind = ANY_TYPE.
+     * Set if argument_kind == FIXED_TYPE.
      */
     dataType?: IStandardSqlDataType;
     /**
@@ -407,19 +407,19 @@ declare namespace bigquery {
    */
   type IBigLakeConfiguration = {
     /**
-     * Required. The connection specifying the credentials to be used to read and write to external storage, such as Cloud Storage. The connection_id can have the form `{project}.{location}.{connection_id}` or `projects/{project}/locations/{location}/connections/{connection_id}".
+     * Optional. The connection specifying the credentials to be used to read and write to external storage, such as Cloud Storage. The connection_id can have the form `{project}.{location}.{connection_id}` or `projects/{project}/locations/{location}/connections/{connection_id}".
      */
     connectionId?: string;
     /**
-     * Required. The file format the table data is stored in.
+     * Optional. The file format the table data is stored in.
      */
     fileFormat?: 'FILE_FORMAT_UNSPECIFIED' | 'PARQUET';
     /**
-     * Required. The fully qualified location prefix of the external folder where table data is stored. The '*' wildcard character is not allowed. The URI should be in the format `gs://bucket/path_to_table/`
+     * Optional. The fully qualified location prefix of the external folder where table data is stored. The '*' wildcard character is not allowed. The URI should be in the format `gs://bucket/path_to_table/`
      */
     storageUri?: string;
     /**
-     * Required. The table format the metadata only snapshots are stored in.
+     * Optional. The table format the metadata only snapshots are stored in.
      */
     tableFormat?: 'TABLE_FORMAT_UNSPECIFIED' | 'ICEBERG';
   };
@@ -5518,7 +5518,7 @@ declare namespace bigquery {
      */
     colsampleBytree?: number;
     /**
-     * The contribution metric. Applies to contribution analysis models. Allowed formats supported are for summable and summable ratio contribution metrics. These include expressions such as "SUM(x)" or "SUM(x)/SUM(y)", where x and y are column names from the base table.
+     * The contribution metric. Applies to contribution analysis models. Allowed formats supported are for summable and summable ratio contribution metrics. These include expressions such as `SUM(x)` or `SUM(x)/SUM(y)`, where x and y are column names from the base table.
      */
     contributionMetric?: string;
     /**
