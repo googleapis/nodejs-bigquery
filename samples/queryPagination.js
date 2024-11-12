@@ -33,6 +33,7 @@ function main() {
     const [job] = await bigquery.createQueryJob(query);
 
     // Wait for job to complete and get rows.
+    // The client library automatically handles pagination.
     const [rows] = await job.getQueryResults();
 
     console.log('Query results:');
