@@ -34,6 +34,9 @@ function main() {
 
     // Wait for job to complete and get rows.
     // The client library automatically handles pagination.
+    // See more info on how to configure paging calls at:
+    //  * https://github.com/googleapis/gax-nodejs/blob/main/client-libraries.md#auto-pagination
+    //  * https://cloud.google.com/bigquery/docs/paging-results#iterate_through_client_libraries_results
     const [rows] = await job.getQueryResults();
 
     console.log('Query results:');
