@@ -2189,6 +2189,47 @@ describe('BigQuery/Table', () => {
       });
     });
 
+
+    it('should return selected fields after consecutive requests', done => {
+      const selectedFields = [['age'], ['name', 'address']];
+      const rows = [
+        [{f: [{v: 40}]}],
+        [{f: [{v: 'John'}, {v: '1234 Fake St, Springfield'}]}],
+      ];
+      const results = [
+        [{age: 40}],
+        [{name: 'John', address: '1234 Fake St, Springfield'}],
+      ];
+      const schema = {
+        fields: [
+          {name: 'name', type: 'string'},
+          {name: 'age', type: 'INTEGER'},
+          {name: 'address', type: 'string'},
+        ],
+      };
+
+      table.metadata = {schema};
+
+      sandbox.restore();
+
+      table.request = (reqOpts: DecorateRequestOptions, callback: Function) => {
+        callback(null, {rows});
+      };
+
+      for (let i = 0; i < 2; i++) {
+        table.getRows(
+          {selectedFields: selectedFields[i].join(',')},
+          (err: Error, rows: {}) => {
+            assert.ifError(err);
+            assert.deepStrictEqual(rows, results[i]);
+            if (i === 1) {
+              done();
+            }
+          }
+        );
+      }
+    });
+
     it('should return selected fields from nested objects', done => {
       const selectedFields = 'objects.nested_object.nested_property_1';
       const rows = [
