@@ -39,14 +39,14 @@ import {
   Job,
   Dataset,
   Query,
-  SimpleQueryRowsResponse,
-  SimpleQueryRowsCallback,
   ResourceCallback,
   RequestCallback,
   PagedResponse,
   PagedCallback,
   JobRequest,
   PagedRequest,
+  QueryRowsResponse,
+  QueryRowsCallback,
 } from '.';
 import {GoogleErrorBody} from '@google-cloud/common/build/src/util';
 import {Duplex, Writable} from 'stream';
@@ -2368,15 +2368,13 @@ class Table extends ServiceObject {
    * See {@link BigQuery#query} for full documentation of this method.
    * @param {object} query See {@link BigQuery#query} for full documentation of this method.
    * @param {function} [callback] See {@link BigQuery#query} for full documentation of this method.
-   * @returns {Promise<SimpleQueryRowsResponse>}
+   * @returns {Promise<QueryRowsResponse>}
    */
-  query(query: Query): Promise<SimpleQueryRowsResponse>;
-  query(query: string): Promise<SimpleQueryRowsResponse>;
-  query(query: Query, callback: SimpleQueryRowsCallback): void;
+  query(query: Query | string, callback: QueryRowsCallback): void;
   query(
     query: Query | string,
-    callback?: SimpleQueryRowsCallback
-  ): void | Promise<SimpleQueryRowsResponse> {
+    callback?: QueryRowsCallback
+  ): void | Promise<QueryRowsCallback> {
     if (typeof query === 'string') {
       query = {
         query,

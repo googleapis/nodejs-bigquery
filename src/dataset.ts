@@ -32,9 +32,9 @@ import {
   PagedRequest,
   PagedResponse,
   Query,
+  QueryRowsCallback,
   QueryRowsResponse,
   ResourceCallback,
-  SimpleQueryRowsCallback,
 } from './bigquery';
 import {
   JobCallback,
@@ -1220,17 +1220,12 @@ class Dataset extends ServiceObject {
    * See {@link BigQuery#query} for full documentation of this method.
    *
    * @param {object} options See {@link BigQuery#query} for full documentation of this method.
-   * @param {function} [callback] See {@link BigQuery#query} for full documentation of this method.
-   * @returns {Promise<SimpleQueryRowsResponse>}
+   * @param {function} [callback] See {@link BigQuery#query} for full documentation of this method.   
    * @returns {Promise<QueryRowsResponse>} See {@link BigQuery#query} for full documentation of this method.
-   */
-  query(options: Query): Promise<QueryRowsResponse>;
-  query(options: string): Promise<QueryRowsResponse>;
-  query(options: Query, callback: SimpleQueryRowsCallback): void;
-  query(options: string, callback: SimpleQueryRowsCallback): void;
+   */  
   query(
     options: Query | string,
-    callback?: SimpleQueryRowsCallback
+    callback?: QueryRowsCallback
   ): void | Promise<QueryRowsResponse> {
     if (typeof options === 'string') {
       options = {
