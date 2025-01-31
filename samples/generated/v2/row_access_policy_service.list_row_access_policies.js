@@ -52,7 +52,7 @@ function main(projectId, datasetId, tableId) {
   // const pageSize = 1234
 
   // Imports the Bigquery library
-  const {RowAccessPolicyServiceClient} = require('bigquery').v2;
+  const {RowAccessPolicyServiceClient} = require('@google-cloud/bigquery').v2;
 
   // Instantiates a client
   const bigqueryClient = new RowAccessPolicyServiceClient();

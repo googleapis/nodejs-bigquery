@@ -50,7 +50,7 @@ function main(projectId, datasetId, tableId, table) {
   // const autodetectSchema = true
 
   // Imports the Bigquery library
-  const {TableServiceClient} = require('bigquery').v2;
+  const {TableServiceClient} = require('@google-cloud/bigquery').v2;
 
   // Instantiates a client
   const bigqueryClient = new TableServiceClient();

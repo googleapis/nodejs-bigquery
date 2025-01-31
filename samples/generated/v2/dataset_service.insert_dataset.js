@@ -58,7 +58,7 @@ function main(projectId, dataset) {
   // const accessPolicyVersion = 1234
 
   // Imports the Bigquery library
-  const {DatasetServiceClient} = require('bigquery').v2;
+  const {DatasetServiceClient} = require('@google-cloud/bigquery').v2;
 
   // Instantiates a client
   const bigqueryClient = new DatasetServiceClient();
