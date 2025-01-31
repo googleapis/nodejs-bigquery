@@ -48,7 +48,7 @@ function main(projectId, datasetId, modelId, model) {
   // const model = {}
 
   // Imports the Bigquery library
-  const {ModelServiceClient} = require('bigquery').v2;
+  const {ModelServiceClient} = require('@google-cloud/bigquery').v2;
 
   // Instantiates a client
   const bigqueryClient = new ModelServiceClient();

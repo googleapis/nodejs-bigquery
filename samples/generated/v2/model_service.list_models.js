@@ -48,7 +48,7 @@ function main(projectId, datasetId) {
   // const pageToken = 'abc123'
 
   // Imports the Bigquery library
-  const {ModelServiceClient} = require('bigquery').v2;
+  const {ModelServiceClient} = require('@google-cloud/bigquery').v2;
 
   // Instantiates a client
   const bigqueryClient = new ModelServiceClient();

@@ -46,7 +46,7 @@ function main(projectId, datasetId, routineId, routine) {
   // const routine = {}
 
   // Imports the Bigquery library
-  const {RoutineServiceClient} = require('bigquery').v2;
+  const {RoutineServiceClient} = require('@google-cloud/bigquery').v2;
 
   // Instantiates a client
   const bigqueryClient = new RoutineServiceClient();

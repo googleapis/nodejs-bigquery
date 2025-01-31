@@ -44,7 +44,7 @@ function main(projectId, datasetId) {
   // const deleteContents = true
 
   // Imports the Bigquery library
-  const {DatasetServiceClient} = require('bigquery').v2;
+  const {DatasetServiceClient} = require('@google-cloud/bigquery').v2;
 
   // Instantiates a client
   const bigqueryClient = new DatasetServiceClient();

@@ -81,7 +81,7 @@ function main(projectId, jobId) {
   // const formatOptions = {}
 
   // Imports the Bigquery library
-  const {JobServiceClient} = require('bigquery').v2;
+  const {JobServiceClient} = require('@google-cloud/bigquery').v2;
 
   // Instantiates a client
   const bigqueryClient = new JobServiceClient();

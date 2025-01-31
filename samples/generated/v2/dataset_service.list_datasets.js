@@ -58,7 +58,7 @@ function main(projectId) {
   // const filter = 'abc123'
 
   // Imports the Bigquery library
-  const {DatasetServiceClient} = require('bigquery').v2;
+  const {DatasetServiceClient} = require('@google-cloud/bigquery').v2;
 
   // Instantiates a client
   const bigqueryClient = new DatasetServiceClient();

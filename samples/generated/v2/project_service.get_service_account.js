@@ -34,7 +34,7 @@ function main(projectId) {
   // const projectId = 'abc123'
 
   // Imports the Bigquery library
-  const {ProjectServiceClient} = require('bigquery').v2;
+  const {ProjectServiceClient} = require('@google-cloud/bigquery').v2;
 
   // Instantiates a client
   const bigqueryClient = new ProjectServiceClient();
