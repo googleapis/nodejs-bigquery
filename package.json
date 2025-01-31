@@ -56,7 +56,9 @@
     "mocha": "^10.7.3",
     "pack-n-play": "^2.0.3",
     "sinon": "^18.0.0",
-    "typescript": "5.1.6"
+    "typescript": "5.1.6",
+    "nise": "6.0.0",
+    "path-to-regexp": "6.3.0"
   },
   "engines": {
     "node": ">=v14"
