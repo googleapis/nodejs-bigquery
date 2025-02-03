@@ -19,7 +19,6 @@ const files = [
   '../src/v2/routine_service_client.ts',
   '../src/v2/row_access_policy_service_client.ts',
 ];
-// TODO: automate construction of methods list
 const output = `
 // /*!
 //  * Copyright 2025 Google LLC
@@ -77,15 +76,13 @@ function ast(file, client) {
   extract(sourceFile!, undefined, client);
   // Either print the found nodes, or offer a list of what identifiers were found
 
-  // TODO - surface data plane methods like query?
+   // TODO - surface data plane methods like query?
   // TODO - possibly dynamically populate the node body if needed?
   foundNodes.map(f => {
     const [name, node] = f;
     // create function name
     const functionName = `${name.escapedText}`;
-
-    // TODO - deal with Stream and async functions
-    // They have different function bodies so we should skip them for now
+    // TODO, properly deal with stream and async paginated functions
     if (functionName.search('Stream') < 0 && functionName.search('Async') < 0) {
       output = output.concat(`\n\t${functionName}(`);
       // add parameters
