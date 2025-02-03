@@ -81,6 +81,8 @@ function ast(file, client) {
     const [name, node] = f;
     // create function name
     const functionName = `${name.escapedText}`;
+    // skip stream/async paginated functions for now
+    // TODO - add proper logic for these
     if (functionName.search('Stream')<0 && functionName.search('Async')<0){
     output = output.concat(`\n\t${functionName}(`);
     // add parameters
@@ -152,8 +154,9 @@ function makeImports(clients) {
   }
 
   imports = imports.concat('} from ".";\n');
+  imports = imports.concat('import type * as gax from "google-gax";\n')
   imports = imports.concat(
-    'import {Callback, CallOptions, PaginationCallback} from "google-gax";\n'
+    'import {Callback, CallOptions, ClientOptions, PaginationCallback} from "google-gax";\n'
   );
   return imports;
 }
@@ -163,29 +166,52 @@ function parseClientName(client) {
   return client.split('ServiceClient')[0].toLowerCase() + 'Client';
 }
 
+function buildOptionTypes(clients){
+    let output = ''
+    let subClientOptionsType = `export type subClientOptions = {opts?: ClientOptions,
+    gaxInstance?: typeof gax | typeof gax.fallback};\n`
+    output = output.concat(subClientOptionsType)
+    let bigQueryOptionsType = 'export type bigQueryClientOptions = {\n'
+    for (let client in clients){
+        let variableDecl = '';
+        const clientName = parseClientName(clients[client]);
+        variableDecl = variableDecl.concat(
+          `\t${clientName}?: ${clients[client]};\n`
+        );
+        bigQueryOptionsType = bigQueryOptionsType.concat(variableDecl)
+    }
+    bigQueryOptionsType = bigQueryOptionsType.concat("};\n")
+    output = output.concat(bigQueryOptionsType)
+    return output
+ 
+}
 // TODO modify to be able to pass option to subclients
 function buildClientConstructor(clients) {
   let variableDecl = '';
-  // TODO - deal with any, which has to do with options passing
-  let constructorInitializers = '\tconstructor(options:any){\n';
+  // TODO fix
+  let comment = `\t// 
+   * @param {object} [subClientOptions] - These options will be shared across subclients and correspond to gax.
+`
+  let constructorInitializers = '\tconstructor(options: bigQueryClientOptions, subClientOptions: subClientOptions){\n';
   for (const client in clients) {
     const clientName = parseClientName(clients[client]);
     variableDecl = variableDecl.concat(
       `\t${clientName}: ${clients[client]};\n`
     );
     constructorInitializers = constructorInitializers.concat(
-      `\t\tthis.${clientName} = options?.${clientName} ?? new ${clients[client]}();\n`
+      `\t\tthis.${clientName} = options?.${clientName} ?? new ${clients[client]}(subClientOptions.opts, subClientOptions.gaxInstance);\n`
     );
   }
   constructorInitializers = constructorInitializers.concat('\t}');
   let output = 'export class BigQueryClient{\n';
-  output = output.concat(variableDecl, '\n', constructorInitializers);
+  output = output.concat(variableDecl, '\n', comment, '\n', constructorInitializers);
   return output;
 }
 
 function buildOutput() {
   let newoutput;
   newoutput = output.concat(makeImports(clients));
+  newoutput = newoutput.concat(buildOptionTypes(clients));
   newoutput = newoutput.concat(buildClientConstructor(clients));
   newoutput = newoutput.concat(astHelper(files, clients));
   newoutput = newoutput.concat('\n}');
