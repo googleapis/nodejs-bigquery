@@ -15,6 +15,5 @@
 """This script is used to synthesize generated parts of this library."""
 
 import synthtool.languages.node as node
-from synthtool import shell
 
 node.owlbot_main()
