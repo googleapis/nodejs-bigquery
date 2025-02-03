@@ -81,7 +81,7 @@ function ast(file, client) {
     const [name, node] = f;
     // create function name
     const functionName = `${name.escapedText}`;
-
+    if (functionName.search('Stream')<0 && functionName.search('Async')<0){
     output = output.concat(`\n\t${functionName}(`);
     // add parameters
     let parametersList = '';
@@ -128,6 +128,7 @@ function ast(file, client) {
         `{\n${optionsOrCallback}\n\t\tthis.${client.toLowerCase()}Client.${functionName}(${argumentsList})\n\t}`
       );
     }
+}
   });
 
   return output;
