@@ -75,61 +75,58 @@ function ast(file, client) {
   // Run the extract function with the script's arguments
   extract(sourceFile!, undefined, client);
   // Either print the found nodes, or offer a list of what identifiers were found
+  const checker = program.getTypeChecker();
 
-   // TODO - surface data plane methods like query?
-  // TODO - possibly dynamically populate the node body if needed?
   foundNodes.map(f => {
     const [name, node] = f;
     // create function name
     const functionName = `${name.escapedText}`;
-    // TODO, properly deal with stream and async paginated functions
-    if (functionName.search('Stream') < 0 && functionName.search('Async') < 0) {
-      output = output.concat(`\n\t${functionName}(`);
-      // add parameters
-      let parametersList = '';
-      let argumentsList = '';
-      for (let i = 0; i < node.parameters.length; i++) {
-        const name = node.parameters[i].name.escapedText;
-        const typeString = node.parameters[i].type.getFullText();
-        let parameter = `${name}: ${typeString}`;
-        parametersList = parametersList.concat(name);
-        // this has to do with function overloading - we will later surface code
-        // that does type checking for options and callback
-        if (name === 'optionsOrCallback') {
-          argumentsList = argumentsList.concat('options');
-        } else {
-          argumentsList = argumentsList.concat(name);
-        }
-        if (i !== node.parameters.length - 1) {
-          parameter += ', ';
-          parametersList += ', ';
-          argumentsList += ', ';
-        }
-        output = output.concat(`\n\t\t${parameter}`);
-      }
-      output = output.concat(')');
-      // add return type
 
-      const returnType = node.type!.getFullText();
-      output = output.concat(`:${returnType}`);
-      // call underlying client function
-      if (node.body) {
-        // this logic needs to be surfaced from underlying clients
-        // to make sure our parameters play nicely with underlying overloads
-        // otherwise you will run into issues similar to https://github.com/microsoft/TypeScript/issues/1805
-        const optionsOrCallback = `
-                let options: CallOptions;
-                if (typeof optionsOrCallback === 'function' && callback === undefined) {
-                    callback = optionsOrCallback;
-                    options = {};
-                }
-                else {
-                    options = optionsOrCallback as CallOptions;
-                }`;
-        output = output.concat(
-          `{\n${optionsOrCallback}\n\t\tthis.${client.toLowerCase()}Client.${functionName}(${argumentsList})\n\t}`
-        );
+    output = output.concat(`\n\t${functionName}(`);
+    // add parameters
+    let parametersList = '';
+    let argumentsList = '';
+    for (let i = 0; i < node.parameters.length; i++) {
+      const name = node.parameters[i].name.escapedText;
+      const typeString = node.parameters[i].type.getFullText();
+      let parameter = `${name}: ${typeString}`;
+      parametersList = parametersList.concat(name);
+      // this has to do with function overloading - we will later surface code
+      // that does type checking for options and callback
+      if (name === 'optionsOrCallback') {
+        argumentsList = argumentsList.concat('options');
+      } else {
+        argumentsList = argumentsList.concat(name);
       }
+      if (i !== node.parameters.length - 1) {
+        parameter += ', ';
+        parametersList += ', ';
+        argumentsList += ', ';
+      }
+      output = output.concat(`\n\t\t${parameter}`);
+    }
+    output = output.concat(')');
+    // add return type
+
+    const returnType = node.type!.getFullText();
+    output = output.concat(`:${returnType}`);
+    // call underlying client function
+    if (node.body) {
+      // this logic needs to be surfaced from underlying clients
+      // to make sure our parameters play nicely with underlying overloads
+      // otherwise you will run into issues similar to https://github.com/microsoft/TypeScript/issues/1805
+      const optionsOrCallback = `
+            let options: CallOptions;
+            if (typeof optionsOrCallback === 'function' && callback === undefined) {
+                callback = optionsOrCallback;
+                options = {};
+            }
+            else {
+                options = optionsOrCallback as CallOptions;
+            }`;
+      output = output.concat(
+        `{\n${optionsOrCallback}\n\t\tthis.${client.toLowerCase()}Client.${functionName}(${argumentsList})\n\t}`
+      );
     }
   });
 
