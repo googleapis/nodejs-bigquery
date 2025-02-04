@@ -83,41 +83,41 @@ function ast(file, client) {
     const functionName = `${name.escapedText}`;
     // skip stream/async paginated functions for now
     // TODO - add proper logic for these
-    if (functionName.search('Stream')<0 && functionName.search('Async')<0){
-    output = output.concat(`\n\t${functionName}(`);
-    // add parameters
-    let parametersList = '';
-    let argumentsList = '';
-    for (let i = 0; i < node.parameters.length; i++) {
-      const name = node.parameters[i].name.escapedText;
-      const typeString = node.parameters[i].type.getFullText();
-      let parameter = `${name}: ${typeString}`;
-      parametersList = parametersList.concat(name);
-      // this has to do with function overloading - we will later surface code
-      // that does type checking for options and callback
-      if (name === 'optionsOrCallback') {
-        argumentsList = argumentsList.concat('options');
-      } else {
-        argumentsList = argumentsList.concat(name);
+    if (functionName.search('Stream') < 0 && functionName.search('Async') < 0) {
+      output = output.concat(`\n\t${functionName}(`);
+      // add parameters
+      let parametersList = '';
+      let argumentsList = '';
+      for (let i = 0; i < node.parameters.length; i++) {
+        const name = node.parameters[i].name.escapedText;
+        const typeString = node.parameters[i].type.getFullText();
+        let parameter = `${name}: ${typeString}`;
+        parametersList = parametersList.concat(name);
+        // this has to do with function overloading - we will later surface code
+        // that does type checking for options and callback
+        if (name === 'optionsOrCallback') {
+          argumentsList = argumentsList.concat('options');
+        } else {
+          argumentsList = argumentsList.concat(name);
+        }
+        if (i !== node.parameters.length - 1) {
+          parameter += ', ';
+          parametersList += ', ';
+          argumentsList += ', ';
+        }
+        output = output.concat(`\n\t\t${parameter}`);
       }
-      if (i !== node.parameters.length - 1) {
-        parameter += ', ';
-        parametersList += ', ';
-        argumentsList += ', ';
-      }
-      output = output.concat(`\n\t\t${parameter}`);
-    }
-    output = output.concat(')');
-    // add return type
+      output = output.concat(')');
+      // add return type
 
-    const returnType = node.type!.getFullText();
-    output = output.concat(`:${returnType}`);
-    // call underlying client function
-    if (node.body) {
-      // this logic needs to be surfaced from underlying clients
-      // to make sure our parameters play nicely with underlying overloads
-      // otherwise you will run into issues similar to https://github.com/microsoft/TypeScript/issues/1805
-      const optionsOrCallback = `
+      const returnType = node.type!.getFullText();
+      output = output.concat(`:${returnType}`);
+      // call underlying client function
+      if (node.body) {
+        // this logic needs to be surfaced from underlying clients
+        // to make sure our parameters play nicely with underlying overloads
+        // otherwise you will run into issues similar to https://github.com/microsoft/TypeScript/issues/1805
+        const optionsOrCallback = `
             let options: CallOptions;
             if (typeof optionsOrCallback === 'function' && callback === undefined) {
                 callback = optionsOrCallback;
@@ -126,11 +126,11 @@ function ast(file, client) {
             else {
                 options = optionsOrCallback as CallOptions;
             }`;
-      output = output.concat(
-        `{\n${optionsOrCallback}\n\t\tthis.${client.toLowerCase()}Client.${functionName}(${argumentsList})\n\t}`
-      );
+        output = output.concat(
+          `{\n${optionsOrCallback}\n\t\tthis.${client.toLowerCase()}Client.${functionName}(${argumentsList})\n\t}`
+        );
+      }
     }
-}
   });
 
   return output;
@@ -146,7 +146,6 @@ function astHelper(files, clients) {
   return output;
 }
 
-// TODO - make dynamic
 function makeImports(clients) {
   let imports = 'import {protos';
   for (const client in clients) {
@@ -154,7 +153,7 @@ function makeImports(clients) {
   }
 
   imports = imports.concat('} from ".";\n');
-  imports = imports.concat('import type * as gax from "google-gax";\n')
+  imports = imports.concat('import type * as gax from "google-gax";\n');
   imports = imports.concat(
     'import {Callback, CallOptions, ClientOptions, PaginationCallback} from "google-gax";\n'
   );
@@ -166,9 +165,9 @@ function parseClientName(client) {
   return client.split('ServiceClient')[0].toLowerCase() + 'Client';
 }
 
-function buildOptionTypes(clients){
-    let output = ''
-    let docstring = `/**
+function buildOptionTypes(clients) {
+  let output = '';
+  const docstring = `/**
    * Options passed to the underlying client.
    *
    * @param {object} [options] - The configuration object.
@@ -206,33 +205,33 @@ function buildOptionTypes(clients){
    *     const gax = require('google-gax/build/src/fallback'); // avoids loading google-gax with gRPC
    *     const client = new DatasetServiceClient({fallback: true}, gax);
    *     \`\`\`
-   */\n`
-    let subClientOptionsType = `export type subClientOptions = {opts?: ClientOptions,
-    gaxInstance?: typeof gax | typeof gax.fallback};\n\n`
-    output = output.concat(docstring, subClientOptionsType)
-    let bigQueryOptionsType = 'export type bigQueryClientOptions = {\n'
-    for (let client in clients){
-        let variableDecl = '';
-        const clientName = parseClientName(clients[client]);
-        variableDecl = variableDecl.concat(
-          `\t${clientName}?: ${clients[client]};\n`
-        );
-        bigQueryOptionsType = bigQueryOptionsType.concat(variableDecl)
-    }
-    bigQueryOptionsType = bigQueryOptionsType.concat("};\n\n")
-    output = output.concat(bigQueryOptionsType)
-    return output
- 
+   */\n`;
+  const subClientOptionsType = `export type subClientOptions = {opts?: ClientOptions,
+    gaxInstance?: typeof gax | typeof gax.fallback};\n\n`;
+  output = output.concat(docstring, subClientOptionsType);
+  let bigQueryOptionsType = 'export type bigQueryClientOptions = {\n';
+  for (const client in clients) {
+    let variableDecl = '';
+    const clientName = parseClientName(clients[client]);
+    variableDecl = variableDecl.concat(
+      `\t${clientName}?: ${clients[client]};\n`
+    );
+    bigQueryOptionsType = bigQueryOptionsType.concat(variableDecl);
+  }
+  bigQueryOptionsType = bigQueryOptionsType.concat('};\n\n');
+  output = output.concat(bigQueryOptionsType);
+  return output;
 }
 
 function buildClientConstructor(clients) {
   let variableDecl = '';
-  let comment = `\t/**
+  const comment = `\t/**
    * @param {object} [bigQueryClientOptions] - Enables user to instantiate clients separately and use those as the subclients.
    * @param {object} [subClientOptions] - These options will be shared across subclients. 
    * To have sub-clients with different options, instantiate each client separately.
-   */`
-  let constructorInitializers = '\tconstructor(options: bigQueryClientOptions, subClientOptions: subClientOptions){\n';
+   */`;
+  let constructorInitializers =
+    '\tconstructor(options: bigQueryClientOptions, subClientOptions: subClientOptions){\n';
   for (const client in clients) {
     const clientName = parseClientName(clients[client]);
     variableDecl = variableDecl.concat(
@@ -244,7 +243,13 @@ function buildClientConstructor(clients) {
   }
   constructorInitializers = constructorInitializers.concat('\t}');
   let output = 'export class BigQueryClient{\n';
-  output = output.concat(variableDecl, '\n', comment, '\n', constructorInitializers);
+  output = output.concat(
+    variableDecl,
+    '\n',
+    comment,
+    '\n',
+    constructorInitializers
+  );
   return output;
 }
 
