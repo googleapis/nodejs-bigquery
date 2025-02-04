@@ -168,9 +168,48 @@ function parseClientName(client) {
 
 function buildOptionTypes(clients){
     let output = ''
+    let docstring = `/**
+   * Options passed to the underlying client.
+   *
+   * @param {object} [options] - The configuration object.
+   * The options accepted by the constructor are described in detail
+   * in [this document](https://github.com/googleapis/gax-nodejs/blob/main/client-libraries.md#creating-the-client-instance).
+   * The common options are:
+   * @param {object} [options.credentials] - Credentials object.
+   * @param {string} [options.credentials.client_email]
+   * @param {string} [options.credentials.private_key]
+   * @param {string} [options.email] - Account email address. Required when
+   *     using a .pem or .p12 keyFilename.
+   * @param {string} [options.keyFilename] - Full path to the a .json, .pem, or
+   *     .p12 key downloaded from the Google Developers Console. If you provide
+   *     a path to a JSON file, the projectId option below is not necessary.
+   *     NOTE: .pem and .p12 require you to specify options.email as well.
+   * @param {number} [options.port] - The port on which to connect to
+   *     the remote host.
+   * @param {string} [options.projectId] - The project ID from the Google
+   *     Developer's Console, e.g. 'grape-spaceship-123'. We will also check
+   *     the environment variable GCLOUD_PROJECT for your project ID. If your
+   *     app is running in an environment which supports
+   *     {@link https://developers.google.com/identity/protocols/application-default-credentials Application Default Credentials},
+   *     your project ID will be detected automatically.
+   * @param {string} [options.apiEndpoint] - The domain name of the
+   *     API remote host.
+   * @param {gax.ClientConfig} [options.clientConfig] - Client configuration override.
+   *     Follows the structure of {@link gapicConfig}.
+   * @param {boolean} [options.fallback] - Use HTTP/1.1 REST mode.
+   *     For more information, please check the
+   *     {@link https://github.com/googleapis/gax-nodejs/blob/main/client-libraries.md#http11-rest-api-mode documentation}.
+   * @param {gax} [gaxInstance]: loaded instance of \`google-gax\`. Useful if you
+   *     need to avoid loading the default gRPC version and want to use the fallback
+   *     HTTP implementation. Load only fallback version and pass it to the constructor:
+   *     \`\`\`
+   *     const gax = require('google-gax/build/src/fallback'); // avoids loading google-gax with gRPC
+   *     const client = new DatasetServiceClient({fallback: true}, gax);
+   *     \`\`\`
+   */\n`
     let subClientOptionsType = `export type subClientOptions = {opts?: ClientOptions,
-    gaxInstance?: typeof gax | typeof gax.fallback};\n`
-    output = output.concat(subClientOptionsType)
+    gaxInstance?: typeof gax | typeof gax.fallback};\n\n`
+    output = output.concat(docstring, subClientOptionsType)
     let bigQueryOptionsType = 'export type bigQueryClientOptions = {\n'
     for (let client in clients){
         let variableDecl = '';
@@ -180,18 +219,19 @@ function buildOptionTypes(clients){
         );
         bigQueryOptionsType = bigQueryOptionsType.concat(variableDecl)
     }
-    bigQueryOptionsType = bigQueryOptionsType.concat("};\n")
+    bigQueryOptionsType = bigQueryOptionsType.concat("};\n\n")
     output = output.concat(bigQueryOptionsType)
     return output
  
 }
-// TODO modify to be able to pass option to subclients
+
 function buildClientConstructor(clients) {
   let variableDecl = '';
-  // TODO fix
-  let comment = `\t// 
-   * @param {object} [subClientOptions] - These options will be shared across subclients and correspond to gax.
-`
+  let comment = `\t/**
+   * @param {object} [bigQueryClientOptions] - Enables user to instantiate clients separately and use those as the subclients.
+   * @param {object} [subClientOptions] - These options will be shared across subclients. 
+   * To have sub-clients with different options, instantiate each client separately.
+   */`
   let constructorInitializers = '\tconstructor(options: bigQueryClientOptions, subClientOptions: subClientOptions){\n';
   for (const client in clients) {
     const clientName = parseClientName(clients[client]);
