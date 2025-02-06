@@ -56,12 +56,18 @@ function extract(node: ts.Node, depth = 0, client): void {
       // and can therefore safely make this assumption to get the human readable name
       const name = node.name as ts.Identifier;
       const nameEscapedText = name.escapedText as string;
-
       // full implementation (not overload) of crud method for client
-      if (node.body && nameEscapedText.search(client) > 0) {
+      // this does not include "undelete" because "delete" will capture it
+      const adminMethodPrefixes: string[] = ['get', 'list', 'delete', 'patch', 'update', 'insert', 'cancel']
+      adminMethodPrefixes.forEach((method:string)=> {  
+ 
         // type is the node.type and we can deal with union types later
-        foundNodes.push([node.name, node]);
-      }
+        if (node.body && nameEscapedText.search(method) >= 0) {
+          // type is the node.type and we can deal with union types later
+          foundNodes.push([node.name, node]);
+        }
+      })
+  
     }
   }
   // Loop through the root AST nodes of the file
@@ -84,7 +90,7 @@ function ast(file, client) {
     const [name, node] = f;
     // create function name
     const functionName = `${name.escapedText}`;
-    if (functionName.search('Stream') < 0 && functionName.search('Async') < 0) {
+    if (functionName.search('Stream') < 0 && functionName.search('Async') < 0 && functionName.search('ProjectId') < 0) {
       output = output.concat(`\n\t${functionName}(`);
       // add parameters
       let parametersList = '';
