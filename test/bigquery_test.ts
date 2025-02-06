@@ -1,6 +1,5 @@
-// TODO - tests
-// that the file exists
-// file compiles
+// TODO that the file exists
+// TODO file compiles and has methods we expect - this might mean dynamic client input
 import {
   BigQueryClient,
   bigQueryClientOptions,
@@ -13,6 +12,16 @@ import * as sinon from 'sinon';
 import {describe, it} from 'mocha';
 import { DatasetServiceClient, TableServiceClient, RowAccessPolicyServiceClient, ModelServiceClient, JobServiceClient, RoutineServiceClient } from '../src';
 
+describe.only('BigQueryClient has the number of clients and methods we expect', () => {
+    it('should have six client attributes', () => {
+        const client = new BigQueryClient();
+        assert.equal(Object.getOwnPropertyNames(client).length, 6)
+    })
+    it('should have 31 methods including the constructor', () => {
+        const client = new BigQueryClient();
+        assert.equal(Object.getOwnPropertyNames(Object.getPrototypeOf(client)).length, 31)
+    })
+})
 describe('BigQueryClient should be able to handle passing in clients and options', () => {
 const subOptions: subClientOptions = {
     opts: {

@@ -35,8 +35,10 @@
     "compile-protos": "compileProtos src",
     "docs": "jsdoc -c .jsdoc.js",
     "fix": "gts fix",
+    "gen-central-client": "tsc scripts/gen_uber_class.ts",
     "lint": "gts check",
-    "prepare": "npm run compile-protos && npm run compile",
+    "prepare": "npm run compile-protos && npm run gen-central-client && npm run compile",
+    "pretest": "npm run prepare",
     "system-test": "c8 mocha build/system-test",
     "test": "c8 mocha build/test"
   },
