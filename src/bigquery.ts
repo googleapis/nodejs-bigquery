@@ -1,0 +1,1072 @@
+
+// /*!
+//  * Copyright 2025 Google LLC
+//  *
+//  * Licensed under the Apache License, Version 2.0 (the "License");
+//  * you may not use this file except in compliance with the License.
+//  * You may obtain a copy of the License at
+//  *
+//  *      http://www.apache.org/licenses/LICENSE-2.0
+//  *
+//  * Unless required by applicable law or agreed to in writing, software
+//  * distributed under the License is distributed on an "AS IS" BASIS,
+//  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  * See the License for the specific language governing permissions and
+//  * limitations under the License.
+//  */
+import {protos, DatasetServiceClient, TableServiceClient, JobServiceClient, ModelServiceClient, RoutineServiceClient, RowAccessPolicyServiceClient} from ".";
+import type * as gax from "google-gax";
+import {Callback, CallOptions, ClientOptions, PaginationCallback} from "google-gax";
+/**
+   * Options passed to the underlying client.
+   *
+   * @param {object} [options] - The configuration object.
+   * The options accepted by the constructor are described in detail
+   * in [this document](https://github.com/googleapis/gax-nodejs/blob/main/client-libraries.md#creating-the-client-instance).
+   * The common options are:
+   * @param {object} [options.credentials] - Credentials object.
+   * @param {string} [options.credentials.client_email]
+   * @param {string} [options.credentials.private_key]
+   * @param {string} [options.email] - Account email address. Required when
+   *     using a .pem or .p12 keyFilename.
+   * @param {string} [options.keyFilename] - Full path to the a .json, .pem, or
+   *     .p12 key downloaded from the Google Developers Console. If you provide
+   *     a path to a JSON file, the projectId option below is not necessary.
+   *     NOTE: .pem and .p12 require you to specify options.email as well.
+   * @param {number} [options.port] - The port on which to connect to
+   *     the remote host.
+   * @param {string} [options.projectId] - The project ID from the Google
+   *     Developer's Console, e.g. 'grape-spaceship-123'. We will also check
+   *     the environment variable GCLOUD_PROJECT for your project ID. If your
+   *     app is running in an environment which supports
+   *     {@link https://developers.google.com/identity/protocols/application-default-credentials Application Default Credentials},
+   *     your project ID will be detected automatically.
+   * @param {string} [options.apiEndpoint] - The domain name of the
+   *     API remote host.
+   * @param {gax.ClientConfig} [options.clientConfig] - Client configuration override.
+   *     Follows the structure of {@link gapicConfig}.
+   * @param {boolean} [options.fallback] - Use HTTP/1.1 REST mode.
+   *     For more information, please check the
+   *     {@link https://github.com/googleapis/gax-nodejs/blob/main/client-libraries.md#http11-rest-api-mode documentation}.
+   * @param {gax} [gaxInstance]: loaded instance of `google-gax`. Useful if you
+   *     need to avoid loading the default gRPC version and want to use the fallback
+   *     HTTP implementation. Load only fallback version and pass it to the constructor:
+   *     ```
+   *     const gax = require('google-gax/build/src/fallback'); // avoids loading google-gax with gRPC
+   *     const client = new DatasetServiceClient({fallback: true}, gax);
+   *     ```
+   */
+export type subClientOptions = {opts?: ClientOptions,
+    gaxInstance?: typeof gax | typeof gax.fallback};
+
+export type bigQueryClientOptions = {
+	datasetClient?: DatasetServiceClient;
+	tableClient?: TableServiceClient;
+	jobClient?: JobServiceClient;
+	modelClient?: ModelServiceClient;
+	routineClient?: RoutineServiceClient;
+	rowaccesspolicyClient?: RowAccessPolicyServiceClient;
+};
+
+export class BigQueryClient{
+	datasetClient: DatasetServiceClient;
+	tableClient: TableServiceClient;
+	jobClient: JobServiceClient;
+	modelClient: ModelServiceClient;
+	routineClient: RoutineServiceClient;
+	rowaccesspolicyClient: RowAccessPolicyServiceClient;
+
+	/**
+  * @param {object} [bigQueryClientOptions] - Enables user to instantiate clients separately and use those as the subclients.
+  * @param {object} [subClientOptions] - These options will be shared across subclients. 
+  * To have sub-clients with different options, instantiate each client separately.
+  */
+	constructor(options: bigQueryClientOptions, subClientOptions: subClientOptions){
+		this.datasetClient = options?.datasetClient ?? new DatasetServiceClient(subClientOptions?.opts, subClientOptions?.gaxInstance);
+		this.tableClient = options?.tableClient ?? new TableServiceClient(subClientOptions?.opts, subClientOptions?.gaxInstance);
+		this.jobClient = options?.jobClient ?? new JobServiceClient(subClientOptions?.opts, subClientOptions?.gaxInstance);
+		this.modelClient = options?.modelClient ?? new ModelServiceClient(subClientOptions?.opts, subClientOptions?.gaxInstance);
+		this.routineClient = options?.routineClient ?? new RoutineServiceClient(subClientOptions?.opts, subClientOptions?.gaxInstance);
+		this.rowaccesspolicyClient = options?.rowaccesspolicyClient ?? new RowAccessPolicyServiceClient(subClientOptions?.opts, subClientOptions?.gaxInstance);
+	}
+	getDataset(
+		request:  protos.google.cloud.bigquery.v2.IGetDatasetRequest, 
+		optionsOrCallback: 
+      | CallOptions
+      | Callback<
+          protos.google.cloud.bigquery.v2.IDataset,
+          protos.google.cloud.bigquery.v2.IGetDatasetRequest | null | undefined,
+          {} | null | undefined
+        >, 
+		callback:  Callback<
+      protos.google.cloud.bigquery.v2.IDataset,
+      protos.google.cloud.bigquery.v2.IGetDatasetRequest | null | undefined,
+      {} | null | undefined
+    >): Promise<
+    [
+      protos.google.cloud.bigquery.v2.IDataset,
+      protos.google.cloud.bigquery.v2.IGetDatasetRequest | undefined,
+      {} | undefined,
+    ]
+  > | void{
+
+            let options: CallOptions;
+            if (typeof optionsOrCallback === 'function' && callback === undefined) {
+                callback = optionsOrCallback;
+                options = {};
+            }
+            else {
+                options = optionsOrCallback as CallOptions;
+            }
+		return this.datasetClient.getDataset(request, options, callback)
+	}
+	insertDataset(
+		request:  protos.google.cloud.bigquery.v2.IInsertDatasetRequest, 
+		optionsOrCallback: 
+      | CallOptions
+      | Callback<
+          protos.google.cloud.bigquery.v2.IDataset,
+          | protos.google.cloud.bigquery.v2.IInsertDatasetRequest
+          | null
+          | undefined,
+          {} | null | undefined
+        >, 
+		callback:  Callback<
+      protos.google.cloud.bigquery.v2.IDataset,
+      protos.google.cloud.bigquery.v2.IInsertDatasetRequest | null | undefined,
+      {} | null | undefined
+    >): Promise<
+    [
+      protos.google.cloud.bigquery.v2.IDataset,
+      protos.google.cloud.bigquery.v2.IInsertDatasetRequest | undefined,
+      {} | undefined,
+    ]
+  > | void{
+
+            let options: CallOptions;
+            if (typeof optionsOrCallback === 'function' && callback === undefined) {
+                callback = optionsOrCallback;
+                options = {};
+            }
+            else {
+                options = optionsOrCallback as CallOptions;
+            }
+		return this.datasetClient.insertDataset(request, options, callback)
+	}
+	patchDataset(
+		request:  protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest, 
+		optionsOrCallback: 
+      | CallOptions
+      | Callback<
+          protos.google.cloud.bigquery.v2.IDataset,
+          | protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest
+          | null
+          | undefined,
+          {} | null | undefined
+        >, 
+		callback:  Callback<
+      protos.google.cloud.bigquery.v2.IDataset,
+      | protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest
+      | null
+      | undefined,
+      {} | null | undefined
+    >): Promise<
+    [
+      protos.google.cloud.bigquery.v2.IDataset,
+      protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest | undefined,
+      {} | undefined,
+    ]
+  > | void{
+
+            let options: CallOptions;
+            if (typeof optionsOrCallback === 'function' && callback === undefined) {
+                callback = optionsOrCallback;
+                options = {};
+            }
+            else {
+                options = optionsOrCallback as CallOptions;
+            }
+		return this.datasetClient.patchDataset(request, options, callback)
+	}
+	updateDataset(
+		request:  protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest, 
+		optionsOrCallback: 
+      | CallOptions
+      | Callback<
+          protos.google.cloud.bigquery.v2.IDataset,
+          | protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest
+          | null
+          | undefined,
+          {} | null | undefined
+        >, 
+		callback:  Callback<
+      protos.google.cloud.bigquery.v2.IDataset,
+      | protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest
+      | null
+      | undefined,
+      {} | null | undefined
+    >): Promise<
+    [
+      protos.google.cloud.bigquery.v2.IDataset,
+      protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest | undefined,
+      {} | undefined,
+    ]
+  > | void{
+
+            let options: CallOptions;
+            if (typeof optionsOrCallback === 'function' && callback === undefined) {
+                callback = optionsOrCallback;
+                options = {};
+            }
+            else {
+                options = optionsOrCallback as CallOptions;
+            }
+		return this.datasetClient.updateDataset(request, options, callback)
+	}
+	deleteDataset(
+		request:  protos.google.cloud.bigquery.v2.IDeleteDatasetRequest, 
+		optionsOrCallback: 
+      | CallOptions
+      | Callback<
+          protos.google.protobuf.IEmpty,
+          | protos.google.cloud.bigquery.v2.IDeleteDatasetRequest
+          | null
+          | undefined,
+          {} | null | undefined
+        >, 
+		callback:  Callback<
+      protos.google.protobuf.IEmpty,
+      protos.google.cloud.bigquery.v2.IDeleteDatasetRequest | null | undefined,
+      {} | null | undefined
+    >): Promise<
+    [
+      protos.google.protobuf.IEmpty,
+      protos.google.cloud.bigquery.v2.IDeleteDatasetRequest | undefined,
+      {} | undefined,
+    ]
+  > | void{
+
+            let options: CallOptions;
+            if (typeof optionsOrCallback === 'function' && callback === undefined) {
+                callback = optionsOrCallback;
+                options = {};
+            }
+            else {
+                options = optionsOrCallback as CallOptions;
+            }
+		return this.datasetClient.deleteDataset(request, options, callback)
+	}
+	undeleteDataset(
+		request:  protos.google.cloud.bigquery.v2.IUndeleteDatasetRequest, 
+		optionsOrCallback: 
+      | CallOptions
+      | Callback<
+          protos.google.cloud.bigquery.v2.IDataset,
+          | protos.google.cloud.bigquery.v2.IUndeleteDatasetRequest
+          | null
+          | undefined,
+          {} | null | undefined
+        >, 
+		callback:  Callback<
+      protos.google.cloud.bigquery.v2.IDataset,
+      | protos.google.cloud.bigquery.v2.IUndeleteDatasetRequest
+      | null
+      | undefined,
+      {} | null | undefined
+    >): Promise<
+    [
+      protos.google.cloud.bigquery.v2.IDataset,
+      protos.google.cloud.bigquery.v2.IUndeleteDatasetRequest | undefined,
+      {} | undefined,
+    ]
+  > | void{
+
+            let options: CallOptions;
+            if (typeof optionsOrCallback === 'function' && callback === undefined) {
+                callback = optionsOrCallback;
+                options = {};
+            }
+            else {
+                options = optionsOrCallback as CallOptions;
+            }
+		return this.datasetClient.undeleteDataset(request, options, callback)
+	}
+	listDatasets(
+		request:  protos.google.cloud.bigquery.v2.IListDatasetsRequest, 
+		optionsOrCallback: 
+      | CallOptions
+      | PaginationCallback<
+          protos.google.cloud.bigquery.v2.IListDatasetsRequest,
+          protos.google.cloud.bigquery.v2.IDatasetList | null | undefined,
+          protos.google.cloud.bigquery.v2.IListFormatDataset
+        >, 
+		callback:  PaginationCallback<
+      protos.google.cloud.bigquery.v2.IListDatasetsRequest,
+      protos.google.cloud.bigquery.v2.IDatasetList | null | undefined,
+      protos.google.cloud.bigquery.v2.IListFormatDataset
+    >): Promise<
+    [
+      protos.google.cloud.bigquery.v2.IListFormatDataset[],
+      protos.google.cloud.bigquery.v2.IListDatasetsRequest | null,
+      protos.google.cloud.bigquery.v2.IDatasetList,
+    ]
+  > | void{
+
+            let options: CallOptions;
+            if (typeof optionsOrCallback === 'function' && callback === undefined) {
+                callback = optionsOrCallback;
+                options = {};
+            }
+            else {
+                options = optionsOrCallback as CallOptions;
+            }
+		return this.datasetClient.listDatasets(request, options, callback)
+	}
+	getTable(
+		request:  protos.google.cloud.bigquery.v2.IGetTableRequest, 
+		optionsOrCallback: 
+      | CallOptions
+      | Callback<
+          protos.google.cloud.bigquery.v2.ITable,
+          protos.google.cloud.bigquery.v2.IGetTableRequest | null | undefined,
+          {} | null | undefined
+        >, 
+		callback:  Callback<
+      protos.google.cloud.bigquery.v2.ITable,
+      protos.google.cloud.bigquery.v2.IGetTableRequest | null | undefined,
+      {} | null | undefined
+    >): Promise<
+    [
+      protos.google.cloud.bigquery.v2.ITable,
+      protos.google.cloud.bigquery.v2.IGetTableRequest | undefined,
+      {} | undefined,
+    ]
+  > | void{
+
+            let options: CallOptions;
+            if (typeof optionsOrCallback === 'function' && callback === undefined) {
+                callback = optionsOrCallback;
+                options = {};
+            }
+            else {
+                options = optionsOrCallback as CallOptions;
+            }
+		return this.tableClient.getTable(request, options, callback)
+	}
+	insertTable(
+		request:  protos.google.cloud.bigquery.v2.IInsertTableRequest, 
+		optionsOrCallback: 
+      | CallOptions
+      | Callback<
+          protos.google.cloud.bigquery.v2.ITable,
+          | protos.google.cloud.bigquery.v2.IInsertTableRequest
+          | null
+          | undefined,
+          {} | null | undefined
+        >, 
+		callback:  Callback<
+      protos.google.cloud.bigquery.v2.ITable,
+      protos.google.cloud.bigquery.v2.IInsertTableRequest | null | undefined,
+      {} | null | undefined
+    >): Promise<
+    [
+      protos.google.cloud.bigquery.v2.ITable,
+      protos.google.cloud.bigquery.v2.IInsertTableRequest | undefined,
+      {} | undefined,
+    ]
+  > | void{
+
+            let options: CallOptions;
+            if (typeof optionsOrCallback === 'function' && callback === undefined) {
+                callback = optionsOrCallback;
+                options = {};
+            }
+            else {
+                options = optionsOrCallback as CallOptions;
+            }
+		return this.tableClient.insertTable(request, options, callback)
+	}
+	patchTable(
+		request:  protos.google.cloud.bigquery.v2.IUpdateOrPatchTableRequest, 
+		optionsOrCallback: 
+      | CallOptions
+      | Callback<
+          protos.google.cloud.bigquery.v2.ITable,
+          | protos.google.cloud.bigquery.v2.IUpdateOrPatchTableRequest
+          | null
+          | undefined,
+          {} | null | undefined
+        >, 
+		callback:  Callback<
+      protos.google.cloud.bigquery.v2.ITable,
+      | protos.google.cloud.bigquery.v2.IUpdateOrPatchTableRequest
+      | null
+      | undefined,
+      {} | null | undefined
+    >): Promise<
+    [
+      protos.google.cloud.bigquery.v2.ITable,
+      protos.google.cloud.bigquery.v2.IUpdateOrPatchTableRequest | undefined,
+      {} | undefined,
+    ]
+  > | void{
+
+            let options: CallOptions;
+            if (typeof optionsOrCallback === 'function' && callback === undefined) {
+                callback = optionsOrCallback;
+                options = {};
+            }
+            else {
+                options = optionsOrCallback as CallOptions;
+            }
+		return this.tableClient.patchTable(request, options, callback)
+	}
+	updateTable(
+		request:  protos.google.cloud.bigquery.v2.IUpdateOrPatchTableRequest, 
+		optionsOrCallback: 
+      | CallOptions
+      | Callback<
+          protos.google.cloud.bigquery.v2.ITable,
+          | protos.google.cloud.bigquery.v2.IUpdateOrPatchTableRequest
+          | null
+          | undefined,
+          {} | null | undefined
+        >, 
+		callback:  Callback<
+      protos.google.cloud.bigquery.v2.ITable,
+      | protos.google.cloud.bigquery.v2.IUpdateOrPatchTableRequest
+      | null
+      | undefined,
+      {} | null | undefined
+    >): Promise<
+    [
+      protos.google.cloud.bigquery.v2.ITable,
+      protos.google.cloud.bigquery.v2.IUpdateOrPatchTableRequest | undefined,
+      {} | undefined,
+    ]
+  > | void{
+
+            let options: CallOptions;
+            if (typeof optionsOrCallback === 'function' && callback === undefined) {
+                callback = optionsOrCallback;
+                options = {};
+            }
+            else {
+                options = optionsOrCallback as CallOptions;
+            }
+		return this.tableClient.updateTable(request, options, callback)
+	}
+	deleteTable(
+		request:  protos.google.cloud.bigquery.v2.IDeleteTableRequest, 
+		optionsOrCallback: 
+      | CallOptions
+      | Callback<
+          protos.google.protobuf.IEmpty,
+          | protos.google.cloud.bigquery.v2.IDeleteTableRequest
+          | null
+          | undefined,
+          {} | null | undefined
+        >, 
+		callback:  Callback<
+      protos.google.protobuf.IEmpty,
+      protos.google.cloud.bigquery.v2.IDeleteTableRequest | null | undefined,
+      {} | null | undefined
+    >): Promise<
+    [
+      protos.google.protobuf.IEmpty,
+      protos.google.cloud.bigquery.v2.IDeleteTableRequest | undefined,
+      {} | undefined,
+    ]
+  > | void{
+
+            let options: CallOptions;
+            if (typeof optionsOrCallback === 'function' && callback === undefined) {
+                callback = optionsOrCallback;
+                options = {};
+            }
+            else {
+                options = optionsOrCallback as CallOptions;
+            }
+		return this.tableClient.deleteTable(request, options, callback)
+	}
+	listTables(
+		request:  protos.google.cloud.bigquery.v2.IListTablesRequest, 
+		optionsOrCallback: 
+      | CallOptions
+      | PaginationCallback<
+          protos.google.cloud.bigquery.v2.IListTablesRequest,
+          protos.google.cloud.bigquery.v2.ITableList | null | undefined,
+          protos.google.cloud.bigquery.v2.IListFormatTable
+        >, 
+		callback:  PaginationCallback<
+      protos.google.cloud.bigquery.v2.IListTablesRequest,
+      protos.google.cloud.bigquery.v2.ITableList | null | undefined,
+      protos.google.cloud.bigquery.v2.IListFormatTable
+    >): Promise<
+    [
+      protos.google.cloud.bigquery.v2.IListFormatTable[],
+      protos.google.cloud.bigquery.v2.IListTablesRequest | null,
+      protos.google.cloud.bigquery.v2.ITableList,
+    ]
+  > | void{
+
+            let options: CallOptions;
+            if (typeof optionsOrCallback === 'function' && callback === undefined) {
+                callback = optionsOrCallback;
+                options = {};
+            }
+            else {
+                options = optionsOrCallback as CallOptions;
+            }
+		return this.tableClient.listTables(request, options, callback)
+	}
+	cancelJob(
+		request:  protos.google.cloud.bigquery.v2.ICancelJobRequest, 
+		optionsOrCallback: 
+      | CallOptions
+      | Callback<
+          protos.google.cloud.bigquery.v2.IJobCancelResponse,
+          protos.google.cloud.bigquery.v2.ICancelJobRequest | null | undefined,
+          {} | null | undefined
+        >, 
+		callback:  Callback<
+      protos.google.cloud.bigquery.v2.IJobCancelResponse,
+      protos.google.cloud.bigquery.v2.ICancelJobRequest | null | undefined,
+      {} | null | undefined
+    >): Promise<
+    [
+      protos.google.cloud.bigquery.v2.IJobCancelResponse,
+      protos.google.cloud.bigquery.v2.ICancelJobRequest | undefined,
+      {} | undefined,
+    ]
+  > | void{
+
+            let options: CallOptions;
+            if (typeof optionsOrCallback === 'function' && callback === undefined) {
+                callback = optionsOrCallback;
+                options = {};
+            }
+            else {
+                options = optionsOrCallback as CallOptions;
+            }
+		return this.jobClient.cancelJob(request, options, callback)
+	}
+	getJob(
+		request:  protos.google.cloud.bigquery.v2.IGetJobRequest, 
+		optionsOrCallback: 
+      | CallOptions
+      | Callback<
+          protos.google.cloud.bigquery.v2.IJob,
+          protos.google.cloud.bigquery.v2.IGetJobRequest | null | undefined,
+          {} | null | undefined
+        >, 
+		callback:  Callback<
+      protos.google.cloud.bigquery.v2.IJob,
+      protos.google.cloud.bigquery.v2.IGetJobRequest | null | undefined,
+      {} | null | undefined
+    >): Promise<
+    [
+      protos.google.cloud.bigquery.v2.IJob,
+      protos.google.cloud.bigquery.v2.IGetJobRequest | undefined,
+      {} | undefined,
+    ]
+  > | void{
+
+            let options: CallOptions;
+            if (typeof optionsOrCallback === 'function' && callback === undefined) {
+                callback = optionsOrCallback;
+                options = {};
+            }
+            else {
+                options = optionsOrCallback as CallOptions;
+            }
+		return this.jobClient.getJob(request, options, callback)
+	}
+	insertJob(
+		request:  protos.google.cloud.bigquery.v2.IInsertJobRequest, 
+		optionsOrCallback: 
+      | CallOptions
+      | Callback<
+          protos.google.cloud.bigquery.v2.IJob,
+          protos.google.cloud.bigquery.v2.IInsertJobRequest | null | undefined,
+          {} | null | undefined
+        >, 
+		callback:  Callback<
+      protos.google.cloud.bigquery.v2.IJob,
+      protos.google.cloud.bigquery.v2.IInsertJobRequest | null | undefined,
+      {} | null | undefined
+    >): Promise<
+    [
+      protos.google.cloud.bigquery.v2.IJob,
+      protos.google.cloud.bigquery.v2.IInsertJobRequest | undefined,
+      {} | undefined,
+    ]
+  > | void{
+
+            let options: CallOptions;
+            if (typeof optionsOrCallback === 'function' && callback === undefined) {
+                callback = optionsOrCallback;
+                options = {};
+            }
+            else {
+                options = optionsOrCallback as CallOptions;
+            }
+		return this.jobClient.insertJob(request, options, callback)
+	}
+	deleteJob(
+		request:  protos.google.cloud.bigquery.v2.IDeleteJobRequest, 
+		optionsOrCallback: 
+      | CallOptions
+      | Callback<
+          protos.google.protobuf.IEmpty,
+          protos.google.cloud.bigquery.v2.IDeleteJobRequest | null | undefined,
+          {} | null | undefined
+        >, 
+		callback:  Callback<
+      protos.google.protobuf.IEmpty,
+      protos.google.cloud.bigquery.v2.IDeleteJobRequest | null | undefined,
+      {} | null | undefined
+    >): Promise<
+    [
+      protos.google.protobuf.IEmpty,
+      protos.google.cloud.bigquery.v2.IDeleteJobRequest | undefined,
+      {} | undefined,
+    ]
+  > | void{
+
+            let options: CallOptions;
+            if (typeof optionsOrCallback === 'function' && callback === undefined) {
+                callback = optionsOrCallback;
+                options = {};
+            }
+            else {
+                options = optionsOrCallback as CallOptions;
+            }
+		return this.jobClient.deleteJob(request, options, callback)
+	}
+	getQueryResults(
+		request:  protos.google.cloud.bigquery.v2.IGetQueryResultsRequest, 
+		optionsOrCallback: 
+      | CallOptions
+      | Callback<
+          protos.google.cloud.bigquery.v2.IGetQueryResultsResponse,
+          | protos.google.cloud.bigquery.v2.IGetQueryResultsRequest
+          | null
+          | undefined,
+          {} | null | undefined
+        >, 
+		callback:  Callback<
+      protos.google.cloud.bigquery.v2.IGetQueryResultsResponse,
+      | protos.google.cloud.bigquery.v2.IGetQueryResultsRequest
+      | null
+      | undefined,
+      {} | null | undefined
+    >): Promise<
+    [
+      protos.google.cloud.bigquery.v2.IGetQueryResultsResponse,
+      protos.google.cloud.bigquery.v2.IGetQueryResultsRequest | undefined,
+      {} | undefined,
+    ]
+  > | void{
+
+            let options: CallOptions;
+            if (typeof optionsOrCallback === 'function' && callback === undefined) {
+                callback = optionsOrCallback;
+                options = {};
+            }
+            else {
+                options = optionsOrCallback as CallOptions;
+            }
+		return this.jobClient.getQueryResults(request, options, callback)
+	}
+	listJobs(
+		request:  protos.google.cloud.bigquery.v2.IListJobsRequest, 
+		optionsOrCallback: 
+      | CallOptions
+      | PaginationCallback<
+          protos.google.cloud.bigquery.v2.IListJobsRequest,
+          protos.google.cloud.bigquery.v2.IJobList | null | undefined,
+          protos.google.cloud.bigquery.v2.IListFormatJob
+        >, 
+		callback:  PaginationCallback<
+      protos.google.cloud.bigquery.v2.IListJobsRequest,
+      protos.google.cloud.bigquery.v2.IJobList | null | undefined,
+      protos.google.cloud.bigquery.v2.IListFormatJob
+    >): Promise<
+    [
+      protos.google.cloud.bigquery.v2.IListFormatJob[],
+      protos.google.cloud.bigquery.v2.IListJobsRequest | null,
+      protos.google.cloud.bigquery.v2.IJobList,
+    ]
+  > | void{
+
+            let options: CallOptions;
+            if (typeof optionsOrCallback === 'function' && callback === undefined) {
+                callback = optionsOrCallback;
+                options = {};
+            }
+            else {
+                options = optionsOrCallback as CallOptions;
+            }
+		return this.jobClient.listJobs(request, options, callback)
+	}
+	getModel(
+		request:  protos.google.cloud.bigquery.v2.IGetModelRequest, 
+		optionsOrCallback: 
+      | CallOptions
+      | Callback<
+          protos.google.cloud.bigquery.v2.IModel,
+          protos.google.cloud.bigquery.v2.IGetModelRequest | null | undefined,
+          {} | null | undefined
+        >, 
+		callback:  Callback<
+      protos.google.cloud.bigquery.v2.IModel,
+      protos.google.cloud.bigquery.v2.IGetModelRequest | null | undefined,
+      {} | null | undefined
+    >): Promise<
+    [
+      protos.google.cloud.bigquery.v2.IModel,
+      protos.google.cloud.bigquery.v2.IGetModelRequest | undefined,
+      {} | undefined,
+    ]
+  > | void{
+
+            let options: CallOptions;
+            if (typeof optionsOrCallback === 'function' && callback === undefined) {
+                callback = optionsOrCallback;
+                options = {};
+            }
+            else {
+                options = optionsOrCallback as CallOptions;
+            }
+		return this.modelClient.getModel(request, options, callback)
+	}
+	patchModel(
+		request:  protos.google.cloud.bigquery.v2.IPatchModelRequest, 
+		optionsOrCallback: 
+      | CallOptions
+      | Callback<
+          protos.google.cloud.bigquery.v2.IModel,
+          protos.google.cloud.bigquery.v2.IPatchModelRequest | null | undefined,
+          {} | null | undefined
+        >, 
+		callback:  Callback<
+      protos.google.cloud.bigquery.v2.IModel,
+      protos.google.cloud.bigquery.v2.IPatchModelRequest | null | undefined,
+      {} | null | undefined
+    >): Promise<
+    [
+      protos.google.cloud.bigquery.v2.IModel,
+      protos.google.cloud.bigquery.v2.IPatchModelRequest | undefined,
+      {} | undefined,
+    ]
+  > | void{
+
+            let options: CallOptions;
+            if (typeof optionsOrCallback === 'function' && callback === undefined) {
+                callback = optionsOrCallback;
+                options = {};
+            }
+            else {
+                options = optionsOrCallback as CallOptions;
+            }
+		return this.modelClient.patchModel(request, options, callback)
+	}
+	deleteModel(
+		request:  protos.google.cloud.bigquery.v2.IDeleteModelRequest, 
+		optionsOrCallback: 
+      | CallOptions
+      | Callback<
+          protos.google.protobuf.IEmpty,
+          | protos.google.cloud.bigquery.v2.IDeleteModelRequest
+          | null
+          | undefined,
+          {} | null | undefined
+        >, 
+		callback:  Callback<
+      protos.google.protobuf.IEmpty,
+      protos.google.cloud.bigquery.v2.IDeleteModelRequest | null | undefined,
+      {} | null | undefined
+    >): Promise<
+    [
+      protos.google.protobuf.IEmpty,
+      protos.google.cloud.bigquery.v2.IDeleteModelRequest | undefined,
+      {} | undefined,
+    ]
+  > | void{
+
+            let options: CallOptions;
+            if (typeof optionsOrCallback === 'function' && callback === undefined) {
+                callback = optionsOrCallback;
+                options = {};
+            }
+            else {
+                options = optionsOrCallback as CallOptions;
+            }
+		return this.modelClient.deleteModel(request, options, callback)
+	}
+	listModels(
+		request:  protos.google.cloud.bigquery.v2.IListModelsRequest, 
+		optionsOrCallback: 
+      | CallOptions
+      | PaginationCallback<
+          protos.google.cloud.bigquery.v2.IListModelsRequest,
+          | protos.google.cloud.bigquery.v2.IListModelsResponse
+          | null
+          | undefined,
+          protos.google.cloud.bigquery.v2.IModel
+        >, 
+		callback:  PaginationCallback<
+      protos.google.cloud.bigquery.v2.IListModelsRequest,
+      protos.google.cloud.bigquery.v2.IListModelsResponse | null | undefined,
+      protos.google.cloud.bigquery.v2.IModel
+    >): Promise<
+    [
+      protos.google.cloud.bigquery.v2.IModel[],
+      protos.google.cloud.bigquery.v2.IListModelsRequest | null,
+      protos.google.cloud.bigquery.v2.IListModelsResponse,
+    ]
+  > | void{
+
+            let options: CallOptions;
+            if (typeof optionsOrCallback === 'function' && callback === undefined) {
+                callback = optionsOrCallback;
+                options = {};
+            }
+            else {
+                options = optionsOrCallback as CallOptions;
+            }
+		return this.modelClient.listModels(request, options, callback)
+	}
+	getRoutine(
+		request:  protos.google.cloud.bigquery.v2.IGetRoutineRequest, 
+		optionsOrCallback: 
+      | CallOptions
+      | Callback<
+          protos.google.cloud.bigquery.v2.IRoutine,
+          protos.google.cloud.bigquery.v2.IGetRoutineRequest | null | undefined,
+          {} | null | undefined
+        >, 
+		callback:  Callback<
+      protos.google.cloud.bigquery.v2.IRoutine,
+      protos.google.cloud.bigquery.v2.IGetRoutineRequest | null | undefined,
+      {} | null | undefined
+    >): Promise<
+    [
+      protos.google.cloud.bigquery.v2.IRoutine,
+      protos.google.cloud.bigquery.v2.IGetRoutineRequest | undefined,
+      {} | undefined,
+    ]
+  > | void{
+
+            let options: CallOptions;
+            if (typeof optionsOrCallback === 'function' && callback === undefined) {
+                callback = optionsOrCallback;
+                options = {};
+            }
+            else {
+                options = optionsOrCallback as CallOptions;
+            }
+		return this.routineClient.getRoutine(request, options, callback)
+	}
+	insertRoutine(
+		request:  protos.google.cloud.bigquery.v2.IInsertRoutineRequest, 
+		optionsOrCallback: 
+      | CallOptions
+      | Callback<
+          protos.google.cloud.bigquery.v2.IRoutine,
+          | protos.google.cloud.bigquery.v2.IInsertRoutineRequest
+          | null
+          | undefined,
+          {} | null | undefined
+        >, 
+		callback:  Callback<
+      protos.google.cloud.bigquery.v2.IRoutine,
+      protos.google.cloud.bigquery.v2.IInsertRoutineRequest | null | undefined,
+      {} | null | undefined
+    >): Promise<
+    [
+      protos.google.cloud.bigquery.v2.IRoutine,
+      protos.google.cloud.bigquery.v2.IInsertRoutineRequest | undefined,
+      {} | undefined,
+    ]
+  > | void{
+
+            let options: CallOptions;
+            if (typeof optionsOrCallback === 'function' && callback === undefined) {
+                callback = optionsOrCallback;
+                options = {};
+            }
+            else {
+                options = optionsOrCallback as CallOptions;
+            }
+		return this.routineClient.insertRoutine(request, options, callback)
+	}
+	updateRoutine(
+		request:  protos.google.cloud.bigquery.v2.IUpdateRoutineRequest, 
+		optionsOrCallback: 
+      | CallOptions
+      | Callback<
+          protos.google.cloud.bigquery.v2.IRoutine,
+          | protos.google.cloud.bigquery.v2.IUpdateRoutineRequest
+          | null
+          | undefined,
+          {} | null | undefined
+        >, 
+		callback:  Callback<
+      protos.google.cloud.bigquery.v2.IRoutine,
+      protos.google.cloud.bigquery.v2.IUpdateRoutineRequest | null | undefined,
+      {} | null | undefined
+    >): Promise<
+    [
+      protos.google.cloud.bigquery.v2.IRoutine,
+      protos.google.cloud.bigquery.v2.IUpdateRoutineRequest | undefined,
+      {} | undefined,
+    ]
+  > | void{
+
+            let options: CallOptions;
+            if (typeof optionsOrCallback === 'function' && callback === undefined) {
+                callback = optionsOrCallback;
+                options = {};
+            }
+            else {
+                options = optionsOrCallback as CallOptions;
+            }
+		return this.routineClient.updateRoutine(request, options, callback)
+	}
+	patchRoutine(
+		request:  protos.google.cloud.bigquery.v2.IPatchRoutineRequest, 
+		optionsOrCallback: 
+      | CallOptions
+      | Callback<
+          protos.google.cloud.bigquery.v2.IRoutine,
+          | protos.google.cloud.bigquery.v2.IPatchRoutineRequest
+          | null
+          | undefined,
+          {} | null | undefined
+        >, 
+		callback:  Callback<
+      protos.google.cloud.bigquery.v2.IRoutine,
+      protos.google.cloud.bigquery.v2.IPatchRoutineRequest | null | undefined,
+      {} | null | undefined
+    >): Promise<
+    [
+      protos.google.cloud.bigquery.v2.IRoutine,
+      protos.google.cloud.bigquery.v2.IPatchRoutineRequest | undefined,
+      {} | undefined,
+    ]
+  > | void{
+
+            let options: CallOptions;
+            if (typeof optionsOrCallback === 'function' && callback === undefined) {
+                callback = optionsOrCallback;
+                options = {};
+            }
+            else {
+                options = optionsOrCallback as CallOptions;
+            }
+		return this.routineClient.patchRoutine(request, options, callback)
+	}
+	deleteRoutine(
+		request:  protos.google.cloud.bigquery.v2.IDeleteRoutineRequest, 
+		optionsOrCallback: 
+      | CallOptions
+      | Callback<
+          protos.google.protobuf.IEmpty,
+          | protos.google.cloud.bigquery.v2.IDeleteRoutineRequest
+          | null
+          | undefined,
+          {} | null | undefined
+        >, 
+		callback:  Callback<
+      protos.google.protobuf.IEmpty,
+      protos.google.cloud.bigquery.v2.IDeleteRoutineRequest | null | undefined,
+      {} | null | undefined
+    >): Promise<
+    [
+      protos.google.protobuf.IEmpty,
+      protos.google.cloud.bigquery.v2.IDeleteRoutineRequest | undefined,
+      {} | undefined,
+    ]
+  > | void{
+
+            let options: CallOptions;
+            if (typeof optionsOrCallback === 'function' && callback === undefined) {
+                callback = optionsOrCallback;
+                options = {};
+            }
+            else {
+                options = optionsOrCallback as CallOptions;
+            }
+		return this.routineClient.deleteRoutine(request, options, callback)
+	}
+	listRoutines(
+		request:  protos.google.cloud.bigquery.v2.IListRoutinesRequest, 
+		optionsOrCallback: 
+      | CallOptions
+      | PaginationCallback<
+          protos.google.cloud.bigquery.v2.IListRoutinesRequest,
+          | protos.google.cloud.bigquery.v2.IListRoutinesResponse
+          | null
+          | undefined,
+          protos.google.cloud.bigquery.v2.IRoutine
+        >, 
+		callback:  PaginationCallback<
+      protos.google.cloud.bigquery.v2.IListRoutinesRequest,
+      protos.google.cloud.bigquery.v2.IListRoutinesResponse | null | undefined,
+      protos.google.cloud.bigquery.v2.IRoutine
+    >): Promise<
+    [
+      protos.google.cloud.bigquery.v2.IRoutine[],
+      protos.google.cloud.bigquery.v2.IListRoutinesRequest | null,
+      protos.google.cloud.bigquery.v2.IListRoutinesResponse,
+    ]
+  > | void{
+
+            let options: CallOptions;
+            if (typeof optionsOrCallback === 'function' && callback === undefined) {
+                callback = optionsOrCallback;
+                options = {};
+            }
+            else {
+                options = optionsOrCallback as CallOptions;
+            }
+		return this.routineClient.listRoutines(request, options, callback)
+	}
+	listRowAccessPolicies(
+		request:  protos.google.cloud.bigquery.v2.IListRowAccessPoliciesRequest, 
+		optionsOrCallback: 
+      | CallOptions
+      | PaginationCallback<
+          protos.google.cloud.bigquery.v2.IListRowAccessPoliciesRequest,
+          | protos.google.cloud.bigquery.v2.IListRowAccessPoliciesResponse
+          | null
+          | undefined,
+          protos.google.cloud.bigquery.v2.IRowAccessPolicy
+        >, 
+		callback:  PaginationCallback<
+      protos.google.cloud.bigquery.v2.IListRowAccessPoliciesRequest,
+      | protos.google.cloud.bigquery.v2.IListRowAccessPoliciesResponse
+      | null
+      | undefined,
+      protos.google.cloud.bigquery.v2.IRowAccessPolicy
+    >): Promise<
+    [
+      protos.google.cloud.bigquery.v2.IRowAccessPolicy[],
+      protos.google.cloud.bigquery.v2.IListRowAccessPoliciesRequest | null,
+      protos.google.cloud.bigquery.v2.IListRowAccessPoliciesResponse,
+    ]
+  > | void{
+
+            let options: CallOptions;
+            if (typeof optionsOrCallback === 'function' && callback === undefined) {
+                callback = optionsOrCallback;
+                options = {};
+            }
+            else {
+                options = optionsOrCallback as CallOptions;
+            }
+		return this.rowaccesspolicyClient.listRowAccessPolicies(request, options, callback)
+	}
+}
