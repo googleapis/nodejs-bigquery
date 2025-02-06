@@ -1,10 +1,6 @@
 // TODO - tests
 // that the file exists
 // file compiles
-// user passes zero clients and no options
-// user passes all their own clients and options
-// user passes zero clients but passes
-// tests that call the various combinations and permutations of options/callback
 import {
   BigQueryClient,
   bigQueryClientOptions,
@@ -15,18 +11,48 @@ import * as protos from '../protos/protos';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import {describe, it} from 'mocha';
+import { DatasetServiceClient, TableServiceClient, RowAccessPolicyServiceClient, ModelServiceClient, JobServiceClient, RoutineServiceClient } from '../src';
 
-describe('BigQueryClient should be able to handle passing in clients', () => {});
-describe('BigQueryClient should call underlying client methods', () => {
-  const subOptions: subClientOptions = {
+describe('BigQueryClient should be able to handle passing in clients and options', () => {
+const subOptions: subClientOptions = {
     opts: {
-      credentials: {client_email: 'fake', private_key: 'fake'},
-      projectId: 'fake',
+      universeDomain: "fake-universe-domain"
     },
   };
-  // TODO possibly update these
-  const options: bigQueryClientOptions = {};
-  const client = new BigQueryClient(options, subOptions);
+  it('creates a central client using clients we pass in', () => {
+    const datasetClient = new DatasetServiceClient(subOptions.opts);
+    const tableClient = new TableServiceClient(subOptions.opts)
+    const jobClient = new JobServiceClient(subOptions.opts)
+    const routineClient = new RoutineServiceClient(subOptions.opts)
+    const modelClient = new ModelServiceClient(subOptions.opts)
+    const rowaccesspolicyClient = new RowAccessPolicyServiceClient(subOptions.opts)
+    const options: bigQueryClientOptions = {datasetClient: datasetClient, tableClient: tableClient, jobClient: jobClient, routineClient: routineClient, modelClient: modelClient, rowaccesspolicyClient: rowaccesspolicyClient};
+    const client = new BigQueryClient(options);
+    assert.ok(client);
+    assert.deepStrictEqual(client.datasetClient.apiEndpoint, "bigquery.fake-universe-domain")
+    assert.deepStrictEqual(client.tableClient.apiEndpoint, "bigquery.fake-universe-domain")
+    assert.deepStrictEqual(client.jobClient.apiEndpoint, "bigquery.fake-universe-domain")
+    assert.deepStrictEqual(client.routineClient.apiEndpoint, "bigquery.fake-universe-domain")
+    assert.deepStrictEqual(client.modelClient.apiEndpoint, "bigquery.fake-universe-domain")
+    assert.deepStrictEqual(client.rowaccesspolicyClient.apiEndpoint, "bigquery.fake-universe-domain")
+
+})
+it('creates a central client using default clients and suboptions we pass in', () => {
+    const client = new BigQueryClient({}, subOptions);
+    assert.ok(client);
+    assert.deepStrictEqual(client.datasetClient.apiEndpoint, "bigquery.fake-universe-domain")
+    assert.deepStrictEqual(client.tableClient.apiEndpoint, "bigquery.fake-universe-domain")
+    assert.deepStrictEqual(client.jobClient.apiEndpoint, "bigquery.fake-universe-domain")
+    assert.deepStrictEqual(client.routineClient.apiEndpoint, "bigquery.fake-universe-domain")
+    assert.deepStrictEqual(client.modelClient.apiEndpoint, "bigquery.fake-universe-domain")
+    assert.deepStrictEqual(client.rowaccesspolicyClient.apiEndpoint, "bigquery.fake-universe-domain")
+
+})
+
+});
+describe('BigQueryClient should call underlying client methods', () => {
+
+  const client = new BigQueryClient();
   // TODO refactor to not have to pass all three options
   describe('BigQuery client should call underlying methods in the Dataset Client', () => {
     after(() => {
