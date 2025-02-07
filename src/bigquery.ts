@@ -93,15 +93,15 @@ export class BigQueryClient{
 		this.rowaccesspolicyClient = options?.rowaccesspolicyClient ?? new RowAccessPolicyServiceClient(subClientOptions?.opts, subClientOptions?.gaxInstance);
 	}
 	getDataset(
-		request:  protos.google.cloud.bigquery.v2.IGetDatasetRequest, 
-		optionsOrCallback: 
+		request?:  protos.google.cloud.bigquery.v2.IGetDatasetRequest, 
+		optionsOrCallback?: 
       | CallOptions
       | Callback<
           protos.google.cloud.bigquery.v2.IDataset,
           protos.google.cloud.bigquery.v2.IGetDatasetRequest | null | undefined,
           {} | null | undefined
         >, 
-		callback:  Callback<
+		callback?:  Callback<
       protos.google.cloud.bigquery.v2.IDataset,
       protos.google.cloud.bigquery.v2.IGetDatasetRequest | null | undefined,
       {} | null | undefined
@@ -113,6 +113,7 @@ export class BigQueryClient{
     ]
   > | void{
 
+            request = request || {};
             let options: CallOptions;
             if (typeof optionsOrCallback === 'function' && callback === undefined) {
                 callback = optionsOrCallback;
@@ -121,11 +122,16 @@ export class BigQueryClient{
             else {
                 options = optionsOrCallback as CallOptions;
             }
-		return this.datasetClient.getDataset(request, options, callback)
-	}
+            if (callback === undefined){
+              return this.datasetClient.getDataset(request, options)
+
+            }
+            return this.datasetClient.getDataset(request, options, callback)
+    
+            }
 	insertDataset(
-		request:  protos.google.cloud.bigquery.v2.IInsertDatasetRequest, 
-		optionsOrCallback: 
+		request?:  protos.google.cloud.bigquery.v2.IInsertDatasetRequest, 
+		optionsOrCallback?: 
       | CallOptions
       | Callback<
           protos.google.cloud.bigquery.v2.IDataset,
@@ -134,7 +140,7 @@ export class BigQueryClient{
           | undefined,
           {} | null | undefined
         >, 
-		callback:  Callback<
+		callback?:  Callback<
       protos.google.cloud.bigquery.v2.IDataset,
       protos.google.cloud.bigquery.v2.IInsertDatasetRequest | null | undefined,
       {} | null | undefined
@@ -146,6 +152,7 @@ export class BigQueryClient{
     ]
   > | void{
 
+            request = request || {};
             let options: CallOptions;
             if (typeof optionsOrCallback === 'function' && callback === undefined) {
                 callback = optionsOrCallback;
@@ -154,11 +161,16 @@ export class BigQueryClient{
             else {
                 options = optionsOrCallback as CallOptions;
             }
-		return this.datasetClient.insertDataset(request, options, callback)
-	}
+            if (callback === undefined){
+              return this.datasetClient.insertDataset(request, options)
+
+            }
+            return this.datasetClient.insertDataset(request, options, callback)
+    
+            }
 	patchDataset(
-		request:  protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest, 
-		optionsOrCallback: 
+		request?:  protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest, 
+		optionsOrCallback?: 
       | CallOptions
       | Callback<
           protos.google.cloud.bigquery.v2.IDataset,
@@ -167,7 +179,7 @@ export class BigQueryClient{
           | undefined,
           {} | null | undefined
         >, 
-		callback:  Callback<
+		callback?:  Callback<
       protos.google.cloud.bigquery.v2.IDataset,
       | protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest
       | null
@@ -181,6 +193,7 @@ export class BigQueryClient{
     ]
   > | void{
 
+            request = request || {};
             let options: CallOptions;
             if (typeof optionsOrCallback === 'function' && callback === undefined) {
                 callback = optionsOrCallback;
@@ -189,11 +202,16 @@ export class BigQueryClient{
             else {
                 options = optionsOrCallback as CallOptions;
             }
-		return this.datasetClient.patchDataset(request, options, callback)
-	}
+            if (callback === undefined){
+              return this.datasetClient.patchDataset(request, options)
+
+            }
+            return this.datasetClient.patchDataset(request, options, callback)
+    
+            }
 	updateDataset(
-		request:  protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest, 
-		optionsOrCallback: 
+		request?:  protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest, 
+		optionsOrCallback?: 
       | CallOptions
       | Callback<
           protos.google.cloud.bigquery.v2.IDataset,
@@ -202,7 +220,7 @@ export class BigQueryClient{
           | undefined,
           {} | null | undefined
         >, 
-		callback:  Callback<
+		callback?:  Callback<
       protos.google.cloud.bigquery.v2.IDataset,
       | protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest
       | null
@@ -216,6 +234,7 @@ export class BigQueryClient{
     ]
   > | void{
 
+            request = request || {};
             let options: CallOptions;
             if (typeof optionsOrCallback === 'function' && callback === undefined) {
                 callback = optionsOrCallback;
@@ -224,11 +243,16 @@ export class BigQueryClient{
             else {
                 options = optionsOrCallback as CallOptions;
             }
-		return this.datasetClient.updateDataset(request, options, callback)
-	}
+            if (callback === undefined){
+              return this.datasetClient.updateDataset(request, options)
+
+            }
+            return this.datasetClient.updateDataset(request, options, callback)
+    
+            }
 	deleteDataset(
-		request:  protos.google.cloud.bigquery.v2.IDeleteDatasetRequest, 
-		optionsOrCallback: 
+		request?:  protos.google.cloud.bigquery.v2.IDeleteDatasetRequest, 
+		optionsOrCallback?: 
       | CallOptions
       | Callback<
           protos.google.protobuf.IEmpty,
@@ -237,7 +261,7 @@ export class BigQueryClient{
           | undefined,
           {} | null | undefined
         >, 
-		callback:  Callback<
+		callback?:  Callback<
       protos.google.protobuf.IEmpty,
       protos.google.cloud.bigquery.v2.IDeleteDatasetRequest | null | undefined,
       {} | null | undefined
@@ -249,6 +273,7 @@ export class BigQueryClient{
     ]
   > | void{
 
+            request = request || {};
             let options: CallOptions;
             if (typeof optionsOrCallback === 'function' && callback === undefined) {
                 callback = optionsOrCallback;
@@ -257,11 +282,16 @@ export class BigQueryClient{
             else {
                 options = optionsOrCallback as CallOptions;
             }
-		return this.datasetClient.deleteDataset(request, options, callback)
-	}
+            if (callback === undefined){
+              return this.datasetClient.deleteDataset(request, options)
+
+            }
+            return this.datasetClient.deleteDataset(request, options, callback)
+    
+            }
 	undeleteDataset(
-		request:  protos.google.cloud.bigquery.v2.IUndeleteDatasetRequest, 
-		optionsOrCallback: 
+		request?:  protos.google.cloud.bigquery.v2.IUndeleteDatasetRequest, 
+		optionsOrCallback?: 
       | CallOptions
       | Callback<
           protos.google.cloud.bigquery.v2.IDataset,
@@ -270,7 +300,7 @@ export class BigQueryClient{
           | undefined,
           {} | null | undefined
         >, 
-		callback:  Callback<
+		callback?:  Callback<
       protos.google.cloud.bigquery.v2.IDataset,
       | protos.google.cloud.bigquery.v2.IUndeleteDatasetRequest
       | null
@@ -284,6 +314,7 @@ export class BigQueryClient{
     ]
   > | void{
 
+            request = request || {};
             let options: CallOptions;
             if (typeof optionsOrCallback === 'function' && callback === undefined) {
                 callback = optionsOrCallback;
@@ -292,18 +323,23 @@ export class BigQueryClient{
             else {
                 options = optionsOrCallback as CallOptions;
             }
-		return this.datasetClient.undeleteDataset(request, options, callback)
-	}
+            if (callback === undefined){
+              return this.datasetClient.undeleteDataset(request, options)
+
+            }
+            return this.datasetClient.undeleteDataset(request, options, callback)
+    
+            }
 	listDatasets(
-		request:  protos.google.cloud.bigquery.v2.IListDatasetsRequest, 
-		optionsOrCallback: 
+		request?:  protos.google.cloud.bigquery.v2.IListDatasetsRequest, 
+		optionsOrCallback?: 
       | CallOptions
       | PaginationCallback<
           protos.google.cloud.bigquery.v2.IListDatasetsRequest,
           protos.google.cloud.bigquery.v2.IDatasetList | null | undefined,
           protos.google.cloud.bigquery.v2.IListFormatDataset
         >, 
-		callback:  PaginationCallback<
+		callback?:  PaginationCallback<
       protos.google.cloud.bigquery.v2.IListDatasetsRequest,
       protos.google.cloud.bigquery.v2.IDatasetList | null | undefined,
       protos.google.cloud.bigquery.v2.IListFormatDataset
@@ -315,6 +351,7 @@ export class BigQueryClient{
     ]
   > | void{
 
+            request = request || {};
             let options: CallOptions;
             if (typeof optionsOrCallback === 'function' && callback === undefined) {
                 callback = optionsOrCallback;
@@ -323,18 +360,23 @@ export class BigQueryClient{
             else {
                 options = optionsOrCallback as CallOptions;
             }
-		return this.datasetClient.listDatasets(request, options, callback)
-	}
+            if (callback === undefined){
+              return this.datasetClient.listDatasets(request, options)
+
+            }
+            return this.datasetClient.listDatasets(request, options, callback)
+    
+            }
 	getTable(
-		request:  protos.google.cloud.bigquery.v2.IGetTableRequest, 
-		optionsOrCallback: 
+		request?:  protos.google.cloud.bigquery.v2.IGetTableRequest, 
+		optionsOrCallback?: 
       | CallOptions
       | Callback<
           protos.google.cloud.bigquery.v2.ITable,
           protos.google.cloud.bigquery.v2.IGetTableRequest | null | undefined,
           {} | null | undefined
         >, 
-		callback:  Callback<
+		callback?:  Callback<
       protos.google.cloud.bigquery.v2.ITable,
       protos.google.cloud.bigquery.v2.IGetTableRequest | null | undefined,
       {} | null | undefined
@@ -346,6 +388,7 @@ export class BigQueryClient{
     ]
   > | void{
 
+            request = request || {};
             let options: CallOptions;
             if (typeof optionsOrCallback === 'function' && callback === undefined) {
                 callback = optionsOrCallback;
@@ -354,11 +397,16 @@ export class BigQueryClient{
             else {
                 options = optionsOrCallback as CallOptions;
             }
-		return this.tableClient.getTable(request, options, callback)
-	}
+            if (callback === undefined){
+              return this.tableClient.getTable(request, options)
+
+            }
+            return this.tableClient.getTable(request, options, callback)
+    
+            }
 	insertTable(
-		request:  protos.google.cloud.bigquery.v2.IInsertTableRequest, 
-		optionsOrCallback: 
+		request?:  protos.google.cloud.bigquery.v2.IInsertTableRequest, 
+		optionsOrCallback?: 
       | CallOptions
       | Callback<
           protos.google.cloud.bigquery.v2.ITable,
@@ -367,7 +415,7 @@ export class BigQueryClient{
           | undefined,
           {} | null | undefined
         >, 
-		callback:  Callback<
+		callback?:  Callback<
       protos.google.cloud.bigquery.v2.ITable,
       protos.google.cloud.bigquery.v2.IInsertTableRequest | null | undefined,
       {} | null | undefined
@@ -379,6 +427,7 @@ export class BigQueryClient{
     ]
   > | void{
 
+            request = request || {};
             let options: CallOptions;
             if (typeof optionsOrCallback === 'function' && callback === undefined) {
                 callback = optionsOrCallback;
@@ -387,11 +436,16 @@ export class BigQueryClient{
             else {
                 options = optionsOrCallback as CallOptions;
             }
-		return this.tableClient.insertTable(request, options, callback)
-	}
+            if (callback === undefined){
+              return this.tableClient.insertTable(request, options)
+
+            }
+            return this.tableClient.insertTable(request, options, callback)
+    
+            }
 	patchTable(
-		request:  protos.google.cloud.bigquery.v2.IUpdateOrPatchTableRequest, 
-		optionsOrCallback: 
+		request?:  protos.google.cloud.bigquery.v2.IUpdateOrPatchTableRequest, 
+		optionsOrCallback?: 
       | CallOptions
       | Callback<
           protos.google.cloud.bigquery.v2.ITable,
@@ -400,7 +454,7 @@ export class BigQueryClient{
           | undefined,
           {} | null | undefined
         >, 
-		callback:  Callback<
+		callback?:  Callback<
       protos.google.cloud.bigquery.v2.ITable,
       | protos.google.cloud.bigquery.v2.IUpdateOrPatchTableRequest
       | null
@@ -414,6 +468,7 @@ export class BigQueryClient{
     ]
   > | void{
 
+            request = request || {};
             let options: CallOptions;
             if (typeof optionsOrCallback === 'function' && callback === undefined) {
                 callback = optionsOrCallback;
@@ -422,11 +477,16 @@ export class BigQueryClient{
             else {
                 options = optionsOrCallback as CallOptions;
             }
-		return this.tableClient.patchTable(request, options, callback)
-	}
+            if (callback === undefined){
+              return this.tableClient.patchTable(request, options)
+
+            }
+            return this.tableClient.patchTable(request, options, callback)
+    
+            }
 	updateTable(
-		request:  protos.google.cloud.bigquery.v2.IUpdateOrPatchTableRequest, 
-		optionsOrCallback: 
+		request?:  protos.google.cloud.bigquery.v2.IUpdateOrPatchTableRequest, 
+		optionsOrCallback?: 
       | CallOptions
       | Callback<
           protos.google.cloud.bigquery.v2.ITable,
@@ -435,7 +495,7 @@ export class BigQueryClient{
           | undefined,
           {} | null | undefined
         >, 
-		callback:  Callback<
+		callback?:  Callback<
       protos.google.cloud.bigquery.v2.ITable,
       | protos.google.cloud.bigquery.v2.IUpdateOrPatchTableRequest
       | null
@@ -449,6 +509,7 @@ export class BigQueryClient{
     ]
   > | void{
 
+            request = request || {};
             let options: CallOptions;
             if (typeof optionsOrCallback === 'function' && callback === undefined) {
                 callback = optionsOrCallback;
@@ -457,11 +518,16 @@ export class BigQueryClient{
             else {
                 options = optionsOrCallback as CallOptions;
             }
-		return this.tableClient.updateTable(request, options, callback)
-	}
+            if (callback === undefined){
+              return this.tableClient.updateTable(request, options)
+
+            }
+            return this.tableClient.updateTable(request, options, callback)
+    
+            }
 	deleteTable(
-		request:  protos.google.cloud.bigquery.v2.IDeleteTableRequest, 
-		optionsOrCallback: 
+		request?:  protos.google.cloud.bigquery.v2.IDeleteTableRequest, 
+		optionsOrCallback?: 
       | CallOptions
       | Callback<
           protos.google.protobuf.IEmpty,
@@ -470,7 +536,7 @@ export class BigQueryClient{
           | undefined,
           {} | null | undefined
         >, 
-		callback:  Callback<
+		callback?:  Callback<
       protos.google.protobuf.IEmpty,
       protos.google.cloud.bigquery.v2.IDeleteTableRequest | null | undefined,
       {} | null | undefined
@@ -482,6 +548,7 @@ export class BigQueryClient{
     ]
   > | void{
 
+            request = request || {};
             let options: CallOptions;
             if (typeof optionsOrCallback === 'function' && callback === undefined) {
                 callback = optionsOrCallback;
@@ -490,18 +557,23 @@ export class BigQueryClient{
             else {
                 options = optionsOrCallback as CallOptions;
             }
-		return this.tableClient.deleteTable(request, options, callback)
-	}
+            if (callback === undefined){
+              return this.tableClient.deleteTable(request, options)
+
+            }
+            return this.tableClient.deleteTable(request, options, callback)
+    
+            }
 	listTables(
-		request:  protos.google.cloud.bigquery.v2.IListTablesRequest, 
-		optionsOrCallback: 
+		request?:  protos.google.cloud.bigquery.v2.IListTablesRequest, 
+		optionsOrCallback?: 
       | CallOptions
       | PaginationCallback<
           protos.google.cloud.bigquery.v2.IListTablesRequest,
           protos.google.cloud.bigquery.v2.ITableList | null | undefined,
           protos.google.cloud.bigquery.v2.IListFormatTable
         >, 
-		callback:  PaginationCallback<
+		callback?:  PaginationCallback<
       protos.google.cloud.bigquery.v2.IListTablesRequest,
       protos.google.cloud.bigquery.v2.ITableList | null | undefined,
       protos.google.cloud.bigquery.v2.IListFormatTable
@@ -513,6 +585,7 @@ export class BigQueryClient{
     ]
   > | void{
 
+            request = request || {};
             let options: CallOptions;
             if (typeof optionsOrCallback === 'function' && callback === undefined) {
                 callback = optionsOrCallback;
@@ -521,18 +594,23 @@ export class BigQueryClient{
             else {
                 options = optionsOrCallback as CallOptions;
             }
-		return this.tableClient.listTables(request, options, callback)
-	}
+            if (callback === undefined){
+              return this.tableClient.listTables(request, options)
+
+            }
+            return this.tableClient.listTables(request, options, callback)
+    
+            }
 	cancelJob(
-		request:  protos.google.cloud.bigquery.v2.ICancelJobRequest, 
-		optionsOrCallback: 
+		request?:  protos.google.cloud.bigquery.v2.ICancelJobRequest, 
+		optionsOrCallback?: 
       | CallOptions
       | Callback<
           protos.google.cloud.bigquery.v2.IJobCancelResponse,
           protos.google.cloud.bigquery.v2.ICancelJobRequest | null | undefined,
           {} | null | undefined
         >, 
-		callback:  Callback<
+		callback?:  Callback<
       protos.google.cloud.bigquery.v2.IJobCancelResponse,
       protos.google.cloud.bigquery.v2.ICancelJobRequest | null | undefined,
       {} | null | undefined
@@ -544,6 +622,7 @@ export class BigQueryClient{
     ]
   > | void{
 
+            request = request || {};
             let options: CallOptions;
             if (typeof optionsOrCallback === 'function' && callback === undefined) {
                 callback = optionsOrCallback;
@@ -552,18 +631,23 @@ export class BigQueryClient{
             else {
                 options = optionsOrCallback as CallOptions;
             }
-		return this.jobClient.cancelJob(request, options, callback)
-	}
+            if (callback === undefined){
+              return this.jobClient.cancelJob(request, options)
+
+            }
+            return this.jobClient.cancelJob(request, options, callback)
+    
+            }
 	getJob(
-		request:  protos.google.cloud.bigquery.v2.IGetJobRequest, 
-		optionsOrCallback: 
+		request?:  protos.google.cloud.bigquery.v2.IGetJobRequest, 
+		optionsOrCallback?: 
       | CallOptions
       | Callback<
           protos.google.cloud.bigquery.v2.IJob,
           protos.google.cloud.bigquery.v2.IGetJobRequest | null | undefined,
           {} | null | undefined
         >, 
-		callback:  Callback<
+		callback?:  Callback<
       protos.google.cloud.bigquery.v2.IJob,
       protos.google.cloud.bigquery.v2.IGetJobRequest | null | undefined,
       {} | null | undefined
@@ -575,6 +659,7 @@ export class BigQueryClient{
     ]
   > | void{
 
+            request = request || {};
             let options: CallOptions;
             if (typeof optionsOrCallback === 'function' && callback === undefined) {
                 callback = optionsOrCallback;
@@ -583,18 +668,23 @@ export class BigQueryClient{
             else {
                 options = optionsOrCallback as CallOptions;
             }
-		return this.jobClient.getJob(request, options, callback)
-	}
+            if (callback === undefined){
+              return this.jobClient.getJob(request, options)
+
+            }
+            return this.jobClient.getJob(request, options, callback)
+    
+            }
 	insertJob(
-		request:  protos.google.cloud.bigquery.v2.IInsertJobRequest, 
-		optionsOrCallback: 
+		request?:  protos.google.cloud.bigquery.v2.IInsertJobRequest, 
+		optionsOrCallback?: 
       | CallOptions
       | Callback<
           protos.google.cloud.bigquery.v2.IJob,
           protos.google.cloud.bigquery.v2.IInsertJobRequest | null | undefined,
           {} | null | undefined
         >, 
-		callback:  Callback<
+		callback?:  Callback<
       protos.google.cloud.bigquery.v2.IJob,
       protos.google.cloud.bigquery.v2.IInsertJobRequest | null | undefined,
       {} | null | undefined
@@ -606,6 +696,7 @@ export class BigQueryClient{
     ]
   > | void{
 
+            request = request || {};
             let options: CallOptions;
             if (typeof optionsOrCallback === 'function' && callback === undefined) {
                 callback = optionsOrCallback;
@@ -614,18 +705,23 @@ export class BigQueryClient{
             else {
                 options = optionsOrCallback as CallOptions;
             }
-		return this.jobClient.insertJob(request, options, callback)
-	}
+            if (callback === undefined){
+              return this.jobClient.insertJob(request, options)
+
+            }
+            return this.jobClient.insertJob(request, options, callback)
+    
+            }
 	deleteJob(
-		request:  protos.google.cloud.bigquery.v2.IDeleteJobRequest, 
-		optionsOrCallback: 
+		request?:  protos.google.cloud.bigquery.v2.IDeleteJobRequest, 
+		optionsOrCallback?: 
       | CallOptions
       | Callback<
           protos.google.protobuf.IEmpty,
           protos.google.cloud.bigquery.v2.IDeleteJobRequest | null | undefined,
           {} | null | undefined
         >, 
-		callback:  Callback<
+		callback?:  Callback<
       protos.google.protobuf.IEmpty,
       protos.google.cloud.bigquery.v2.IDeleteJobRequest | null | undefined,
       {} | null | undefined
@@ -637,6 +733,7 @@ export class BigQueryClient{
     ]
   > | void{
 
+            request = request || {};
             let options: CallOptions;
             if (typeof optionsOrCallback === 'function' && callback === undefined) {
                 callback = optionsOrCallback;
@@ -645,18 +742,23 @@ export class BigQueryClient{
             else {
                 options = optionsOrCallback as CallOptions;
             }
-		return this.jobClient.deleteJob(request, options, callback)
-	}
+            if (callback === undefined){
+              return this.jobClient.deleteJob(request, options)
+
+            }
+            return this.jobClient.deleteJob(request, options, callback)
+    
+            }
 	listJobs(
-		request:  protos.google.cloud.bigquery.v2.IListJobsRequest, 
-		optionsOrCallback: 
+		request?:  protos.google.cloud.bigquery.v2.IListJobsRequest, 
+		optionsOrCallback?: 
       | CallOptions
       | PaginationCallback<
           protos.google.cloud.bigquery.v2.IListJobsRequest,
           protos.google.cloud.bigquery.v2.IJobList | null | undefined,
           protos.google.cloud.bigquery.v2.IListFormatJob
         >, 
-		callback:  PaginationCallback<
+		callback?:  PaginationCallback<
       protos.google.cloud.bigquery.v2.IListJobsRequest,
       protos.google.cloud.bigquery.v2.IJobList | null | undefined,
       protos.google.cloud.bigquery.v2.IListFormatJob
@@ -668,6 +770,7 @@ export class BigQueryClient{
     ]
   > | void{
 
+            request = request || {};
             let options: CallOptions;
             if (typeof optionsOrCallback === 'function' && callback === undefined) {
                 callback = optionsOrCallback;
@@ -676,18 +779,23 @@ export class BigQueryClient{
             else {
                 options = optionsOrCallback as CallOptions;
             }
-		return this.jobClient.listJobs(request, options, callback)
-	}
+            if (callback === undefined){
+              return this.jobClient.listJobs(request, options)
+
+            }
+            return this.jobClient.listJobs(request, options, callback)
+    
+            }
 	getModel(
-		request:  protos.google.cloud.bigquery.v2.IGetModelRequest, 
-		optionsOrCallback: 
+		request?:  protos.google.cloud.bigquery.v2.IGetModelRequest, 
+		optionsOrCallback?: 
       | CallOptions
       | Callback<
           protos.google.cloud.bigquery.v2.IModel,
           protos.google.cloud.bigquery.v2.IGetModelRequest | null | undefined,
           {} | null | undefined
         >, 
-		callback:  Callback<
+		callback?:  Callback<
       protos.google.cloud.bigquery.v2.IModel,
       protos.google.cloud.bigquery.v2.IGetModelRequest | null | undefined,
       {} | null | undefined
@@ -699,6 +807,7 @@ export class BigQueryClient{
     ]
   > | void{
 
+            request = request || {};
             let options: CallOptions;
             if (typeof optionsOrCallback === 'function' && callback === undefined) {
                 callback = optionsOrCallback;
@@ -707,18 +816,23 @@ export class BigQueryClient{
             else {
                 options = optionsOrCallback as CallOptions;
             }
-		return this.modelClient.getModel(request, options, callback)
-	}
+            if (callback === undefined){
+              return this.modelClient.getModel(request, options)
+
+            }
+            return this.modelClient.getModel(request, options, callback)
+    
+            }
 	patchModel(
-		request:  protos.google.cloud.bigquery.v2.IPatchModelRequest, 
-		optionsOrCallback: 
+		request?:  protos.google.cloud.bigquery.v2.IPatchModelRequest, 
+		optionsOrCallback?: 
       | CallOptions
       | Callback<
           protos.google.cloud.bigquery.v2.IModel,
           protos.google.cloud.bigquery.v2.IPatchModelRequest | null | undefined,
           {} | null | undefined
         >, 
-		callback:  Callback<
+		callback?:  Callback<
       protos.google.cloud.bigquery.v2.IModel,
       protos.google.cloud.bigquery.v2.IPatchModelRequest | null | undefined,
       {} | null | undefined
@@ -730,6 +844,7 @@ export class BigQueryClient{
     ]
   > | void{
 
+            request = request || {};
             let options: CallOptions;
             if (typeof optionsOrCallback === 'function' && callback === undefined) {
                 callback = optionsOrCallback;
@@ -738,11 +853,16 @@ export class BigQueryClient{
             else {
                 options = optionsOrCallback as CallOptions;
             }
-		return this.modelClient.patchModel(request, options, callback)
-	}
+            if (callback === undefined){
+              return this.modelClient.patchModel(request, options)
+
+            }
+            return this.modelClient.patchModel(request, options, callback)
+    
+            }
 	deleteModel(
-		request:  protos.google.cloud.bigquery.v2.IDeleteModelRequest, 
-		optionsOrCallback: 
+		request?:  protos.google.cloud.bigquery.v2.IDeleteModelRequest, 
+		optionsOrCallback?: 
       | CallOptions
       | Callback<
           protos.google.protobuf.IEmpty,
@@ -751,7 +871,7 @@ export class BigQueryClient{
           | undefined,
           {} | null | undefined
         >, 
-		callback:  Callback<
+		callback?:  Callback<
       protos.google.protobuf.IEmpty,
       protos.google.cloud.bigquery.v2.IDeleteModelRequest | null | undefined,
       {} | null | undefined
@@ -763,6 +883,7 @@ export class BigQueryClient{
     ]
   > | void{
 
+            request = request || {};
             let options: CallOptions;
             if (typeof optionsOrCallback === 'function' && callback === undefined) {
                 callback = optionsOrCallback;
@@ -771,11 +892,16 @@ export class BigQueryClient{
             else {
                 options = optionsOrCallback as CallOptions;
             }
-		return this.modelClient.deleteModel(request, options, callback)
-	}
+            if (callback === undefined){
+              return this.modelClient.deleteModel(request, options)
+
+            }
+            return this.modelClient.deleteModel(request, options, callback)
+    
+            }
 	listModels(
-		request:  protos.google.cloud.bigquery.v2.IListModelsRequest, 
-		optionsOrCallback: 
+		request?:  protos.google.cloud.bigquery.v2.IListModelsRequest, 
+		optionsOrCallback?: 
       | CallOptions
       | PaginationCallback<
           protos.google.cloud.bigquery.v2.IListModelsRequest,
@@ -784,7 +910,7 @@ export class BigQueryClient{
           | undefined,
           protos.google.cloud.bigquery.v2.IModel
         >, 
-		callback:  PaginationCallback<
+		callback?:  PaginationCallback<
       protos.google.cloud.bigquery.v2.IListModelsRequest,
       protos.google.cloud.bigquery.v2.IListModelsResponse | null | undefined,
       protos.google.cloud.bigquery.v2.IModel
@@ -796,6 +922,7 @@ export class BigQueryClient{
     ]
   > | void{
 
+            request = request || {};
             let options: CallOptions;
             if (typeof optionsOrCallback === 'function' && callback === undefined) {
                 callback = optionsOrCallback;
@@ -804,18 +931,23 @@ export class BigQueryClient{
             else {
                 options = optionsOrCallback as CallOptions;
             }
-		return this.modelClient.listModels(request, options, callback)
-	}
+            if (callback === undefined){
+              return this.modelClient.listModels(request, options)
+
+            }
+            return this.modelClient.listModels(request, options, callback)
+    
+            }
 	getRoutine(
-		request:  protos.google.cloud.bigquery.v2.IGetRoutineRequest, 
-		optionsOrCallback: 
+		request?:  protos.google.cloud.bigquery.v2.IGetRoutineRequest, 
+		optionsOrCallback?: 
       | CallOptions
       | Callback<
           protos.google.cloud.bigquery.v2.IRoutine,
           protos.google.cloud.bigquery.v2.IGetRoutineRequest | null | undefined,
           {} | null | undefined
         >, 
-		callback:  Callback<
+		callback?:  Callback<
       protos.google.cloud.bigquery.v2.IRoutine,
       protos.google.cloud.bigquery.v2.IGetRoutineRequest | null | undefined,
       {} | null | undefined
@@ -827,6 +959,7 @@ export class BigQueryClient{
     ]
   > | void{
 
+            request = request || {};
             let options: CallOptions;
             if (typeof optionsOrCallback === 'function' && callback === undefined) {
                 callback = optionsOrCallback;
@@ -835,11 +968,16 @@ export class BigQueryClient{
             else {
                 options = optionsOrCallback as CallOptions;
             }
-		return this.routineClient.getRoutine(request, options, callback)
-	}
+            if (callback === undefined){
+              return this.routineClient.getRoutine(request, options)
+
+            }
+            return this.routineClient.getRoutine(request, options, callback)
+    
+            }
 	insertRoutine(
-		request:  protos.google.cloud.bigquery.v2.IInsertRoutineRequest, 
-		optionsOrCallback: 
+		request?:  protos.google.cloud.bigquery.v2.IInsertRoutineRequest, 
+		optionsOrCallback?: 
       | CallOptions
       | Callback<
           protos.google.cloud.bigquery.v2.IRoutine,
@@ -848,7 +986,7 @@ export class BigQueryClient{
           | undefined,
           {} | null | undefined
         >, 
-		callback:  Callback<
+		callback?:  Callback<
       protos.google.cloud.bigquery.v2.IRoutine,
       protos.google.cloud.bigquery.v2.IInsertRoutineRequest | null | undefined,
       {} | null | undefined
@@ -860,6 +998,7 @@ export class BigQueryClient{
     ]
   > | void{
 
+            request = request || {};
             let options: CallOptions;
             if (typeof optionsOrCallback === 'function' && callback === undefined) {
                 callback = optionsOrCallback;
@@ -868,11 +1007,16 @@ export class BigQueryClient{
             else {
                 options = optionsOrCallback as CallOptions;
             }
-		return this.routineClient.insertRoutine(request, options, callback)
-	}
+            if (callback === undefined){
+              return this.routineClient.insertRoutine(request, options)
+
+            }
+            return this.routineClient.insertRoutine(request, options, callback)
+    
+            }
 	updateRoutine(
-		request:  protos.google.cloud.bigquery.v2.IUpdateRoutineRequest, 
-		optionsOrCallback: 
+		request?:  protos.google.cloud.bigquery.v2.IUpdateRoutineRequest, 
+		optionsOrCallback?: 
       | CallOptions
       | Callback<
           protos.google.cloud.bigquery.v2.IRoutine,
@@ -881,7 +1025,7 @@ export class BigQueryClient{
           | undefined,
           {} | null | undefined
         >, 
-		callback:  Callback<
+		callback?:  Callback<
       protos.google.cloud.bigquery.v2.IRoutine,
       protos.google.cloud.bigquery.v2.IUpdateRoutineRequest | null | undefined,
       {} | null | undefined
@@ -893,6 +1037,7 @@ export class BigQueryClient{
     ]
   > | void{
 
+            request = request || {};
             let options: CallOptions;
             if (typeof optionsOrCallback === 'function' && callback === undefined) {
                 callback = optionsOrCallback;
@@ -901,11 +1046,16 @@ export class BigQueryClient{
             else {
                 options = optionsOrCallback as CallOptions;
             }
-		return this.routineClient.updateRoutine(request, options, callback)
-	}
+            if (callback === undefined){
+              return this.routineClient.updateRoutine(request, options)
+
+            }
+            return this.routineClient.updateRoutine(request, options, callback)
+    
+            }
 	patchRoutine(
-		request:  protos.google.cloud.bigquery.v2.IPatchRoutineRequest, 
-		optionsOrCallback: 
+		request?:  protos.google.cloud.bigquery.v2.IPatchRoutineRequest, 
+		optionsOrCallback?: 
       | CallOptions
       | Callback<
           protos.google.cloud.bigquery.v2.IRoutine,
@@ -914,7 +1064,7 @@ export class BigQueryClient{
           | undefined,
           {} | null | undefined
         >, 
-		callback:  Callback<
+		callback?:  Callback<
       protos.google.cloud.bigquery.v2.IRoutine,
       protos.google.cloud.bigquery.v2.IPatchRoutineRequest | null | undefined,
       {} | null | undefined
@@ -926,6 +1076,7 @@ export class BigQueryClient{
     ]
   > | void{
 
+            request = request || {};
             let options: CallOptions;
             if (typeof optionsOrCallback === 'function' && callback === undefined) {
                 callback = optionsOrCallback;
@@ -934,11 +1085,16 @@ export class BigQueryClient{
             else {
                 options = optionsOrCallback as CallOptions;
             }
-		return this.routineClient.patchRoutine(request, options, callback)
-	}
+            if (callback === undefined){
+              return this.routineClient.patchRoutine(request, options)
+
+            }
+            return this.routineClient.patchRoutine(request, options, callback)
+    
+            }
 	deleteRoutine(
-		request:  protos.google.cloud.bigquery.v2.IDeleteRoutineRequest, 
-		optionsOrCallback: 
+		request?:  protos.google.cloud.bigquery.v2.IDeleteRoutineRequest, 
+		optionsOrCallback?: 
       | CallOptions
       | Callback<
           protos.google.protobuf.IEmpty,
@@ -947,7 +1103,7 @@ export class BigQueryClient{
           | undefined,
           {} | null | undefined
         >, 
-		callback:  Callback<
+		callback?:  Callback<
       protos.google.protobuf.IEmpty,
       protos.google.cloud.bigquery.v2.IDeleteRoutineRequest | null | undefined,
       {} | null | undefined
@@ -959,6 +1115,7 @@ export class BigQueryClient{
     ]
   > | void{
 
+            request = request || {};
             let options: CallOptions;
             if (typeof optionsOrCallback === 'function' && callback === undefined) {
                 callback = optionsOrCallback;
@@ -967,11 +1124,16 @@ export class BigQueryClient{
             else {
                 options = optionsOrCallback as CallOptions;
             }
-		return this.routineClient.deleteRoutine(request, options, callback)
-	}
+            if (callback === undefined){
+              return this.routineClient.deleteRoutine(request, options)
+
+            }
+            return this.routineClient.deleteRoutine(request, options, callback)
+    
+            }
 	listRoutines(
-		request:  protos.google.cloud.bigquery.v2.IListRoutinesRequest, 
-		optionsOrCallback: 
+		request?:  protos.google.cloud.bigquery.v2.IListRoutinesRequest, 
+		optionsOrCallback?: 
       | CallOptions
       | PaginationCallback<
           protos.google.cloud.bigquery.v2.IListRoutinesRequest,
@@ -980,7 +1142,7 @@ export class BigQueryClient{
           | undefined,
           protos.google.cloud.bigquery.v2.IRoutine
         >, 
-		callback:  PaginationCallback<
+		callback?:  PaginationCallback<
       protos.google.cloud.bigquery.v2.IListRoutinesRequest,
       protos.google.cloud.bigquery.v2.IListRoutinesResponse | null | undefined,
       protos.google.cloud.bigquery.v2.IRoutine
@@ -992,6 +1154,7 @@ export class BigQueryClient{
     ]
   > | void{
 
+            request = request || {};
             let options: CallOptions;
             if (typeof optionsOrCallback === 'function' && callback === undefined) {
                 callback = optionsOrCallback;
@@ -1000,11 +1163,16 @@ export class BigQueryClient{
             else {
                 options = optionsOrCallback as CallOptions;
             }
-		return this.routineClient.listRoutines(request, options, callback)
-	}
+            if (callback === undefined){
+              return this.routineClient.listRoutines(request, options)
+
+            }
+            return this.routineClient.listRoutines(request, options, callback)
+    
+            }
 	listRowAccessPolicies(
-		request:  protos.google.cloud.bigquery.v2.IListRowAccessPoliciesRequest, 
-		optionsOrCallback: 
+		request?:  protos.google.cloud.bigquery.v2.IListRowAccessPoliciesRequest, 
+		optionsOrCallback?: 
       | CallOptions
       | PaginationCallback<
           protos.google.cloud.bigquery.v2.IListRowAccessPoliciesRequest,
@@ -1013,7 +1181,7 @@ export class BigQueryClient{
           | undefined,
           protos.google.cloud.bigquery.v2.IRowAccessPolicy
         >, 
-		callback:  PaginationCallback<
+		callback?:  PaginationCallback<
       protos.google.cloud.bigquery.v2.IListRowAccessPoliciesRequest,
       | protos.google.cloud.bigquery.v2.IListRowAccessPoliciesResponse
       | null
@@ -1027,6 +1195,7 @@ export class BigQueryClient{
     ]
   > | void{
 
+            request = request || {};
             let options: CallOptions;
             if (typeof optionsOrCallback === 'function' && callback === undefined) {
                 callback = optionsOrCallback;
@@ -1035,6 +1204,11 @@ export class BigQueryClient{
             else {
                 options = optionsOrCallback as CallOptions;
             }
-		return this.rowaccesspolicyClient.listRowAccessPolicies(request, options, callback)
-	}
+            if (callback === undefined){
+              return this.rowaccesspolicyClient.listRowAccessPolicies(request, options)
+
+            }
+            return this.rowaccesspolicyClient.listRowAccessPolicies(request, options, callback)
+    
+            }
 }

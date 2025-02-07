@@ -108,8 +108,10 @@ function ast(file, client) {
       let argumentsList = '';
       for (let i = 0; i < node.parameters.length; i++) {
         const name = node.parameters[i].name.escapedText;
+        const questionToken = node.parameters[i].questionToken ? '?' : '';
         const typeString = node.parameters[i].type.getFullText();
-        let parameter = `${name}: ${typeString}`;
+        let parameter = `${name}${questionToken}: ${typeString}`;
+
         parametersList = parametersList.concat(name);
         // this has to do with function overloading - we will later surface code
         // that does type checking for options and callback
@@ -135,7 +137,9 @@ function ast(file, client) {
         // this logic needs to be surfaced from underlying clients
         // to make sure our parameters play nicely with underlying overloads
         // otherwise you will run into issues similar to https://github.com/microsoft/TypeScript/issues/1805
+        // we also add a check for undefined callback 
         const optionsOrCallback = `
+            request = request || {};
             let options: CallOptions;
             if (typeof optionsOrCallback === 'function' && callback === undefined) {
                 callback = optionsOrCallback;
@@ -143,9 +147,15 @@ function ast(file, client) {
             }
             else {
                 options = optionsOrCallback as CallOptions;
-            }`;
+            }
+            if (callback === undefined){
+              return this.${client.toLowerCase()}Client.${functionName}(request, options)
+
+            }
+            return this.${client.toLowerCase()}Client.${functionName}(${argumentsList})\n    
+            `;
         output = output.concat(
-          `{\n${optionsOrCallback}\n\t\treturn this.${client.toLowerCase()}Client.${functionName}(${argumentsList})\n\t}`
+          `{\n${optionsOrCallback}}`
         );
       }
     }
