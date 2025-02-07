@@ -35,9 +35,9 @@ describe('BigQueryClient has the number of clients and methods we expect', () =>
         const client = new BigQueryClient();
         assert.equal(Object.getOwnPropertyNames(client).length, 6)
     })
-    it('should have 31 methods including the constructor', () => {
+    it('should have 30 methods including the constructor', () => {
         const client = new BigQueryClient();
-        assert.equal(Object.getOwnPropertyNames(Object.getPrototypeOf(client)).length, 31)
+        assert.equal(Object.getOwnPropertyNames(Object.getPrototypeOf(client)).length, 30)
     })
 })
 describe('BigQueryClient should be able to handle passing in clients and options', () => {
@@ -77,6 +77,10 @@ it('creates a central client using default clients and suboptions we pass in', (
 })
 
 });
+
+// It is not important that these unit tests validate the responses
+// underlying client unit tests will do that - it is only important that
+// we validate the connection between the BigQuery client and the methods it calls
 describe('BigQueryClient should call underlying client methods', () => {
 
   const client = new BigQueryClient();
@@ -85,7 +89,6 @@ describe('BigQueryClient should call underlying client methods', () => {
     after(() => {
       sinon.restore();
     });
-    // TODO fix list
     it('should call getDataset', async () => {
       const datasetRequest = {
         projectId: 'projectId',
@@ -93,7 +96,7 @@ describe('BigQueryClient should call underlying client methods', () => {
       } as protos.google.cloud.bigquery.v2.IGetDatasetRequest;
       const getStub = sinon
         .stub(client.datasetClient, 'getDataset')
-        .resolves('Dataset');
+        .resolves('FakeDataset');
       await client.getDataset(datasetRequest, {}, () => {});
       assert.ok(getStub.calledOnce);
     });
@@ -104,7 +107,7 @@ describe('BigQueryClient should call underlying client methods', () => {
       } as protos.google.cloud.bigquery.v2.IInsertDatasetRequest;
       const insertStub = sinon
         .stub(client.datasetClient, 'insertDataset')
-        .resolves('Dataset');
+        .resolves('FakeDataset');
       await client.insertDataset(datasetRequest, {}, () => {});
       assert.ok(insertStub.calledOnce);
     });
@@ -115,19 +118,19 @@ describe('BigQueryClient should call underlying client methods', () => {
       } as protos.google.cloud.bigquery.v2.IUndeleteDatasetRequest;
       const undeleteStub = sinon
         .stub(client.datasetClient, 'undeleteDataset')
-        .resolves('Dataset');
+        .resolves('FakeDataset');
       await client.undeleteDataset(datasetRequest, {}, () => {});
       assert.ok(undeleteStub.calledOnce);
     });
 
-    //   it('should call listDatasets', async () => {
-    //     const datasetRequest = {
-    //       projectId: 'projectId',
-    //     } as protos.google.cloud.bigquery.v2.IListDatasetsRequest;
-    //     const listStub = sinon.stub(client.datasetClient, 'listDatasets').returns(new gax.FakePagedAsyncIterable(['dataset']));
-    //     await client.listDatasets(datasetRequest, {}, () => {});
-    //     assert.ok(listStub.calledOnce);
-    //   });
+      it('should call listDatasets', async () => {
+        const datasetRequest = {
+          projectId: 'projectId',
+        } as protos.google.cloud.bigquery.v2.IListDatasetsRequest;
+        const listStub = sinon.stub(client.datasetClient, 'listDatasets').resolves('FakeDatasetList');
+        await client.listDatasets(datasetRequest, {}, () => {});
+        assert.ok(listStub.calledOnce);
+      });
 
     it('should call patchDataset', async () => {
       const datasetRequest = {
@@ -137,7 +140,7 @@ describe('BigQueryClient should call underlying client methods', () => {
       } as protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest;
       const patchStub = sinon
         .stub(client.datasetClient, 'patchDataset')
-        .resolves('Dataset');
+        .resolves('FakeDataset');
       await client.patchDataset(datasetRequest, {}, () => {});
       assert.ok(patchStub.calledOnce);
     });
@@ -154,6 +157,15 @@ describe('BigQueryClient should call underlying client methods', () => {
       await client.updateDataset(datasetRequest, {}, () => {});
       assert.ok(updateStub.calledOnce);
     });
+    it('should call deleteDataset', async () => {
+        const jobRequest = {
+          projectId: 'projectId',
+          datasetId: 'datasetId',
+        } as protos.google.cloud.bigquery.v2.IDeleteDatasetRequest;
+        const deleteStub = sinon.stub(client.datasetClient, 'deleteDataset').resolves({});
+        await client.deleteDataset(jobRequest, {}, () => {});
+        assert.ok(deleteStub.calledOnce);
+      });
   });
 
   describe('BigQuery client should call underlying methods in the Job Client', () => {
@@ -165,7 +177,7 @@ describe('BigQueryClient should call underlying client methods', () => {
         projectId: 'projectId',
         jobId: 'jobId',
       } as protos.google.cloud.bigquery.v2.IGetJobRequest;
-      const getStub = sinon.stub(client.jobClient, 'getJob').resolves('Job');
+      const getStub = sinon.stub(client.jobClient, 'getJob').resolves('FakeJob');
       await client.getJob(jobRequest, {}, () => {});
       assert.ok(getStub.calledOnce);
     });
@@ -177,7 +189,7 @@ describe('BigQueryClient should call underlying client methods', () => {
       } as protos.google.cloud.bigquery.v2.IInsertJobRequest;
       const insertStub = sinon
         .stub(client.jobClient, 'insertJob')
-        .resolves('Job');
+        .resolves('FakeJob');
       await client.insertJob(jobRequest, {}, () => {});
       assert.ok(insertStub.calledOnce);
     });
@@ -189,7 +201,7 @@ describe('BigQueryClient should call underlying client methods', () => {
       } as protos.google.cloud.bigquery.v2.ICancelJobRequest;
       const cancelStub = sinon
         .stub(client.jobClient, 'cancelJob')
-        .resolves('Job');
+        .resolves('FakeJob');
       await client.cancelJob(jobRequest, {}, () => {});
       assert.ok(cancelStub.calledOnce);
     });
@@ -203,15 +215,14 @@ describe('BigQueryClient should call underlying client methods', () => {
       await client.deleteJob(jobRequest, {}, () => {});
       assert.ok(deleteStub.calledOnce);
     });
-    // TODO fix
-    //   it('should call listJobs', async () => {
-    //     const jobRequest = {
-    //       projectId: 'projectId',
-    //     } as protos.google.cloud.bigquery.v2.IListJobsRequest;
-    //     const listStub = sinon.stub(client.jobClient, 'listJobs').returns(new gax.FakePagedAsyncIterable(['job']));
-    //     await client.listJobs(jobRequest, {}, () => {});
-    //     assert.ok(listStub.calledOnce);
-    //   });
+    it('should call listJobs', async () => {
+    const jobRequest = {
+        projectId: 'projectId',
+    } as protos.google.cloud.bigquery.v2.IListJobsRequest;
+    const listStub = sinon.stub(client.jobClient, 'listJobs').resolves('FakeJobsList');
+    await client.listJobs(jobRequest, {}, () => {});
+    assert.ok(listStub.calledOnce);
+    });
   });
 
   describe('BigQuery client should call underlying methods in the Model Client', () => {
@@ -227,7 +238,7 @@ describe('BigQueryClient should call underlying client methods', () => {
       } as protos.google.cloud.bigquery.v2.IGetModelRequest;
       const getStub = sinon
         .stub(client.modelClient, 'getModel')
-        .resolves('Model');
+        .resolves('FakeModel');
       await client.getModel(modelRequest, {}, () => {});
       assert.ok(getStub.calledOnce);
     });
@@ -241,7 +252,7 @@ describe('BigQueryClient should call underlying client methods', () => {
       } as protos.google.cloud.bigquery.v2.IPatchModelRequest;
       const patchStub = sinon
         .stub(client.modelClient, 'patchModel')
-        .resolves('Model');
+        .resolves('FakeModel');
       await client.patchModel(modelRequest, {}, () => {});
       assert.ok(patchStub.calledOnce);
     });
@@ -259,15 +270,15 @@ describe('BigQueryClient should call underlying client methods', () => {
       assert.ok(deleteStub.calledOnce);
     });
 
-    // it('should call listModels', async () => {
-    //   const modelRequest = {
-    //     projectId: 'projectId',
-    //     datasetId: 'datasetId',
-    //   } as protos.google.cloud.bigquery.v2.IListModelsRequest;
-    //   const listStub = sinon.stub(client.modelClient, 'listModels').returns(new gax.FakePagedAsyncIterable(['model']));
-    //   await client.listModels(modelRequest, {}, () => {});
-    //   assert.ok(listStub.calledOnce);
-    // });
+    it('should call listModels', async () => {
+      const modelRequest = {
+        projectId: 'projectId',
+        datasetId: 'datasetId',
+      } as protos.google.cloud.bigquery.v2.IListModelsRequest;
+      const listStub = sinon.stub(client.modelClient, 'listModels').resolves('FakeModels');
+      await client.listModels(modelRequest, {}, () => {});
+      assert.ok(listStub.calledOnce);
+    });
   });
 
   describe('BigQuery client should call underlying methods in the Routine Client', () => {
@@ -283,7 +294,7 @@ describe('BigQueryClient should call underlying client methods', () => {
       } as protos.google.cloud.bigquery.v2.IGetRoutineRequest;
       const getStub = sinon
         .stub(client.routineClient, 'getRoutine')
-        .resolves('Routine');
+        .resolves('FakeRoutine');
       await client.getRoutine(routineRequest, {}, () => {});
       assert.ok(getStub.calledOnce);
     });
@@ -296,7 +307,7 @@ describe('BigQueryClient should call underlying client methods', () => {
       } as protos.google.cloud.bigquery.v2.IInsertRoutineRequest;
       const insertStub = sinon
         .stub(client.routineClient, 'insertRoutine')
-        .resolves('Routine');
+        .resolves('FakeRoutine');
       await client.insertRoutine(routineRequest, {}, () => {});
       assert.ok(insertStub.calledOnce);
     });
@@ -310,7 +321,7 @@ describe('BigQueryClient should call underlying client methods', () => {
       } as protos.google.cloud.bigquery.v2.IUpdateRoutineRequest;
       const updateStub = sinon
         .stub(client.routineClient, 'updateRoutine')
-        .resolves('Routine');
+        .resolves('FakeRoutine');
       await client.updateRoutine(routineRequest, {}, () => {});
       assert.ok(updateStub.calledOnce);
     });
@@ -324,7 +335,7 @@ describe('BigQueryClient should call underlying client methods', () => {
       } as protos.google.cloud.bigquery.v2.IPatchRoutineRequest;
       const patchStub = sinon
         .stub(client.routineClient, 'patchRoutine')
-        .resolves('Routine');
+        .resolves('FakeRoutine');
       await client.patchRoutine(routineRequest, {}, () => {});
       assert.ok(patchStub.calledOnce);
     });
@@ -342,15 +353,15 @@ describe('BigQueryClient should call underlying client methods', () => {
       assert.ok(deleteStub.calledOnce);
     });
 
-    // it('should call listRoutines', async () => {
-    //   const routineRequest = {
-    //     projectId: 'projectId',
-    //     datasetId: 'datasetId',
-    //   } as protos.google.cloud.bigquery.v2.IListRoutinesRequest;
-    //   const listStub = sinon.stub(client.routineClient, 'listRoutines').returns(new gax.FakePagedAsyncIterable(['routine']));
-    //   await client.listRoutines(routineRequest, {}, () => {});
-    //   assert.ok(listStub.calledOnce);
-    // });
+    it('should call listRoutines', async () => {
+      const routineRequest = {
+        projectId: 'projectId',
+        datasetId: 'datasetId',
+      } as protos.google.cloud.bigquery.v2.IListRoutinesRequest;
+      const listStub = sinon.stub(client.routineClient, 'listRoutines').resolves('FakeRoutines');
+      await client.listRoutines(routineRequest, {}, () => {});
+      assert.ok(listStub.calledOnce);
+    });
   });
 
   describe('BigQuery client should call underlying methods in the Table Client', () => {
@@ -366,7 +377,7 @@ describe('BigQueryClient should call underlying client methods', () => {
       } as protos.google.cloud.bigquery.v2.IGetTableRequest;
       const getStub = sinon
         .stub(client.tableClient, 'getTable')
-        .resolves('Table');
+        .resolves('FakeTable');
       await client.getTable(tableRequest, {}, () => {});
       assert.ok(getStub.calledOnce);
     });
@@ -379,7 +390,7 @@ describe('BigQueryClient should call underlying client methods', () => {
       } as protos.google.cloud.bigquery.v2.IInsertTableRequest;
       const insertStub = sinon
         .stub(client.tableClient, 'insertTable')
-        .resolves('Table');
+        .resolves('FakeTable');
       await client.insertTable(tableRequest, {}, () => {});
       assert.ok(insertStub.calledOnce);
     });
@@ -393,7 +404,7 @@ describe('BigQueryClient should call underlying client methods', () => {
       } as protos.google.cloud.bigquery.v2.IUpdateOrPatchTableRequest;
       const updateStub = sinon
         .stub(client.tableClient, 'updateTable')
-        .resolves('Table');
+        .resolves('FakeTable');
       await client.updateTable(tableRequest, {}, () => {});
       assert.ok(updateStub.calledOnce);
     });
@@ -407,7 +418,7 @@ describe('BigQueryClient should call underlying client methods', () => {
       } as protos.google.cloud.bigquery.v2.IUpdateOrPatchTableRequest;
       const patchStub = sinon
         .stub(client.tableClient, 'patchTable')
-        .resolves('Table');
+        .resolves('FakeTable');
       await client.patchTable(tableRequest, {}, () => {});
       assert.ok(patchStub.calledOnce);
     });
@@ -425,32 +436,31 @@ describe('BigQueryClient should call underlying client methods', () => {
       assert.ok(deleteStub.calledOnce);
     });
 
-    // it('should call listTables', async () => {
-    //   const tableRequest = {
-    //     projectId: 'projectId',
-    //     datasetId: 'datasetId',
-    //   } as protos.google.cloud.bigquery.v2.IListTablesRequest;
-    //   const listStub = sinon.stub(client.tableClient, 'listTables').returns(new gax.FakePagedAsyncIterable(['table']));
-    //   await client.listTables(tableRequest, {}, () => {});
-    //   assert.ok(listStub.calledOnce);
-    // });
+    it('should call listTables', async () => {
+      const tableRequest = {
+        projectId: 'projectId',
+        datasetId: 'datasetId',
+      } as protos.google.cloud.bigquery.v2.IListTablesRequest;
+      const listStub = sinon.stub(client.tableClient, 'listTables').resolves('FakeTableList');
+      await client.listTables(tableRequest, {}, () => {});
+      assert.ok(listStub.calledOnce);
+    });
   });
   describe('BigQuery client should call underlying methods in the Row Access Policy Client', () => {
     after(() => {
       sinon.restore();
     });
-    // TODO fix
-    // it('should call listRowAccessPolicies', async () => {
-    //   const rowAccessPolicyRequest = {
-    //     projectId: 'projectId',
-    //     datasetId: 'datasetId',
-    //     tableId: 'tableId', // Ensure all required fields are present
-    //   } as protos.google.cloud.bigquery.v2.IListRowAccessPoliciesRequest;
-    //   const listStub = sinon
-    //     .stub(client.rowaccesspolicyClient, 'listRowAccessPolicies')
-    //     .returns(new gax.FakePagedAsyncIterable(['rowAccessPolicy'])); // Use correct return type
-    //   await client.listRowAccessPolicies(rowAccessPolicyRequest, {}, () => {});
-    //   assert.ok(listStub.calledOnce);
-    // });
+    it('should call listRowAccessPolicies', async () => {
+      const rowAccessPolicyRequest = {
+        projectId: 'projectId',
+        datasetId: 'datasetId',
+        tableId: 'tableId', // Ensure all required fields are present
+      } as protos.google.cloud.bigquery.v2.IListRowAccessPoliciesRequest;
+      const listStub = sinon
+        .stub(client.rowaccesspolicyClient, 'listRowAccessPolicies')
+        .resolves('FakeRowAccessPoliciesList');
+      await client.listRowAccessPolicies(rowAccessPolicyRequest, {}, () => {});
+      assert.ok(listStub.calledOnce);
+    });
   });
 });

@@ -99,7 +99,8 @@ function ast(file, client) {
     if (
       functionName.search('Stream') < 0 &&
       functionName.search('Async') < 0 &&
-      functionName.search('ProjectId') < 0
+      functionName.search('ProjectId') < 0 &&
+      functionName.search('getQueryResults') < 0
     ) {
       output = output.concat(`\n\t${functionName}(`);
       // add parameters

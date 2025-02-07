@@ -647,41 +647,6 @@ export class BigQueryClient{
             }
 		return this.jobClient.deleteJob(request, options, callback)
 	}
-	getQueryResults(
-		request:  protos.google.cloud.bigquery.v2.IGetQueryResultsRequest, 
-		optionsOrCallback: 
-      | CallOptions
-      | Callback<
-          protos.google.cloud.bigquery.v2.IGetQueryResultsResponse,
-          | protos.google.cloud.bigquery.v2.IGetQueryResultsRequest
-          | null
-          | undefined,
-          {} | null | undefined
-        >, 
-		callback:  Callback<
-      protos.google.cloud.bigquery.v2.IGetQueryResultsResponse,
-      | protos.google.cloud.bigquery.v2.IGetQueryResultsRequest
-      | null
-      | undefined,
-      {} | null | undefined
-    >): Promise<
-    [
-      protos.google.cloud.bigquery.v2.IGetQueryResultsResponse,
-      protos.google.cloud.bigquery.v2.IGetQueryResultsRequest | undefined,
-      {} | undefined,
-    ]
-  > | void{
-
-            let options: CallOptions;
-            if (typeof optionsOrCallback === 'function' && callback === undefined) {
-                callback = optionsOrCallback;
-                options = {};
-            }
-            else {
-                options = optionsOrCallback as CallOptions;
-            }
-		return this.jobClient.getQueryResults(request, options, callback)
-	}
 	listJobs(
 		request:  protos.google.cloud.bigquery.v2.IListJobsRequest, 
 		optionsOrCallback: 
