@@ -149,12 +149,11 @@ function ast(file, client) {
                 options = optionsOrCallback as CallOptions;
             }
             if (callback === undefined){
-              return this.${client.toLowerCase()}Client.${functionName}(request, options)
-
+              return this.${client.toLowerCase()}Client.${functionName}(request, options);
             }
-            return this.${client.toLowerCase()}Client.${functionName}(${argumentsList})\n    
-            `;
-        output = output.concat(`{\n${optionsOrCallback}}`);
+            return this.${client.toLowerCase()}Client.${functionName}(${argumentsList});  
+            }`;
+        output = output.concat(`{\n${optionsOrCallback}`);
       }
     }
   });
