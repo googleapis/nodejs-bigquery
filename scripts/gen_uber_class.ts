@@ -137,7 +137,7 @@ function ast(file, client) {
         // this logic needs to be surfaced from underlying clients
         // to make sure our parameters play nicely with underlying overloads
         // otherwise you will run into issues similar to https://github.com/microsoft/TypeScript/issues/1805
-        // we also add a check for undefined callback 
+        // we also add a check for undefined callback
         const optionsOrCallback = `
             request = request || {};
             let options: CallOptions;
@@ -154,9 +154,7 @@ function ast(file, client) {
             }
             return this.${client.toLowerCase()}Client.${functionName}(${argumentsList})\n    
             `;
-        output = output.concat(
-          `{\n${optionsOrCallback}}`
-        );
+        output = output.concat(`{\n${optionsOrCallback}}`);
       }
     }
   });

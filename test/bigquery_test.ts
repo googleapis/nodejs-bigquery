@@ -466,26 +466,27 @@ describe('BigQueryClient should call underlying client methods asynchronously', 
 });
 
 
-// TODO 
 describe('BigQueryClient should call underlying client methods synchronously', () => {
 
     const client = new BigQueryClient();
-    // TODO refactor to not have to pass all three options
-    // TODO refactor synchronous tests - log data in callback
+
     describe('BigQuery client should call underlying methods in the Dataset Client', () => {
       after(() => {
         sinon.restore();
       });
-      it('should call getDataset', async () => {
+      it('should call getDataset', () => {
         const datasetRequest = {
           projectId: 'projectId',
           datasetId: 'datasetId',
         } as protos.google.cloud.bigquery.v2.IGetDatasetRequest;
         const getStub = sinon
           .stub(client.datasetClient, 'getDataset')
-          .resolves('FakeDataset');
-        await client.getDataset(datasetRequest, {}, () => {});
+          .callsArgWith(2, null, 'FakeDataset');
+        const resp = client.getDataset(datasetRequest, {}, (err, response) => {if(err){ throw err;
+        }return response+" called back"});
         assert.ok(getStub.calledOnce);
+        assert.strictEqual("FakeDataset called back", resp)
+
       });
       it('should call insertDataset', async () => {
         const datasetRequest = {
@@ -494,9 +495,12 @@ describe('BigQueryClient should call underlying client methods synchronously', (
         } as protos.google.cloud.bigquery.v2.IInsertDatasetRequest;
         const insertStub = sinon
           .stub(client.datasetClient, 'insertDataset')
-          .resolves('FakeDataset');
-        await client.insertDataset(datasetRequest, {}, () => {});
+          .callsArgWith(2, null, 'FakeDataset');
+        const resp = client.insertDataset(datasetRequest, {}, (err, response) => {if(err){ throw err;
+        }return response+" called back"});
         assert.ok(insertStub.calledOnce);
+    
+          assert.strictEqual("FakeDataset called back", resp)
       });
       it('should call undeleteDataset', async () => {
         const datasetRequest = {
@@ -505,18 +509,23 @@ describe('BigQueryClient should call underlying client methods synchronously', (
         } as protos.google.cloud.bigquery.v2.IUndeleteDatasetRequest;
         const undeleteStub = sinon
           .stub(client.datasetClient, 'undeleteDataset')
-          .resolves('FakeDataset');
-        await client.undeleteDataset(datasetRequest, {}, () => {});
+          .callsArgWith(2, null, 'FakeDataset');
+        const resp = client.undeleteDataset(datasetRequest, {}, (err, response) => {if(err){ throw err;
+        }return response+" called back"});
         assert.ok(undeleteStub.calledOnce);
+        assert.strictEqual("FakeDataset called back", resp)
       });
   
         it('should call listDatasets', async () => {
           const datasetRequest = {
             projectId: 'projectId',
           } as protos.google.cloud.bigquery.v2.IListDatasetsRequest;
-          const listStub = sinon.stub(client.datasetClient, 'listDatasets').resolves('FakeDatasetList');
-          await client.listDatasets(datasetRequest, {}, () => {});
+          const listStub = sinon.stub(client.datasetClient, 'listDatasets').callsArgWith(2, null, 'FakeDatasetList');;
+          const resp = client.listDatasets(datasetRequest, {}, (err, response) => {if(err){ throw err;
+          }return response+" called back"});
           assert.ok(listStub.calledOnce);
+          assert.strictEqual("FakeDatasetList called back", resp)
+
         });
   
       it('should call patchDataset', async () => {
@@ -527,9 +536,11 @@ describe('BigQueryClient should call underlying client methods synchronously', (
         } as protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest;
         const patchStub = sinon
           .stub(client.datasetClient, 'patchDataset')
-          .resolves('FakeDataset');
-        await client.patchDataset(datasetRequest, {}, () => {});
+          .callsArgWith(2, null, 'FakeDataset');
+        const resp = client.patchDataset(datasetRequest, {}, (err, response) => {if(err){ throw err;
+        }return response+" called back"});
         assert.ok(patchStub.calledOnce);
+        assert.strictEqual("FakeDataset called back", resp)
       });
   
       it('should call updateDataset', async () => {
@@ -540,21 +551,26 @@ describe('BigQueryClient should call underlying client methods synchronously', (
         } as protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest;
         const updateStub = sinon
           .stub(client.datasetClient, 'updateDataset')
-          .resolves('Dataset');
-        await client.updateDataset(datasetRequest, {}, () => {});
+          .callsArgWith(2, null, 'FakeDataset');
+        const resp = client.updateDataset(datasetRequest, {}, (err, response) => {if(err){ throw err;
+        }return response+" called back"});
         assert.ok(updateStub.calledOnce);
+        assert.strictEqual("FakeDataset called back", resp)
+
       });
       it('should call deleteDataset', async () => {
-          const jobRequest = {
+          const datasetRequest = {
             projectId: 'projectId',
             datasetId: 'datasetId',
           } as protos.google.cloud.bigquery.v2.IDeleteDatasetRequest;
-          const deleteStub = sinon.stub(client.datasetClient, 'deleteDataset').resolves({});
-          await client.deleteDataset(jobRequest, {}, () => {});
+          const deleteStub = sinon.stub(client.datasetClient, 'deleteDataset').callsArgWith(2, null, 'FakeDataset');
+          const resp = client.deleteDataset(datasetRequest, {}, (err, response) => {if(err){ throw err;
+          }return response+" called back"});
           assert.ok(deleteStub.calledOnce);
+          assert.strictEqual("FakeDataset called back", resp)
+
         });
     });
-    // TODO refactor synchronous tests - log data in callback
 
     describe('BigQuery client should call underlying methods in the Job Client', () => {
       after(() => {
@@ -565,9 +581,12 @@ describe('BigQueryClient should call underlying client methods synchronously', (
           projectId: 'projectId',
           jobId: 'jobId',
         } as protos.google.cloud.bigquery.v2.IGetJobRequest;
-        const getStub = sinon.stub(client.jobClient, 'getJob').resolves('FakeJob');
-        await client.getJob(jobRequest, {}, () => {});
+        const getStub = sinon.stub(client.jobClient, 'getJob').callsArgWith(2, null, 'FakeJob');
+        const resp = client.getJob(jobRequest, {}, (err, response) => {if(err){ throw err;
+        }return response+" called back"});
         assert.ok(getStub.calledOnce);
+        assert.strictEqual("FakeJob called back", resp)
+
       });
   
       it('should call insertJob', async () => {
@@ -577,9 +596,11 @@ describe('BigQueryClient should call underlying client methods synchronously', (
         } as protos.google.cloud.bigquery.v2.IInsertJobRequest;
         const insertStub = sinon
           .stub(client.jobClient, 'insertJob')
-          .resolves('FakeJob');
-        await client.insertJob(jobRequest, {}, () => {});
+          .callsArgWith(2, null, 'FakeJob');
+        const resp = client.insertJob(jobRequest, {}, (err, response) => {if(err){ throw err;
+        }return response+" called back"});
         assert.ok(insertStub.calledOnce);
+        assert.strictEqual("FakeJob called back", resp)
       });
   
       it('should call cancelJob', async () => {
@@ -589,9 +610,11 @@ describe('BigQueryClient should call underlying client methods synchronously', (
         } as protos.google.cloud.bigquery.v2.ICancelJobRequest;
         const cancelStub = sinon
           .stub(client.jobClient, 'cancelJob')
-          .resolves('FakeJob');
-        await client.cancelJob(jobRequest, {}, () => {});
+          .callsArgWith(2, null, 'FakeJob');
+        const resp = client.cancelJob(jobRequest, {}, (err, response) => {if(err){ throw err;
+        }return response+" called back"});
         assert.ok(cancelStub.calledOnce);
+        assert.strictEqual("FakeJob called back", resp)
       });
   
       it('should call deleteJob', async () => {
@@ -599,20 +622,23 @@ describe('BigQueryClient should call underlying client methods synchronously', (
           projectId: 'projectId',
           jobId: 'jobId',
         } as protos.google.cloud.bigquery.v2.IDeleteJobRequest;
-        const deleteStub = sinon.stub(client.jobClient, 'deleteJob').resolves({});
-        await client.deleteJob(jobRequest, {}, () => {});
+        const deleteStub = sinon.stub(client.jobClient, 'deleteJob').callsArgWith(2, null, 'FakeJob');;
+        const resp = client.deleteJob(jobRequest, {}, (err, response) => {if(err){ throw err;
+        }return response+" called back"});
         assert.ok(deleteStub.calledOnce);
+        assert.strictEqual("FakeJob called back", resp)
       });
       it('should call listJobs', async () => {
       const jobRequest = {
           projectId: 'projectId',
       } as protos.google.cloud.bigquery.v2.IListJobsRequest;
-      const listStub = sinon.stub(client.jobClient, 'listJobs').resolves('FakeJobsList');
-      await client.listJobs(jobRequest, {}, () => {});
+      const listStub = sinon.stub(client.jobClient, 'listJobs').callsArgWith(2, null, 'FakeJob');
+      const resp = client.listJobs(jobRequest, {}, (err, response) => {if(err){ throw err;
+      }return response+" called back"});
       assert.ok(listStub.calledOnce);
+      assert.strictEqual("FakeJob called back", resp)
       });
     });
-    // TODO refactor synchronous tests - log data in callback
 
     describe('BigQuery client should call underlying methods in the Model Client', () => {
       after(() => {
@@ -627,9 +653,11 @@ describe('BigQueryClient should call underlying client methods synchronously', (
         } as protos.google.cloud.bigquery.v2.IGetModelRequest;
         const getStub = sinon
           .stub(client.modelClient, 'getModel')
-          .resolves('FakeModel');
-        await client.getModel(modelRequest, {}, () => {});
+          .callsArgWith(2, null, 'FakeModel');
+        const resp = client.getModel(modelRequest, {}, (err, response) => {if(err){ throw err;
+        }return response+" called back"});
         assert.ok(getStub.calledOnce);
+        assert.strictEqual("FakeModel called back", resp)
       });
   
       it('should call patchModel', async () => {
@@ -641,9 +669,11 @@ describe('BigQueryClient should call underlying client methods synchronously', (
         } as protos.google.cloud.bigquery.v2.IPatchModelRequest;
         const patchStub = sinon
           .stub(client.modelClient, 'patchModel')
-          .resolves('FakeModel');
-        await client.patchModel(modelRequest, {}, () => {});
+          .callsArgWith(2, null, 'FakeModel');
+        const resp = client.patchModel(modelRequest, {},(err, response) => {if(err){ throw err;
+        }return response+" called back"});
         assert.ok(patchStub.calledOnce);
+        assert.strictEqual("FakeModel called back", resp)
       });
   
       it('should call deleteModel', async () => {
@@ -654,9 +684,11 @@ describe('BigQueryClient should call underlying client methods synchronously', (
         } as protos.google.cloud.bigquery.v2.IDeleteModelRequest;
         const deleteStub = sinon
           .stub(client.modelClient, 'deleteModel')
-          .resolves({});
-        await client.deleteModel(modelRequest, {}, () => {});
+          .callsArgWith(2, null, 'FakeModel');
+        const resp = client.deleteModel(modelRequest, {}, (err, response) => {if(err){ throw err;
+        }return response+" called back"});
         assert.ok(deleteStub.calledOnce);
+        assert.strictEqual("FakeModel called back", resp)
       });
   
       it('should call listModels', async () => {
@@ -664,12 +696,13 @@ describe('BigQueryClient should call underlying client methods synchronously', (
           projectId: 'projectId',
           datasetId: 'datasetId',
         } as protos.google.cloud.bigquery.v2.IListModelsRequest;
-        const listStub = sinon.stub(client.modelClient, 'listModels').resolves('FakeModels');
-        await client.listModels(modelRequest, {}, () => {});
+        const listStub = sinon.stub(client.modelClient, 'listModels').callsArgWith(2, null, 'FakeModel');
+        const resp = client.listModels(modelRequest, {}, (err, response) => {if(err){ throw err;
+        }return response+" called back"});
         assert.ok(listStub.calledOnce);
+        assert.strictEqual("FakeModel called back", resp)
       });
     });
-    // TODO refactor synchronous tests - log data in callback
 
     describe('BigQuery client should call underlying methods in the Routine Client', () => {
       after(() => {
@@ -684,9 +717,11 @@ describe('BigQueryClient should call underlying client methods synchronously', (
         } as protos.google.cloud.bigquery.v2.IGetRoutineRequest;
         const getStub = sinon
           .stub(client.routineClient, 'getRoutine')
-          .resolves('FakeRoutine');
-        await client.getRoutine(routineRequest, {}, () => {});
+          .callsArgWith(2, null, 'FakeRoutine');
+        const resp = client.getRoutine(routineRequest, {}, (err, response) => {if(err){ throw err;
+        }return response+" called back"});
         assert.ok(getStub.calledOnce);
+        assert.strictEqual("FakeRoutine called back", resp)
       });
   
       it('should call insertRoutine', async () => {
@@ -697,9 +732,12 @@ describe('BigQueryClient should call underlying client methods synchronously', (
         } as protos.google.cloud.bigquery.v2.IInsertRoutineRequest;
         const insertStub = sinon
           .stub(client.routineClient, 'insertRoutine')
-          .resolves('FakeRoutine');
-        await client.insertRoutine(routineRequest, {}, () => {});
+          .callsArgWith(2, null, 'FakeRoutine');
+        const resp = client.insertRoutine(routineRequest, {}, (err, response) => {if(err){ throw err;
+        }return response+" called back"});
         assert.ok(insertStub.calledOnce);
+        assert.strictEqual("FakeRoutine called back", resp)
+
       });
   
       it('should call updateRoutine', async () => {
@@ -711,9 +749,12 @@ describe('BigQueryClient should call underlying client methods synchronously', (
         } as protos.google.cloud.bigquery.v2.IUpdateRoutineRequest;
         const updateStub = sinon
           .stub(client.routineClient, 'updateRoutine')
-          .resolves('FakeRoutine');
-        await client.updateRoutine(routineRequest, {}, () => {});
+          .callsArgWith(2, null, 'FakeRoutine');
+        const resp = client.updateRoutine(routineRequest, {}, (err, response) => {if(err){ throw err;
+        }return response+" called back"});
         assert.ok(updateStub.calledOnce);
+        assert.strictEqual("FakeRoutine called back", resp)
+
       });
   
       it('should call patchRoutine', async () => {
@@ -725,9 +766,12 @@ describe('BigQueryClient should call underlying client methods synchronously', (
         } as protos.google.cloud.bigquery.v2.IPatchRoutineRequest;
         const patchStub = sinon
           .stub(client.routineClient, 'patchRoutine')
-          .resolves('FakeRoutine');
-        await client.patchRoutine(routineRequest, {}, () => {});
+          .callsArgWith(2, null, 'FakeRoutine');
+        const resp = client.patchRoutine(routineRequest, {}, (err, response) => {if(err){ throw err;
+        }return response+" called back"});
         assert.ok(patchStub.calledOnce);
+        assert.strictEqual("FakeRoutine called back", resp)
+
       });
   
       it('should call deleteRoutine', async () => {
@@ -738,9 +782,12 @@ describe('BigQueryClient should call underlying client methods synchronously', (
         } as protos.google.cloud.bigquery.v2.IDeleteRoutineRequest;
         const deleteStub = sinon
           .stub(client.routineClient, 'deleteRoutine')
-          .resolves({});
-        await client.deleteRoutine(routineRequest, {}, () => {});
+          .callsArgWith(2, null, 'FakeRoutine');
+        const resp = client.deleteRoutine(routineRequest, {}, (err, response) => {if(err){ throw err;
+        }return response+" called back"});
         assert.ok(deleteStub.calledOnce);
+        assert.strictEqual("FakeRoutine called back", resp)
+
       });
   
       it('should call listRoutines', async () => {
@@ -748,12 +795,14 @@ describe('BigQueryClient should call underlying client methods synchronously', (
           projectId: 'projectId',
           datasetId: 'datasetId',
         } as protos.google.cloud.bigquery.v2.IListRoutinesRequest;
-        const listStub = sinon.stub(client.routineClient, 'listRoutines').resolves('FakeRoutines');
-        await client.listRoutines(routineRequest, {}, () => {});
+        const listStub = sinon.stub(client.routineClient, 'listRoutines').callsArgWith(2, null, 'FakeRoutine');;
+        const resp = client.listRoutines(routineRequest, {}, (err, response) => {if(err){ throw err;
+        }return response+" called back"});
         assert.ok(listStub.calledOnce);
+        assert.strictEqual("FakeRoutine called back", resp)
+
       });
     });
-    // TODO refactor synchronous tests - log data in callback
 
     describe('BigQuery client should call underlying methods in the Table Client', () => {
       after(() => {
@@ -768,9 +817,12 @@ describe('BigQueryClient should call underlying client methods synchronously', (
         } as protos.google.cloud.bigquery.v2.IGetTableRequest;
         const getStub = sinon
           .stub(client.tableClient, 'getTable')
-          .resolves('FakeTable');
-        await client.getTable(tableRequest, {}, () => {});
+          .callsArgWith(2, null, 'FakeTable');
+        const resp = client.getTable(tableRequest, {}, (err, response) => {if(err){ throw err;
+        }return response+" called back"});
         assert.ok(getStub.calledOnce);
+        assert.strictEqual("FakeTable called back", resp)
+
       });
   
       it('should call insertTable', async () => {
@@ -781,9 +833,12 @@ describe('BigQueryClient should call underlying client methods synchronously', (
         } as protos.google.cloud.bigquery.v2.IInsertTableRequest;
         const insertStub = sinon
           .stub(client.tableClient, 'insertTable')
-          .resolves('FakeTable');
-        await client.insertTable(tableRequest, {}, () => {});
+          .callsArgWith(2, null, 'FakeTable');
+        const resp = client.insertTable(tableRequest, {}, (err, response) => {if(err){ throw err;
+        }return response+" called back"});
         assert.ok(insertStub.calledOnce);
+        assert.strictEqual("FakeTable called back", resp)
+
       });
   
       it('should call updateTable', async () => {
@@ -795,9 +850,12 @@ describe('BigQueryClient should call underlying client methods synchronously', (
         } as protos.google.cloud.bigquery.v2.IUpdateOrPatchTableRequest;
         const updateStub = sinon
           .stub(client.tableClient, 'updateTable')
-          .resolves('FakeTable');
-        await client.updateTable(tableRequest, {}, () => {});
+          .callsArgWith(2, null, 'FakeTable');
+        const resp = client.updateTable(tableRequest, {}, (err, response) => {if(err){ throw err;
+        }return response+" called back"});
         assert.ok(updateStub.calledOnce);
+        assert.strictEqual("FakeTable called back", resp)
+
       });
   
       it('should call patchTable', async () => {
@@ -809,9 +867,12 @@ describe('BigQueryClient should call underlying client methods synchronously', (
         } as protos.google.cloud.bigquery.v2.IUpdateOrPatchTableRequest;
         const patchStub = sinon
           .stub(client.tableClient, 'patchTable')
-          .resolves('FakeTable');
-        await client.patchTable(tableRequest, {}, () => {});
+          .callsArgWith(2, null, 'FakeTable');
+        const resp = client.patchTable(tableRequest, {}, (err, response) => {if(err){ throw err;
+        }return response+" called back"});
         assert.ok(patchStub.calledOnce);
+        assert.strictEqual("FakeTable called back", resp)
+
       });
   
       it('should call deleteTable', async () => {
@@ -822,9 +883,12 @@ describe('BigQueryClient should call underlying client methods synchronously', (
         } as protos.google.cloud.bigquery.v2.IDeleteTableRequest;
         const deleteStub = sinon
           .stub(client.tableClient, 'deleteTable')
-          .resolves({});
-        await client.deleteTable(tableRequest, {}, () => {});
+          .callsArgWith(2, null, 'FakeTable');
+        const resp = client.deleteTable(tableRequest, {}, (err, response) => {if(err){ throw err;
+        }return response+" called back"});
         assert.ok(deleteStub.calledOnce);
+        assert.strictEqual("FakeTable called back", resp)
+
       });
   
       it('should call listTables', async () => {
@@ -832,12 +896,14 @@ describe('BigQueryClient should call underlying client methods synchronously', (
           projectId: 'projectId',
           datasetId: 'datasetId',
         } as protos.google.cloud.bigquery.v2.IListTablesRequest;
-        const listStub = sinon.stub(client.tableClient, 'listTables').resolves('FakeTableList');
-        await client.listTables(tableRequest, {}, () => {});
+        const listStub = sinon.stub(client.tableClient, 'listTables').callsArgWith(2, null, 'FakeTable');;
+        const resp = client.listTables(tableRequest, {}, (err, response) => {if(err){ throw err;
+        }return response+" called back"});
         assert.ok(listStub.calledOnce);
+        assert.strictEqual("FakeTable called back", resp)
+
       });
     });
-      // TODO refactor synchronous tests - log data in callback
 
     describe('BigQuery client should call underlying methods in the Row Access Policy Client', () => {
       after(() => {
@@ -851,9 +917,12 @@ describe('BigQueryClient should call underlying client methods synchronously', (
         } as protos.google.cloud.bigquery.v2.IListRowAccessPoliciesRequest;
         const listStub = sinon
           .stub(client.rowaccesspolicyClient, 'listRowAccessPolicies')
-          .resolves('FakeRowAccessPoliciesList');
-        await client.listRowAccessPolicies(rowAccessPolicyRequest, {}, () => {});
+          .callsArgWith(2, null, 'FakeRowAccessPoliciesList');
+        const resp = client.listRowAccessPolicies(rowAccessPolicyRequest, {}, (err, response) => {if(err){ throw err;
+        }return response+" called back"});
         assert.ok(listStub.calledOnce);
+        assert.strictEqual("FakeRowAccessPoliciesList called back", resp)
+
       });
     });
   });
