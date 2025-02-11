@@ -280,6 +280,7 @@ function buildClientConstructor(clients) {
 }
 
 function buildOutput() {
+  console.log('Regenerating bigquery.ts');
   let newoutput;
   newoutput = output.concat(makeImports(clients));
   newoutput = newoutput.concat(buildOptionTypes(clients));
