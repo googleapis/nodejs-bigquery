@@ -676,7 +676,7 @@ describe('BigQuery', () => {
             const badTable = dataset.table(table.id!, {location: 'US'});
 
             badTable.createCopyJob(otherTable, err => {
-              assert.notEqual(err, null);
+              assert.notEqual(err, null); // TODO(alvarowolfx): check for 404 ?
               done();
             });
           });
