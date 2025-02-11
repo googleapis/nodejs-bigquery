@@ -588,6 +588,8 @@ export class BigQuery extends Service {
       parseJSON?: boolean;
     }
   ) {
+    // copy schema fields to avoid mutation when filtering selected fields
+    let schemaFields = schema.fields ? [...schema.fields] : [];
     if (options.selectedFields && options.selectedFields!.length > 0) {
       const selectedFieldsArray = options.selectedFields!.map(c => {
         return c.split('.');
@@ -595,7 +597,7 @@ export class BigQuery extends Service {
 
       const currentFields = selectedFieldsArray.map(c => c.shift());
       //filter schema fields based on selected fields.
-      schema.fields = schema.fields?.filter(
+      schemaFields = schemaFields.filter(
         field =>
           currentFields
             .map(c => c!.toLowerCase())
@@ -610,7 +612,7 @@ export class BigQuery extends Service {
 
     function mergeSchema(row: TableRow) {
       return row.f!.map((field: TableRowField, index: number) => {
-        const schemaField = schema.fields![index];
+        const schemaField = schemaFields[index];
         let value = field.v;
         if (schemaField.mode === 'REPEATED') {
           value = (value as TableRowField[]).map(val => {
