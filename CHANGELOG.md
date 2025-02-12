@@ -4,6 +4,13 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## [7.9.2](https://github.com/googleapis/nodejs-bigquery/compare/v7.9.1...v7.9.2) (2025-02-12)
+
+
+### Bug Fixes
+
+* Avoid schema field mutation when passing selectedFields opt ([#1437](https://github.com/googleapis/nodejs-bigquery/issues/1437)) ([27044d5](https://github.com/googleapis/nodejs-bigquery/commit/27044d52e6bb6b4b6dbc746a0cfb02951817d7f1))
+
 ## [7.9.1](https://github.com/googleapis/nodejs-bigquery/compare/v7.9.0...v7.9.1) (2024-09-23)
 
 
