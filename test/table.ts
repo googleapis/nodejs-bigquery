@@ -2189,6 +2189,56 @@ describe('BigQuery/Table', () => {
       });
     });
 
+    it('should return selected fields after consecutive calls', done => {
+      const callSequence = [
+        {
+          selectedFields: ['age'],
+          rows: [{f: [{v: 40}]}],
+          expected: [{age: 40}],
+        },
+        {
+          selectedFields: ['name', 'address'],
+          rows: [{f: [{v: 'John'}, {v: '1234 Fake St, Springfield'}]}],
+          expected: [{name: 'John', address: '1234 Fake St, Springfield'}],
+        },
+        {
+          selectedFields: ['age'],
+          rows: [{f: [{v: 50}]}],
+          expected: [{age: 50}],
+        },
+      ];
+      const schema = {
+        fields: [
+          {name: 'name', type: 'string'},
+          {name: 'age', type: 'INTEGER'},
+          {name: 'address', type: 'string'},
+        ],
+      };
+
+      table.metadata = {schema};
+
+      sandbox.restore();
+
+      for (const [i, call] of callSequence.entries()) {
+        table.request = (
+          reqOpts: DecorateRequestOptions,
+          callback: Function
+        ) => {
+          callback(null, {rows: call.rows});
+        };
+        table.getRows(
+          {selectedFields: call.selectedFields.join(',')},
+          (err: Error, rows: {}) => {
+            assert.ifError(err);
+            assert.deepStrictEqual(rows, call.expected);
+            if (i === callSequence.length - 1) {
+              done();
+            }
+          }
+        );
+      }
+    });
+
     it('should return selected fields from nested objects', done => {
       const selectedFields = 'objects.nested_object.nested_property_1';
       const rows = [
