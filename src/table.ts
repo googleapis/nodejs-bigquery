@@ -1830,6 +1830,10 @@ class Table extends ServiceObject {
     delete options.wrapIntegers;
     const parseJSON = options.parseJSON ? options.parseJSON : false;
     delete options.parseJSON;
+    const selectedFields = options.selectedFields
+      ? options.selectedFields.split(',')
+      : [];
+    delete options.selectedFields;
     const onComplete = (
       err: Error | null,
       rows: TableRow[] | null,
@@ -1841,10 +1845,8 @@ class Table extends ServiceObject {
         return;
       }
       rows = BigQuery.mergeSchemaWithRows_(this.metadata.schema, rows || [], {
-        wrapIntegers: wrapIntegers,
-        selectedFields: options.selectedFields
-          ? options.selectedFields!.split(',')
-          : [],
+        wrapIntegers,
+        selectedFields,
         parseJSON,
       });
       callback!(null, rows, nextQuery, resp);
