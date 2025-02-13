@@ -1224,7 +1224,12 @@ export class BigQuery extends Service {
       );
     } else if (typeName === 'STRUCT') {
       queryParameter.parameterValue!.structValues = Object.keys(value).reduce(
-        (structValues, prop) => {
+        (
+          structValues: {
+            [key: string]: bigquery.IQueryParameterValue;
+          },
+          prop: string
+        ) => {
           let nestedQueryParameter;
           if (providedType) {
             nestedQueryParameter = BigQuery.valueToQueryParameter_(
@@ -1234,8 +1239,9 @@ export class BigQuery extends Service {
           } else {
             nestedQueryParameter = BigQuery.valueToQueryParameter_(value[prop]);
           }
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (structValues as any)[prop] = nestedQueryParameter.parameterValue;
+          if (nestedQueryParameter.parameterValue !== undefined) {
+            structValues[prop] = nestedQueryParameter.parameterValue;
+          }
           return structValues;
         },
         {}
@@ -1869,7 +1875,7 @@ export class BigQuery extends Service {
     if (options.projectId) {
       reqOpts.projectId = options.projectId;
     }
-    this.request(reqOpts, (err, resp) => {
+    this.request(reqOpts, (err, resp: bigquery.IDatasetList) => {
       if (err) {
         callback!(err, null, null, resp);
         return;
@@ -1883,7 +1889,6 @@ export class BigQuery extends Service {
         });
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const datasets = (resp.datasets || []).map(
         (dataset: bigquery.IDataset) => {
           const dsOpts: DatasetOptions = {
@@ -2001,7 +2006,8 @@ export class BigQuery extends Service {
         }
         const jobs = (resp.jobs || []).map((jobObject: bigquery.IJob) => {
           const job = this.job(jobObject.jobReference!.jobId!, {
-            location: jobObject.jobReference!.location!,
+            location: jobObject.jobReference?.location,
+            projectId: jobObject.jobReference?.projectId,
           });
           job.metadata = jobObject!;
           return job;
@@ -2031,6 +2037,7 @@ export class BigQuery extends Service {
     if (this.location) {
       options = extend({location: this.location}, options);
     }
+    options = extend({projectId: this.projectId}, options);
     return new Job(this, id, options);
   }
 
