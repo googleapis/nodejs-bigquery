@@ -1,18 +1,14 @@
 {
   "name": "@google-cloud/bigquery",
-  "description": "Google BigQuery Client Library for Node.js",
-  "version": "7.9.1",
+  "version": "0.1.0",
+  "description": "Bigquery client for Node.js",
+  "repository": "googleapis/nodejs-bigquery",
   "license": "Apache-2.0",
   "author": "Google LLC",
-  "engines": {
-    "node": ">=14.0.0"
-  },
-  "repository": "googleapis/nodejs-bigquery",
-  "main": "./build/src/index.js",
-  "types": "./build/src/index.d.ts",
+  "main": "build/src/index.js",
   "files": [
     "build/src",
-    "!build/src/**/*.map"
+    "build/protos"
   ],
   "keywords": [
     "google apis client",
@@ -24,68 +20,47 @@
     "google cloud",
     "cloud",
     "google bigquery",
-    "bigquery"
+    "bigquery",
+    "dataset service",
+    "job service",
+    "model service",
+    "project service",
+    "routine service",
+    "row access policy service",
+    "table service"
   ],
   "scripts": {
-    "prebenchmark": "npm run compile",
-    "benchmark": "node build/benchmark/bench.js benchmark/queries.json",
-    "docs": "jsdoc -c .jsdoc.js",
-    "lint": "gts check",
-    "samples-test": "cd samples/ && npm link ../ && npm test && cd ../",
-    "test": "c8 mocha build/test",
-    "system-test": "mocha build/system-test --timeout 600000",
-    "presystem-test": "npm run compile",
     "clean": "gts clean",
-    "compile": "tsc -p . && cp src/types.d.ts build/src/",
+    "compile": "tsc -p . && cp -r protos build/ && minifyProtoJson",
+    "compile-protos": "compileProtos src",
+    "docs": "jsdoc -c .jsdoc.js",
     "fix": "gts fix",
-    "predocs": "npm run compile",
-    "prepare": "npm run compile",
-    "pretest": "npm run compile",
-    "docs-test": "linkinator docs",
-    "predocs-test": "npm run docs",
-    "types": "node scripts/gen-types.js",
-    "prelint": "cd samples; npm link ../; npm install",
-    "precompile": "gts clean"
+    "lint": "gts check",
+    "prepare": "npm run compile-protos && npm run compile",
+    "system-test": "c8 mocha build/system-test",
+    "test": "c8 mocha build/test"
   },
   "dependencies": {
-    "@google-cloud/common": "^5.0.0",
-    "@google-cloud/paginator": "^5.0.2",
-    "@google-cloud/precise-date": "^4.0.0",
-    "@google-cloud/promisify": "^4.0.0",
-    "arrify": "^2.0.1",
-    "big.js": "^6.0.0",
-    "duplexify": "^4.0.0",
-    "extend": "^3.0.2",
-    "is": "^3.3.0",
-    "stream-events": "^1.0.5",
-    "uuid": "^9.0.0"
+    "google-gax": "^4.4.0"
   },
   "devDependencies": {
-    "@google-cloud/storage": "^7.0.0",
-    "@types/big.js": "^6.2.0",
-    "@types/extend": "^3.0.1",
-    "@types/is": "0.0.25",
-    "@types/mocha": "^9.0.0",
-    "@types/node": "^20.0.0",
-    "@types/proxyquire": "^1.3.28",
-    "@types/sinon": "^10.0.0",
-    "@types/uuid": "^9.0.0",
-    "c8": "^9.0.0",
-    "codecov": "^3.5.0",
-    "discovery-tsd": "^0.3.0",
-    "eslint-plugin-prettier": "^5.0.0",
-    "gts": "^5.0.0",
-    "jsdoc": "^4.0.0",
+    "@types/mocha": "^10.0.7",
+    "@types/node": "^20.16.4",
+    "@types/sinon": "^10.0.20",
+    "c8": "^9.1.0",
+    "gapic-tools": "^0.4.6",
+    "gts": "5.3.1",
+    "jsdoc": "^4.0.3",
     "jsdoc-fresh": "^3.0.0",
     "jsdoc-region-tag": "^3.0.0",
-    "linkinator": "^3.0.0",
-    "mocha": "^9.2.2",
-    "pack-n-play": "^2.0.0",
-    "prettier": "^3.0.0",
-    "proxyquire": "^2.1.0",
+    "mocha": "^10.7.3",
+    "pack-n-play": "^2.0.3",
     "sinon": "^18.0.0",
+    "typescript": "5.1.6",
     "nise": "6.0.0",
-    "path-to-regexp": "6.3.0",
-    "typescript": "^5.1.6"
+    "path-to-regexp": "6.3.0"
+  },
+  "engines": {
+    "node": ">=v14"
   }
 }
