@@ -89,7 +89,7 @@ function ast(file, client) {
   // Run the extract function with the script's arguments
   extract(sourceFile!, undefined, client);
   // Either print the found nodes, or offer a list of what identifiers were found
-  const checker = program.getTypeChecker();
+  program.getTypeChecker();
 
   foundNodes.map(f => {
     const [name, node] = f;
