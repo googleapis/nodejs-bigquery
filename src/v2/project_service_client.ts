@@ -18,12 +18,7 @@
 
 /* global window */
 import type * as gax from 'google-gax';
-import type {
-  Callback,
-  CallOptions,
-  Descriptors,
-  ClientOptions,
-} from 'google-gax';
+import type {Callback, CallOptions, Descriptors, ClientOptions} from 'google-gax';
 
 import * as protos from '../../protos/protos';
 import jsonProtos = require('../../protos/protos.json');
@@ -101,36 +96,17 @@ export class ProjectServiceClient {
    *     const client = new ProjectServiceClient({fallback: true}, gax);
    *     ```
    */
-  constructor(
-    opts?: ClientOptions,
-    gaxInstance?: typeof gax | typeof gax.fallback
-  ) {
+  constructor(opts?: ClientOptions, gaxInstance?: typeof gax | typeof gax.fallback) {
     // Ensure that options include all the required fields.
     const staticMembers = this.constructor as typeof ProjectServiceClient;
-    if (
-      opts?.universe_domain &&
-      opts?.universeDomain &&
-      opts?.universe_domain !== opts?.universeDomain
-    ) {
-      throw new Error(
-        'Please set either universe_domain or universeDomain, but not both.'
-      );
+    if (opts?.universe_domain && opts?.universeDomain && opts?.universe_domain !== opts?.universeDomain) {
+      throw new Error('Please set either universe_domain or universeDomain, but not both.');
     }
-    const universeDomainEnvVar =
-      typeof process === 'object' && typeof process.env === 'object'
-        ? process.env['GOOGLE_CLOUD_UNIVERSE_DOMAIN']
-        : undefined;
-    this._universeDomain =
-      opts?.universeDomain ??
-      opts?.universe_domain ??
-      universeDomainEnvVar ??
-      'googleapis.com';
+    const universeDomainEnvVar = (typeof process === 'object' && typeof process.env === 'object') ? process.env['GOOGLE_CLOUD_UNIVERSE_DOMAIN'] : undefined;
+    this._universeDomain = opts?.universeDomain ?? opts?.universe_domain ?? universeDomainEnvVar ?? 'googleapis.com';
     this._servicePath = 'bigquery.' + this._universeDomain;
-    const servicePath =
-      opts?.servicePath || opts?.apiEndpoint || this._servicePath;
-    this._providedCustomServicePath = !!(
-      opts?.servicePath || opts?.apiEndpoint
-    );
+    const servicePath = opts?.servicePath || opts?.apiEndpoint || this._servicePath;
+    this._providedCustomServicePath = !!(opts?.servicePath || opts?.apiEndpoint);
     const port = opts?.port || staticMembers.port;
     const clientConfig = opts?.clientConfig ?? {};
     // Implicitly enable HTTP transport for the APIs that use REST as transport (e.g. Google Cloud Compute).
@@ -139,9 +115,7 @@ export class ProjectServiceClient {
     } else {
       opts.fallback = opts.fallback ?? true;
     }
-    const fallback =
-      opts?.fallback ??
-      (typeof window !== 'undefined' && typeof window?.fetch === 'function');
+    const fallback = opts?.fallback ?? (typeof window !== 'undefined' && typeof window?.fetch === 'function');
     opts = Object.assign({servicePath, port, clientConfig, fallback}, opts);
 
     // Request numeric enum values if REST transport is used.
@@ -167,7 +141,7 @@ export class ProjectServiceClient {
     this._opts = opts;
 
     // Save the auth object to the client, for use by other methods.
-    this.auth = this._gaxGrpc.auth as gax.GoogleAuth;
+    this.auth = (this._gaxGrpc.auth as gax.GoogleAuth);
 
     // Set useJWTAccessWithScope on the auth object.
     this.auth.useJWTAccessWithScope = true;
@@ -181,7 +155,10 @@ export class ProjectServiceClient {
     }
 
     // Determine the client header string.
-    const clientHeader = [`gax/${this._gaxModule.version}`, `gapic/${version}`];
+    const clientHeader = [
+      `gax/${this._gaxModule.version}`,
+      `gapic/${version}`,
+    ];
     if (typeof process === 'object' && 'versions' in process) {
       clientHeader.push(`gl-node/${process.versions.node}`);
     } else {
@@ -200,11 +177,8 @@ export class ProjectServiceClient {
 
     // Put together the default options sent with requests.
     this._defaults = this._gaxGrpc.constructSettings(
-      'google.cloud.bigquery.v2.ProjectService',
-      gapicConfig as gax.ClientConfig,
-      opts.clientConfig || {},
-      {'x-goog-api-client': clientHeader.join(' ')}
-    );
+        'google.cloud.bigquery.v2.ProjectService', gapicConfig as gax.ClientConfig,
+        opts.clientConfig || {}, {'x-goog-api-client': clientHeader.join(' ')});
 
     // Set up a dictionary of "inner API calls"; the core implementation
     // of calling the API is handled in `google-gax`, with this code
@@ -235,35 +209,31 @@ export class ProjectServiceClient {
     // Put together the "service stub" for
     // google.cloud.bigquery.v2.ProjectService.
     this.projectServiceStub = this._gaxGrpc.createStub(
-      this._opts.fallback
-        ? (this._protos as protobuf.Root).lookupService(
-            'google.cloud.bigquery.v2.ProjectService'
-          )
-        : // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        this._opts.fallback ?
+          (this._protos as protobuf.Root).lookupService('google.cloud.bigquery.v2.ProjectService') :
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (this._protos as any).google.cloud.bigquery.v2.ProjectService,
-      this._opts,
-      this._providedCustomServicePath
-    ) as Promise<{[method: string]: Function}>;
+        this._opts, this._providedCustomServicePath) as Promise<{[method: string]: Function}>;
 
     // Iterate over each of the methods that the service provides
     // and create an API call method for each.
-    const projectServiceStubMethods = ['getServiceAccount'];
+    const projectServiceStubMethods =
+        ['getServiceAccount'];
     for (const methodName of projectServiceStubMethods) {
       const callPromise = this.projectServiceStub.then(
-        stub =>
-          (...args: Array<{}>) => {
-            if (this._terminated) {
-              return Promise.reject('The client has already been closed.');
-            }
-            const func = stub[methodName];
-            return func.apply(stub, args);
-          },
-        (err: Error | null | undefined) => () => {
+        stub => (...args: Array<{}>) => {
+          if (this._terminated) {
+            return Promise.reject('The client has already been closed.');
+          }
+          const func = stub[methodName];
+          return func.apply(stub, args);
+        },
+        (err: Error|null|undefined) => () => {
           throw err;
-        }
-      );
+        });
 
-      const descriptor = undefined;
+      const descriptor =
+        undefined;
       const apiCall = this._gaxModule.createApiCall(
         callPromise,
         this._defaults[methodName],
@@ -283,14 +253,8 @@ export class ProjectServiceClient {
    * @returns {string} The DNS address for this service.
    */
   static get servicePath() {
-    if (
-      typeof process === 'object' &&
-      typeof process.emitWarning === 'function'
-    ) {
-      process.emitWarning(
-        'Static servicePath is deprecated, please use the instance method instead.',
-        'DeprecationWarning'
-      );
+    if (typeof process === 'object' && typeof process.emitWarning === 'function') {
+      process.emitWarning('Static servicePath is deprecated, please use the instance method instead.', 'DeprecationWarning');
     }
     return 'bigquery.googleapis.com';
   }
@@ -301,14 +265,8 @@ export class ProjectServiceClient {
    * @returns {string} The DNS address for this service.
    */
   static get apiEndpoint() {
-    if (
-      typeof process === 'object' &&
-      typeof process.emitWarning === 'function'
-    ) {
-      process.emitWarning(
-        'Static apiEndpoint is deprecated, please use the instance method instead.',
-        'DeprecationWarning'
-      );
+    if (typeof process === 'object' && typeof process.emitWarning === 'function') {
+      process.emitWarning('Static apiEndpoint is deprecated, please use the instance method instead.', 'DeprecationWarning');
     }
     return 'bigquery.googleapis.com';
   }
@@ -342,7 +300,7 @@ export class ProjectServiceClient {
     return [
       'https://www.googleapis.com/auth/bigquery',
       'https://www.googleapis.com/auth/cloud-platform',
-      'https://www.googleapis.com/auth/cloud-platform.read-only',
+      'https://www.googleapis.com/auth/cloud-platform.read-only'
     ];
   }
 
@@ -352,9 +310,8 @@ export class ProjectServiceClient {
    * Return the project ID used by this class.
    * @returns {Promise} A promise that resolves to string containing the project ID.
    */
-  getProjectId(
-    callback?: Callback<string, undefined, undefined>
-  ): Promise<string> | void {
+  getProjectId(callback?: Callback<string, undefined, undefined>):
+      Promise<string>|void {
     if (callback) {
       this.auth.getProjectId(callback);
       return;
@@ -365,97 +322,78 @@ export class ProjectServiceClient {
   // -------------------
   // -- Service calls --
   // -------------------
-  /**
-   * RPC to get the service account for a project used for interactions with
-   * Google Cloud KMS
-   *
-   * @param {Object} request
-   *   The request object that will be sent.
-   * @param {string} request.projectId
-   *   Required. ID of the project.
-   * @param {object} [options]
-   *   Call options. See {@link https://googleapis.dev/nodejs/google-gax/latest/interfaces/CallOptions.html|CallOptions} for more details.
-   * @returns {Promise} - The promise which resolves to an array.
-   *   The first element of the array is an object representing {@link protos.google.cloud.bigquery.v2.GetServiceAccountResponse|GetServiceAccountResponse}.
-   *   Please see the {@link https://github.com/googleapis/gax-nodejs/blob/master/client-libraries.md#regular-methods | documentation }
-   *   for more details and examples.
-   * @example <caption>include:samples/generated/v2/project_service.get_service_account.js</caption>
-   * region_tag:bigquery_v2_generated_ProjectService_GetServiceAccount_async
-   */
+/**
+ * RPC to get the service account for a project used for interactions with
+ * Google Cloud KMS
+ *
+ * @param {Object} request
+ *   The request object that will be sent.
+ * @param {string} request.projectId
+ *   Required. ID of the project.
+ * @param {object} [options]
+ *   Call options. See {@link https://googleapis.dev/nodejs/google-gax/latest/interfaces/CallOptions.html|CallOptions} for more details.
+ * @returns {Promise} - The promise which resolves to an array.
+ *   The first element of the array is an object representing {@link protos.google.cloud.bigquery.v2.GetServiceAccountResponse|GetServiceAccountResponse}.
+ *   Please see the {@link https://github.com/googleapis/gax-nodejs/blob/master/client-libraries.md#regular-methods | documentation }
+ *   for more details and examples.
+ * @example <caption>include:samples/generated/v2/project_service.get_service_account.js</caption>
+ * region_tag:bigquery_v2_generated_ProjectService_GetServiceAccount_async
+ */
   getServiceAccount(
-    request?: protos.google.cloud.bigquery.v2.IGetServiceAccountRequest,
-    options?: CallOptions
-  ): Promise<
-    [
-      protos.google.cloud.bigquery.v2.IGetServiceAccountResponse,
-      protos.google.cloud.bigquery.v2.IGetServiceAccountRequest | undefined,
-      {} | undefined,
-    ]
-  >;
+      request?: protos.google.cloud.bigquery.v2.IGetServiceAccountRequest,
+      options?: CallOptions):
+      Promise<[
+        protos.google.cloud.bigquery.v2.IGetServiceAccountResponse,
+        protos.google.cloud.bigquery.v2.IGetServiceAccountRequest|undefined, {}|undefined
+      ]>;
   getServiceAccount(
-    request: protos.google.cloud.bigquery.v2.IGetServiceAccountRequest,
-    options: CallOptions,
-    callback: Callback<
-      protos.google.cloud.bigquery.v2.IGetServiceAccountResponse,
-      | protos.google.cloud.bigquery.v2.IGetServiceAccountRequest
-      | null
-      | undefined,
-      {} | null | undefined
-    >
-  ): void;
-  getServiceAccount(
-    request: protos.google.cloud.bigquery.v2.IGetServiceAccountRequest,
-    callback: Callback<
-      protos.google.cloud.bigquery.v2.IGetServiceAccountResponse,
-      | protos.google.cloud.bigquery.v2.IGetServiceAccountRequest
-      | null
-      | undefined,
-      {} | null | undefined
-    >
-  ): void;
-  getServiceAccount(
-    request?: protos.google.cloud.bigquery.v2.IGetServiceAccountRequest,
-    optionsOrCallback?:
-      | CallOptions
-      | Callback<
+      request: protos.google.cloud.bigquery.v2.IGetServiceAccountRequest,
+      options: CallOptions,
+      callback: Callback<
           protos.google.cloud.bigquery.v2.IGetServiceAccountResponse,
-          | protos.google.cloud.bigquery.v2.IGetServiceAccountRequest
-          | null
-          | undefined,
-          {} | null | undefined
-        >,
-    callback?: Callback<
-      protos.google.cloud.bigquery.v2.IGetServiceAccountResponse,
-      | protos.google.cloud.bigquery.v2.IGetServiceAccountRequest
-      | null
-      | undefined,
-      {} | null | undefined
-    >
-  ): Promise<
-    [
-      protos.google.cloud.bigquery.v2.IGetServiceAccountResponse,
-      protos.google.cloud.bigquery.v2.IGetServiceAccountRequest | undefined,
-      {} | undefined,
-    ]
-  > | void {
+          protos.google.cloud.bigquery.v2.IGetServiceAccountRequest|null|undefined,
+          {}|null|undefined>): void;
+  getServiceAccount(
+      request: protos.google.cloud.bigquery.v2.IGetServiceAccountRequest,
+      callback: Callback<
+          protos.google.cloud.bigquery.v2.IGetServiceAccountResponse,
+          protos.google.cloud.bigquery.v2.IGetServiceAccountRequest|null|undefined,
+          {}|null|undefined>): void;
+  getServiceAccount(
+      request?: protos.google.cloud.bigquery.v2.IGetServiceAccountRequest,
+      optionsOrCallback?: CallOptions|Callback<
+          protos.google.cloud.bigquery.v2.IGetServiceAccountResponse,
+          protos.google.cloud.bigquery.v2.IGetServiceAccountRequest|null|undefined,
+          {}|null|undefined>,
+      callback?: Callback<
+          protos.google.cloud.bigquery.v2.IGetServiceAccountResponse,
+          protos.google.cloud.bigquery.v2.IGetServiceAccountRequest|null|undefined,
+          {}|null|undefined>):
+      Promise<[
+        protos.google.cloud.bigquery.v2.IGetServiceAccountResponse,
+        protos.google.cloud.bigquery.v2.IGetServiceAccountRequest|undefined, {}|undefined
+      ]>|void {
     request = request || {};
     let options: CallOptions;
     if (typeof optionsOrCallback === 'function' && callback === undefined) {
       callback = optionsOrCallback;
       options = {};
-    } else {
+    }
+    else {
       options = optionsOrCallback as CallOptions;
     }
     options = options || {};
     options.otherArgs = options.otherArgs || {};
     options.otherArgs.headers = options.otherArgs.headers || {};
-    options.otherArgs.headers['x-goog-request-params'] =
-      this._gaxModule.routingHeader.fromParams({
-        project_id: request.projectId ?? '',
-      });
+    options.otherArgs.headers[
+      'x-goog-request-params'
+    ] = this._gaxModule.routingHeader.fromParams({
+      'project_id': request.projectId ?? '',
+    });
     this.initialize();
     return this.innerApiCalls.getServiceAccount(request, options, callback);
   }
+
 
   /**
    * Terminate the gRPC channel and close the client.

@@ -7222,6 +7222,9 @@ export namespace google {
 
                     /** QueryRequest jobCreationMode */
                     jobCreationMode?: (google.cloud.bigquery.v2.QueryRequest.JobCreationMode|keyof typeof google.cloud.bigquery.v2.QueryRequest.JobCreationMode|null);
+
+                    /** QueryRequest writeIncrementalResults */
+                    writeIncrementalResults?: (boolean|null);
                 }
 
                 /** Represents a QueryRequest. */
@@ -7286,6 +7289,9 @@ export namespace google {
 
                     /** QueryRequest jobCreationMode. */
                     public jobCreationMode: (google.cloud.bigquery.v2.QueryRequest.JobCreationMode|keyof typeof google.cloud.bigquery.v2.QueryRequest.JobCreationMode);
+
+                    /** QueryRequest writeIncrementalResults. */
+                    public writeIncrementalResults: boolean;
 
                     /**
                      * Creates a new QueryRequest instance using the specified properties.
@@ -7393,6 +7399,9 @@ export namespace google {
                     /** QueryResponse queryId */
                     queryId?: (string|null);
 
+                    /** QueryResponse location */
+                    location?: (string|null);
+
                     /** QueryResponse totalRows */
                     totalRows?: (google.protobuf.IUInt64Value|null);
 
@@ -7404,6 +7413,12 @@ export namespace google {
 
                     /** QueryResponse totalBytesProcessed */
                     totalBytesProcessed?: (google.protobuf.IInt64Value|null);
+
+                    /** QueryResponse totalBytesBilled */
+                    totalBytesBilled?: (number|Long|string|null);
+
+                    /** QueryResponse totalSlotMs */
+                    totalSlotMs?: (number|Long|string|null);
 
                     /** QueryResponse jobComplete */
                     jobComplete?: (google.protobuf.IBoolValue|null);
@@ -7422,6 +7437,15 @@ export namespace google {
 
                     /** QueryResponse dmlStats */
                     dmlStats?: (google.cloud.bigquery.v2.IDmlStats|null);
+
+                    /** QueryResponse creationTime */
+                    creationTime?: (number|Long|string|null);
+
+                    /** QueryResponse startTime */
+                    startTime?: (number|Long|string|null);
+
+                    /** QueryResponse endTime */
+                    endTime?: (number|Long|string|null);
                 }
 
                 /** Represents a QueryResponse. */
@@ -7448,6 +7472,9 @@ export namespace google {
                     /** QueryResponse queryId. */
                     public queryId: string;
 
+                    /** QueryResponse location. */
+                    public location: string;
+
                     /** QueryResponse totalRows. */
                     public totalRows?: (google.protobuf.IUInt64Value|null);
 
@@ -7459,6 +7486,12 @@ export namespace google {
 
                     /** QueryResponse totalBytesProcessed. */
                     public totalBytesProcessed?: (google.protobuf.IInt64Value|null);
+
+                    /** QueryResponse totalBytesBilled. */
+                    public totalBytesBilled?: (number|Long|string|null);
+
+                    /** QueryResponse totalSlotMs. */
+                    public totalSlotMs?: (number|Long|string|null);
 
                     /** QueryResponse jobComplete. */
                     public jobComplete?: (google.protobuf.IBoolValue|null);
@@ -7477,6 +7510,15 @@ export namespace google {
 
                     /** QueryResponse dmlStats. */
                     public dmlStats?: (google.cloud.bigquery.v2.IDmlStats|null);
+
+                    /** QueryResponse creationTime. */
+                    public creationTime?: (number|Long|string|null);
+
+                    /** QueryResponse startTime. */
+                    public startTime?: (number|Long|string|null);
+
+                    /** QueryResponse endTime. */
+                    public endTime?: (number|Long|string|null);
 
                     /**
                      * Creates a new QueryResponse instance using the specified properties.
@@ -7845,6 +7887,9 @@ export namespace google {
 
                     /** JobConfigurationQuery continuous */
                     continuous?: (google.protobuf.IBoolValue|null);
+
+                    /** JobConfigurationQuery writeIncrementalResults */
+                    writeIncrementalResults?: (boolean|null);
                 }
 
                 /** Represents a JobConfigurationQuery. */
@@ -7930,6 +7975,9 @@ export namespace google {
 
                     /** JobConfigurationQuery continuous. */
                     public continuous?: (google.protobuf.IBoolValue|null);
+
+                    /** JobConfigurationQuery writeIncrementalResults. */
+                    public writeIncrementalResults: boolean;
 
                     /**
                      * Creates a new JobConfigurationQuery instance using the specified properties.
@@ -11968,6 +12016,241 @@ export namespace google {
                     }
                 }
 
+                /** Properties of a StoredColumnsUsage. */
+                interface IStoredColumnsUsage {
+
+                    /** StoredColumnsUsage isQueryAccelerated */
+                    isQueryAccelerated?: (boolean|null);
+
+                    /** StoredColumnsUsage baseTable */
+                    baseTable?: (google.cloud.bigquery.v2.ITableReference|null);
+
+                    /** StoredColumnsUsage storedColumnsUnusedReasons */
+                    storedColumnsUnusedReasons?: (google.cloud.bigquery.v2.StoredColumnsUsage.IStoredColumnsUnusedReason[]|null);
+                }
+
+                /** Represents a StoredColumnsUsage. */
+                class StoredColumnsUsage implements IStoredColumnsUsage {
+
+                    /**
+                     * Constructs a new StoredColumnsUsage.
+                     * @param [properties] Properties to set
+                     */
+                    constructor(properties?: google.cloud.bigquery.v2.IStoredColumnsUsage);
+
+                    /** StoredColumnsUsage isQueryAccelerated. */
+                    public isQueryAccelerated?: (boolean|null);
+
+                    /** StoredColumnsUsage baseTable. */
+                    public baseTable?: (google.cloud.bigquery.v2.ITableReference|null);
+
+                    /** StoredColumnsUsage storedColumnsUnusedReasons. */
+                    public storedColumnsUnusedReasons: google.cloud.bigquery.v2.StoredColumnsUsage.IStoredColumnsUnusedReason[];
+
+                    /**
+                     * Creates a new StoredColumnsUsage instance using the specified properties.
+                     * @param [properties] Properties to set
+                     * @returns StoredColumnsUsage instance
+                     */
+                    public static create(properties?: google.cloud.bigquery.v2.IStoredColumnsUsage): google.cloud.bigquery.v2.StoredColumnsUsage;
+
+                    /**
+                     * Encodes the specified StoredColumnsUsage message. Does not implicitly {@link google.cloud.bigquery.v2.StoredColumnsUsage.verify|verify} messages.
+                     * @param message StoredColumnsUsage message or plain object to encode
+                     * @param [writer] Writer to encode to
+                     * @returns Writer
+                     */
+                    public static encode(message: google.cloud.bigquery.v2.IStoredColumnsUsage, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                    /**
+                     * Encodes the specified StoredColumnsUsage message, length delimited. Does not implicitly {@link google.cloud.bigquery.v2.StoredColumnsUsage.verify|verify} messages.
+                     * @param message StoredColumnsUsage message or plain object to encode
+                     * @param [writer] Writer to encode to
+                     * @returns Writer
+                     */
+                    public static encodeDelimited(message: google.cloud.bigquery.v2.IStoredColumnsUsage, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                    /**
+                     * Decodes a StoredColumnsUsage message from the specified reader or buffer.
+                     * @param reader Reader or buffer to decode from
+                     * @param [length] Message length if known beforehand
+                     * @returns StoredColumnsUsage
+                     * @throws {Error} If the payload is not a reader or valid buffer
+                     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                     */
+                    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): google.cloud.bigquery.v2.StoredColumnsUsage;
+
+                    /**
+                     * Decodes a StoredColumnsUsage message from the specified reader or buffer, length delimited.
+                     * @param reader Reader or buffer to decode from
+                     * @returns StoredColumnsUsage
+                     * @throws {Error} If the payload is not a reader or valid buffer
+                     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                     */
+                    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): google.cloud.bigquery.v2.StoredColumnsUsage;
+
+                    /**
+                     * Verifies a StoredColumnsUsage message.
+                     * @param message Plain object to verify
+                     * @returns `null` if valid, otherwise the reason why it is not
+                     */
+                    public static verify(message: { [k: string]: any }): (string|null);
+
+                    /**
+                     * Creates a StoredColumnsUsage message from a plain object. Also converts values to their respective internal types.
+                     * @param object Plain object
+                     * @returns StoredColumnsUsage
+                     */
+                    public static fromObject(object: { [k: string]: any }): google.cloud.bigquery.v2.StoredColumnsUsage;
+
+                    /**
+                     * Creates a plain object from a StoredColumnsUsage message. Also converts values to other types if specified.
+                     * @param message StoredColumnsUsage
+                     * @param [options] Conversion options
+                     * @returns Plain object
+                     */
+                    public static toObject(message: google.cloud.bigquery.v2.StoredColumnsUsage, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                    /**
+                     * Converts this StoredColumnsUsage to JSON.
+                     * @returns JSON object
+                     */
+                    public toJSON(): { [k: string]: any };
+
+                    /**
+                     * Gets the default type url for StoredColumnsUsage
+                     * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+                     * @returns The default type url
+                     */
+                    public static getTypeUrl(typeUrlPrefix?: string): string;
+                }
+
+                namespace StoredColumnsUsage {
+
+                    /** Properties of a StoredColumnsUnusedReason. */
+                    interface IStoredColumnsUnusedReason {
+
+                        /** StoredColumnsUnusedReason code */
+                        code?: (google.cloud.bigquery.v2.StoredColumnsUsage.StoredColumnsUnusedReason.Code|keyof typeof google.cloud.bigquery.v2.StoredColumnsUsage.StoredColumnsUnusedReason.Code|null);
+
+                        /** StoredColumnsUnusedReason message */
+                        message?: (string|null);
+
+                        /** StoredColumnsUnusedReason uncoveredColumns */
+                        uncoveredColumns?: (string[]|null);
+                    }
+
+                    /** Represents a StoredColumnsUnusedReason. */
+                    class StoredColumnsUnusedReason implements IStoredColumnsUnusedReason {
+
+                        /**
+                         * Constructs a new StoredColumnsUnusedReason.
+                         * @param [properties] Properties to set
+                         */
+                        constructor(properties?: google.cloud.bigquery.v2.StoredColumnsUsage.IStoredColumnsUnusedReason);
+
+                        /** StoredColumnsUnusedReason code. */
+                        public code?: (google.cloud.bigquery.v2.StoredColumnsUsage.StoredColumnsUnusedReason.Code|keyof typeof google.cloud.bigquery.v2.StoredColumnsUsage.StoredColumnsUnusedReason.Code|null);
+
+                        /** StoredColumnsUnusedReason message. */
+                        public message?: (string|null);
+
+                        /** StoredColumnsUnusedReason uncoveredColumns. */
+                        public uncoveredColumns: string[];
+
+                        /**
+                         * Creates a new StoredColumnsUnusedReason instance using the specified properties.
+                         * @param [properties] Properties to set
+                         * @returns StoredColumnsUnusedReason instance
+                         */
+                        public static create(properties?: google.cloud.bigquery.v2.StoredColumnsUsage.IStoredColumnsUnusedReason): google.cloud.bigquery.v2.StoredColumnsUsage.StoredColumnsUnusedReason;
+
+                        /**
+                         * Encodes the specified StoredColumnsUnusedReason message. Does not implicitly {@link google.cloud.bigquery.v2.StoredColumnsUsage.StoredColumnsUnusedReason.verify|verify} messages.
+                         * @param message StoredColumnsUnusedReason message or plain object to encode
+                         * @param [writer] Writer to encode to
+                         * @returns Writer
+                         */
+                        public static encode(message: google.cloud.bigquery.v2.StoredColumnsUsage.IStoredColumnsUnusedReason, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                        /**
+                         * Encodes the specified StoredColumnsUnusedReason message, length delimited. Does not implicitly {@link google.cloud.bigquery.v2.StoredColumnsUsage.StoredColumnsUnusedReason.verify|verify} messages.
+                         * @param message StoredColumnsUnusedReason message or plain object to encode
+                         * @param [writer] Writer to encode to
+                         * @returns Writer
+                         */
+                        public static encodeDelimited(message: google.cloud.bigquery.v2.StoredColumnsUsage.IStoredColumnsUnusedReason, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                        /**
+                         * Decodes a StoredColumnsUnusedReason message from the specified reader or buffer.
+                         * @param reader Reader or buffer to decode from
+                         * @param [length] Message length if known beforehand
+                         * @returns StoredColumnsUnusedReason
+                         * @throws {Error} If the payload is not a reader or valid buffer
+                         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                         */
+                        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): google.cloud.bigquery.v2.StoredColumnsUsage.StoredColumnsUnusedReason;
+
+                        /**
+                         * Decodes a StoredColumnsUnusedReason message from the specified reader or buffer, length delimited.
+                         * @param reader Reader or buffer to decode from
+                         * @returns StoredColumnsUnusedReason
+                         * @throws {Error} If the payload is not a reader or valid buffer
+                         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                         */
+                        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): google.cloud.bigquery.v2.StoredColumnsUsage.StoredColumnsUnusedReason;
+
+                        /**
+                         * Verifies a StoredColumnsUnusedReason message.
+                         * @param message Plain object to verify
+                         * @returns `null` if valid, otherwise the reason why it is not
+                         */
+                        public static verify(message: { [k: string]: any }): (string|null);
+
+                        /**
+                         * Creates a StoredColumnsUnusedReason message from a plain object. Also converts values to their respective internal types.
+                         * @param object Plain object
+                         * @returns StoredColumnsUnusedReason
+                         */
+                        public static fromObject(object: { [k: string]: any }): google.cloud.bigquery.v2.StoredColumnsUsage.StoredColumnsUnusedReason;
+
+                        /**
+                         * Creates a plain object from a StoredColumnsUnusedReason message. Also converts values to other types if specified.
+                         * @param message StoredColumnsUnusedReason
+                         * @param [options] Conversion options
+                         * @returns Plain object
+                         */
+                        public static toObject(message: google.cloud.bigquery.v2.StoredColumnsUsage.StoredColumnsUnusedReason, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                        /**
+                         * Converts this StoredColumnsUnusedReason to JSON.
+                         * @returns JSON object
+                         */
+                        public toJSON(): { [k: string]: any };
+
+                        /**
+                         * Gets the default type url for StoredColumnsUnusedReason
+                         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+                         * @returns The default type url
+                         */
+                        public static getTypeUrl(typeUrlPrefix?: string): string;
+                    }
+
+                    namespace StoredColumnsUnusedReason {
+
+                        /** Code enum. */
+                        enum Code {
+                            CODE_UNSPECIFIED = 0,
+                            STORED_COLUMNS_COVER_INSUFFICIENT = 1,
+                            BASE_TABLE_HAS_RLS = 2,
+                            BASE_TABLE_HAS_CLS = 3,
+                            UNSUPPORTED_PREFILTER = 4,
+                            INTERNAL_ERROR = 5,
+                            OTHER_REASON = 6
+                        }
+                    }
+                }
+
                 /** Properties of a SearchStatistics. */
                 interface ISearchStatistics {
 
@@ -12090,6 +12373,9 @@ export namespace google {
 
                     /** VectorSearchStatistics indexUnusedReasons */
                     indexUnusedReasons?: (google.cloud.bigquery.v2.IIndexUnusedReason[]|null);
+
+                    /** VectorSearchStatistics storedColumnsUsages */
+                    storedColumnsUsages?: (google.cloud.bigquery.v2.IStoredColumnsUsage[]|null);
                 }
 
                 /** Represents a VectorSearchStatistics. */
@@ -12106,6 +12392,9 @@ export namespace google {
 
                     /** VectorSearchStatistics indexUnusedReasons. */
                     public indexUnusedReasons: google.cloud.bigquery.v2.IIndexUnusedReason[];
+
+                    /** VectorSearchStatistics storedColumnsUsages. */
+                    public storedColumnsUsages: google.cloud.bigquery.v2.IStoredColumnsUsage[];
 
                     /**
                      * Creates a new VectorSearchStatistics instance using the specified properties.
@@ -19919,6 +20208,12 @@ export namespace google {
                             /** TrainingOptions timeSeriesIdColumns */
                             timeSeriesIdColumns?: (string[]|null);
 
+                            /** TrainingOptions forecastLimitLowerBound */
+                            forecastLimitLowerBound?: (number|null);
+
+                            /** TrainingOptions forecastLimitUpperBound */
+                            forecastLimitUpperBound?: (number|null);
+
                             /** TrainingOptions horizon */
                             horizon?: (number|Long|string|null);
 
@@ -20198,6 +20493,12 @@ export namespace google {
 
                             /** TrainingOptions timeSeriesIdColumns. */
                             public timeSeriesIdColumns: string[];
+
+                            /** TrainingOptions forecastLimitLowerBound. */
+                            public forecastLimitLowerBound: number;
+
+                            /** TrainingOptions forecastLimitUpperBound. */
+                            public forecastLimitUpperBound: number;
 
                             /** TrainingOptions horizon. */
                             public horizon: (number|Long|string);
@@ -23397,6 +23698,13 @@ export namespace google {
                     public static getTypeUrl(typeUrlPrefix?: string): string;
                 }
 
+                /** ManagedTableType enum. */
+                enum ManagedTableType {
+                    MANAGED_TABLE_TYPE_UNSPECIFIED = 0,
+                    NATIVE = 1,
+                    ICEBERG = 2
+                }
+
                 /** Properties of a PartitioningDefinition. */
                 interface IPartitioningDefinition {
 
@@ -25921,6 +26229,76 @@ export namespace google {
                      * @returns Promise
                      */
                     public listRowAccessPolicies(request: google.cloud.bigquery.v2.IListRowAccessPoliciesRequest): Promise<google.cloud.bigquery.v2.ListRowAccessPoliciesResponse>;
+
+                    /**
+                     * Calls GetRowAccessPolicy.
+                     * @param request GetRowAccessPolicyRequest message or plain object
+                     * @param callback Node-style callback called with the error, if any, and RowAccessPolicy
+                     */
+                    public getRowAccessPolicy(request: google.cloud.bigquery.v2.IGetRowAccessPolicyRequest, callback: google.cloud.bigquery.v2.RowAccessPolicyService.GetRowAccessPolicyCallback): void;
+
+                    /**
+                     * Calls GetRowAccessPolicy.
+                     * @param request GetRowAccessPolicyRequest message or plain object
+                     * @returns Promise
+                     */
+                    public getRowAccessPolicy(request: google.cloud.bigquery.v2.IGetRowAccessPolicyRequest): Promise<google.cloud.bigquery.v2.RowAccessPolicy>;
+
+                    /**
+                     * Calls CreateRowAccessPolicy.
+                     * @param request CreateRowAccessPolicyRequest message or plain object
+                     * @param callback Node-style callback called with the error, if any, and RowAccessPolicy
+                     */
+                    public createRowAccessPolicy(request: google.cloud.bigquery.v2.ICreateRowAccessPolicyRequest, callback: google.cloud.bigquery.v2.RowAccessPolicyService.CreateRowAccessPolicyCallback): void;
+
+                    /**
+                     * Calls CreateRowAccessPolicy.
+                     * @param request CreateRowAccessPolicyRequest message or plain object
+                     * @returns Promise
+                     */
+                    public createRowAccessPolicy(request: google.cloud.bigquery.v2.ICreateRowAccessPolicyRequest): Promise<google.cloud.bigquery.v2.RowAccessPolicy>;
+
+                    /**
+                     * Calls UpdateRowAccessPolicy.
+                     * @param request UpdateRowAccessPolicyRequest message or plain object
+                     * @param callback Node-style callback called with the error, if any, and RowAccessPolicy
+                     */
+                    public updateRowAccessPolicy(request: google.cloud.bigquery.v2.IUpdateRowAccessPolicyRequest, callback: google.cloud.bigquery.v2.RowAccessPolicyService.UpdateRowAccessPolicyCallback): void;
+
+                    /**
+                     * Calls UpdateRowAccessPolicy.
+                     * @param request UpdateRowAccessPolicyRequest message or plain object
+                     * @returns Promise
+                     */
+                    public updateRowAccessPolicy(request: google.cloud.bigquery.v2.IUpdateRowAccessPolicyRequest): Promise<google.cloud.bigquery.v2.RowAccessPolicy>;
+
+                    /**
+                     * Calls DeleteRowAccessPolicy.
+                     * @param request DeleteRowAccessPolicyRequest message or plain object
+                     * @param callback Node-style callback called with the error, if any, and Empty
+                     */
+                    public deleteRowAccessPolicy(request: google.cloud.bigquery.v2.IDeleteRowAccessPolicyRequest, callback: google.cloud.bigquery.v2.RowAccessPolicyService.DeleteRowAccessPolicyCallback): void;
+
+                    /**
+                     * Calls DeleteRowAccessPolicy.
+                     * @param request DeleteRowAccessPolicyRequest message or plain object
+                     * @returns Promise
+                     */
+                    public deleteRowAccessPolicy(request: google.cloud.bigquery.v2.IDeleteRowAccessPolicyRequest): Promise<google.protobuf.Empty>;
+
+                    /**
+                     * Calls BatchDeleteRowAccessPolicies.
+                     * @param request BatchDeleteRowAccessPoliciesRequest message or plain object
+                     * @param callback Node-style callback called with the error, if any, and Empty
+                     */
+                    public batchDeleteRowAccessPolicies(request: google.cloud.bigquery.v2.IBatchDeleteRowAccessPoliciesRequest, callback: google.cloud.bigquery.v2.RowAccessPolicyService.BatchDeleteRowAccessPoliciesCallback): void;
+
+                    /**
+                     * Calls BatchDeleteRowAccessPolicies.
+                     * @param request BatchDeleteRowAccessPoliciesRequest message or plain object
+                     * @returns Promise
+                     */
+                    public batchDeleteRowAccessPolicies(request: google.cloud.bigquery.v2.IBatchDeleteRowAccessPoliciesRequest): Promise<google.protobuf.Empty>;
                 }
 
                 namespace RowAccessPolicyService {
@@ -25931,6 +26309,41 @@ export namespace google {
                      * @param [response] ListRowAccessPoliciesResponse
                      */
                     type ListRowAccessPoliciesCallback = (error: (Error|null), response?: google.cloud.bigquery.v2.ListRowAccessPoliciesResponse) => void;
+
+                    /**
+                     * Callback as used by {@link google.cloud.bigquery.v2.RowAccessPolicyService|getRowAccessPolicy}.
+                     * @param error Error, if any
+                     * @param [response] RowAccessPolicy
+                     */
+                    type GetRowAccessPolicyCallback = (error: (Error|null), response?: google.cloud.bigquery.v2.RowAccessPolicy) => void;
+
+                    /**
+                     * Callback as used by {@link google.cloud.bigquery.v2.RowAccessPolicyService|createRowAccessPolicy}.
+                     * @param error Error, if any
+                     * @param [response] RowAccessPolicy
+                     */
+                    type CreateRowAccessPolicyCallback = (error: (Error|null), response?: google.cloud.bigquery.v2.RowAccessPolicy) => void;
+
+                    /**
+                     * Callback as used by {@link google.cloud.bigquery.v2.RowAccessPolicyService|updateRowAccessPolicy}.
+                     * @param error Error, if any
+                     * @param [response] RowAccessPolicy
+                     */
+                    type UpdateRowAccessPolicyCallback = (error: (Error|null), response?: google.cloud.bigquery.v2.RowAccessPolicy) => void;
+
+                    /**
+                     * Callback as used by {@link google.cloud.bigquery.v2.RowAccessPolicyService|deleteRowAccessPolicy}.
+                     * @param error Error, if any
+                     * @param [response] Empty
+                     */
+                    type DeleteRowAccessPolicyCallback = (error: (Error|null), response?: google.protobuf.Empty) => void;
+
+                    /**
+                     * Callback as used by {@link google.cloud.bigquery.v2.RowAccessPolicyService|batchDeleteRowAccessPolicies}.
+                     * @param error Error, if any
+                     * @param [response] Empty
+                     */
+                    type BatchDeleteRowAccessPoliciesCallback = (error: (Error|null), response?: google.protobuf.Empty) => void;
                 }
 
                 /** Properties of a ListRowAccessPoliciesRequest. */
@@ -26157,6 +26570,599 @@ export namespace google {
                     public static getTypeUrl(typeUrlPrefix?: string): string;
                 }
 
+                /** Properties of a GetRowAccessPolicyRequest. */
+                interface IGetRowAccessPolicyRequest {
+
+                    /** GetRowAccessPolicyRequest projectId */
+                    projectId?: (string|null);
+
+                    /** GetRowAccessPolicyRequest datasetId */
+                    datasetId?: (string|null);
+
+                    /** GetRowAccessPolicyRequest tableId */
+                    tableId?: (string|null);
+
+                    /** GetRowAccessPolicyRequest policyId */
+                    policyId?: (string|null);
+                }
+
+                /** Represents a GetRowAccessPolicyRequest. */
+                class GetRowAccessPolicyRequest implements IGetRowAccessPolicyRequest {
+
+                    /**
+                     * Constructs a new GetRowAccessPolicyRequest.
+                     * @param [properties] Properties to set
+                     */
+                    constructor(properties?: google.cloud.bigquery.v2.IGetRowAccessPolicyRequest);
+
+                    /** GetRowAccessPolicyRequest projectId. */
+                    public projectId: string;
+
+                    /** GetRowAccessPolicyRequest datasetId. */
+                    public datasetId: string;
+
+                    /** GetRowAccessPolicyRequest tableId. */
+                    public tableId: string;
+
+                    /** GetRowAccessPolicyRequest policyId. */
+                    public policyId: string;
+
+                    /**
+                     * Creates a new GetRowAccessPolicyRequest instance using the specified properties.
+                     * @param [properties] Properties to set
+                     * @returns GetRowAccessPolicyRequest instance
+                     */
+                    public static create(properties?: google.cloud.bigquery.v2.IGetRowAccessPolicyRequest): google.cloud.bigquery.v2.GetRowAccessPolicyRequest;
+
+                    /**
+                     * Encodes the specified GetRowAccessPolicyRequest message. Does not implicitly {@link google.cloud.bigquery.v2.GetRowAccessPolicyRequest.verify|verify} messages.
+                     * @param message GetRowAccessPolicyRequest message or plain object to encode
+                     * @param [writer] Writer to encode to
+                     * @returns Writer
+                     */
+                    public static encode(message: google.cloud.bigquery.v2.IGetRowAccessPolicyRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                    /**
+                     * Encodes the specified GetRowAccessPolicyRequest message, length delimited. Does not implicitly {@link google.cloud.bigquery.v2.GetRowAccessPolicyRequest.verify|verify} messages.
+                     * @param message GetRowAccessPolicyRequest message or plain object to encode
+                     * @param [writer] Writer to encode to
+                     * @returns Writer
+                     */
+                    public static encodeDelimited(message: google.cloud.bigquery.v2.IGetRowAccessPolicyRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                    /**
+                     * Decodes a GetRowAccessPolicyRequest message from the specified reader or buffer.
+                     * @param reader Reader or buffer to decode from
+                     * @param [length] Message length if known beforehand
+                     * @returns GetRowAccessPolicyRequest
+                     * @throws {Error} If the payload is not a reader or valid buffer
+                     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                     */
+                    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): google.cloud.bigquery.v2.GetRowAccessPolicyRequest;
+
+                    /**
+                     * Decodes a GetRowAccessPolicyRequest message from the specified reader or buffer, length delimited.
+                     * @param reader Reader or buffer to decode from
+                     * @returns GetRowAccessPolicyRequest
+                     * @throws {Error} If the payload is not a reader or valid buffer
+                     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                     */
+                    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): google.cloud.bigquery.v2.GetRowAccessPolicyRequest;
+
+                    /**
+                     * Verifies a GetRowAccessPolicyRequest message.
+                     * @param message Plain object to verify
+                     * @returns `null` if valid, otherwise the reason why it is not
+                     */
+                    public static verify(message: { [k: string]: any }): (string|null);
+
+                    /**
+                     * Creates a GetRowAccessPolicyRequest message from a plain object. Also converts values to their respective internal types.
+                     * @param object Plain object
+                     * @returns GetRowAccessPolicyRequest
+                     */
+                    public static fromObject(object: { [k: string]: any }): google.cloud.bigquery.v2.GetRowAccessPolicyRequest;
+
+                    /**
+                     * Creates a plain object from a GetRowAccessPolicyRequest message. Also converts values to other types if specified.
+                     * @param message GetRowAccessPolicyRequest
+                     * @param [options] Conversion options
+                     * @returns Plain object
+                     */
+                    public static toObject(message: google.cloud.bigquery.v2.GetRowAccessPolicyRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                    /**
+                     * Converts this GetRowAccessPolicyRequest to JSON.
+                     * @returns JSON object
+                     */
+                    public toJSON(): { [k: string]: any };
+
+                    /**
+                     * Gets the default type url for GetRowAccessPolicyRequest
+                     * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+                     * @returns The default type url
+                     */
+                    public static getTypeUrl(typeUrlPrefix?: string): string;
+                }
+
+                /** Properties of a CreateRowAccessPolicyRequest. */
+                interface ICreateRowAccessPolicyRequest {
+
+                    /** CreateRowAccessPolicyRequest projectId */
+                    projectId?: (string|null);
+
+                    /** CreateRowAccessPolicyRequest datasetId */
+                    datasetId?: (string|null);
+
+                    /** CreateRowAccessPolicyRequest tableId */
+                    tableId?: (string|null);
+
+                    /** CreateRowAccessPolicyRequest rowAccessPolicy */
+                    rowAccessPolicy?: (google.cloud.bigquery.v2.IRowAccessPolicy|null);
+                }
+
+                /** Represents a CreateRowAccessPolicyRequest. */
+                class CreateRowAccessPolicyRequest implements ICreateRowAccessPolicyRequest {
+
+                    /**
+                     * Constructs a new CreateRowAccessPolicyRequest.
+                     * @param [properties] Properties to set
+                     */
+                    constructor(properties?: google.cloud.bigquery.v2.ICreateRowAccessPolicyRequest);
+
+                    /** CreateRowAccessPolicyRequest projectId. */
+                    public projectId: string;
+
+                    /** CreateRowAccessPolicyRequest datasetId. */
+                    public datasetId: string;
+
+                    /** CreateRowAccessPolicyRequest tableId. */
+                    public tableId: string;
+
+                    /** CreateRowAccessPolicyRequest rowAccessPolicy. */
+                    public rowAccessPolicy?: (google.cloud.bigquery.v2.IRowAccessPolicy|null);
+
+                    /**
+                     * Creates a new CreateRowAccessPolicyRequest instance using the specified properties.
+                     * @param [properties] Properties to set
+                     * @returns CreateRowAccessPolicyRequest instance
+                     */
+                    public static create(properties?: google.cloud.bigquery.v2.ICreateRowAccessPolicyRequest): google.cloud.bigquery.v2.CreateRowAccessPolicyRequest;
+
+                    /**
+                     * Encodes the specified CreateRowAccessPolicyRequest message. Does not implicitly {@link google.cloud.bigquery.v2.CreateRowAccessPolicyRequest.verify|verify} messages.
+                     * @param message CreateRowAccessPolicyRequest message or plain object to encode
+                     * @param [writer] Writer to encode to
+                     * @returns Writer
+                     */
+                    public static encode(message: google.cloud.bigquery.v2.ICreateRowAccessPolicyRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                    /**
+                     * Encodes the specified CreateRowAccessPolicyRequest message, length delimited. Does not implicitly {@link google.cloud.bigquery.v2.CreateRowAccessPolicyRequest.verify|verify} messages.
+                     * @param message CreateRowAccessPolicyRequest message or plain object to encode
+                     * @param [writer] Writer to encode to
+                     * @returns Writer
+                     */
+                    public static encodeDelimited(message: google.cloud.bigquery.v2.ICreateRowAccessPolicyRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                    /**
+                     * Decodes a CreateRowAccessPolicyRequest message from the specified reader or buffer.
+                     * @param reader Reader or buffer to decode from
+                     * @param [length] Message length if known beforehand
+                     * @returns CreateRowAccessPolicyRequest
+                     * @throws {Error} If the payload is not a reader or valid buffer
+                     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                     */
+                    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): google.cloud.bigquery.v2.CreateRowAccessPolicyRequest;
+
+                    /**
+                     * Decodes a CreateRowAccessPolicyRequest message from the specified reader or buffer, length delimited.
+                     * @param reader Reader or buffer to decode from
+                     * @returns CreateRowAccessPolicyRequest
+                     * @throws {Error} If the payload is not a reader or valid buffer
+                     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                     */
+                    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): google.cloud.bigquery.v2.CreateRowAccessPolicyRequest;
+
+                    /**
+                     * Verifies a CreateRowAccessPolicyRequest message.
+                     * @param message Plain object to verify
+                     * @returns `null` if valid, otherwise the reason why it is not
+                     */
+                    public static verify(message: { [k: string]: any }): (string|null);
+
+                    /**
+                     * Creates a CreateRowAccessPolicyRequest message from a plain object. Also converts values to their respective internal types.
+                     * @param object Plain object
+                     * @returns CreateRowAccessPolicyRequest
+                     */
+                    public static fromObject(object: { [k: string]: any }): google.cloud.bigquery.v2.CreateRowAccessPolicyRequest;
+
+                    /**
+                     * Creates a plain object from a CreateRowAccessPolicyRequest message. Also converts values to other types if specified.
+                     * @param message CreateRowAccessPolicyRequest
+                     * @param [options] Conversion options
+                     * @returns Plain object
+                     */
+                    public static toObject(message: google.cloud.bigquery.v2.CreateRowAccessPolicyRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                    /**
+                     * Converts this CreateRowAccessPolicyRequest to JSON.
+                     * @returns JSON object
+                     */
+                    public toJSON(): { [k: string]: any };
+
+                    /**
+                     * Gets the default type url for CreateRowAccessPolicyRequest
+                     * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+                     * @returns The default type url
+                     */
+                    public static getTypeUrl(typeUrlPrefix?: string): string;
+                }
+
+                /** Properties of an UpdateRowAccessPolicyRequest. */
+                interface IUpdateRowAccessPolicyRequest {
+
+                    /** UpdateRowAccessPolicyRequest projectId */
+                    projectId?: (string|null);
+
+                    /** UpdateRowAccessPolicyRequest datasetId */
+                    datasetId?: (string|null);
+
+                    /** UpdateRowAccessPolicyRequest tableId */
+                    tableId?: (string|null);
+
+                    /** UpdateRowAccessPolicyRequest policyId */
+                    policyId?: (string|null);
+
+                    /** UpdateRowAccessPolicyRequest rowAccessPolicy */
+                    rowAccessPolicy?: (google.cloud.bigquery.v2.IRowAccessPolicy|null);
+                }
+
+                /** Represents an UpdateRowAccessPolicyRequest. */
+                class UpdateRowAccessPolicyRequest implements IUpdateRowAccessPolicyRequest {
+
+                    /**
+                     * Constructs a new UpdateRowAccessPolicyRequest.
+                     * @param [properties] Properties to set
+                     */
+                    constructor(properties?: google.cloud.bigquery.v2.IUpdateRowAccessPolicyRequest);
+
+                    /** UpdateRowAccessPolicyRequest projectId. */
+                    public projectId: string;
+
+                    /** UpdateRowAccessPolicyRequest datasetId. */
+                    public datasetId: string;
+
+                    /** UpdateRowAccessPolicyRequest tableId. */
+                    public tableId: string;
+
+                    /** UpdateRowAccessPolicyRequest policyId. */
+                    public policyId: string;
+
+                    /** UpdateRowAccessPolicyRequest rowAccessPolicy. */
+                    public rowAccessPolicy?: (google.cloud.bigquery.v2.IRowAccessPolicy|null);
+
+                    /**
+                     * Creates a new UpdateRowAccessPolicyRequest instance using the specified properties.
+                     * @param [properties] Properties to set
+                     * @returns UpdateRowAccessPolicyRequest instance
+                     */
+                    public static create(properties?: google.cloud.bigquery.v2.IUpdateRowAccessPolicyRequest): google.cloud.bigquery.v2.UpdateRowAccessPolicyRequest;
+
+                    /**
+                     * Encodes the specified UpdateRowAccessPolicyRequest message. Does not implicitly {@link google.cloud.bigquery.v2.UpdateRowAccessPolicyRequest.verify|verify} messages.
+                     * @param message UpdateRowAccessPolicyRequest message or plain object to encode
+                     * @param [writer] Writer to encode to
+                     * @returns Writer
+                     */
+                    public static encode(message: google.cloud.bigquery.v2.IUpdateRowAccessPolicyRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                    /**
+                     * Encodes the specified UpdateRowAccessPolicyRequest message, length delimited. Does not implicitly {@link google.cloud.bigquery.v2.UpdateRowAccessPolicyRequest.verify|verify} messages.
+                     * @param message UpdateRowAccessPolicyRequest message or plain object to encode
+                     * @param [writer] Writer to encode to
+                     * @returns Writer
+                     */
+                    public static encodeDelimited(message: google.cloud.bigquery.v2.IUpdateRowAccessPolicyRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                    /**
+                     * Decodes an UpdateRowAccessPolicyRequest message from the specified reader or buffer.
+                     * @param reader Reader or buffer to decode from
+                     * @param [length] Message length if known beforehand
+                     * @returns UpdateRowAccessPolicyRequest
+                     * @throws {Error} If the payload is not a reader or valid buffer
+                     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                     */
+                    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): google.cloud.bigquery.v2.UpdateRowAccessPolicyRequest;
+
+                    /**
+                     * Decodes an UpdateRowAccessPolicyRequest message from the specified reader or buffer, length delimited.
+                     * @param reader Reader or buffer to decode from
+                     * @returns UpdateRowAccessPolicyRequest
+                     * @throws {Error} If the payload is not a reader or valid buffer
+                     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                     */
+                    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): google.cloud.bigquery.v2.UpdateRowAccessPolicyRequest;
+
+                    /**
+                     * Verifies an UpdateRowAccessPolicyRequest message.
+                     * @param message Plain object to verify
+                     * @returns `null` if valid, otherwise the reason why it is not
+                     */
+                    public static verify(message: { [k: string]: any }): (string|null);
+
+                    /**
+                     * Creates an UpdateRowAccessPolicyRequest message from a plain object. Also converts values to their respective internal types.
+                     * @param object Plain object
+                     * @returns UpdateRowAccessPolicyRequest
+                     */
+                    public static fromObject(object: { [k: string]: any }): google.cloud.bigquery.v2.UpdateRowAccessPolicyRequest;
+
+                    /**
+                     * Creates a plain object from an UpdateRowAccessPolicyRequest message. Also converts values to other types if specified.
+                     * @param message UpdateRowAccessPolicyRequest
+                     * @param [options] Conversion options
+                     * @returns Plain object
+                     */
+                    public static toObject(message: google.cloud.bigquery.v2.UpdateRowAccessPolicyRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                    /**
+                     * Converts this UpdateRowAccessPolicyRequest to JSON.
+                     * @returns JSON object
+                     */
+                    public toJSON(): { [k: string]: any };
+
+                    /**
+                     * Gets the default type url for UpdateRowAccessPolicyRequest
+                     * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+                     * @returns The default type url
+                     */
+                    public static getTypeUrl(typeUrlPrefix?: string): string;
+                }
+
+                /** Properties of a DeleteRowAccessPolicyRequest. */
+                interface IDeleteRowAccessPolicyRequest {
+
+                    /** DeleteRowAccessPolicyRequest projectId */
+                    projectId?: (string|null);
+
+                    /** DeleteRowAccessPolicyRequest datasetId */
+                    datasetId?: (string|null);
+
+                    /** DeleteRowAccessPolicyRequest tableId */
+                    tableId?: (string|null);
+
+                    /** DeleteRowAccessPolicyRequest policyId */
+                    policyId?: (string|null);
+
+                    /** DeleteRowAccessPolicyRequest force */
+                    force?: (boolean|null);
+                }
+
+                /** Represents a DeleteRowAccessPolicyRequest. */
+                class DeleteRowAccessPolicyRequest implements IDeleteRowAccessPolicyRequest {
+
+                    /**
+                     * Constructs a new DeleteRowAccessPolicyRequest.
+                     * @param [properties] Properties to set
+                     */
+                    constructor(properties?: google.cloud.bigquery.v2.IDeleteRowAccessPolicyRequest);
+
+                    /** DeleteRowAccessPolicyRequest projectId. */
+                    public projectId: string;
+
+                    /** DeleteRowAccessPolicyRequest datasetId. */
+                    public datasetId: string;
+
+                    /** DeleteRowAccessPolicyRequest tableId. */
+                    public tableId: string;
+
+                    /** DeleteRowAccessPolicyRequest policyId. */
+                    public policyId: string;
+
+                    /** DeleteRowAccessPolicyRequest force. */
+                    public force?: (boolean|null);
+
+                    /**
+                     * Creates a new DeleteRowAccessPolicyRequest instance using the specified properties.
+                     * @param [properties] Properties to set
+                     * @returns DeleteRowAccessPolicyRequest instance
+                     */
+                    public static create(properties?: google.cloud.bigquery.v2.IDeleteRowAccessPolicyRequest): google.cloud.bigquery.v2.DeleteRowAccessPolicyRequest;
+
+                    /**
+                     * Encodes the specified DeleteRowAccessPolicyRequest message. Does not implicitly {@link google.cloud.bigquery.v2.DeleteRowAccessPolicyRequest.verify|verify} messages.
+                     * @param message DeleteRowAccessPolicyRequest message or plain object to encode
+                     * @param [writer] Writer to encode to
+                     * @returns Writer
+                     */
+                    public static encode(message: google.cloud.bigquery.v2.IDeleteRowAccessPolicyRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                    /**
+                     * Encodes the specified DeleteRowAccessPolicyRequest message, length delimited. Does not implicitly {@link google.cloud.bigquery.v2.DeleteRowAccessPolicyRequest.verify|verify} messages.
+                     * @param message DeleteRowAccessPolicyRequest message or plain object to encode
+                     * @param [writer] Writer to encode to
+                     * @returns Writer
+                     */
+                    public static encodeDelimited(message: google.cloud.bigquery.v2.IDeleteRowAccessPolicyRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                    /**
+                     * Decodes a DeleteRowAccessPolicyRequest message from the specified reader or buffer.
+                     * @param reader Reader or buffer to decode from
+                     * @param [length] Message length if known beforehand
+                     * @returns DeleteRowAccessPolicyRequest
+                     * @throws {Error} If the payload is not a reader or valid buffer
+                     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                     */
+                    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): google.cloud.bigquery.v2.DeleteRowAccessPolicyRequest;
+
+                    /**
+                     * Decodes a DeleteRowAccessPolicyRequest message from the specified reader or buffer, length delimited.
+                     * @param reader Reader or buffer to decode from
+                     * @returns DeleteRowAccessPolicyRequest
+                     * @throws {Error} If the payload is not a reader or valid buffer
+                     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                     */
+                    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): google.cloud.bigquery.v2.DeleteRowAccessPolicyRequest;
+
+                    /**
+                     * Verifies a DeleteRowAccessPolicyRequest message.
+                     * @param message Plain object to verify
+                     * @returns `null` if valid, otherwise the reason why it is not
+                     */
+                    public static verify(message: { [k: string]: any }): (string|null);
+
+                    /**
+                     * Creates a DeleteRowAccessPolicyRequest message from a plain object. Also converts values to their respective internal types.
+                     * @param object Plain object
+                     * @returns DeleteRowAccessPolicyRequest
+                     */
+                    public static fromObject(object: { [k: string]: any }): google.cloud.bigquery.v2.DeleteRowAccessPolicyRequest;
+
+                    /**
+                     * Creates a plain object from a DeleteRowAccessPolicyRequest message. Also converts values to other types if specified.
+                     * @param message DeleteRowAccessPolicyRequest
+                     * @param [options] Conversion options
+                     * @returns Plain object
+                     */
+                    public static toObject(message: google.cloud.bigquery.v2.DeleteRowAccessPolicyRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                    /**
+                     * Converts this DeleteRowAccessPolicyRequest to JSON.
+                     * @returns JSON object
+                     */
+                    public toJSON(): { [k: string]: any };
+
+                    /**
+                     * Gets the default type url for DeleteRowAccessPolicyRequest
+                     * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+                     * @returns The default type url
+                     */
+                    public static getTypeUrl(typeUrlPrefix?: string): string;
+                }
+
+                /** Properties of a BatchDeleteRowAccessPoliciesRequest. */
+                interface IBatchDeleteRowAccessPoliciesRequest {
+
+                    /** BatchDeleteRowAccessPoliciesRequest projectId */
+                    projectId?: (string|null);
+
+                    /** BatchDeleteRowAccessPoliciesRequest datasetId */
+                    datasetId?: (string|null);
+
+                    /** BatchDeleteRowAccessPoliciesRequest tableId */
+                    tableId?: (string|null);
+
+                    /** BatchDeleteRowAccessPoliciesRequest policyIds */
+                    policyIds?: (string[]|null);
+
+                    /** BatchDeleteRowAccessPoliciesRequest force */
+                    force?: (boolean|null);
+                }
+
+                /** Represents a BatchDeleteRowAccessPoliciesRequest. */
+                class BatchDeleteRowAccessPoliciesRequest implements IBatchDeleteRowAccessPoliciesRequest {
+
+                    /**
+                     * Constructs a new BatchDeleteRowAccessPoliciesRequest.
+                     * @param [properties] Properties to set
+                     */
+                    constructor(properties?: google.cloud.bigquery.v2.IBatchDeleteRowAccessPoliciesRequest);
+
+                    /** BatchDeleteRowAccessPoliciesRequest projectId. */
+                    public projectId: string;
+
+                    /** BatchDeleteRowAccessPoliciesRequest datasetId. */
+                    public datasetId: string;
+
+                    /** BatchDeleteRowAccessPoliciesRequest tableId. */
+                    public tableId: string;
+
+                    /** BatchDeleteRowAccessPoliciesRequest policyIds. */
+                    public policyIds: string[];
+
+                    /** BatchDeleteRowAccessPoliciesRequest force. */
+                    public force?: (boolean|null);
+
+                    /**
+                     * Creates a new BatchDeleteRowAccessPoliciesRequest instance using the specified properties.
+                     * @param [properties] Properties to set
+                     * @returns BatchDeleteRowAccessPoliciesRequest instance
+                     */
+                    public static create(properties?: google.cloud.bigquery.v2.IBatchDeleteRowAccessPoliciesRequest): google.cloud.bigquery.v2.BatchDeleteRowAccessPoliciesRequest;
+
+                    /**
+                     * Encodes the specified BatchDeleteRowAccessPoliciesRequest message. Does not implicitly {@link google.cloud.bigquery.v2.BatchDeleteRowAccessPoliciesRequest.verify|verify} messages.
+                     * @param message BatchDeleteRowAccessPoliciesRequest message or plain object to encode
+                     * @param [writer] Writer to encode to
+                     * @returns Writer
+                     */
+                    public static encode(message: google.cloud.bigquery.v2.IBatchDeleteRowAccessPoliciesRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                    /**
+                     * Encodes the specified BatchDeleteRowAccessPoliciesRequest message, length delimited. Does not implicitly {@link google.cloud.bigquery.v2.BatchDeleteRowAccessPoliciesRequest.verify|verify} messages.
+                     * @param message BatchDeleteRowAccessPoliciesRequest message or plain object to encode
+                     * @param [writer] Writer to encode to
+                     * @returns Writer
+                     */
+                    public static encodeDelimited(message: google.cloud.bigquery.v2.IBatchDeleteRowAccessPoliciesRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                    /**
+                     * Decodes a BatchDeleteRowAccessPoliciesRequest message from the specified reader or buffer.
+                     * @param reader Reader or buffer to decode from
+                     * @param [length] Message length if known beforehand
+                     * @returns BatchDeleteRowAccessPoliciesRequest
+                     * @throws {Error} If the payload is not a reader or valid buffer
+                     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                     */
+                    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): google.cloud.bigquery.v2.BatchDeleteRowAccessPoliciesRequest;
+
+                    /**
+                     * Decodes a BatchDeleteRowAccessPoliciesRequest message from the specified reader or buffer, length delimited.
+                     * @param reader Reader or buffer to decode from
+                     * @returns BatchDeleteRowAccessPoliciesRequest
+                     * @throws {Error} If the payload is not a reader or valid buffer
+                     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                     */
+                    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): google.cloud.bigquery.v2.BatchDeleteRowAccessPoliciesRequest;
+
+                    /**
+                     * Verifies a BatchDeleteRowAccessPoliciesRequest message.
+                     * @param message Plain object to verify
+                     * @returns `null` if valid, otherwise the reason why it is not
+                     */
+                    public static verify(message: { [k: string]: any }): (string|null);
+
+                    /**
+                     * Creates a BatchDeleteRowAccessPoliciesRequest message from a plain object. Also converts values to their respective internal types.
+                     * @param object Plain object
+                     * @returns BatchDeleteRowAccessPoliciesRequest
+                     */
+                    public static fromObject(object: { [k: string]: any }): google.cloud.bigquery.v2.BatchDeleteRowAccessPoliciesRequest;
+
+                    /**
+                     * Creates a plain object from a BatchDeleteRowAccessPoliciesRequest message. Also converts values to other types if specified.
+                     * @param message BatchDeleteRowAccessPoliciesRequest
+                     * @param [options] Conversion options
+                     * @returns Plain object
+                     */
+                    public static toObject(message: google.cloud.bigquery.v2.BatchDeleteRowAccessPoliciesRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                    /**
+                     * Converts this BatchDeleteRowAccessPoliciesRequest to JSON.
+                     * @returns JSON object
+                     */
+                    public toJSON(): { [k: string]: any };
+
+                    /**
+                     * Gets the default type url for BatchDeleteRowAccessPoliciesRequest
+                     * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+                     * @returns The default type url
+                     */
+                    public static getTypeUrl(typeUrlPrefix?: string): string;
+                }
+
                 /** Properties of a RowAccessPolicy. */
                 interface IRowAccessPolicy {
 
@@ -26174,6 +27180,9 @@ export namespace google {
 
                     /** RowAccessPolicy lastModifiedTime */
                     lastModifiedTime?: (google.protobuf.ITimestamp|null);
+
+                    /** RowAccessPolicy grantees */
+                    grantees?: (string[]|null);
                 }
 
                 /** Represents a RowAccessPolicy. */
@@ -26199,6 +27208,9 @@ export namespace google {
 
                     /** RowAccessPolicy lastModifiedTime. */
                     public lastModifiedTime?: (google.protobuf.ITimestamp|null);
+
+                    /** RowAccessPolicy grantees. */
+                    public grantees: string[];
 
                     /**
                      * Creates a new RowAccessPolicy instance using the specified properties.
@@ -27414,6 +28426,9 @@ export namespace google {
                     /** Table biglakeConfiguration */
                     biglakeConfiguration?: (google.cloud.bigquery.v2.IBigLakeConfiguration|null);
 
+                    /** Table managedTableType */
+                    managedTableType?: (google.cloud.bigquery.v2.ManagedTableType|keyof typeof google.cloud.bigquery.v2.ManagedTableType|null);
+
                     /** Table location */
                     location?: (string|null);
 
@@ -27573,6 +28588,9 @@ export namespace google {
 
                     /** Table biglakeConfiguration. */
                     public biglakeConfiguration?: (google.cloud.bigquery.v2.IBigLakeConfiguration|null);
+
+                    /** Table managedTableType. */
+                    public managedTableType: (google.cloud.bigquery.v2.ManagedTableType|keyof typeof google.cloud.bigquery.v2.ManagedTableType);
 
                     /** Table location. */
                     public location: string;

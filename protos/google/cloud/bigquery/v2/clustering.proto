@@ -27,7 +27,8 @@ message Clustering {
   // clustering fields should be prioritized from most to least important
   // for filtering purposes.
   //
-  // Additional information on limitations can be found here:
-  // https://cloud.google.com/bigquery/docs/creating-clustered-tables#limitations
+  // For additional information, see
+  // [Introduction to clustered
+  // tables](https://cloud.google.com/bigquery/docs/clustered-tables#limitations).
   repeated string fields = 1;
 }

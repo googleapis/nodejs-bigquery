@@ -29,6 +29,31 @@
           "timeout_millis": 64000,
           "retry_codes_name": "deadline_exceeded_resource_exhausted_unavailable",
           "retry_params_name": "default"
+        },
+        "GetRowAccessPolicy": {
+          "timeout_millis": 64000,
+          "retry_codes_name": "deadline_exceeded_resource_exhausted_unavailable",
+          "retry_params_name": "default"
+        },
+        "CreateRowAccessPolicy": {
+          "timeout_millis": 64000,
+          "retry_codes_name": "deadline_exceeded_resource_exhausted_unavailable",
+          "retry_params_name": "default"
+        },
+        "UpdateRowAccessPolicy": {
+          "timeout_millis": 64000,
+          "retry_codes_name": "deadline_exceeded_resource_exhausted_unavailable",
+          "retry_params_name": "default"
+        },
+        "DeleteRowAccessPolicy": {
+          "timeout_millis": 64000,
+          "retry_codes_name": "deadline_exceeded_resource_exhausted_unavailable",
+          "retry_params_name": "default"
+        },
+        "BatchDeleteRowAccessPolicies": {
+          "timeout_millis": 64000,
+          "retry_codes_name": "deadline_exceeded_resource_exhausted_unavailable",
+          "retry_params_name": "default"
         }
       }
     }

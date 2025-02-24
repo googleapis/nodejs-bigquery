@@ -41,8 +41,9 @@ function main(projectId, jobId) {
   // const jobId = 'abc123'
   /**
    *  The geographic location of the job. Required.
-   *  See details at:
-   *  https://cloud.google.com/bigquery/docs/locations#specifying_your_location.
+   *  For more information, see how to
+   *  specify
+   *  locations (https://cloud.google.com/bigquery/docs/locations#specify_locations).
    */
   // const location = 'abc123'
 

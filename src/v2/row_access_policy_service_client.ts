@@ -18,14 +18,7 @@
 
 /* global window */
 import type * as gax from 'google-gax';
-import type {
-  Callback,
-  CallOptions,
-  Descriptors,
-  ClientOptions,
-  PaginationCallback,
-  GaxCall,
-} from 'google-gax';
+import type {Callback, CallOptions, Descriptors, ClientOptions, PaginationCallback, GaxCall} from 'google-gax';
 import {Transform} from 'stream';
 import * as protos from '../../protos/protos';
 import jsonProtos = require('../../protos/protos.json');
@@ -103,37 +96,17 @@ export class RowAccessPolicyServiceClient {
    *     const client = new RowAccessPolicyServiceClient({fallback: true}, gax);
    *     ```
    */
-  constructor(
-    opts?: ClientOptions,
-    gaxInstance?: typeof gax | typeof gax.fallback
-  ) {
+  constructor(opts?: ClientOptions, gaxInstance?: typeof gax | typeof gax.fallback) {
     // Ensure that options include all the required fields.
-    const staticMembers = this
-      .constructor as typeof RowAccessPolicyServiceClient;
-    if (
-      opts?.universe_domain &&
-      opts?.universeDomain &&
-      opts?.universe_domain !== opts?.universeDomain
-    ) {
-      throw new Error(
-        'Please set either universe_domain or universeDomain, but not both.'
-      );
+    const staticMembers = this.constructor as typeof RowAccessPolicyServiceClient;
+    if (opts?.universe_domain && opts?.universeDomain && opts?.universe_domain !== opts?.universeDomain) {
+      throw new Error('Please set either universe_domain or universeDomain, but not both.');
     }
-    const universeDomainEnvVar =
-      typeof process === 'object' && typeof process.env === 'object'
-        ? process.env['GOOGLE_CLOUD_UNIVERSE_DOMAIN']
-        : undefined;
-    this._universeDomain =
-      opts?.universeDomain ??
-      opts?.universe_domain ??
-      universeDomainEnvVar ??
-      'googleapis.com';
+    const universeDomainEnvVar = (typeof process === 'object' && typeof process.env === 'object') ? process.env['GOOGLE_CLOUD_UNIVERSE_DOMAIN'] : undefined;
+    this._universeDomain = opts?.universeDomain ?? opts?.universe_domain ?? universeDomainEnvVar ?? 'googleapis.com';
     this._servicePath = 'bigquery.' + this._universeDomain;
-    const servicePath =
-      opts?.servicePath || opts?.apiEndpoint || this._servicePath;
-    this._providedCustomServicePath = !!(
-      opts?.servicePath || opts?.apiEndpoint
-    );
+    const servicePath = opts?.servicePath || opts?.apiEndpoint || this._servicePath;
+    this._providedCustomServicePath = !!(opts?.servicePath || opts?.apiEndpoint);
     const port = opts?.port || staticMembers.port;
     const clientConfig = opts?.clientConfig ?? {};
     // Implicitly enable HTTP transport for the APIs that use REST as transport (e.g. Google Cloud Compute).
@@ -142,9 +115,7 @@ export class RowAccessPolicyServiceClient {
     } else {
       opts.fallback = opts.fallback ?? true;
     }
-    const fallback =
-      opts?.fallback ??
-      (typeof window !== 'undefined' && typeof window?.fetch === 'function');
+    const fallback = opts?.fallback ?? (typeof window !== 'undefined' && typeof window?.fetch === 'function');
     opts = Object.assign({servicePath, port, clientConfig, fallback}, opts);
 
     // Request numeric enum values if REST transport is used.
@@ -170,7 +141,7 @@ export class RowAccessPolicyServiceClient {
     this._opts = opts;
 
     // Save the auth object to the client, for use by other methods.
-    this.auth = this._gaxGrpc.auth as gax.GoogleAuth;
+    this.auth = (this._gaxGrpc.auth as gax.GoogleAuth);
 
     // Set useJWTAccessWithScope on the auth object.
     this.auth.useJWTAccessWithScope = true;
@@ -184,7 +155,10 @@ export class RowAccessPolicyServiceClient {
     }
 
     // Determine the client header string.
-    const clientHeader = [`gax/${this._gaxModule.version}`, `gapic/${version}`];
+    const clientHeader = [
+      `gax/${this._gaxModule.version}`,
+      `gapic/${version}`,
+    ];
     if (typeof process === 'object' && 'versions' in process) {
       clientHeader.push(`gl-node/${process.versions.node}`);
     } else {
@@ -205,20 +179,14 @@ export class RowAccessPolicyServiceClient {
     // (e.g. 50 results at a time, with tokens to get subsequent
     // pages). Denote the keys used for pagination and results.
     this.descriptors.page = {
-      listRowAccessPolicies: new this._gaxModule.PageDescriptor(
-        'pageToken',
-        'nextPageToken',
-        'rowAccessPolicies'
-      ),
+      listRowAccessPolicies:
+          new this._gaxModule.PageDescriptor('pageToken', 'nextPageToken', 'rowAccessPolicies')
     };
 
     // Put together the default options sent with requests.
     this._defaults = this._gaxGrpc.constructSettings(
-      'google.cloud.bigquery.v2.RowAccessPolicyService',
-      gapicConfig as gax.ClientConfig,
-      opts.clientConfig || {},
-      {'x-goog-api-client': clientHeader.join(' ')}
-    );
+        'google.cloud.bigquery.v2.RowAccessPolicyService', gapicConfig as gax.ClientConfig,
+        opts.clientConfig || {}, {'x-goog-api-client': clientHeader.join(' ')});
 
     // Set up a dictionary of "inner API calls"; the core implementation
     // of calling the API is handled in `google-gax`, with this code
@@ -249,35 +217,32 @@ export class RowAccessPolicyServiceClient {
     // Put together the "service stub" for
     // google.cloud.bigquery.v2.RowAccessPolicyService.
     this.rowAccessPolicyServiceStub = this._gaxGrpc.createStub(
-      this._opts.fallback
-        ? (this._protos as protobuf.Root).lookupService(
-            'google.cloud.bigquery.v2.RowAccessPolicyService'
-          )
-        : // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        this._opts.fallback ?
+          (this._protos as protobuf.Root).lookupService('google.cloud.bigquery.v2.RowAccessPolicyService') :
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (this._protos as any).google.cloud.bigquery.v2.RowAccessPolicyService,
-      this._opts,
-      this._providedCustomServicePath
-    ) as Promise<{[method: string]: Function}>;
+        this._opts, this._providedCustomServicePath) as Promise<{[method: string]: Function}>;
 
     // Iterate over each of the methods that the service provides
     // and create an API call method for each.
-    const rowAccessPolicyServiceStubMethods = ['listRowAccessPolicies'];
+    const rowAccessPolicyServiceStubMethods =
+        ['listRowAccessPolicies', 'getRowAccessPolicy', 'createRowAccessPolicy', 'updateRowAccessPolicy', 'deleteRowAccessPolicy', 'batchDeleteRowAccessPolicies'];
     for (const methodName of rowAccessPolicyServiceStubMethods) {
       const callPromise = this.rowAccessPolicyServiceStub.then(
-        stub =>
-          (...args: Array<{}>) => {
-            if (this._terminated) {
-              return Promise.reject('The client has already been closed.');
-            }
-            const func = stub[methodName];
-            return func.apply(stub, args);
-          },
-        (err: Error | null | undefined) => () => {
+        stub => (...args: Array<{}>) => {
+          if (this._terminated) {
+            return Promise.reject('The client has already been closed.');
+          }
+          const func = stub[methodName];
+          return func.apply(stub, args);
+        },
+        (err: Error|null|undefined) => () => {
           throw err;
-        }
-      );
+        });
 
-      const descriptor = this.descriptors.page[methodName] || undefined;
+      const descriptor =
+        this.descriptors.page[methodName] ||
+        undefined;
       const apiCall = this._gaxModule.createApiCall(
         callPromise,
         this._defaults[methodName],
@@ -297,14 +262,8 @@ export class RowAccessPolicyServiceClient {
    * @returns {string} The DNS address for this service.
    */
   static get servicePath() {
-    if (
-      typeof process === 'object' &&
-      typeof process.emitWarning === 'function'
-    ) {
-      process.emitWarning(
-        'Static servicePath is deprecated, please use the instance method instead.',
-        'DeprecationWarning'
-      );
+    if (typeof process === 'object' && typeof process.emitWarning === 'function') {
+      process.emitWarning('Static servicePath is deprecated, please use the instance method instead.', 'DeprecationWarning');
     }
     return 'bigquery.googleapis.com';
   }
@@ -315,14 +274,8 @@ export class RowAccessPolicyServiceClient {
    * @returns {string} The DNS address for this service.
    */
   static get apiEndpoint() {
-    if (
-      typeof process === 'object' &&
-      typeof process.emitWarning === 'function'
-    ) {
-      process.emitWarning(
-        'Static apiEndpoint is deprecated, please use the instance method instead.',
-        'DeprecationWarning'
-      );
+    if (typeof process === 'object' && typeof process.emitWarning === 'function') {
+      process.emitWarning('Static apiEndpoint is deprecated, please use the instance method instead.', 'DeprecationWarning');
     }
     return 'bigquery.googleapis.com';
   }
@@ -356,7 +309,7 @@ export class RowAccessPolicyServiceClient {
     return [
       'https://www.googleapis.com/auth/bigquery',
       'https://www.googleapis.com/auth/cloud-platform',
-      'https://www.googleapis.com/auth/cloud-platform.read-only',
+      'https://www.googleapis.com/auth/cloud-platform.read-only'
     ];
   }
 
@@ -366,9 +319,8 @@ export class RowAccessPolicyServiceClient {
    * Return the project ID used by this class.
    * @returns {Promise} A promise that resolves to string containing the project ID.
    */
-  getProjectId(
-    callback?: Callback<string, undefined, undefined>
-  ): Promise<string> | void {
+  getProjectId(callback?: Callback<string, undefined, undefined>):
+      Promise<string>|void {
     if (callback) {
       this.auth.getProjectId(callback);
       return;
@@ -379,154 +331,540 @@ export class RowAccessPolicyServiceClient {
   // -------------------
   // -- Service calls --
   // -------------------
-
-  /**
-   * Lists all row access policies on the specified table.
-   *
-   * @param {Object} request
-   *   The request object that will be sent.
-   * @param {string} request.projectId
-   *   Required. Project ID of the row access policies to list.
-   * @param {string} request.datasetId
-   *   Required. Dataset ID of row access policies to list.
-   * @param {string} request.tableId
-   *   Required. Table ID of the table to list row access policies.
-   * @param {string} request.pageToken
-   *   Page token, returned by a previous call, to request the next page of
-   *   results.
-   * @param {number} request.pageSize
-   *   The maximum number of results to return in a single response page. Leverage
-   *   the page tokens to iterate through the entire collection.
-   * @param {object} [options]
-   *   Call options. See {@link https://googleapis.dev/nodejs/google-gax/latest/interfaces/CallOptions.html|CallOptions} for more details.
-   * @returns {Promise} - The promise which resolves to an array.
-   *   The first element of the array is Array of {@link protos.google.cloud.bigquery.v2.RowAccessPolicy|RowAccessPolicy}.
-   *   The client library will perform auto-pagination by default: it will call the API as many
-   *   times as needed and will merge results from all the pages into this array.
-   *   Note that it can affect your quota.
-   *   We recommend using `listRowAccessPoliciesAsync()`
-   *   method described below for async iteration which you can stop as needed.
-   *   Please see the {@link https://github.com/googleapis/gax-nodejs/blob/master/client-libraries.md#auto-pagination | documentation }
-   *   for more details and examples.
-   */
-  listRowAccessPolicies(
-    request?: protos.google.cloud.bigquery.v2.IListRowAccessPoliciesRequest,
-    options?: CallOptions
-  ): Promise<
-    [
-      protos.google.cloud.bigquery.v2.IRowAccessPolicy[],
-      protos.google.cloud.bigquery.v2.IListRowAccessPoliciesRequest | null,
-      protos.google.cloud.bigquery.v2.IListRowAccessPoliciesResponse,
-    ]
-  >;
-  listRowAccessPolicies(
-    request: protos.google.cloud.bigquery.v2.IListRowAccessPoliciesRequest,
-    options: CallOptions,
-    callback: PaginationCallback<
-      protos.google.cloud.bigquery.v2.IListRowAccessPoliciesRequest,
-      | protos.google.cloud.bigquery.v2.IListRowAccessPoliciesResponse
-      | null
-      | undefined,
-      protos.google.cloud.bigquery.v2.IRowAccessPolicy
-    >
-  ): void;
-  listRowAccessPolicies(
-    request: protos.google.cloud.bigquery.v2.IListRowAccessPoliciesRequest,
-    callback: PaginationCallback<
-      protos.google.cloud.bigquery.v2.IListRowAccessPoliciesRequest,
-      | protos.google.cloud.bigquery.v2.IListRowAccessPoliciesResponse
-      | null
-      | undefined,
-      protos.google.cloud.bigquery.v2.IRowAccessPolicy
-    >
-  ): void;
-  listRowAccessPolicies(
-    request?: protos.google.cloud.bigquery.v2.IListRowAccessPoliciesRequest,
-    optionsOrCallback?:
-      | CallOptions
-      | PaginationCallback<
-          protos.google.cloud.bigquery.v2.IListRowAccessPoliciesRequest,
-          | protos.google.cloud.bigquery.v2.IListRowAccessPoliciesResponse
-          | null
-          | undefined,
-          protos.google.cloud.bigquery.v2.IRowAccessPolicy
-        >,
-    callback?: PaginationCallback<
-      protos.google.cloud.bigquery.v2.IListRowAccessPoliciesRequest,
-      | protos.google.cloud.bigquery.v2.IListRowAccessPoliciesResponse
-      | null
-      | undefined,
-      protos.google.cloud.bigquery.v2.IRowAccessPolicy
-    >
-  ): Promise<
-    [
-      protos.google.cloud.bigquery.v2.IRowAccessPolicy[],
-      protos.google.cloud.bigquery.v2.IListRowAccessPoliciesRequest | null,
-      protos.google.cloud.bigquery.v2.IListRowAccessPoliciesResponse,
-    ]
-  > | void {
+/**
+ * Gets the specified row access policy by policy ID.
+ *
+ * @param {Object} request
+ *   The request object that will be sent.
+ * @param {string} request.projectId
+ *   Required. Project ID of the table to get the row access policy.
+ * @param {string} request.datasetId
+ *   Required. Dataset ID of the table to get the row access policy.
+ * @param {string} request.tableId
+ *   Required. Table ID of the table to get the row access policy.
+ * @param {string} request.policyId
+ *   Required. Policy ID of the row access policy.
+ * @param {object} [options]
+ *   Call options. See {@link https://googleapis.dev/nodejs/google-gax/latest/interfaces/CallOptions.html|CallOptions} for more details.
+ * @returns {Promise} - The promise which resolves to an array.
+ *   The first element of the array is an object representing {@link protos.google.cloud.bigquery.v2.RowAccessPolicy|RowAccessPolicy}.
+ *   Please see the {@link https://github.com/googleapis/gax-nodejs/blob/master/client-libraries.md#regular-methods | documentation }
+ *   for more details and examples.
+ * @example <caption>include:samples/generated/v2/row_access_policy_service.get_row_access_policy.js</caption>
+ * region_tag:bigquery_v2_generated_RowAccessPolicyService_GetRowAccessPolicy_async
+ */
+  getRowAccessPolicy(
+      request?: protos.google.cloud.bigquery.v2.IGetRowAccessPolicyRequest,
+      options?: CallOptions):
+      Promise<[
+        protos.google.cloud.bigquery.v2.IRowAccessPolicy,
+        protos.google.cloud.bigquery.v2.IGetRowAccessPolicyRequest|undefined, {}|undefined
+      ]>;
+  getRowAccessPolicy(
+      request: protos.google.cloud.bigquery.v2.IGetRowAccessPolicyRequest,
+      options: CallOptions,
+      callback: Callback<
+          protos.google.cloud.bigquery.v2.IRowAccessPolicy,
+          protos.google.cloud.bigquery.v2.IGetRowAccessPolicyRequest|null|undefined,
+          {}|null|undefined>): void;
+  getRowAccessPolicy(
+      request: protos.google.cloud.bigquery.v2.IGetRowAccessPolicyRequest,
+      callback: Callback<
+          protos.google.cloud.bigquery.v2.IRowAccessPolicy,
+          protos.google.cloud.bigquery.v2.IGetRowAccessPolicyRequest|null|undefined,
+          {}|null|undefined>): void;
+  getRowAccessPolicy(
+      request?: protos.google.cloud.bigquery.v2.IGetRowAccessPolicyRequest,
+      optionsOrCallback?: CallOptions|Callback<
+          protos.google.cloud.bigquery.v2.IRowAccessPolicy,
+          protos.google.cloud.bigquery.v2.IGetRowAccessPolicyRequest|null|undefined,
+          {}|null|undefined>,
+      callback?: Callback<
+          protos.google.cloud.bigquery.v2.IRowAccessPolicy,
+          protos.google.cloud.bigquery.v2.IGetRowAccessPolicyRequest|null|undefined,
+          {}|null|undefined>):
+      Promise<[
+        protos.google.cloud.bigquery.v2.IRowAccessPolicy,
+        protos.google.cloud.bigquery.v2.IGetRowAccessPolicyRequest|undefined, {}|undefined
+      ]>|void {
     request = request || {};
     let options: CallOptions;
     if (typeof optionsOrCallback === 'function' && callback === undefined) {
       callback = optionsOrCallback;
       options = {};
-    } else {
+    }
+    else {
       options = optionsOrCallback as CallOptions;
     }
     options = options || {};
     options.otherArgs = options.otherArgs || {};
     options.otherArgs.headers = options.otherArgs.headers || {};
-    options.otherArgs.headers['x-goog-request-params'] =
-      this._gaxModule.routingHeader.fromParams({
-        project_id: request.projectId ?? '',
-        dataset_id: request.datasetId ?? '',
-        table_id: request.tableId ?? '',
-      });
+    options.otherArgs.headers[
+      'x-goog-request-params'
+    ] = this._gaxModule.routingHeader.fromParams({
+      'project_id': request.projectId ?? '',
+      'dataset_id': request.datasetId ?? '',
+      'table_id': request.tableId ?? '',
+      'policy_id': request.policyId ?? '',
+    });
+    this.initialize();
+    return this.innerApiCalls.getRowAccessPolicy(request, options, callback);
+  }
+/**
+ * Creates a row access policy.
+ *
+ * @param {Object} request
+ *   The request object that will be sent.
+ * @param {string} request.projectId
+ *   Required. Project ID of the table to get the row access policy.
+ * @param {string} request.datasetId
+ *   Required. Dataset ID of the table to get the row access policy.
+ * @param {string} request.tableId
+ *   Required. Table ID of the table to get the row access policy.
+ * @param {google.cloud.bigquery.v2.RowAccessPolicy} request.rowAccessPolicy
+ *   Required. The row access policy to create.
+ * @param {object} [options]
+ *   Call options. See {@link https://googleapis.dev/nodejs/google-gax/latest/interfaces/CallOptions.html|CallOptions} for more details.
+ * @returns {Promise} - The promise which resolves to an array.
+ *   The first element of the array is an object representing {@link protos.google.cloud.bigquery.v2.RowAccessPolicy|RowAccessPolicy}.
+ *   Please see the {@link https://github.com/googleapis/gax-nodejs/blob/master/client-libraries.md#regular-methods | documentation }
+ *   for more details and examples.
+ * @example <caption>include:samples/generated/v2/row_access_policy_service.create_row_access_policy.js</caption>
+ * region_tag:bigquery_v2_generated_RowAccessPolicyService_CreateRowAccessPolicy_async
+ */
+  createRowAccessPolicy(
+      request?: protos.google.cloud.bigquery.v2.ICreateRowAccessPolicyRequest,
+      options?: CallOptions):
+      Promise<[
+        protos.google.cloud.bigquery.v2.IRowAccessPolicy,
+        protos.google.cloud.bigquery.v2.ICreateRowAccessPolicyRequest|undefined, {}|undefined
+      ]>;
+  createRowAccessPolicy(
+      request: protos.google.cloud.bigquery.v2.ICreateRowAccessPolicyRequest,
+      options: CallOptions,
+      callback: Callback<
+          protos.google.cloud.bigquery.v2.IRowAccessPolicy,
+          protos.google.cloud.bigquery.v2.ICreateRowAccessPolicyRequest|null|undefined,
+          {}|null|undefined>): void;
+  createRowAccessPolicy(
+      request: protos.google.cloud.bigquery.v2.ICreateRowAccessPolicyRequest,
+      callback: Callback<
+          protos.google.cloud.bigquery.v2.IRowAccessPolicy,
+          protos.google.cloud.bigquery.v2.ICreateRowAccessPolicyRequest|null|undefined,
+          {}|null|undefined>): void;
+  createRowAccessPolicy(
+      request?: protos.google.cloud.bigquery.v2.ICreateRowAccessPolicyRequest,
+      optionsOrCallback?: CallOptions|Callback<
+          protos.google.cloud.bigquery.v2.IRowAccessPolicy,
+          protos.google.cloud.bigquery.v2.ICreateRowAccessPolicyRequest|null|undefined,
+          {}|null|undefined>,
+      callback?: Callback<
+          protos.google.cloud.bigquery.v2.IRowAccessPolicy,
+          protos.google.cloud.bigquery.v2.ICreateRowAccessPolicyRequest|null|undefined,
+          {}|null|undefined>):
+      Promise<[
+        protos.google.cloud.bigquery.v2.IRowAccessPolicy,
+        protos.google.cloud.bigquery.v2.ICreateRowAccessPolicyRequest|undefined, {}|undefined
+      ]>|void {
+    request = request || {};
+    let options: CallOptions;
+    if (typeof optionsOrCallback === 'function' && callback === undefined) {
+      callback = optionsOrCallback;
+      options = {};
+    }
+    else {
+      options = optionsOrCallback as CallOptions;
+    }
+    options = options || {};
+    options.otherArgs = options.otherArgs || {};
+    options.otherArgs.headers = options.otherArgs.headers || {};
+    options.otherArgs.headers[
+      'x-goog-request-params'
+    ] = this._gaxModule.routingHeader.fromParams({
+      'project_id': request.projectId ?? '',
+      'dataset_id': request.datasetId ?? '',
+      'table_id': request.tableId ?? '',
+    });
+    this.initialize();
+    return this.innerApiCalls.createRowAccessPolicy(request, options, callback);
+  }
+/**
+ * Updates a row access policy.
+ *
+ * @param {Object} request
+ *   The request object that will be sent.
+ * @param {string} request.projectId
+ *   Required. Project ID of the table to get the row access policy.
+ * @param {string} request.datasetId
+ *   Required. Dataset ID of the table to get the row access policy.
+ * @param {string} request.tableId
+ *   Required. Table ID of the table to get the row access policy.
+ * @param {string} request.policyId
+ *   Required. Policy ID of the row access policy.
+ * @param {google.cloud.bigquery.v2.RowAccessPolicy} request.rowAccessPolicy
+ *   Required. The row access policy to update.
+ * @param {object} [options]
+ *   Call options. See {@link https://googleapis.dev/nodejs/google-gax/latest/interfaces/CallOptions.html|CallOptions} for more details.
+ * @returns {Promise} - The promise which resolves to an array.
+ *   The first element of the array is an object representing {@link protos.google.cloud.bigquery.v2.RowAccessPolicy|RowAccessPolicy}.
+ *   Please see the {@link https://github.com/googleapis/gax-nodejs/blob/master/client-libraries.md#regular-methods | documentation }
+ *   for more details and examples.
+ * @example <caption>include:samples/generated/v2/row_access_policy_service.update_row_access_policy.js</caption>
+ * region_tag:bigquery_v2_generated_RowAccessPolicyService_UpdateRowAccessPolicy_async
+ */
+  updateRowAccessPolicy(
+      request?: protos.google.cloud.bigquery.v2.IUpdateRowAccessPolicyRequest,
+      options?: CallOptions):
+      Promise<[
+        protos.google.cloud.bigquery.v2.IRowAccessPolicy,
+        protos.google.cloud.bigquery.v2.IUpdateRowAccessPolicyRequest|undefined, {}|undefined
+      ]>;
+  updateRowAccessPolicy(
+      request: protos.google.cloud.bigquery.v2.IUpdateRowAccessPolicyRequest,
+      options: CallOptions,
+      callback: Callback<
+          protos.google.cloud.bigquery.v2.IRowAccessPolicy,
+          protos.google.cloud.bigquery.v2.IUpdateRowAccessPolicyRequest|null|undefined,
+          {}|null|undefined>): void;
+  updateRowAccessPolicy(
+      request: protos.google.cloud.bigquery.v2.IUpdateRowAccessPolicyRequest,
+      callback: Callback<
+          protos.google.cloud.bigquery.v2.IRowAccessPolicy,
+          protos.google.cloud.bigquery.v2.IUpdateRowAccessPolicyRequest|null|undefined,
+          {}|null|undefined>): void;
+  updateRowAccessPolicy(
+      request?: protos.google.cloud.bigquery.v2.IUpdateRowAccessPolicyRequest,
+      optionsOrCallback?: CallOptions|Callback<
+          protos.google.cloud.bigquery.v2.IRowAccessPolicy,
+          protos.google.cloud.bigquery.v2.IUpdateRowAccessPolicyRequest|null|undefined,
+          {}|null|undefined>,
+      callback?: Callback<
+          protos.google.cloud.bigquery.v2.IRowAccessPolicy,
+          protos.google.cloud.bigquery.v2.IUpdateRowAccessPolicyRequest|null|undefined,
+          {}|null|undefined>):
+      Promise<[
+        protos.google.cloud.bigquery.v2.IRowAccessPolicy,
+        protos.google.cloud.bigquery.v2.IUpdateRowAccessPolicyRequest|undefined, {}|undefined
+      ]>|void {
+    request = request || {};
+    let options: CallOptions;
+    if (typeof optionsOrCallback === 'function' && callback === undefined) {
+      callback = optionsOrCallback;
+      options = {};
+    }
+    else {
+      options = optionsOrCallback as CallOptions;
+    }
+    options = options || {};
+    options.otherArgs = options.otherArgs || {};
+    options.otherArgs.headers = options.otherArgs.headers || {};
+    options.otherArgs.headers[
+      'x-goog-request-params'
+    ] = this._gaxModule.routingHeader.fromParams({
+      'project_id': request.projectId ?? '',
+      'dataset_id': request.datasetId ?? '',
+      'table_id': request.tableId ?? '',
+      'policy_id': request.policyId ?? '',
+    });
+    this.initialize();
+    return this.innerApiCalls.updateRowAccessPolicy(request, options, callback);
+  }
+/**
+ * Deletes a row access policy.
+ *
+ * @param {Object} request
+ *   The request object that will be sent.
+ * @param {string} request.projectId
+ *   Required. Project ID of the table to delete the row access policy.
+ * @param {string} request.datasetId
+ *   Required. Dataset ID of the table to delete the row access policy.
+ * @param {string} request.tableId
+ *   Required. Table ID of the table to delete the row access policy.
+ * @param {string} request.policyId
+ *   Required. Policy ID of the row access policy.
+ * @param {boolean} request.force
+ *   If set to true, it deletes the row access policy even if it's the last row
+ *   access policy on the table and the deletion will widen the access rather
+ *   narrowing it.
+ * @param {object} [options]
+ *   Call options. See {@link https://googleapis.dev/nodejs/google-gax/latest/interfaces/CallOptions.html|CallOptions} for more details.
+ * @returns {Promise} - The promise which resolves to an array.
+ *   The first element of the array is an object representing {@link protos.google.protobuf.Empty|Empty}.
+ *   Please see the {@link https://github.com/googleapis/gax-nodejs/blob/master/client-libraries.md#regular-methods | documentation }
+ *   for more details and examples.
+ * @example <caption>include:samples/generated/v2/row_access_policy_service.delete_row_access_policy.js</caption>
+ * region_tag:bigquery_v2_generated_RowAccessPolicyService_DeleteRowAccessPolicy_async
+ */
+  deleteRowAccessPolicy(
+      request?: protos.google.cloud.bigquery.v2.IDeleteRowAccessPolicyRequest,
+      options?: CallOptions):
+      Promise<[
+        protos.google.protobuf.IEmpty,
+        protos.google.cloud.bigquery.v2.IDeleteRowAccessPolicyRequest|undefined, {}|undefined
+      ]>;
+  deleteRowAccessPolicy(
+      request: protos.google.cloud.bigquery.v2.IDeleteRowAccessPolicyRequest,
+      options: CallOptions,
+      callback: Callback<
+          protos.google.protobuf.IEmpty,
+          protos.google.cloud.bigquery.v2.IDeleteRowAccessPolicyRequest|null|undefined,
+          {}|null|undefined>): void;
+  deleteRowAccessPolicy(
+      request: protos.google.cloud.bigquery.v2.IDeleteRowAccessPolicyRequest,
+      callback: Callback<
+          protos.google.protobuf.IEmpty,
+          protos.google.cloud.bigquery.v2.IDeleteRowAccessPolicyRequest|null|undefined,
+          {}|null|undefined>): void;
+  deleteRowAccessPolicy(
+      request?: protos.google.cloud.bigquery.v2.IDeleteRowAccessPolicyRequest,
+      optionsOrCallback?: CallOptions|Callback<
+          protos.google.protobuf.IEmpty,
+          protos.google.cloud.bigquery.v2.IDeleteRowAccessPolicyRequest|null|undefined,
+          {}|null|undefined>,
+      callback?: Callback<
+          protos.google.protobuf.IEmpty,
+          protos.google.cloud.bigquery.v2.IDeleteRowAccessPolicyRequest|null|undefined,
+          {}|null|undefined>):
+      Promise<[
+        protos.google.protobuf.IEmpty,
+        protos.google.cloud.bigquery.v2.IDeleteRowAccessPolicyRequest|undefined, {}|undefined
+      ]>|void {
+    request = request || {};
+    let options: CallOptions;
+    if (typeof optionsOrCallback === 'function' && callback === undefined) {
+      callback = optionsOrCallback;
+      options = {};
+    }
+    else {
+      options = optionsOrCallback as CallOptions;
+    }
+    options = options || {};
+    options.otherArgs = options.otherArgs || {};
+    options.otherArgs.headers = options.otherArgs.headers || {};
+    options.otherArgs.headers[
+      'x-goog-request-params'
+    ] = this._gaxModule.routingHeader.fromParams({
+      'project_id': request.projectId ?? '',
+      'dataset_id': request.datasetId ?? '',
+      'table_id': request.tableId ?? '',
+      'policy_id': request.policyId ?? '',
+    });
+    this.initialize();
+    return this.innerApiCalls.deleteRowAccessPolicy(request, options, callback);
+  }
+/**
+ * Deletes provided row access policies.
+ *
+ * @param {Object} request
+ *   The request object that will be sent.
+ * @param {string} request.projectId
+ *   Required. Project ID of the table to delete the row access policies.
+ * @param {string} request.datasetId
+ *   Required. Dataset ID of the table to delete the row access policies.
+ * @param {string} request.tableId
+ *   Required. Table ID of the table to delete the row access policies.
+ * @param {string[]} request.policyIds
+ *   Required. Policy IDs of the row access policies.
+ * @param {boolean} request.force
+ *   If set to true, it deletes the row access policy even if it's the last row
+ *   access policy on the table and the deletion will widen the access rather
+ *   narrowing it.
+ * @param {object} [options]
+ *   Call options. See {@link https://googleapis.dev/nodejs/google-gax/latest/interfaces/CallOptions.html|CallOptions} for more details.
+ * @returns {Promise} - The promise which resolves to an array.
+ *   The first element of the array is an object representing {@link protos.google.protobuf.Empty|Empty}.
+ *   Please see the {@link https://github.com/googleapis/gax-nodejs/blob/master/client-libraries.md#regular-methods | documentation }
+ *   for more details and examples.
+ * @example <caption>include:samples/generated/v2/row_access_policy_service.batch_delete_row_access_policies.js</caption>
+ * region_tag:bigquery_v2_generated_RowAccessPolicyService_BatchDeleteRowAccessPolicies_async
+ */
+  batchDeleteRowAccessPolicies(
+      request?: protos.google.cloud.bigquery.v2.IBatchDeleteRowAccessPoliciesRequest,
+      options?: CallOptions):
+      Promise<[
+        protos.google.protobuf.IEmpty,
+        protos.google.cloud.bigquery.v2.IBatchDeleteRowAccessPoliciesRequest|undefined, {}|undefined
+      ]>;
+  batchDeleteRowAccessPolicies(
+      request: protos.google.cloud.bigquery.v2.IBatchDeleteRowAccessPoliciesRequest,
+      options: CallOptions,
+      callback: Callback<
+          protos.google.protobuf.IEmpty,
+          protos.google.cloud.bigquery.v2.IBatchDeleteRowAccessPoliciesRequest|null|undefined,
+          {}|null|undefined>): void;
+  batchDeleteRowAccessPolicies(
+      request: protos.google.cloud.bigquery.v2.IBatchDeleteRowAccessPoliciesRequest,
+      callback: Callback<
+          protos.google.protobuf.IEmpty,
+          protos.google.cloud.bigquery.v2.IBatchDeleteRowAccessPoliciesRequest|null|undefined,
+          {}|null|undefined>): void;
+  batchDeleteRowAccessPolicies(
+      request?: protos.google.cloud.bigquery.v2.IBatchDeleteRowAccessPoliciesRequest,
+      optionsOrCallback?: CallOptions|Callback<
+          protos.google.protobuf.IEmpty,
+          protos.google.cloud.bigquery.v2.IBatchDeleteRowAccessPoliciesRequest|null|undefined,
+          {}|null|undefined>,
+      callback?: Callback<
+          protos.google.protobuf.IEmpty,
+          protos.google.cloud.bigquery.v2.IBatchDeleteRowAccessPoliciesRequest|null|undefined,
+          {}|null|undefined>):
+      Promise<[
+        protos.google.protobuf.IEmpty,
+        protos.google.cloud.bigquery.v2.IBatchDeleteRowAccessPoliciesRequest|undefined, {}|undefined
+      ]>|void {
+    request = request || {};
+    let options: CallOptions;
+    if (typeof optionsOrCallback === 'function' && callback === undefined) {
+      callback = optionsOrCallback;
+      options = {};
+    }
+    else {
+      options = optionsOrCallback as CallOptions;
+    }
+    options = options || {};
+    options.otherArgs = options.otherArgs || {};
+    options.otherArgs.headers = options.otherArgs.headers || {};
+    options.otherArgs.headers[
+      'x-goog-request-params'
+    ] = this._gaxModule.routingHeader.fromParams({
+      'project_id': request.projectId ?? '',
+      'dataset_id': request.datasetId ?? '',
+      'table_id': request.tableId ?? '',
+    });
+    this.initialize();
+    return this.innerApiCalls.batchDeleteRowAccessPolicies(request, options, callback);
+  }
+
+ /**
+ * Lists all row access policies on the specified table.
+ *
+ * @param {Object} request
+ *   The request object that will be sent.
+ * @param {string} request.projectId
+ *   Required. Project ID of the row access policies to list.
+ * @param {string} request.datasetId
+ *   Required. Dataset ID of row access policies to list.
+ * @param {string} request.tableId
+ *   Required. Table ID of the table to list row access policies.
+ * @param {string} request.pageToken
+ *   Page token, returned by a previous call, to request the next page of
+ *   results.
+ * @param {number} request.pageSize
+ *   The maximum number of results to return in a single response page. Leverage
+ *   the page tokens to iterate through the entire collection.
+ * @param {object} [options]
+ *   Call options. See {@link https://googleapis.dev/nodejs/google-gax/latest/interfaces/CallOptions.html|CallOptions} for more details.
+ * @returns {Promise} - The promise which resolves to an array.
+ *   The first element of the array is Array of {@link protos.google.cloud.bigquery.v2.RowAccessPolicy|RowAccessPolicy}.
+ *   The client library will perform auto-pagination by default: it will call the API as many
+ *   times as needed and will merge results from all the pages into this array.
+ *   Note that it can affect your quota.
+ *   We recommend using `listRowAccessPoliciesAsync()`
+ *   method described below for async iteration which you can stop as needed.
+ *   Please see the {@link https://github.com/googleapis/gax-nodejs/blob/master/client-libraries.md#auto-pagination | documentation }
+ *   for more details and examples.
+ */
+  listRowAccessPolicies(
+      request?: protos.google.cloud.bigquery.v2.IListRowAccessPoliciesRequest,
+      options?: CallOptions):
+      Promise<[
+        protos.google.cloud.bigquery.v2.IRowAccessPolicy[],
+        protos.google.cloud.bigquery.v2.IListRowAccessPoliciesRequest|null,
+        protos.google.cloud.bigquery.v2.IListRowAccessPoliciesResponse
+      ]>;
+  listRowAccessPolicies(
+      request: protos.google.cloud.bigquery.v2.IListRowAccessPoliciesRequest,
+      options: CallOptions,
+      callback: PaginationCallback<
+          protos.google.cloud.bigquery.v2.IListRowAccessPoliciesRequest,
+          protos.google.cloud.bigquery.v2.IListRowAccessPoliciesResponse|null|undefined,
+          protos.google.cloud.bigquery.v2.IRowAccessPolicy>): void;
+  listRowAccessPolicies(
+      request: protos.google.cloud.bigquery.v2.IListRowAccessPoliciesRequest,
+      callback: PaginationCallback<
+          protos.google.cloud.bigquery.v2.IListRowAccessPoliciesRequest,
+          protos.google.cloud.bigquery.v2.IListRowAccessPoliciesResponse|null|undefined,
+          protos.google.cloud.bigquery.v2.IRowAccessPolicy>): void;
+  listRowAccessPolicies(
+      request?: protos.google.cloud.bigquery.v2.IListRowAccessPoliciesRequest,
+      optionsOrCallback?: CallOptions|PaginationCallback<
+          protos.google.cloud.bigquery.v2.IListRowAccessPoliciesRequest,
+          protos.google.cloud.bigquery.v2.IListRowAccessPoliciesResponse|null|undefined,
+          protos.google.cloud.bigquery.v2.IRowAccessPolicy>,
+      callback?: PaginationCallback<
+          protos.google.cloud.bigquery.v2.IListRowAccessPoliciesRequest,
+          protos.google.cloud.bigquery.v2.IListRowAccessPoliciesResponse|null|undefined,
+          protos.google.cloud.bigquery.v2.IRowAccessPolicy>):
+      Promise<[
+        protos.google.cloud.bigquery.v2.IRowAccessPolicy[],
+        protos.google.cloud.bigquery.v2.IListRowAccessPoliciesRequest|null,
+        protos.google.cloud.bigquery.v2.IListRowAccessPoliciesResponse
+      ]>|void {
+    request = request || {};
+    let options: CallOptions;
+    if (typeof optionsOrCallback === 'function' && callback === undefined) {
+      callback = optionsOrCallback;
+      options = {};
+    }
+    else {
+      options = optionsOrCallback as CallOptions;
+    }
+    options = options || {};
+    options.otherArgs = options.otherArgs || {};
+    options.otherArgs.headers = options.otherArgs.headers || {};
+    options.otherArgs.headers[
+      'x-goog-request-params'
+    ] = this._gaxModule.routingHeader.fromParams({
+      'project_id': request.projectId ?? '',
+      'dataset_id': request.datasetId ?? '',
+      'table_id': request.tableId ?? '',
+    });
     this.initialize();
     return this.innerApiCalls.listRowAccessPolicies(request, options, callback);
   }
 
-  /**
-   * Equivalent to `listRowAccessPolicies`, but returns a NodeJS Stream object.
-   * @param {Object} request
-   *   The request object that will be sent.
-   * @param {string} request.projectId
-   *   Required. Project ID of the row access policies to list.
-   * @param {string} request.datasetId
-   *   Required. Dataset ID of row access policies to list.
-   * @param {string} request.tableId
-   *   Required. Table ID of the table to list row access policies.
-   * @param {string} request.pageToken
-   *   Page token, returned by a previous call, to request the next page of
-   *   results.
-   * @param {number} request.pageSize
-   *   The maximum number of results to return in a single response page. Leverage
-   *   the page tokens to iterate through the entire collection.
-   * @param {object} [options]
-   *   Call options. See {@link https://googleapis.dev/nodejs/google-gax/latest/interfaces/CallOptions.html|CallOptions} for more details.
-   * @returns {Stream}
-   *   An object stream which emits an object representing {@link protos.google.cloud.bigquery.v2.RowAccessPolicy|RowAccessPolicy} on 'data' event.
-   *   The client library will perform auto-pagination by default: it will call the API as many
-   *   times as needed. Note that it can affect your quota.
-   *   We recommend using `listRowAccessPoliciesAsync()`
-   *   method described below for async iteration which you can stop as needed.
-   *   Please see the {@link https://github.com/googleapis/gax-nodejs/blob/master/client-libraries.md#auto-pagination | documentation }
-   *   for more details and examples.
-   */
+/**
+ * Equivalent to `listRowAccessPolicies`, but returns a NodeJS Stream object.
+ * @param {Object} request
+ *   The request object that will be sent.
+ * @param {string} request.projectId
+ *   Required. Project ID of the row access policies to list.
+ * @param {string} request.datasetId
+ *   Required. Dataset ID of row access policies to list.
+ * @param {string} request.tableId
+ *   Required. Table ID of the table to list row access policies.
+ * @param {string} request.pageToken
+ *   Page token, returned by a previous call, to request the next page of
+ *   results.
+ * @param {number} request.pageSize
+ *   The maximum number of results to return in a single response page. Leverage
+ *   the page tokens to iterate through the entire collection.
+ * @param {object} [options]
+ *   Call options. See {@link https://googleapis.dev/nodejs/google-gax/latest/interfaces/CallOptions.html|CallOptions} for more details.
+ * @returns {Stream}
+ *   An object stream which emits an object representing {@link protos.google.cloud.bigquery.v2.RowAccessPolicy|RowAccessPolicy} on 'data' event.
+ *   The client library will perform auto-pagination by default: it will call the API as many
+ *   times as needed. Note that it can affect your quota.
+ *   We recommend using `listRowAccessPoliciesAsync()`
+ *   method described below for async iteration which you can stop as needed.
+ *   Please see the {@link https://github.com/googleapis/gax-nodejs/blob/master/client-libraries.md#auto-pagination | documentation }
+ *   for more details and examples.
+ */
   listRowAccessPoliciesStream(
-    request?: protos.google.cloud.bigquery.v2.IListRowAccessPoliciesRequest,
-    options?: CallOptions
-  ): Transform {
+      request?: protos.google.cloud.bigquery.v2.IListRowAccessPoliciesRequest,
+      options?: CallOptions):
+    Transform{
     request = request || {};
     options = options || {};
     options.otherArgs = options.otherArgs || {};
     options.otherArgs.headers = options.otherArgs.headers || {};
-    options.otherArgs.headers['x-goog-request-params'] =
-      this._gaxModule.routingHeader.fromParams({
-        project_id: request.projectId ?? '',
-        dataset_id: request.datasetId ?? '',
-        table_id: request.tableId ?? '',
-      });
+    options.otherArgs.headers[
+      'x-goog-request-params'
+    ] = this._gaxModule.routingHeader.fromParams({
+      'project_id': request.projectId ?? '',
+      'dataset_id': request.datasetId ?? '',
+      'table_id': request.tableId ?? '',
+    });
     const defaultCallSettings = this._defaults['listRowAccessPolicies'];
     const callSettings = defaultCallSettings.merge(options);
     this.initialize();
@@ -537,50 +875,51 @@ export class RowAccessPolicyServiceClient {
     );
   }
 
-  /**
-   * Equivalent to `listRowAccessPolicies`, but returns an iterable object.
-   *
-   * `for`-`await`-`of` syntax is used with the iterable to get response elements on-demand.
-   * @param {Object} request
-   *   The request object that will be sent.
-   * @param {string} request.projectId
-   *   Required. Project ID of the row access policies to list.
-   * @param {string} request.datasetId
-   *   Required. Dataset ID of row access policies to list.
-   * @param {string} request.tableId
-   *   Required. Table ID of the table to list row access policies.
-   * @param {string} request.pageToken
-   *   Page token, returned by a previous call, to request the next page of
-   *   results.
-   * @param {number} request.pageSize
-   *   The maximum number of results to return in a single response page. Leverage
-   *   the page tokens to iterate through the entire collection.
-   * @param {object} [options]
-   *   Call options. See {@link https://googleapis.dev/nodejs/google-gax/latest/interfaces/CallOptions.html|CallOptions} for more details.
-   * @returns {Object}
-   *   An iterable Object that allows {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols | async iteration }.
-   *   When you iterate the returned iterable, each element will be an object representing
-   *   {@link protos.google.cloud.bigquery.v2.RowAccessPolicy|RowAccessPolicy}. The API will be called under the hood as needed, once per the page,
-   *   so you can stop the iteration when you don't need more results.
-   *   Please see the {@link https://github.com/googleapis/gax-nodejs/blob/master/client-libraries.md#auto-pagination | documentation }
-   *   for more details and examples.
-   * @example <caption>include:samples/generated/v2/row_access_policy_service.list_row_access_policies.js</caption>
-   * region_tag:bigquery_v2_generated_RowAccessPolicyService_ListRowAccessPolicies_async
-   */
+/**
+ * Equivalent to `listRowAccessPolicies`, but returns an iterable object.
+ *
+ * `for`-`await`-`of` syntax is used with the iterable to get response elements on-demand.
+ * @param {Object} request
+ *   The request object that will be sent.
+ * @param {string} request.projectId
+ *   Required. Project ID of the row access policies to list.
+ * @param {string} request.datasetId
+ *   Required. Dataset ID of row access policies to list.
+ * @param {string} request.tableId
+ *   Required. Table ID of the table to list row access policies.
+ * @param {string} request.pageToken
+ *   Page token, returned by a previous call, to request the next page of
+ *   results.
+ * @param {number} request.pageSize
+ *   The maximum number of results to return in a single response page. Leverage
+ *   the page tokens to iterate through the entire collection.
+ * @param {object} [options]
+ *   Call options. See {@link https://googleapis.dev/nodejs/google-gax/latest/interfaces/CallOptions.html|CallOptions} for more details.
+ * @returns {Object}
+ *   An iterable Object that allows {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols | async iteration }.
+ *   When you iterate the returned iterable, each element will be an object representing
+ *   {@link protos.google.cloud.bigquery.v2.RowAccessPolicy|RowAccessPolicy}. The API will be called under the hood as needed, once per the page,
+ *   so you can stop the iteration when you don't need more results.
+ *   Please see the {@link https://github.com/googleapis/gax-nodejs/blob/master/client-libraries.md#auto-pagination | documentation }
+ *   for more details and examples.
+ * @example <caption>include:samples/generated/v2/row_access_policy_service.list_row_access_policies.js</caption>
+ * region_tag:bigquery_v2_generated_RowAccessPolicyService_ListRowAccessPolicies_async
+ */
   listRowAccessPoliciesAsync(
-    request?: protos.google.cloud.bigquery.v2.IListRowAccessPoliciesRequest,
-    options?: CallOptions
-  ): AsyncIterable<protos.google.cloud.bigquery.v2.IRowAccessPolicy> {
+      request?: protos.google.cloud.bigquery.v2.IListRowAccessPoliciesRequest,
+      options?: CallOptions):
+    AsyncIterable<protos.google.cloud.bigquery.v2.IRowAccessPolicy>{
     request = request || {};
     options = options || {};
     options.otherArgs = options.otherArgs || {};
     options.otherArgs.headers = options.otherArgs.headers || {};
-    options.otherArgs.headers['x-goog-request-params'] =
-      this._gaxModule.routingHeader.fromParams({
-        project_id: request.projectId ?? '',
-        dataset_id: request.datasetId ?? '',
-        table_id: request.tableId ?? '',
-      });
+    options.otherArgs.headers[
+      'x-goog-request-params'
+    ] = this._gaxModule.routingHeader.fromParams({
+      'project_id': request.projectId ?? '',
+      'dataset_id': request.datasetId ?? '',
+      'table_id': request.tableId ?? '',
+    });
     const defaultCallSettings = this._defaults['listRowAccessPolicies'];
     const callSettings = defaultCallSettings.merge(options);
     this.initialize();

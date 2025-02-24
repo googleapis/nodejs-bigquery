@@ -18,14 +18,7 @@
 
 /* global window */
 import type * as gax from 'google-gax';
-import type {
-  Callback,
-  CallOptions,
-  Descriptors,
-  ClientOptions,
-  PaginationCallback,
-  GaxCall,
-} from 'google-gax';
+import type {Callback, CallOptions, Descriptors, ClientOptions, PaginationCallback, GaxCall} from 'google-gax';
 import {Transform} from 'stream';
 import * as protos from '../../protos/protos';
 import jsonProtos = require('../../protos/protos.json');
@@ -103,36 +96,17 @@ export class DatasetServiceClient {
    *     const client = new DatasetServiceClient({fallback: true}, gax);
    *     ```
    */
-  constructor(
-    opts?: ClientOptions,
-    gaxInstance?: typeof gax | typeof gax.fallback
-  ) {
+  constructor(opts?: ClientOptions, gaxInstance?: typeof gax | typeof gax.fallback) {
     // Ensure that options include all the required fields.
     const staticMembers = this.constructor as typeof DatasetServiceClient;
-    if (
-      opts?.universe_domain &&
-      opts?.universeDomain &&
-      opts?.universe_domain !== opts?.universeDomain
-    ) {
-      throw new Error(
-        'Please set either universe_domain or universeDomain, but not both.'
-      );
+    if (opts?.universe_domain && opts?.universeDomain && opts?.universe_domain !== opts?.universeDomain) {
+      throw new Error('Please set either universe_domain or universeDomain, but not both.');
     }
-    const universeDomainEnvVar =
-      typeof process === 'object' && typeof process.env === 'object'
-        ? process.env['GOOGLE_CLOUD_UNIVERSE_DOMAIN']
-        : undefined;
-    this._universeDomain =
-      opts?.universeDomain ??
-      opts?.universe_domain ??
-      universeDomainEnvVar ??
-      'googleapis.com';
+    const universeDomainEnvVar = (typeof process === 'object' && typeof process.env === 'object') ? process.env['GOOGLE_CLOUD_UNIVERSE_DOMAIN'] : undefined;
+    this._universeDomain = opts?.universeDomain ?? opts?.universe_domain ?? universeDomainEnvVar ?? 'googleapis.com';
     this._servicePath = 'bigquery.' + this._universeDomain;
-    const servicePath =
-      opts?.servicePath || opts?.apiEndpoint || this._servicePath;
-    this._providedCustomServicePath = !!(
-      opts?.servicePath || opts?.apiEndpoint
-    );
+    const servicePath = opts?.servicePath || opts?.apiEndpoint || this._servicePath;
+    this._providedCustomServicePath = !!(opts?.servicePath || opts?.apiEndpoint);
     const port = opts?.port || staticMembers.port;
     const clientConfig = opts?.clientConfig ?? {};
     // Implicitly enable HTTP transport for the APIs that use REST as transport (e.g. Google Cloud Compute).
@@ -141,9 +115,7 @@ export class DatasetServiceClient {
     } else {
       opts.fallback = opts.fallback ?? true;
     }
-    const fallback =
-      opts?.fallback ??
-      (typeof window !== 'undefined' && typeof window?.fetch === 'function');
+    const fallback = opts?.fallback ?? (typeof window !== 'undefined' && typeof window?.fetch === 'function');
     opts = Object.assign({servicePath, port, clientConfig, fallback}, opts);
 
     // Request numeric enum values if REST transport is used.
@@ -169,7 +141,7 @@ export class DatasetServiceClient {
     this._opts = opts;
 
     // Save the auth object to the client, for use by other methods.
-    this.auth = this._gaxGrpc.auth as gax.GoogleAuth;
+    this.auth = (this._gaxGrpc.auth as gax.GoogleAuth);
 
     // Set useJWTAccessWithScope on the auth object.
     this.auth.useJWTAccessWithScope = true;
@@ -183,7 +155,10 @@ export class DatasetServiceClient {
     }
 
     // Determine the client header string.
-    const clientHeader = [`gax/${this._gaxModule.version}`, `gapic/${version}`];
+    const clientHeader = [
+      `gax/${this._gaxModule.version}`,
+      `gapic/${version}`,
+    ];
     if (typeof process === 'object' && 'versions' in process) {
       clientHeader.push(`gl-node/${process.versions.node}`);
     } else {
@@ -204,20 +179,14 @@ export class DatasetServiceClient {
     // (e.g. 50 results at a time, with tokens to get subsequent
     // pages). Denote the keys used for pagination and results.
     this.descriptors.page = {
-      listDatasets: new this._gaxModule.PageDescriptor(
-        'pageToken',
-        'nextPageToken',
-        'datasets'
-      ),
+      listDatasets:
+          new this._gaxModule.PageDescriptor('pageToken', 'nextPageToken', 'datasets')
     };
 
     // Put together the default options sent with requests.
     this._defaults = this._gaxGrpc.constructSettings(
-      'google.cloud.bigquery.v2.DatasetService',
-      gapicConfig as gax.ClientConfig,
-      opts.clientConfig || {},
-      {'x-goog-api-client': clientHeader.join(' ')}
-    );
+        'google.cloud.bigquery.v2.DatasetService', gapicConfig as gax.ClientConfig,
+        opts.clientConfig || {}, {'x-goog-api-client': clientHeader.join(' ')});
 
     // Set up a dictionary of "inner API calls"; the core implementation
     // of calling the API is handled in `google-gax`, with this code
@@ -248,43 +217,32 @@ export class DatasetServiceClient {
     // Put together the "service stub" for
     // google.cloud.bigquery.v2.DatasetService.
     this.datasetServiceStub = this._gaxGrpc.createStub(
-      this._opts.fallback
-        ? (this._protos as protobuf.Root).lookupService(
-            'google.cloud.bigquery.v2.DatasetService'
-          )
-        : // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        this._opts.fallback ?
+          (this._protos as protobuf.Root).lookupService('google.cloud.bigquery.v2.DatasetService') :
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (this._protos as any).google.cloud.bigquery.v2.DatasetService,
-      this._opts,
-      this._providedCustomServicePath
-    ) as Promise<{[method: string]: Function}>;
+        this._opts, this._providedCustomServicePath) as Promise<{[method: string]: Function}>;
 
     // Iterate over each of the methods that the service provides
     // and create an API call method for each.
-    const datasetServiceStubMethods = [
-      'getDataset',
-      'insertDataset',
-      'patchDataset',
-      'updateDataset',
-      'deleteDataset',
-      'listDatasets',
-      'undeleteDataset',
-    ];
+    const datasetServiceStubMethods =
+        ['getDataset', 'insertDataset', 'patchDataset', 'updateDataset', 'deleteDataset', 'listDatasets', 'undeleteDataset'];
     for (const methodName of datasetServiceStubMethods) {
       const callPromise = this.datasetServiceStub.then(
-        stub =>
-          (...args: Array<{}>) => {
-            if (this._terminated) {
-              return Promise.reject('The client has already been closed.');
-            }
-            const func = stub[methodName];
-            return func.apply(stub, args);
-          },
-        (err: Error | null | undefined) => () => {
+        stub => (...args: Array<{}>) => {
+          if (this._terminated) {
+            return Promise.reject('The client has already been closed.');
+          }
+          const func = stub[methodName];
+          return func.apply(stub, args);
+        },
+        (err: Error|null|undefined) => () => {
           throw err;
-        }
-      );
+        });
 
-      const descriptor = this.descriptors.page[methodName] || undefined;
+      const descriptor =
+        this.descriptors.page[methodName] ||
+        undefined;
       const apiCall = this._gaxModule.createApiCall(
         callPromise,
         this._defaults[methodName],
@@ -304,14 +262,8 @@ export class DatasetServiceClient {
    * @returns {string} The DNS address for this service.
    */
   static get servicePath() {
-    if (
-      typeof process === 'object' &&
-      typeof process.emitWarning === 'function'
-    ) {
-      process.emitWarning(
-        'Static servicePath is deprecated, please use the instance method instead.',
-        'DeprecationWarning'
-      );
+    if (typeof process === 'object' && typeof process.emitWarning === 'function') {
+      process.emitWarning('Static servicePath is deprecated, please use the instance method instead.', 'DeprecationWarning');
     }
     return 'bigquery.googleapis.com';
   }
@@ -322,14 +274,8 @@ export class DatasetServiceClient {
    * @returns {string} The DNS address for this service.
    */
   static get apiEndpoint() {
-    if (
-      typeof process === 'object' &&
-      typeof process.emitWarning === 'function'
-    ) {
-      process.emitWarning(
-        'Static apiEndpoint is deprecated, please use the instance method instead.',
-        'DeprecationWarning'
-      );
+    if (typeof process === 'object' && typeof process.emitWarning === 'function') {
+      process.emitWarning('Static apiEndpoint is deprecated, please use the instance method instead.', 'DeprecationWarning');
     }
     return 'bigquery.googleapis.com';
   }
@@ -363,7 +309,7 @@ export class DatasetServiceClient {
     return [
       'https://www.googleapis.com/auth/bigquery',
       'https://www.googleapis.com/auth/cloud-platform',
-      'https://www.googleapis.com/auth/cloud-platform.read-only',
+      'https://www.googleapis.com/auth/cloud-platform.read-only'
     ];
   }
 
@@ -373,9 +319,8 @@ export class DatasetServiceClient {
    * Return the project ID used by this class.
    * @returns {Promise} A promise that resolves to string containing the project ID.
    */
-  getProjectId(
-    callback?: Callback<string, undefined, undefined>
-  ): Promise<string> | void {
+  getProjectId(callback?: Callback<string, undefined, undefined>):
+      Promise<string>|void {
     if (callback) {
       this.auth.getProjectId(callback);
       return;
@@ -386,817 +331,708 @@ export class DatasetServiceClient {
   // -------------------
   // -- Service calls --
   // -------------------
-  /**
-   * Returns the dataset specified by datasetID.
-   *
-   * @param {Object} request
-   *   The request object that will be sent.
-   * @param {string} request.projectId
-   *   Required. Project ID of the requested dataset
-   * @param {string} request.datasetId
-   *   Required. Dataset ID of the requested dataset
-   * @param {google.cloud.bigquery.v2.GetDatasetRequest.DatasetView} [request.datasetView]
-   *   Optional. Specifies the view that determines which dataset information is
-   *   returned. By default, metadata and ACL information are returned.
-   * @param {number} [request.accessPolicyVersion]
-   *   Optional. The version of the access policy schema to fetch.
-   *   Valid values are 0, 1, and 3. Requests specifying an invalid value will be
-   *   rejected.
-   *
-   *   Requests for conditional access policy binding in datasets must specify
-   *   version 3. Dataset with no conditional role bindings in access policy may
-   *   specify any valid value or leave the field unset.
-   *
-   *   This field will be maped to [IAM Policy version]
-   *   (https://cloud.google.com/iam/docs/policies#versions) and will be used to
-   *   fetch policy from IAM.
-   *
-   *   If unset or if 0 or 1 value is used for dataset with conditional bindings,
-   *   access entry with condition will have role string appended by
-   *   'withcond' string followed by a hash value. For example :
-   *   {
-   *     "access": [
-   *        {
-   *           "role":
-   *           "roles/bigquery.dataViewer_with_conditionalbinding_7a34awqsda",
-   *           "userByEmail": "user@example.com",
-   *        }
-   *     ]
-   *   }
-   *   Please refer https://cloud.google.com/iam/docs/troubleshooting-withcond for
-   *   more details.
-   * @param {object} [options]
-   *   Call options. See {@link https://googleapis.dev/nodejs/google-gax/latest/interfaces/CallOptions.html|CallOptions} for more details.
-   * @returns {Promise} - The promise which resolves to an array.
-   *   The first element of the array is an object representing {@link protos.google.cloud.bigquery.v2.Dataset|Dataset}.
-   *   Please see the {@link https://github.com/googleapis/gax-nodejs/blob/master/client-libraries.md#regular-methods | documentation }
-   *   for more details and examples.
-   * @example <caption>include:samples/generated/v2/dataset_service.get_dataset.js</caption>
-   * region_tag:bigquery_v2_generated_DatasetService_GetDataset_async
-   */
+/**
+ * Returns the dataset specified by datasetID.
+ *
+ * @param {Object} request
+ *   The request object that will be sent.
+ * @param {string} request.projectId
+ *   Required. Project ID of the requested dataset
+ * @param {string} request.datasetId
+ *   Required. Dataset ID of the requested dataset
+ * @param {google.cloud.bigquery.v2.GetDatasetRequest.DatasetView} [request.datasetView]
+ *   Optional. Specifies the view that determines which dataset information is
+ *   returned. By default, metadata and ACL information are returned.
+ * @param {number} [request.accessPolicyVersion]
+ *   Optional. The version of the access policy schema to fetch.
+ *   Valid values are 0, 1, and 3. Requests specifying an invalid value will be
+ *   rejected.
+ *
+ *   Requests for conditional access policy binding in datasets must specify
+ *   version 3. Dataset with no conditional role bindings in access policy may
+ *   specify any valid value or leave the field unset.
+ *
+ *   This field will be mapped to [IAM Policy version]
+ *   (https://cloud.google.com/iam/docs/policies#versions) and will be used to
+ *   fetch policy from IAM.
+ *
+ *   If unset or if 0 or 1 value is used for dataset with conditional bindings,
+ *   access entry with condition will have role string appended by
+ *   'withcond' string followed by a hash value. For example :
+ *   {
+ *     "access": [
+ *        {
+ *           "role":
+ *           "roles/bigquery.dataViewer_with_conditionalbinding_7a34awqsda",
+ *           "userByEmail": "user@example.com",
+ *        }
+ *     ]
+ *   }
+ *   Please refer https://cloud.google.com/iam/docs/troubleshooting-withcond for
+ *   more details.
+ * @param {object} [options]
+ *   Call options. See {@link https://googleapis.dev/nodejs/google-gax/latest/interfaces/CallOptions.html|CallOptions} for more details.
+ * @returns {Promise} - The promise which resolves to an array.
+ *   The first element of the array is an object representing {@link protos.google.cloud.bigquery.v2.Dataset|Dataset}.
+ *   Please see the {@link https://github.com/googleapis/gax-nodejs/blob/master/client-libraries.md#regular-methods | documentation }
+ *   for more details and examples.
+ * @example <caption>include:samples/generated/v2/dataset_service.get_dataset.js</caption>
+ * region_tag:bigquery_v2_generated_DatasetService_GetDataset_async
+ */
   getDataset(
-    request?: protos.google.cloud.bigquery.v2.IGetDatasetRequest,
-    options?: CallOptions
-  ): Promise<
-    [
-      protos.google.cloud.bigquery.v2.IDataset,
-      protos.google.cloud.bigquery.v2.IGetDatasetRequest | undefined,
-      {} | undefined,
-    ]
-  >;
+      request?: protos.google.cloud.bigquery.v2.IGetDatasetRequest,
+      options?: CallOptions):
+      Promise<[
+        protos.google.cloud.bigquery.v2.IDataset,
+        protos.google.cloud.bigquery.v2.IGetDatasetRequest|undefined, {}|undefined
+      ]>;
   getDataset(
-    request: protos.google.cloud.bigquery.v2.IGetDatasetRequest,
-    options: CallOptions,
-    callback: Callback<
-      protos.google.cloud.bigquery.v2.IDataset,
-      protos.google.cloud.bigquery.v2.IGetDatasetRequest | null | undefined,
-      {} | null | undefined
-    >
-  ): void;
-  getDataset(
-    request: protos.google.cloud.bigquery.v2.IGetDatasetRequest,
-    callback: Callback<
-      protos.google.cloud.bigquery.v2.IDataset,
-      protos.google.cloud.bigquery.v2.IGetDatasetRequest | null | undefined,
-      {} | null | undefined
-    >
-  ): void;
-  getDataset(
-    request?: protos.google.cloud.bigquery.v2.IGetDatasetRequest,
-    optionsOrCallback?:
-      | CallOptions
-      | Callback<
+      request: protos.google.cloud.bigquery.v2.IGetDatasetRequest,
+      options: CallOptions,
+      callback: Callback<
           protos.google.cloud.bigquery.v2.IDataset,
-          protos.google.cloud.bigquery.v2.IGetDatasetRequest | null | undefined,
-          {} | null | undefined
-        >,
-    callback?: Callback<
-      protos.google.cloud.bigquery.v2.IDataset,
-      protos.google.cloud.bigquery.v2.IGetDatasetRequest | null | undefined,
-      {} | null | undefined
-    >
-  ): Promise<
-    [
-      protos.google.cloud.bigquery.v2.IDataset,
-      protos.google.cloud.bigquery.v2.IGetDatasetRequest | undefined,
-      {} | undefined,
-    ]
-  > | void {
+          protos.google.cloud.bigquery.v2.IGetDatasetRequest|null|undefined,
+          {}|null|undefined>): void;
+  getDataset(
+      request: protos.google.cloud.bigquery.v2.IGetDatasetRequest,
+      callback: Callback<
+          protos.google.cloud.bigquery.v2.IDataset,
+          protos.google.cloud.bigquery.v2.IGetDatasetRequest|null|undefined,
+          {}|null|undefined>): void;
+  getDataset(
+      request?: protos.google.cloud.bigquery.v2.IGetDatasetRequest,
+      optionsOrCallback?: CallOptions|Callback<
+          protos.google.cloud.bigquery.v2.IDataset,
+          protos.google.cloud.bigquery.v2.IGetDatasetRequest|null|undefined,
+          {}|null|undefined>,
+      callback?: Callback<
+          protos.google.cloud.bigquery.v2.IDataset,
+          protos.google.cloud.bigquery.v2.IGetDatasetRequest|null|undefined,
+          {}|null|undefined>):
+      Promise<[
+        protos.google.cloud.bigquery.v2.IDataset,
+        protos.google.cloud.bigquery.v2.IGetDatasetRequest|undefined, {}|undefined
+      ]>|void {
     request = request || {};
     let options: CallOptions;
     if (typeof optionsOrCallback === 'function' && callback === undefined) {
       callback = optionsOrCallback;
       options = {};
-    } else {
+    }
+    else {
       options = optionsOrCallback as CallOptions;
     }
     options = options || {};
     options.otherArgs = options.otherArgs || {};
     options.otherArgs.headers = options.otherArgs.headers || {};
-    options.otherArgs.headers['x-goog-request-params'] =
-      this._gaxModule.routingHeader.fromParams({
-        project_id: request.projectId ?? '',
-        dataset_id: request.datasetId ?? '',
-      });
+    options.otherArgs.headers[
+      'x-goog-request-params'
+    ] = this._gaxModule.routingHeader.fromParams({
+      'project_id': request.projectId ?? '',
+      'dataset_id': request.datasetId ?? '',
+    });
     this.initialize();
     return this.innerApiCalls.getDataset(request, options, callback);
   }
-  /**
-   * Creates a new empty dataset.
-   *
-   * @param {Object} request
-   *   The request object that will be sent.
-   * @param {string} request.projectId
-   *   Required. Project ID of the new dataset
-   * @param {google.cloud.bigquery.v2.Dataset} request.dataset
-   *   Required. Datasets resource to use for the new dataset
-   * @param {number} [request.accessPolicyVersion]
-   *   Optional. The version of the provided access policy schema.
-   *   Valid values are 0, 1, and 3. Requests specifying an invalid value will be
-   *   rejected.
-   *
-   *   This version refers to the schema version of the access policy and not the
-   *   version of access policy. This field's value can be equal or more
-   *   than the access policy schema provided in the request.
-   *   For example,
-   *     * Requests with conditional access policy binding in datasets must
-   *     specify
-   *       version 3.
-   *     * But dataset with no conditional role bindings in access policy
-   *       may specify any valid value or leave the field unset.
-   *   If unset or if 0 or 1 value is used for dataset with conditional
-   *   bindings, request will be rejected.
-   *
-   *   This field will be maped to IAM Policy version
-   *   (https://cloud.google.com/iam/docs/policies#versions) and will be used to
-   *   set policy in IAM.
-   * @param {object} [options]
-   *   Call options. See {@link https://googleapis.dev/nodejs/google-gax/latest/interfaces/CallOptions.html|CallOptions} for more details.
-   * @returns {Promise} - The promise which resolves to an array.
-   *   The first element of the array is an object representing {@link protos.google.cloud.bigquery.v2.Dataset|Dataset}.
-   *   Please see the {@link https://github.com/googleapis/gax-nodejs/blob/master/client-libraries.md#regular-methods | documentation }
-   *   for more details and examples.
-   * @example <caption>include:samples/generated/v2/dataset_service.insert_dataset.js</caption>
-   * region_tag:bigquery_v2_generated_DatasetService_InsertDataset_async
-   */
+/**
+ * Creates a new empty dataset.
+ *
+ * @param {Object} request
+ *   The request object that will be sent.
+ * @param {string} request.projectId
+ *   Required. Project ID of the new dataset
+ * @param {google.cloud.bigquery.v2.Dataset} request.dataset
+ *   Required. Datasets resource to use for the new dataset
+ * @param {number} [request.accessPolicyVersion]
+ *   Optional. The version of the provided access policy schema.
+ *   Valid values are 0, 1, and 3. Requests specifying an invalid value will be
+ *   rejected.
+ *
+ *   This version refers to the schema version of the access policy and not the
+ *   version of access policy. This field's value can be equal or more
+ *   than the access policy schema provided in the request.
+ *   For example,
+ *     * Requests with conditional access policy binding in datasets must
+ *     specify
+ *       version 3.
+ *     * But dataset with no conditional role bindings in access policy
+ *       may specify any valid value or leave the field unset.
+ *   If unset or if 0 or 1 value is used for dataset with conditional
+ *   bindings, request will be rejected.
+ *
+ *   This field will be mapped to IAM Policy version
+ *   (https://cloud.google.com/iam/docs/policies#versions) and will be used to
+ *   set policy in IAM.
+ * @param {object} [options]
+ *   Call options. See {@link https://googleapis.dev/nodejs/google-gax/latest/interfaces/CallOptions.html|CallOptions} for more details.
+ * @returns {Promise} - The promise which resolves to an array.
+ *   The first element of the array is an object representing {@link protos.google.cloud.bigquery.v2.Dataset|Dataset}.
+ *   Please see the {@link https://github.com/googleapis/gax-nodejs/blob/master/client-libraries.md#regular-methods | documentation }
+ *   for more details and examples.
+ * @example <caption>include:samples/generated/v2/dataset_service.insert_dataset.js</caption>
+ * region_tag:bigquery_v2_generated_DatasetService_InsertDataset_async
+ */
   insertDataset(
-    request?: protos.google.cloud.bigquery.v2.IInsertDatasetRequest,
-    options?: CallOptions
-  ): Promise<
-    [
-      protos.google.cloud.bigquery.v2.IDataset,
-      protos.google.cloud.bigquery.v2.IInsertDatasetRequest | undefined,
-      {} | undefined,
-    ]
-  >;
+      request?: protos.google.cloud.bigquery.v2.IInsertDatasetRequest,
+      options?: CallOptions):
+      Promise<[
+        protos.google.cloud.bigquery.v2.IDataset,
+        protos.google.cloud.bigquery.v2.IInsertDatasetRequest|undefined, {}|undefined
+      ]>;
   insertDataset(
-    request: protos.google.cloud.bigquery.v2.IInsertDatasetRequest,
-    options: CallOptions,
-    callback: Callback<
-      protos.google.cloud.bigquery.v2.IDataset,
-      protos.google.cloud.bigquery.v2.IInsertDatasetRequest | null | undefined,
-      {} | null | undefined
-    >
-  ): void;
-  insertDataset(
-    request: protos.google.cloud.bigquery.v2.IInsertDatasetRequest,
-    callback: Callback<
-      protos.google.cloud.bigquery.v2.IDataset,
-      protos.google.cloud.bigquery.v2.IInsertDatasetRequest | null | undefined,
-      {} | null | undefined
-    >
-  ): void;
-  insertDataset(
-    request?: protos.google.cloud.bigquery.v2.IInsertDatasetRequest,
-    optionsOrCallback?:
-      | CallOptions
-      | Callback<
+      request: protos.google.cloud.bigquery.v2.IInsertDatasetRequest,
+      options: CallOptions,
+      callback: Callback<
           protos.google.cloud.bigquery.v2.IDataset,
-          | protos.google.cloud.bigquery.v2.IInsertDatasetRequest
-          | null
-          | undefined,
-          {} | null | undefined
-        >,
-    callback?: Callback<
-      protos.google.cloud.bigquery.v2.IDataset,
-      protos.google.cloud.bigquery.v2.IInsertDatasetRequest | null | undefined,
-      {} | null | undefined
-    >
-  ): Promise<
-    [
-      protos.google.cloud.bigquery.v2.IDataset,
-      protos.google.cloud.bigquery.v2.IInsertDatasetRequest | undefined,
-      {} | undefined,
-    ]
-  > | void {
+          protos.google.cloud.bigquery.v2.IInsertDatasetRequest|null|undefined,
+          {}|null|undefined>): void;
+  insertDataset(
+      request: protos.google.cloud.bigquery.v2.IInsertDatasetRequest,
+      callback: Callback<
+          protos.google.cloud.bigquery.v2.IDataset,
+          protos.google.cloud.bigquery.v2.IInsertDatasetRequest|null|undefined,
+          {}|null|undefined>): void;
+  insertDataset(
+      request?: protos.google.cloud.bigquery.v2.IInsertDatasetRequest,
+      optionsOrCallback?: CallOptions|Callback<
+          protos.google.cloud.bigquery.v2.IDataset,
+          protos.google.cloud.bigquery.v2.IInsertDatasetRequest|null|undefined,
+          {}|null|undefined>,
+      callback?: Callback<
+          protos.google.cloud.bigquery.v2.IDataset,
+          protos.google.cloud.bigquery.v2.IInsertDatasetRequest|null|undefined,
+          {}|null|undefined>):
+      Promise<[
+        protos.google.cloud.bigquery.v2.IDataset,
+        protos.google.cloud.bigquery.v2.IInsertDatasetRequest|undefined, {}|undefined
+      ]>|void {
     request = request || {};
     let options: CallOptions;
     if (typeof optionsOrCallback === 'function' && callback === undefined) {
       callback = optionsOrCallback;
       options = {};
-    } else {
+    }
+    else {
       options = optionsOrCallback as CallOptions;
     }
     options = options || {};
     options.otherArgs = options.otherArgs || {};
     options.otherArgs.headers = options.otherArgs.headers || {};
-    options.otherArgs.headers['x-goog-request-params'] =
-      this._gaxModule.routingHeader.fromParams({
-        project_id: request.projectId ?? '',
-      });
+    options.otherArgs.headers[
+      'x-goog-request-params'
+    ] = this._gaxModule.routingHeader.fromParams({
+      'project_id': request.projectId ?? '',
+    });
     this.initialize();
     return this.innerApiCalls.insertDataset(request, options, callback);
   }
-  /**
-   * Updates information in an existing dataset. The update method replaces the
-   * entire dataset resource, whereas the patch method only replaces fields that
-   * are provided in the submitted dataset resource.
-   * This method supports RFC5789 patch semantics.
-   *
-   * @param {Object} request
-   *   The request object that will be sent.
-   * @param {string} request.projectId
-   *   Required. Project ID of the dataset being updated
-   * @param {string} request.datasetId
-   *   Required. Dataset ID of the dataset being updated
-   * @param {google.cloud.bigquery.v2.Dataset} request.dataset
-   *   Required. Datasets resource which will replace or patch the specified
-   *   dataset.
-   * @param {number} [request.accessPolicyVersion]
-   *   Optional. The version of the provided access policy schema.
-   *   Valid values are 0, 1, and 3. Requests specifying an invalid value will be
-   *   rejected.
-   *
-   *   This version refers to the schema version of the access policy and not the
-   *   version of access policy. This field's value can be equal or more
-   *   than the access policy schema provided in the request.
-   *   For example,
-   *     * Operations updating conditional access policy binding in datasets must
-   *     specify
-   *       version 3. Some of the operations are :
-   *         -  Adding a new access policy entry with condition.
-   *         -  Removing an access policy entry with condition.
-   *         -  Updating an access policy entry with condition.
-   *     * But dataset with no conditional role bindings in access policy
-   *       may specify any valid value or leave the field unset.
-   *   If unset or if 0 or 1 value is used for dataset with conditional
-   *   bindings, request will be rejected.
-   *
-   *   This field will be maped to IAM Policy version
-   *   (https://cloud.google.com/iam/docs/policies#versions) and will be used to
-   *   set policy in IAM.
-   * @param {object} [options]
-   *   Call options. See {@link https://googleapis.dev/nodejs/google-gax/latest/interfaces/CallOptions.html|CallOptions} for more details.
-   * @returns {Promise} - The promise which resolves to an array.
-   *   The first element of the array is an object representing {@link protos.google.cloud.bigquery.v2.Dataset|Dataset}.
-   *   Please see the {@link https://github.com/googleapis/gax-nodejs/blob/master/client-libraries.md#regular-methods | documentation }
-   *   for more details and examples.
-   * @example <caption>include:samples/generated/v2/dataset_service.patch_dataset.js</caption>
-   * region_tag:bigquery_v2_generated_DatasetService_PatchDataset_async
-   */
+/**
+ * Updates information in an existing dataset. The update method replaces the
+ * entire dataset resource, whereas the patch method only replaces fields that
+ * are provided in the submitted dataset resource.
+ * This method supports RFC5789 patch semantics.
+ *
+ * @param {Object} request
+ *   The request object that will be sent.
+ * @param {string} request.projectId
+ *   Required. Project ID of the dataset being updated
+ * @param {string} request.datasetId
+ *   Required. Dataset ID of the dataset being updated
+ * @param {google.cloud.bigquery.v2.Dataset} request.dataset
+ *   Required. Datasets resource which will replace or patch the specified
+ *   dataset.
+ * @param {number} [request.accessPolicyVersion]
+ *   Optional. The version of the provided access policy schema.
+ *   Valid values are 0, 1, and 3. Requests specifying an invalid value will be
+ *   rejected.
+ *
+ *   This version refers to the schema version of the access policy and not the
+ *   version of access policy. This field's value can be equal or more
+ *   than the access policy schema provided in the request.
+ *   For example,
+ *     * Operations updating conditional access policy binding in datasets must
+ *     specify
+ *       version 3. Some of the operations are :
+ *         -  Adding a new access policy entry with condition.
+ *         -  Removing an access policy entry with condition.
+ *         -  Updating an access policy entry with condition.
+ *     * But dataset with no conditional role bindings in access policy
+ *       may specify any valid value or leave the field unset.
+ *   If unset or if 0 or 1 value is used for dataset with conditional
+ *   bindings, request will be rejected.
+ *
+ *   This field will be mapped to IAM Policy version
+ *   (https://cloud.google.com/iam/docs/policies#versions) and will be used to
+ *   set policy in IAM.
+ * @param {object} [options]
+ *   Call options. See {@link https://googleapis.dev/nodejs/google-gax/latest/interfaces/CallOptions.html|CallOptions} for more details.
+ * @returns {Promise} - The promise which resolves to an array.
+ *   The first element of the array is an object representing {@link protos.google.cloud.bigquery.v2.Dataset|Dataset}.
+ *   Please see the {@link https://github.com/googleapis/gax-nodejs/blob/master/client-libraries.md#regular-methods | documentation }
+ *   for more details and examples.
+ * @example <caption>include:samples/generated/v2/dataset_service.patch_dataset.js</caption>
+ * region_tag:bigquery_v2_generated_DatasetService_PatchDataset_async
+ */
   patchDataset(
-    request?: protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest,
-    options?: CallOptions
-  ): Promise<
-    [
-      protos.google.cloud.bigquery.v2.IDataset,
-      protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest | undefined,
-      {} | undefined,
-    ]
-  >;
+      request?: protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest,
+      options?: CallOptions):
+      Promise<[
+        protos.google.cloud.bigquery.v2.IDataset,
+        protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest|undefined, {}|undefined
+      ]>;
   patchDataset(
-    request: protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest,
-    options: CallOptions,
-    callback: Callback<
-      protos.google.cloud.bigquery.v2.IDataset,
-      | protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest
-      | null
-      | undefined,
-      {} | null | undefined
-    >
-  ): void;
-  patchDataset(
-    request: protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest,
-    callback: Callback<
-      protos.google.cloud.bigquery.v2.IDataset,
-      | protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest
-      | null
-      | undefined,
-      {} | null | undefined
-    >
-  ): void;
-  patchDataset(
-    request?: protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest,
-    optionsOrCallback?:
-      | CallOptions
-      | Callback<
+      request: protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest,
+      options: CallOptions,
+      callback: Callback<
           protos.google.cloud.bigquery.v2.IDataset,
-          | protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest
-          | null
-          | undefined,
-          {} | null | undefined
-        >,
-    callback?: Callback<
-      protos.google.cloud.bigquery.v2.IDataset,
-      | protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest
-      | null
-      | undefined,
-      {} | null | undefined
-    >
-  ): Promise<
-    [
-      protos.google.cloud.bigquery.v2.IDataset,
-      protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest | undefined,
-      {} | undefined,
-    ]
-  > | void {
+          protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest|null|undefined,
+          {}|null|undefined>): void;
+  patchDataset(
+      request: protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest,
+      callback: Callback<
+          protos.google.cloud.bigquery.v2.IDataset,
+          protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest|null|undefined,
+          {}|null|undefined>): void;
+  patchDataset(
+      request?: protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest,
+      optionsOrCallback?: CallOptions|Callback<
+          protos.google.cloud.bigquery.v2.IDataset,
+          protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest|null|undefined,
+          {}|null|undefined>,
+      callback?: Callback<
+          protos.google.cloud.bigquery.v2.IDataset,
+          protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest|null|undefined,
+          {}|null|undefined>):
+      Promise<[
+        protos.google.cloud.bigquery.v2.IDataset,
+        protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest|undefined, {}|undefined
+      ]>|void {
     request = request || {};
     let options: CallOptions;
     if (typeof optionsOrCallback === 'function' && callback === undefined) {
       callback = optionsOrCallback;
       options = {};
-    } else {
+    }
+    else {
       options = optionsOrCallback as CallOptions;
     }
     options = options || {};
     options.otherArgs = options.otherArgs || {};
     options.otherArgs.headers = options.otherArgs.headers || {};
-    options.otherArgs.headers['x-goog-request-params'] =
-      this._gaxModule.routingHeader.fromParams({
-        project_id: request.projectId ?? '',
-        dataset_id: request.datasetId ?? '',
-      });
+    options.otherArgs.headers[
+      'x-goog-request-params'
+    ] = this._gaxModule.routingHeader.fromParams({
+      'project_id': request.projectId ?? '',
+      'dataset_id': request.datasetId ?? '',
+    });
     this.initialize();
     return this.innerApiCalls.patchDataset(request, options, callback);
   }
-  /**
-   * Updates information in an existing dataset. The update method replaces the
-   * entire dataset resource, whereas the patch method only replaces fields that
-   * are provided in the submitted dataset resource.
-   *
-   * @param {Object} request
-   *   The request object that will be sent.
-   * @param {string} request.projectId
-   *   Required. Project ID of the dataset being updated
-   * @param {string} request.datasetId
-   *   Required. Dataset ID of the dataset being updated
-   * @param {google.cloud.bigquery.v2.Dataset} request.dataset
-   *   Required. Datasets resource which will replace or patch the specified
-   *   dataset.
-   * @param {number} [request.accessPolicyVersion]
-   *   Optional. The version of the provided access policy schema.
-   *   Valid values are 0, 1, and 3. Requests specifying an invalid value will be
-   *   rejected.
-   *
-   *   This version refers to the schema version of the access policy and not the
-   *   version of access policy. This field's value can be equal or more
-   *   than the access policy schema provided in the request.
-   *   For example,
-   *     * Operations updating conditional access policy binding in datasets must
-   *     specify
-   *       version 3. Some of the operations are :
-   *         -  Adding a new access policy entry with condition.
-   *         -  Removing an access policy entry with condition.
-   *         -  Updating an access policy entry with condition.
-   *     * But dataset with no conditional role bindings in access policy
-   *       may specify any valid value or leave the field unset.
-   *   If unset or if 0 or 1 value is used for dataset with conditional
-   *   bindings, request will be rejected.
-   *
-   *   This field will be maped to IAM Policy version
-   *   (https://cloud.google.com/iam/docs/policies#versions) and will be used to
-   *   set policy in IAM.
-   * @param {object} [options]
-   *   Call options. See {@link https://googleapis.dev/nodejs/google-gax/latest/interfaces/CallOptions.html|CallOptions} for more details.
-   * @returns {Promise} - The promise which resolves to an array.
-   *   The first element of the array is an object representing {@link protos.google.cloud.bigquery.v2.Dataset|Dataset}.
-   *   Please see the {@link https://github.com/googleapis/gax-nodejs/blob/master/client-libraries.md#regular-methods | documentation }
-   *   for more details and examples.
-   * @example <caption>include:samples/generated/v2/dataset_service.update_dataset.js</caption>
-   * region_tag:bigquery_v2_generated_DatasetService_UpdateDataset_async
-   */
+/**
+ * Updates information in an existing dataset. The update method replaces the
+ * entire dataset resource, whereas the patch method only replaces fields that
+ * are provided in the submitted dataset resource.
+ *
+ * @param {Object} request
+ *   The request object that will be sent.
+ * @param {string} request.projectId
+ *   Required. Project ID of the dataset being updated
+ * @param {string} request.datasetId
+ *   Required. Dataset ID of the dataset being updated
+ * @param {google.cloud.bigquery.v2.Dataset} request.dataset
+ *   Required. Datasets resource which will replace or patch the specified
+ *   dataset.
+ * @param {number} [request.accessPolicyVersion]
+ *   Optional. The version of the provided access policy schema.
+ *   Valid values are 0, 1, and 3. Requests specifying an invalid value will be
+ *   rejected.
+ *
+ *   This version refers to the schema version of the access policy and not the
+ *   version of access policy. This field's value can be equal or more
+ *   than the access policy schema provided in the request.
+ *   For example,
+ *     * Operations updating conditional access policy binding in datasets must
+ *     specify
+ *       version 3. Some of the operations are :
+ *         -  Adding a new access policy entry with condition.
+ *         -  Removing an access policy entry with condition.
+ *         -  Updating an access policy entry with condition.
+ *     * But dataset with no conditional role bindings in access policy
+ *       may specify any valid value or leave the field unset.
+ *   If unset or if 0 or 1 value is used for dataset with conditional
+ *   bindings, request will be rejected.
+ *
+ *   This field will be mapped to IAM Policy version
+ *   (https://cloud.google.com/iam/docs/policies#versions) and will be used to
+ *   set policy in IAM.
+ * @param {object} [options]
+ *   Call options. See {@link https://googleapis.dev/nodejs/google-gax/latest/interfaces/CallOptions.html|CallOptions} for more details.
+ * @returns {Promise} - The promise which resolves to an array.
+ *   The first element of the array is an object representing {@link protos.google.cloud.bigquery.v2.Dataset|Dataset}.
+ *   Please see the {@link https://github.com/googleapis/gax-nodejs/blob/master/client-libraries.md#regular-methods | documentation }
+ *   for more details and examples.
+ * @example <caption>include:samples/generated/v2/dataset_service.update_dataset.js</caption>
+ * region_tag:bigquery_v2_generated_DatasetService_UpdateDataset_async
+ */
   updateDataset(
-    request?: protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest,
-    options?: CallOptions
-  ): Promise<
-    [
-      protos.google.cloud.bigquery.v2.IDataset,
-      protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest | undefined,
-      {} | undefined,
-    ]
-  >;
+      request?: protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest,
+      options?: CallOptions):
+      Promise<[
+        protos.google.cloud.bigquery.v2.IDataset,
+        protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest|undefined, {}|undefined
+      ]>;
   updateDataset(
-    request: protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest,
-    options: CallOptions,
-    callback: Callback<
-      protos.google.cloud.bigquery.v2.IDataset,
-      | protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest
-      | null
-      | undefined,
-      {} | null | undefined
-    >
-  ): void;
-  updateDataset(
-    request: protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest,
-    callback: Callback<
-      protos.google.cloud.bigquery.v2.IDataset,
-      | protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest
-      | null
-      | undefined,
-      {} | null | undefined
-    >
-  ): void;
-  updateDataset(
-    request?: protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest,
-    optionsOrCallback?:
-      | CallOptions
-      | Callback<
+      request: protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest,
+      options: CallOptions,
+      callback: Callback<
           protos.google.cloud.bigquery.v2.IDataset,
-          | protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest
-          | null
-          | undefined,
-          {} | null | undefined
-        >,
-    callback?: Callback<
-      protos.google.cloud.bigquery.v2.IDataset,
-      | protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest
-      | null
-      | undefined,
-      {} | null | undefined
-    >
-  ): Promise<
-    [
-      protos.google.cloud.bigquery.v2.IDataset,
-      protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest | undefined,
-      {} | undefined,
-    ]
-  > | void {
+          protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest|null|undefined,
+          {}|null|undefined>): void;
+  updateDataset(
+      request: protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest,
+      callback: Callback<
+          protos.google.cloud.bigquery.v2.IDataset,
+          protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest|null|undefined,
+          {}|null|undefined>): void;
+  updateDataset(
+      request?: protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest,
+      optionsOrCallback?: CallOptions|Callback<
+          protos.google.cloud.bigquery.v2.IDataset,
+          protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest|null|undefined,
+          {}|null|undefined>,
+      callback?: Callback<
+          protos.google.cloud.bigquery.v2.IDataset,
+          protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest|null|undefined,
+          {}|null|undefined>):
+      Promise<[
+        protos.google.cloud.bigquery.v2.IDataset,
+        protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest|undefined, {}|undefined
+      ]>|void {
     request = request || {};
     let options: CallOptions;
     if (typeof optionsOrCallback === 'function' && callback === undefined) {
       callback = optionsOrCallback;
       options = {};
-    } else {
+    }
+    else {
       options = optionsOrCallback as CallOptions;
     }
     options = options || {};
     options.otherArgs = options.otherArgs || {};
     options.otherArgs.headers = options.otherArgs.headers || {};
-    options.otherArgs.headers['x-goog-request-params'] =
-      this._gaxModule.routingHeader.fromParams({
-        project_id: request.projectId ?? '',
-        dataset_id: request.datasetId ?? '',
-      });
+    options.otherArgs.headers[
+      'x-goog-request-params'
+    ] = this._gaxModule.routingHeader.fromParams({
+      'project_id': request.projectId ?? '',
+      'dataset_id': request.datasetId ?? '',
+    });
     this.initialize();
     return this.innerApiCalls.updateDataset(request, options, callback);
   }
-  /**
-   * Deletes the dataset specified by the datasetId value. Before you can delete
-   * a dataset, you must delete all its tables, either manually or by specifying
-   * deleteContents. Immediately after deletion, you can create another dataset
-   * with the same name.
-   *
-   * @param {Object} request
-   *   The request object that will be sent.
-   * @param {string} request.projectId
-   *   Required. Project ID of the dataset being deleted
-   * @param {string} request.datasetId
-   *   Required. Dataset ID of dataset being deleted
-   * @param {boolean} request.deleteContents
-   *   If True, delete all the tables in the dataset.
-   *   If False and the dataset contains tables, the request will fail.
-   *   Default is False
-   * @param {object} [options]
-   *   Call options. See {@link https://googleapis.dev/nodejs/google-gax/latest/interfaces/CallOptions.html|CallOptions} for more details.
-   * @returns {Promise} - The promise which resolves to an array.
-   *   The first element of the array is an object representing {@link protos.google.protobuf.Empty|Empty}.
-   *   Please see the {@link https://github.com/googleapis/gax-nodejs/blob/master/client-libraries.md#regular-methods | documentation }
-   *   for more details and examples.
-   * @example <caption>include:samples/generated/v2/dataset_service.delete_dataset.js</caption>
-   * region_tag:bigquery_v2_generated_DatasetService_DeleteDataset_async
-   */
+/**
+ * Deletes the dataset specified by the datasetId value. Before you can delete
+ * a dataset, you must delete all its tables, either manually or by specifying
+ * deleteContents. Immediately after deletion, you can create another dataset
+ * with the same name.
+ *
+ * @param {Object} request
+ *   The request object that will be sent.
+ * @param {string} request.projectId
+ *   Required. Project ID of the dataset being deleted
+ * @param {string} request.datasetId
+ *   Required. Dataset ID of dataset being deleted
+ * @param {boolean} request.deleteContents
+ *   If True, delete all the tables in the dataset.
+ *   If False and the dataset contains tables, the request will fail.
+ *   Default is False
+ * @param {object} [options]
+ *   Call options. See {@link https://googleapis.dev/nodejs/google-gax/latest/interfaces/CallOptions.html|CallOptions} for more details.
+ * @returns {Promise} - The promise which resolves to an array.
+ *   The first element of the array is an object representing {@link protos.google.protobuf.Empty|Empty}.
+ *   Please see the {@link https://github.com/googleapis/gax-nodejs/blob/master/client-libraries.md#regular-methods | documentation }
+ *   for more details and examples.
+ * @example <caption>include:samples/generated/v2/dataset_service.delete_dataset.js</caption>
+ * region_tag:bigquery_v2_generated_DatasetService_DeleteDataset_async
+ */
   deleteDataset(
-    request?: protos.google.cloud.bigquery.v2.IDeleteDatasetRequest,
-    options?: CallOptions
-  ): Promise<
-    [
-      protos.google.protobuf.IEmpty,
-      protos.google.cloud.bigquery.v2.IDeleteDatasetRequest | undefined,
-      {} | undefined,
-    ]
-  >;
+      request?: protos.google.cloud.bigquery.v2.IDeleteDatasetRequest,
+      options?: CallOptions):
+      Promise<[
+        protos.google.protobuf.IEmpty,
+        protos.google.cloud.bigquery.v2.IDeleteDatasetRequest|undefined, {}|undefined
+      ]>;
   deleteDataset(
-    request: protos.google.cloud.bigquery.v2.IDeleteDatasetRequest,
-    options: CallOptions,
-    callback: Callback<
-      protos.google.protobuf.IEmpty,
-      protos.google.cloud.bigquery.v2.IDeleteDatasetRequest | null | undefined,
-      {} | null | undefined
-    >
-  ): void;
-  deleteDataset(
-    request: protos.google.cloud.bigquery.v2.IDeleteDatasetRequest,
-    callback: Callback<
-      protos.google.protobuf.IEmpty,
-      protos.google.cloud.bigquery.v2.IDeleteDatasetRequest | null | undefined,
-      {} | null | undefined
-    >
-  ): void;
-  deleteDataset(
-    request?: protos.google.cloud.bigquery.v2.IDeleteDatasetRequest,
-    optionsOrCallback?:
-      | CallOptions
-      | Callback<
+      request: protos.google.cloud.bigquery.v2.IDeleteDatasetRequest,
+      options: CallOptions,
+      callback: Callback<
           protos.google.protobuf.IEmpty,
-          | protos.google.cloud.bigquery.v2.IDeleteDatasetRequest
-          | null
-          | undefined,
-          {} | null | undefined
-        >,
-    callback?: Callback<
-      protos.google.protobuf.IEmpty,
-      protos.google.cloud.bigquery.v2.IDeleteDatasetRequest | null | undefined,
-      {} | null | undefined
-    >
-  ): Promise<
-    [
-      protos.google.protobuf.IEmpty,
-      protos.google.cloud.bigquery.v2.IDeleteDatasetRequest | undefined,
-      {} | undefined,
-    ]
-  > | void {
+          protos.google.cloud.bigquery.v2.IDeleteDatasetRequest|null|undefined,
+          {}|null|undefined>): void;
+  deleteDataset(
+      request: protos.google.cloud.bigquery.v2.IDeleteDatasetRequest,
+      callback: Callback<
+          protos.google.protobuf.IEmpty,
+          protos.google.cloud.bigquery.v2.IDeleteDatasetRequest|null|undefined,
+          {}|null|undefined>): void;
+  deleteDataset(
+      request?: protos.google.cloud.bigquery.v2.IDeleteDatasetRequest,
+      optionsOrCallback?: CallOptions|Callback<
+          protos.google.protobuf.IEmpty,
+          protos.google.cloud.bigquery.v2.IDeleteDatasetRequest|null|undefined,
+          {}|null|undefined>,
+      callback?: Callback<
+          protos.google.protobuf.IEmpty,
+          protos.google.cloud.bigquery.v2.IDeleteDatasetRequest|null|undefined,
+          {}|null|undefined>):
+      Promise<[
+        protos.google.protobuf.IEmpty,
+        protos.google.cloud.bigquery.v2.IDeleteDatasetRequest|undefined, {}|undefined
+      ]>|void {
     request = request || {};
     let options: CallOptions;
     if (typeof optionsOrCallback === 'function' && callback === undefined) {
       callback = optionsOrCallback;
       options = {};
-    } else {
+    }
+    else {
       options = optionsOrCallback as CallOptions;
     }
     options = options || {};
     options.otherArgs = options.otherArgs || {};
     options.otherArgs.headers = options.otherArgs.headers || {};
-    options.otherArgs.headers['x-goog-request-params'] =
-      this._gaxModule.routingHeader.fromParams({
-        project_id: request.projectId ?? '',
-        dataset_id: request.datasetId ?? '',
-      });
+    options.otherArgs.headers[
+      'x-goog-request-params'
+    ] = this._gaxModule.routingHeader.fromParams({
+      'project_id': request.projectId ?? '',
+      'dataset_id': request.datasetId ?? '',
+    });
     this.initialize();
     return this.innerApiCalls.deleteDataset(request, options, callback);
   }
-  /**
-   * Undeletes a dataset which is within time travel window based on datasetId.
-   * If a time is specified, the dataset version deleted at that time is
-   * undeleted, else the last live version is undeleted.
-   *
-   * @param {Object} request
-   *   The request object that will be sent.
-   * @param {string} request.projectId
-   *   Required. Project ID of the dataset to be undeleted
-   * @param {string} request.datasetId
-   *   Required. Dataset ID of dataset being deleted
-   * @param {google.protobuf.Timestamp} [request.deletionTime]
-   *   Optional. The exact time when the dataset was deleted. If not specified,
-   *   the most recently deleted version is undeleted. Undeleting a dataset
-   *   using deletion time is not supported.
-   * @param {object} [options]
-   *   Call options. See {@link https://googleapis.dev/nodejs/google-gax/latest/interfaces/CallOptions.html|CallOptions} for more details.
-   * @returns {Promise} - The promise which resolves to an array.
-   *   The first element of the array is an object representing {@link protos.google.cloud.bigquery.v2.Dataset|Dataset}.
-   *   Please see the {@link https://github.com/googleapis/gax-nodejs/blob/master/client-libraries.md#regular-methods | documentation }
-   *   for more details and examples.
-   * @example <caption>include:samples/generated/v2/dataset_service.undelete_dataset.js</caption>
-   * region_tag:bigquery_v2_generated_DatasetService_UndeleteDataset_async
-   */
+/**
+ * Undeletes a dataset which is within time travel window based on datasetId.
+ * If a time is specified, the dataset version deleted at that time is
+ * undeleted, else the last live version is undeleted.
+ *
+ * @param {Object} request
+ *   The request object that will be sent.
+ * @param {string} request.projectId
+ *   Required. Project ID of the dataset to be undeleted
+ * @param {string} request.datasetId
+ *   Required. Dataset ID of dataset being deleted
+ * @param {google.protobuf.Timestamp} [request.deletionTime]
+ *   Optional. The exact time when the dataset was deleted. If not specified,
+ *   the most recently deleted version is undeleted. Undeleting a dataset
+ *   using deletion time is not supported.
+ * @param {object} [options]
+ *   Call options. See {@link https://googleapis.dev/nodejs/google-gax/latest/interfaces/CallOptions.html|CallOptions} for more details.
+ * @returns {Promise} - The promise which resolves to an array.
+ *   The first element of the array is an object representing {@link protos.google.cloud.bigquery.v2.Dataset|Dataset}.
+ *   Please see the {@link https://github.com/googleapis/gax-nodejs/blob/master/client-libraries.md#regular-methods | documentation }
+ *   for more details and examples.
+ * @example <caption>include:samples/generated/v2/dataset_service.undelete_dataset.js</caption>
+ * region_tag:bigquery_v2_generated_DatasetService_UndeleteDataset_async
+ */
   undeleteDataset(
-    request?: protos.google.cloud.bigquery.v2.IUndeleteDatasetRequest,
-    options?: CallOptions
-  ): Promise<
-    [
-      protos.google.cloud.bigquery.v2.IDataset,
-      protos.google.cloud.bigquery.v2.IUndeleteDatasetRequest | undefined,
-      {} | undefined,
-    ]
-  >;
+      request?: protos.google.cloud.bigquery.v2.IUndeleteDatasetRequest,
+      options?: CallOptions):
+      Promise<[
+        protos.google.cloud.bigquery.v2.IDataset,
+        protos.google.cloud.bigquery.v2.IUndeleteDatasetRequest|undefined, {}|undefined
+      ]>;
   undeleteDataset(
-    request: protos.google.cloud.bigquery.v2.IUndeleteDatasetRequest,
-    options: CallOptions,
-    callback: Callback<
-      protos.google.cloud.bigquery.v2.IDataset,
-      | protos.google.cloud.bigquery.v2.IUndeleteDatasetRequest
-      | null
-      | undefined,
-      {} | null | undefined
-    >
-  ): void;
-  undeleteDataset(
-    request: protos.google.cloud.bigquery.v2.IUndeleteDatasetRequest,
-    callback: Callback<
-      protos.google.cloud.bigquery.v2.IDataset,
-      | protos.google.cloud.bigquery.v2.IUndeleteDatasetRequest
-      | null
-      | undefined,
-      {} | null | undefined
-    >
-  ): void;
-  undeleteDataset(
-    request?: protos.google.cloud.bigquery.v2.IUndeleteDatasetRequest,
-    optionsOrCallback?:
-      | CallOptions
-      | Callback<
+      request: protos.google.cloud.bigquery.v2.IUndeleteDatasetRequest,
+      options: CallOptions,
+      callback: Callback<
           protos.google.cloud.bigquery.v2.IDataset,
-          | protos.google.cloud.bigquery.v2.IUndeleteDatasetRequest
-          | null
-          | undefined,
-          {} | null | undefined
-        >,
-    callback?: Callback<
-      protos.google.cloud.bigquery.v2.IDataset,
-      | protos.google.cloud.bigquery.v2.IUndeleteDatasetRequest
-      | null
-      | undefined,
-      {} | null | undefined
-    >
-  ): Promise<
-    [
-      protos.google.cloud.bigquery.v2.IDataset,
-      protos.google.cloud.bigquery.v2.IUndeleteDatasetRequest | undefined,
-      {} | undefined,
-    ]
-  > | void {
+          protos.google.cloud.bigquery.v2.IUndeleteDatasetRequest|null|undefined,
+          {}|null|undefined>): void;
+  undeleteDataset(
+      request: protos.google.cloud.bigquery.v2.IUndeleteDatasetRequest,
+      callback: Callback<
+          protos.google.cloud.bigquery.v2.IDataset,
+          protos.google.cloud.bigquery.v2.IUndeleteDatasetRequest|null|undefined,
+          {}|null|undefined>): void;
+  undeleteDataset(
+      request?: protos.google.cloud.bigquery.v2.IUndeleteDatasetRequest,
+      optionsOrCallback?: CallOptions|Callback<
+          protos.google.cloud.bigquery.v2.IDataset,
+          protos.google.cloud.bigquery.v2.IUndeleteDatasetRequest|null|undefined,
+          {}|null|undefined>,
+      callback?: Callback<
+          protos.google.cloud.bigquery.v2.IDataset,
+          protos.google.cloud.bigquery.v2.IUndeleteDatasetRequest|null|undefined,
+          {}|null|undefined>):
+      Promise<[
+        protos.google.cloud.bigquery.v2.IDataset,
+        protos.google.cloud.bigquery.v2.IUndeleteDatasetRequest|undefined, {}|undefined
+      ]>|void {
     request = request || {};
     let options: CallOptions;
     if (typeof optionsOrCallback === 'function' && callback === undefined) {
       callback = optionsOrCallback;
       options = {};
-    } else {
+    }
+    else {
       options = optionsOrCallback as CallOptions;
     }
     options = options || {};
     options.otherArgs = options.otherArgs || {};
     options.otherArgs.headers = options.otherArgs.headers || {};
-    options.otherArgs.headers['x-goog-request-params'] =
-      this._gaxModule.routingHeader.fromParams({
-        project_id: request.projectId ?? '',
-        dataset_id: request.datasetId ?? '',
-      });
+    options.otherArgs.headers[
+      'x-goog-request-params'
+    ] = this._gaxModule.routingHeader.fromParams({
+      'project_id': request.projectId ?? '',
+      'dataset_id': request.datasetId ?? '',
+    });
     this.initialize();
     return this.innerApiCalls.undeleteDataset(request, options, callback);
   }
 
-  /**
-   * Lists all datasets in the specified project to which the user has been
-   * granted the READER dataset role.
-   *
-   * @param {Object} request
-   *   The request object that will be sent.
-   * @param {string} request.projectId
-   *   Required. Project ID of the datasets to be listed
-   * @param {google.protobuf.UInt32Value| number } request.maxResults
-   *   The maximum number of results to return in a single response page.
-   *   Leverage the page tokens to iterate through the entire collection.
-   * @param {string} request.pageToken
-   *   Page token, returned by a previous call, to request the next page of
-   *   results
-   * @param {boolean} request.all
-   *   Whether to list all datasets, including hidden ones
-   * @param {string} request.filter
-   *   An expression for filtering the results of the request by label.
-   *   The syntax is `labels.<name>[:<value>]`.
-   *   Multiple filters can be ANDed together by connecting with a space.
-   *   Example: `labels.department:receiving labels.active`.
-   *   See [Filtering datasets using
-   *   labels](https://cloud.google.com/bigquery/docs/filtering-labels#filtering_datasets_using_labels)
-   *   for details.
-   * @param {object} [options]
-   *   Call options. See {@link https://googleapis.dev/nodejs/google-gax/latest/interfaces/CallOptions.html|CallOptions} for more details.
-   * @returns {Promise} - The promise which resolves to an array.
-   *   The first element of the array is Array of {@link protos.google.cloud.bigquery.v2.ListFormatDataset|ListFormatDataset}.
-   *   The client library will perform auto-pagination by default: it will call the API as many
-   *   times as needed and will merge results from all the pages into this array.
-   *   Note that it can affect your quota.
-   *   We recommend using `listDatasetsAsync()`
-   *   method described below for async iteration which you can stop as needed.
-   *   Please see the {@link https://github.com/googleapis/gax-nodejs/blob/master/client-libraries.md#auto-pagination | documentation }
-   *   for more details and examples.
-   */
+ /**
+ * Lists all datasets in the specified project to which the user has been
+ * granted the READER dataset role.
+ *
+ * @param {Object} request
+ *   The request object that will be sent.
+ * @param {string} request.projectId
+ *   Required. Project ID of the datasets to be listed
+  * @param {google.protobuf.UInt32Value| number } request.maxResults
+ *   The maximum number of results to return in a single response page.
+ *   Leverage the page tokens to iterate through the entire collection.
+ * @param {string} request.pageToken
+ *   Page token, returned by a previous call, to request the next page of
+ *   results
+ * @param {boolean} request.all
+ *   Whether to list all datasets, including hidden ones
+ * @param {string} request.filter
+ *   An expression for filtering the results of the request by label.
+ *   The syntax is `labels.<name>[:<value>]`.
+ *   Multiple filters can be AND-ed together by connecting with a space.
+ *   Example: `labels.department:receiving labels.active`.
+ *   See [Filtering datasets using
+ *   labels](https://cloud.google.com/bigquery/docs/filtering-labels#filtering_datasets_using_labels)
+ *   for details.
+ * @param {object} [options]
+ *   Call options. See {@link https://googleapis.dev/nodejs/google-gax/latest/interfaces/CallOptions.html|CallOptions} for more details.
+ * @returns {Promise} - The promise which resolves to an array.
+ *   The first element of the array is Array of {@link protos.google.cloud.bigquery.v2.ListFormatDataset|ListFormatDataset}.
+ *   The client library will perform auto-pagination by default: it will call the API as many
+ *   times as needed and will merge results from all the pages into this array.
+ *   Note that it can affect your quota.
+ *   We recommend using `listDatasetsAsync()`
+ *   method described below for async iteration which you can stop as needed.
+ *   Please see the {@link https://github.com/googleapis/gax-nodejs/blob/master/client-libraries.md#auto-pagination | documentation }
+ *   for more details and examples.
+ */
   listDatasets(
-    request?: protos.google.cloud.bigquery.v2.IListDatasetsRequest,
-    options?: CallOptions
-  ): Promise<
-    [
-      protos.google.cloud.bigquery.v2.IListFormatDataset[],
-      protos.google.cloud.bigquery.v2.IListDatasetsRequest | null,
-      protos.google.cloud.bigquery.v2.IDatasetList,
-    ]
-  >;
+      request?: protos.google.cloud.bigquery.v2.IListDatasetsRequest,
+      options?: CallOptions):
+      Promise<[
+        protos.google.cloud.bigquery.v2.IListFormatDataset[],
+        protos.google.cloud.bigquery.v2.IListDatasetsRequest|null,
+        protos.google.cloud.bigquery.v2.IDatasetList
+      ]>;
   listDatasets(
-    request: protos.google.cloud.bigquery.v2.IListDatasetsRequest,
-    options: CallOptions,
-    callback: PaginationCallback<
-      protos.google.cloud.bigquery.v2.IListDatasetsRequest,
-      protos.google.cloud.bigquery.v2.IDatasetList | null | undefined,
-      protos.google.cloud.bigquery.v2.IListFormatDataset
-    >
-  ): void;
-  listDatasets(
-    request: protos.google.cloud.bigquery.v2.IListDatasetsRequest,
-    callback: PaginationCallback<
-      protos.google.cloud.bigquery.v2.IListDatasetsRequest,
-      protos.google.cloud.bigquery.v2.IDatasetList | null | undefined,
-      protos.google.cloud.bigquery.v2.IListFormatDataset
-    >
-  ): void;
-  listDatasets(
-    request?: protos.google.cloud.bigquery.v2.IListDatasetsRequest,
-    optionsOrCallback?:
-      | CallOptions
-      | PaginationCallback<
+      request: protos.google.cloud.bigquery.v2.IListDatasetsRequest,
+      options: CallOptions,
+      callback: PaginationCallback<
           protos.google.cloud.bigquery.v2.IListDatasetsRequest,
-          protos.google.cloud.bigquery.v2.IDatasetList | null | undefined,
-          protos.google.cloud.bigquery.v2.IListFormatDataset
-        >,
-    callback?: PaginationCallback<
-      protos.google.cloud.bigquery.v2.IListDatasetsRequest,
-      protos.google.cloud.bigquery.v2.IDatasetList | null | undefined,
-      protos.google.cloud.bigquery.v2.IListFormatDataset
-    >
-  ): Promise<
-    [
-      protos.google.cloud.bigquery.v2.IListFormatDataset[],
-      protos.google.cloud.bigquery.v2.IListDatasetsRequest | null,
-      protos.google.cloud.bigquery.v2.IDatasetList,
-    ]
-  > | void {
+          protos.google.cloud.bigquery.v2.IDatasetList|null|undefined,
+          protos.google.cloud.bigquery.v2.IListFormatDataset>): void;
+  listDatasets(
+      request: protos.google.cloud.bigquery.v2.IListDatasetsRequest,
+      callback: PaginationCallback<
+          protos.google.cloud.bigquery.v2.IListDatasetsRequest,
+          protos.google.cloud.bigquery.v2.IDatasetList|null|undefined,
+          protos.google.cloud.bigquery.v2.IListFormatDataset>): void;
+  listDatasets(
+      request?: protos.google.cloud.bigquery.v2.IListDatasetsRequest,
+      optionsOrCallback?: CallOptions|PaginationCallback<
+          protos.google.cloud.bigquery.v2.IListDatasetsRequest,
+          protos.google.cloud.bigquery.v2.IDatasetList|null|undefined,
+          protos.google.cloud.bigquery.v2.IListFormatDataset>,
+      callback?: PaginationCallback<
+          protos.google.cloud.bigquery.v2.IListDatasetsRequest,
+          protos.google.cloud.bigquery.v2.IDatasetList|null|undefined,
+          protos.google.cloud.bigquery.v2.IListFormatDataset>):
+      Promise<[
+        protos.google.cloud.bigquery.v2.IListFormatDataset[],
+        protos.google.cloud.bigquery.v2.IListDatasetsRequest|null,
+        protos.google.cloud.bigquery.v2.IDatasetList
+      ]>|void {
     request = request || {};
     // Converts number to Unit32 or Int32 value for non-compliant APIs.
-    if (request.maxResults && typeof request.maxResults === 'number') {
-      const maxResultsObject = {value: request.maxResults};
-      request.maxResults = maxResultsObject;
+    if(request.maxResults && typeof request.maxResults === "number"){
+      const maxResultsObject = {"value": request.maxResults}
+      request.maxResults = maxResultsObject
     }
     let options: CallOptions;
     if (typeof optionsOrCallback === 'function' && callback === undefined) {
       callback = optionsOrCallback;
       options = {};
-    } else {
+    }
+    else {
       options = optionsOrCallback as CallOptions;
     }
     options = options || {};
     options.otherArgs = options.otherArgs || {};
     options.otherArgs.headers = options.otherArgs.headers || {};
-    options.otherArgs.headers['x-goog-request-params'] =
-      this._gaxModule.routingHeader.fromParams({
-        project_id: request.projectId ?? '',
-      });
+    options.otherArgs.headers[
+      'x-goog-request-params'
+    ] = this._gaxModule.routingHeader.fromParams({
+      'project_id': request.projectId ?? '',
+    });
     this.initialize();
     return this.innerApiCalls.listDatasets(request, options, callback);
   }
 
-  /**
-   * Equivalent to `listDatasets`, but returns a NodeJS Stream object.
-   * @param {Object} request
-   *   The request object that will be sent.
-   * @param {string} request.projectId
-   *   Required. Project ID of the datasets to be listed
-   * @param {google.protobuf.UInt32Value} request.maxResults
-   *   The maximum number of results to return in a single response page.
-   *   Leverage the page tokens to iterate through the entire collection.
-   * @param {string} request.pageToken
-   *   Page token, returned by a previous call, to request the next page of
-   *   results
-   * @param {boolean} request.all
-   *   Whether to list all datasets, including hidden ones
-   * @param {string} request.filter
-   *   An expression for filtering the results of the request by label.
-   *   The syntax is `labels.<name>[:<value>]`.
-   *   Multiple filters can be ANDed together by connecting with a space.
-   *   Example: `labels.department:receiving labels.active`.
-   *   See [Filtering datasets using
-   *   labels](https://cloud.google.com/bigquery/docs/filtering-labels#filtering_datasets_using_labels)
-   *   for details.
-   * @param {object} [options]
-   *   Call options. See {@link https://googleapis.dev/nodejs/google-gax/latest/interfaces/CallOptions.html|CallOptions} for more details.
-   * @returns {Stream}
-   *   An object stream which emits an object representing {@link protos.google.cloud.bigquery.v2.ListFormatDataset|ListFormatDataset} on 'data' event.
-   *   The client library will perform auto-pagination by default: it will call the API as many
-   *   times as needed. Note that it can affect your quota.
-   *   We recommend using `listDatasetsAsync()`
-   *   method described below for async iteration which you can stop as needed.
-   *   Please see the {@link https://github.com/googleapis/gax-nodejs/blob/master/client-libraries.md#auto-pagination | documentation }
-   *   for more details and examples.
-   */
+/**
+ * Equivalent to `listDatasets`, but returns a NodeJS Stream object.
+ * @param {Object} request
+ *   The request object that will be sent.
+ * @param {string} request.projectId
+ *   Required. Project ID of the datasets to be listed
+ * @param {google.protobuf.UInt32Value} request.maxResults
+ *   The maximum number of results to return in a single response page.
+ *   Leverage the page tokens to iterate through the entire collection.
+ * @param {string} request.pageToken
+ *   Page token, returned by a previous call, to request the next page of
+ *   results
+ * @param {boolean} request.all
+ *   Whether to list all datasets, including hidden ones
+ * @param {string} request.filter
+ *   An expression for filtering the results of the request by label.
+ *   The syntax is `labels.<name>[:<value>]`.
+ *   Multiple filters can be AND-ed together by connecting with a space.
+ *   Example: `labels.department:receiving labels.active`.
+ *   See [Filtering datasets using
+ *   labels](https://cloud.google.com/bigquery/docs/filtering-labels#filtering_datasets_using_labels)
+ *   for details.
+ * @param {object} [options]
+ *   Call options. See {@link https://googleapis.dev/nodejs/google-gax/latest/interfaces/CallOptions.html|CallOptions} for more details.
+ * @returns {Stream}
+ *   An object stream which emits an object representing {@link protos.google.cloud.bigquery.v2.ListFormatDataset|ListFormatDataset} on 'data' event.
+ *   The client library will perform auto-pagination by default: it will call the API as many
+ *   times as needed. Note that it can affect your quota.
+ *   We recommend using `listDatasetsAsync()`
+ *   method described below for async iteration which you can stop as needed.
+ *   Please see the {@link https://github.com/googleapis/gax-nodejs/blob/master/client-libraries.md#auto-pagination | documentation }
+ *   for more details and examples.
+ */
   listDatasetsStream(
-    request?: protos.google.cloud.bigquery.v2.IListDatasetsRequest,
-    options?: CallOptions
-  ): Transform {
+      request?: protos.google.cloud.bigquery.v2.IListDatasetsRequest,
+      options?: CallOptions):
+    Transform{
     request = request || {};
     options = options || {};
     options.otherArgs = options.otherArgs || {};
     options.otherArgs.headers = options.otherArgs.headers || {};
-    options.otherArgs.headers['x-goog-request-params'] =
-      this._gaxModule.routingHeader.fromParams({
-        project_id: request.projectId ?? '',
-      });
+    options.otherArgs.headers[
+      'x-goog-request-params'
+    ] = this._gaxModule.routingHeader.fromParams({
+      'project_id': request.projectId ?? '',
+    });
     const defaultCallSettings = this._defaults['listDatasets'];
     const callSettings = defaultCallSettings.merge(options);
     this.initialize();
@@ -1207,54 +1043,55 @@ export class DatasetServiceClient {
     );
   }
 
-  /**
-   * Equivalent to `listDatasets`, but returns an iterable object.
-   *
-   * `for`-`await`-`of` syntax is used with the iterable to get response elements on-demand.
-   * @param {Object} request
-   *   The request object that will be sent.
-   * @param {string} request.projectId
-   *   Required. Project ID of the datasets to be listed
-   * @param {google.protobuf.UInt32Value} request.maxResults
-   *   The maximum number of results to return in a single response page.
-   *   Leverage the page tokens to iterate through the entire collection.
-   * @param {string} request.pageToken
-   *   Page token, returned by a previous call, to request the next page of
-   *   results
-   * @param {boolean} request.all
-   *   Whether to list all datasets, including hidden ones
-   * @param {string} request.filter
-   *   An expression for filtering the results of the request by label.
-   *   The syntax is `labels.<name>[:<value>]`.
-   *   Multiple filters can be ANDed together by connecting with a space.
-   *   Example: `labels.department:receiving labels.active`.
-   *   See [Filtering datasets using
-   *   labels](https://cloud.google.com/bigquery/docs/filtering-labels#filtering_datasets_using_labels)
-   *   for details.
-   * @param {object} [options]
-   *   Call options. See {@link https://googleapis.dev/nodejs/google-gax/latest/interfaces/CallOptions.html|CallOptions} for more details.
-   * @returns {Object}
-   *   An iterable Object that allows {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols | async iteration }.
-   *   When you iterate the returned iterable, each element will be an object representing
-   *   {@link protos.google.cloud.bigquery.v2.ListFormatDataset|ListFormatDataset}. The API will be called under the hood as needed, once per the page,
-   *   so you can stop the iteration when you don't need more results.
-   *   Please see the {@link https://github.com/googleapis/gax-nodejs/blob/master/client-libraries.md#auto-pagination | documentation }
-   *   for more details and examples.
-   * @example <caption>include:samples/generated/v2/dataset_service.list_datasets.js</caption>
-   * region_tag:bigquery_v2_generated_DatasetService_ListDatasets_async
-   */
+/**
+ * Equivalent to `listDatasets`, but returns an iterable object.
+ *
+ * `for`-`await`-`of` syntax is used with the iterable to get response elements on-demand.
+ * @param {Object} request
+ *   The request object that will be sent.
+ * @param {string} request.projectId
+ *   Required. Project ID of the datasets to be listed
+ * @param {google.protobuf.UInt32Value} request.maxResults
+ *   The maximum number of results to return in a single response page.
+ *   Leverage the page tokens to iterate through the entire collection.
+ * @param {string} request.pageToken
+ *   Page token, returned by a previous call, to request the next page of
+ *   results
+ * @param {boolean} request.all
+ *   Whether to list all datasets, including hidden ones
+ * @param {string} request.filter
+ *   An expression for filtering the results of the request by label.
+ *   The syntax is `labels.<name>[:<value>]`.
+ *   Multiple filters can be AND-ed together by connecting with a space.
+ *   Example: `labels.department:receiving labels.active`.
+ *   See [Filtering datasets using
+ *   labels](https://cloud.google.com/bigquery/docs/filtering-labels#filtering_datasets_using_labels)
+ *   for details.
+ * @param {object} [options]
+ *   Call options. See {@link https://googleapis.dev/nodejs/google-gax/latest/interfaces/CallOptions.html|CallOptions} for more details.
+ * @returns {Object}
+ *   An iterable Object that allows {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols | async iteration }.
+ *   When you iterate the returned iterable, each element will be an object representing
+ *   {@link protos.google.cloud.bigquery.v2.ListFormatDataset|ListFormatDataset}. The API will be called under the hood as needed, once per the page,
+ *   so you can stop the iteration when you don't need more results.
+ *   Please see the {@link https://github.com/googleapis/gax-nodejs/blob/master/client-libraries.md#auto-pagination | documentation }
+ *   for more details and examples.
+ * @example <caption>include:samples/generated/v2/dataset_service.list_datasets.js</caption>
+ * region_tag:bigquery_v2_generated_DatasetService_ListDatasets_async
+ */
   listDatasetsAsync(
-    request?: protos.google.cloud.bigquery.v2.IListDatasetsRequest,
-    options?: CallOptions
-  ): AsyncIterable<protos.google.cloud.bigquery.v2.IListFormatDataset> {
+      request?: protos.google.cloud.bigquery.v2.IListDatasetsRequest,
+      options?: CallOptions):
+    AsyncIterable<protos.google.cloud.bigquery.v2.IListFormatDataset>{
     request = request || {};
     options = options || {};
     options.otherArgs = options.otherArgs || {};
     options.otherArgs.headers = options.otherArgs.headers || {};
-    options.otherArgs.headers['x-goog-request-params'] =
-      this._gaxModule.routingHeader.fromParams({
-        project_id: request.projectId ?? '',
-      });
+    options.otherArgs.headers[
+      'x-goog-request-params'
+    ] = this._gaxModule.routingHeader.fromParams({
+      'project_id': request.projectId ?? '',
+    });
     const defaultCallSettings = this._defaults['listDatasets'];
     const callSettings = defaultCallSettings.merge(options);
     this.initialize();

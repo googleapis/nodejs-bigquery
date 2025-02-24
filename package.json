@@ -47,7 +47,7 @@
     "@types/mocha": "^10.0.7",
     "@types/node": "^20.16.4",
     "@types/sinon": "^10.0.20",
-    "c8": "^9.1.0",
+    "c8": "^10.1.2",
     "gapic-tools": "^0.4.6",
     "gts": "5.3.1",
     "jsdoc": "^4.0.3",
@@ -56,9 +56,7 @@
     "mocha": "^10.7.3",
     "pack-n-play": "^2.0.3",
     "sinon": "^18.0.0",
-    "typescript": "5.1.6",
-    "nise": "6.0.0",
-    "path-to-regexp": "6.3.0"
+    "typescript": "5.1.6"
   },
   "engines": {
     "node": ">=v14"
