@@ -55,8 +55,6 @@ function extract(node: ts.Node, depth = 0, client): void {
       // and can therefore safely make this assumption to get the human readable name
       const name = node.name as ts.Identifier;
       const nameEscapedText = name.escapedText as string;
-      // full implementation (not overload) of crud method for client
-      // this does not include "undelete" because "delete" will capture it
       const adminMethodPrefixes: string[] = [
         'get',
         'list',
@@ -65,11 +63,11 @@ function extract(node: ts.Node, depth = 0, client): void {
         'update',
         'insert',
         'cancel',
+        'undelete',
       ];
       adminMethodPrefixes.forEach((method: string) => {
-        // type is the node.type and we can deal with union types later
-        if (node.body && nameEscapedText.search(method) >= 0) {
-          // type is the node.type and we can deal with union types later
+        // full implementation (not overload) of crud method for client
+        if (node.body && nameEscapedText.startsWith(method) === true) {
           foundNodes.push([node.name, node]);
         }
       });
