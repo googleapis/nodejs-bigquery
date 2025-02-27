@@ -1,6 +1,6 @@
 import * as ts from 'typescript';
 const fs = require('fs');
-// TODO: maintainer - if a new client is added, add it to this list
+// TODO(maintainer) - if a new client is added, add it to this list
 
 // Intentionally not surfacing projectServiceClient - it has methods that do not follow these patterns
 const clients = [
@@ -46,9 +46,9 @@ function extract(node: ts.Node, depth = 0, client): void {
   function getKind(node: ts.Node) {
     return ts.SyntaxKind[node.kind];
   }
-  const thingsWeCareAbout = ['MethodDeclaration'];
+  const methodsToInclude = ['MethodDeclaration'];
   const kind = getKind(node);
-  if (thingsWeCareAbout.includes(kind)) {
+  if (methodsToInclude.includes(kind)) {
     if (ts.isMethodDeclaration(node)) {
       // this typecasting has to be done because the name of a MethodDeclaration
       // can be one of a few different types but in our use case we know it's an identifier
