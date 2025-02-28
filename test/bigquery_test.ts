@@ -18,8 +18,8 @@
 
 import {
   BigQueryClient,
-  bigQueryClientOptions,
-  subClientOptions,
+  BigQueryClientOptions,
+  SubClientOptions,
 } from '../src/bigquery';
 
 import * as protos from '../protos/protos';
@@ -51,7 +51,7 @@ describe('BigQueryClient has the number of clients and methods we expect', () =>
   });
 });
 describe('BigQueryClient should be able to handle passing in clients and options', () => {
-  const subOptions: subClientOptions = {
+  const subOptions: SubClientOptions = {
     opts: {
       universeDomain: 'fake-universe-domain',
     },
@@ -65,7 +65,7 @@ describe('BigQueryClient should be able to handle passing in clients and options
     const rowaccesspolicyClient = new RowAccessPolicyServiceClient(
       subOptions.opts
     );
-    const options: bigQueryClientOptions = {
+    const options: BigQueryClientOptions = {
       datasetClient: datasetClient,
       tableClient: tableClient,
       jobClient: jobClient,

@@ -70,12 +70,12 @@ import {
  *     const client = new DatasetServiceClient({fallback: true}, gax);
  *     ```
  */
-export type subClientOptions = {
+export type SubClientOptions = {
   opts?: ClientOptions;
   gaxInstance?: typeof gax | typeof gax.fallback;
 };
 
-export type bigQueryClientOptions = {
+export type BigQueryClientOptions = {
   datasetClient?: DatasetServiceClient;
   tableClient?: TableServiceClient;
   jobClient?: JobServiceClient;
@@ -93,13 +93,13 @@ export class BigQueryClient {
   rowaccesspolicyClient: RowAccessPolicyServiceClient;
 
   /**
-   * @param {object} [bigQueryClientOptions] - Enables user to instantiate clients separately and use those as the subclients.
-   * @param {object} [subClientOptions] - These options will be shared across subclients.
+   * @param {object} [BigQueryClientOptions] - Enables user to instantiate clients separately and use those as the subclients.
+   * @param {object} [SubClientOptions] - These options will be shared across subclients.
    * To have sub-clients with different options, instantiate each client separately.
    */
   constructor(
-    options?: bigQueryClientOptions,
-    subClientOptions?: subClientOptions
+    options?: BigQueryClientOptions,
+    subClientOptions?: SubClientOptions
   ) {
     this.datasetClient =
       options?.datasetClient ??

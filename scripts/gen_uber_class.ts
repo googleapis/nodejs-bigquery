@@ -3,7 +3,7 @@ const fs = require('fs');
 // TODO(maintainer) - if a new client is added, add it to this list
 
 // Intentionally not surfacing projectServiceClient - it has methods that do not follow these patterns
-const clients = [
+const CLIENTS = [
   'DatasetServiceClient',
   'TableServiceClient',
   'JobServiceClient',
@@ -11,7 +11,7 @@ const clients = [
   'RoutineServiceClient',
   'RowAccessPolicyServiceClient',
 ];
-const files = [
+const FILES = [
   '../src/v2/dataset_service_client.ts',
   '../src/v2/table_service_client.ts',
   '../src/v2/job_service_client.ts',
@@ -19,7 +19,7 @@ const files = [
   '../src/v2/routine_service_client.ts',
   '../src/v2/row_access_policy_service_client.ts',
 ];
-const output = `
+const HEADER = `
 // Copyright 2025 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -228,10 +228,10 @@ function buildOptionTypes(clients) {
    *     const client = new DatasetServiceClient({fallback: true}, gax);
    *     \`\`\`
    */\n`;
-  const subClientOptionsType = `export type subClientOptions = {opts?: ClientOptions,
+  const subClientOptionsType = `export type SubClientOptions = {opts?: ClientOptions,
     gaxInstance?: typeof gax | typeof gax.fallback};\n\n`;
   output = output.concat(docstring, subClientOptionsType);
-  let bigQueryOptionsType = 'export type bigQueryClientOptions = {\n';
+  let bigQueryOptionsType = 'export type BigQueryClientOptions = {\n';
   for (const client in clients) {
     let variableDecl = '';
     const clientName = parseClientName(clients[client]);
@@ -247,12 +247,12 @@ function buildOptionTypes(clients) {
 function buildClientConstructor(clients) {
   let variableDecl = '';
   const comment = `\t/**
-  * @param {object} [bigQueryClientOptions] - Enables user to instantiate clients separately and use those as the subclients.
-  * @param {object} [subClientOptions] - These options will be shared across subclients. 
+  * @param {object} [BigQueryClientOptions] - Enables user to instantiate clients separately and use those as the subclients.
+  * @param {object} [SubClientOptions] - These options will be shared across subclients.
   * To have sub-clients with different options, instantiate each client separately.
   */`;
   let constructorInitializers =
-    '\tconstructor(options?: bigQueryClientOptions, subClientOptions?: subClientOptions){\n';
+    '\tconstructor(options?: BigQueryClientOptions, subClientOptions?: SubClientOptions){\n';
   for (const client in clients) {
     const clientName = parseClientName(clients[client]);
     variableDecl = variableDecl.concat(
@@ -276,13 +276,13 @@ function buildClientConstructor(clients) {
 
 function buildOutput() {
   console.log('Regenerating bigquery.ts');
-  let newoutput;
-  newoutput = output.concat(makeImports(clients));
-  newoutput = newoutput.concat(buildOptionTypes(clients));
-  newoutput = newoutput.concat(buildClientConstructor(clients));
-  newoutput = newoutput.concat(astHelper(files, clients));
-  newoutput = newoutput.concat('\n}');
-  return newoutput;
+  let output = '';
+  output = HEADER.concat(makeImports(CLIENTS));
+  output = output.concat(buildOptionTypes(CLIENTS));
+  output = output.concat(buildClientConstructor(CLIENTS));
+  output = output.concat(astHelper(FILES, CLIENTS));
+  output = output.concat('\n}');
+  return output;
 }
 
 const finaloutput = buildOutput();
