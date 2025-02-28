@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 import * as ts from 'typescript';
 const fs = require('fs');
 // TODO(maintainer) - if a new client is added, add it to this list
@@ -34,7 +33,7 @@ const FILES = [
   '../src/v2/routine_service_client.ts',
   '../src/v2/row_access_policy_service_client.ts',
 ];
-const HEADER = `
+const LICENSE = `
 // Copyright 2025 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -53,6 +52,14 @@ const HEADER = `
 // ** All changes to this file may be overwritten. **
 
 `;
+
+// TODO: possibly add logic for stream and async?
+const EXCLUDED_FUNCTION_TERMS = [
+  'Stream', // excluding streaming because it would require different generation logic
+  'Async', // excluding async because it would require different generation logic
+  'getQueryResults', // only surfacing admin plane methods for now
+  'ProjectId', // don't surface getProjectId methods - there will be conflicts
+];
 let foundNodes = [];
 function extract(node: ts.Node, depth = 0, client): void {
   // Create a Program to represent the project, then pull out the
@@ -110,14 +117,18 @@ function ast(file, client) {
     const [name, node] = f;
     // create function name
     const functionName = `${name.escapedText}`;
-    if (
-      functionName.search('Stream') < 0 &&
-      functionName.search('Async') < 0 &&
-      functionName.search('ProjectId') < 0 &&
-      functionName.search('getQueryResults') < 0
-    ) {
+    let isExcludedFunction = false;
+    for (const term of EXCLUDED_FUNCTION_TERMS) {
+      if (functionName.search(term) >= 0) {
+        isExcludedFunction = true;
+        break;
+      }
+    }
+
+    if (!isExcludedFunction) {
+      // TODO - add docstring
       output = output.concat(`\n\t${functionName}(`);
-      // add parameters
+      // add parameters - pull in their name, whether they're optional or not, and their type
       let parametersList = '';
       let argumentsList = '';
       for (let i = 0; i < node.parameters.length; i++) {
@@ -152,20 +163,20 @@ function ast(file, client) {
         // otherwise you will run into issues similar to https://github.com/microsoft/TypeScript/issues/1805
         // we also add a check for undefined callback
         const optionsOrCallback = `
-            request = request || {};
-            let options: CallOptions;
-            if (typeof optionsOrCallback === 'function' && callback === undefined) {
-                callback = optionsOrCallback;
-                options = {};
-            }
-            else {
-                options = optionsOrCallback as CallOptions;
-            }
-            if (callback === undefined){
-              return this.${client.toLowerCase()}Client.${functionName}(request, options);
-            }
-            return this.${client.toLowerCase()}Client.${functionName}(${argumentsList});
-            }`;
+              request = request || {};
+              let options: CallOptions;
+              if (typeof optionsOrCallback === 'function' && callback === undefined) {
+                  callback = optionsOrCallback;
+                  options = {};
+              }
+              else {
+                  options = optionsOrCallback as CallOptions;
+              }
+              if (callback === undefined){
+                return this.${client.toLowerCase()}Client.${functionName}(request, options);
+              }
+              return this.${client.toLowerCase()}Client.${functionName}(${argumentsList});
+              }`;
         output = output.concat(`{\n${optionsOrCallback}\n`);
       }
     }
@@ -247,7 +258,7 @@ function buildOptionTypes(clients) {
    *     \`\`\`
    */\n`;
 
-   const subClientOptionsType = `export type SubClientOptions = {opts?: ClientOptions,
+  const subClientOptionsType = `export type SubClientOptions = {opts?: ClientOptions,
     gaxInstance?: typeof gax | typeof gax.fallback};\n\n`;
   output = output.concat(docstring, subClientOptionsType);
 
@@ -301,7 +312,7 @@ function buildClientConstructor(clients) {
 function buildOutput() {
   console.log('Regenerating bigquery.ts');
   let output = '';
-  output = HEADER.concat(makeImports(CLIENTS));
+  output = LICENSE.concat(makeImports(CLIENTS));
   output = output.concat(buildOptionTypes(CLIENTS));
   output = output.concat(buildClientConstructor(CLIENTS));
   output = output.concat(astHelper(FILES, CLIENTS));
