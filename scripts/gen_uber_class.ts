@@ -79,6 +79,8 @@ function extract(node: ts.Node, depth = 0, client): void {
   });
 }
 
+// contains the logic to traverse each file and pull in the nodes from the AST
+// that contain elements we want to use
 function ast(file, client) {
   let output = '';
   const program = ts.createProgram([file], {allowJs: true});
@@ -125,7 +127,6 @@ function ast(file, client) {
         output = output.concat(`\n\t\t${parameter}`);
       }
       output = output.concat(')');
-      // add return type
 
       const returnType = node.type!.getFullText();
       output = output.concat(`:${returnType}`);
@@ -150,7 +151,7 @@ function ast(file, client) {
             }
             return this.${client.toLowerCase()}Client.${functionName}(${argumentsList});
             }`;
-        output = output.concat(`{\n${optionsOrCallback}`);
+        output = output.concat(`{\n${optionsOrCallback}\n`);
       }
     }
   });

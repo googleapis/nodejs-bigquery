@@ -172,6 +172,7 @@ export class BigQueryClient {
     }
     return this.datasetClient.getDataset(request, options, callback);
   }
+
   insertDataset(
     request?: protos.google.cloud.bigquery.v2.IInsertDatasetRequest,
     optionsOrCallback?:
@@ -208,6 +209,7 @@ export class BigQueryClient {
     }
     return this.datasetClient.insertDataset(request, options, callback);
   }
+
   patchDataset(
     request?: protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest,
     optionsOrCallback?:
@@ -246,6 +248,7 @@ export class BigQueryClient {
     }
     return this.datasetClient.patchDataset(request, options, callback);
   }
+
   updateDataset(
     request?: protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest,
     optionsOrCallback?:
@@ -284,6 +287,7 @@ export class BigQueryClient {
     }
     return this.datasetClient.updateDataset(request, options, callback);
   }
+
   deleteDataset(
     request?: protos.google.cloud.bigquery.v2.IDeleteDatasetRequest,
     optionsOrCallback?:
@@ -320,6 +324,7 @@ export class BigQueryClient {
     }
     return this.datasetClient.deleteDataset(request, options, callback);
   }
+
   undeleteDataset(
     request?: protos.google.cloud.bigquery.v2.IUndeleteDatasetRequest,
     optionsOrCallback?:
@@ -358,6 +363,7 @@ export class BigQueryClient {
     }
     return this.datasetClient.undeleteDataset(request, options, callback);
   }
+
   listDatasets(
     request?: protos.google.cloud.bigquery.v2.IListDatasetsRequest,
     optionsOrCallback?:
@@ -392,6 +398,7 @@ export class BigQueryClient {
     }
     return this.datasetClient.listDatasets(request, options, callback);
   }
+
   getTable(
     request?: protos.google.cloud.bigquery.v2.IGetTableRequest,
     optionsOrCallback?:
@@ -426,6 +433,7 @@ export class BigQueryClient {
     }
     return this.tableClient.getTable(request, options, callback);
   }
+
   insertTable(
     request?: protos.google.cloud.bigquery.v2.IInsertTableRequest,
     optionsOrCallback?:
@@ -462,6 +470,7 @@ export class BigQueryClient {
     }
     return this.tableClient.insertTable(request, options, callback);
   }
+
   patchTable(
     request?: protos.google.cloud.bigquery.v2.IUpdateOrPatchTableRequest,
     optionsOrCallback?:
@@ -500,6 +509,7 @@ export class BigQueryClient {
     }
     return this.tableClient.patchTable(request, options, callback);
   }
+
   updateTable(
     request?: protos.google.cloud.bigquery.v2.IUpdateOrPatchTableRequest,
     optionsOrCallback?:
@@ -538,6 +548,7 @@ export class BigQueryClient {
     }
     return this.tableClient.updateTable(request, options, callback);
   }
+
   deleteTable(
     request?: protos.google.cloud.bigquery.v2.IDeleteTableRequest,
     optionsOrCallback?:
@@ -574,6 +585,7 @@ export class BigQueryClient {
     }
     return this.tableClient.deleteTable(request, options, callback);
   }
+
   listTables(
     request?: protos.google.cloud.bigquery.v2.IListTablesRequest,
     optionsOrCallback?:
@@ -608,6 +620,7 @@ export class BigQueryClient {
     }
     return this.tableClient.listTables(request, options, callback);
   }
+
   cancelJob(
     request?: protos.google.cloud.bigquery.v2.ICancelJobRequest,
     optionsOrCallback?:
@@ -642,6 +655,7 @@ export class BigQueryClient {
     }
     return this.jobClient.cancelJob(request, options, callback);
   }
+
   getJob(
     request?: protos.google.cloud.bigquery.v2.IGetJobRequest,
     optionsOrCallback?:
@@ -676,6 +690,7 @@ export class BigQueryClient {
     }
     return this.jobClient.getJob(request, options, callback);
   }
+
   insertJob(
     request?: protos.google.cloud.bigquery.v2.IInsertJobRequest,
     optionsOrCallback?:
@@ -710,6 +725,7 @@ export class BigQueryClient {
     }
     return this.jobClient.insertJob(request, options, callback);
   }
+
   deleteJob(
     request?: protos.google.cloud.bigquery.v2.IDeleteJobRequest,
     optionsOrCallback?:
@@ -744,6 +760,7 @@ export class BigQueryClient {
     }
     return this.jobClient.deleteJob(request, options, callback);
   }
+
   listJobs(
     request?: protos.google.cloud.bigquery.v2.IListJobsRequest,
     optionsOrCallback?:
@@ -778,6 +795,7 @@ export class BigQueryClient {
     }
     return this.jobClient.listJobs(request, options, callback);
   }
+
   getModel(
     request?: protos.google.cloud.bigquery.v2.IGetModelRequest,
     optionsOrCallback?:
@@ -812,6 +830,7 @@ export class BigQueryClient {
     }
     return this.modelClient.getModel(request, options, callback);
   }
+
   patchModel(
     request?: protos.google.cloud.bigquery.v2.IPatchModelRequest,
     optionsOrCallback?:
@@ -846,6 +865,7 @@ export class BigQueryClient {
     }
     return this.modelClient.patchModel(request, options, callback);
   }
+
   deleteModel(
     request?: protos.google.cloud.bigquery.v2.IDeleteModelRequest,
     optionsOrCallback?:
@@ -882,6 +902,7 @@ export class BigQueryClient {
     }
     return this.modelClient.deleteModel(request, options, callback);
   }
+
   listModels(
     request?: protos.google.cloud.bigquery.v2.IListModelsRequest,
     optionsOrCallback?:
@@ -918,6 +939,7 @@ export class BigQueryClient {
     }
     return this.modelClient.listModels(request, options, callback);
   }
+
   getRoutine(
     request?: protos.google.cloud.bigquery.v2.IGetRoutineRequest,
     optionsOrCallback?:
@@ -952,6 +974,7 @@ export class BigQueryClient {
     }
     return this.routineClient.getRoutine(request, options, callback);
   }
+
   insertRoutine(
     request?: protos.google.cloud.bigquery.v2.IInsertRoutineRequest,
     optionsOrCallback?:
@@ -988,6 +1011,7 @@ export class BigQueryClient {
     }
     return this.routineClient.insertRoutine(request, options, callback);
   }
+
   updateRoutine(
     request?: protos.google.cloud.bigquery.v2.IUpdateRoutineRequest,
     optionsOrCallback?:
@@ -1024,6 +1048,7 @@ export class BigQueryClient {
     }
     return this.routineClient.updateRoutine(request, options, callback);
   }
+
   patchRoutine(
     request?: protos.google.cloud.bigquery.v2.IPatchRoutineRequest,
     optionsOrCallback?:
@@ -1060,6 +1085,7 @@ export class BigQueryClient {
     }
     return this.routineClient.patchRoutine(request, options, callback);
   }
+
   deleteRoutine(
     request?: protos.google.cloud.bigquery.v2.IDeleteRoutineRequest,
     optionsOrCallback?:
@@ -1096,6 +1122,7 @@ export class BigQueryClient {
     }
     return this.routineClient.deleteRoutine(request, options, callback);
   }
+
   listRoutines(
     request?: protos.google.cloud.bigquery.v2.IListRoutinesRequest,
     optionsOrCallback?:
@@ -1132,6 +1159,7 @@ export class BigQueryClient {
     }
     return this.routineClient.listRoutines(request, options, callback);
   }
+
   listRowAccessPolicies(
     request?: protos.google.cloud.bigquery.v2.IListRowAccessPoliciesRequest,
     optionsOrCallback?:
