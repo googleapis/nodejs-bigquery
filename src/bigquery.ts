@@ -24,6 +24,7 @@ import {
   RoutineServiceClient,
   RowAccessPolicyServiceClient,
 } from '.';
+
 import type * as gax from 'google-gax';
 import {
   Callback,
@@ -31,6 +32,7 @@ import {
   ClientOptions,
   PaginationCallback,
 } from 'google-gax';
+import {Transform} from 'stream';
 /**
  * Options passed to the underlying client.
  *
@@ -399,6 +401,20 @@ export class BigQueryClient {
     return this.datasetClient.listDatasets(request, options, callback);
   }
 
+  listDatasetsStream(
+    request?: protos.google.cloud.bigquery.v2.IListDatasetsRequest,
+    options?: CallOptions
+  ): Transform {
+    return this.datasetClient.listDatasetsStream(request, options);
+  }
+
+  listDatasetsAsync(
+    request?: protos.google.cloud.bigquery.v2.IListDatasetsRequest,
+    options?: CallOptions
+  ): AsyncIterable<protos.google.cloud.bigquery.v2.IListFormatDataset> {
+    return this.datasetClient.listDatasetsAsync(request, options);
+  }
+
   getTable(
     request?: protos.google.cloud.bigquery.v2.IGetTableRequest,
     optionsOrCallback?:
@@ -621,6 +637,20 @@ export class BigQueryClient {
     return this.tableClient.listTables(request, options, callback);
   }
 
+  listTablesStream(
+    request?: protos.google.cloud.bigquery.v2.IListTablesRequest,
+    options?: CallOptions
+  ): Transform {
+    return this.tableClient.listTablesStream(request, options);
+  }
+
+  listTablesAsync(
+    request?: protos.google.cloud.bigquery.v2.IListTablesRequest,
+    options?: CallOptions
+  ): AsyncIterable<protos.google.cloud.bigquery.v2.IListFormatTable> {
+    return this.tableClient.listTablesAsync(request, options);
+  }
+
   cancelJob(
     request?: protos.google.cloud.bigquery.v2.ICancelJobRequest,
     optionsOrCallback?:
@@ -796,6 +826,20 @@ export class BigQueryClient {
     return this.jobClient.listJobs(request, options, callback);
   }
 
+  listJobsStream(
+    request?: protos.google.cloud.bigquery.v2.IListJobsRequest,
+    options?: CallOptions
+  ): Transform {
+    return this.jobClient.listJobsStream(request, options);
+  }
+
+  listJobsAsync(
+    request?: protos.google.cloud.bigquery.v2.IListJobsRequest,
+    options?: CallOptions
+  ): AsyncIterable<protos.google.cloud.bigquery.v2.IListFormatJob> {
+    return this.jobClient.listJobsAsync(request, options);
+  }
+
   getModel(
     request?: protos.google.cloud.bigquery.v2.IGetModelRequest,
     optionsOrCallback?:
@@ -938,6 +982,20 @@ export class BigQueryClient {
       return this.modelClient.listModels(request, options);
     }
     return this.modelClient.listModels(request, options, callback);
+  }
+
+  listModelsStream(
+    request?: protos.google.cloud.bigquery.v2.IListModelsRequest,
+    options?: CallOptions
+  ): Transform {
+    return this.modelClient.listModelsStream(request, options);
+  }
+
+  listModelsAsync(
+    request?: protos.google.cloud.bigquery.v2.IListModelsRequest,
+    options?: CallOptions
+  ): AsyncIterable<protos.google.cloud.bigquery.v2.IModel> {
+    return this.modelClient.listModelsAsync(request, options);
   }
 
   getRoutine(
@@ -1160,6 +1218,20 @@ export class BigQueryClient {
     return this.routineClient.listRoutines(request, options, callback);
   }
 
+  listRoutinesStream(
+    request?: protos.google.cloud.bigquery.v2.IListRoutinesRequest,
+    options?: CallOptions
+  ): Transform {
+    return this.routineClient.listRoutinesStream(request, options);
+  }
+
+  listRoutinesAsync(
+    request?: protos.google.cloud.bigquery.v2.IListRoutinesRequest,
+    options?: CallOptions
+  ): AsyncIterable<protos.google.cloud.bigquery.v2.IRoutine> {
+    return this.routineClient.listRoutinesAsync(request, options);
+  }
+
   listRowAccessPolicies(
     request?: protos.google.cloud.bigquery.v2.IListRowAccessPoliciesRequest,
     optionsOrCallback?:
@@ -1200,6 +1272,26 @@ export class BigQueryClient {
       request,
       options,
       callback
+    );
+  }
+
+  listRowAccessPoliciesStream(
+    request?: protos.google.cloud.bigquery.v2.IListRowAccessPoliciesRequest,
+    options?: CallOptions
+  ): Transform {
+    return this.rowaccesspolicyClient.listRowAccessPoliciesStream(
+      request,
+      options
+    );
+  }
+
+  listRowAccessPoliciesAsync(
+    request?: protos.google.cloud.bigquery.v2.IListRowAccessPoliciesRequest,
+    options?: CallOptions
+  ): AsyncIterable<protos.google.cloud.bigquery.v2.IRowAccessPolicy> {
+    return this.rowaccesspolicyClient.listRowAccessPoliciesAsync(
+      request,
+      options
     );
   }
 }

@@ -158,11 +158,22 @@ function ast(file, client) {
       output = output.concat(`:${returnType}`);
       // call underlying client function
       if (node.body) {
-        // this logic needs to be surfaced from underlying clients
-        // to make sure our parameters play nicely with underlying overloads
-        // otherwise you will run into issues similar to https://github.com/microsoft/TypeScript/issues/1805
-        // we also add a check for undefined callback
-        const optionsOrCallback = `
+        let optionsOrCallback = '';
+        // TODO - camelcase of row access policies
+        if (functionName.endsWith('Stream')) {
+          // TODO change
+          optionsOrCallback = `
+          return this.${client.toLowerCase()}Client.${functionName}(request, options);}`;
+        } else if (functionName.endsWith('Async')) {
+          // TODO change
+          optionsOrCallback = `
+          return this.${client.toLowerCase()}Client.${functionName}(request, options);}`;
+        } else {
+          // this logic needs to be surfaced from underlying clients
+          // to make sure our parameters play nicely with underlying overloads
+          // otherwise you will run into issues similar to https://github.com/microsoft/TypeScript/issues/1805
+          // we also add a check for undefined callback
+          optionsOrCallback = `
               request = request || {};
               let options: CallOptions;
               if (typeof optionsOrCallback === 'function' && callback === undefined) {
@@ -177,6 +188,7 @@ function ast(file, client) {
               }
               return this.${client.toLowerCase()}Client.${functionName}(${argumentsList});
               }`;
+        }
         output = output.concat(`{\n${optionsOrCallback}\n`);
       }
     }
@@ -203,11 +215,13 @@ function makeImports(clients) {
   }
 
   imports = imports.concat('} from ".";\n');
-  imports = imports.concat('import type * as gax from "google-gax";\n');
+  const staticImports = `
+  import type * as gax from "google-gax";
+  import {Callback, CallOptions, ClientOptions, PaginationCallback} from "google-gax";
+  import {Transform} from 'stream';
+  `;
 
-  imports = imports.concat(
-    'import {Callback, CallOptions, ClientOptions, PaginationCallback} from "google-gax";\n'
-  );
+  imports = imports.concat(staticImports);
   return imports;
 }
 
