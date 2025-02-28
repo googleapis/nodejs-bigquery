@@ -62,7 +62,7 @@ describe('BigQueryClient should be able to handle passing in clients and options
     const jobClient = new JobServiceClient(subOptions.opts);
     const routineClient = new RoutineServiceClient(subOptions.opts);
     const modelClient = new ModelServiceClient(subOptions.opts);
-    const rowaccesspolicyClient = new RowAccessPolicyServiceClient(
+    const rowAccessPolicyClient = new RowAccessPolicyServiceClient(
       subOptions.opts
     );
     const options: BigQueryClientOptions = {
@@ -71,7 +71,7 @@ describe('BigQueryClient should be able to handle passing in clients and options
       jobClient: jobClient,
       routineClient: routineClient,
       modelClient: modelClient,
-      rowaccesspolicyClient: rowaccesspolicyClient,
+      rowAccessPolicyClient: rowAccessPolicyClient,
     };
     const client = new BigQueryClient(options);
     assert.ok(client);
@@ -96,7 +96,7 @@ describe('BigQueryClient should be able to handle passing in clients and options
       'bigquery.fake-universe-domain'
     );
     assert.deepStrictEqual(
-      client.rowaccesspolicyClient.apiEndpoint,
+      client.rowAccessPolicyClient.apiEndpoint,
       'bigquery.fake-universe-domain'
     );
   });
@@ -124,7 +124,7 @@ describe('BigQueryClient should be able to handle passing in clients and options
       'bigquery.fake-universe-domain'
     );
     assert.deepStrictEqual(
-      client.rowaccesspolicyClient.apiEndpoint,
+      client.rowAccessPolicyClient.apiEndpoint,
       'bigquery.fake-universe-domain'
     );
   });
@@ -631,7 +631,7 @@ describe('BigQueryClient should call underlying client methods asynchronously', 
         tableId: 'tableId', // Ensure all required fields are present
       } as protos.google.cloud.bigquery.v2.IListRowAccessPoliciesRequest;
       const listStub = sinon
-        .stub(client.rowaccesspolicyClient, 'listRowAccessPolicies')
+        .stub(client.rowAccessPolicyClient, 'listRowAccessPolicies')
         .resolves('FakeRowAccessPoliciesList');
       await client.listRowAccessPolicies(rowAccessPolicyRequest);
       assert.ok(listStub.calledOnce);
@@ -641,7 +641,7 @@ describe('BigQueryClient should call underlying client methods asynchronously', 
         projectId: 'projectId',
       } as protos.google.cloud.bigquery.v2.IListRowAccessPoliciesRequest;
       const listStub = sinon
-        .stub(client.rowaccesspolicyClient, 'listRowAccessPoliciesStream')
+        .stub(client.rowAccessPolicyClient, 'listRowAccessPoliciesStream')
         .resolves('FakeRowAccessPoliciesListStream');
 
       await client.listRowAccessPoliciesStream(rowAccessPoliciesRequest);
@@ -652,7 +652,7 @@ describe('BigQueryClient should call underlying client methods asynchronously', 
         projectId: 'projectId',
       } as protos.google.cloud.bigquery.v2.IListRowAccessPoliciesRequest;
       const listStub = sinon
-        .stub(client.rowaccesspolicyClient, 'listRowAccessPoliciesAsync')
+        .stub(client.rowAccessPolicyClient, 'listRowAccessPoliciesAsync')
         .resolves('FakeRowAccessPoliciesListIterable');
 
       await client.listRowAccessPoliciesAsync(rowAccessPoliciesRequest);
@@ -1226,7 +1226,7 @@ describe('BigQueryClient should call underlying client methods synchronously', (
         tableId: 'tableId', // Ensure all required fields are present
       } as protos.google.cloud.bigquery.v2.IListRowAccessPoliciesRequest;
       const listStub = sinon
-        .stub(client.rowaccesspolicyClient, 'listRowAccessPolicies')
+        .stub(client.rowAccessPolicyClient, 'listRowAccessPolicies')
         .callsArgWith(2, null, 'FakeRowAccessPoliciesList');
       const resp = client.listRowAccessPolicies(
         rowAccessPolicyRequest,

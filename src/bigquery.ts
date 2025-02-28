@@ -83,7 +83,7 @@ export type BigQueryClientOptions = {
   jobClient?: JobServiceClient;
   modelClient?: ModelServiceClient;
   routineClient?: RoutineServiceClient;
-  rowaccesspolicyClient?: RowAccessPolicyServiceClient;
+  rowAccessPolicyClient?: RowAccessPolicyServiceClient;
 };
 
 export class BigQueryClient {
@@ -92,7 +92,7 @@ export class BigQueryClient {
   jobClient: JobServiceClient;
   modelClient: ModelServiceClient;
   routineClient: RoutineServiceClient;
-  rowaccesspolicyClient: RowAccessPolicyServiceClient;
+  rowAccessPolicyClient: RowAccessPolicyServiceClient;
 
   /**
    * @param {object} [BigQueryClientOptions] - Enables user to instantiate clients separately and use those as the subclients.
@@ -133,8 +133,8 @@ export class BigQueryClient {
         subClientOptions?.opts,
         subClientOptions?.gaxInstance
       );
-    this.rowaccesspolicyClient =
-      options?.rowaccesspolicyClient ??
+    this.rowAccessPolicyClient =
+      options?.rowAccessPolicyClient ??
       new RowAccessPolicyServiceClient(
         subClientOptions?.opts,
         subClientOptions?.gaxInstance
@@ -1266,9 +1266,9 @@ export class BigQueryClient {
       options = optionsOrCallback as CallOptions;
     }
     if (callback === undefined) {
-      return this.rowaccesspolicyClient.listRowAccessPolicies(request, options);
+      return this.rowAccessPolicyClient.listRowAccessPolicies(request, options);
     }
-    return this.rowaccesspolicyClient.listRowAccessPolicies(
+    return this.rowAccessPolicyClient.listRowAccessPolicies(
       request,
       options,
       callback
@@ -1279,7 +1279,7 @@ export class BigQueryClient {
     request?: protos.google.cloud.bigquery.v2.IListRowAccessPoliciesRequest,
     options?: CallOptions
   ): Transform {
-    return this.rowaccesspolicyClient.listRowAccessPoliciesStream(
+    return this.rowAccessPolicyClient.listRowAccessPoliciesStream(
       request,
       options
     );
@@ -1289,7 +1289,7 @@ export class BigQueryClient {
     request?: protos.google.cloud.bigquery.v2.IListRowAccessPoliciesRequest,
     options?: CallOptions
   ): AsyncIterable<protos.google.cloud.bigquery.v2.IRowAccessPolicy> {
-    return this.rowaccesspolicyClient.listRowAccessPoliciesAsync(
+    return this.rowAccessPolicyClient.listRowAccessPoliciesAsync(
       request,
       options
     );

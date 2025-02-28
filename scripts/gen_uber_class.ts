@@ -153,18 +153,19 @@ function ast(file, client) {
 
       const returnType = node.type!.getFullText();
       output = output.concat(`:${returnType}`);
+
+      const clientName = parseClientName(client);
+
       // call underlying client function
       if (node.body) {
         let optionsOrCallback = '';
         // TODO - camelcase of row access policies
         if (functionName.endsWith('Stream')) {
-          // TODO change
           optionsOrCallback = `
-          return this.${client.toLowerCase()}Client.${functionName}(request, options);}`;
+          return this.${clientName}.${functionName}(request, options);}`;
         } else if (functionName.endsWith('Async')) {
-          // TODO change
           optionsOrCallback = `
-          return this.${client.toLowerCase()}Client.${functionName}(request, options);}`;
+          return this.${clientName}.${functionName}(request, options);}`;
         } else {
           // this logic needs to be surfaced from underlying clients
           // to make sure our parameters play nicely with underlying overloads
@@ -181,9 +182,9 @@ function ast(file, client) {
                   options = optionsOrCallback as CallOptions;
               }
               if (callback === undefined){
-                return this.${client.toLowerCase()}Client.${functionName}(request, options);
+                return this.${clientName}.${functionName}(request, options);
               }
-              return this.${client.toLowerCase()}Client.${functionName}(${argumentsList});
+              return this.${clientName}.${functionName}(${argumentsList});
               }`;
         }
         output = output.concat(`{\n${optionsOrCallback}\n`);
@@ -224,7 +225,11 @@ function makeImports(clients) {
 
 // convert client types to the names we'll use for variables
 function parseClientName(client) {
-  return client.split('ServiceClient')[0].toLowerCase() + 'Client';
+  // without this we'd end up with rowaccesspolicyClient
+
+  return client.search('RowAccessPolicy') >= 0
+    ? 'rowAccessPolicyClient'
+    : client.split('ServiceClient')[0].toLowerCase() + 'Client';
 }
 
 function buildOptionTypes(clients) {
