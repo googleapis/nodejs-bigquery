@@ -1,3 +1,18 @@
+// Copyright 2025 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+
 import * as ts from 'typescript';
 const fs = require('fs');
 // TODO(maintainer) - if a new client is added, add it to this list
@@ -159,6 +174,7 @@ function ast(file, client) {
   return output;
 }
 
+// loop through the files and call the AST function on them
 function astHelper(files, clients) {
   let output = '';
   for (const f in files) {
@@ -188,6 +204,7 @@ function makeImports(clients) {
 function parseClientName(client) {
   return client.split('ServiceClient')[0].toLowerCase() + 'Client';
 }
+
 function buildOptionTypes(clients) {
   let output = '';
   const docstring = `/**
@@ -229,9 +246,11 @@ function buildOptionTypes(clients) {
    *     const client = new DatasetServiceClient({fallback: true}, gax);
    *     \`\`\`
    */\n`;
-  const subClientOptionsType = `export type SubClientOptions = {opts?: ClientOptions,
+
+   const subClientOptionsType = `export type SubClientOptions = {opts?: ClientOptions,
     gaxInstance?: typeof gax | typeof gax.fallback};\n\n`;
   output = output.concat(docstring, subClientOptionsType);
+
   let bigQueryOptionsType = 'export type BigQueryClientOptions = {\n';
   for (const client in clients) {
     let variableDecl = '';
@@ -245,6 +264,7 @@ function buildOptionTypes(clients) {
   output = output.concat(bigQueryOptionsType);
   return output;
 }
+
 function buildClientConstructor(clients) {
   let variableDecl = '';
   const comment = `\t/**
@@ -275,6 +295,9 @@ function buildClientConstructor(clients) {
   return output;
 }
 
+// first add the components that don't come from underlying files
+// (imports, exported types, docstring w/ client constructor)
+// then, traverse the file inputs and add the functions from them
 function buildOutput() {
   console.log('Regenerating bigquery.ts');
   let output = '';
