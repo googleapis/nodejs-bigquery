@@ -53,10 +53,7 @@ const LICENSE = `
 
 `;
 
-// TODO: possibly add logic for stream and async?
 const EXCLUDED_FUNCTION_TERMS = [
-  'Stream', // excluding streaming because it would require different generation logic
-  'Async', // excluding async because it would require different generation logic
   'getQueryResults', // only surfacing admin plane methods for now
   'ProjectId', // don't surface getProjectId methods - there will be conflicts
 ];

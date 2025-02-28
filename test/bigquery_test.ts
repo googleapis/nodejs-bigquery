@@ -34,7 +34,6 @@ import {
   JobServiceClient,
   RoutineServiceClient,
 } from '../src';
-import {PassThrough, Transform} from 'stream';
 
 // this test assumes that the npm "pretest" session has been run
 // and the client was regenerated immediately before these tests are run
@@ -190,7 +189,7 @@ describe('BigQueryClient should call underlying client methods asynchronously', 
       const listStub = sinon
         .stub(client.datasetClient, 'listDatasetsStream')
         .resolves('FakeDatasetListStream');
-      
+
       await client.listDatasetsStream(datasetRequest);
       assert.ok(listStub.calledOnce);
     });
@@ -201,7 +200,7 @@ describe('BigQueryClient should call underlying client methods asynchronously', 
       const listStub = sinon
         .stub(client.datasetClient, 'listDatasetsAsync')
         .resolves('FakeDatasetListIterable');
-      
+
       await client.listDatasetsAsync(datasetRequest);
       assert.ok(listStub.calledOnce);
     });
@@ -310,7 +309,7 @@ describe('BigQueryClient should call underlying client methods asynchronously', 
       const listStub = sinon
         .stub(client.jobClient, 'listJobsStream')
         .resolves('FakeJobListStream');
-      
+
       await client.listJobsStream(jobRequest);
       assert.ok(listStub.calledOnce);
     });
@@ -321,7 +320,7 @@ describe('BigQueryClient should call underlying client methods asynchronously', 
       const listStub = sinon
         .stub(client.jobClient, 'listJobsAsync')
         .resolves('FakeJobListIterable');
-      
+
       await client.listJobsAsync(jobRequest);
       assert.ok(listStub.calledOnce);
     });
@@ -390,7 +389,7 @@ describe('BigQueryClient should call underlying client methods asynchronously', 
       const listStub = sinon
         .stub(client.modelClient, 'listModelsStream')
         .resolves('FakeModelListStream');
-      
+
       await client.listModelsStream(modelRequest);
       assert.ok(listStub.calledOnce);
     });
@@ -401,7 +400,7 @@ describe('BigQueryClient should call underlying client methods asynchronously', 
       const listStub = sinon
         .stub(client.modelClient, 'listModelsAsync')
         .resolves('FakeModelListIterable');
-      
+
       await client.listModelsAsync(modelRequest);
       assert.ok(listStub.calledOnce);
     });
@@ -496,7 +495,7 @@ describe('BigQueryClient should call underlying client methods asynchronously', 
       const listStub = sinon
         .stub(client.routineClient, 'listRoutinesStream')
         .resolves('FakeRoutineListStream');
-      
+
       await client.listRoutinesStream(routineRequest);
       assert.ok(listStub.calledOnce);
     });
@@ -507,7 +506,7 @@ describe('BigQueryClient should call underlying client methods asynchronously', 
       const listStub = sinon
         .stub(client.routineClient, 'listRoutinesAsync')
         .resolves('FakeRoutineListIterable');
-      
+
       await client.listRoutinesAsync(routineRequest);
       assert.ok(listStub.calledOnce);
     });
@@ -603,7 +602,7 @@ describe('BigQueryClient should call underlying client methods asynchronously', 
       const listStub = sinon
         .stub(client.tableClient, 'listTablesStream')
         .resolves('FakeTableListStream');
-      
+
       await client.listTablesStream(tableRequest);
       assert.ok(listStub.calledOnce);
     });
@@ -614,7 +613,7 @@ describe('BigQueryClient should call underlying client methods asynchronously', 
       const listStub = sinon
         .stub(client.tableClient, 'listTablesAsync')
         .resolves('FakeTableListIterable');
-      
+
       await client.listTablesAsync(tableRequest);
       assert.ok(listStub.calledOnce);
     });
@@ -644,7 +643,7 @@ describe('BigQueryClient should call underlying client methods asynchronously', 
       const listStub = sinon
         .stub(client.rowaccesspolicyClient, 'listRowAccessPoliciesStream')
         .resolves('FakeRowAccessPoliciesListStream');
-      
+
       await client.listRowAccessPoliciesStream(rowAccessPoliciesRequest);
       assert.ok(listStub.calledOnce);
     });
@@ -655,7 +654,7 @@ describe('BigQueryClient should call underlying client methods asynchronously', 
       const listStub = sinon
         .stub(client.rowaccesspolicyClient, 'listRowAccessPoliciesAsync')
         .resolves('FakeRowAccessPoliciesListIterable');
-      
+
       await client.listRowAccessPoliciesAsync(rowAccessPoliciesRequest);
       assert.ok(listStub.calledOnce);
     });
