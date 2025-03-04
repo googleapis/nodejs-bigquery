@@ -13,7 +13,9 @@
 // limitations under the License.
 
 import * as ts from 'typescript';
-const fs = require('fs');
+import * as fs from 'fs';
+import * as prettier from 'prettier';
+
 // TODO(maintainer) - if a new client is added, add it to this list
 
 // Intentionally not surfacing projectServiceClient - it has methods that do not follow these patterns
@@ -107,8 +109,7 @@ function ast(file, client) {
 
   // Run the extract function with the script's arguments
   extract(sourceFile!, undefined, client);
-  // Either print the found nodes, or offer a list of what identifiers were found
-  program.getTypeChecker();
+  const checker = program.getTypeChecker();
 
   foundNodes.map(f => {
     const [name, node] = f;
@@ -159,7 +160,6 @@ function ast(file, client) {
       // call underlying client function
       if (node.body) {
         let optionsOrCallback = '';
-        // TODO - camelcase of row access policies
         if (functionName.endsWith('Stream')) {
           optionsOrCallback = `
           return this.${clientName}.${functionName}(request, options);}`;
@@ -325,7 +325,7 @@ function buildClientConstructor(clients) {
 // first add the components that don't come from underlying files
 // (imports, exported types, docstring w/ client constructor)
 // then, traverse the file inputs and add the functions from them
-function buildOutput() {
+async function buildOutput() {
   console.log('Regenerating bigquery.ts');
   let output = '';
   output = LICENSE.concat(makeImports(CLIENTS));
@@ -333,10 +333,17 @@ function buildOutput() {
   output = output.concat(buildClientConstructor(CLIENTS));
   output = output.concat(astHelper(FILES, CLIENTS));
   output = output.concat('\n}');
-  return output;
+  return prettier.format(output, {
+    parser: 'typescript',
+    trailingComma: 'es5',
+    singleQuote: true,
+    bracketSpacing: false,
+  });
 }
-
-const finaloutput = buildOutput();
-fs.writeFile('../src/bigquery.ts', finaloutput, err => {
-  if (err) throw err;
-});
+async function main() {
+  const finaloutput = await buildOutput();
+  fs.writeFile('../src/bigquery.ts', finaloutput, err => {
+    if (err) throw err;
+  });
+}
+main();
