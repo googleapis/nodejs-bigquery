@@ -31,6 +31,8 @@ const RowAccessPolicyServiceClient = v2.RowAccessPolicyServiceClient;
 type RowAccessPolicyServiceClient = v2.RowAccessPolicyServiceClient;
 const TableServiceClient = v2.TableServiceClient;
 type TableServiceClient = v2.TableServiceClient;
+
+export {BigQueryClient} from './bigquery';
 export {
   v2,
   DatasetServiceClient,
