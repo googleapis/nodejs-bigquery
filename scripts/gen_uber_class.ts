@@ -59,11 +59,21 @@ const EXCLUDED_FUNCTION_TERMS = [
   'getQueryResults', // only surfacing admin plane methods for now
   'ProjectId', // don't surface getProjectId methods - there will be conflicts
 ];
-let foundNodes = [];
-function extract(node: ts.Node, depth = 0, client): void {
-  // Create a Program to represent the project, then pull out the
-  // source file to parse its AST.
+type NameMethodPair = [ts.PropertyName, ts.MethodDeclaration];
+type MethodDocstringMap = Map<string, string>;
+let foundNodes: NameMethodPair[] = [];
+const methodDocstrings: MethodDocstringMap = new Map();
+let sourceFile: ts.SourceFile;
 
+function getEscapedText(name: ts.PropertyName | ts.BindingName): string {
+  // this typecasting has to be done because the name of a MethodDeclaration a parameter
+  // can be one of a few different types but in our use case we know it's an identifier
+  // and can therefore safely make this assumption to get the human readable name
+  name = name as ts.Identifier;
+  const nameEscapedText = name.escapedText as string;
+  return nameEscapedText;
+}
+function extract(node: ts.Node, depth = 0, client): void {
   function getKind(node: ts.Node) {
     return ts.SyntaxKind[node.kind];
   }
@@ -71,11 +81,7 @@ function extract(node: ts.Node, depth = 0, client): void {
   const kind = getKind(node);
   if (methodsToInclude.includes(kind)) {
     if (ts.isMethodDeclaration(node)) {
-      // this typecasting has to be done because the name of a MethodDeclaration
-      // can be one of a few different types but in our use case we know it's an identifier
-      // and can therefore safely make this assumption to get the human readable name
-      const name = node.name as ts.Identifier;
-      const nameEscapedText = name.escapedText as string;
+      const nameEscapedText = getEscapedText(node.name);
       const adminMethodPrefixes: string[] = [
         'get',
         'list',
@@ -87,6 +93,32 @@ function extract(node: ts.Node, depth = 0, client): void {
         'undelete',
       ];
       adminMethodPrefixes.forEach((method: string) => {
+        // the typescript compiler API does not recognize docstrings as a type of node
+        // so they have to be extracted from the full file text.
+        // If a method has overloads, the docstring will be part of the first overload
+        // we construct this map so that we can retrieve the proper docstring later
+        if (methodDocstrings.get(nameEscapedText) === undefined) {
+          // gets the text range in the file where the comment for this method is
+          const commentRanges = ts.getLeadingCommentRanges(
+            sourceFile.getFullText(),
+            node.getFullStart()
+          );
+          let docString = '';
+          // concatenates all parts of the comment into a string
+          if (commentRanges) {
+            commentRanges.map(r => {
+              docString = docString.concat(
+                sourceFile!.getFullText().slice(r.pos, r.end)
+              );
+              if (r.hasTrailingNewLine) {
+                docString = docString.concat('\n');
+              }
+            });
+          }
+          // store for later
+          methodDocstrings.set(nameEscapedText, docString);
+        }
+
         // full implementation (not overload) of crud method for client
         if (node.body && nameEscapedText.startsWith(method) === true) {
           foundNodes.push([node.name, node]);
@@ -105,16 +137,18 @@ function extract(node: ts.Node, depth = 0, client): void {
 function ast(file, client) {
   let output = '';
   const program = ts.createProgram([file], {allowJs: true});
-  const sourceFile = program.getSourceFile(file);
+  sourceFile = program.getSourceFile(file)!;
 
   // Run the extract function with the script's arguments
-  extract(sourceFile!, undefined, client);
-  const checker = program.getTypeChecker();
+  extract(sourceFile, undefined, client);
+  program.getTypeChecker();
 
   foundNodes.map(f => {
     const [name, node] = f;
+    const escapedName = getEscapedText(name);
+
     // create function name
-    const functionName = `${name.escapedText}`;
+    const functionName = `${escapedName}`;
     let isExcludedFunction = false;
     for (const term of EXCLUDED_FUNCTION_TERMS) {
       if (functionName.search(term) >= 0) {
@@ -124,15 +158,16 @@ function ast(file, client) {
     }
 
     if (!isExcludedFunction) {
-      // TODO - add docstring
-      output = output.concat(`\n\t${functionName}(`);
+      const docString = methodDocstrings.get(functionName);
+      output = output.concat(`\n\n${docString}`);
+      output = output.concat(`\t${functionName}(`);
       // add parameters - pull in their name, whether they're optional or not, and their type
       let parametersList = '';
       let argumentsList = '';
       for (let i = 0; i < node.parameters.length; i++) {
-        const name = node.parameters[i].name.escapedText;
+        const name = getEscapedText(node.parameters[i].name);
         const questionToken = node.parameters[i].questionToken ? '?' : '';
-        const typeString = node.parameters[i].type.getFullText();
+        const typeString = node.parameters[i].type?.getFullText();
         let parameter = `${name}${questionToken}: ${typeString}`;
 
         parametersList = parametersList.concat(name);
@@ -212,14 +247,14 @@ function makeImports(clients) {
     imports = imports.concat(`, ${clients[client]}`);
   }
 
-  imports = imports.concat('} from ".";\n');
+  imports = imports.concat('} from ".";');
   const staticImports = `
   import type * as gax from "google-gax";
   import {Callback, CallOptions, ClientOptions, PaginationCallback} from "google-gax";
   import {Transform} from 'stream';
   `;
 
-  imports = imports.concat(staticImports);
+  imports = imports.concat(`${staticImports}\n\n`);
   return imports;
 }
 
