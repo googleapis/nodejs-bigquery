@@ -42,12 +42,18 @@ describe('BigQueryClient has the number of clients and methods we expect', () =>
     const client = new BigQueryClient();
     assert.equal(Object.getOwnPropertyNames(client).length, 6);
   });
-  it('should have 42 methods including the constructor', () => {
+  it('should have 45 methods including the constructor', () => {
     const client = new BigQueryClient();
-    assert.equal(
-      Object.getOwnPropertyNames(Object.getPrototypeOf(client)).length,
-      42
-    );
+    try {
+      assert.equal(
+        Object.getOwnPropertyNames(Object.getPrototypeOf(client)).length,
+        45
+      );
+    } catch (e) {
+      throw Error(
+        `${e}: Methods were added when the client was regenerated. Add sync and async tests for those methods, then update this test afterwards.`
+      );
+    }
   });
 });
 describe('BigQueryClient should be able to handle passing in clients and options', () => {
@@ -618,11 +624,53 @@ describe('BigQueryClient should call underlying client methods asynchronously', 
       assert.ok(listStub.calledOnce);
     });
   });
-  // TODO update with stream/async
 
   describe('BigQuery client should call underlying methods in the Row Access Policy Client', () => {
     after(() => {
       sinon.restore();
+    });
+
+    it('should call getRowAccessPolicy', async () => {
+      const rowAccessPolicyRequest = {
+        projectId: 'projectId',
+        datasetId: 'datasetId',
+        tableId: 'tableId',
+        policyId: 'policyId',
+      } as protos.google.cloud.bigquery.v2.IGetRowAccessPolicyRequest;
+      const getStub = sinon
+        .stub(client.rowAccessPolicyClient, 'getRowAccessPolicy')
+        .resolves('FakeRowAccessPolicy');
+      await client.getRowAccessPolicy(rowAccessPolicyRequest);
+      assert.ok(getStub.calledOnce);
+    });
+    it('should call updateRowAccessPolicy', async () => {
+      const rowAccessPolicyRequest = {
+        projectId: 'projectId',
+        datasetId: 'datasetId',
+        tableId: 'tableId',
+        policyId: 'policyId',
+        rowAccessPolicy: {
+          rowAccessPolicyReference: {tableId: 'tableId', policyId: 'policyId'},
+        }, // Add required fields
+      } as protos.google.cloud.bigquery.v2.IUpdateRowAccessPolicyRequest;
+      const updateStub = sinon
+        .stub(client.rowAccessPolicyClient, 'updateRowAccessPolicy')
+        .resolves('FakeRowAccessPolicy');
+      await client.updateRowAccessPolicy(rowAccessPolicyRequest);
+      assert.ok(updateStub.calledOnce);
+    });
+    it('should call deleteRowAccessPolicy', async () => {
+      const rowAccessPolicyRequest = {
+        projectId: 'projectId',
+        datasetId: 'datasetId',
+        tableId: 'tableId',
+        policyId: 'policyId',
+      } as protos.google.cloud.bigquery.v2.IDeleteRowAccessPolicyRequest;
+      const deleteStub = sinon
+        .stub(client.rowAccessPolicyClient, 'deleteRowAccessPolicy')
+        .resolves({});
+      await client.deleteRowAccessPolicy(rowAccessPolicyRequest);
+      assert.ok(deleteStub.calledOnce);
     });
     it('should call listRowAccessPolicies', async () => {
       const rowAccessPolicyRequest = {
@@ -685,7 +733,7 @@ describe('BigQueryClient should call underlying client methods synchronously', (
       assert.ok(getStub.calledOnce);
       assert.strictEqual('FakeDataset called back', resp);
     });
-    it('should call insertDataset', async () => {
+    it('should call insertDataset', () => {
       const datasetRequest = {
         projectId: 'projectId',
         dataset: {datasetReference: {datasetId: 'datasetId'}},
@@ -703,7 +751,7 @@ describe('BigQueryClient should call underlying client methods synchronously', (
 
       assert.strictEqual('FakeDataset called back', resp);
     });
-    it('should call undeleteDataset', async () => {
+    it('should call undeleteDataset', () => {
       const datasetRequest = {
         projectId: 'projectId',
         datasetId: 'datasetId',
@@ -725,7 +773,7 @@ describe('BigQueryClient should call underlying client methods synchronously', (
       assert.strictEqual('FakeDataset called back', resp);
     });
 
-    it('should call listDatasets', async () => {
+    it('should call listDatasets', () => {
       const datasetRequest = {
         projectId: 'projectId',
       } as protos.google.cloud.bigquery.v2.IListDatasetsRequest;
@@ -742,7 +790,7 @@ describe('BigQueryClient should call underlying client methods synchronously', (
       assert.strictEqual('FakeDatasetList called back', resp);
     });
 
-    it('should call patchDataset', async () => {
+    it('should call patchDataset', () => {
       const datasetRequest = {
         projectId: 'projectId',
         datasetId: 'datasetId',
@@ -761,7 +809,7 @@ describe('BigQueryClient should call underlying client methods synchronously', (
       assert.strictEqual('FakeDataset called back', resp);
     });
 
-    it('should call updateDataset', async () => {
+    it('should call updateDataset', () => {
       const datasetRequest = {
         projectId: 'projectId',
         datasetId: 'datasetId',
@@ -779,7 +827,7 @@ describe('BigQueryClient should call underlying client methods synchronously', (
       assert.ok(updateStub.calledOnce);
       assert.strictEqual('FakeDataset called back', resp);
     });
-    it('should call deleteDataset', async () => {
+    it('should call deleteDataset', () => {
       const datasetRequest = {
         projectId: 'projectId',
         datasetId: 'datasetId',
@@ -802,7 +850,7 @@ describe('BigQueryClient should call underlying client methods synchronously', (
     after(() => {
       sinon.restore();
     });
-    it('should call getJob', async () => {
+    it('should call getJob', () => {
       const jobRequest = {
         projectId: 'projectId',
         jobId: 'jobId',
@@ -820,7 +868,7 @@ describe('BigQueryClient should call underlying client methods synchronously', (
       assert.strictEqual('FakeJob called back', resp);
     });
 
-    it('should call insertJob', async () => {
+    it('should call insertJob', () => {
       const jobRequest = {
         projectId: 'projectId', // Add required fields to the request
         job: {}, // Add required fields to the job object if needed
@@ -838,7 +886,7 @@ describe('BigQueryClient should call underlying client methods synchronously', (
       assert.strictEqual('FakeJob called back', resp);
     });
 
-    it('should call cancelJob', async () => {
+    it('should call cancelJob', () => {
       const jobRequest = {
         projectId: 'projectId',
         jobId: 'jobId',
@@ -856,7 +904,7 @@ describe('BigQueryClient should call underlying client methods synchronously', (
       assert.strictEqual('FakeJob called back', resp);
     });
 
-    it('should call deleteJob', async () => {
+    it('should call deleteJob', () => {
       const jobRequest = {
         projectId: 'projectId',
         jobId: 'jobId',
@@ -873,7 +921,7 @@ describe('BigQueryClient should call underlying client methods synchronously', (
       assert.ok(deleteStub.calledOnce);
       assert.strictEqual('FakeJob called back', resp);
     });
-    it('should call listJobs', async () => {
+    it('should call listJobs', () => {
       const jobRequest = {
         projectId: 'projectId',
       } as protos.google.cloud.bigquery.v2.IListJobsRequest;
@@ -896,7 +944,7 @@ describe('BigQueryClient should call underlying client methods synchronously', (
       sinon.restore();
     });
 
-    it('should call getModel', async () => {
+    it('should call getModel', () => {
       const modelRequest = {
         projectId: 'projectId',
         datasetId: 'datasetId',
@@ -915,7 +963,7 @@ describe('BigQueryClient should call underlying client methods synchronously', (
       assert.strictEqual('FakeModel called back', resp);
     });
 
-    it('should call patchModel', async () => {
+    it('should call patchModel', () => {
       const modelRequest = {
         projectId: 'projectId',
         datasetId: 'datasetId',
@@ -935,7 +983,7 @@ describe('BigQueryClient should call underlying client methods synchronously', (
       assert.strictEqual('FakeModel called back', resp);
     });
 
-    it('should call deleteModel', async () => {
+    it('should call deleteModel', () => {
       const modelRequest = {
         projectId: 'projectId',
         datasetId: 'datasetId',
@@ -954,7 +1002,7 @@ describe('BigQueryClient should call underlying client methods synchronously', (
       assert.strictEqual('FakeModel called back', resp);
     });
 
-    it('should call listModels', async () => {
+    it('should call listModels', () => {
       const modelRequest = {
         projectId: 'projectId',
         datasetId: 'datasetId',
@@ -978,7 +1026,7 @@ describe('BigQueryClient should call underlying client methods synchronously', (
       sinon.restore();
     });
 
-    it('should call getRoutine', async () => {
+    it('should call getRoutine', () => {
       const routineRequest = {
         projectId: 'projectId',
         datasetId: 'datasetId',
@@ -997,7 +1045,7 @@ describe('BigQueryClient should call underlying client methods synchronously', (
       assert.strictEqual('FakeRoutine called back', resp);
     });
 
-    it('should call insertRoutine', async () => {
+    it('should call insertRoutine', () => {
       const routineRequest = {
         projectId: 'projectId',
         datasetId: 'datasetId',
@@ -1016,7 +1064,7 @@ describe('BigQueryClient should call underlying client methods synchronously', (
       assert.strictEqual('FakeRoutine called back', resp);
     });
 
-    it('should call updateRoutine', async () => {
+    it('should call updateRoutine', () => {
       const routineRequest = {
         projectId: 'projectId',
         datasetId: 'datasetId',
@@ -1036,7 +1084,7 @@ describe('BigQueryClient should call underlying client methods synchronously', (
       assert.strictEqual('FakeRoutine called back', resp);
     });
 
-    it('should call patchRoutine', async () => {
+    it('should call patchRoutine', () => {
       const routineRequest = {
         projectId: 'projectId',
         datasetId: 'datasetId',
@@ -1056,7 +1104,7 @@ describe('BigQueryClient should call underlying client methods synchronously', (
       assert.strictEqual('FakeRoutine called back', resp);
     });
 
-    it('should call deleteRoutine', async () => {
+    it('should call deleteRoutine', () => {
       const routineRequest = {
         projectId: 'projectId',
         datasetId: 'datasetId',
@@ -1075,7 +1123,7 @@ describe('BigQueryClient should call underlying client methods synchronously', (
       assert.strictEqual('FakeRoutine called back', resp);
     });
 
-    it('should call listRoutines', async () => {
+    it('should call listRoutines', () => {
       const routineRequest = {
         projectId: 'projectId',
         datasetId: 'datasetId',
@@ -1099,7 +1147,7 @@ describe('BigQueryClient should call underlying client methods synchronously', (
       sinon.restore();
     });
 
-    it('should call getTable', async () => {
+    it('should call getTable', () => {
       const tableRequest = {
         projectId: 'projectId',
         datasetId: 'datasetId',
@@ -1118,7 +1166,7 @@ describe('BigQueryClient should call underlying client methods synchronously', (
       assert.strictEqual('FakeTable called back', resp);
     });
 
-    it('should call insertTable', async () => {
+    it('should call insertTable', () => {
       const tableRequest = {
         projectId: 'projectId',
         datasetId: 'datasetId',
@@ -1137,7 +1185,7 @@ describe('BigQueryClient should call underlying client methods synchronously', (
       assert.strictEqual('FakeTable called back', resp);
     });
 
-    it('should call updateTable', async () => {
+    it('should call updateTable', () => {
       const tableRequest = {
         projectId: 'projectId',
         datasetId: 'datasetId',
@@ -1157,7 +1205,7 @@ describe('BigQueryClient should call underlying client methods synchronously', (
       assert.strictEqual('FakeTable called back', resp);
     });
 
-    it('should call patchTable', async () => {
+    it('should call patchTable', () => {
       const tableRequest = {
         projectId: 'projectId',
         datasetId: 'datasetId',
@@ -1177,7 +1225,7 @@ describe('BigQueryClient should call underlying client methods synchronously', (
       assert.strictEqual('FakeTable called back', resp);
     });
 
-    it('should call deleteTable', async () => {
+    it('should call deleteTable', () => {
       const tableRequest = {
         projectId: 'projectId',
         datasetId: 'datasetId',
@@ -1196,7 +1244,7 @@ describe('BigQueryClient should call underlying client methods synchronously', (
       assert.strictEqual('FakeTable called back', resp);
     });
 
-    it('should call listTables', async () => {
+    it('should call listTables', () => {
       const tableRequest = {
         projectId: 'projectId',
         datasetId: 'datasetId',
@@ -1219,7 +1267,82 @@ describe('BigQueryClient should call underlying client methods synchronously', (
     after(() => {
       sinon.restore();
     });
-    it('should call listRowAccessPolicies', async () => {
+
+    it('should call getRowAccessPolicy', () => {
+      const rowAccessPolicyRequest = {
+        projectId: 'projectId',
+        datasetId: 'datasetId',
+        tableId: 'tableId',
+        policyId: 'policyId',
+      } as protos.google.cloud.bigquery.v2.IGetRowAccessPolicyRequest;
+      const getStub = sinon
+        .stub(client.rowAccessPolicyClient, 'getRowAccessPolicy')
+        .callsArgWith(2, null, 'FakeRowAccessPolicy');
+      const resp = client.getRowAccessPolicy(
+        rowAccessPolicyRequest,
+        {},
+        (err, response) => {
+          if (err) {
+            throw err;
+          }
+          return response + ' called back';
+        }
+      );
+      assert.ok(getStub.calledOnce);
+      assert.strictEqual('FakeRowAccessPolicy called back', resp);
+    });
+
+    it('should call updateRowAccessPolicy', () => {
+      const rowAccessPolicyRequest = {
+        projectId: 'projectId',
+        datasetId: 'datasetId',
+        tableId: 'tableId',
+        policyId: 'policyId',
+        rowAccessPolicy: {
+          rowAccessPolicyReference: {tableId: 'tableId', policyId: 'policyId'},
+        }, // Add required fields
+      } as protos.google.cloud.bigquery.v2.IUpdateRowAccessPolicyRequest;
+      const updateStub = sinon
+        .stub(client.rowAccessPolicyClient, 'updateRowAccessPolicy')
+        .callsArgWith(2, null, 'FakeRowAccessPolicy');
+      const resp = client.updateRowAccessPolicy(
+        rowAccessPolicyRequest,
+        {},
+        (err, response) => {
+          if (err) {
+            throw err;
+          }
+          return response + ' called back';
+        }
+      );
+      assert.ok(updateStub.calledOnce);
+      assert.strictEqual('FakeRowAccessPolicy called back', resp);
+    });
+
+    it('should call deleteRowAccessPolicy', () => {
+      const rowAccessPolicyRequest = {
+        projectId: 'projectId',
+        datasetId: 'datasetId',
+        tableId: 'tableId',
+        policyId: 'policyId',
+      } as protos.google.cloud.bigquery.v2.IDeleteRowAccessPolicyRequest;
+      const deleteStub = sinon
+        .stub(client.rowAccessPolicyClient, 'deleteRowAccessPolicy')
+        .callsArgWith(2, null, 'FakeRowAccessPolicy');
+      const resp = client.deleteRowAccessPolicy(
+        rowAccessPolicyRequest,
+        {},
+        (err, response) => {
+          if (err) {
+            throw err;
+          }
+          return response + ' called back';
+        }
+      );
+      assert.ok(deleteStub.calledOnce);
+      assert.strictEqual('FakeRowAccessPolicy called back', resp);
+    });
+    it('should call listRowAccessPolicies', () => {
       const rowAccessPolicyRequest = {
         projectId: 'projectId',
         datasetId: 'datasetId',
