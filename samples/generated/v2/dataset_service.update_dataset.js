@@ -59,7 +59,7 @@ function main(projectId, datasetId, dataset) {
    *      may specify any valid value or leave the field unset.
    *  If unset or if 0 or 1 value is used for dataset with conditional
    *  bindings, request will be rejected.
-   *  This field will be maped to IAM Policy version
+   *  This field will be mapped to IAM Policy version
    *  (https://cloud.google.com/iam/docs/policies#versions) and will be used to
    *  set policy in IAM.
    */

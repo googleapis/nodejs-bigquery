@@ -1,4 +1,4 @@
-// Copyright 2025 Google LLC
+// Copyright 2020 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 // ** All changes to this file may be overwritten. **
 
 import * as v2 from './v2';
+
 const DatasetServiceClient = v2.DatasetServiceClient;
 type DatasetServiceClient = v2.DatasetServiceClient;
 const JobServiceClient = v2.JobServiceClient;
@@ -34,16 +35,6 @@ type TableServiceClient = v2.TableServiceClient;
 
 export {BigQueryClient} from './bigquery';
 export {
-  v2,
-  DatasetServiceClient,
-  JobServiceClient,
-  ModelServiceClient,
-  ProjectServiceClient,
-  RoutineServiceClient,
-  RowAccessPolicyServiceClient,
-  TableServiceClient,
-};
-export default {
   v2,
   DatasetServiceClient,
   JobServiceClient,

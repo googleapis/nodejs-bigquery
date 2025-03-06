@@ -49,7 +49,7 @@ function main(projectId) {
   /**
    *  An expression for filtering the results of the request by label.
    *  The syntax is `labels.<name>:<value>`.
-   *  Multiple filters can be ANDed together by connecting with a space.
+   *  Multiple filters can be AND-ed together by connecting with a space.
    *  Example: `labels.department:receiving labels.active`.
    *  See Filtering datasets using
    *  labels (https://cloud.google.com/bigquery/docs/filtering-labels#filtering_datasets_using_labels)

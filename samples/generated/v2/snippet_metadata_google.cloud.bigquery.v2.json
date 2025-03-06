@@ -426,7 +426,7 @@
             "segments": [
                 {
                     "start": 25,
-                    "end": 69,
+                    "end": 70,
                     "type": "FULL"
                 }
             ],
@@ -518,7 +518,7 @@
             "segments": [
                 {
                     "start": 25,
-                    "end": 67,
+                    "end": 68,
                     "type": "FULL"
                 }
             ],
@@ -638,7 +638,7 @@
             "segments": [
                 {
                     "start": 25,
-                    "end": 101,
+                    "end": 102,
                     "type": "FULL"
                 }
             ],
@@ -1336,6 +1336,278 @@
                 "method": {
                     "shortName": "ListRowAccessPolicies",
                     "fullName": "google.cloud.bigquery.v2.RowAccessPolicyService.ListRowAccessPolicies",
+                    "service": {
+                        "shortName": "RowAccessPolicyService",
+                        "fullName": "google.cloud.bigquery.v2.RowAccessPolicyService"
+                    }
+                }
+            }
+        },
+        {
+            "regionTag": "bigquery_v2_generated_RowAccessPolicyService_GetRowAccessPolicy_async",
+            "title": "DatasetService getRowAccessPolicy Sample",
+            "origin": "API_DEFINITION",
+            "description": " Gets the specified row access policy by policy ID.",
+            "canonical": true,
+            "file": "row_access_policy_service.get_row_access_policy.js",
+            "language": "JAVASCRIPT",
+            "segments": [
+                {
+                    "start": 25,
+                    "end": 68,
+                    "type": "FULL"
+                }
+            ],
+            "clientMethod": {
+                "shortName": "GetRowAccessPolicy",
+                "fullName": "google.cloud.bigquery.v2.RowAccessPolicyService.GetRowAccessPolicy",
+                "async": true,
+                "parameters": [
+                    {
+                        "name": "project_id",
+                        "type": "TYPE_STRING"
+                    },
+                    {
+                        "name": "dataset_id",
+                        "type": "TYPE_STRING"
+                    },
+                    {
+                        "name": "table_id",
+                        "type": "TYPE_STRING"
+                    },
+                    {
+                        "name": "policy_id",
+                        "type": "TYPE_STRING"
+                    }
+                ],
+                "resultType": ".google.cloud.bigquery.v2.RowAccessPolicy",
+                "client": {
+                    "shortName": "RowAccessPolicyServiceClient",
+                    "fullName": "google.cloud.bigquery.v2.RowAccessPolicyServiceClient"
+                },
+                "method": {
+                    "shortName": "GetRowAccessPolicy",
+                    "fullName": "google.cloud.bigquery.v2.RowAccessPolicyService.GetRowAccessPolicy",
+                    "service": {
+                        "shortName": "RowAccessPolicyService",
+                        "fullName": "google.cloud.bigquery.v2.RowAccessPolicyService"
+                    }
+                }
+            }
+        },
+        {
+            "regionTag": "bigquery_v2_generated_RowAccessPolicyService_CreateRowAccessPolicy_async",
+            "title": "DatasetService createRowAccessPolicy Sample",
+            "origin": "API_DEFINITION",
+            "description": " Creates a row access policy.",
+            "canonical": true,
+            "file": "row_access_policy_service.create_row_access_policy.js",
+            "language": "JAVASCRIPT",
+            "segments": [
+                {
+                    "start": 25,
+                    "end": 68,
+                    "type": "FULL"
+                }
+            ],
+            "clientMethod": {
+                "shortName": "CreateRowAccessPolicy",
+                "fullName": "google.cloud.bigquery.v2.RowAccessPolicyService.CreateRowAccessPolicy",
+                "async": true,
+                "parameters": [
+                    {
+                        "name": "project_id",
+                        "type": "TYPE_STRING"
+                    },
+                    {
+                        "name": "dataset_id",
+                        "type": "TYPE_STRING"
+                    },
+                    {
+                        "name": "table_id",
+                        "type": "TYPE_STRING"
+                    },
+                    {
+                        "name": "row_access_policy",
+                        "type": ".google.cloud.bigquery.v2.RowAccessPolicy"
+                    }
+                ],
+                "resultType": ".google.cloud.bigquery.v2.RowAccessPolicy",
+                "client": {
+                    "shortName": "RowAccessPolicyServiceClient",
+                    "fullName": "google.cloud.bigquery.v2.RowAccessPolicyServiceClient"
+                },
+                "method": {
+                    "shortName": "CreateRowAccessPolicy",
+                    "fullName": "google.cloud.bigquery.v2.RowAccessPolicyService.CreateRowAccessPolicy",
+                    "service": {
+                        "shortName": "RowAccessPolicyService",
+                        "fullName": "google.cloud.bigquery.v2.RowAccessPolicyService"
+                    }
+                }
+            }
+        },
+        {
+            "regionTag": "bigquery_v2_generated_RowAccessPolicyService_UpdateRowAccessPolicy_async",
+            "title": "DatasetService updateRowAccessPolicy Sample",
+            "origin": "API_DEFINITION",
+            "description": " Updates a row access policy.",
+            "canonical": true,
+            "file": "row_access_policy_service.update_row_access_policy.js",
+            "language": "JAVASCRIPT",
+            "segments": [
+                {
+                    "start": 25,
+                    "end": 73,
+                    "type": "FULL"
+                }
+            ],
+            "clientMethod": {
+                "shortName": "UpdateRowAccessPolicy",
+                "fullName": "google.cloud.bigquery.v2.RowAccessPolicyService.UpdateRowAccessPolicy",
+                "async": true,
+                "parameters": [
+                    {
+                        "name": "project_id",
+                        "type": "TYPE_STRING"
+                    },
+                    {
+                        "name": "dataset_id",
+                        "type": "TYPE_STRING"
+                    },
+                    {
+                        "name": "table_id",
+                        "type": "TYPE_STRING"
+                    },
+                    {
+                        "name": "policy_id",
+                        "type": "TYPE_STRING"
+                    },
+                    {
+                        "name": "row_access_policy",
+                        "type": ".google.cloud.bigquery.v2.RowAccessPolicy"
+                    }
+                ],
+                "resultType": ".google.cloud.bigquery.v2.RowAccessPolicy",
+                "client": {
+                    "shortName": "RowAccessPolicyServiceClient",
+                    "fullName": "google.cloud.bigquery.v2.RowAccessPolicyServiceClient"
+                },
+                "method": {
+                    "shortName": "UpdateRowAccessPolicy",
+                    "fullName": "google.cloud.bigquery.v2.RowAccessPolicyService.UpdateRowAccessPolicy",
+                    "service": {
+                        "shortName": "RowAccessPolicyService",
+                        "fullName": "google.cloud.bigquery.v2.RowAccessPolicyService"
+                    }
+                }
+            }
+        },
+        {
+            "regionTag": "bigquery_v2_generated_RowAccessPolicyService_DeleteRowAccessPolicy_async",
+            "title": "DatasetService deleteRowAccessPolicy Sample",
+            "origin": "API_DEFINITION",
+            "description": " Deletes a row access policy.",
+            "canonical": true,
+            "file": "row_access_policy_service.delete_row_access_policy.js",
+            "language": "JAVASCRIPT",
+            "segments": [
+                {
+                    "start": 25,
+                    "end": 74,
+                    "type": "FULL"
+                }
+            ],
+            "clientMethod": {
+                "shortName": "DeleteRowAccessPolicy",
+                "fullName": "google.cloud.bigquery.v2.RowAccessPolicyService.DeleteRowAccessPolicy",
+                "async": true,
+                "parameters": [
+                    {
+                        "name": "project_id",
+                        "type": "TYPE_STRING"
+                    },
+                    {
+                        "name": "dataset_id",
+                        "type": "TYPE_STRING"
+                    },
+                    {
+                        "name": "table_id",
+                        "type": "TYPE_STRING"
+                    },
+                    {
+                        "name": "policy_id",
+                        "type": "TYPE_STRING"
+                    },
+                    {
+                        "name": "force",
+                        "type": "TYPE_BOOL"
+                    }
+                ],
+                "resultType": ".google.protobuf.Empty",
+                "client": {
+                    "shortName": "RowAccessPolicyServiceClient",
+                    "fullName": "google.cloud.bigquery.v2.RowAccessPolicyServiceClient"
+                },
+                "method": {
+                    "shortName": "DeleteRowAccessPolicy",
+                    "fullName": "google.cloud.bigquery.v2.RowAccessPolicyService.DeleteRowAccessPolicy",
+                    "service": {
+                        "shortName": "RowAccessPolicyService",
+                        "fullName": "google.cloud.bigquery.v2.RowAccessPolicyService"
+                    }
+                }
+            }
+        },
+        {
+            "regionTag": "bigquery_v2_generated_RowAccessPolicyService_BatchDeleteRowAccessPolicies_async",
+            "title": "DatasetService batchDeleteRowAccessPolicies Sample",
+            "origin": "API_DEFINITION",
+            "description": " Deletes provided row access policies.",
+            "canonical": true,
+            "file": "row_access_policy_service.batch_delete_row_access_policies.js",
+            "language": "JAVASCRIPT",
+            "segments": [
+                {
+                    "start": 25,
+                    "end": 74,
+                    "type": "FULL"
+                }
+            ],
+            "clientMethod": {
+                "shortName": "BatchDeleteRowAccessPolicies",
+                "fullName": "google.cloud.bigquery.v2.RowAccessPolicyService.BatchDeleteRowAccessPolicies",
+                "async": true,
+                "parameters": [
+                    {
+                        "name": "project_id",
+                        "type": "TYPE_STRING"
+                    },
+                    {
+                        "name": "dataset_id",
+                        "type": "TYPE_STRING"
+                    },
+                    {
+                        "name": "table_id",
+                        "type": "TYPE_STRING"
+                    },
+                    {
+                        "name": "policy_ids",
+                        "type": "TYPE_STRING[]"
+                    },
+                    {
+                        "name": "force",
+                        "type": "TYPE_BOOL"
+                    }
+                ],
+                "resultType": ".google.protobuf.Empty",
+                "client": {
+                    "shortName": "RowAccessPolicyServiceClient",
+                    "fullName": "google.cloud.bigquery.v2.RowAccessPolicyServiceClient"
+                },
+                "method": {
+                    "shortName": "BatchDeleteRowAccessPolicies",
+                    "fullName": "google.cloud.bigquery.v2.RowAccessPolicyService.BatchDeleteRowAccessPolicies",
                     "service": {
                         "shortName": "RowAccessPolicyService",
                         "fullName": "google.cloud.bigquery.v2.RowAccessPolicyService"

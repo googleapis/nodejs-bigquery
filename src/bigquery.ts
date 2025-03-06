@@ -55,7 +55,7 @@ import {Transform} from 'stream';
  *     Developer's Console, e.g. 'grape-spaceship-123'. We will also check
  *     the environment variable GCLOUD_PROJECT for your project ID. If your
  *     app is running in an environment which supports
- *     {@link https://developers.google.com/identity/protocols/application-default-credentials Application Default Credentials},
+ *     {@link https://cloud.google.com/docs/authentication/application-default-credentials Application Default Credentials},
  *     your project ID will be detected automatically.
  * @param {string} [options.apiEndpoint] - The domain name of the
  *     API remote host.
@@ -165,7 +165,7 @@ export class BigQueryClient {
    *   version 3. Dataset with no conditional role bindings in access policy may
    *   specify any valid value or leave the field unset.
    *
-   *   This field will be maped to [IAM Policy version]
+   *   This field will be mapped to [IAM Policy version]
    *   (https://cloud.google.com/iam/docs/policies#versions) and will be used to
    *   fetch policy from IAM.
    *
@@ -253,7 +253,7 @@ export class BigQueryClient {
    *   If unset or if 0 or 1 value is used for dataset with conditional
    *   bindings, request will be rejected.
    *
-   *   This field will be maped to IAM Policy version
+   *   This field will be mapped to IAM Policy version
    *   (https://cloud.google.com/iam/docs/policies#versions) and will be used to
    *   set policy in IAM.
    * @param {object} [options]
@@ -337,7 +337,7 @@ export class BigQueryClient {
    *   If unset or if 0 or 1 value is used for dataset with conditional
    *   bindings, request will be rejected.
    *
-   *   This field will be maped to IAM Policy version
+   *   This field will be mapped to IAM Policy version
    *   (https://cloud.google.com/iam/docs/policies#versions) and will be used to
    *   set policy in IAM.
    * @param {object} [options]
@@ -422,7 +422,7 @@ export class BigQueryClient {
    *   If unset or if 0 or 1 value is used for dataset with conditional
    *   bindings, request will be rejected.
    *
-   *   This field will be maped to IAM Policy version
+   *   This field will be mapped to IAM Policy version
    *   (https://cloud.google.com/iam/docs/policies#versions) and will be used to
    *   set policy in IAM.
    * @param {object} [options]
@@ -617,7 +617,7 @@ export class BigQueryClient {
    * @param {string} request.filter
    *   An expression for filtering the results of the request by label.
    *   The syntax is `labels.<name>[:<value>]`.
-   *   Multiple filters can be ANDed together by connecting with a space.
+   *   Multiple filters can be AND-ed together by connecting with a space.
    *   Example: `labels.department:receiving labels.active`.
    *   See [Filtering datasets using
    *   labels](https://cloud.google.com/bigquery/docs/filtering-labels#filtering_datasets_using_labels)
@@ -686,7 +686,7 @@ export class BigQueryClient {
    * @param {string} request.filter
    *   An expression for filtering the results of the request by label.
    *   The syntax is `labels.<name>[:<value>]`.
-   *   Multiple filters can be ANDed together by connecting with a space.
+   *   Multiple filters can be AND-ed together by connecting with a space.
    *   Example: `labels.department:receiving labels.active`.
    *   See [Filtering datasets using
    *   labels](https://cloud.google.com/bigquery/docs/filtering-labels#filtering_datasets_using_labels)
@@ -728,7 +728,7 @@ export class BigQueryClient {
    * @param {string} request.filter
    *   An expression for filtering the results of the request by label.
    *   The syntax is `labels.<name>[:<value>]`.
-   *   Multiple filters can be ANDed together by connecting with a space.
+   *   Multiple filters can be AND-ed together by connecting with a space.
    *   Example: `labels.department:receiving labels.active`.
    *   See [Filtering datasets using
    *   labels](https://cloud.google.com/bigquery/docs/filtering-labels#filtering_datasets_using_labels)
@@ -1214,16 +1214,15 @@ export class BigQueryClient {
    * @param {string} request.jobId
    *   Required. Job ID of the job to cancel
    * @param {string} request.location
-   *   The geographic location of the job. You must specify the location to run
-   *   the job for the following scenarios:
+   *   The geographic location of the job. You must
+   *   [specify the
+   *   location](https://cloud.google.com/bigquery/docs/locations#specify_locations)
+   *   to run the job for the following scenarios:
    *
    *   * If the location to run a job is not in the `us` or
    *     the `eu` multi-regional location
    *   * If the job's location is in a single region (for example,
    *     `us-central1`)
-   *
-   *   For more information, see
-   *   https://cloud.google.com/bigquery/docs/locations#specifying_your_location.
    * @param {object} [options]
    *   Call options. See {@link https://googleapis.dev/nodejs/google-gax/latest/interfaces/CallOptions.html|CallOptions} for more details.
    * @returns {Promise} - The promise which resolves to an array.
@@ -1288,8 +1287,9 @@ export class BigQueryClient {
    *   * If the job's location is in a single region (for example,
    *     `us-central1`)
    *
-   *   For more information, see
-   *   https://cloud.google.com/bigquery/docs/locations#specifying_your_location.
+   *   For more information, see how to
+   *   [specify
+   *   locations](https://cloud.google.com/bigquery/docs/locations#specify_locations).
    * @param {object} [options]
    *   Call options. See {@link https://googleapis.dev/nodejs/google-gax/latest/interfaces/CallOptions.html|CallOptions} for more details.
    * @returns {Promise} - The promise which resolves to an array.
@@ -1412,8 +1412,10 @@ export class BigQueryClient {
    *   allowed.
    * @param {string} request.location
    *   The geographic location of the job. Required.
-   *   See details at:
-   *   https://cloud.google.com/bigquery/docs/locations#specifying_your_location.
+   *
+   *   For more information, see how to
+   *   [specify
+   *   locations](https://cloud.google.com/bigquery/docs/locations#specify_locations).
    * @param {object} [options]
    *   Call options. See {@link https://googleapis.dev/nodejs/google-gax/latest/interfaces/CallOptions.html|CallOptions} for more details.
    * @returns {Promise} - The promise which resolves to an array.
@@ -2381,6 +2383,207 @@ export class BigQueryClient {
   // -------------------
   // -- Service calls --
   // -------------------
+  /**
+   * Gets the specified row access policy by policy ID.
+   *
+   * @param {Object} request
+   *   The request object that will be sent.
+   * @param {string} request.projectId
+   *   Required. Project ID of the table to get the row access policy.
+   * @param {string} request.datasetId
+   *   Required. Dataset ID of the table to get the row access policy.
+   * @param {string} request.tableId
+   *   Required. Table ID of the table to get the row access policy.
+   * @param {string} request.policyId
+   *   Required. Policy ID of the row access policy.
+   * @param {object} [options]
+   *   Call options. See {@link https://googleapis.dev/nodejs/google-gax/latest/interfaces/CallOptions.html|CallOptions} for more details.
+   * @returns {Promise} - The promise which resolves to an array.
+   *   The first element of the array is an object representing {@link protos.google.cloud.bigquery.v2.RowAccessPolicy|RowAccessPolicy}.
+   *   Please see the {@link https://github.com/googleapis/gax-nodejs/blob/master/client-libraries.md#regular-methods | documentation }
+   *   for more details and examples.
+   * @example <caption>include:samples/generated/v2/row_access_policy_service.get_row_access_policy.js</caption>
+   * region_tag:bigquery_v2_generated_RowAccessPolicyService_GetRowAccessPolicy_async
+   */
+  getRowAccessPolicy(
+    request?: protos.google.cloud.bigquery.v2.IGetRowAccessPolicyRequest,
+    optionsOrCallback?:
+      | CallOptions
+      | Callback<
+          protos.google.cloud.bigquery.v2.IRowAccessPolicy,
+          | protos.google.cloud.bigquery.v2.IGetRowAccessPolicyRequest
+          | null
+          | undefined,
+          {} | null | undefined
+        >,
+    callback?: Callback<
+      protos.google.cloud.bigquery.v2.IRowAccessPolicy,
+      | protos.google.cloud.bigquery.v2.IGetRowAccessPolicyRequest
+      | null
+      | undefined,
+      {} | null | undefined
+    >
+  ): Promise<
+    [
+      protos.google.cloud.bigquery.v2.IRowAccessPolicy,
+      protos.google.cloud.bigquery.v2.IGetRowAccessPolicyRequest | undefined,
+      {} | undefined,
+    ]
+  > | void {
+    request = request || {};
+    let options: CallOptions;
+    if (typeof optionsOrCallback === 'function' && callback === undefined) {
+      callback = optionsOrCallback;
+      options = {};
+    } else {
+      options = optionsOrCallback as CallOptions;
+    }
+    if (callback === undefined) {
+      return this.rowAccessPolicyClient.getRowAccessPolicy(request, options);
+    }
+    return this.rowAccessPolicyClient.getRowAccessPolicy(
+      request,
+      options,
+      callback
+    );
+  }
+
+  /**
+   * Updates a row access policy.
+   *
+   * @param {Object} request
+   *   The request object that will be sent.
+   * @param {string} request.projectId
+   *   Required. Project ID of the table to get the row access policy.
+   * @param {string} request.datasetId
+   *   Required. Dataset ID of the table to get the row access policy.
+   * @param {string} request.tableId
+   *   Required. Table ID of the table to get the row access policy.
+   * @param {string} request.policyId
+   *   Required. Policy ID of the row access policy.
+   * @param {google.cloud.bigquery.v2.RowAccessPolicy} request.rowAccessPolicy
+   *   Required. The row access policy to update.
+   * @param {object} [options]
+   *   Call options. See {@link https://googleapis.dev/nodejs/google-gax/latest/interfaces/CallOptions.html|CallOptions} for more details.
+   * @returns {Promise} - The promise which resolves to an array.
+   *   The first element of the array is an object representing {@link protos.google.cloud.bigquery.v2.RowAccessPolicy|RowAccessPolicy}.
+   *   Please see the {@link https://github.com/googleapis/gax-nodejs/blob/master/client-libraries.md#regular-methods | documentation }
+   *   for more details and examples.
+   * @example <caption>include:samples/generated/v2/row_access_policy_service.update_row_access_policy.js</caption>
+   * region_tag:bigquery_v2_generated_RowAccessPolicyService_UpdateRowAccessPolicy_async
+   */
+  updateRowAccessPolicy(
+    request?: protos.google.cloud.bigquery.v2.IUpdateRowAccessPolicyRequest,
+    optionsOrCallback?:
+      | CallOptions
+      | Callback<
+          protos.google.cloud.bigquery.v2.IRowAccessPolicy,
+          | protos.google.cloud.bigquery.v2.IUpdateRowAccessPolicyRequest
+          | null
+          | undefined,
+          {} | null | undefined
+        >,
+    callback?: Callback<
+      protos.google.cloud.bigquery.v2.IRowAccessPolicy,
+      | protos.google.cloud.bigquery.v2.IUpdateRowAccessPolicyRequest
+      | null
+      | undefined,
+      {} | null | undefined
+    >
+  ): Promise<
+    [
+      protos.google.cloud.bigquery.v2.IRowAccessPolicy,
+      protos.google.cloud.bigquery.v2.IUpdateRowAccessPolicyRequest | undefined,
+      {} | undefined,
+    ]
+  > | void {
+    request = request || {};
+    let options: CallOptions;
+    if (typeof optionsOrCallback === 'function' && callback === undefined) {
+      callback = optionsOrCallback;
+      options = {};
+    } else {
+      options = optionsOrCallback as CallOptions;
+    }
+    if (callback === undefined) {
+      return this.rowAccessPolicyClient.updateRowAccessPolicy(request, options);
+    }
+    return this.rowAccessPolicyClient.updateRowAccessPolicy(
+      request,
+      options,
+      callback
+    );
+  }
+
+  /**
+   * Deletes a row access policy.
+   *
+   * @param {Object} request
+   *   The request object that will be sent.
+   * @param {string} request.projectId
+   *   Required. Project ID of the table to delete the row access policy.
+   * @param {string} request.datasetId
+   *   Required. Dataset ID of the table to delete the row access policy.
+   * @param {string} request.tableId
+   *   Required. Table ID of the table to delete the row access policy.
+   * @param {string} request.policyId
+   *   Required. Policy ID of the row access policy.
+   * @param {boolean} request.force
+   *   If set to true, it deletes the row access policy even if it's the last row
+   *   access policy on the table and the deletion will widen the access rather
+   *   narrowing it.
+   * @param {object} [options]
+   *   Call options. See {@link https://googleapis.dev/nodejs/google-gax/latest/interfaces/CallOptions.html|CallOptions} for more details.
+   * @returns {Promise} - The promise which resolves to an array.
+   *   The first element of the array is an object representing {@link protos.google.protobuf.Empty|Empty}.
+   *   Please see the {@link https://github.com/googleapis/gax-nodejs/blob/master/client-libraries.md#regular-methods | documentation }
+   *   for more details and examples.
+   * @example <caption>include:samples/generated/v2/row_access_policy_service.delete_row_access_policy.js</caption>
+   * region_tag:bigquery_v2_generated_RowAccessPolicyService_DeleteRowAccessPolicy_async
+   */
+  deleteRowAccessPolicy(
+    request?: protos.google.cloud.bigquery.v2.IDeleteRowAccessPolicyRequest,
+    optionsOrCallback?:
+      | CallOptions
+      | Callback<
+          protos.google.protobuf.IEmpty,
+          | protos.google.cloud.bigquery.v2.IDeleteRowAccessPolicyRequest
+          | null
+          | undefined,
+          {} | null | undefined
+        >,
+    callback?: Callback<
+      protos.google.protobuf.IEmpty,
+      | protos.google.cloud.bigquery.v2.IDeleteRowAccessPolicyRequest
+      | null
+      | undefined,
+      {} | null | undefined
+    >
+  ): Promise<
+    [
+      protos.google.protobuf.IEmpty,
+      protos.google.cloud.bigquery.v2.IDeleteRowAccessPolicyRequest | undefined,
+      {} | undefined,
+    ]
+  > | void {
+    request = request || {};
+    let options: CallOptions;
+    if (typeof optionsOrCallback === 'function' && callback === undefined) {
+      callback = optionsOrCallback;
+      options = {};
+    } else {
+      options = optionsOrCallback as CallOptions;
+    }
+    if (callback === undefined) {
+      return this.rowAccessPolicyClient.deleteRowAccessPolicy(request, options);
+    }
+    return this.rowAccessPolicyClient.deleteRowAccessPolicy(
+      request,
+      options,
+      callback
+    );
+  }
+
   /**
    * Lists all row access policies on the specified table.
    *

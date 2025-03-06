@@ -1,0 +1,13 @@
+{
+  "recurse": true,
+  "skip": [
+    "https://console.cloud.google.com/flows/enableapi?apiid=bigquery.googleapis.com",
+    "https://console.cloud.google.com/project"
+  ],
+  "silent": true,
+  "concurrency": 5,
+  "retry": true,
+  "retryErrors": true,
+  "retryErrorsCount": 5,
+  "retryErrorsJitter": 3000
+}
