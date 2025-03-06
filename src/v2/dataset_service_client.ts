@@ -407,7 +407,7 @@ export class DatasetServiceClient {
    *   version 3. Dataset with no conditional role bindings in access policy may
    *   specify any valid value or leave the field unset.
    *
-   *   This field will be maped to [IAM Policy version]
+   *   This field will be mapped to [IAM Policy version]
    *   (https://cloud.google.com/iam/docs/policies#versions) and will be used to
    *   fetch policy from IAM.
    *
@@ -527,7 +527,7 @@ export class DatasetServiceClient {
    *   If unset or if 0 or 1 value is used for dataset with conditional
    *   bindings, request will be rejected.
    *
-   *   This field will be maped to IAM Policy version
+   *   This field will be mapped to IAM Policy version
    *   (https://cloud.google.com/iam/docs/policies#versions) and will be used to
    *   set policy in IAM.
    * @param {object} [options]
@@ -642,7 +642,7 @@ export class DatasetServiceClient {
    *   If unset or if 0 or 1 value is used for dataset with conditional
    *   bindings, request will be rejected.
    *
-   *   This field will be maped to IAM Policy version
+   *   This field will be mapped to IAM Policy version
    *   (https://cloud.google.com/iam/docs/policies#versions) and will be used to
    *   set policy in IAM.
    * @param {object} [options]
@@ -763,7 +763,7 @@ export class DatasetServiceClient {
    *   If unset or if 0 or 1 value is used for dataset with conditional
    *   bindings, request will be rejected.
    *
-   *   This field will be maped to IAM Policy version
+   *   This field will be mapped to IAM Policy version
    *   (https://cloud.google.com/iam/docs/policies#versions) and will be used to
    *   set policy in IAM.
    * @param {object} [options]
@@ -1063,7 +1063,7 @@ export class DatasetServiceClient {
    * @param {string} request.filter
    *   An expression for filtering the results of the request by label.
    *   The syntax is `labels.<name>[:<value>]`.
-   *   Multiple filters can be ANDed together by connecting with a space.
+   *   Multiple filters can be AND-ed together by connecting with a space.
    *   Example: `labels.department:receiving labels.active`.
    *   See [Filtering datasets using
    *   labels](https://cloud.google.com/bigquery/docs/filtering-labels#filtering_datasets_using_labels)
@@ -1169,7 +1169,7 @@ export class DatasetServiceClient {
    * @param {string} request.filter
    *   An expression for filtering the results of the request by label.
    *   The syntax is `labels.<name>[:<value>]`.
-   *   Multiple filters can be ANDed together by connecting with a space.
+   *   Multiple filters can be AND-ed together by connecting with a space.
    *   Example: `labels.department:receiving labels.active`.
    *   See [Filtering datasets using
    *   labels](https://cloud.google.com/bigquery/docs/filtering-labels#filtering_datasets_using_labels)
@@ -1226,7 +1226,7 @@ export class DatasetServiceClient {
    * @param {string} request.filter
    *   An expression for filtering the results of the request by label.
    *   The syntax is `labels.<name>[:<value>]`.
-   *   Multiple filters can be ANDed together by connecting with a space.
+   *   Multiple filters can be AND-ed together by connecting with a space.
    *   Example: `labels.department:receiving labels.active`.
    *   See [Filtering datasets using
    *   labels](https://cloud.google.com/bigquery/docs/filtering-labels#filtering_datasets_using_labels)

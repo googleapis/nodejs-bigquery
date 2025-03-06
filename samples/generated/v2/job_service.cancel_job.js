@@ -37,14 +37,14 @@ function main(projectId, jobId) {
    */
   // const jobId = 'abc123'
   /**
-   *  The geographic location of the job. You must specify the location to run
-   *  the job for the following scenarios:
+   *  The geographic location of the job. You must
+   *  specify the
+   *  location (https://cloud.google.com/bigquery/docs/locations#specify_locations)
+   *  to run the job for the following scenarios:
    *  * If the location to run a job is not in the `us` or
    *    the `eu` multi-regional location
    *  * If the job's location is in a single region (for example,
    *    `us-central1`)
-   *  For more information, see
-   *  https://cloud.google.com/bigquery/docs/locations#specifying_your_location.
    */
   // const location = 'abc123'
 

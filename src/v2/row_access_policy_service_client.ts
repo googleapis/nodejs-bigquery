@@ -261,7 +261,14 @@ export class RowAccessPolicyServiceClient {
 
     // Iterate over each of the methods that the service provides
     // and create an API call method for each.
-    const rowAccessPolicyServiceStubMethods = ['listRowAccessPolicies'];
+    const rowAccessPolicyServiceStubMethods = [
+      'listRowAccessPolicies',
+      'getRowAccessPolicy',
+      'createRowAccessPolicy',
+      'updateRowAccessPolicy',
+      'deleteRowAccessPolicy',
+      'batchDeleteRowAccessPolicies',
+    ];
     for (const methodName of rowAccessPolicyServiceStubMethods) {
       const callPromise = this.rowAccessPolicyServiceStub.then(
         stub =>
@@ -379,6 +386,519 @@ export class RowAccessPolicyServiceClient {
   // -------------------
   // -- Service calls --
   // -------------------
+  /**
+   * Gets the specified row access policy by policy ID.
+   *
+   * @param {Object} request
+   *   The request object that will be sent.
+   * @param {string} request.projectId
+   *   Required. Project ID of the table to get the row access policy.
+   * @param {string} request.datasetId
+   *   Required. Dataset ID of the table to get the row access policy.
+   * @param {string} request.tableId
+   *   Required. Table ID of the table to get the row access policy.
+   * @param {string} request.policyId
+   *   Required. Policy ID of the row access policy.
+   * @param {object} [options]
+   *   Call options. See {@link https://googleapis.dev/nodejs/google-gax/latest/interfaces/CallOptions.html|CallOptions} for more details.
+   * @returns {Promise} - The promise which resolves to an array.
+   *   The first element of the array is an object representing {@link protos.google.cloud.bigquery.v2.RowAccessPolicy|RowAccessPolicy}.
+   *   Please see the {@link https://github.com/googleapis/gax-nodejs/blob/master/client-libraries.md#regular-methods | documentation }
+   *   for more details and examples.
+   * @example <caption>include:samples/generated/v2/row_access_policy_service.get_row_access_policy.js</caption>
+   * region_tag:bigquery_v2_generated_RowAccessPolicyService_GetRowAccessPolicy_async
+   */
+  getRowAccessPolicy(
+    request?: protos.google.cloud.bigquery.v2.IGetRowAccessPolicyRequest,
+    options?: CallOptions
+  ): Promise<
+    [
+      protos.google.cloud.bigquery.v2.IRowAccessPolicy,
+      protos.google.cloud.bigquery.v2.IGetRowAccessPolicyRequest | undefined,
+      {} | undefined,
+    ]
+  >;
+  getRowAccessPolicy(
+    request: protos.google.cloud.bigquery.v2.IGetRowAccessPolicyRequest,
+    options: CallOptions,
+    callback: Callback<
+      protos.google.cloud.bigquery.v2.IRowAccessPolicy,
+      | protos.google.cloud.bigquery.v2.IGetRowAccessPolicyRequest
+      | null
+      | undefined,
+      {} | null | undefined
+    >
+  ): void;
+  getRowAccessPolicy(
+    request: protos.google.cloud.bigquery.v2.IGetRowAccessPolicyRequest,
+    callback: Callback<
+      protos.google.cloud.bigquery.v2.IRowAccessPolicy,
+      | protos.google.cloud.bigquery.v2.IGetRowAccessPolicyRequest
+      | null
+      | undefined,
+      {} | null | undefined
+    >
+  ): void;
+  getRowAccessPolicy(
+    request?: protos.google.cloud.bigquery.v2.IGetRowAccessPolicyRequest,
+    optionsOrCallback?:
+      | CallOptions
+      | Callback<
+          protos.google.cloud.bigquery.v2.IRowAccessPolicy,
+          | protos.google.cloud.bigquery.v2.IGetRowAccessPolicyRequest
+          | null
+          | undefined,
+          {} | null | undefined
+        >,
+    callback?: Callback<
+      protos.google.cloud.bigquery.v2.IRowAccessPolicy,
+      | protos.google.cloud.bigquery.v2.IGetRowAccessPolicyRequest
+      | null
+      | undefined,
+      {} | null | undefined
+    >
+  ): Promise<
+    [
+      protos.google.cloud.bigquery.v2.IRowAccessPolicy,
+      protos.google.cloud.bigquery.v2.IGetRowAccessPolicyRequest | undefined,
+      {} | undefined,
+    ]
+  > | void {
+    request = request || {};
+    let options: CallOptions;
+    if (typeof optionsOrCallback === 'function' && callback === undefined) {
+      callback = optionsOrCallback;
+      options = {};
+    } else {
+      options = optionsOrCallback as CallOptions;
+    }
+    options = options || {};
+    options.otherArgs = options.otherArgs || {};
+    options.otherArgs.headers = options.otherArgs.headers || {};
+    options.otherArgs.headers['x-goog-request-params'] =
+      this._gaxModule.routingHeader.fromParams({
+        project_id: request.projectId ?? '',
+        dataset_id: request.datasetId ?? '',
+        table_id: request.tableId ?? '',
+        policy_id: request.policyId ?? '',
+      });
+    this.initialize();
+    return this.innerApiCalls.getRowAccessPolicy(request, options, callback);
+  }
+  /**
+   * Creates a row access policy.
+   *
+   * @param {Object} request
+   *   The request object that will be sent.
+   * @param {string} request.projectId
+   *   Required. Project ID of the table to get the row access policy.
+   * @param {string} request.datasetId
+   *   Required. Dataset ID of the table to get the row access policy.
+   * @param {string} request.tableId
+   *   Required. Table ID of the table to get the row access policy.
+   * @param {google.cloud.bigquery.v2.RowAccessPolicy} request.rowAccessPolicy
+   *   Required. The row access policy to create.
+   * @param {object} [options]
+   *   Call options. See {@link https://googleapis.dev/nodejs/google-gax/latest/interfaces/CallOptions.html|CallOptions} for more details.
+   * @returns {Promise} - The promise which resolves to an array.
+   *   The first element of the array is an object representing {@link protos.google.cloud.bigquery.v2.RowAccessPolicy|RowAccessPolicy}.
+   *   Please see the {@link https://github.com/googleapis/gax-nodejs/blob/master/client-libraries.md#regular-methods | documentation }
+   *   for more details and examples.
+   * @example <caption>include:samples/generated/v2/row_access_policy_service.create_row_access_policy.js</caption>
+   * region_tag:bigquery_v2_generated_RowAccessPolicyService_CreateRowAccessPolicy_async
+   */
+  createRowAccessPolicy(
+    request?: protos.google.cloud.bigquery.v2.ICreateRowAccessPolicyRequest,
+    options?: CallOptions
+  ): Promise<
+    [
+      protos.google.cloud.bigquery.v2.IRowAccessPolicy,
+      protos.google.cloud.bigquery.v2.ICreateRowAccessPolicyRequest | undefined,
+      {} | undefined,
+    ]
+  >;
+  createRowAccessPolicy(
+    request: protos.google.cloud.bigquery.v2.ICreateRowAccessPolicyRequest,
+    options: CallOptions,
+    callback: Callback<
+      protos.google.cloud.bigquery.v2.IRowAccessPolicy,
+      | protos.google.cloud.bigquery.v2.ICreateRowAccessPolicyRequest
+      | null
+      | undefined,
+      {} | null | undefined
+    >
+  ): void;
+  createRowAccessPolicy(
+    request: protos.google.cloud.bigquery.v2.ICreateRowAccessPolicyRequest,
+    callback: Callback<
+      protos.google.cloud.bigquery.v2.IRowAccessPolicy,
+      | protos.google.cloud.bigquery.v2.ICreateRowAccessPolicyRequest
+      | null
+      | undefined,
+      {} | null | undefined
+    >
+  ): void;
+  createRowAccessPolicy(
+    request?: protos.google.cloud.bigquery.v2.ICreateRowAccessPolicyRequest,
+    optionsOrCallback?:
+      | CallOptions
+      | Callback<
+          protos.google.cloud.bigquery.v2.IRowAccessPolicy,
+          | protos.google.cloud.bigquery.v2.ICreateRowAccessPolicyRequest
+          | null
+          | undefined,
+          {} | null | undefined
+        >,
+    callback?: Callback<
+      protos.google.cloud.bigquery.v2.IRowAccessPolicy,
+      | protos.google.cloud.bigquery.v2.ICreateRowAccessPolicyRequest
+      | null
+      | undefined,
+      {} | null | undefined
+    >
+  ): Promise<
+    [
+      protos.google.cloud.bigquery.v2.IRowAccessPolicy,
+      protos.google.cloud.bigquery.v2.ICreateRowAccessPolicyRequest | undefined,
+      {} | undefined,
+    ]
+  > | void {
+    request = request || {};
+    let options: CallOptions;
+    if (typeof optionsOrCallback === 'function' && callback === undefined) {
+      callback = optionsOrCallback;
+      options = {};
+    } else {
+      options = optionsOrCallback as CallOptions;
+    }
+    options = options || {};
+    options.otherArgs = options.otherArgs || {};
+    options.otherArgs.headers = options.otherArgs.headers || {};
+    options.otherArgs.headers['x-goog-request-params'] =
+      this._gaxModule.routingHeader.fromParams({
+        project_id: request.projectId ?? '',
+        dataset_id: request.datasetId ?? '',
+        table_id: request.tableId ?? '',
+      });
+    this.initialize();
+    return this.innerApiCalls.createRowAccessPolicy(request, options, callback);
+  }
+  /**
+   * Updates a row access policy.
+   *
+   * @param {Object} request
+   *   The request object that will be sent.
+   * @param {string} request.projectId
+   *   Required. Project ID of the table to get the row access policy.
+   * @param {string} request.datasetId
+   *   Required. Dataset ID of the table to get the row access policy.
+   * @param {string} request.tableId
+   *   Required. Table ID of the table to get the row access policy.
+   * @param {string} request.policyId
+   *   Required. Policy ID of the row access policy.
+   * @param {google.cloud.bigquery.v2.RowAccessPolicy} request.rowAccessPolicy
+   *   Required. The row access policy to update.
+   * @param {object} [options]
+   *   Call options. See {@link https://googleapis.dev/nodejs/google-gax/latest/interfaces/CallOptions.html|CallOptions} for more details.
+   * @returns {Promise} - The promise which resolves to an array.
+   *   The first element of the array is an object representing {@link protos.google.cloud.bigquery.v2.RowAccessPolicy|RowAccessPolicy}.
+   *   Please see the {@link https://github.com/googleapis/gax-nodejs/blob/master/client-libraries.md#regular-methods | documentation }
+   *   for more details and examples.
+   * @example <caption>include:samples/generated/v2/row_access_policy_service.update_row_access_policy.js</caption>
+   * region_tag:bigquery_v2_generated_RowAccessPolicyService_UpdateRowAccessPolicy_async
+   */
+  updateRowAccessPolicy(
+    request?: protos.google.cloud.bigquery.v2.IUpdateRowAccessPolicyRequest,
+    options?: CallOptions
+  ): Promise<
+    [
+      protos.google.cloud.bigquery.v2.IRowAccessPolicy,
+      protos.google.cloud.bigquery.v2.IUpdateRowAccessPolicyRequest | undefined,
+      {} | undefined,
+    ]
+  >;
+  updateRowAccessPolicy(
+    request: protos.google.cloud.bigquery.v2.IUpdateRowAccessPolicyRequest,
+    options: CallOptions,
+    callback: Callback<
+      protos.google.cloud.bigquery.v2.IRowAccessPolicy,
+      | protos.google.cloud.bigquery.v2.IUpdateRowAccessPolicyRequest
+      | null
+      | undefined,
+      {} | null | undefined
+    >
+  ): void;
+  updateRowAccessPolicy(
+    request: protos.google.cloud.bigquery.v2.IUpdateRowAccessPolicyRequest,
+    callback: Callback<
+      protos.google.cloud.bigquery.v2.IRowAccessPolicy,
+      | protos.google.cloud.bigquery.v2.IUpdateRowAccessPolicyRequest
+      | null
+      | undefined,
+      {} | null | undefined
+    >
+  ): void;
+  updateRowAccessPolicy(
+    request?: protos.google.cloud.bigquery.v2.IUpdateRowAccessPolicyRequest,
+    optionsOrCallback?:
+      | CallOptions
+      | Callback<
+          protos.google.cloud.bigquery.v2.IRowAccessPolicy,
+          | protos.google.cloud.bigquery.v2.IUpdateRowAccessPolicyRequest
+          | null
+          | undefined,
+          {} | null | undefined
+        >,
+    callback?: Callback<
+      protos.google.cloud.bigquery.v2.IRowAccessPolicy,
+      | protos.google.cloud.bigquery.v2.IUpdateRowAccessPolicyRequest
+      | null
+      | undefined,
+      {} | null | undefined
+    >
+  ): Promise<
+    [
+      protos.google.cloud.bigquery.v2.IRowAccessPolicy,
+      protos.google.cloud.bigquery.v2.IUpdateRowAccessPolicyRequest | undefined,
+      {} | undefined,
+    ]
+  > | void {
+    request = request || {};
+    let options: CallOptions;
+    if (typeof optionsOrCallback === 'function' && callback === undefined) {
+      callback = optionsOrCallback;
+      options = {};
+    } else {
+      options = optionsOrCallback as CallOptions;
+    }
+    options = options || {};
+    options.otherArgs = options.otherArgs || {};
+    options.otherArgs.headers = options.otherArgs.headers || {};
+    options.otherArgs.headers['x-goog-request-params'] =
+      this._gaxModule.routingHeader.fromParams({
+        project_id: request.projectId ?? '',
+        dataset_id: request.datasetId ?? '',
+        table_id: request.tableId ?? '',
+        policy_id: request.policyId ?? '',
+      });
+    this.initialize();
+    return this.innerApiCalls.updateRowAccessPolicy(request, options, callback);
+  }
+  /**
+   * Deletes a row access policy.
+   *
+   * @param {Object} request
+   *   The request object that will be sent.
+   * @param {string} request.projectId
+   *   Required. Project ID of the table to delete the row access policy.
+   * @param {string} request.datasetId
+   *   Required. Dataset ID of the table to delete the row access policy.
+   * @param {string} request.tableId
+   *   Required. Table ID of the table to delete the row access policy.
+   * @param {string} request.policyId
+   *   Required. Policy ID of the row access policy.
+   * @param {boolean} request.force
+   *   If set to true, it deletes the row access policy even if it's the last row
+   *   access policy on the table and the deletion will widen the access rather
+   *   narrowing it.
+   * @param {object} [options]
+   *   Call options. See {@link https://googleapis.dev/nodejs/google-gax/latest/interfaces/CallOptions.html|CallOptions} for more details.
+   * @returns {Promise} - The promise which resolves to an array.
+   *   The first element of the array is an object representing {@link protos.google.protobuf.Empty|Empty}.
+   *   Please see the {@link https://github.com/googleapis/gax-nodejs/blob/master/client-libraries.md#regular-methods | documentation }
+   *   for more details and examples.
+   * @example <caption>include:samples/generated/v2/row_access_policy_service.delete_row_access_policy.js</caption>
+   * region_tag:bigquery_v2_generated_RowAccessPolicyService_DeleteRowAccessPolicy_async
+   */
+  deleteRowAccessPolicy(
+    request?: protos.google.cloud.bigquery.v2.IDeleteRowAccessPolicyRequest,
+    options?: CallOptions
+  ): Promise<
+    [
+      protos.google.protobuf.IEmpty,
+      protos.google.cloud.bigquery.v2.IDeleteRowAccessPolicyRequest | undefined,
+      {} | undefined,
+    ]
+  >;
+  deleteRowAccessPolicy(
+    request: protos.google.cloud.bigquery.v2.IDeleteRowAccessPolicyRequest,
+    options: CallOptions,
+    callback: Callback<
+      protos.google.protobuf.IEmpty,
+      | protos.google.cloud.bigquery.v2.IDeleteRowAccessPolicyRequest
+      | null
+      | undefined,
+      {} | null | undefined
+    >
+  ): void;
+  deleteRowAccessPolicy(
+    request: protos.google.cloud.bigquery.v2.IDeleteRowAccessPolicyRequest,
+    callback: Callback<
+      protos.google.protobuf.IEmpty,
+      | protos.google.cloud.bigquery.v2.IDeleteRowAccessPolicyRequest
+      | null
+      | undefined,
+      {} | null | undefined
+    >
+  ): void;
+  deleteRowAccessPolicy(
+    request?: protos.google.cloud.bigquery.v2.IDeleteRowAccessPolicyRequest,
+    optionsOrCallback?:
+      | CallOptions
+      | Callback<
+          protos.google.protobuf.IEmpty,
+          | protos.google.cloud.bigquery.v2.IDeleteRowAccessPolicyRequest
+          | null
+          | undefined,
+          {} | null | undefined
+        >,
+    callback?: Callback<
+      protos.google.protobuf.IEmpty,
+      | protos.google.cloud.bigquery.v2.IDeleteRowAccessPolicyRequest
+      | null
+      | undefined,
+      {} | null | undefined
+    >
+  ): Promise<
+    [
+      protos.google.protobuf.IEmpty,
+      protos.google.cloud.bigquery.v2.IDeleteRowAccessPolicyRequest | undefined,
+      {} | undefined,
+    ]
+  > | void {
+    request = request || {};
+    let options: CallOptions;
+    if (typeof optionsOrCallback === 'function' && callback === undefined) {
+      callback = optionsOrCallback;
+      options = {};
+    } else {
+      options = optionsOrCallback as CallOptions;
+    }
+    options = options || {};
+    options.otherArgs = options.otherArgs || {};
+    options.otherArgs.headers = options.otherArgs.headers || {};
+    options.otherArgs.headers['x-goog-request-params'] =
+      this._gaxModule.routingHeader.fromParams({
+        project_id: request.projectId ?? '',
+        dataset_id: request.datasetId ?? '',
+        table_id: request.tableId ?? '',
+        policy_id: request.policyId ?? '',
+      });
+    this.initialize();
+    return this.innerApiCalls.deleteRowAccessPolicy(request, options, callback);
+  }
+  /**
+   * Deletes provided row access policies.
+   *
+   * @param {Object} request
+   *   The request object that will be sent.
+   * @param {string} request.projectId
+   *   Required. Project ID of the table to delete the row access policies.
+   * @param {string} request.datasetId
+   *   Required. Dataset ID of the table to delete the row access policies.
+   * @param {string} request.tableId
+   *   Required. Table ID of the table to delete the row access policies.
+   * @param {string[]} request.policyIds
+   *   Required. Policy IDs of the row access policies.
+   * @param {boolean} request.force
+   *   If set to true, it deletes the row access policy even if it's the last row
+   *   access policy on the table and the deletion will widen the access rather
+   *   narrowing it.
+   * @param {object} [options]
+   *   Call options. See {@link https://googleapis.dev/nodejs/google-gax/latest/interfaces/CallOptions.html|CallOptions} for more details.
+   * @returns {Promise} - The promise which resolves to an array.
+   *   The first element of the array is an object representing {@link protos.google.protobuf.Empty|Empty}.
+   *   Please see the {@link https://github.com/googleapis/gax-nodejs/blob/master/client-libraries.md#regular-methods | documentation }
+   *   for more details and examples.
+   * @example <caption>include:samples/generated/v2/row_access_policy_service.batch_delete_row_access_policies.js</caption>
+   * region_tag:bigquery_v2_generated_RowAccessPolicyService_BatchDeleteRowAccessPolicies_async
+   */
+  batchDeleteRowAccessPolicies(
+    request?: protos.google.cloud.bigquery.v2.IBatchDeleteRowAccessPoliciesRequest,
+    options?: CallOptions
+  ): Promise<
+    [
+      protos.google.protobuf.IEmpty,
+      (
+        | protos.google.cloud.bigquery.v2.IBatchDeleteRowAccessPoliciesRequest
+        | undefined
+      ),
+      {} | undefined,
+    ]
+  >;
+  batchDeleteRowAccessPolicies(
+    request: protos.google.cloud.bigquery.v2.IBatchDeleteRowAccessPoliciesRequest,
+    options: CallOptions,
+    callback: Callback<
+      protos.google.protobuf.IEmpty,
+      | protos.google.cloud.bigquery.v2.IBatchDeleteRowAccessPoliciesRequest
+      | null
+      | undefined,
+      {} | null | undefined
+    >
+  ): void;
+  batchDeleteRowAccessPolicies(
+    request: protos.google.cloud.bigquery.v2.IBatchDeleteRowAccessPoliciesRequest,
+    callback: Callback<
+      protos.google.protobuf.IEmpty,
+      | protos.google.cloud.bigquery.v2.IBatchDeleteRowAccessPoliciesRequest
+      | null
+      | undefined,
+      {} | null | undefined
+    >
+  ): void;
+  batchDeleteRowAccessPolicies(
+    request?: protos.google.cloud.bigquery.v2.IBatchDeleteRowAccessPoliciesRequest,
+    optionsOrCallback?:
+      | CallOptions
+      | Callback<
+          protos.google.protobuf.IEmpty,
+          | protos.google.cloud.bigquery.v2.IBatchDeleteRowAccessPoliciesRequest
+          | null
+          | undefined,
+          {} | null | undefined
+        >,
+    callback?: Callback<
+      protos.google.protobuf.IEmpty,
+      | protos.google.cloud.bigquery.v2.IBatchDeleteRowAccessPoliciesRequest
+      | null
+      | undefined,
+      {} | null | undefined
+    >
+  ): Promise<
+    [
+      protos.google.protobuf.IEmpty,
+      (
+        | protos.google.cloud.bigquery.v2.IBatchDeleteRowAccessPoliciesRequest
+        | undefined
+      ),
+      {} | undefined,
+    ]
+  > | void {
+    request = request || {};
+    let options: CallOptions;
+    if (typeof optionsOrCallback === 'function' && callback === undefined) {
+      callback = optionsOrCallback;
+      options = {};
+    } else {
+      options = optionsOrCallback as CallOptions;
+    }
+    options = options || {};
+    options.otherArgs = options.otherArgs || {};
+    options.otherArgs.headers = options.otherArgs.headers || {};
+    options.otherArgs.headers['x-goog-request-params'] =
+      this._gaxModule.routingHeader.fromParams({
+        project_id: request.projectId ?? '',
+        dataset_id: request.datasetId ?? '',
+        table_id: request.tableId ?? '',
+      });
+    this.initialize();
+    return this.innerApiCalls.batchDeleteRowAccessPolicies(
+      request,
+      options,
+      callback
+    );
+  }
 
   /**
    * Lists all row access policies on the specified table.

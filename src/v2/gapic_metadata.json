@@ -346,6 +346,31 @@
         "grpc": {
           "libraryClient": "RowAccessPolicyServiceClient",
           "rpcs": {
+            "GetRowAccessPolicy": {
+              "methods": [
+                "getRowAccessPolicy"
+              ]
+            },
+            "CreateRowAccessPolicy": {
+              "methods": [
+                "createRowAccessPolicy"
+              ]
+            },
+            "UpdateRowAccessPolicy": {
+              "methods": [
+                "updateRowAccessPolicy"
+              ]
+            },
+            "DeleteRowAccessPolicy": {
+              "methods": [
+                "deleteRowAccessPolicy"
+              ]
+            },
+            "BatchDeleteRowAccessPolicies": {
+              "methods": [
+                "batchDeleteRowAccessPolicies"
+              ]
+            },
             "ListRowAccessPolicies": {
               "methods": [
                 "listRowAccessPolicies",
@@ -358,6 +383,31 @@
         "grpc-fallback": {
           "libraryClient": "RowAccessPolicyServiceClient",
           "rpcs": {
+            "GetRowAccessPolicy": {
+              "methods": [
+                "getRowAccessPolicy"
+              ]
+            },
+            "CreateRowAccessPolicy": {
+              "methods": [
+                "createRowAccessPolicy"
+              ]
+            },
+            "UpdateRowAccessPolicy": {
+              "methods": [
+                "updateRowAccessPolicy"
+              ]
+            },
+            "DeleteRowAccessPolicy": {
+              "methods": [
+                "deleteRowAccessPolicy"
+              ]
+            },
+            "BatchDeleteRowAccessPolicies": {
+              "methods": [
+                "batchDeleteRowAccessPolicies"
+              ]
+            },
             "ListRowAccessPolicies": {
               "methods": [
                 "listRowAccessPolicies",

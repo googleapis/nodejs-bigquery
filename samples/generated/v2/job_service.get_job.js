@@ -43,8 +43,9 @@ function main(projectId, jobId) {
    *    the `eu` multi-regional location
    *  * If the job's location is in a single region (for example,
    *    `us-central1`)
-   *  For more information, see
-   *  https://cloud.google.com/bigquery/docs/locations#specifying_your_location.
+   *  For more information, see how to
+   *  specify
+   *  locations (https://cloud.google.com/bigquery/docs/locations#specify_locations).
    */
   // const location = 'abc123'
 

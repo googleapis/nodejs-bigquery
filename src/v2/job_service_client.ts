@@ -400,16 +400,15 @@ export class JobServiceClient {
    * @param {string} request.jobId
    *   Required. Job ID of the job to cancel
    * @param {string} request.location
-   *   The geographic location of the job. You must specify the location to run
-   *   the job for the following scenarios:
+   *   The geographic location of the job. You must
+   *   [specify the
+   *   location](https://cloud.google.com/bigquery/docs/locations#specify_locations)
+   *   to run the job for the following scenarios:
    *
    *   * If the location to run a job is not in the `us` or
    *     the `eu` multi-regional location
    *   * If the job's location is in a single region (for example,
    *     `us-central1`)
-   *
-   *   For more information, see
-   *   https://cloud.google.com/bigquery/docs/locations#specifying_your_location.
    * @param {object} [options]
    *   Call options. See {@link https://googleapis.dev/nodejs/google-gax/latest/interfaces/CallOptions.html|CallOptions} for more details.
    * @returns {Promise} - The promise which resolves to an array.
@@ -506,8 +505,9 @@ export class JobServiceClient {
    *   * If the job's location is in a single region (for example,
    *     `us-central1`)
    *
-   *   For more information, see
-   *   https://cloud.google.com/bigquery/docs/locations#specifying_your_location.
+   *   For more information, see how to
+   *   [specify
+   *   locations](https://cloud.google.com/bigquery/docs/locations#specify_locations).
    * @param {object} [options]
    *   Call options. See {@link https://googleapis.dev/nodejs/google-gax/latest/interfaces/CallOptions.html|CallOptions} for more details.
    * @returns {Promise} - The promise which resolves to an array.
@@ -693,8 +693,10 @@ export class JobServiceClient {
    *   allowed.
    * @param {string} request.location
    *   The geographic location of the job. Required.
-   *   See details at:
-   *   https://cloud.google.com/bigquery/docs/locations#specifying_your_location.
+   *
+   *   For more information, see how to
+   *   [specify
+   *   locations](https://cloud.google.com/bigquery/docs/locations#specify_locations).
    * @param {object} [options]
    *   Call options. See {@link https://googleapis.dev/nodejs/google-gax/latest/interfaces/CallOptions.html|CallOptions} for more details.
    * @returns {Promise} - The promise which resolves to an array.
@@ -811,8 +813,9 @@ export class JobServiceClient {
    *   * If the job's location is in a single region (for example,
    *   `us-central1`)
    *
-   *   For more information, see
-   *   https://cloud.google.com/bigquery/docs/locations#specifying_your_location.
+   *   For more information, see how to
+   *   [specify
+   *   locations](https://cloud.google.com/bigquery/docs/locations#specify_locations).
    * @param {google.cloud.bigquery.v2.DataFormatOptions} [request.formatOptions]
    *   Optional. Output format adjustments.
    * @param {object} [options]
