@@ -14,6 +14,7 @@
 
 import * as ts from 'typescript';
 import * as fs from 'fs';
+import {open} from 'node:fs/promises'
 import * as prettier from 'prettier';
 
 // TODO(maintainer) - if a new client is added, add it to this list
@@ -390,9 +391,10 @@ async function buildOutput() {
 }
 
 async function main() {
-  const finaloutput = await buildOutput();
-  fs.writeFile('../src/bigquery.ts', finaloutput, err => {
-    if (err) throw err;
-  });
+  await readHandwrittenCode()
+  // const finaloutput = await buildOutput();
+  // fs.writeFile('../src/bigquery.ts', finaloutput, err => {
+  //   if (err) throw err;
+  // });
 }
 main();
