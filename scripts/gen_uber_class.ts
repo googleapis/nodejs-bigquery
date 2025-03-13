@@ -14,6 +14,7 @@
 
 import * as ts from 'typescript';
 import * as fs from 'fs';
+import {open} from 'node:fs/promises'
 import * as prettier from 'prettier';
 
 // TODO(maintainer) - if a new client is added, add it to this list
