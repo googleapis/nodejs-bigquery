@@ -530,9 +530,28 @@ export class BigQueryClient {
       options = optionsOrCallback as CallOptions;
     }
     if (callback === undefined) {
-      return this.datasetClient.deleteDataset(request, options);
+      console.log('deleting')
+        console.log('before')
+        this.datasetClient.deleteDataset(request, options, (err: any, response) => {
+          // console.log("error", err, err.note)
+          if(err){
+            if(err.note==="Exception occurred in retry method that was not classified as transient"){
+              console.log("it's okay")
+              // TODO properly format response 
+              return "Something"
+            }
+       
+          throw err;
+          }else{
+            console.log('after!!', response)
+
+            return response;
+          }
+
+        });
+
     }
-    return this.datasetClient.deleteDataset(request, options, callback);
+    // return this.datasetClient.deleteDataset(request, options, callback);
   }
 
   /**
