@@ -2732,4 +2732,10 @@ export class BigQueryClient {
       options
     );
   }
+
+  // Begin handwritten
+  exampleMethod() {
+    return 'BigQuery!';
+  }
+  // End handwritten
 }

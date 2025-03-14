@@ -357,6 +357,18 @@ function buildClientConstructor(clients) {
   return output;
 }
 
+// Looks at existing bigquery.ts - all handwritten code MUST be
+// in between // Begin handwritten and // End handwritten tags
+// or it will be overwritten
+function readHandwrittenCode(): string {
+  let handwrittenCode = '\n';
+  const input = fs.readFileSync('../src/bigquery.ts', 'utf8');
+  const startIndex = input.search('// Begin handwritten');
+  const endIndex = input.search('// End handwritten') + 18; // +18 includes the comment "end handwritten"
+  handwrittenCode = handwrittenCode.concat(input.slice(startIndex, endIndex));
+  return handwrittenCode;
+}
+
 // first add the components that don't come from underlying files
 // (imports, exported types, docstring w/ client constructor)
 // then, traverse the file inputs and add the functions from them
@@ -367,6 +379,7 @@ async function buildOutput() {
   output = output.concat(buildOptionTypes(CLIENTS));
   output = output.concat(buildClientConstructor(CLIENTS));
   output = output.concat(astHelper(FILES, CLIENTS));
+  output = output.concat(readHandwrittenCode());
   output = output.concat('\n}');
   return prettier.format(output, {
     parser: 'typescript',
@@ -375,6 +388,7 @@ async function buildOutput() {
     bracketSpacing: false,
   });
 }
+
 async function main() {
   const finaloutput = await buildOutput();
   fs.writeFile('../src/bigquery.ts', finaloutput, err => {
