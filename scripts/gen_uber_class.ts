@@ -14,7 +14,7 @@
 
 import * as ts from 'typescript';
 import * as fs from 'fs';
-import {open} from 'node:fs/promises'
+import * as fsPromises from 'node:fs/promises';
 import * as prettier from 'prettier';
 
 // TODO(maintainer) - if a new client is added, add it to this list
@@ -358,33 +358,16 @@ function buildClientConstructor(clients) {
   return output;
 }
 
-// TODO - read bigquery.ts, look for handwritten stuff, store it
-async function readHandwrittenCode(): Promise<void> {
-  let output = ''
-  // let input = ''
-  // fs.readFile('../src/bigquery.ts', 'utf8', (err, data) => {
-  //   if(err) throw err;
-  //   input = input.concat(data)
-  //   const startIndex = input.search("// Begin handwritten")
-  //   const endIndex = input.search("// End handwritten") + 18 // +18 includes the comment "end handwritten"
-  //   const handwrittenCode = input.slice(startIndex, endIndex)
-  //   return handwrittenCode
-  // })
-  const file = await open('../src/bigquery.ts')
-  let append = false;
-  for await (const line of file.readLines()){
-    if(append){
-      output = output.concat(line + "\n")
-    }else{
-      if(line.search("// Begin handwritten")>0){
-        append = true;
-        output = output.concat(line + "\n")
-      }else if (line.search("// End handwritten")>0){
-        append = false;
-      }
-    }
-  }
-  console.log(output)
+// Looks at existing bigquery.ts - all handwritten code MUST be
+// in between // Begin handwritten and // End handwritten tags
+// or it will be overwritten
+async function readHandwrittenCode(): Promise<string> {
+  let handwrittenCode = '\n';
+  const input = await fsPromises.readFile('../src/bigquery.ts', 'utf8');
+  const startIndex = input.search('// Begin handwritten');
+  const endIndex = input.search('// End handwritten') + 18; // +18 includes the comment "end handwritten"
+  handwrittenCode = handwrittenCode.concat(input.slice(startIndex, endIndex));
+  return handwrittenCode;
 }
 
 // first add the components that don't come from underlying files
@@ -397,7 +380,7 @@ async function buildOutput() {
   output = output.concat(buildOptionTypes(CLIENTS));
   output = output.concat(buildClientConstructor(CLIENTS));
   output = output.concat(astHelper(FILES, CLIENTS));
-  // output = output.concat(readHandwrittenCode())
+  output = output.concat(await readHandwrittenCode());
   output = output.concat('\n}');
   return prettier.format(output, {
     parser: 'typescript',
@@ -407,14 +390,10 @@ async function buildOutput() {
   });
 }
 
-
-
-
 async function main() {
-  await readHandwrittenCode()
-  // const finaloutput = await buildOutput();
-  // fs.writeFile('../src/bigquery.ts', finaloutput, err => {
-  //   if (err) throw err;
-  // });
+  const finaloutput = await buildOutput();
+  fs.writeFile('../src/bigquery.ts', finaloutput, err => {
+    if (err) throw err;
+  });
 }
 main();

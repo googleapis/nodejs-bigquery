@@ -2734,8 +2734,8 @@ export class BigQueryClient {
   }
 
   // Begin handwritten
-  method() {
-    return "hi"
+  exampleMethod() {
+    return 'BigQuery!';
   }
   // End handwritten
 }
