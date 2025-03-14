@@ -14,7 +14,6 @@
 
 import * as ts from 'typescript';
 import * as fs from 'fs';
-import * as fsPromises from 'node:fs/promises';
 import * as prettier from 'prettier';
 
 // TODO(maintainer) - if a new client is added, add it to this list
@@ -361,9 +360,9 @@ function buildClientConstructor(clients) {
 // Looks at existing bigquery.ts - all handwritten code MUST be
 // in between // Begin handwritten and // End handwritten tags
 // or it will be overwritten
-async function readHandwrittenCode(): Promise<string> {
+function readHandwrittenCode(): string {
   let handwrittenCode = '\n';
-  const input = await fsPromises.readFile('../src/bigquery.ts', 'utf8');
+  const input = fs.readFileSync('../src/bigquery.ts', 'utf8');
   const startIndex = input.search('// Begin handwritten');
   const endIndex = input.search('// End handwritten') + 18; // +18 includes the comment "end handwritten"
   handwrittenCode = handwrittenCode.concat(input.slice(startIndex, endIndex));
@@ -380,7 +379,7 @@ async function buildOutput() {
   output = output.concat(buildOptionTypes(CLIENTS));
   output = output.concat(buildClientConstructor(CLIENTS));
   output = output.concat(astHelper(FILES, CLIENTS));
-  output = output.concat(await readHandwrittenCode());
+  output = output.concat(readHandwrittenCode());
   output = output.concat('\n}');
   return prettier.format(output, {
     parser: 'typescript',
