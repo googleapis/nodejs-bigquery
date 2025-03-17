@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * Discovery Revision: 20250128
+ * Discovery Revision: 20250216
  */
 
 /**
@@ -49,7 +49,7 @@ declare namespace bigquery {
      */
     rocAuc?: number;
     /**
-     * Threshold at which the metrics are computed. For binary classification models this is the positive class threshold. For multi-class classfication models this is the confidence threshold.
+     * Threshold at which the metrics are computed. For binary classification models this is the positive class threshold. For multi-class classification models this is the confidence threshold.
      */
     threshold?: number;
   };
@@ -1596,7 +1596,15 @@ declare namespace bigquery {
      */
     csvOptions?: ICsvOptions;
     /**
-     * Defines the list of possible SQL data types to which the source decimal values are converted. This list and the precision and the scale parameters of the decimal field determine the target type. In the order of NUMERIC, BIGNUMERIC, and STRING, a type is picked if it is in the specified list and if it supports the precision and the scale. STRING supports all precision and scale values. If none of the listed types supports the precision and the scale, the type supporting the widest range in the specified list is picked, and if a value exceeds the supported range when reading the data, an error will be thrown. Example: Suppose the value of this field is ["NUMERIC", "BIGNUMERIC"]. If (precision,scale) is: * (38,9) -> NUMERIC; * (39,9) -> BIGNUMERIC (NUMERIC cannot hold 30 integer digits); * (38,10) -> BIGNUMERIC (NUMERIC cannot hold 10 fractional digits); * (76,38) -> BIGNUMERIC; * (77,38) -> BIGNUMERIC (error if value exeeds supported range). This field cannot contain duplicate types. The order of the types in this field is ignored. For example, ["BIGNUMERIC", "NUMERIC"] is the same as ["NUMERIC", "BIGNUMERIC"] and NUMERIC always takes precedence over BIGNUMERIC. Defaults to ["NUMERIC", "STRING"] for ORC and ["NUMERIC"] for the other file formats.
+     * Optional. Format used to parse DATE values. Supports C-style and SQL-style values.
+     */
+    dateFormat?: string;
+    /**
+     * Optional. Format used to parse DATETIME values. Supports C-style and SQL-style values.
+     */
+    datetimeFormat?: string;
+    /**
+     * Defines the list of possible SQL data types to which the source decimal values are converted. This list and the precision and the scale parameters of the decimal field determine the target type. In the order of NUMERIC, BIGNUMERIC, and STRING, a type is picked if it is in the specified list and if it supports the precision and the scale. STRING supports all precision and scale values. If none of the listed types supports the precision and the scale, the type supporting the widest range in the specified list is picked, and if a value exceeds the supported range when reading the data, an error will be thrown. Example: Suppose the value of this field is ["NUMERIC", "BIGNUMERIC"]. If (precision,scale) is: * (38,9) -> NUMERIC; * (39,9) -> BIGNUMERIC (NUMERIC cannot hold 30 integer digits); * (38,10) -> BIGNUMERIC (NUMERIC cannot hold 10 fractional digits); * (76,38) -> BIGNUMERIC; * (77,38) -> BIGNUMERIC (error if value exceeds supported range). This field cannot contain duplicate types. The order of the types in this field is ignored. For example, ["BIGNUMERIC", "NUMERIC"] is the same as ["NUMERIC", "BIGNUMERIC"] and NUMERIC always takes precedence over BIGNUMERIC. Defaults to ["NUMERIC", "STRING"] for ORC and ["NUMERIC"] for the other file formats.
      */
     decimalTargetTypes?: Array<
       'DECIMAL_TARGET_TYPE_UNSPECIFIED' | 'NUMERIC' | 'BIGNUMERIC' | 'STRING'
@@ -1662,6 +1670,18 @@ declare namespace bigquery {
      * [Required] The fully-qualified URIs that point to your data in Google Cloud. For Google Cloud Storage URIs: Each URI can contain one '*' wildcard character and it must come after the 'bucket' name. Size limits related to load jobs apply to external data sources. For Google Cloud Bigtable URIs: Exactly one URI can be specified and it has be a fully specified and valid HTTPS URL for a Google Cloud Bigtable table. For Google Cloud Datastore backups, exactly one URI can be specified. Also, the '*' wildcard character is not allowed.
      */
     sourceUris?: Array<string>;
+    /**
+     * Optional. Format used to parse TIME values. Supports C-style and SQL-style values.
+     */
+    timeFormat?: string;
+    /**
+     * Optional. Time zone used when parsing timestamp values that do not have specific time zone information (e.g. 2024-04-20 12:34:56). The expected format is a IANA timezone string (e.g. America/Los_Angeles).
+     */
+    timeZone?: string;
+    /**
+     * Optional. Format used to parse TIMESTAMP values. Supports C-style and SQL-style values.
+     */
+    timestampFormat?: string;
   };
 
   /**
@@ -2389,7 +2409,15 @@ declare namespace bigquery {
      */
     createSession?: boolean;
     /**
-     * Defines the list of possible SQL data types to which the source decimal values are converted. This list and the precision and the scale parameters of the decimal field determine the target type. In the order of NUMERIC, BIGNUMERIC, and STRING, a type is picked if it is in the specified list and if it supports the precision and the scale. STRING supports all precision and scale values. If none of the listed types supports the precision and the scale, the type supporting the widest range in the specified list is picked, and if a value exceeds the supported range when reading the data, an error will be thrown. Example: Suppose the value of this field is ["NUMERIC", "BIGNUMERIC"]. If (precision,scale) is: * (38,9) -> NUMERIC; * (39,9) -> BIGNUMERIC (NUMERIC cannot hold 30 integer digits); * (38,10) -> BIGNUMERIC (NUMERIC cannot hold 10 fractional digits); * (76,38) -> BIGNUMERIC; * (77,38) -> BIGNUMERIC (error if value exeeds supported range). This field cannot contain duplicate types. The order of the types in this field is ignored. For example, ["BIGNUMERIC", "NUMERIC"] is the same as ["NUMERIC", "BIGNUMERIC"] and NUMERIC always takes precedence over BIGNUMERIC. Defaults to ["NUMERIC", "STRING"] for ORC and ["NUMERIC"] for the other file formats.
+     * Optional. Date format used for parsing DATE values.
+     */
+    dateFormat?: string;
+    /**
+     * Optional. Date format used for parsing DATETIME values.
+     */
+    datetimeFormat?: string;
+    /**
+     * Defines the list of possible SQL data types to which the source decimal values are converted. This list and the precision and the scale parameters of the decimal field determine the target type. In the order of NUMERIC, BIGNUMERIC, and STRING, a type is picked if it is in the specified list and if it supports the precision and the scale. STRING supports all precision and scale values. If none of the listed types supports the precision and the scale, the type supporting the widest range in the specified list is picked, and if a value exceeds the supported range when reading the data, an error will be thrown. Example: Suppose the value of this field is ["NUMERIC", "BIGNUMERIC"]. If (precision,scale) is: * (38,9) -> NUMERIC; * (39,9) -> BIGNUMERIC (NUMERIC cannot hold 30 integer digits); * (38,10) -> BIGNUMERIC (NUMERIC cannot hold 10 fractional digits); * (76,38) -> BIGNUMERIC; * (77,38) -> BIGNUMERIC (error if value exceeds supported range). This field cannot contain duplicate types. The order of the types in this field is ignored. For example, ["BIGNUMERIC", "NUMERIC"] is the same as ["NUMERIC", "BIGNUMERIC"] and NUMERIC always takes precedence over BIGNUMERIC. Defaults to ["NUMERIC", "STRING"] for ORC and ["NUMERIC"] for the other file formats.
      */
     decimalTargetTypes?: Array<
       'DECIMAL_TARGET_TYPE_UNSPECIFIED' | 'NUMERIC' | 'BIGNUMERIC' | 'STRING'
@@ -2493,9 +2521,21 @@ declare namespace bigquery {
      */
     sourceUris?: Array<string>;
     /**
+     * Optional. Date format used for parsing TIME values.
+     */
+    timeFormat?: string;
+    /**
      * Time-based partitioning specification for the destination table. Only one of timePartitioning and rangePartitioning should be specified.
      */
     timePartitioning?: ITimePartitioning;
+    /**
+     * Optional. [Experimental] Default time zone that will apply when parsing timestamp values that have no specific time zone.
+     */
+    timeZone?: string;
+    /**
+     * Optional. Date format used for parsing TIMESTAMP values.
+     */
+    timestampFormat?: string;
     /**
      * Optional. If sourceFormat is set to "AVRO", indicates whether to interpret logical types as the corresponding BigQuery data type (for example, TIMESTAMP), instead of using the raw type (for example, INTEGER).
      */
@@ -3369,7 +3409,7 @@ declare namespace bigquery {
   };
 
   /**
-   * Statistics for metadata caching in BigLake tables.
+   * Statistics for metadata caching in queried tables.
    */
   type IMetadataCacheStatistics = {
     /**
@@ -3894,6 +3934,10 @@ declare namespace bigquery {
      */
     defaultDataset?: IDatasetReference;
     /**
+     * Optional. Custom encryption configuration (e.g., Cloud KMS keys)
+     */
+    destinationEncryptionConfiguration?: IEncryptionConfiguration;
+    /**
      * Optional. If set to true, BigQuery doesn't run the job. Instead, if the query is valid, BigQuery returns statistics about the job such as how many bytes would be processed. If the query is invalid, an error returns. The default value is false.
      */
     dryRun?: boolean;
@@ -3908,6 +3952,10 @@ declare namespace bigquery {
       | 'JOB_CREATION_MODE_UNSPECIFIED'
       | 'JOB_CREATION_REQUIRED'
       | 'JOB_CREATION_OPTIONAL';
+    /**
+     * Optional. Job timeout in milliseconds. If this time limit is exceeded, BigQuery will attempt to stop a longer job, but may not always succeed in canceling it before the job completes. For example, a job that takes more than 60 seconds to complete has a better chance of being stopped than a job that takes 10 seconds to complete. This timeout applies to the query even if a job does not need to be created.
+     */
+    jobTimeoutMs?: string;
     /**
      * The resource type of the request.
      */
@@ -5381,7 +5429,7 @@ declare namespace bigquery {
        */
       view?: {
         /**
-         * Specifices the privacy policy for the view.
+         * Specifies the privacy policy for the view.
          */
         privacyPolicy?: IPrivacyPolicy;
         /**
@@ -6232,7 +6280,7 @@ declare namespace bigquery {
      */
     foreignDefinitions?: Array<IForeignViewDefinition>;
     /**
-     * Optional. Specifices the privacy policy for the view.
+     * Optional. Specifies the privacy policy for the view.
      */
     privacyPolicy?: IPrivacyPolicy;
     /**
@@ -6297,7 +6345,7 @@ declare namespace bigquery {
        */
       all?: boolean;
       /**
-       * An expression for filtering the results of the request by label. The syntax is `labels.[:]`. Multiple filters can be ANDed together by connecting with a space. Example: `labels.department:receiving labels.active`. See [Filtering datasets using labels](https://cloud.google.com/bigquery/docs/filtering-labels#filtering_datasets_using_labels) for details.
+       * An expression for filtering the results of the request by label. The syntax is `labels.[:]`. Multiple filters can be AND-ed together by connecting with a space. Example: `labels.department:receiving labels.active`. See [Filtering datasets using labels](https://cloud.google.com/bigquery/docs/filtering-labels#filtering_datasets_using_labels) for details.
        */
       filter?: string;
       /**
