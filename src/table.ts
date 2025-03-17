@@ -1833,7 +1833,6 @@ class Table extends ServiceObject {
     const selectedFields = options.selectedFields
       ? options.selectedFields.split(',')
       : [];
-    delete options.selectedFields;
     const onComplete = (
       err: Error | null,
       rows: TableRow[] | null,

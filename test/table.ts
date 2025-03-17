@@ -2179,6 +2179,7 @@ describe('BigQuery/Table', () => {
       sandbox.restore();
 
       table.request = (reqOpts: DecorateRequestOptions, callback: Function) => {
+        assert(reqOpts.qs.selectedFields, selectedFields);
         callback(null, {rows});
       };
 
@@ -2190,15 +2191,38 @@ describe('BigQuery/Table', () => {
     });
 
     it('should return selected fields after consecutive calls', done => {
+      const buildNestedObject = (value: Record<string, string>) => {
+        return [
+          {
+            v: {
+              f: [
+                {
+                  v: {
+                    f: Object.values(value).map(v => ({v})),
+                  },
+                },
+              ],
+            },
+          },
+        ];
+      };
       const callSequence = [
         {
-          selectedFields: ['age'],
-          rows: [{f: [{v: 40}]}],
-          expected: [{age: 40}],
+          selectedFields: ['age', 'nested.object.a'],
+          rows: [
+            {
+              f: [{v: 40}, {v: buildNestedObject({a: '1'})}],
+            },
+          ],
+          expected: [{age: 40, nested: [{object: {a: '1'}}]}],
         },
         {
           selectedFields: ['name', 'address'],
-          rows: [{f: [{v: 'John'}, {v: '1234 Fake St, Springfield'}]}],
+          rows: [
+            {
+              f: [{v: 'John'}, {v: '1234 Fake St, Springfield'}],
+            },
+          ],
           expected: [{name: 'John', address: '1234 Fake St, Springfield'}],
         },
         {
@@ -2212,6 +2236,27 @@ describe('BigQuery/Table', () => {
           {name: 'name', type: 'string'},
           {name: 'age', type: 'INTEGER'},
           {name: 'address', type: 'string'},
+          {
+            name: 'nested',
+            type: 'RECORD',
+            mode: 'REPEATED',
+            fields: [
+              {
+                name: 'object',
+                type: 'RECORD',
+                fields: [
+                  {
+                    name: 'a',
+                    type: 'STRING',
+                  },
+                  {
+                    name: 'b',
+                    type: 'STRING',
+                  },
+                ],
+              },
+            ],
+          },
         ],
       };
 

@@ -588,14 +588,18 @@ export class BigQuery extends Service {
       parseJSON?: boolean;
     }
   ) {
-    // copy schema fields to avoid mutation when filtering selected fields
-    let schemaFields = schema.fields ? [...schema.fields] : [];
+    // deep copy schema fields to avoid mutation
+    let schemaFields: TableField[] = extend(true, [], schema.fields);
+    let selectedFields: string[] = extend(true, [], options.selectedFields);
     if (options.selectedFields && options.selectedFields!.length > 0) {
       const selectedFieldsArray = options.selectedFields!.map(c => {
         return c.split('.');
       });
 
-      const currentFields = selectedFieldsArray.map(c => c.shift());
+      const currentFields = selectedFieldsArray
+        .map(c => c.shift())
+        .filter(c => c !== undefined);
+
       //filter schema fields based on selected fields.
       schemaFields = schemaFields.filter(
         field =>
@@ -603,7 +607,7 @@ export class BigQuery extends Service {
             .map(c => c!.toLowerCase())
             .indexOf(field.name!.toLowerCase()) >= 0
       );
-      options.selectedFields = selectedFieldsArray
+      selectedFields = selectedFieldsArray
         .filter(c => c.length > 0)
         .map(c => c.join('.'));
     }
@@ -614,12 +618,18 @@ export class BigQuery extends Service {
       return row.f!.map((field: TableRowField, index: number) => {
         const schemaField = schemaFields[index];
         let value = field.v;
-        if (schemaField.mode === 'REPEATED') {
+        if (schemaField && schemaField.mode === 'REPEATED') {
           value = (value as TableRowField[]).map(val => {
-            return convertSchemaFieldValue(schemaField, val.v, options);
+            return convertSchemaFieldValue(schemaField, val.v, {
+              ...options,
+              selectedFields,
+            });
           });
         } else {
-          value = convertSchemaFieldValue(schemaField, value, options);
+          value = convertSchemaFieldValue(schemaField, value, {
+            ...options,
+            selectedFields,
+          });
         }
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const fieldObject: any = {};
