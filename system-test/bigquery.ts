@@ -905,7 +905,7 @@ describe('BigQuery', () => {
       const emptyTable = await dataset.table(emptyTableId);
       const [rows] = await emptyTable.getRows();
       assert(Array.isArray(rows));
-      assert.equal(rows.length, 0);      
+      assert.equal(rows.length, 0);
     });
 
     it('should get the rows in a table via stream', done => {
