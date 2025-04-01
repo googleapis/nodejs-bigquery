@@ -580,7 +580,7 @@ export class BigQuery extends Service {
    * @returns Fields using their matching names from the table's schema.
    */
   static mergeSchemaWithRows_(
-    schema: TableSchema | TableField,
+    schema: TableSchema | TableField | undefined,
     rows: TableRow[],
     options: {
       wrapIntegers: boolean | IntegerTypeCastOptions;
@@ -589,7 +589,7 @@ export class BigQuery extends Service {
     }
   ) {
     // deep copy schema fields to avoid mutation
-    let schemaFields: TableField[] = extend(true, [], schema.fields);
+    let schemaFields: TableField[] = extend(true, [], schema?.fields);
     let selectedFields: string[] = extend(true, [], options.selectedFields);
     if (options.selectedFields && options.selectedFields!.length > 0) {
       const selectedFieldsArray = options.selectedFields!.map(c => {
