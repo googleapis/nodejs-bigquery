@@ -896,6 +896,18 @@ describe('BigQuery', () => {
       });
     });
 
+    // Empty results sets will not fetch table schema
+    it('should get the rows from an empty table', async () => {
+      const emptyTableId = generateName('empty-table');
+      await dataset.createTable(emptyTableId, {
+        schema: [{name: 'id', type: 'STRING'}],
+      });
+      const emptyTable = dataset.table(emptyTableId);
+      const [rows] = await emptyTable.getRows();
+      assert(Array.isArray(rows));
+      assert.equal(rows.length, 0);
+    });
+
     it('should get the rows in a table via stream', done => {
       table
         .createReadStream()
