@@ -4,6 +4,13 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## [7.9.4](https://github.com/googleapis/nodejs-bigquery/compare/v7.9.3...v7.9.4) (2025-04-02)
+
+
+### Bug Fixes
+
+* MergeSchemaWithRows can be called with empty schema if result set is empty ([#1455](https://github.com/googleapis/nodejs-bigquery/issues/1455)) ([e608601](https://github.com/googleapis/nodejs-bigquery/commit/e608601157a95430a63ce0047194ba40190b2e42))
+
 ## [7.9.3](https://github.com/googleapis/nodejs-bigquery/compare/v7.9.2...v7.9.3) (2025-03-17)
 
 
