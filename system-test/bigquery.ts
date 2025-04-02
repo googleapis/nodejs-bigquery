@@ -902,7 +902,7 @@ describe('BigQuery', () => {
       await dataset.createTable(emptyTableId, {
         schema: [{name: 'id', type: 'STRING'}],
       });
-      const emptyTable = await dataset.table(emptyTableId);
+      const emptyTable = dataset.table(emptyTableId);
       const [rows] = await emptyTable.getRows();
       assert(Array.isArray(rows));
       assert.equal(rows.length, 0);
