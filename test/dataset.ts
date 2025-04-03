@@ -19,13 +19,13 @@ import {
   util,
 } from '@google-cloud/common';
 import * as pfy from '@google-cloud/promisify';
-import arrify = require('arrify');
 import * as assert from 'assert';
 import {describe, it, before, beforeEach} from 'mocha';
 import * as extend from 'extend';
 import * as proxyquire from 'proxyquire';
 
 import * as _root from '../src';
+import {toArray} from '../src/util';
 import {DatasetOptions} from '../src/dataset';
 import {FormattedMetadata, TableOptions} from '../src/table';
 
@@ -56,7 +56,7 @@ const fakePaginator = {
       if (c.name !== 'Dataset') {
         return;
       }
-      methods = arrify(methods);
+      methods = toArray(methods);
       assert.strictEqual(c.name, 'Dataset');
       assert.deepStrictEqual(methods, [
         'getModels',
@@ -203,7 +203,7 @@ describe('BigQuery/Dataset', () => {
         bq.createDataset = (
           id: string,
           options: DatasetOptions,
-          callback: Function
+          callback: Function,
         ) => {
           assert.strictEqual(options.location, LOCATION);
           callback(); // the done fn
@@ -217,7 +217,7 @@ describe('BigQuery/Dataset', () => {
         bq.createDataset = (
           id: string,
           options: DatasetOptions,
-          callback: Function
+          callback: Function,
         ) => {
           assert.strictEqual(options.projectId, 'project-id');
           callback(); // the done fn
@@ -323,7 +323,7 @@ describe('BigQuery/Dataset', () => {
           defaultDataset: {
             datasetId: ds.id,
           },
-        }
+        },
       );
 
       ds.bigQuery.createQueryJob = (options: {}, callback: Function) => {
@@ -339,7 +339,7 @@ describe('BigQuery/Dataset', () => {
     it('should accept a query string', done => {
       ds.bigQuery.createQueryJob = (
         options: _root.Query,
-        callback: Function
+        callback: Function,
       ) => {
         assert.strictEqual(options.query, FAKE_QUERY);
         callback(); // the done fn
@@ -531,7 +531,7 @@ describe('BigQuery/Dataset', () => {
       ds.request = (reqOpts: DecorateRequestOptions) => {
         assert.deepStrictEqual(
           reqOpts.json.schema.fields,
-          SCHEMA_OBJECT.fields
+          SCHEMA_OBJECT.fields,
         );
         done();
       };
@@ -541,7 +541,7 @@ describe('BigQuery/Dataset', () => {
         {
           schema: SCHEMA_OBJECT.fields,
         },
-        assert.ifError
+        assert.ifError,
       );
     });
 
@@ -563,7 +563,7 @@ describe('BigQuery/Dataset', () => {
             fields: [{id: 'name', type: 'STRING'}, nestedField],
           },
         },
-        assert.ifError
+        assert.ifError,
       );
     });
 
@@ -592,7 +592,7 @@ describe('BigQuery/Dataset', () => {
           assert.ifError(err);
           assert(table instanceof Table);
           done();
-        }
+        },
       );
     });
 
@@ -642,7 +642,7 @@ describe('BigQuery/Dataset', () => {
           assert.ifError(err);
           assert.strictEqual(apiResponse, API_RESPONSE);
           done();
-        }
+        },
       );
     });
 
@@ -652,7 +652,7 @@ describe('BigQuery/Dataset', () => {
           a: 'b',
           c: 'd',
         },
-        API_RESPONSE
+        API_RESPONSE,
       );
 
       ds.request = (reqOpts: DecorateRequestOptions, callback: Function) => {
@@ -666,7 +666,7 @@ describe('BigQuery/Dataset', () => {
           assert.ifError(err);
           assert.strictEqual(table.metadata, apiResponse);
           done();
-        }
+        },
       );
     });
   });
@@ -798,7 +798,7 @@ describe('BigQuery/Dataset', () => {
             err: Error,
             models: _root.Model[],
             nextQuery: {},
-            apiResponse_: {}
+            apiResponse_: {},
           ) => {
             assert.ifError(err);
 
@@ -808,7 +808,7 @@ describe('BigQuery/Dataset', () => {
             assert.strictEqual(model.id, modelId);
             assert.strictEqual(apiResponse_, apiResponse);
             done();
-          }
+          },
         );
       });
 
@@ -842,7 +842,7 @@ describe('BigQuery/Dataset', () => {
             assert.ifError(err);
             assert.deepStrictEqual(nextQuery, expectedNextQuery);
             done();
-          }
+          },
         );
       });
     });
@@ -920,7 +920,7 @@ describe('BigQuery/Dataset', () => {
             err: Error,
             tables: _root.Table[],
             nextQuery: {},
-            apiResponse_: {}
+            apiResponse_: {},
           ) => {
             assert.ifError(err);
 
@@ -931,7 +931,7 @@ describe('BigQuery/Dataset', () => {
             assert.strictEqual(table.location, LOCATION);
             assert.strictEqual(apiResponse_, apiResponse);
             done();
-          }
+          },
         );
       });
 
@@ -965,7 +965,7 @@ describe('BigQuery/Dataset', () => {
             assert.ifError(err);
             assert.deepStrictEqual(nextQuery, expectedNextQuery);
             done();
-          }
+          },
         );
       });
     });

@@ -24,7 +24,7 @@ describe('📦 pack-n-play test', () => {
       sample: {
         description: 'TypeScript user can use the type definitions',
         ts: readFileSync(
-          './system-test/fixtures/sample/src/index.ts'
+          './system-test/fixtures/sample/src/index.ts',
         ).toString(),
         dependencies: ['@types/node'],
       },

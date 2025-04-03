@@ -27,7 +27,7 @@ const bigquery = new BigQuery();
 describe('Quickstart', () => {
   const datasetName = `nodejs_samples_tests_quickstart_${uuid.v4()}`.replace(
     /-/gi,
-    '_'
+    '_',
   );
   beforeEach(async function () {
     this.currentTest.retries(2);

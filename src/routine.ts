@@ -295,7 +295,7 @@ class Routine extends ServiceObject {
   setMetadata(metadata: RoutineMetadata, callback: ResponseCallback): void;
   setMetadata(
     metadata: RoutineMetadata,
-    callback?: ResponseCallback
+    callback?: ResponseCallback,
   ): void | Promise<SetMetadataResponse> {
     // per the python client, it would appear that in order to update a routine
     // you need to send the routine in its entirety, not just the updated fields

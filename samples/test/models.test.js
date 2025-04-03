@@ -98,11 +98,11 @@ describe('Models', function () {
 describe('Create/Delete Model', () => {
   const datasetId = `${GCLOUD_TESTS_PREFIX}_delete_${uuid.v4()}`.replace(
     /-/gi,
-    '_'
+    '_',
   );
   const modelId = `${GCLOUD_TESTS_PREFIX}_delete_${uuid.v4()}`.replace(
     /-/gi,
-    '_'
+    '_',
   );
 
   before(async () => {

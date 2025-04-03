@@ -61,11 +61,11 @@ describe('Authorized View Tutorial', () => {
 
   it('should create an authorized view', async () => {
     const output = execSync(
-      `node authViewTutorial.js ${projectId} ${sourceDatasetId} ${sourceTableId} ${sharedDatasetId} ${sharedViewId}`
+      `node authViewTutorial.js ${projectId} ${sourceDatasetId} ${sourceTableId} ${sharedDatasetId} ${sharedViewId}`,
     );
     assert.include(
       output,
-      `View ${projectId}:${sharedDatasetId}.${sharedViewId} created.`
+      `View ${projectId}:${sharedDatasetId}.${sharedViewId} created.`,
     );
     const [exists] = await bigquery
       .dataset(sharedDatasetId)

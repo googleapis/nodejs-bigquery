@@ -67,7 +67,7 @@ describe('Routines', () => {
 
   it('should create a routine', async () => {
     const output = execSync(
-      `node createRoutine.js ${datasetId} ${newRoutineId}`
+      `node createRoutine.js ${datasetId} ${newRoutineId}`,
     );
     assert.include(output, `Routine ${newRoutineId} created.`);
   });
@@ -128,7 +128,7 @@ describe('Routines', () => {
 
     it('should delete a routine', async () => {
       const output = execSync(
-        `node deleteRoutine.js ${datasetId} ${routineId}`
+        `node deleteRoutine.js ${datasetId} ${routineId}`,
       );
       assert.include(output, `Routine ${routineId} deleted.`);
       const [exists] = await bigquery

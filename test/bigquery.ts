@@ -20,7 +20,6 @@ import {
   util,
 } from '@google-cloud/common';
 import * as pfy from '@google-cloud/promisify';
-import arrify = require('arrify');
 import * as assert from 'assert';
 import {describe, it, after, afterEach, before, beforeEach} from 'mocha';
 import * as Big from 'big.js';
@@ -29,6 +28,7 @@ import * as proxyquire from 'proxyquire';
 import * as sinon from 'sinon';
 import * as uuid from 'uuid';
 
+import {toArray} from '../src/util';
 import {
   BigQueryInt,
   BigQueryDate,
@@ -125,7 +125,7 @@ const fakePaginator = {
       if (c.name !== 'BigQuery') {
         return;
       }
-      methods = arrify(methods);
+      methods = toArray(methods);
       assert.strictEqual(c.name, 'BigQuery');
       assert.deepStrictEqual(methods, ['getDatasets', 'getJobs']);
       extended = true;
@@ -227,7 +227,7 @@ describe('BigQuery', () => {
       assert.deepStrictEqual(
         calledWith.packageJson,
         // eslint-disable-next-line @typescript-eslint/no-var-requires
-        require('../../package.json')
+        require('../../package.json'),
       );
     });
 
@@ -249,11 +249,11 @@ describe('BigQuery', () => {
       const calledWith = bq.calledWith_[0];
       assert.strictEqual(
         calledWith.baseUrl,
-        `https://${protocollessApiEndpoint}/bigquery/v2`
+        `https://${protocollessApiEndpoint}/bigquery/v2`,
       );
       assert.strictEqual(
         calledWith.apiEndpoint,
-        `https://${protocollessApiEndpoint}`
+        `https://${protocollessApiEndpoint}`,
       );
     });
 
@@ -275,11 +275,11 @@ describe('BigQuery', () => {
       const calledWith = bq.calledWith_[0];
       assert.strictEqual(
         calledWith.baseUrl,
-        'https://bigquery.fake-tpc-env.example.com/bigquery/v2'
+        'https://bigquery.fake-tpc-env.example.com/bigquery/v2',
       );
       assert.strictEqual(
         calledWith.apiEndpoint,
-        'https://bigquery.fake-tpc-env.example.com'
+        'https://bigquery.fake-tpc-env.example.com',
       );
     });
 
@@ -372,7 +372,7 @@ describe('BigQuery', () => {
         assert.strictEqual(calledWith.baseUrl, EMULATOR_HOST);
         assert.strictEqual(
           calledWith.apiEndpoint,
-          'https://internal.benchmark.com/path'
+          'https://internal.benchmark.com/path',
         );
       });
 
@@ -399,7 +399,7 @@ describe('BigQuery', () => {
         assert.strictEqual(calledWith.baseUrl, EMULATOR_HOST);
         assert.strictEqual(
           calledWith.apiEndpoint,
-          'https://internal.benchmark.com/path'
+          'https://internal.benchmark.com/path',
         );
       });
     });
@@ -709,7 +709,7 @@ describe('BigQuery', () => {
       const mergedRows = BigQuery.mergeSchemaWithRows_(
         SCHEMA_OBJECT,
         rows.raw,
-        {}
+        {},
       );
       mergedRows.forEach((mergedRow: {}, i: number) => {
         assert.deepStrictEqual(mergedRow, rows.expectedParsed[i]);
@@ -1003,7 +1003,7 @@ describe('BigQuery', () => {
       assert.strictEqual(dateRange.apiValue, '[2020-01-01, 2020-12-31)');
       assert.strictEqual(
         dateRange.literalValue,
-        'RANGE<DATE> [2020-01-01, 2020-12-31)'
+        'RANGE<DATE> [2020-01-01, 2020-12-31)',
       );
       assert.deepStrictEqual(dateRange.value, {
         start: '2020-01-01',
@@ -1013,11 +1013,11 @@ describe('BigQuery', () => {
       const datetimeRange = bq.range(INPUT_DATETIME_RANGE, 'DATETIME');
       assert.strictEqual(
         datetimeRange.apiValue,
-        '[2020-01-01 12:00:00, 2020-12-31 12:00:00)'
+        '[2020-01-01 12:00:00, 2020-12-31 12:00:00)',
       );
       assert.strictEqual(
         datetimeRange.literalValue,
-        'RANGE<DATETIME> [2020-01-01 12:00:00, 2020-12-31 12:00:00)'
+        'RANGE<DATETIME> [2020-01-01 12:00:00, 2020-12-31 12:00:00)',
       );
       assert.deepStrictEqual(datetimeRange.value, {
         start: '2020-01-01 12:00:00',
@@ -1027,11 +1027,11 @@ describe('BigQuery', () => {
       const timestampRange = bq.range(INPUT_TIMESTAMP_RANGE, 'TIMESTAMP');
       assert.strictEqual(
         timestampRange.apiValue,
-        '[2020-10-01T04:00:00.000Z, 2020-12-31T04:00:00.000Z)'
+        '[2020-10-01T04:00:00.000Z, 2020-12-31T04:00:00.000Z)',
       );
       assert.strictEqual(
         timestampRange.literalValue,
-        'RANGE<TIMESTAMP> [2020-10-01T04:00:00.000Z, 2020-12-31T04:00:00.000Z)'
+        'RANGE<TIMESTAMP> [2020-10-01T04:00:00.000Z, 2020-12-31T04:00:00.000Z)',
       );
       assert.deepStrictEqual(timestampRange.value, {
         start: '2020-10-01T04:00:00.000Z',
@@ -1047,7 +1047,7 @@ describe('BigQuery', () => {
       assert.strictEqual(dateRange.apiValue, INPUT_DATE_RANGE);
       assert.strictEqual(
         dateRange.literalValue,
-        `RANGE<DATE> ${INPUT_DATE_RANGE}`
+        `RANGE<DATE> ${INPUT_DATE_RANGE}`,
       );
       assert.strictEqual(dateRange.elementType, 'DATE');
       assert.deepStrictEqual(dateRange.value, {
@@ -1062,7 +1062,7 @@ describe('BigQuery', () => {
       assert.strictEqual(datetimeRange.apiValue, INPUT_DATETIME_RANGE);
       assert.strictEqual(
         datetimeRange.literalValue,
-        `RANGE<DATETIME> ${INPUT_DATETIME_RANGE}`
+        `RANGE<DATETIME> ${INPUT_DATETIME_RANGE}`,
       );
       assert.strictEqual(datetimeRange.elementType, 'DATETIME');
       assert.deepStrictEqual(datetimeRange.value, {
@@ -1076,11 +1076,11 @@ describe('BigQuery', () => {
       });
       assert.strictEqual(
         timestampRange.apiValue,
-        '[2020-10-01T04:00:00.000Z, 2020-12-31T04:00:00.000Z)'
+        '[2020-10-01T04:00:00.000Z, 2020-12-31T04:00:00.000Z)',
       );
       assert.strictEqual(
         timestampRange.literalValue,
-        'RANGE<TIMESTAMP> [2020-10-01T04:00:00.000Z, 2020-12-31T04:00:00.000Z)'
+        'RANGE<TIMESTAMP> [2020-10-01T04:00:00.000Z, 2020-12-31T04:00:00.000Z)',
       );
       assert.strictEqual(timestampRange.elementType, 'TIMESTAMP');
       assert.deepStrictEqual(timestampRange.value, {
@@ -1095,12 +1095,12 @@ describe('BigQuery', () => {
           start: '2020-01-01',
           end: '2020-12-31',
         },
-        'DATE'
+        'DATE',
       );
       assert.strictEqual(dateRange.apiValue, INPUT_DATE_RANGE);
       assert.strictEqual(
         dateRange.literalValue,
-        `RANGE<DATE> ${INPUT_DATE_RANGE}`
+        `RANGE<DATE> ${INPUT_DATE_RANGE}`,
       );
       assert.strictEqual(dateRange.elementType, 'DATE');
 
@@ -1109,12 +1109,12 @@ describe('BigQuery', () => {
           start: '2020-01-01 12:00:00',
           end: '2020-12-31 12:00:00',
         },
-        'DATETIME'
+        'DATETIME',
       );
       assert.strictEqual(datetimeRange.apiValue, INPUT_DATETIME_RANGE);
       assert.strictEqual(
         datetimeRange.literalValue,
-        `RANGE<DATETIME> ${INPUT_DATETIME_RANGE}`
+        `RANGE<DATETIME> ${INPUT_DATETIME_RANGE}`,
       );
       assert.strictEqual(datetimeRange.elementType, 'DATETIME');
 
@@ -1123,15 +1123,15 @@ describe('BigQuery', () => {
           start: '2020-10-01 12:00:00+08',
           end: '2020-12-31 12:00:00+08',
         },
-        'TIMESTAMP'
+        'TIMESTAMP',
       );
       assert.strictEqual(
         timestampRange.apiValue,
-        '[2020-10-01T04:00:00.000Z, 2020-12-31T04:00:00.000Z)'
+        '[2020-10-01T04:00:00.000Z, 2020-12-31T04:00:00.000Z)',
       );
       assert.strictEqual(
         timestampRange.literalValue,
-        'RANGE<TIMESTAMP> [2020-10-01T04:00:00.000Z, 2020-12-31T04:00:00.000Z)'
+        'RANGE<TIMESTAMP> [2020-10-01T04:00:00.000Z, 2020-12-31T04:00:00.000Z)',
       );
       assert.strictEqual(timestampRange.elementType, 'TIMESTAMP');
     });
@@ -1141,28 +1141,28 @@ describe('BigQuery', () => {
         {
           start: '2020-01-01',
         },
-        'DATE'
+        'DATE',
       );
       assert.strictEqual(
         dateRange.literalValue,
-        'RANGE<DATE> [2020-01-01, UNBOUNDED)'
+        'RANGE<DATE> [2020-01-01, UNBOUNDED)',
       );
 
       const datetimeRange = bq.range(
         {
           end: '2020-12-31 12:00:00',
         },
-        'DATETIME'
+        'DATETIME',
       );
       assert.strictEqual(
         datetimeRange.literalValue,
-        'RANGE<DATETIME> [UNBOUNDED, 2020-12-31 12:00:00)'
+        'RANGE<DATETIME> [UNBOUNDED, 2020-12-31 12:00:00)',
       );
 
       const timestampRange = bq.range({}, 'TIMESTAMP');
       assert.strictEqual(
         timestampRange.literalValue,
-        'RANGE<TIMESTAMP> [UNBOUNDED, UNBOUNDED)'
+        'RANGE<TIMESTAMP> [UNBOUNDED, UNBOUNDED)',
       );
     });
   });
@@ -1242,7 +1242,7 @@ describe('BigQuery', () => {
               '{\n' +
               '  integerTypeCastFunction: provide <your_custom_function>\n' +
               '  fields: optionally specify field name(s) to be custom casted\n' +
-              '}\n'
+              '}\n',
           );
         };
 
@@ -1251,9 +1251,9 @@ describe('BigQuery', () => {
             () =>
               new BigQueryInt(
                 valueObject,
-                {} as IntegerTypeCastOptions
+                {} as IntegerTypeCastOptions,
               ).valueOf(),
-            /integerTypeCastFunction is not a function or was not provided\./
+            /integerTypeCastFunction is not a function or was not provided\./,
           );
         });
 
@@ -1289,7 +1289,7 @@ describe('BigQuery', () => {
             () => {
               new BigQueryInt(largeIntegerValue).valueOf();
             },
-            expectedError({integerValue: largeIntegerValue})
+            expectedError({integerValue: largeIntegerValue}),
           );
 
           // should throw when string is passed
@@ -1297,7 +1297,7 @@ describe('BigQuery', () => {
             () => {
               new BigQueryInt(smallIntegerValue.toString()).valueOf();
             },
-            expectedError({integerValue: smallIntegerValue})
+            expectedError({integerValue: smallIntegerValue}),
           );
         });
 
@@ -1312,7 +1312,7 @@ describe('BigQuery', () => {
             () => {
               new BigQueryInt(valueObject);
             },
-            new RegExp(`Integer value ${largeIntegerValue} is out of bounds.`)
+            new RegExp(`Integer value ${largeIntegerValue} is out of bounds.`),
           );
         });
 
@@ -1323,7 +1323,7 @@ describe('BigQuery', () => {
                 new BigQueryInt(valueObject, {
                   integerTypeCastFunction: {} as Function,
                 }).valueOf(),
-              /integerTypeCastFunction is not a function or was not provided\./
+              /integerTypeCastFunction is not a function or was not provided\./,
             );
           });
 
@@ -1372,7 +1372,7 @@ describe('BigQuery', () => {
                 new BigQueryInt(valueObject, {
                   integerTypeCastFunction: stub,
                 }).valueOf(),
-              /integerTypeCastFunction threw an error:/
+              /integerTypeCastFunction threw an error:/,
             );
           });
         });
@@ -1392,63 +1392,63 @@ describe('BigQuery', () => {
     it('should return correct types', () => {
       assert.strictEqual(
         BigQuery.getTypeDescriptorFromValue_(bq.date()).type,
-        'DATE'
+        'DATE',
       );
       assert.strictEqual(
         BigQuery.getTypeDescriptorFromValue_(bq.datetime('')).type,
-        'DATETIME'
+        'DATETIME',
       );
       assert.strictEqual(
         BigQuery.getTypeDescriptorFromValue_(bq.time()).type,
-        'TIME'
+        'TIME',
       );
       assert.strictEqual(
         BigQuery.getTypeDescriptorFromValue_(bq.timestamp(0)).type,
-        'TIMESTAMP'
+        'TIMESTAMP',
       );
       assert.strictEqual(
         BigQuery.getTypeDescriptorFromValue_(Buffer.alloc(2)).type,
-        'BYTES'
+        'BYTES',
       );
       assert.strictEqual(
         BigQuery.getTypeDescriptorFromValue_(true).type,
-        'BOOL'
+        'BOOL',
       );
       assert.strictEqual(BigQuery.getTypeDescriptorFromValue_(8).type, 'INT64');
       assert.strictEqual(
         BigQuery.getTypeDescriptorFromValue_(8.1).type,
-        'FLOAT64'
+        'FLOAT64',
       );
       assert.strictEqual(
         BigQuery.getTypeDescriptorFromValue_('hi').type,
-        'STRING'
+        'STRING',
       );
       assert.strictEqual(
         BigQuery.getTypeDescriptorFromValue_(new Big('1.1')).type,
-        'NUMERIC'
+        'NUMERIC',
       );
       assert.strictEqual(
         BigQuery.getTypeDescriptorFromValue_(
-          new Big('1999.9876543210123456789')
+          new Big('1999.9876543210123456789'),
         ).type,
-        'BIGNUMERIC'
+        'BIGNUMERIC',
       );
       assert.strictEqual(
         BigQuery.getTypeDescriptorFromValue_(bq.int('100')).type,
-        'INT64'
+        'INT64',
       );
       assert.strictEqual(
         BigQuery.getTypeDescriptorFromValue_(bq.geography('POINT (1 1')).type,
-        'GEOGRAPHY'
+        'GEOGRAPHY',
       );
       assert.strictEqual(
         BigQuery.getTypeDescriptorFromValue_(
           bq.range(
             '[2020-10-01 12:00:00+08, 2020-12-31 12:00:00+08)',
-            'TIMESTAMP'
-          )
+            'TIMESTAMP',
+          ),
         ).type,
-        'RANGE'
+        'RANGE',
       );
     });
 
@@ -1484,7 +1484,7 @@ describe('BigQuery', () => {
         [
           'This value could not be translated to a BigQuery data type.',
           undefined,
-        ].join('\n')
+        ].join('\n'),
       );
 
       assert.throws(() => {
@@ -1500,7 +1500,7 @@ describe('BigQuery', () => {
 
     it('should throw with a null value', () => {
       const expectedError = new RegExp(
-        "Parameter types must be provided for null values via the 'types' field in query options."
+        "Parameter types must be provided for null values via the 'types' field in query options.",
       );
 
       assert.throws(() => {
@@ -1580,7 +1580,7 @@ describe('BigQuery', () => {
 
       const queryParameter = BigQuery.valueToQueryParameter_(
         value,
-        providedType
+        providedType,
       );
 
       assert.strictEqual(queryParameter.parameterValue.value, value);
@@ -1718,7 +1718,7 @@ describe('BigQuery', () => {
 
       const queryParameter = BigQuery.valueToQueryParameter_(
         array,
-        providedType
+        providedType,
       );
       const arrayValues = queryParameter.parameterValue.arrayValues;
       assert.deepStrictEqual(arrayValues, [
@@ -1764,7 +1764,7 @@ describe('BigQuery', () => {
 
       const getTypeStub = sandbox.stub(
         BigQuery,
-        'getTypeDescriptorFromProvidedType_'
+        'getTypeDescriptorFromProvidedType_',
       );
       getTypeStub.onFirstCall().returns({
         type: 'STRUCT',
@@ -1781,7 +1781,7 @@ describe('BigQuery', () => {
 
       const queryParameter = BigQuery.valueToQueryParameter_(
         struct,
-        providedType
+        providedType,
       );
       const structValues = queryParameter.parameterValue.structValues;
       assert.deepStrictEqual(structValues, {
@@ -1839,7 +1839,7 @@ describe('BigQuery', () => {
           parameterValue: {
             value: strValue,
           },
-        }
+        },
       );
     });
 
@@ -1873,7 +1873,7 @@ describe('BigQuery', () => {
         sandbox.stub(BigQuery, '_isCustomType').returns(true);
         assert.strictEqual(
           BigQuery._getValue(geography, geography.type),
-          geography.value
+          geography.value,
         );
       });
 
@@ -1923,7 +1923,7 @@ describe('BigQuery', () => {
         assert.strictEqual(reqOpts.projectId, ANOTHER_PROJECT_ID);
         assert.strictEqual(
           reqOpts.uri,
-          `https://bigquery.googleapis.com/bigquery/v2/projects/${ANOTHER_PROJECT_ID}/datasets`
+          `https://bigquery.googleapis.com/bigquery/v2/projects/${ANOTHER_PROJECT_ID}/datasets`,
         );
         assert.deepStrictEqual(reqOpts.json.datasetReference, {
           datasetId: DATASET_ID,
@@ -1937,7 +1937,7 @@ describe('BigQuery', () => {
         {
           projectId: ANOTHER_PROJECT_ID,
         },
-        assert.ifError
+        assert.ifError,
       );
     });
 
@@ -2010,7 +2010,7 @@ describe('BigQuery', () => {
           assert.ifError(err);
           assert.deepStrictEqual(apiResponse, resp);
           done();
-        }
+        },
       );
     });
 
@@ -2303,7 +2303,7 @@ describe('BigQuery', () => {
               datasetId: dataset.id,
               projectId: dataset.projectId,
               tableId: TABLE_ID,
-            }
+            },
           );
 
           done();
@@ -2352,7 +2352,7 @@ describe('BigQuery', () => {
             query: QUERY_STRING,
             params: NAMED_PARAMS,
           },
-          assert.ifError
+          assert.ifError,
         );
       });
 
@@ -2362,7 +2362,7 @@ describe('BigQuery', () => {
           assert.strictEqual((reqOpts as any).params, undefined);
           assert.deepStrictEqual(
             reqOpts.configuration?.query?.queryParameters,
-            NAMED_PARAMS
+            NAMED_PARAMS,
           );
           done();
         };
@@ -2372,7 +2372,7 @@ describe('BigQuery', () => {
             query: QUERY_STRING,
             queryParameters: NAMED_PARAMS,
           },
-          assert.ifError
+          assert.ifError,
         );
       });
 
@@ -2389,7 +2389,7 @@ describe('BigQuery', () => {
               query: QUERY_STRING,
               params: NAMED_PARAMS,
             },
-            assert.ifError
+            assert.ifError,
           );
         });
 
@@ -2413,7 +2413,7 @@ describe('BigQuery', () => {
               query: QUERY_STRING,
               params: NAMED_PARAMS,
             },
-            assert.ifError
+            assert.ifError,
           );
         });
 
@@ -2427,7 +2427,7 @@ describe('BigQuery', () => {
               assert.strictEqual(value, NAMED_PARAMS.key);
               assert.strictEqual(providedType, NAMED_TYPES.key);
               return queryParameter;
-            }
+            },
           );
           bq.createJob = (reqOpts: JobOptions) => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -2440,7 +2440,7 @@ describe('BigQuery', () => {
               params: NAMED_PARAMS,
               types: NAMED_TYPES,
             },
-            assert.ifError
+            assert.ifError,
           );
         });
 
@@ -2463,7 +2463,7 @@ describe('BigQuery', () => {
               params: NAMED_PARAMS,
               types: {},
             },
-            assert.ifError
+            assert.ifError,
           );
         });
 
@@ -2497,7 +2497,7 @@ describe('BigQuery', () => {
               query: QUERY_STRING,
               params: POSITIONAL_PARAMS,
             },
-            assert.ifError
+            assert.ifError,
           );
         });
 
@@ -2520,7 +2520,7 @@ describe('BigQuery', () => {
               query: QUERY_STRING,
               params: POSITIONAL_PARAMS,
             },
-            assert.ifError
+            assert.ifError,
           );
         });
 
@@ -2561,7 +2561,7 @@ describe('BigQuery', () => {
               params: POSITIONAL_PARAMS,
               types: POSITIONAL_TYPES,
             },
-            assert.ifError
+            assert.ifError,
           );
         });
 
@@ -2598,7 +2598,7 @@ describe('BigQuery', () => {
         assert.strictEqual(
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (reqOpts.configuration!.query as any).dryRun,
-          undefined
+          undefined,
         );
         assert.strictEqual(reqOpts.configuration!.dryRun, options.dryRun);
         done();
@@ -2617,7 +2617,7 @@ describe('BigQuery', () => {
         assert.strictEqual(
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (reqOpts.configuration!.query as any).labels,
-          undefined
+          undefined,
         );
         assert.deepStrictEqual(reqOpts.configuration!.labels, options.labels);
         done();
@@ -2636,7 +2636,7 @@ describe('BigQuery', () => {
         assert.strictEqual(
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (reqOpts.configuration!.query as any).jobPrefix,
-          undefined
+          undefined,
         );
         assert.strictEqual(reqOpts.jobPrefix, options.jobPrefix);
         done();
@@ -2655,7 +2655,7 @@ describe('BigQuery', () => {
         assert.strictEqual(
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (reqOpts.configuration!.query as any).location,
-          undefined
+          undefined,
         );
         assert.strictEqual(reqOpts.location, LOCATION);
         done();
@@ -2674,7 +2674,7 @@ describe('BigQuery', () => {
         assert.strictEqual(
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (reqOpts.configuration!.query as any).jobId,
-          undefined
+          undefined,
         );
         assert.strictEqual(reqOpts.jobId, options.jobId);
         done();
@@ -2693,11 +2693,11 @@ describe('BigQuery', () => {
         assert.strictEqual(
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (reqOpts.configuration!.query as any).jobTimeoutMs,
-          undefined
+          undefined,
         );
         assert.strictEqual(
           reqOpts.configuration!.jobTimeoutMs,
-          `${options.jobTimeoutMs}`
+          `${options.jobTimeoutMs}`,
         );
         done();
       };
@@ -2844,7 +2844,7 @@ describe('BigQuery', () => {
           assert.ifError(err);
           assert.strictEqual(apiResponse, resp);
           done();
-        }
+        },
       );
     });
 
@@ -2891,7 +2891,7 @@ describe('BigQuery', () => {
       bq.makeAuthenticatedRequest = (reqOpts: DecorateRequestOptions) => {
         assert.strictEqual(
           reqOpts.uri,
-          `https://bigquery.googleapis.com/bigquery/v2/projects/${ANOTHER_PROJECT_ID}/datasets`
+          `https://bigquery.googleapis.com/bigquery/v2/projects/${ANOTHER_PROJECT_ID}/datasets`,
         );
         done();
       };
@@ -3135,12 +3135,12 @@ describe('BigQuery', () => {
         (err: Error, rows: {}, resp: {}) => {
           assert.strictEqual(
             err.message,
-            'The query did not complete before 1000ms'
+            'The query did not complete before 1000ms',
           );
           assert.strictEqual(rows, null);
           assert.strictEqual(resp, fakeJob);
           done();
-        }
+        },
       );
     });
 
@@ -3459,7 +3459,7 @@ describe('BigQuery', () => {
       const query = 'SELECT';
       bq.queryAsStream_(query, done);
       assert(
-        queryStub.calledOnceWithExactly(query, defaultOpts, sinon.match.func)
+        queryStub.calledOnceWithExactly(query, defaultOpts, sinon.match.func),
       );
     });
 
@@ -3530,18 +3530,18 @@ describe('BigQuery', () => {
 
     it('should default protocol to https', () => {
       const endpoint = BigQuery.sanitizeEndpoint(
-        USER_DEFINED_SHORT_API_ENDPOINT
+        USER_DEFINED_SHORT_API_ENDPOINT,
       );
       assert.strictEqual(endpoint.match(PROTOCOL_REGEX)![1], 'https');
     });
 
     it('should not override protocol', () => {
       const endpoint = BigQuery.sanitizeEndpoint(
-        USER_DEFINED_FULL_API_ENDPOINT
+        USER_DEFINED_FULL_API_ENDPOINT,
       );
       assert.strictEqual(
         endpoint.match(PROTOCOL_REGEX)![1],
-        USER_DEFINED_PROTOCOL
+        USER_DEFINED_PROTOCOL,
       );
     });
 

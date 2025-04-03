@@ -30,7 +30,7 @@ export function logger(source: string, msg: string, ...otherArgs: any[]) {
     const time = new Date().toISOString();
     const formattedMsg = util.format(
       `D ${time} | ${source} | ${msg} |`,
-      ...otherArgs
+      ...otherArgs,
     );
     logFunction(formattedMsg);
   }
