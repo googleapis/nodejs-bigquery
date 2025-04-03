@@ -921,10 +921,7 @@ describe('BigQuery', () => {
 
       fs.createReadStream(TEST_DATA_JSON_PATH)
         .pipe(table.createWriteStream('json'))
-        .on('error', err => {
-          console.log('on stream error', err);
-          done(err);
-        })
+        .on('error', done)
         .on('complete', _job => {
           job = _job;
         })
