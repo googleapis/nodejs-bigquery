@@ -1540,7 +1540,6 @@ class Table extends ServiceObject {
         location: this.location,
       },
     };
-    console.log('job metadata', jobMetadata);
     dup.once('writing', () => {
       util.makeWritableStream(
         dup,
@@ -1648,7 +1647,6 @@ class Table extends ServiceObject {
     stream.on('job', (job: Job) => {
       job
         .on('error', err => {
-          console.log('error creating job', err);
           stream.destroy(err);
         })
         .on('complete', () => {
