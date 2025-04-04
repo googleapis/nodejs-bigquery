@@ -365,7 +365,7 @@ class Dataset extends ServiceObject {
       createMethod: (
         id: string,
         optionsOrCallback?: CreateDatasetOptions | DatasetCallback,
-        cb?: DatasetCallback
+        cb?: DatasetCallback,
       ) => {
         let options =
           typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
@@ -408,7 +408,7 @@ class Dataset extends ServiceObject {
           // Override projectId if provided
           reqOpts.uri = reqOpts.uri.replace(
             `/projects/${this.bigQuery.projectId}/`,
-            `/projects/${this.projectId}/`
+            `/projects/${this.projectId}/`,
           );
         }
         return reqOpts;
@@ -531,7 +531,7 @@ class Dataset extends ServiceObject {
   createQueryJob(options: string | Query, callback: JobCallback): void;
   createQueryJob(
     options: string | Query,
-    callback?: JobCallback
+    callback?: JobCallback,
   ): void | Promise<JobResponse> {
     if (typeof options === 'string') {
       options = {
@@ -633,12 +633,12 @@ class Dataset extends ServiceObject {
   createRoutine(
     id: string,
     config: RoutineMetadata,
-    callback: RoutineCallback
+    callback: RoutineCallback,
   ): void;
   createRoutine(
     id: string,
     config: RoutineMetadata,
-    callback?: RoutineCallback
+    callback?: RoutineCallback,
   ): void | Promise<RoutineResponse> {
     const json = Object.assign({}, config, {
       routineReference: {
@@ -663,7 +663,7 @@ class Dataset extends ServiceObject {
         const routine = this.routine(resp.routineReference.routineId);
         routine.metadata = resp;
         callback!(null, routine, resp);
-      }
+      },
     );
   }
 
@@ -726,13 +726,13 @@ class Dataset extends ServiceObject {
   createTable(
     id: string,
     options: TableMetadata,
-    callback: TableCallback
+    callback: TableCallback,
   ): void;
   createTable(id: string, callback: TableCallback): void;
   createTable(
     id: string,
     optionsOrCallback?: TableMetadata | TableCallback,
-    cb?: TableCallback
+    cb?: TableCallback,
   ): void | Promise<TableResponse> {
     const options =
       typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
@@ -764,7 +764,7 @@ class Dataset extends ServiceObject {
 
         table.metadata = resp;
         callback!(null, table, resp);
-      }
+      },
     );
   }
 
@@ -818,7 +818,7 @@ class Dataset extends ServiceObject {
   delete(callback: DeleteCallback): void;
   delete(
     optionsOrCallback?: DeleteCallback | DatasetDeleteOptions,
-    callback?: DeleteCallback
+    callback?: DeleteCallback,
   ): void | Promise<[Metadata]> {
     const options =
       typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
@@ -835,7 +835,7 @@ class Dataset extends ServiceObject {
         uri: '',
         qs: query,
       },
-      callback!
+      callback!,
     );
   }
 
@@ -921,7 +921,7 @@ class Dataset extends ServiceObject {
   getModels(callback: GetModelsCallback): void;
   getModels(
     optsOrCb?: GetModelsOptions | GetModelsCallback,
-    cb?: GetModelsCallback
+    cb?: GetModelsCallback,
   ): void | Promise<GetModelsResponse> {
     const options = typeof optsOrCb === 'object' ? optsOrCb : {};
     const callback = typeof optsOrCb === 'function' ? optsOrCb : cb;
@@ -951,7 +951,7 @@ class Dataset extends ServiceObject {
         });
 
         callback!(null, models, nextQuery, resp);
-      }
+      },
     );
   }
 
@@ -1035,7 +1035,7 @@ class Dataset extends ServiceObject {
   getRoutines(callback: GetRoutinesCallback): void;
   getRoutines(
     optsOrCb?: GetRoutinesOptions | GetRoutinesCallback,
-    cb?: GetRoutinesCallback
+    cb?: GetRoutinesCallback,
   ): void | Promise<GetRoutinesResponse> {
     const options = typeof optsOrCb === 'object' ? optsOrCb : {};
     const callback = typeof optsOrCb === 'function' ? optsOrCb : cb;
@@ -1065,7 +1065,7 @@ class Dataset extends ServiceObject {
         });
 
         callback!(null, routines, nextQuery, resp);
-      }
+      },
     );
   }
 
@@ -1151,7 +1151,7 @@ class Dataset extends ServiceObject {
   getTables(callback: GetTablesCallback): void;
   getTables(
     optionsOrCallback?: GetTablesOptions | GetTablesCallback,
-    cb?: GetTablesCallback
+    cb?: GetTablesCallback,
   ): void | Promise<GetTablesResponse> {
     const options =
       typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
@@ -1185,7 +1185,7 @@ class Dataset extends ServiceObject {
           return table;
         });
         callback!(null, tables, nextQuery, resp);
-      }
+      },
     );
   }
 
@@ -1230,7 +1230,7 @@ class Dataset extends ServiceObject {
   query(options: string, callback: SimpleQueryRowsCallback): void;
   query(
     options: Query | string,
-    callback?: SimpleQueryRowsCallback
+    callback?: SimpleQueryRowsCallback,
   ): void | Promise<QueryRowsResponse> {
     if (typeof options === 'string') {
       options = {
@@ -1307,7 +1307,7 @@ class Dataset extends ServiceObject {
         location: this.location,
         projectId: this.projectId,
       },
-      options
+      options,
     );
     return new Table(this, id, options);
   }

@@ -17,7 +17,7 @@
 function main(
   datasetId = 'my_dataset',
   tableId = 'my_table',
-  projectId = 'my_project'
+  projectId = 'my_project',
 ) {
   // [START bigquery_query_legacy_large_results]
   // Import the Google Cloud client library

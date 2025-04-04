@@ -16,7 +16,7 @@
 
 function main(
   datasetId = 'my_dataset', // Existing dataset
-  routineId = 'my_routine' // Routine to be created
+  routineId = 'my_routine', // Routine to be created
 ) {
   // [START bigquery_create_routine]
   // Import the Google Cloud client library and create a client

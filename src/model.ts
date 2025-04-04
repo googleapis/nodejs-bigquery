@@ -16,7 +16,7 @@
 
 import {ServiceObject, util} from '@google-cloud/common';
 import {promisifyAll} from '@google-cloud/promisify';
-import arrify = require('arrify');
+import {toArray} from './util';
 import * as extend from 'extend';
 import {
   BigQuery,
@@ -378,18 +378,18 @@ class Model extends ServiceObject {
    */
   createExtractJob(
     destination: string | File,
-    options?: CreateExtractJobOptions
+    options?: CreateExtractJobOptions,
   ): Promise<JobResponse>;
   createExtractJob(
     destination: string | File,
     options: CreateExtractJobOptions,
-    callback: JobCallback
+    callback: JobCallback,
   ): void;
   createExtractJob(destination: string | File, callback: JobCallback): void;
   createExtractJob(
     destination: string | File,
     optionsOrCallback?: CreateExtractJobOptions | JobCallback,
-    cb?: JobCallback
+    cb?: JobCallback,
   ): void | Promise<JobResponse> {
     let options =
       typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
@@ -397,7 +397,7 @@ class Model extends ServiceObject {
       typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
 
     options = extend(true, options, {
-      destinationUris: (arrify(destination) as Array<File | string>).map(
+      destinationUris: (toArray(destination) as Array<File | string>).map(
         dest => {
           if (util.isCustomType(dest, 'storage/file')) {
             return (
@@ -409,7 +409,7 @@ class Model extends ServiceObject {
             return dest;
           }
           throw new Error('Destination must be a string or a File object.');
-        }
+        },
       ),
     });
 
@@ -527,18 +527,18 @@ class Model extends ServiceObject {
    */
   extract(
     destination: string | File,
-    options?: CreateExtractJobOptions
+    options?: CreateExtractJobOptions,
   ): Promise<JobMetadataResponse>;
   extract(
     destination: string | File,
     options: CreateExtractJobOptions,
-    callback?: JobMetadataCallback
+    callback?: JobMetadataCallback,
   ): void;
   extract(destination: string | File, callback?: JobMetadataCallback): void;
   extract(
     destination: string | File,
     optionsOrCallback?: CreateExtractJobOptions | JobMetadataCallback,
-    cb?: JobMetadataCallback
+    cb?: JobMetadataCallback,
   ): void | Promise<JobMetadataResponse> {
     const options =
       typeof optionsOrCallback === 'object' ? optionsOrCallback : {};

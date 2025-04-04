@@ -45,7 +45,7 @@ async function getRedirectUrl() {
   const oAuth2Client = new OAuth2Client(
     keys.installed.client_id,
     keys.installed.client_secret,
-    keys.installed.redirect_uris[0]
+    keys.installed.redirect_uris[0],
   );
 
   // Generate the url that will be used for the consent dialog.
@@ -56,7 +56,7 @@ async function getRedirectUrl() {
   });
 
   console.info(
-    `Please visit this URL to authorize this application: ${authorizeUrl}`
+    `Please visit this URL to authorize this application: ${authorizeUrl}`,
   );
 
   const code = await rl.questionAsync('Enter the authorization code: ');
@@ -71,7 +71,7 @@ async function exchangeCode(code) {
   const oAuth2Client = new OAuth2Client(
     keys.installed.client_id,
     keys.installed.client_secret,
-    keys.installed.redirect_uris[0]
+    keys.installed.redirect_uris[0],
   );
 
   const r = await oAuth2Client.getToken(code);

@@ -25,7 +25,7 @@ import * as common from '@google-cloud/common';
 import {paginator, ResourceStream} from '@google-cloud/paginator';
 import {promisifyAll} from '@google-cloud/promisify';
 import {PreciseDate} from '@google-cloud/precise-date';
-import arrify = require('arrify');
+import {toArray} from './util';
 import * as Big from 'big.js';
 import * as extend from 'extend';
 import * as is from 'is';
@@ -67,7 +67,7 @@ export interface PagedCallback<T, Q, R> {
     err: Error | null,
     resource?: T[] | null,
     nextQuery?: Q | null,
-    response?: R | null
+    response?: R | null,
   ): void;
 }
 
@@ -586,7 +586,7 @@ export class BigQuery extends Service {
       wrapIntegers: boolean | IntegerTypeCastOptions;
       selectedFields?: string[];
       parseJSON?: boolean;
-    }
+    },
   ) {
     // deep copy schema fields to avoid mutation
     let schemaFields: TableField[] = extend(true, [], schema?.fields);
@@ -605,14 +605,14 @@ export class BigQuery extends Service {
         field =>
           currentFields
             .map(c => c!.toLowerCase())
-            .indexOf(field.name!.toLowerCase()) >= 0
+            .indexOf(field.name!.toLowerCase()) >= 0,
       );
       selectedFields = selectedFieldsArray
         .filter(c => c.length > 0)
         .map(c => c.join('.'));
     }
 
-    return arrify(rows).map(mergeSchema).map(flattenRows);
+    return toArray(rows).map(mergeSchema).map(flattenRows);
 
     function mergeSchema(row: TableRow) {
       return row.f!.map((field: TableRowField, index: number) => {
@@ -915,7 +915,7 @@ export class BigQuery extends Service {
    */
   static range(
     value: string | BigQueryRangeOptions,
-    elementType?: string
+    elementType?: string,
   ): BigQueryRange {
     return new BigQueryRange(value, elementType);
   }
@@ -966,14 +966,14 @@ export class BigQuery extends Service {
    */
   static int(
     value: string | number | IntegerTypeCastValue,
-    typeCastOptions?: IntegerTypeCastOptions
+    typeCastOptions?: IntegerTypeCastOptions,
   ) {
     return new BigQueryInt(value, typeCastOptions);
   }
 
   int(
     value: string | number | IntegerTypeCastValue,
-    typeCastOptions?: IntegerTypeCastOptions
+    typeCastOptions?: IntegerTypeCastOptions,
   ) {
     return BigQuery.int(value, typeCastOptions);
   }
@@ -1018,7 +1018,7 @@ export class BigQuery extends Service {
           '{\n' +
           '  integerTypeCastFunction: provide <your_custom_function>\n' +
           '  fields: optionally specify field name(s) to be custom casted\n' +
-          '}\n'
+          '}\n',
       );
     }
     return num;
@@ -1037,7 +1037,7 @@ export class BigQuery extends Service {
    * @returns {string} The valid type provided.
    */
   static getTypeDescriptorFromProvidedType_(
-    providedType: string | ProvidedTypeStruct | ProvidedTypeArray
+    providedType: string | ProvidedTypeStruct | ProvidedTypeArray,
   ): ValueType {
     // The list of types can be found in src/types.d.ts
     const VALID_TYPES = [
@@ -1081,7 +1081,7 @@ export class BigQuery extends Service {
           return {
             name: prop,
             type: BigQuery.getTypeDescriptorFromProvidedType_(
-              (providedType as ProvidedTypeStruct)[prop]
+              (providedType as ProvidedTypeStruct)[prop],
             ),
           };
         }),
@@ -1113,7 +1113,7 @@ export class BigQuery extends Service {
 
     if (value === null) {
       throw new Error(
-        "Parameter types must be provided for null values via the 'types' field in query options."
+        "Parameter types must be provided for null values via the 'types' field in query options.",
       );
     }
 
@@ -1147,7 +1147,7 @@ export class BigQuery extends Service {
     } else if (Array.isArray(value)) {
       if (value.length === 0) {
         throw new Error(
-          "Parameter types must be provided for empty arrays via the 'types' field in query options."
+          "Parameter types must be provided for empty arrays via the 'types' field in query options.",
         );
       }
       return {
@@ -1178,7 +1178,7 @@ export class BigQuery extends Service {
         [
           'This value could not be translated to a BigQuery data type.',
           value,
-        ].join('\n')
+        ].join('\n'),
       );
     }
 
@@ -1202,7 +1202,7 @@ export class BigQuery extends Service {
   static valueToQueryParameter_(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     value: any,
-    providedType?: string | ProvidedTypeStruct | ProvidedTypeArray
+    providedType?: string | ProvidedTypeStruct | ProvidedTypeArray,
   ) {
     if (is.date(value)) {
       value = BigQuery.timestamp(value as Date);
@@ -1230,7 +1230,7 @@ export class BigQuery extends Service {
             }
           }
           return {value} as bigquery.IQueryParameterValue;
-        }
+        },
       );
     } else if (typeName === 'STRUCT') {
       queryParameter.parameterValue!.structValues = Object.keys(value).reduce(
@@ -1239,7 +1239,7 @@ export class BigQuery extends Service {
           if (providedType) {
             nestedQueryParameter = BigQuery.valueToQueryParameter_(
               value[prop],
-              (providedType as ProvidedTypeStruct)[prop]
+              (providedType as ProvidedTypeStruct)[prop],
             );
           } else {
             nestedQueryParameter = BigQuery.valueToQueryParameter_(value[prop]);
@@ -1248,7 +1248,7 @@ export class BigQuery extends Service {
           (structValues as any)[prop] = nestedQueryParameter.parameterValue;
           return structValues;
         },
-        {}
+        {},
       );
     } else if (typeName === 'RANGE') {
       let rangeValue: BigQueryRange;
@@ -1257,7 +1257,7 @@ export class BigQuery extends Service {
       } else {
         rangeValue = BigQuery.range(
           value,
-          queryParameter.parameterType?.rangeElementType?.type
+          queryParameter.parameterType?.rangeElementType?.type,
         );
       }
       queryParameter.parameterValue!.rangeValue = {
@@ -1273,7 +1273,7 @@ export class BigQuery extends Service {
     } else {
       queryParameter.parameterValue!.value = BigQuery._getValue(
         value,
-        parameterType
+        parameterType,
       );
     }
 
@@ -1337,18 +1337,18 @@ export class BigQuery extends Service {
    */
   createDataset(
     id: string,
-    options?: DatasetResource
+    options?: DatasetResource,
   ): Promise<DatasetResponse>;
   createDataset(
     id: string,
     options: DatasetResource,
-    callback: DatasetCallback
+    callback: DatasetCallback,
   ): void;
   createDataset(id: string, callback: DatasetCallback): void;
   createDataset(
     id: string,
     optionsOrCallback?: DatasetResource | DatasetCallback,
-    cb?: DatasetCallback
+    cb?: DatasetCallback,
   ): void | Promise<DatasetResponse> {
     const options =
       typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
@@ -1368,7 +1368,7 @@ export class BigQuery extends Service {
           datasetReference: {
             datasetId: id,
           },
-        }
+        },
       ),
     };
     if (options.projectId) {
@@ -1486,7 +1486,7 @@ export class BigQuery extends Service {
   createQueryJob(options: Query | string, callback: JobCallback): void;
   createQueryJob(
     opts: Query | string,
-    callback?: JobCallback
+    callback?: JobCallback,
   ): void | Promise<JobResponse> {
     const options = typeof opts === 'object' ? opts : {query: opts};
     this.trace_('[createQueryJob]', options, callback);
@@ -1499,7 +1499,7 @@ export class BigQuery extends Service {
       {
         useLegacySql: false,
       },
-      options
+      options,
     );
     this.trace_('[createQueryJob]', query);
 
@@ -1520,7 +1520,7 @@ export class BigQuery extends Service {
     if (query.params) {
       const {parameterMode, params} = this.buildQueryParams_(
         query.params,
-        query.types
+        query.types,
       );
       query.parameterMode = parameterMode;
       query.queryParameters = params;
@@ -1567,7 +1567,7 @@ export class BigQuery extends Service {
 
   private buildQueryParams_(
     params: Query['params'],
-    types: Query['types']
+    types: Query['types'],
   ): {
     parameterMode: ParameterMode;
     params: bigquery.IQueryParameter[] | undefined;
@@ -1589,7 +1589,7 @@ export class BigQuery extends Service {
         if (types) {
           if (!is.object(types)) {
             throw new Error(
-              'Provided types must match the value type passed to `params`'
+              'Provided types must match the value type passed to `params`',
             );
           }
 
@@ -1598,7 +1598,7 @@ export class BigQuery extends Service {
           if (namedTypes[namedParameter]) {
             queryParameter = BigQuery.valueToQueryParameter_(
               value,
-              namedTypes[namedParameter]
+              namedTypes[namedParameter],
             );
           } else {
             queryParameter = BigQuery.valueToQueryParameter_(value);
@@ -1614,7 +1614,7 @@ export class BigQuery extends Service {
       if (types) {
         if (!is.array(types)) {
           throw new Error(
-            'Provided types must match the value type passed to `params`'
+            'Provided types must match the value type passed to `params`',
           );
         }
 
@@ -1626,7 +1626,7 @@ export class BigQuery extends Service {
         params.forEach((value: {}, i: number) => {
           const queryParameter = BigQuery.valueToQueryParameter_(
             value,
-            positionalTypes[i]
+            positionalTypes[i],
           );
           queryParameters.push(queryParameter);
         });
@@ -1706,7 +1706,7 @@ export class BigQuery extends Service {
   createJob(options: JobOptions, callback: JobCallback): void;
   createJob(
     options: JobOptions,
-    callback?: JobCallback
+    callback?: JobCallback,
   ): void | Promise<JobResponse> {
     const JOB_ID_PROVIDED = typeof options.jobId !== 'undefined';
     const DRY_RUN = options.configuration?.dryRun
@@ -1779,7 +1779,7 @@ export class BigQuery extends Service {
         job.location = resp.jobReference.location;
         job.metadata = resp;
         callback!(err, job, resp);
-      }
+      },
     );
   }
 
@@ -1865,7 +1865,7 @@ export class BigQuery extends Service {
   getDatasets(callback: DatasetsCallback): void;
   getDatasets(
     optionsOrCallback?: GetDatasetsOptions | DatasetsCallback,
-    cb?: DatasetsCallback
+    cb?: DatasetsCallback,
   ): void | Promise<DatasetsResponse> {
     const options =
       typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
@@ -1906,7 +1906,7 @@ export class BigQuery extends Service {
 
           ds.metadata = dataset!;
           return ds;
-        }
+        },
       );
 
       callback!(null, datasets, nextQuery, resp);
@@ -1986,7 +1986,7 @@ export class BigQuery extends Service {
   getJobs(callback: GetJobsCallback): void;
   getJobs(
     optionsOrCallback?: GetJobsOptions | GetJobsCallback,
-    cb?: GetJobsCallback
+    cb?: GetJobsCallback,
   ): void | Promise<GetJobsResponse> {
     const options =
       typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
@@ -2017,7 +2017,7 @@ export class BigQuery extends Service {
           return job;
         });
         callback!(null, jobs, nextQuery, resp);
-      }
+      },
     );
   }
 
@@ -2165,12 +2165,12 @@ export class BigQuery extends Service {
   query(
     query: string,
     options: QueryOptions,
-    callback?: QueryRowsCallback
+    callback?: QueryRowsCallback,
   ): void;
   query(
     query: Query,
     options: QueryOptions,
-    callback?: SimpleQueryRowsCallback
+    callback?: SimpleQueryRowsCallback,
   ): void;
   query(query: string, callback?: QueryRowsCallback): void;
   query(query: Query, callback?: SimpleQueryRowsCallback): void;
@@ -2180,7 +2180,7 @@ export class BigQuery extends Service {
       | QueryOptions
       | SimpleQueryRowsCallback
       | QueryRowsCallback,
-    cb?: SimpleQueryRowsCallback | QueryRowsCallback
+    cb?: SimpleQueryRowsCallback | QueryRowsCallback,
   ): void | Promise<SimpleQueryRowsResponse> | Promise<QueryRowsResponse> {
     let options =
       typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
@@ -2247,7 +2247,7 @@ export class BigQuery extends Service {
       // If timeout override was provided, return error.
       if (queryReq.timeoutMs) {
         const err = new Error(
-          `The query did not complete before ${queryReq.timeoutMs}ms`
+          `The query did not complete before ${queryReq.timeoutMs}ms`,
         );
         (callback as SimpleQueryRowsCallback)(err, null, job);
         return;
@@ -2269,7 +2269,7 @@ export class BigQuery extends Service {
    */
   private buildQueryRequest_(
     query: string | Query,
-    options: QueryOptions
+    options: QueryOptions,
   ): bigquery.IQueryRequest | undefined {
     if (process.env.FAST_QUERY_PATH === 'DISABLED') {
       return undefined;
@@ -2333,7 +2333,7 @@ export class BigQuery extends Service {
     }
     const {parameterMode, params} = this.buildQueryParams_(
       queryObj.params,
-      queryObj.types
+      queryObj.types,
     );
     if (params) {
       req.queryParameters = params;
@@ -2346,7 +2346,7 @@ export class BigQuery extends Service {
 
   private runJobsQuery(
     req: bigquery.IQueryRequest,
-    callback?: JobsQueryCallback
+    callback?: JobsQueryCallback,
   ): void | Promise<JobsQueryResponse> {
     this.trace_('[runJobsQuery]', req, callback);
     this.request(
@@ -2371,7 +2371,7 @@ export class BigQuery extends Service {
           job = this.job(res.queryId); // stateless query
         }
         callback!(null, job, res);
-      }
+      },
     );
   }
 
@@ -2443,7 +2443,7 @@ function convertSchemaFieldValue(
     wrapIntegers: boolean | IntegerTypeCastOptions;
     selectedFields?: string[];
     parseJSON?: boolean;
-  }
+  },
 ) {
   if (is.null(value)) {
     return value;
@@ -2471,7 +2471,7 @@ function convertSchemaFieldValue(
         ? typeof wrapIntegers === 'object'
           ? BigQuery.int(
               {integerValue: value, schemaFieldName: schemaField.name},
-              wrapIntegers
+              wrapIntegers,
             ).valueOf()
           : BigQuery.int(value)
         : Number(value);
@@ -2519,7 +2519,7 @@ function convertSchemaFieldValue(
     case 'RANGE': {
       value = BigQueryRange.fromSchemaValue_(
         value,
-        schemaField.rangeElementType!.type!
+        schemaField.rangeElementType!.type!,
       );
       break;
     }
@@ -2546,7 +2546,7 @@ export class BigQueryRange {
     if (typeof value === 'string') {
       if (!elementType) {
         throw new Error(
-          'invalid RANGE. Element type required when using RANGE API string.'
+          'invalid RANGE. Element type required when using RANGE API string.',
         );
       }
 
@@ -2559,7 +2559,7 @@ export class BigQueryRange {
       if (start && end) {
         if (typeof start !== typeof end) {
           throw Error(
-            'upper and lower bound on a RANGE should be of the same type.'
+            'upper and lower bound on a RANGE should be of the same type.',
           );
         }
       }
@@ -2608,7 +2608,7 @@ export class BigQueryRange {
     const parts = cleanedValue.split(',');
     if (parts.length !== 2) {
       throw new Error(
-        'invalid RANGE. See RANGE literal format docs for more information.'
+        'invalid RANGE. See RANGE literal format docs for more information.',
       );
     }
 
@@ -2631,13 +2631,13 @@ export class BigQueryRange {
         start: convertRangeSchemaValue(start),
         end: convertRangeSchemaValue(end),
       },
-      elementType
+      elementType,
     );
   }
 
   private convertElement_(
     value?: string | BigQueryDate | BigQueryDatetime | BigQueryTimestamp,
-    elementType?: string
+    elementType?: string,
   ) {
     if (typeof value === 'string') {
       if (value === 'UNBOUNDED' || value === 'NULL') {
@@ -2796,7 +2796,7 @@ export class BigQueryInt extends Number {
   private _schemaFieldName: string | undefined;
   constructor(
     value: string | number | IntegerTypeCastValue,
-    typeCastOptions?: IntegerTypeCastOptions
+    typeCastOptions?: IntegerTypeCastOptions,
   ) {
     super(typeof value === 'object' ? value.integerValue : value);
     this._schemaFieldName =
@@ -2811,12 +2811,12 @@ export class BigQueryInt extends Number {
     if (typeCastOptions) {
       if (typeof typeCastOptions.integerTypeCastFunction !== 'function') {
         throw new Error(
-          'integerTypeCastFunction is not a function or was not provided.'
+          'integerTypeCastFunction is not a function or was not provided.',
         );
       }
 
       const typeCastFields = typeCastOptions.fields
-        ? arrify(typeCastOptions.fields)
+        ? toArray(typeCastOptions.fields)
         : undefined;
 
       let customCast = true;

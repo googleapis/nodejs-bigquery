@@ -134,7 +134,7 @@ describe('BigQuery/Routine', () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (FakeServiceObject.prototype as any).setMetadata = function (
         metadata: {},
-        callback: Function
+        callback: Function,
       ) {
         assert.strictEqual(this, routine);
         assert.deepStrictEqual(metadata, expectedMetadata);

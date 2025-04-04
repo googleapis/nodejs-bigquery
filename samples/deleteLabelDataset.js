@@ -20,7 +20,7 @@
 //   usage: node deleteLabelDataset.js <DATASET_ID>
 
 function main(
-  datasetId = 'my_dataset' // Existing dataset
+  datasetId = 'my_dataset', // Existing dataset
 ) {
   // [START bigquery_delete_label_dataset]
   // Import the Google Cloud client library

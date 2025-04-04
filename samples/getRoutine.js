@@ -16,7 +16,7 @@
 
 function main(
   datasetId = 'my_dataset', // Existing dataset
-  routineId = 'my_routine' // Existing routine
+  routineId = 'my_routine', // Existing routine
 ) {
   // [START bigquery_get_routine]
   // Import the Google Cloud client library and create a client
@@ -38,7 +38,7 @@ function main(
     const [routine] = await dataset.routine(routineId).get();
 
     console.log(
-      `Routine ${routine.metadata.routineReference.routineId} retrieved.`
+      `Routine ${routine.metadata.routineReference.routineId} retrieved.`,
     );
   }
   getRoutine();

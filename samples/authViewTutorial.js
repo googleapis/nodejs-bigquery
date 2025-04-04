@@ -19,7 +19,7 @@ function main(
   sourceDatasetId = 'shared_views',
   sourceTableId = 'my_source_table',
   sharedDatasetId = 'shared_views',
-  sharedViewId = 'github_analyst_view'
+  sharedViewId = 'github_analyst_view',
 ) {
   // [START bigquery_authorized_view_tutorial]
   async function authorizedViewTutorial() {

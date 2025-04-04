@@ -18,7 +18,7 @@ function main(
   schema = [
     {name: 'name', type: 'STRING'},
     {name: 'post_abbr', type: 'STRING'},
-  ]
+  ],
 ) {
   // [START bigquery_query_external_gcs_temp]
   // Import the Google Cloud client library and create a client

@@ -25,7 +25,7 @@ import {
 } from '@google-cloud/common';
 import {paginator, ResourceStream} from '@google-cloud/paginator';
 import {promisifyAll} from '@google-cloud/promisify';
-import arrify = require('arrify');
+import {toArray} from './util';
 import * as Big from 'big.js';
 import * as extend from 'extend';
 import {once} from 'events';
@@ -34,6 +34,8 @@ import * as is from 'is';
 import * as path from 'path';
 import * as streamEvents from 'stream-events';
 import * as uuid from 'uuid';
+import * as duplexify from 'duplexify';
+
 import {
   BigQuery,
   Job,
@@ -54,9 +56,6 @@ import {JobMetadata} from './job';
 import bigquery from './types';
 import {BigQueryRange, IntegerTypeCastOptions} from './bigquery';
 import {RowQueue} from './rowQueue';
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const duplexify = require('duplexify');
 
 // This is supposed to be a @google-cloud/storage `File` type. The storage npm
 // module includes these types, but is current installed as a devDependency.
@@ -1034,7 +1033,7 @@ class Table extends ServiceObject {
     metadataOrCallback?: CopyTableMetadata | JobCallback,
     cb?: JobCallback
   ): void | Promise<JobResponse> {
-    const sourceTables = arrify(source) as Table[];
+    const sourceTables = toArray(source) as Table[];
     sourceTables.forEach(sourceTable => {
       if (!(sourceTable instanceof Table)) {
         throw new Error('Source must be a Table object.');
@@ -1186,7 +1185,7 @@ class Table extends ServiceObject {
       typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
 
     options = extend(true, options, {
-      destinationUris: arrify(destination).map(dest => {
+      destinationUris: toArray(destination).map(dest => {
         if (!util.isCustomType(dest, 'storage/file')) {
           throw new Error('Destination must be a File object.');
         }
@@ -1429,7 +1428,7 @@ class Table extends ServiceObject {
     }
 
     extend(true, body.configuration.load, metadata, {
-      sourceUris: arrify(source).map(src => {
+      sourceUris: toArray(source).map(src => {
         if (!util.isCustomType(src, 'storage/file')) {
           throw new Error('Source must be a File object.');
         }
@@ -1531,31 +1530,30 @@ class Table extends ServiceObject {
     }
 
     const dup = streamEvents(duplexify());
-
+    const jobMetadata = {
+      configuration: {
+        load: metadata,
+      },
+      jobReference: {
+        jobId,
+        projectId: this.dataset.projectId,
+        location: this.location,
+      },
+    };
     dup.once('writing', () => {
       util.makeWritableStream(
         dup,
         {
           makeAuthenticatedRequest: this.bigQuery.makeAuthenticatedRequest,
-          metadata: {
-            configuration: {
-              load: metadata,
-            },
-            jobReference: {
-              jobId,
-              projectId: this.dataset.projectId,
-              location: this.location,
-            },
-          } as {},
+          metadata: jobMetadata as {},
           request: {
             uri: `${this.bigQuery.apiEndpoint}/upload/bigquery/v2/projects/${this.dataset.projectId}/jobs`,
           },
         },
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (data: any) => {
-          const job = this.bigQuery.job(data.jobReference.jobId, {
-            location: data.jobReference.location,
-            projectId: data.jobReference.projectId,
+        (data: bigquery.IJob) => {
+          const job = this.bigQuery.job(data.jobReference?.jobId!, {
+            location: data.jobReference?.location,
+            projectId: data.jobReference?.projectId,
           });
           job.metadata = data;
           dup.emit('job', job);
@@ -2167,7 +2165,7 @@ class Table extends ServiceObject {
     rows: RowMetadata | RowMetadata[],
     options: InsertRowsOptions
   ): Promise<bigquery.ITableDataInsertAllResponse> {
-    rows = arrify(rows) as RowMetadata[];
+    rows = toArray(rows) as RowMetadata[];
 
     if (!rows.length) {
       throw new Error('You must provide at least 1 row to be inserted.');
@@ -2547,7 +2545,7 @@ class Table extends ServiceObject {
     permissions: string | string[],
     callback?: PermissionsCallback
   ): void | Promise<PermissionsResponse> {
-    permissions = arrify(permissions);
+    permissions = toArray(permissions);
 
     const json = extend(true, {}, {permissions});
 

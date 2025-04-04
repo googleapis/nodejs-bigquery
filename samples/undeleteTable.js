@@ -17,7 +17,7 @@
 function main(
   datasetId = 'my_dataset', // Dataset
   tableId = 'my_table_to_undelete', // Table to recover
-  recoveredTableId = 'my_recovered_table' // Recovered table
+  recoveredTableId = 'my_recovered_table', // Recovered table
 ) {
   // [START bigquery_undelete_table]
   // Import the Google Cloud client library
@@ -56,7 +56,7 @@ function main(
       .copy(bigquery.dataset(datasetId).table(recoveredTableId));
 
     console.log(
-      `Copied data from deleted table ${tableId} to ${recoveredTableId}`
+      `Copied data from deleted table ${tableId} to ${recoveredTableId}`,
     );
   }
   // [END bigquery_undelete_table]
