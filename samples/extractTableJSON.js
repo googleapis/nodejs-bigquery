@@ -18,7 +18,7 @@ function main(
   datasetId = 'my_dataset',
   tableId = 'my_table',
   bucketName = 'my-bucket',
-  filename = 'file.json'
+  filename = 'file.json',
 ) {
   // [START bigquery_extract_table_json]
   // Import the Google Cloud client libraries
