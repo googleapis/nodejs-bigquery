@@ -548,7 +548,7 @@ class Table extends ServiceObject {
       },
       {
         fields: [],
-      },
+      }
     );
   }
 
@@ -604,11 +604,11 @@ class Table extends ServiceObject {
       return Object.keys(value).reduce(
         (acc: {[index: string]: {} | null}, key) => {
           acc[key] = Table.encodeValue_(
-            (value as {[index: string]: {} | null})[key],
+            (value as {[index: string]: {} | null})[key]
           );
           return acc;
         },
-        {},
+        {}
       );
     }
     return value;
@@ -721,18 +721,18 @@ class Table extends ServiceObject {
    */
   copy(
     destination: Table,
-    metadata?: CopyTableMetadata,
+    metadata?: CopyTableMetadata
   ): Promise<JobMetadataResponse>;
   copy(
     destination: Table,
     metadata: CopyTableMetadata,
-    callback: JobMetadataCallback,
+    callback: JobMetadataCallback
   ): void;
   copy(destination: Table, callback: JobMetadataCallback): void;
   copy(
     destination: Table,
     metadataOrCallback?: CopyTableMetadata | JobMetadataCallback,
-    cb?: JobMetadataCallback,
+    cb?: JobMetadataCallback
   ): void | Promise<JobMetadataResponse> {
     const metadata =
       typeof metadataOrCallback === 'object' ? metadataOrCallback : {};
@@ -750,7 +750,7 @@ class Table extends ServiceObject {
         job!.on('error', callback!).on('complete', (metadata: JobMetadata) => {
           callback!(null, metadata);
         });
-      },
+      }
     );
   }
 
@@ -817,18 +817,18 @@ class Table extends ServiceObject {
    */
   copyFrom(
     sourceTables: Table | Table[],
-    metadata?: CopyTableMetadata,
+    metadata?: CopyTableMetadata
   ): Promise<JobMetadataResponse>;
   copyFrom(
     sourceTables: Table | Table[],
     metadata: CopyTableMetadata,
-    callback: JobMetadataCallback,
+    callback: JobMetadataCallback
   ): void;
   copyFrom(sourceTables: Table | Table[], callback: JobMetadataCallback): void;
   copyFrom(
     sourceTables: Table | Table[],
     metadataOrCallback?: CopyTableMetadata | JobMetadataCallback,
-    cb?: JobMetadataCallback,
+    cb?: JobMetadataCallback
   ): void | Promise<JobMetadataResponse> {
     const metadata =
       typeof metadataOrCallback === 'object' ? metadataOrCallback : {};
@@ -900,18 +900,18 @@ class Table extends ServiceObject {
    */
   createCopyJob(
     destination: Table,
-    metadata?: CreateCopyJobMetadata,
+    metadata?: CreateCopyJobMetadata
   ): Promise<JobResponse>;
   createCopyJob(
     destination: Table,
     metadata: CreateCopyJobMetadata,
-    callback: JobCallback,
+    callback: JobCallback
   ): void;
   createCopyJob(destination: Table, callback: JobCallback): void;
   createCopyJob(
     destination: Table,
     metadataOrCallback?: CreateCopyJobMetadata | JobCallback,
-    cb?: JobCallback,
+    cb?: JobCallback
   ): void | Promise<JobResponse> {
     if (!(destination instanceof Table)) {
       throw new Error('Destination must be a Table object.');
@@ -1020,18 +1020,18 @@ class Table extends ServiceObject {
    */
   createCopyFromJob(
     source: Table | Table[],
-    metadata?: CopyTableMetadata,
+    metadata?: CopyTableMetadata
   ): Promise<JobResponse>;
   createCopyFromJob(
     source: Table | Table[],
     metadata: CopyTableMetadata,
-    callback: JobCallback,
+    callback: JobCallback
   ): void;
   createCopyFromJob(source: Table | Table[], callback: JobCallback): void;
   createCopyFromJob(
     source: Table | Table[],
     metadataOrCallback?: CopyTableMetadata | JobCallback,
-    cb?: JobCallback,
+    cb?: JobCallback
   ): void | Promise<JobResponse> {
     const sourceTables = toArray(source) as Table[];
     sourceTables.forEach(sourceTable => {
@@ -1166,18 +1166,18 @@ class Table extends ServiceObject {
    */
   createExtractJob(
     destination: File,
-    options?: CreateExtractJobOptions,
+    options?: CreateExtractJobOptions
   ): Promise<JobResponse>;
   createExtractJob(
     destination: File,
     options: CreateExtractJobOptions,
-    callback: JobCallback,
+    callback: JobCallback
   ): void;
   createExtractJob(destination: File, callback: JobCallback): void;
   createExtractJob(
     destination: File,
     optionsOrCallback?: CreateExtractJobOptions | JobCallback,
-    cb?: JobCallback,
+    cb?: JobCallback
   ): void | Promise<JobResponse> {
     let options =
       typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
@@ -1339,18 +1339,18 @@ class Table extends ServiceObject {
    */
   createLoadJob(
     source: string | File | File[],
-    metadata?: JobLoadMetadata,
+    metadata?: JobLoadMetadata
   ): Promise<JobResponse>;
   createLoadJob(
     source: string | File | File[],
     metadata: JobLoadMetadata,
-    callback: JobCallback,
+    callback: JobCallback
   ): void;
   createLoadJob(source: string | File | File[], callback: JobCallback): void;
   createLoadJob(
     source: string | File | File[],
     metadataOrCallback?: JobLoadMetadata | JobCallback,
-    cb?: JobCallback,
+    cb?: JobCallback
   ): void | Promise<JobResponse> {
     const metadata =
       typeof metadataOrCallback === 'object' ? metadataOrCallback : {};
@@ -1359,7 +1359,7 @@ class Table extends ServiceObject {
 
     this._createLoadJob(source, metadata).then(
       ([resp]) => callback!(null, resp, resp.metadata),
-      err => callback!(err),
+      err => callback!(err)
     );
   }
 
@@ -1371,7 +1371,7 @@ class Table extends ServiceObject {
    */
   async _createLoadJob(
     source: string | File | File[],
-    metadata: JobLoadMetadata,
+    metadata: JobLoadMetadata
   ): Promise<JobResponse> {
     if (metadata.format) {
       metadata.sourceFormat = FORMATS[metadata.format.toLowerCase()];
@@ -1459,7 +1459,7 @@ class Table extends ServiceObject {
   createQueryJob(options: Query, callback: JobCallback): void;
   createQueryJob(
     options: Query,
-    callback?: JobCallback,
+    callback?: JobCallback
   ): void | Promise<JobResponse> {
     return this.dataset.createQueryJob(options, callback!);
   }
@@ -1515,7 +1515,7 @@ class Table extends ServiceObject {
           tableId: this.id,
         },
       },
-      metadata,
+      metadata
     );
 
     let jobId = metadata.jobId || uuid.v4();
@@ -1545,20 +1545,6 @@ class Table extends ServiceObject {
         dup,
         {
           makeAuthenticatedRequest: this.bigQuery.makeAuthenticatedRequest,
-          /* TODO: REMOVE, THIS IS JUST FOR DEBUG
-          makeAuthenticatedRequest: (reqOpts) => {
-            console.log("reqOpts", reqOpts)
-            this.bigQuery.request(reqOpts, (err, body, resp) => {
-              if (err) {
-                dup.destroy(err);
-                return;
-              }
-
-              this.metadata = body;
-              dup.emit('response', resp);
-              dup.emit('complete');
-            })
-          },*/
           metadata: jobMetadata as {},
           request: {
             uri: `${this.bigQuery.apiEndpoint}/upload/bigquery/v2/projects/${this.dataset.projectId}/jobs`,
@@ -1571,7 +1557,7 @@ class Table extends ServiceObject {
           });
           job.metadata = data;
           dup.emit('job', job);
-        },
+        }
       );
     });
     return dup;
@@ -1730,18 +1716,18 @@ class Table extends ServiceObject {
    */
   extract(
     destination: File,
-    options?: CreateExtractJobOptions,
+    options?: CreateExtractJobOptions
   ): Promise<JobMetadataResponse>;
   extract(
     destination: File,
     options: CreateExtractJobOptions,
-    callback?: JobMetadataCallback,
+    callback?: JobMetadataCallback
   ): void;
   extract(destination: File, callback?: JobMetadataCallback): void;
   extract(
     destination: File,
     optionsOrCallback?: CreateExtractJobOptions | JobMetadataCallback,
-    cb?: JobMetadataCallback,
+    cb?: JobMetadataCallback
   ): void | Promise<JobMetadataResponse> {
     const options =
       typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
@@ -1832,7 +1818,7 @@ class Table extends ServiceObject {
    */
   getRows(
     optionsOrCallback?: GetRowsOptions | RowsCallback,
-    cb?: RowsCallback,
+    cb?: RowsCallback
   ): void | Promise<RowsResponse> {
     const options =
       typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
@@ -1849,7 +1835,7 @@ class Table extends ServiceObject {
       err: Error | null,
       rows: TableRow[] | null,
       nextQuery: GetRowsOptions | null,
-      resp: bigquery.ITableList,
+      resp: bigquery.ITableList
     ) => {
       if (err) {
         callback!(err, null, null, resp);
@@ -1867,7 +1853,7 @@ class Table extends ServiceObject {
       {
         'formatOptions.useInt64Timestamp': true,
       },
-      options,
+      options
     );
 
     this.request(
@@ -1896,13 +1882,13 @@ class Table extends ServiceObject {
                 return;
               }
               onComplete(null, resp.rows, nextQuery, resp);
-            },
+            }
           );
           return;
         }
 
         onComplete(null, resp.rows, nextQuery, resp);
-      },
+      }
     );
   }
 
@@ -2058,18 +2044,18 @@ class Table extends ServiceObject {
    */
   insert(
     rows: RowMetadata | RowMetadata[],
-    options?: InsertRowsOptions,
+    options?: InsertRowsOptions
   ): Promise<InsertRowsResponse>;
   insert(
     rows: RowMetadata | RowMetadata[],
     options: InsertRowsOptions,
-    callback: InsertRowsCallback,
+    callback: InsertRowsCallback
   ): void;
   insert(rows: RowMetadata | RowMetadata[], callback: InsertRowsCallback): void;
   insert(
     rows: RowMetadata | RowMetadata[],
     optionsOrCallback?: InsertRowsOptions | InsertRowsCallback,
-    cb?: InsertRowsCallback,
+    cb?: InsertRowsCallback
   ): void | Promise<InsertRowsResponse> {
     const options =
       typeof optionsOrCallback === 'object'
@@ -2082,7 +2068,7 @@ class Table extends ServiceObject {
     if (callback) {
       promise.then(
         resp => callback(null, resp),
-        err => callback(err, null),
+        err => callback(err, null)
       );
     } else {
       return promise.then(r => [r]);
@@ -2099,7 +2085,7 @@ class Table extends ServiceObject {
    */
   private async _insertAndCreateTable(
     rows: RowMetadata | RowMetadata[],
-    options: InsertRowsOptions,
+    options: InsertRowsOptions
   ): Promise<bigquery.ITableDataInsertAllResponse | bigquery.ITable> {
     const {schema} = options;
     const delay = 60000;
@@ -2140,7 +2126,7 @@ class Table extends ServiceObject {
    */
   private async _insertWithRetry(
     rows: RowMetadata | RowMetadata[],
-    options: InsertRowsOptions,
+    options: InsertRowsOptions
   ): Promise<bigquery.ITableDataInsertAllResponse> {
     const {partialRetries = 3} = options;
     let error: GoogleErrorBody;
@@ -2177,7 +2163,7 @@ class Table extends ServiceObject {
    */
   private async _insert(
     rows: RowMetadata | RowMetadata[],
-    options: InsertRowsOptions,
+    options: InsertRowsOptions
   ): Promise<bigquery.ITableDataInsertAllResponse> {
     rows = toArray(rows) as RowMetadata[];
 
@@ -2224,7 +2210,7 @@ class Table extends ServiceObject {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           row: rows[(insertError as any).index],
         };
-      },
+      }
     );
 
     if (partialFailures.length > 0) {
@@ -2243,7 +2229,7 @@ class Table extends ServiceObject {
     dup._write = (
       chunk: RowMetadata,
       encoding: BufferEncoding,
-      cb: Function,
+      cb: Function
     ) => {
       this.rowQueue!.add(chunk, () => {});
       cb!();
@@ -2255,12 +2241,12 @@ class Table extends ServiceObject {
 
   load(
     source: string | File | File[],
-    metadata?: JobLoadMetadata,
+    metadata?: JobLoadMetadata
   ): Promise<JobMetadataResponse>;
   load(
     source: string | File | File[],
     metadata: JobLoadMetadata,
-    callback: JobMetadataCallback,
+    callback: JobMetadataCallback
   ): void;
   load(source: string | File | File[], callback: JobMetadataCallback): void;
   /**
@@ -2345,18 +2331,18 @@ class Table extends ServiceObject {
    */
   load(
     source: string | File | File[],
-    metadata?: JobLoadMetadata,
+    metadata?: JobLoadMetadata
   ): Promise<JobMetadataResponse>;
   load(
     source: string | File | File[],
     metadata: JobLoadMetadata,
-    callback: JobMetadataCallback,
+    callback: JobMetadataCallback
   ): void;
   load(source: string | File | File[], callback: JobMetadataCallback): void;
   load(
     source: string | File | File[],
     metadataOrCallback?: JobLoadMetadata | JobMetadataCallback,
-    cb?: JobMetadataCallback,
+    cb?: JobMetadataCallback
   ): void | Promise<JobMetadataResponse> {
     const metadata =
       typeof metadataOrCallback === 'object' ? metadataOrCallback : {};
@@ -2388,7 +2374,7 @@ class Table extends ServiceObject {
   query(query: Query, callback: SimpleQueryRowsCallback): void;
   query(
     query: Query | string,
-    callback?: SimpleQueryRowsCallback,
+    callback?: SimpleQueryRowsCallback
   ): void | Promise<SimpleQueryRowsResponse> {
     if (typeof query === 'string') {
       query = {
@@ -2446,11 +2432,11 @@ class Table extends ServiceObject {
   setMetadata(metadata: SetTableMetadataOptions): Promise<SetMetadataResponse>;
   setMetadata(
     metadata: SetTableMetadataOptions,
-    callback: ResponseCallback,
+    callback: ResponseCallback
   ): void;
   setMetadata(
     metadata: SetTableMetadataOptions,
-    callback?: ResponseCallback,
+    callback?: ResponseCallback
   ): void | Promise<SetMetadataResponse> {
     const body = Table.formatMetadata_(metadata as TableMetadata);
     super.setMetadata(body, callback!);
@@ -2461,12 +2447,12 @@ class Table extends ServiceObject {
    * @returns {Promise<PolicyResponse>}
    */
   getIamPolicy(
-    optionsOrCallback?: GetPolicyOptions | PolicyCallback,
+    optionsOrCallback?: GetPolicyOptions | PolicyCallback
   ): Promise<PolicyResponse>;
   getIamPolicy(options: GetPolicyOptions, callback: PolicyCallback): void;
   getIamPolicy(
     optionsOrCallback?: GetPolicyOptions,
-    cb?: PolicyCallback,
+    cb?: PolicyCallback
   ): void | Promise<PolicyResponse> {
     const options =
       typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
@@ -2494,7 +2480,7 @@ class Table extends ServiceObject {
           return;
         }
         callback!(null, resp);
-      },
+      }
     );
   }
 
@@ -2504,18 +2490,18 @@ class Table extends ServiceObject {
    */
   setIamPolicy(
     policy: Policy,
-    options?: SetPolicyOptions,
+    options?: SetPolicyOptions
   ): Promise<PolicyResponse>;
   setIamPolicy(
     policy: Policy,
     options: SetPolicyOptions,
-    callback: PolicyCallback,
+    callback: PolicyCallback
   ): void;
   setIamPolicy(policy: Policy, callback: PolicyCallback): void;
   setIamPolicy(
     policy: Policy,
     optionsOrCallback?: SetPolicyOptions | PolicyCallback,
-    cb?: PolicyCallback,
+    cb?: PolicyCallback
   ): void | Promise<PolicyResponse> {
     const options =
       typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
@@ -2540,7 +2526,7 @@ class Table extends ServiceObject {
           return;
         }
         callback!(null, resp);
-      },
+      }
     );
   }
 
@@ -2549,15 +2535,15 @@ class Table extends ServiceObject {
    * @returns {Promise<PermissionsResponse>}
    */
   testIamPermissions(
-    permissions: string | string[],
+    permissions: string | string[]
   ): Promise<PermissionsResponse>;
   testIamPermissions(
     permissions: string | string[],
-    callback: PermissionsCallback,
+    callback: PermissionsCallback
   ): void;
   testIamPermissions(
     permissions: string | string[],
-    callback?: PermissionsCallback,
+    callback?: PermissionsCallback
   ): void | Promise<PermissionsResponse> {
     permissions = toArray(permissions);
 
@@ -2575,7 +2561,7 @@ class Table extends ServiceObject {
           return;
         }
         callback!(null, resp);
-      },
+      }
     );
   }
 }
