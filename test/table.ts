@@ -29,7 +29,7 @@ import * as extend from 'extend';
 import * as proxyquire from 'proxyquire';
 import * as sinon from 'sinon';
 import * as stream from 'stream';
-import * as uuid from 'uuid';
+import * as crypto from 'crypto';
 
 import {BigQuery, Query} from '../src/bigquery';
 import {toArray} from '../src/util';
@@ -111,7 +111,7 @@ const fakePaginator = {
   },
 };
 
-let fakeUuid = extend(true, {}, uuid);
+let fakeCrypto = extend(true, {}, crypto);
 
 class FakeServiceObject extends ServiceObject {
   calledWith_: IArguments;
@@ -132,7 +132,7 @@ const sandbox = sinon.createSandbox();
 describe('BigQuery/Table', () => {
   before(() => {
     Table = proxyquire('../src/table.js', {
-      uuid: fakeUuid,
+      crypto: fakeCrypto,
       '@google-cloud/common': {
         ServiceObject: FakeServiceObject,
         util: fakeUtil,
@@ -159,7 +159,7 @@ describe('BigQuery/Table', () => {
   });
 
   beforeEach(() => {
-    fakeUuid = Object.assign(fakeUuid, uuid);
+    fakeCrypto = Object.assign(fakeCrypto, crypto);
     isCustomTypeOverride = null;
     makeWritableStreamOverride = null;
     tableOverrides = {};
@@ -1670,10 +1670,10 @@ describe('BigQuery/Table', () => {
 
       beforeEach(() => {
         fakeJob = new EventEmitter();
-        fakeJobId = uuid.v4();
+        fakeJobId = crypto.randomUUID();
         sandbox
-          .stub(fakeUuid, 'v4')
-          .returns(fakeJobId as unknown as Uint8Array<ArrayBufferLike>);
+          .stub(fakeCrypto, 'randomUUID')
+          .returns(fakeJobId as crypto.UUID);
       });
 
       it('should make a writable stream when written to', done => {
@@ -2458,8 +2458,8 @@ describe('BigQuery/Table', () => {
       insertSpy = sinon.spy(table, '_insert');
       requestStub = sinon.stub(table, 'request').resolves([{}]);
       sandbox
-        .stub(fakeUuid, 'v4')
-        .returns(fakeInsertId as unknown as Uint8Array<ArrayBufferLike>);
+        .stub(fakeCrypto, 'randomUUID')
+        .returns(fakeInsertId as crypto.UUID);
     });
 
     afterEach(() => {

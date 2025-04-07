@@ -17,7 +17,7 @@
 const {assert} = require('chai');
 const {describe, it, before, after, beforeEach} = require('mocha');
 const path = require('path');
-const uuid = require('uuid');
+const {randomUUID} = require('crypto');
 const cp = require('child_process');
 const {Storage} = require('@google-cloud/storage');
 const {BigQuery} = require('@google-cloud/bigquery');
@@ -33,7 +33,7 @@ const GCLOUD_TESTS_PREFIX = 'nodejs_samples_tests';
 const storage = new Storage();
 
 const generateUuid = () =>
-  `${GCLOUD_TESTS_PREFIX}_${uuid.v4()}`.replace(/-/gi, '_');
+  `${GCLOUD_TESTS_PREFIX}_${randomUUID()}`.replace(/-/gi, '_');
 
 const datasetId = generateUuid();
 const srcDatasetId = datasetId;
@@ -647,8 +647,8 @@ describe('Tables', () => {
   });
 
   describe('Delete Table', () => {
-    const datasetId = `gcloud_tests_${uuid.v4()}`.replace(/-/gi, '_');
-    const tableId = `gcloud_tests_${uuid.v4()}`.replace(/-/gi, '_');
+    const datasetId = `gcloud_tests_${randomUUID()}`.replace(/-/gi, '_');
+    const tableId = `gcloud_tests_${randomUUID()}`.replace(/-/gi, '_');
 
     before(async () => {
       const datasetOptions = {

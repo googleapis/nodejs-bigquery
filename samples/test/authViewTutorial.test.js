@@ -17,7 +17,7 @@
 const {assert} = require('chai');
 const {describe, it, before, beforeEach, after} = require('mocha');
 const cp = require('child_process');
-const uuid = require('uuid');
+const {randomUUID} = require('crypto');
 
 const {BigQuery} = require('@google-cloud/bigquery');
 
@@ -25,7 +25,7 @@ const execSync = cmd => cp.execSync(cmd, {encoding: 'utf-8'});
 
 const GCLOUD_TESTS_PREFIX = 'nodejs_samples_tests_authView';
 const generateUuid = () =>
-  `${GCLOUD_TESTS_PREFIX}_${uuid.v4()}`.replace(/-/gi, '_');
+  `${GCLOUD_TESTS_PREFIX}_${randomUUID()}`.replace(/-/gi, '_');
 let projectId;
 const datasetId = generateUuid();
 const tableId = generateUuid();

@@ -26,7 +26,7 @@ import * as Big from 'big.js';
 import * as extend from 'extend';
 import * as proxyquire from 'proxyquire';
 import * as sinon from 'sinon';
-import * as uuid from 'uuid';
+import * as crypto from 'crypto';
 
 import {toArray} from '../src/util';
 import {
@@ -46,7 +46,7 @@ import {
 import {SinonStub} from 'sinon';
 import {PreciseDate} from '@google-cloud/precise-date';
 
-const fakeUuid = extend(true, {}, uuid);
+const fakeCrypto = extend(true, {}, crypto);
 
 class FakeApiError {
   calledWith_: Array<{}>;
@@ -166,7 +166,7 @@ describe('BigQuery', () => {
   before(() => {
     delete process.env.BIGQUERY_EMULATOR_HOST;
     BigQuery = proxyquire('../src/bigquery', {
-      uuid: fakeUuid,
+      crypto: fakeCrypto,
       './dataset': {
         Dataset: FakeDataset,
       },
@@ -2042,11 +2042,10 @@ describe('BigQuery', () => {
     let fakeJobId: string;
 
     beforeEach(() => {
-      fakeJobId = uuid.v4();
+      fakeJobId = crypto.randomUUID();
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (fakeUuid as any).v4 = () => {
-        return fakeJobId;
+      fakeCrypto.randomUUID = (_) => {
+        return fakeJobId as crypto.UUID;
       };
     });
 
@@ -3124,7 +3123,7 @@ describe('BigQuery', () => {
 
       bq.runJobsQuery = (query: {}, callback: Function) => {
         callback(null, fakeJob, {
-          queryId: uuid.v1(),
+          queryId: crypto.randomUUID(),
           jobComplete: false,
         });
       };

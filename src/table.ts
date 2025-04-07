@@ -33,7 +33,7 @@ import * as fs from 'fs';
 import * as is from 'is';
 import * as path from 'path';
 import * as streamEvents from 'stream-events';
-import * as uuid from 'uuid';
+import {randomUUID} from 'crypto';
 import * as duplexify from 'duplexify';
 
 import {
@@ -1518,7 +1518,7 @@ class Table extends ServiceObject {
       metadata
     );
 
-    let jobId = metadata.jobId || uuid.v4();
+    let jobId = metadata.jobId || randomUUID();
 
     if (metadata.jobId) {
       delete metadata.jobId;
@@ -2180,7 +2180,7 @@ class Table extends ServiceObject {
         };
 
         if (options.createInsertId !== false) {
-          encoded.insertId = uuid.v4();
+          encoded.insertId = randomUUID();
         }
 
         return encoded;

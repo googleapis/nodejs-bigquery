@@ -22,7 +22,7 @@ import * as assert from 'assert';
 import {describe, it, before, after} from 'mocha';
 import * as Big from 'big.js';
 import * as fs from 'fs';
-import * as uuid from 'uuid';
+import {randomUUID} from 'crypto';
 import {Readable} from 'stream';
 
 import {
@@ -282,7 +282,7 @@ describe('BigQuery', () => {
   });
 
   it('should honor the job id option', done => {
-    const jobId = `hi-im-a-job-id-${uuid.v4()}`;
+    const jobId = `hi-im-a-job-id-${randomUUID()}`;
     const options = {query, jobId};
 
     bigquery.createQueryJob(options, (err, job) => {
@@ -1930,7 +1930,7 @@ describe('BigQuery', () => {
   });
 
   function generateName(resourceType: string) {
-    return `${GCLOUD_TESTS_PREFIX}_${resourceType}_${uuid.v1()}`.replace(
+    return `${GCLOUD_TESTS_PREFIX}_${resourceType}_${randomUUID()}`.replace(
       /-/g,
       '_',
     );

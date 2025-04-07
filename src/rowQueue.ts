@@ -16,7 +16,7 @@
 
 import * as common from '@google-cloud/common';
 import * as extend from 'extend';
-import * as uuid from 'uuid';
+import {randomUUID} from 'crypto';
 import {RequestCallback, Table, InsertStreamOptions} from '.';
 import {GoogleErrorBody} from '@google-cloud/common/build/src/util';
 import bigquery from './types';
@@ -108,7 +108,7 @@ export class RowQueue {
       };
 
       if (this.insertRowsOptions.createInsertId !== false) {
-        row.insertId = uuid.v4();
+        row.insertId = randomUUID();
       }
     }
 

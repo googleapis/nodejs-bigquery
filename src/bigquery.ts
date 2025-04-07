@@ -29,7 +29,7 @@ import {toArray} from './util';
 import * as Big from 'big.js';
 import * as extend from 'extend';
 import * as is from 'is';
-import * as uuid from 'uuid';
+import {randomUUID} from 'crypto';
 
 import {Dataset, DatasetOptions} from './dataset';
 import {Job, JobOptions, QueryResultsOptions} from './job';
@@ -1714,7 +1714,7 @@ export class BigQuery extends Service {
       : false;
 
     const reqOpts = Object.assign({}, options);
-    let jobId = JOB_ID_PROVIDED ? reqOpts.jobId : uuid.v4();
+    let jobId = JOB_ID_PROVIDED ? reqOpts.jobId : randomUUID();
 
     if (reqOpts.jobId) {
       delete reqOpts.jobId;
@@ -2325,7 +2325,7 @@ export class BigQuery extends Service {
       maxResults: queryObj.maxResults || options.maxResults,
       query: queryObj.query,
       useLegacySql: false,
-      requestId: uuid.v4(),
+      requestId: randomUUID(),
       jobCreationMode: 'JOB_CREATION_OPTIONAL',
     };
     if (!this._enableQueryPreview) {
