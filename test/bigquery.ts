@@ -2044,7 +2044,7 @@ describe('BigQuery', () => {
     beforeEach(() => {
       fakeJobId = crypto.randomUUID();
 
-      fakeCrypto.randomUUID = (_) => {
+      fakeCrypto.randomUUID = _ => {
         return fakeJobId as crypto.UUID;
       };
     });

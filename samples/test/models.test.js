@@ -29,7 +29,10 @@ const bigquery = new BigQuery();
 describe('Models', function () {
   // Increase timeout to accommodate model creation.
   this.timeout(300000);
-  const datasetId = `${GCLOUD_TESTS_PREFIX}_${randomUUID()}`.replace(/-/gi, '_');
+  const datasetId = `${GCLOUD_TESTS_PREFIX}_${randomUUID()}`.replace(
+    /-/gi,
+    '_',
+  );
   const modelId = `${GCLOUD_TESTS_PREFIX}_${randomUUID()}`.replace(/-/gi, '_');
 
   before(async () => {
