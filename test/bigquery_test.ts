@@ -35,6 +35,13 @@ import {
   RoutineServiceClient,
 } from '../src';
 
+
+//TODO - delete tests
+// 1. success no callback
+// 2. success yes callback
+// 3. error no callback
+// 4. error yes callback 
+
 // this test assumes that the npm "pretest" session has been run
 // and the client was regenerated immediately before these tests are run
 describe('BigQueryClient has the number of clients and methods we expect', () => {

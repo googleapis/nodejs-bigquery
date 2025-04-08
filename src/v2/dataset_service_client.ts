@@ -942,7 +942,6 @@ export class DatasetServiceClient {
         dataset_id: request.datasetId ?? '',
       });
     this.initialize();
-    console.log('in delete calls')
     return this.innerApiCalls.deleteDataset(request, options, callback);
   }
   /**

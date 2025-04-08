@@ -473,6 +473,32 @@ export class BigQueryClient {
     return this.datasetClient.updateDataset(request, options, callback);
   }
 
+  async deleteDatasetHelper(request?: protos.google.cloud.bigquery.v2.IDeleteDatasetRequest,
+    options?: CallOptions
+  ): Promise<
+    [
+      protos.google.protobuf.IEmpty,
+      protos.google.cloud.bigquery.v2.IDeleteDatasetRequest | undefined,
+      {} | undefined,
+    ]
+  >{
+    try{
+      const response = await this.datasetClient.deleteDataset(request, options)
+      return response;
+    }
+    catch(error: any) {  
+     console.log("ERROR", error)
+     if (error.message === "Unexpected end of JSON input"){
+       // Gax considers a null, non error response from the service to be a problem
+       // it is for all services that aren't BQ 
+       // https://github.com/googleapis/gax-nodejs/pull/1681
+       // "normal" responses would be an empty JSON - simulate that to prevent an error
+       //@ts-ignore -- TODO FIX
+       return [{}, null, null]; // TODO - verify this is the gRPC and fallback response
+      }
+      throw error;
+     }
+  }
   /**
    * Deletes the dataset specified by the datasetId value. Before you can delete
    * a dataset, you must delete all its tables, either manually or by specifying
@@ -529,29 +555,30 @@ export class BigQueryClient {
     } else {
       options = optionsOrCallback as CallOptions;
     }
-    // if (callback === undefined) {
-    //   return this.datasetClient.deleteDataset(request, options);
-    // }
-    this.datasetClient.deleteDataset(request, options).then((resp) => {
-      console.log('resp bq', resp)
-      callback!(null, resp)
-      return
-    }).catch((error: any) => {
-      if (error.message === "Unexpected end of JSON input"){
-        console.log("it's okay")
-       // this is ok
-       callback!(null, [{}, null, null]); // TODO - verify this is the gRPC and fallback response
-       return
-      }
-      console.log('error in catch', error)
-
-      callback!(error)
-      return
-    });
-
-   // return this.innerApiCalls.deleteSecret(request, options, callback);
- 
-    // return this.datasetClient.deleteDataset(request, options, callback);
+    if (callback === undefined) {
+     return this.deleteDatasetHelper(request, options)
+        
+    }else{
+      this.datasetClient.deleteDataset(request, options).then((resp) => {
+        // because BigQuery delete calls don't return a response, this bit of code
+        // likely won't ever be hit, but it would be if
+        // the responses ever change to being properly formatted
+        callback!(null, resp)
+        return
+      }).catch((error: any) => {
+        if (error.message === "Unexpected end of JSON input"){
+         // Gax considers a null, non error response from the service to be a problem
+         // it is for all services that aren't BQ 
+         // https://github.com/googleapis/gax-nodejs/pull/1681
+         // "normal" responses would be an empty JSON - simulate that to prevent an error
+         callback!(null, [{}, null, null]); // TODO - verify this is the gRPC and fallback response
+         return
+        }
+        callback!(error)
+        return
+      });
+    }
+    
   }
 
   /**
