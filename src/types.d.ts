@@ -1000,7 +1000,7 @@ declare namespace bigquery {
     /**
      * The labels associated with this dataset. You can use these to organize and group your datasets. You can set this property when inserting or updating a dataset. See [Creating and Updating Dataset Labels](https://cloud.google.com/bigquery/docs/creating-managing-labels#creating_and_updating_dataset_labels) for more information.
      */
-    labels?: {[key: string]: string};
+    labels?: { [key: string]: string };
     /**
      * Output only. The date when this dataset was last modified, in milliseconds since the epoch.
      */
@@ -1024,7 +1024,7 @@ declare namespace bigquery {
     /**
      * Optional. The [tags](https://cloud.google.com/bigquery/docs/tags) attached to this dataset. Tag keys are globally unique. Tag key is expected to be in the namespaced format, for example "123456789012/environment" where 123456789012 is the ID of the parent organization or project resource for this tag key. Tag value is expected to be the short name, for example "Production". See [Tag definitions](https://cloud.google.com/iam/docs/tags-access-control#definitions) for more details.
      */
-    resourceTags?: {[key: string]: string};
+    resourceTags?: { [key: string]: string };
     /**
      * Optional. Output only. Restriction config for all tables and dataset. If set, restrict certain accesses on the dataset and all its tables based on the config. See [Data egress](https://cloud.google.com/bigquery/docs/analytics-hub-introduction#data_egress) for more details.
      */
@@ -1108,7 +1108,7 @@ declare namespace bigquery {
       /**
        * The labels associated with this dataset. You can use these to organize and group your datasets.
        */
-      labels?: {[key: string]: string};
+      labels?: { [key: string]: string };
       /**
        * The geographic location where the dataset resides.
        */
@@ -1165,7 +1165,7 @@ declare namespace bigquery {
     /**
      * Optional. The labels associated with this table. You can use these to organize and group your tables. This will only be used if the destination table is newly created. If the table already exists and labels are different than the current labels are provided, the job will fail.
      */
-    labels?: {[key: string]: string};
+    labels?: { [key: string]: string };
   };
 
   /**
@@ -1557,7 +1557,7 @@ declare namespace bigquery {
     /**
      * Optional. A map of key value pairs defining the parameters and properties of the open source schema. Maximum size of 2MiB.
      */
-    parameters?: {[key: string]: string};
+    parameters?: { [key: string]: string };
   };
 
   /**
@@ -1571,7 +1571,7 @@ declare namespace bigquery {
     /**
      * Optional. A map of the key-value pairs defining the parameters and properties of the open source table. Corresponds with Hive metastore table parameters. Maximum size of 4MiB.
      */
-    parameters?: {[key: string]: string};
+    parameters?: { [key: string]: string };
     /**
      * Optional. A storage descriptor containing information about the physical storage of this table.
      */
@@ -2315,7 +2315,7 @@ declare namespace bigquery {
     /**
      * The labels associated with this job. You can use these to organize and group your jobs. Label keys and values can be no longer than 63 characters, can only contain lowercase letters, numeric characters, underscores and dashes. International characters are allowed. Label values are optional. Label keys must start with a letter and each label in the list must have a different key.
      */
-    labels?: {[key: string]: string};
+    labels?: { [key: string]: string };
     /**
      * [Pick one] Configures a load job.
      */
@@ -2657,7 +2657,7 @@ declare namespace bigquery {
     /**
      * Optional. You can specify external table definitions, which operate as ephemeral tables that can be queried. These definitions are configured using a JSON map, where the string key represents the table identifier, and the value is the corresponding external data configuration object.
      */
-    tableDefinitions?: {[key: string]: IExternalDataConfiguration};
+    tableDefinitions?: { [key: string]: IExternalDataConfiguration };
     /**
      * Time-based partitioning specification for the destination table. Only one of timePartitioning and rangePartitioning should be specified.
      */
@@ -3224,7 +3224,7 @@ declare namespace bigquery {
   /**
    * Represents a single JSON object.
    */
-  type IJsonObject = {[key: string]: IJsonValue};
+  type IJsonObject = { [key: string]: IJsonValue };
 
   /**
    * Json Options for load and make external tables.
@@ -3545,7 +3545,7 @@ declare namespace bigquery {
     /**
      * The labels associated with this model. You can use these to organize and group your models. Label keys and values can be no longer than 63 characters, can only contain lowercase letters, numeric characters, underscores and dashes. International characters are allowed. Label values are optional. Label keys must start with a letter and each label in the list must have a different key.
      */
-    labels?: {[key: string]: string};
+    labels?: { [key: string]: string };
     /**
      * Output only. The time when this model was last modified, in millisecs since the epoch.
      */
@@ -3855,7 +3855,7 @@ declare namespace bigquery {
     /**
      * Output only. Information about query optimizations.
      */
-    optimizationDetails?: {[key: string]: any};
+    optimizationDetails?: { [key: string]: any };
   };
 
   /**
@@ -3926,7 +3926,7 @@ declare namespace bigquery {
     /**
      * The struct field values.
      */
-    structValues?: {[key: string]: IQueryParameterValue};
+    structValues?: { [key: string]: IQueryParameterValue };
     /**
      * Optional. The value of this value, if a simple scalar type.
      */
@@ -3983,7 +3983,7 @@ declare namespace bigquery {
     /**
      * Optional. The labels associated with this query. Labels can be used to organize and group query jobs. Label keys and values can be no longer than 63 characters, can only contain lowercase letters, numeric characters, underscores and dashes. International characters are allowed. Label keys must start with a letter and each label in the list must have a different key.
      */
-    labels?: {[key: string]: string};
+    labels?: { [key: string]: string };
     /**
      * The geographic location where the job should run. For more information, see how to [specify locations](https://cloud.google.com/bigquery/docs/locations#specify_locations).
      */
@@ -4260,7 +4260,7 @@ declare namespace bigquery {
     /**
      * User-defined context as a set of key/value pairs, which will be sent as function invocation context together with batched arguments in the requests to the remote service. The total number of bytes of keys and values must be less than 8KB.
      */
-    userDefinedContext?: {[key: string]: string};
+    userDefinedContext?: { [key: string]: string };
   };
 
   /**
@@ -4585,7 +4585,7 @@ declare namespace bigquery {
     /**
      * Optional. Key-value pairs that define the initialization parameters for the serialization library. Maximum size 10 Kib.
      */
-    parameters?: {[key: string]: string};
+    parameters?: { [key: string]: string };
     /**
      * Required. Specifies a fully-qualified class name of the serialization library that is responsible for the translation of data between table representation and the underlying low-level input and output format structures. The maximum length is 256 characters.
      */
@@ -4689,7 +4689,7 @@ declare namespace bigquery {
     /**
      * Configuration properties as a set of key/value pairs, which will be passed on to the Spark application. For more information, see [Apache Spark](https://spark.apache.org/docs/latest/index.html) and the [procedure option list](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#procedure_option_list).
      */
-    properties?: {[key: string]: string};
+    properties?: { [key: string]: string };
     /**
      * Python files to be placed on the PYTHONPATH for PySpark application. Supported file types: `.py`, `.egg`, and `.zip`. For more information about Apache Spark, see [Apache Spark](https://spark.apache.org/docs/latest/index.html).
      */
@@ -4707,7 +4707,7 @@ declare namespace bigquery {
     /**
      * Output only. Endpoints returned from Dataproc. Key list: - history_server_endpoint: A link to Spark job UI.
      */
-    endpoints?: {[key: string]: string};
+    endpoints?: { [key: string]: string };
     /**
      * Output only. The Google Cloud Storage bucket that is used as the default file system by the Spark application. This field is only filled when the Spark procedure uses the invoker security mode. The `gcsStagingBucket` bucket is inferred from the `@@spark_proc_properties.staging_bucket` system variable (if it is provided). Otherwise, BigQuery creates a default staging bucket for the job and returns the bucket name in this field. Example: * `gs://[bucket_name]`
      */
@@ -4945,11 +4945,11 @@ declare namespace bigquery {
     /**
      * Output only. Data type for each system variable.
      */
-    types?: {[key: string]: IStandardSqlDataType};
+    types?: { [key: string]: IStandardSqlDataType };
     /**
      * Output only. Value for each system variable.
      */
-    values?: {[key: string]: any};
+    values?: { [key: string]: any };
   };
 
   type ITable = {
@@ -5019,7 +5019,7 @@ declare namespace bigquery {
     /**
      * The labels associated with this table. You can use these to organize and group your tables. Label keys and values can be no longer than 63 characters, can only contain lowercase letters, numeric characters, underscores and dashes. International characters are allowed. Label values are optional. Label keys must start with a letter and each label in the list must have a different key.
      */
-    labels?: {[key: string]: string};
+    labels?: { [key: string]: string };
     /**
      * Output only. The time when this table was last modified, in milliseconds since the epoch.
      */
@@ -5119,7 +5119,7 @@ declare namespace bigquery {
     /**
      * [Optional] The tags associated with this table. Tag keys are globally unique. See additional information on [tags](https://cloud.google.com/iam/docs/tags-access-control#definitions). An object containing a list of "key": value pairs. The key is the namespaced friendly name of the tag key, e.g. "12345/environment" where 12345 is parent id. The value is the friendly short name of the tag value, e.g. "production".
      */
-    resourceTags?: {[key: string]: string};
+    resourceTags?: { [key: string]: string };
     /**
      * Optional. Output only. Restriction config for table. If set, restrict certain accesses on the table based on the config. See [Data egress](https://cloud.google.com/bigquery/docs/analytics-hub-introduction#data_egress) for more details.
      */
@@ -5166,7 +5166,7 @@ declare namespace bigquery {
     view?: IViewDefinition;
   };
 
-  type ITableCell = {v?: any};
+  type ITableCell = { v?: any };
 
   /**
    * The TableConstraints defines the primary key and foreign key.
@@ -5427,7 +5427,7 @@ declare namespace bigquery {
       /**
        * The labels associated with this table. You can use these to organize and group your tables.
        */
-      labels?: {[key: string]: string};
+      labels?: { [key: string]: string };
       /**
        * The range partitioning for this table.
        */
@@ -5997,7 +5997,7 @@ declare namespace bigquery {
     /**
      * Weights associated with each label class, for rebalancing the training data. Only applicable for classification models.
      */
-    labelClassWeights?: {[key: string]: number};
+    labelClassWeights?: { [key: string]: number };
     /**
      * Learning rate in training. Used only for iterative training algorithms.
      */
