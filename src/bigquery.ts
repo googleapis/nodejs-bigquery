@@ -529,28 +529,28 @@ export class BigQueryClient {
     } else {
       options = optionsOrCallback as CallOptions;
     }
-    if (callback === undefined) {
-      console.log('deleting')
-        console.log('before')
-        this.datasetClient.deleteDataset(request, options, (err: any, response) => {
-          // console.log("error", err, err.note)
-          if(err){
-            if(err.note==="Exception occurred in retry method that was not classified as transient"){
-              console.log("it's okay")
-              // TODO properly format response 
-              return "Something"
-            }
-       
-          throw err;
-          }else{
-            console.log('after!!', response)
+    // if (callback === undefined) {
+    //   return this.datasetClient.deleteDataset(request, options);
+    // }
+    this.datasetClient.deleteDataset(request, options).then((resp) => {
+      console.log('resp bq', resp)
+      callback!(null, resp)
+      return
+    }).catch((error: any) => {
+      if (error.message === "Unexpected end of JSON input"){
+        console.log("it's okay")
+       // this is ok
+       callback!(null, [{}, null, null]); // TODO - verify this is the gRPC and fallback response
+       return
+      }
+      console.log('error in catch', error)
 
-            return response;
-          }
+      callback!(error)
+      return
+    });
 
-        });
-
-    }
+   // return this.innerApiCalls.deleteSecret(request, options, callback);
+ 
     // return this.datasetClient.deleteDataset(request, options, callback);
   }
 
