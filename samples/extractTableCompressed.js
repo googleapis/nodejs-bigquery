@@ -18,7 +18,7 @@ function main(
   datasetId = 'my_dataset',
   tableId = 'my_table',
   bucketName = 'my-bucket',
-  filename = 'file.csv'
+  filename = 'file.csv',
 ) {
   // [START bigquery_extract_table_compressed]
   // Import the Google Cloud client libraries

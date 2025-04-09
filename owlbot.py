@@ -21,4 +21,3 @@ node.owlbot_main(templates_excludes=['.github/bug-report.md'])
 
 # Regenerate Discovery types.
 shell.run(('npm','run','types'))
-node.fix()

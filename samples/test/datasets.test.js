@@ -18,13 +18,13 @@ const {BigQuery} = require('@google-cloud/bigquery');
 const {assert} = require('chai');
 const {describe, it, after, before, beforeEach} = require('mocha');
 const cp = require('child_process');
-const uuid = require('uuid');
+const {randomUUID} = require('crypto');
 
 const execSync = cmd => cp.execSync(cmd, {encoding: 'utf-8'});
 const GCLOUD_TESTS_PREFIX = 'nodejs_samples_tests';
-const datasetId = `${GCLOUD_TESTS_PREFIX}_datasets_${uuid.v4()}`.replace(
+const datasetId = `${GCLOUD_TESTS_PREFIX}_datasets_${randomUUID()}`.replace(
   /-/gi,
-  '_'
+  '_',
 );
 
 const bigquery = new BigQuery();
@@ -118,7 +118,7 @@ describe('Datasets', () => {
     const output = execSync(`node updateDatasetDescription.js ${datasetId}`);
     assert.include(
       output,
-      `${datasetId} description: New dataset description.`
+      `${datasetId} description: New dataset description.`,
     );
   });
 
@@ -177,7 +177,7 @@ describe('Datasets', () => {
   async function deleteDatasets() {
     let [datasets] = await bigquery.getDatasets();
     datasets = datasets.filter(dataset =>
-      dataset.id.includes(GCLOUD_TESTS_PREFIX)
+      dataset.id.includes(GCLOUD_TESTS_PREFIX),
     );
 
     for (const dataset of datasets) {

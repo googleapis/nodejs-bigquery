@@ -17,7 +17,7 @@
 function main(
   datasetId = 'my_dataset',
   tableId = 'my_table',
-  filename = '/path/to/file.csv'
+  filename = '/path/to/file.csv',
 ) {
   // [START bigquery_load_from_file]
   // Imports the Google Cloud client library

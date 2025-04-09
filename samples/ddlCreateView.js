@@ -17,7 +17,7 @@
 function main(
   projectId = 'my_project', // GCP Project ID
   datasetId = 'my_dataset', // Existing dataset ID
-  tableId = 'my_new_view' // View to be created
+  tableId = 'my_new_view', // View to be created
 ) {
   // [START bigquery_ddl_create_view]
   // Import the Google Cloud client library and create a client

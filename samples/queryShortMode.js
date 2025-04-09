@@ -43,7 +43,7 @@ function main() {
       const jobRef = res.jobReference;
       const qualifiedId = `${jobRef.projectId}.${jobRef.location}.${jobRef.jobId}`;
       console.log(
-        `Query was run with job state. Job ID: ${qualifiedId}, Query ID: ${res.queryId}`
+        `Query was run with job state. Job ID: ${qualifiedId}, Query ID: ${res.queryId}`,
       );
     }
     // Print the results

@@ -17,7 +17,7 @@
 function main(
   datasetId = 'my_dataset', // Existing dataset
   sourceTable = 'my_table', // Existing table to copy from
-  destinationTable = 'testing' // Existing table to copy to
+  destinationTable = 'testing', // Existing table to copy to
 ) {
   // [START bigquery_copy_table_multiple_source]
   // Import the Google Cloud client library

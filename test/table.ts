@@ -21,7 +21,6 @@ import {
 import {GoogleErrorBody} from '@google-cloud/common/build/src/util';
 import * as pfy from '@google-cloud/promisify';
 import {File} from '@google-cloud/storage';
-import arrify = require('arrify');
 import * as assert from 'assert';
 import {describe, it, afterEach, beforeEach, before, after} from 'mocha';
 import * as Big from 'big.js';
@@ -30,9 +29,10 @@ import * as extend from 'extend';
 import * as proxyquire from 'proxyquire';
 import * as sinon from 'sinon';
 import * as stream from 'stream';
-import * as uuid from 'uuid';
+import * as crypto from 'crypto';
 
 import {BigQuery, Query} from '../src/bigquery';
+import {toArray} from '../src/util';
 import {Job, JobOptions} from '../src/job';
 import {
   CopyTableMetadata,
@@ -100,7 +100,7 @@ const fakePaginator = {
         return;
       }
 
-      methods = arrify(methods);
+      methods = toArray(methods);
       assert.strictEqual(c.name, 'Table');
       assert.deepStrictEqual(methods, ['getRows']);
       extended = true;
@@ -111,7 +111,7 @@ const fakePaginator = {
   },
 };
 
-let fakeUuid = extend(true, {}, uuid);
+let fakeCrypto = extend(true, {}, crypto);
 
 class FakeServiceObject extends ServiceObject {
   calledWith_: IArguments;
@@ -132,7 +132,7 @@ const sandbox = sinon.createSandbox();
 describe('BigQuery/Table', () => {
   before(() => {
     Table = proxyquire('../src/table.js', {
-      uuid: fakeUuid,
+      crypto: fakeCrypto,
       '@google-cloud/common': {
         ServiceObject: FakeServiceObject,
         util: fakeUtil,
@@ -159,7 +159,7 @@ describe('BigQuery/Table', () => {
   });
 
   beforeEach(() => {
-    fakeUuid = Object.assign(fakeUuid, uuid);
+    fakeCrypto = Object.assign(fakeCrypto, crypto);
     isCustomTypeOverride = null;
     makeWritableStreamOverride = null;
     tableOverrides = {};
@@ -319,7 +319,7 @@ describe('BigQuery/Table', () => {
     it('should create a schema object from a string', () => {
       assert.deepStrictEqual(
         Table.createSchemaFromString_(SCHEMA_STRING),
-        SCHEMA_OBJECT
+        SCHEMA_OBJECT,
       );
     });
 
@@ -349,7 +349,7 @@ describe('BigQuery/Table', () => {
 
       const range = BigQuery.range(
         '[2020-10-01 12:00:00+08, 2020-12-31 12:00:00+08)',
-        'TIMESTAMP'
+        'TIMESTAMP',
       );
       assert.deepEqual(Table.encodeValue_(range), {
         start: '2020-10-01T04:00:00.000Z',
@@ -436,11 +436,11 @@ describe('BigQuery/Table', () => {
       assert.strictEqual(Table.encodeValue_(new Big('-123.456')), '-123.456');
       assert.strictEqual(
         Table.encodeValue_(new Big('99999999999999999999999999999.999999999')),
-        '99999999999999999999999999999.999999999'
+        '99999999999999999999999999999.999999999',
       );
       assert.strictEqual(
         Table.encodeValue_(new Big('-99999999999999999999999999999.999999999')),
-        '-99999999999999999999999999999.999999999'
+        '-99999999999999999999999999999.999999999',
       );
     });
 
@@ -543,7 +543,7 @@ describe('BigQuery/Table', () => {
       table.createCopyJob = (
         destination: {},
         metadata: {},
-        callback: Function
+        callback: Function,
       ) => {
         callback(null, fakeJob);
       };
@@ -581,7 +581,7 @@ describe('BigQuery/Table', () => {
       table.createCopyJob = (
         destination: {},
         metadata: {},
-        callback: Function
+        callback: Function,
       ) => {
         callback(error, null, response);
       };
@@ -626,7 +626,7 @@ describe('BigQuery/Table', () => {
       table.createCopyFromJob = (
         sourceTables: {},
         metadata: {},
-        callback: Function
+        callback: Function,
       ) => {
         callback(null, fakeJob);
       };
@@ -661,7 +661,7 @@ describe('BigQuery/Table', () => {
       table.createCopyFromJob = (
         sourceTables: {},
         metadata: {},
-        callback: Function
+        callback: Function,
       ) => {
         callback(error, null, response);
       };
@@ -707,17 +707,17 @@ describe('BigQuery/Table', () => {
     it('should throw if a destination is not a Table', async () => {
       await assert.rejects(
         async () => table.createCopyJob(),
-        /Destination must be a Table/
+        /Destination must be a Table/,
       );
 
       await assert.rejects(
         async () => table.createCopyJob({}),
-        /Destination must be a Table/
+        /Destination must be a Table/,
       );
 
       await assert.rejects(
         async () => table.createCopyJob(() => {}),
-        /Destination must be a Table/
+        /Destination must be a Table/,
       );
     });
 
@@ -759,7 +759,7 @@ describe('BigQuery/Table', () => {
         assert.strictEqual(
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (reqOpts.configuration!.copy as any).jobPrefix,
-          undefined
+          undefined,
         );
         callback(); // the done fn
       };
@@ -786,7 +786,7 @@ describe('BigQuery/Table', () => {
         assert.strictEqual(
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (reqOpts.configuration!.copy as any).jobId,
-          undefined
+          undefined,
         );
         callback(); // the done fn
       };
@@ -823,22 +823,22 @@ describe('BigQuery/Table', () => {
     it('should throw if a source is not a Table', async () => {
       await assert.rejects(
         async () => table.createCopyFromJob(['table']),
-        /Source must be a Table/
+        /Source must be a Table/,
       );
 
       await assert.rejects(
         async () => table.createCopyFromJob([SOURCE_TABLE, 'table']),
-        /Source must be a Table/
+        /Source must be a Table/,
       );
 
       await assert.rejects(
         async () => table.createCopyFromJob({}),
-        /Source must be a Table/
+        /Source must be a Table/,
       );
 
       await assert.rejects(
         async () => table.createCopyFromJob(() => {}),
-        /Source must be a Table/
+        /Source must be a Table/,
       );
     });
 
@@ -903,7 +903,7 @@ describe('BigQuery/Table', () => {
         assert.strictEqual(
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (reqOpts.configuration!.copy as any).jobPrefix,
-          undefined
+          undefined,
         );
         callback(); // the done fn
       };
@@ -930,7 +930,7 @@ describe('BigQuery/Table', () => {
         assert.strictEqual(
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (reqOpts.configuration!.copy as any).jobId,
-          undefined
+          undefined,
         );
         callback(); // the done fn
       };
@@ -1045,7 +1045,7 @@ describe('BigQuery/Table', () => {
           const extract = reqOpts.configuration!.extract!;
           assert.strictEqual(
             extract.destinationFormat,
-            'NEWLINE_DELIMITED_JSON'
+            'NEWLINE_DELIMITED_JSON',
           );
           done();
         };
@@ -1093,7 +1093,7 @@ describe('BigQuery/Table', () => {
         table.createExtractJob(
           FILE,
           {format: 'export_metadata'},
-          assert.ifError
+          assert.ifError,
         );
       });
     });
@@ -1101,7 +1101,7 @@ describe('BigQuery/Table', () => {
       table.bigQuery.createJob = (reqOpts: JobOptions) => {
         assert.deepStrictEqual(
           reqOpts.configuration!.extract!.destinationUris,
-          ['gs://' + FILE.bucket.name + '/' + FILE.name]
+          ['gs://' + FILE.bucket.name + '/' + FILE.name],
         );
         done();
       };
@@ -1168,7 +1168,7 @@ describe('BigQuery/Table', () => {
         assert.strictEqual(
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (reqOpts.configuration!.extract as any).gzip,
-          undefined
+          undefined,
         );
         done();
       };
@@ -1187,7 +1187,7 @@ describe('BigQuery/Table', () => {
         assert.strictEqual(
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (reqOpts.configuration!.extract as any).jobPrefix,
-          undefined
+          undefined,
         );
         callback(); // the done fn
       };
@@ -1215,7 +1215,7 @@ describe('BigQuery/Table', () => {
         assert.strictEqual(
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (reqOpts.configuration!.extract as any).jobId,
-          undefined
+          undefined,
         );
         callback(); // the done fn
       };
@@ -1353,7 +1353,7 @@ describe('BigQuery/Table', () => {
       };
       await assert.rejects(
         async () => table.createLoadJob({}),
-        /Source must be a File object/
+        /Source must be a File object/,
       );
     });
 
@@ -1367,7 +1367,7 @@ describe('BigQuery/Table', () => {
               sourceUris: ['gs://' + FILE.bucket.name + '/' + FILE.name],
             },
           },
-        })
+        }),
       );
     });
 
@@ -1381,7 +1381,7 @@ describe('BigQuery/Table', () => {
               sourceFormat: 'NEWLINE_DELIMITED_JSON',
             },
           },
-        })
+        }),
       );
     });
 
@@ -1395,7 +1395,7 @@ describe('BigQuery/Table', () => {
               sourceFormat: 'AVRO',
             },
           },
-        })
+        }),
       );
     });
 
@@ -1421,7 +1421,7 @@ describe('BigQuery/Table', () => {
               jobPrefix: undefined,
             },
           },
-        })
+        }),
       );
     });
 
@@ -1443,7 +1443,7 @@ describe('BigQuery/Table', () => {
               jobId: undefined,
             },
           },
-        })
+        }),
       );
     });
 
@@ -1458,7 +1458,7 @@ describe('BigQuery/Table', () => {
                 sourceFormat: 'CSV',
               },
             },
-          })
+          }),
         );
       });
 
@@ -1472,7 +1472,7 @@ describe('BigQuery/Table', () => {
                 sourceFormat: 'NEWLINE_DELIMITED_JSON',
               },
             },
-          })
+          }),
         );
       });
 
@@ -1486,7 +1486,7 @@ describe('BigQuery/Table', () => {
                 sourceFormat: 'AVRO',
               },
             },
-          })
+          }),
         );
       });
 
@@ -1500,7 +1500,7 @@ describe('BigQuery/Table', () => {
                 sourceFormat: 'DATASTORE_BACKUP',
               },
             },
-          })
+          }),
         );
       });
     });
@@ -1548,7 +1548,7 @@ describe('BigQuery/Table', () => {
       it('should accept export_metadata', done => {
         makeWritableStreamOverride = (
           stream: stream.Stream,
-          options: MakeWritableStreamOptions
+          options: MakeWritableStreamOptions,
         ) => {
           const load = options.metadata.configuration!.load!;
           assert.strictEqual(load.sourceFormat, 'DATASTORE_BACKUP');
@@ -1561,7 +1561,7 @@ describe('BigQuery/Table', () => {
       it('should accept csv', done => {
         makeWritableStreamOverride = (
           stream: stream.Stream,
-          options: MakeWritableStreamOptions
+          options: MakeWritableStreamOptions,
         ) => {
           const load = options.metadata.configuration!.load!;
           assert.strictEqual(load.sourceFormat, 'CSV');
@@ -1574,7 +1574,7 @@ describe('BigQuery/Table', () => {
       it('should accept json', done => {
         makeWritableStreamOverride = (
           stream: stream.Stream,
-          options: MakeWritableStreamOptions
+          options: MakeWritableStreamOptions,
         ) => {
           const load = options.metadata.configuration!.load!;
           assert.strictEqual(load.sourceFormat, 'NEWLINE_DELIMITED_JSON');
@@ -1587,7 +1587,7 @@ describe('BigQuery/Table', () => {
       it('should accept avro', done => {
         makeWritableStreamOverride = (
           stream: stream.Stream,
-          options: MakeWritableStreamOptions
+          options: MakeWritableStreamOptions,
         ) => {
           const load = options.metadata.configuration!.load!;
           assert.strictEqual(load.sourceFormat, 'AVRO');
@@ -1600,7 +1600,7 @@ describe('BigQuery/Table', () => {
       it('should accept export_metadata', done => {
         makeWritableStreamOverride = (
           stream: stream.Stream,
-          options: MakeWritableStreamOptions
+          options: MakeWritableStreamOptions,
         ) => {
           const load = options.metadata.configuration!.load!;
           assert.strictEqual(load.sourceFormat, 'DATASTORE_BACKUP');
@@ -1620,7 +1620,7 @@ describe('BigQuery/Table', () => {
 
       makeWritableStreamOverride = (
         stream: stream.Stream,
-        options: MakeWritableStreamOptions
+        options: MakeWritableStreamOptions,
       ) => {
         const load = options.metadata.configuration!.load!;
         assert.deepStrictEqual(load.schema, expectedSchema);
@@ -1640,11 +1640,11 @@ describe('BigQuery/Table', () => {
       };
       makeWritableStreamOverride = (
         stream: stream.Stream,
-        options: MakeWritableStreamOptions
+        options: MakeWritableStreamOptions,
       ) => {
         assert.deepStrictEqual(
           options.metadata.configuration?.load?.destinationTable,
-          expectedMetadata.destinationTable
+          expectedMetadata.destinationTable,
         );
         done();
       };
@@ -1670,8 +1670,10 @@ describe('BigQuery/Table', () => {
 
       beforeEach(() => {
         fakeJob = new EventEmitter();
-        fakeJobId = uuid.v4();
-        sandbox.stub(fakeUuid, 'v4').returns(fakeJobId);
+        fakeJobId = crypto.randomUUID();
+        sandbox
+          .stub(fakeCrypto, 'randomUUID')
+          .returns(fakeJobId as crypto.UUID);
       });
 
       it('should make a writable stream when written to', done => {
@@ -1686,7 +1688,7 @@ describe('BigQuery/Table', () => {
       it('should pass extended metadata', done => {
         makeWritableStreamOverride = (
           stream: stream.Stream,
-          options: MakeWritableStreamOptions
+          options: MakeWritableStreamOptions,
         ) => {
           assert.deepStrictEqual(options.metadata, {
             configuration: {
@@ -1715,7 +1717,7 @@ describe('BigQuery/Table', () => {
       it('should pass the correct request uri', done => {
         makeWritableStreamOverride = (
           stream: stream.Stream,
-          options: MakeWritableStreamOptions
+          options: MakeWritableStreamOptions,
         ) => {
           const uri =
             table.bigQuery.apiEndpoint +
@@ -1735,7 +1737,7 @@ describe('BigQuery/Table', () => {
 
         makeWritableStreamOverride = (
           stream: stream.Stream,
-          options: MakeWritableStreamOptions
+          options: MakeWritableStreamOptions,
         ) => {
           const jobId = options.metadata.jobReference!.jobId;
           assert.strictEqual(jobId, expectedJobId);
@@ -1755,7 +1757,7 @@ describe('BigQuery/Table', () => {
 
         makeWritableStreamOverride = (
           stream: stream.Stream,
-          options: MakeWritableStreamOptions
+          options: MakeWritableStreamOptions,
         ) => {
           const location = options.metadata.jobReference!.location;
           assert.strictEqual(location, LOCATION);
@@ -1772,7 +1774,7 @@ describe('BigQuery/Table', () => {
 
         makeWritableStreamOverride = (
           stream: stream.Stream,
-          options: MakeWritableStreamOptions
+          options: MakeWritableStreamOptions,
         ) => {
           const jobReference = options.metadata.jobReference!;
           assert.strictEqual(jobReference.jobId, jobId);
@@ -1810,7 +1812,7 @@ describe('BigQuery/Table', () => {
         makeWritableStreamOverride = (
           stream: {},
           options: {},
-          callback: Function
+          callback: Function,
         ) => {
           callback(metadata);
         };
@@ -1906,7 +1908,7 @@ describe('BigQuery/Table', () => {
       table.createExtractJob = (
         destination: {},
         metadata: {},
-        callback: Function
+        callback: Function,
       ) => {
         callback(null, fakeJob);
       };
@@ -1941,7 +1943,7 @@ describe('BigQuery/Table', () => {
       table.createExtractJob = (
         destination: {},
         metadata: {},
-        callback: Function
+        callback: Function,
       ) => {
         callback(error, null, response);
       };
@@ -2079,7 +2081,7 @@ describe('BigQuery/Table', () => {
           err: Error,
           rows: {},
           nextQuery: {},
-          apiResponse_: {}
+          apiResponse_: {},
         ) {
           assert.strictEqual(err, error);
           assert.strictEqual(rows, null);
@@ -2267,7 +2269,7 @@ describe('BigQuery/Table', () => {
       for (const [i, call] of callSequence.entries()) {
         table.request = (
           reqOpts: DecorateRequestOptions,
-          callback: Function
+          callback: Function,
         ) => {
           callback(null, {rows: call.rows});
         };
@@ -2279,7 +2281,7 @@ describe('BigQuery/Table', () => {
             if (i === callSequence.length - 1) {
               done();
             }
-          }
+          },
         );
       }
     });
@@ -2455,7 +2457,9 @@ describe('BigQuery/Table', () => {
     beforeEach(() => {
       insertSpy = sinon.spy(table, '_insert');
       requestStub = sinon.stub(table, 'request').resolves([{}]);
-      sandbox.stub(fakeUuid, 'v4').returns(fakeInsertId);
+      sandbox
+        .stub(fakeCrypto, 'randomUUID')
+        .returns(fakeInsertId as crypto.UUID);
     });
 
     afterEach(() => {
@@ -2491,7 +2495,7 @@ describe('BigQuery/Table', () => {
     it('should throw an error if rows is empty', async () => {
       await assert.rejects(
         async () => table.insert([]),
-        /You must provide at least 1 row to be inserted/
+        /You must provide at least 1 row to be inserted/,
       );
     });
 
@@ -2502,7 +2506,7 @@ describe('BigQuery/Table', () => {
           method: 'POST',
           uri: '/insertAll',
           json: dataApiFormat,
-        })
+        }),
       );
     });
 
@@ -2520,8 +2524,8 @@ describe('BigQuery/Table', () => {
       await table.insert([data[0]]);
       assert(
         requestStub.calledOnceWith(
-          sinon.match.hasNested('json.rows[0].insertId', fakeInsertId)
-        )
+          sinon.match.hasNested('json.rows[0].insertId', fakeInsertId),
+        ),
       );
     });
 
@@ -2532,8 +2536,8 @@ describe('BigQuery/Table', () => {
         requestStub.calledWithMatch(
           ({json}: DecorateRequestOptions) =>
             json.rows[0].insertId === undefined &&
-            json.createInsertId === undefined
-        )
+            json.createInsertId === undefined,
+        ),
       );
     });
 
@@ -2607,7 +2611,7 @@ describe('BigQuery/Table', () => {
       ]);
 
       const reflection = await reflectAfterTimer(() =>
-        table.insert(data, OPTIONS)
+        table.insert(data, OPTIONS),
       );
       assert(reflection.isRejected);
       assert.strictEqual(insertSpy.callCount, 4);
@@ -2629,7 +2633,7 @@ describe('BigQuery/Table', () => {
       ]);
 
       const reflection = await reflectAfterTimer(() =>
-        table.insert(data, {...OPTIONS, partialRetries})
+        table.insert(data, {...OPTIONS, partialRetries}),
       );
       assert(reflection.isRejected);
       assert.strictEqual(insertSpy.callCount, partialRetries + 1);
@@ -2650,7 +2654,7 @@ describe('BigQuery/Table', () => {
       ]);
 
       const reflection = await reflectAfterTimer(() =>
-        table.insert(data, {...OPTIONS, partialRetries: 0})
+        table.insert(data, {...OPTIONS, partialRetries: 0}),
       );
       assert(reflection.isRejected);
       assert.strictEqual(insertSpy.callCount, 1);
@@ -2671,7 +2675,7 @@ describe('BigQuery/Table', () => {
       ]);
 
       const reflection = await reflectAfterTimer(() =>
-        table.insert(data, {...OPTIONS, partialRetries: -1})
+        table.insert(data, {...OPTIONS, partialRetries: -1}),
       );
       assert(reflection.isRejected);
       assert.strictEqual(insertSpy.callCount, 1);
@@ -2714,29 +2718,29 @@ describe('BigQuery/Table', () => {
       requestStub.onCall(3).resolves(goodResponse);
 
       const reflection = await reflectAfterTimer(() =>
-        table.insert(data, OPTIONS)
+        table.insert(data, OPTIONS),
       );
       assert(reflection.isFulfilled);
 
       assert.deepStrictEqual(
         requestStub.getCall(0).args[0].json,
         dataApiFormat,
-        'first call: try all 5'
+        'first call: try all 5',
       );
       assert.deepStrictEqual(
         requestStub.getCall(1).args[0].json,
         {rows: dataApiFormat.rows.slice(0, 4)},
-        'second call: previous failures were 4/5'
+        'second call: previous failures were 4/5',
       );
       assert.deepStrictEqual(
         requestStub.getCall(2).args[0].json,
         {rows: dataApiFormat.rows.slice(0, 3)},
-        'third call: previous failures were 3/5'
+        'third call: previous failures were 3/5',
       );
       assert.deepStrictEqual(
         requestStub.getCall(3).args[0].json,
         {rows: dataApiFormat.rows.slice(1, 3)},
-        'fourth call: previous failures were 2/5'
+        'fourth call: previous failures were 2/5',
       );
       assert(!requestStub.getCall(4), 'fifth call: should not have happened');
       assert.ok(reflection.value);
@@ -2769,7 +2773,7 @@ describe('BigQuery/Table', () => {
 
       assert.strictEqual(
         reqOpts.json.ignoreUnknownValues,
-        opts.ignoreUnknownValues
+        opts.ignoreUnknownValues,
       );
       assert.strictEqual(reqOpts.json.skipInvalidRows, opts.skipInvalidRows);
       assert.strictEqual(reqOpts.json.templateSuffix, opts.templateSuffix);
@@ -2800,13 +2804,13 @@ describe('BigQuery/Table', () => {
         assert(requestStub.calledOnce);
         assert.strictEqual(
           requestStub.firstCall.lastArg.json.schema,
-          undefined
+          undefined,
         );
       });
 
       it('should attempt to create table if not created', async () => {
         const reflection = await reflectAfterTimer(() =>
-          table.insert(data, OPTIONS)
+          table.insert(data, OPTIONS),
         );
         assert(reflection.isFulfilled);
         assert(createStub.calledOnce);
@@ -2820,7 +2824,7 @@ describe('BigQuery/Table', () => {
         const firstCheckDelay = 50000;
         const remainingCheckDelay = expectedDelay - firstCheckDelay;
 
-        pReflect(table.insert(data, OPTIONS)); // gracefully handle async errors
+        void pReflect(table.insert(data, OPTIONS)); // gracefully handle async errors
         assert(insertCreateSpy.calledOnce); // just called `insert`, that's 1 so far
 
         await clock.tickAsync(firstCheckDelay); // first 50s
@@ -2835,7 +2839,7 @@ describe('BigQuery/Table', () => {
         await clock.runAllAsync(); // for good measure
         assert(
           insertCreateSpy.calledTwice,
-          'should not have called insert again'
+          'should not have called insert again',
         );
       });
 
@@ -2844,7 +2848,7 @@ describe('BigQuery/Table', () => {
         createStub.rejects(error);
 
         const reflection = await reflectAfterTimer(() =>
-          table.insert(data, OPTIONS)
+          table.insert(data, OPTIONS),
         );
         assert(reflection.isRejected);
         assert.strictEqual(reflection.reason, error);
@@ -2854,7 +2858,7 @@ describe('BigQuery/Table', () => {
         createStub.rejects({code: 409});
 
         const reflection = await reflectAfterTimer(() =>
-          table.insert(data, OPTIONS)
+          table.insert(data, OPTIONS),
         );
         assert(reflection.isFulfilled);
         assert(createStub.calledOnce);
@@ -2872,7 +2876,7 @@ describe('BigQuery/Table', () => {
         requestStub.onThirdCall().resolves(goodResponse);
 
         const reflection = await reflectAfterTimer(() =>
-          table.insert(data, OPTIONS)
+          table.insert(data, OPTIONS),
         );
         assert(reflection.isFulfilled);
         assert(requestStub.calledThrice);
@@ -2881,7 +2885,7 @@ describe('BigQuery/Table', () => {
             method: 'POST',
             uri: '/insertAll',
             json: dataApiFormat,
-          })
+          }),
         );
         assert.deepStrictEqual(reflection.value, goodResponse);
       });
@@ -2984,7 +2988,7 @@ describe('BigQuery/Table', () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (FakeServiceObject.prototype as any).setMetadata = function (
         metadata: {},
-        callback: Function
+        callback: Function,
       ) {
         assert.strictEqual(this, table);
         assert.strictEqual(metadata, formattedMetadata);

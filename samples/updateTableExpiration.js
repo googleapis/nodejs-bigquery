@@ -17,7 +17,7 @@
 function main(
   datasetId = 'my_dataset', // Existing dataset
   tableId = 'my_table', // Existing table
-  expirationTime = Date.now() + 1000 * 60 * 60 * 24 * 5 // 5 days from current time in ms
+  expirationTime = Date.now() + 1000 * 60 * 60 * 24 * 5, // 5 days from current time in ms
 ) {
   // [START bigquery_update_table_expiration]
   // Import the Google Cloud client library

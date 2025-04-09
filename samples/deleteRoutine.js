@@ -16,7 +16,7 @@
 
 function main(
   datasetId = 'my_dataset', // Existing dataset
-  routineId = 'my_routine' // Routine to be deleted
+  routineId = 'my_routine', // Routine to be deleted
 ) {
   // [START bigquery_delete_routine]
   // Import the Google Cloud client library and create a client

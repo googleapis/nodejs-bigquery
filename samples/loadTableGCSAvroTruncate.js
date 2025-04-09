@@ -16,7 +16,7 @@
 
 function main(
   datasetId = 'my_dataset', // Existing dataset ID
-  tableId = 'us_states' // Existing table ID
+  tableId = 'us_states', // Existing table ID
 ) {
   // [START bigquery_load_table_gcs_avro_truncate]
   // Import the Google Cloud client libraries
@@ -64,7 +64,7 @@ function main(
     // load() waits for the job to finish
     console.log(`Job ${job.id} completed.`);
     console.log(
-      `Write disposition used: ${job.configuration.load.writeDisposition}.`
+      `Write disposition used: ${job.configuration.load.writeDisposition}.`,
     );
   }
   // [END bigquery_load_table_gcs_avro_truncate]
