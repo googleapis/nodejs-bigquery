@@ -2824,7 +2824,7 @@ describe('BigQuery/Table', () => {
         const firstCheckDelay = 50000;
         const remainingCheckDelay = expectedDelay - firstCheckDelay;
 
-        pReflect(table.insert(data, OPTIONS)); // gracefully handle async errors
+        void pReflect(table.insert(data, OPTIONS)); // gracefully handle async errors
         assert(insertCreateSpy.calledOnce); // just called `insert`, that's 1 so far
 
         await clock.tickAsync(firstCheckDelay); // first 50s

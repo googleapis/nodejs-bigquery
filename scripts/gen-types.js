@@ -58,6 +58,7 @@ function overridedRender() {
   return prettier.format(fullSource, {
     parser: 'typescript',
     singleQuote: true,
+    bracketSpacing: false,
   });
 }
 

@@ -54,7 +54,7 @@ import {GoogleErrorBody} from '@google-cloud/common/build/src/util';
 import {Duplex, Writable} from 'stream';
 import {JobMetadata} from './job';
 import bigquery from './types';
-import {BigQueryRange, IntegerTypeCastOptions} from './bigquery';
+import {IntegerTypeCastOptions} from './bigquery';
 import {RowQueue} from './rowQueue';
 
 // This is supposed to be a @google-cloud/storage `File` type. The storage npm
@@ -1551,11 +1551,15 @@ class Table extends ServiceObject {
           },
         },
         (data: bigquery.IJob) => {
-          const job = this.bigQuery.job(data.jobReference?.jobId!, {
-            location: data.jobReference?.location,
-            projectId: data.jobReference?.projectId,
-          });
-          job.metadata = data;
+          let job: Job | null = null;
+          const jobRef = data.jobReference;
+          if (jobRef && jobRef.jobId) {
+            job = this.bigQuery.job(jobRef.jobId, {
+              location: jobRef.location,
+              projectId: jobRef.projectId,
+            });
+            job.metadata = data;
+          }
           dup.emit('job', job);
         },
       );
@@ -1875,7 +1879,7 @@ class Table extends ServiceObject {
 
         if (resp.rows && resp.rows.length > 0 && !this.metadata.schema) {
           // We don't know the schema for this table yet. Do a quick stat.
-          this.getMetadata(
+          void this.getMetadata(
             (err: Error, metadata: Metadata, apiResponse: bigquery.ITable) => {
               if (err) {
                 onComplete(err, null, null, apiResponse!);
@@ -2439,7 +2443,7 @@ class Table extends ServiceObject {
     callback?: ResponseCallback,
   ): void | Promise<SetMetadataResponse> {
     const body = Table.formatMetadata_(metadata as TableMetadata);
-    super.setMetadata(body, callback!);
+    void super.setMetadata(body, callback!);
   }
 
   /**

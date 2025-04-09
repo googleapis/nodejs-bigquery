@@ -299,15 +299,17 @@ class Routine extends ServiceObject {
   ): void | Promise<SetMetadataResponse> {
     // per the python client, it would appear that in order to update a routine
     // you need to send the routine in its entirety, not just the updated fields
-    this.getMetadata((err: Error | null, fullMetadata: RoutineMetadata) => {
-      if (err) {
-        callback!(err);
-        return;
-      }
+    void this.getMetadata(
+      (err: Error | null, fullMetadata: RoutineMetadata) => {
+        if (err) {
+          callback!(err);
+          return;
+        }
 
-      const updatedMetadata = extend(true, {}, fullMetadata, metadata);
-      super.setMetadata(updatedMetadata, callback!);
-    });
+        const updatedMetadata = extend(true, {}, fullMetadata, metadata);
+        void super.setMetadata(updatedMetadata, callback!);
+      },
+    );
   }
 }
 

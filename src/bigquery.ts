@@ -2215,7 +2215,7 @@ export class BigQuery extends Service {
       return;
     }
 
-    this.runJobsQuery(queryReq, (err, job, res) => {
+    void this.runJobsQuery(queryReq, (err, job, res) => {
       this.trace_('[runJobsQuery callback]: ', query, err, job, res);
       if (err) {
         (callback as SimpleQueryRowsCallback)(err, null, job);

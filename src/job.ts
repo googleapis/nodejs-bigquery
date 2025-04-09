@@ -654,7 +654,7 @@ class Job extends Operation {
    * @param {function} callback
    */
   poll_(callback: MetadataCallback): void {
-    this.getMetadata((err: Error, metadata: Metadata) => {
+    void this.getMetadata((err: Error, metadata: Metadata) => {
       if (!err && metadata.status && metadata.status.errorResult) {
         err = new util.ApiError(metadata.status);
       }
