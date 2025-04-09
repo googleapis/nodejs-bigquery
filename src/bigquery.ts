@@ -98,12 +98,6 @@ export type QueryRowsCallback = PagedCallback<
   QueryResultsResponse
 >;
 
-export type SimpleQueryRowsResponse = [RowMetadata[], bigquery.IJob];
-export type SimpleQueryRowsCallback = ResourceCallback<
-  RowMetadata[],
-  bigquery.IJob
->;
-
 export type Query = JobRequest<bigquery.IJobConfigurationQuery> & {
   destination?: Table;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -2160,28 +2154,24 @@ export class BigQuery extends Service {
    * });
    * ```
    */
-  query(query: string, options?: QueryOptions): Promise<QueryRowsResponse>;
-  query(query: Query, options?: QueryOptions): Promise<SimpleQueryRowsResponse>;
   query(
-    query: string,
+    query: Query | string,
+    options?: QueryOptions
+  ): Promise<QueryRowsResponse>;
+  query(
+    query: Query | string,
+    callback?: QueryRowsCallback
+  ): Promise<QueryRowsResponse>;
+  query(
+    query: Query | string,
     options: QueryOptions,
     callback?: QueryRowsCallback
   ): void;
   query(
-    query: Query,
-    options: QueryOptions,
-    callback?: SimpleQueryRowsCallback
-  ): void;
-  query(query: string, callback?: QueryRowsCallback): void;
-  query(query: Query, callback?: SimpleQueryRowsCallback): void;
-  query(
-    query: string | Query,
-    optionsOrCallback?:
-      | QueryOptions
-      | SimpleQueryRowsCallback
-      | QueryRowsCallback,
-    cb?: SimpleQueryRowsCallback | QueryRowsCallback
-  ): void | Promise<SimpleQueryRowsResponse> | Promise<QueryRowsResponse> {
+    query: Query | string,
+    optionsOrCallback?: QueryOptions | QueryRowsCallback,
+    cb?: QueryRowsCallback
+  ): void | Promise<QueryRowsResponse> {
     let options =
       typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
     const queryOpts =
@@ -2200,11 +2190,11 @@ export class BigQuery extends Service {
     if (!queryReq) {
       this.createQueryJob(query, (err, job, resp) => {
         if (err) {
-          (callback as SimpleQueryRowsCallback)(err, null, resp);
+          callback && callback(err, null, null, resp);
           return;
         }
         if (typeof query === 'object' && query.dryRun) {
-          (callback as SimpleQueryRowsCallback)(null, [], resp);
+          callback && callback(null, [], null, resp);
           return;
         }
         // The Job is important for the `queryAsStream_` method, so a new query
@@ -2218,7 +2208,7 @@ export class BigQuery extends Service {
     this.runJobsQuery(queryReq, (err, job, res) => {
       this.trace_('[runJobsQuery callback]: ', query, err, job, res);
       if (err) {
-        (callback as SimpleQueryRowsCallback)(err, null, job);
+        (callback as QueryRowsCallback)(err, null, job);
         return;
       }
 
@@ -2249,7 +2239,7 @@ export class BigQuery extends Service {
         const err = new Error(
           `The query did not complete before ${queryReq.timeoutMs}ms`
         );
-        (callback as SimpleQueryRowsCallback)(err, null, job);
+        callback && callback(err, null, job);
         return;
       }
       delete options.timeoutMs;
@@ -2381,9 +2371,9 @@ export class BigQuery extends Service {
    *
    * @private
    */
-  queryAsStream_(query: Query, callback?: SimpleQueryRowsCallback) {
+  queryAsStream_(query: Query, callback?: QueryRowsCallback) {
     if (query.job) {
-      query.job.getQueryResults(query, callback as QueryRowsCallback);
+      query.job.getQueryResults(query, callback);
       return;
     }
 
