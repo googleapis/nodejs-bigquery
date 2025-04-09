@@ -535,8 +535,8 @@ export class BigQueryClient {
     }
 
     if (callback === undefined) {
-      // we need a helper function because we can't make this an async function
-      // without causing typing problems
+      // we need a helper function because we can't make deleteDataset an async function
+      // without causing awful typing problems
       return this.deleteDatasetHelperAsync(request, options);
     }
 
@@ -551,11 +551,14 @@ export class BigQueryClient {
       })
       .catch((error: any) => {
         if (error.message === 'Unexpected end of JSON input') {
-          // Gax considers a null, non error response from the service to be a problem
-          // it is for all services that aren't BQ
+          // BQ behaves unusually and doesn't return what we expect
+          // for a successful delete call - this is a workaround to prevent
+          // an erroneous error from reaching the user and to
+          // simulate what a response would be in other GAPICs
+          // See this PR for more info
           // https://github.com/googleapis/gax-nodejs/pull/1681
+
           const empty = protos.google.protobuf.Empty.fromObject({});
-          // "normal" responses would be empty - simulate that to prevent an error
           callback!(null, [empty, null, null]);
           return;
         }
@@ -578,10 +581,13 @@ export class BigQueryClient {
       return response;
     } catch (error: any) {
       if (error.message === 'Unexpected end of JSON input') {
-        // Gax considers a null, non error response from the service to be a problem
-        // it is for all services that aren't BQ
+        // BQ behaves unusually and doesn't return what we expect
+        // for a successful delete call - this is a workaround to prevent
+        // an erroneous error from reaching the user and to
+        // simulate what a response would be in other GAPICs
+        // See this PR for more info
         // https://github.com/googleapis/gax-nodejs/pull/1681
-        // "normal" responses would be an empty JSON - simulate that to prevent an error
+
         const empty = protos.google.protobuf.Empty.fromObject({});
         return [empty, undefined, undefined];
       }
@@ -1125,8 +1131,8 @@ export class BigQueryClient {
     }
 
     if (callback === undefined) {
-      // we need a helper function because we can't make this an async function
-      // without causing typing problems
+      // we need a helper function because we can't make deleteTable an async function
+      // without causing awful typing problems
       return this.deleteTableHelperAsync(request, options);
     }
 
@@ -1141,11 +1147,14 @@ export class BigQueryClient {
       })
       .catch((error: any) => {
         if (error.message === 'Unexpected end of JSON input') {
-          // Gax considers a null, non error response from the service to be a problem
-          // it is for all services that aren't BQ
+          // BQ behaves unusually and doesn't return what we expect
+          // for a successful delete call - this is a workaround to prevent
+          // an erroneous error from reaching the user and to
+          // simulate what a response would be in other GAPICs
+          // See this PR for more info
           // https://github.com/googleapis/gax-nodejs/pull/1681
+
           const empty = protos.google.protobuf.Empty.fromObject({});
-          // "normal" responses would be empty - simulate that to prevent an error
           callback!(null, [empty, null, null]);
           return;
         }
@@ -1168,10 +1177,13 @@ export class BigQueryClient {
       return response;
     } catch (error: any) {
       if (error.message === 'Unexpected end of JSON input') {
-        // Gax considers a null, non error response from the service to be a problem
-        // it is for all services that aren't BQ
+        // BQ behaves unusually and doesn't return what we expect
+        // for a successful delete call - this is a workaround to prevent
+        // an erroneous error from reaching the user and to
+        // simulate what a response would be in other GAPICs
+        // See this PR for more info
         // https://github.com/googleapis/gax-nodejs/pull/1681
-        // "normal" responses would be an empty JSON - simulate that to prevent an error
+
         const empty = protos.google.protobuf.Empty.fromObject({});
         return [empty, undefined, undefined];
       }
@@ -1570,8 +1582,8 @@ export class BigQueryClient {
     }
 
     if (callback === undefined) {
-      // we need a helper function because we can't make this an async function
-      // without causing typing problems
+      // we need a helper function because we can't make deleteJob an async function
+      // without causing awful typing problems
       return this.deleteJobHelperAsync(request, options);
     }
 
@@ -1586,11 +1598,14 @@ export class BigQueryClient {
       })
       .catch((error: any) => {
         if (error.message === 'Unexpected end of JSON input') {
-          // Gax considers a null, non error response from the service to be a problem
-          // it is for all services that aren't BQ
+          // BQ behaves unusually and doesn't return what we expect
+          // for a successful delete call - this is a workaround to prevent
+          // an erroneous error from reaching the user and to
+          // simulate what a response would be in other GAPICs
+          // See this PR for more info
           // https://github.com/googleapis/gax-nodejs/pull/1681
+
           const empty = protos.google.protobuf.Empty.fromObject({});
-          // "normal" responses would be empty - simulate that to prevent an error
           callback!(null, [empty, null, null]);
           return;
         }
@@ -1613,10 +1628,13 @@ export class BigQueryClient {
       return response;
     } catch (error: any) {
       if (error.message === 'Unexpected end of JSON input') {
-        // Gax considers a null, non error response from the service to be a problem
-        // it is for all services that aren't BQ
+        // BQ behaves unusually and doesn't return what we expect
+        // for a successful delete call - this is a workaround to prevent
+        // an erroneous error from reaching the user and to
+        // simulate what a response would be in other GAPICs
+        // See this PR for more info
         // https://github.com/googleapis/gax-nodejs/pull/1681
-        // "normal" responses would be an empty JSON - simulate that to prevent an error
+
         const empty = protos.google.protobuf.Empty.fromObject({});
         return [empty, undefined, undefined];
       }
@@ -1969,8 +1987,8 @@ export class BigQueryClient {
     }
 
     if (callback === undefined) {
-      // we need a helper function because we can't make this an async function
-      // without causing typing problems
+      // we need a helper function because we can't make deleteModel an async function
+      // without causing awful typing problems
       return this.deleteModelHelperAsync(request, options);
     }
 
@@ -1985,11 +2003,14 @@ export class BigQueryClient {
       })
       .catch((error: any) => {
         if (error.message === 'Unexpected end of JSON input') {
-          // Gax considers a null, non error response from the service to be a problem
-          // it is for all services that aren't BQ
+          // BQ behaves unusually and doesn't return what we expect
+          // for a successful delete call - this is a workaround to prevent
+          // an erroneous error from reaching the user and to
+          // simulate what a response would be in other GAPICs
+          // See this PR for more info
           // https://github.com/googleapis/gax-nodejs/pull/1681
+
           const empty = protos.google.protobuf.Empty.fromObject({});
-          // "normal" responses would be empty - simulate that to prevent an error
           callback!(null, [empty, null, null]);
           return;
         }
@@ -2012,10 +2033,13 @@ export class BigQueryClient {
       return response;
     } catch (error: any) {
       if (error.message === 'Unexpected end of JSON input') {
-        // Gax considers a null, non error response from the service to be a problem
-        // it is for all services that aren't BQ
+        // BQ behaves unusually and doesn't return what we expect
+        // for a successful delete call - this is a workaround to prevent
+        // an erroneous error from reaching the user and to
+        // simulate what a response would be in other GAPICs
+        // See this PR for more info
         // https://github.com/googleapis/gax-nodejs/pull/1681
-        // "normal" responses would be an empty JSON - simulate that to prevent an error
+
         const empty = protos.google.protobuf.Empty.fromObject({});
         return [empty, undefined, undefined];
       }
@@ -2454,8 +2478,8 @@ export class BigQueryClient {
     }
 
     if (callback === undefined) {
-      // we need a helper function because we can't make this an async function
-      // without causing typing problems
+      // we need a helper function because we can't make deleteRoutine an async function
+      // without causing awful typing problems
       return this.deleteRoutineHelperAsync(request, options);
     }
 
@@ -2470,11 +2494,14 @@ export class BigQueryClient {
       })
       .catch((error: any) => {
         if (error.message === 'Unexpected end of JSON input') {
-          // Gax considers a null, non error response from the service to be a problem
-          // it is for all services that aren't BQ
+          // BQ behaves unusually and doesn't return what we expect
+          // for a successful delete call - this is a workaround to prevent
+          // an erroneous error from reaching the user and to
+          // simulate what a response would be in other GAPICs
+          // See this PR for more info
           // https://github.com/googleapis/gax-nodejs/pull/1681
+
           const empty = protos.google.protobuf.Empty.fromObject({});
-          // "normal" responses would be empty - simulate that to prevent an error
           callback!(null, [empty, null, null]);
           return;
         }
@@ -2497,10 +2524,13 @@ export class BigQueryClient {
       return response;
     } catch (error: any) {
       if (error.message === 'Unexpected end of JSON input') {
-        // Gax considers a null, non error response from the service to be a problem
-        // it is for all services that aren't BQ
+        // BQ behaves unusually and doesn't return what we expect
+        // for a successful delete call - this is a workaround to prevent
+        // an erroneous error from reaching the user and to
+        // simulate what a response would be in other GAPICs
+        // See this PR for more info
         // https://github.com/googleapis/gax-nodejs/pull/1681
-        // "normal" responses would be an empty JSON - simulate that to prevent an error
+
         const empty = protos.google.protobuf.Empty.fromObject({});
         return [empty, undefined, undefined];
       }
@@ -2851,8 +2881,8 @@ export class BigQueryClient {
     }
 
     if (callback === undefined) {
-      // we need a helper function because we can't make this an async function
-      // without causing typing problems
+      // we need a helper function because we can't make deleteRowAccessPolicy an async function
+      // without causing awful typing problems
       return this.deleteRowAccessPolicyHelperAsync(request, options);
     }
 
@@ -2867,11 +2897,14 @@ export class BigQueryClient {
       })
       .catch((error: any) => {
         if (error.message === 'Unexpected end of JSON input') {
-          // Gax considers a null, non error response from the service to be a problem
-          // it is for all services that aren't BQ
+          // BQ behaves unusually and doesn't return what we expect
+          // for a successful delete call - this is a workaround to prevent
+          // an erroneous error from reaching the user and to
+          // simulate what a response would be in other GAPICs
+          // See this PR for more info
           // https://github.com/googleapis/gax-nodejs/pull/1681
+
           const empty = protos.google.protobuf.Empty.fromObject({});
-          // "normal" responses would be empty - simulate that to prevent an error
           callback!(null, [empty, null, null]);
           return;
         }
@@ -2897,10 +2930,13 @@ export class BigQueryClient {
       return response;
     } catch (error: any) {
       if (error.message === 'Unexpected end of JSON input') {
-        // Gax considers a null, non error response from the service to be a problem
-        // it is for all services that aren't BQ
+        // BQ behaves unusually and doesn't return what we expect
+        // for a successful delete call - this is a workaround to prevent
+        // an erroneous error from reaching the user and to
+        // simulate what a response would be in other GAPICs
+        // See this PR for more info
         // https://github.com/googleapis/gax-nodejs/pull/1681
-        // "normal" responses would be an empty JSON - simulate that to prevent an error
+
         const empty = protos.google.protobuf.Empty.fromObject({});
         return [empty, undefined, undefined];
       }
@@ -3057,7 +3093,6 @@ export class BigQueryClient {
       options
     );
   }
-
   // Begin handwritten
   exampleMethod() {
     return 'BigQuery!';
