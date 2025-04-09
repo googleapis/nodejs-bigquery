@@ -150,6 +150,7 @@ function ast(file, client) {
     // create function name
     const functionName = `${escapedName}`;
     let isExcludedFunction = false;
+    let isDeleteFunction = functionName.startsWith('delete') ?? false
     for (const term of EXCLUDED_FUNCTION_TERMS) {
       if (functionName.search(term) >= 0) {
         isExcludedFunction = true;
@@ -164,12 +165,15 @@ function ast(file, client) {
       // add parameters - pull in their name, whether they're optional or not, and their type
       let parametersList = '';
       let argumentsList = '';
+      let parametersObj = {}
       for (let i = 0; i < node.parameters.length; i++) {
         const name = getEscapedText(node.parameters[i].name);
         const questionToken = node.parameters[i].questionToken ? '?' : '';
         const typeString = node.parameters[i].type?.getFullText();
         let parameter = `${name}${questionToken}: ${typeString}`;
-
+        // this object is used as part of constructing the helper function
+        // we create for deletes
+        parametersObj[name] = typeString
         parametersList = parametersList.concat(name);
         // this has to do with function overloading - we will later surface code
         // that does type checking for options and callback
@@ -191,10 +195,12 @@ function ast(file, client) {
       output = output.concat(`:${returnType}`);
 
       const clientName = parseClientName(client);
+      let asyncHelperFunction = ''
 
       // call underlying client function
       if (node.body) {
         let optionsOrCallback = '';
+        let returnStatement = '';
         if (functionName.endsWith('Stream')) {
           optionsOrCallback = `
           return this.${clientName}.${functionName}(request, options);}`;
@@ -215,14 +221,81 @@ function ast(file, client) {
               }
               else {
                   options = optionsOrCallback as CallOptions;
+              }`
+            if (isDeleteFunction){
+              //TODO - refactor into a helper function 
+              
+              const asyncHelperFunctionName = `${functionName}HelperAsync`
+              // return type for the overall function is a promise for the no callback case
+              // or void in the case of a callback; we only care about the promise type right now
+              const returnTypeNoVoid = returnType.split('| void')[0]
+              asyncHelperFunction = `
+              private async ${asyncHelperFunctionName}(request?: ${parametersObj['request']}, options?: CallOptions):${returnTypeNoVoid}{
+                try{
+                  const response = await this.${clientName}.${functionName}(request, options);
+                  return response;
+                }catch(error:any){
+                 if (error.message === "Unexpected end of JSON input"){
+                    // BQ behaves unusually and doesn't return what we expect
+                    // for a successful delete call - this is a workaround to prevent
+                    // an erroneous error from reaching the user and to 
+                    // simulate what a response would be in other GAPICs
+                    // See this PR for more info
+                    // https://github.com/googleapis/gax-nodejs/pull/1681
+                    const empty = protos.google.protobuf.Empty.fromObject({})
+                    return [empty, undefined, undefined];
+                    }
+                    throw error;
+                  }
+                }
+              `
+              const noCallbackReturn = `
+              // we need a helper function because we can't make ${functionName} an async function
+              // without causing awful typing problems
+              return this.${asyncHelperFunctionName}(request, options)`
+              const callbackReturn = `
+              this.${clientName}.${functionName}(request, options).then((response) => {
+                // because BigQuery delete calls don't return a response, this bit of code
+                // likely won't ever be hit, but it would be if
+                // the responses ever change to being properly formatted
+                callback!(null, response)
+                return
+              }).catch((error: any) => {
+                if (error.message === "Unexpected end of JSON input"){
+                  // BQ behaves unusually and doesn't return what we expect
+                  // for a successful delete call - this is a workaround to prevent
+                  // an erroneous error from reaching the user and to 
+                  // simulate what a response would be in other GAPICs
+                  // See this PR for more info
+                  // https://github.com/googleapis/gax-nodejs/pull/1681
+                  const empty = protos.google.protobuf.Empty.fromObject({})
+                  callback!(null, [empty, null, null]);
+                  return
+                }
+                  callback!(error)
+                  return
+              })`
+              returnStatement = `
+              if (callback === undefined){
+                ${noCallbackReturn}
               }
+                ${callbackReturn}
+              }`;            
+            }
+            else{
+              returnStatement = `
               if (callback === undefined){
                 return this.${clientName}.${functionName}(request, options);
               }
               return this.${clientName}.${functionName}(${argumentsList});
               }`;
+            }
+
         }
-        output = output.concat(`{\n${optionsOrCallback}\n`);
+        output = output.concat(`{\n${optionsOrCallback}\n${returnStatement}`);
+        if(isDeleteFunction){
+          output = output.concat(asyncHelperFunction)
+        }
       }
     }
   });

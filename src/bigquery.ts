@@ -221,6 +221,7 @@ export class BigQueryClient {
     } else {
       options = optionsOrCallback as CallOptions;
     }
+
     if (callback === undefined) {
       return this.datasetClient.getDataset(request, options);
     }
@@ -296,6 +297,7 @@ export class BigQueryClient {
     } else {
       options = optionsOrCallback as CallOptions;
     }
+
     if (callback === undefined) {
       return this.datasetClient.insertDataset(request, options);
     }
@@ -382,6 +384,7 @@ export class BigQueryClient {
     } else {
       options = optionsOrCallback as CallOptions;
     }
+
     if (callback === undefined) {
       return this.datasetClient.patchDataset(request, options);
     }
@@ -467,38 +470,13 @@ export class BigQueryClient {
     } else {
       options = optionsOrCallback as CallOptions;
     }
+
     if (callback === undefined) {
       return this.datasetClient.updateDataset(request, options);
     }
     return this.datasetClient.updateDataset(request, options, callback);
   }
 
-  async deleteDatasetHelper(request?: protos.google.cloud.bigquery.v2.IDeleteDatasetRequest,
-    options?: CallOptions
-  ): Promise<
-    [
-      protos.google.protobuf.IEmpty,
-      protos.google.cloud.bigquery.v2.IDeleteDatasetRequest | undefined,
-      {} | undefined,
-    ]
-  >{
-    try{
-      const response = await this.datasetClient.deleteDataset(request, options)
-      return response;
-    }
-    catch(error: any) {  
-     console.log("ERROR", error)
-     if (error.message === "Unexpected end of JSON input"){
-       // Gax considers a null, non error response from the service to be a problem
-       // it is for all services that aren't BQ 
-       // https://github.com/googleapis/gax-nodejs/pull/1681
-       // "normal" responses would be an empty JSON - simulate that to prevent an error
-       //@ts-ignore -- TODO FIX
-       return [{}, null, null]; // TODO - verify this is the gRPC and fallback response
-      }
-      throw error;
-     }
-  }
   /**
    * Deletes the dataset specified by the datasetId value. Before you can delete
    * a dataset, you must delete all its tables, either manually or by specifying
@@ -555,30 +533,60 @@ export class BigQueryClient {
     } else {
       options = optionsOrCallback as CallOptions;
     }
+
     if (callback === undefined) {
-     return this.deleteDatasetHelper(request, options)
-        
-    }else{
-      this.datasetClient.deleteDataset(request, options).then((resp) => {
+      // we need a helper function because we can't make this an async function
+      // without causing typing problems
+      return this.deleteDatasetHelperAsync(request, options);
+    }
+
+    this.datasetClient
+      .deleteDataset(request, options)
+      .then((response) => {
         // because BigQuery delete calls don't return a response, this bit of code
         // likely won't ever be hit, but it would be if
         // the responses ever change to being properly formatted
-        callback!(null, resp)
-        return
-      }).catch((error: any) => {
-        if (error.message === "Unexpected end of JSON input"){
-         // Gax considers a null, non error response from the service to be a problem
-         // it is for all services that aren't BQ 
-         // https://github.com/googleapis/gax-nodejs/pull/1681
-         // "normal" responses would be an empty JSON - simulate that to prevent an error
-         callback!(null, [{}, null, null]); // TODO - verify this is the gRPC and fallback response
-         return
+        callback!(null, response);
+        return;
+      })
+      .catch((error: any) => {
+        if (error.message === 'Unexpected end of JSON input') {
+          // Gax considers a null, non error response from the service to be a problem
+          // it is for all services that aren't BQ
+          // https://github.com/googleapis/gax-nodejs/pull/1681
+          const empty = protos.google.protobuf.Empty.fromObject({});
+          // "normal" responses would be empty - simulate that to prevent an error
+          callback!(null, [empty, null, null]);
+          return;
         }
-        callback!(error)
-        return
+        callback!(error);
+        return;
       });
+  }
+  private async deleteDatasetHelperAsync(
+    request?: protos.google.cloud.bigquery.v2.IDeleteDatasetRequest,
+    options?: CallOptions
+  ): Promise<
+    [
+      protos.google.protobuf.IEmpty,
+      protos.google.cloud.bigquery.v2.IDeleteDatasetRequest | undefined,
+      {} | undefined,
+    ]
+  > {
+    try {
+      const response = await this.datasetClient.deleteDataset(request, options);
+      return response;
+    } catch (error: any) {
+      if (error.message === 'Unexpected end of JSON input') {
+        // Gax considers a null, non error response from the service to be a problem
+        // it is for all services that aren't BQ
+        // https://github.com/googleapis/gax-nodejs/pull/1681
+        // "normal" responses would be an empty JSON - simulate that to prevent an error
+        const empty = protos.google.protobuf.Empty.fromObject({});
+        return [empty, undefined, undefined];
+      }
+      throw error;
     }
-    
   }
 
   /**
@@ -638,6 +646,7 @@ export class BigQueryClient {
     } else {
       options = optionsOrCallback as CallOptions;
     }
+
     if (callback === undefined) {
       return this.datasetClient.undeleteDataset(request, options);
     }
@@ -709,6 +718,7 @@ export class BigQueryClient {
     } else {
       options = optionsOrCallback as CallOptions;
     }
+
     if (callback === undefined) {
       return this.datasetClient.listDatasets(request, options);
     }
@@ -863,6 +873,7 @@ export class BigQueryClient {
     } else {
       options = optionsOrCallback as CallOptions;
     }
+
     if (callback === undefined) {
       return this.tableClient.getTable(request, options);
     }
@@ -920,6 +931,7 @@ export class BigQueryClient {
     } else {
       options = optionsOrCallback as CallOptions;
     }
+
     if (callback === undefined) {
       return this.tableClient.insertTable(request, options);
     }
@@ -986,6 +998,7 @@ export class BigQueryClient {
     } else {
       options = optionsOrCallback as CallOptions;
     }
+
     if (callback === undefined) {
       return this.tableClient.patchTable(request, options);
     }
@@ -1051,6 +1064,7 @@ export class BigQueryClient {
     } else {
       options = optionsOrCallback as CallOptions;
     }
+
     if (callback === undefined) {
       return this.tableClient.updateTable(request, options);
     }
@@ -1109,10 +1123,60 @@ export class BigQueryClient {
     } else {
       options = optionsOrCallback as CallOptions;
     }
+
     if (callback === undefined) {
-      return this.tableClient.deleteTable(request, options);
+      // we need a helper function because we can't make this an async function
+      // without causing typing problems
+      return this.deleteTableHelperAsync(request, options);
     }
-    return this.tableClient.deleteTable(request, options, callback);
+
+    this.tableClient
+      .deleteTable(request, options)
+      .then((response) => {
+        // because BigQuery delete calls don't return a response, this bit of code
+        // likely won't ever be hit, but it would be if
+        // the responses ever change to being properly formatted
+        callback!(null, response);
+        return;
+      })
+      .catch((error: any) => {
+        if (error.message === 'Unexpected end of JSON input') {
+          // Gax considers a null, non error response from the service to be a problem
+          // it is for all services that aren't BQ
+          // https://github.com/googleapis/gax-nodejs/pull/1681
+          const empty = protos.google.protobuf.Empty.fromObject({});
+          // "normal" responses would be empty - simulate that to prevent an error
+          callback!(null, [empty, null, null]);
+          return;
+        }
+        callback!(error);
+        return;
+      });
+  }
+  private async deleteTableHelperAsync(
+    request?: protos.google.cloud.bigquery.v2.IDeleteTableRequest,
+    options?: CallOptions
+  ): Promise<
+    [
+      protos.google.protobuf.IEmpty,
+      protos.google.cloud.bigquery.v2.IDeleteTableRequest | undefined,
+      {} | undefined,
+    ]
+  > {
+    try {
+      const response = await this.tableClient.deleteTable(request, options);
+      return response;
+    } catch (error: any) {
+      if (error.message === 'Unexpected end of JSON input') {
+        // Gax considers a null, non error response from the service to be a problem
+        // it is for all services that aren't BQ
+        // https://github.com/googleapis/gax-nodejs/pull/1681
+        // "normal" responses would be an empty JSON - simulate that to prevent an error
+        const empty = protos.google.protobuf.Empty.fromObject({});
+        return [empty, undefined, undefined];
+      }
+      throw error;
+    }
   }
 
   /**
@@ -1172,6 +1236,7 @@ export class BigQueryClient {
     } else {
       options = optionsOrCallback as CallOptions;
     }
+
     if (callback === undefined) {
       return this.tableClient.listTables(request, options);
     }
@@ -1307,6 +1372,7 @@ export class BigQueryClient {
     } else {
       options = optionsOrCallback as CallOptions;
     }
+
     if (callback === undefined) {
       return this.jobClient.cancelJob(request, options);
     }
@@ -1374,6 +1440,7 @@ export class BigQueryClient {
     } else {
       options = optionsOrCallback as CallOptions;
     }
+
     if (callback === undefined) {
       return this.jobClient.getJob(request, options);
     }
@@ -1437,6 +1504,7 @@ export class BigQueryClient {
     } else {
       options = optionsOrCallback as CallOptions;
     }
+
     if (callback === undefined) {
       return this.jobClient.insertJob(request, options);
     }
@@ -1500,10 +1568,60 @@ export class BigQueryClient {
     } else {
       options = optionsOrCallback as CallOptions;
     }
+
     if (callback === undefined) {
-      return this.jobClient.deleteJob(request, options);
+      // we need a helper function because we can't make this an async function
+      // without causing typing problems
+      return this.deleteJobHelperAsync(request, options);
     }
-    return this.jobClient.deleteJob(request, options, callback);
+
+    this.jobClient
+      .deleteJob(request, options)
+      .then((response) => {
+        // because BigQuery delete calls don't return a response, this bit of code
+        // likely won't ever be hit, but it would be if
+        // the responses ever change to being properly formatted
+        callback!(null, response);
+        return;
+      })
+      .catch((error: any) => {
+        if (error.message === 'Unexpected end of JSON input') {
+          // Gax considers a null, non error response from the service to be a problem
+          // it is for all services that aren't BQ
+          // https://github.com/googleapis/gax-nodejs/pull/1681
+          const empty = protos.google.protobuf.Empty.fromObject({});
+          // "normal" responses would be empty - simulate that to prevent an error
+          callback!(null, [empty, null, null]);
+          return;
+        }
+        callback!(error);
+        return;
+      });
+  }
+  private async deleteJobHelperAsync(
+    request?: protos.google.cloud.bigquery.v2.IDeleteJobRequest,
+    options?: CallOptions
+  ): Promise<
+    [
+      protos.google.protobuf.IEmpty,
+      protos.google.cloud.bigquery.v2.IDeleteJobRequest | undefined,
+      {} | undefined,
+    ]
+  > {
+    try {
+      const response = await this.jobClient.deleteJob(request, options);
+      return response;
+    } catch (error: any) {
+      if (error.message === 'Unexpected end of JSON input') {
+        // Gax considers a null, non error response from the service to be a problem
+        // it is for all services that aren't BQ
+        // https://github.com/googleapis/gax-nodejs/pull/1681
+        // "normal" responses would be an empty JSON - simulate that to prevent an error
+        const empty = protos.google.protobuf.Empty.fromObject({});
+        return [empty, undefined, undefined];
+      }
+      throw error;
+    }
   }
 
   /**
@@ -1579,6 +1697,7 @@ export class BigQueryClient {
     } else {
       options = optionsOrCallback as CallOptions;
     }
+
     if (callback === undefined) {
       return this.jobClient.listJobs(request, options);
     }
@@ -1730,6 +1849,7 @@ export class BigQueryClient {
     } else {
       options = optionsOrCallback as CallOptions;
     }
+
     if (callback === undefined) {
       return this.modelClient.getModel(request, options);
     }
@@ -1789,6 +1909,7 @@ export class BigQueryClient {
     } else {
       options = optionsOrCallback as CallOptions;
     }
+
     if (callback === undefined) {
       return this.modelClient.patchModel(request, options);
     }
@@ -1846,10 +1967,60 @@ export class BigQueryClient {
     } else {
       options = optionsOrCallback as CallOptions;
     }
+
     if (callback === undefined) {
-      return this.modelClient.deleteModel(request, options);
+      // we need a helper function because we can't make this an async function
+      // without causing typing problems
+      return this.deleteModelHelperAsync(request, options);
     }
-    return this.modelClient.deleteModel(request, options, callback);
+
+    this.modelClient
+      .deleteModel(request, options)
+      .then((response) => {
+        // because BigQuery delete calls don't return a response, this bit of code
+        // likely won't ever be hit, but it would be if
+        // the responses ever change to being properly formatted
+        callback!(null, response);
+        return;
+      })
+      .catch((error: any) => {
+        if (error.message === 'Unexpected end of JSON input') {
+          // Gax considers a null, non error response from the service to be a problem
+          // it is for all services that aren't BQ
+          // https://github.com/googleapis/gax-nodejs/pull/1681
+          const empty = protos.google.protobuf.Empty.fromObject({});
+          // "normal" responses would be empty - simulate that to prevent an error
+          callback!(null, [empty, null, null]);
+          return;
+        }
+        callback!(error);
+        return;
+      });
+  }
+  private async deleteModelHelperAsync(
+    request?: protos.google.cloud.bigquery.v2.IDeleteModelRequest,
+    options?: CallOptions
+  ): Promise<
+    [
+      protos.google.protobuf.IEmpty,
+      protos.google.cloud.bigquery.v2.IDeleteModelRequest | undefined,
+      {} | undefined,
+    ]
+  > {
+    try {
+      const response = await this.modelClient.deleteModel(request, options);
+      return response;
+    } catch (error: any) {
+      if (error.message === 'Unexpected end of JSON input') {
+        // Gax considers a null, non error response from the service to be a problem
+        // it is for all services that aren't BQ
+        // https://github.com/googleapis/gax-nodejs/pull/1681
+        // "normal" responses would be an empty JSON - simulate that to prevent an error
+        const empty = protos.google.protobuf.Empty.fromObject({});
+        return [empty, undefined, undefined];
+      }
+      throw error;
+    }
   }
 
   /**
@@ -1912,6 +2083,7 @@ export class BigQueryClient {
     } else {
       options = optionsOrCallback as CallOptions;
     }
+
     if (callback === undefined) {
       return this.modelClient.listModels(request, options);
     }
@@ -2037,6 +2209,7 @@ export class BigQueryClient {
     } else {
       options = optionsOrCallback as CallOptions;
     }
+
     if (callback === undefined) {
       return this.routineClient.getRoutine(request, options);
     }
@@ -2094,6 +2267,7 @@ export class BigQueryClient {
     } else {
       options = optionsOrCallback as CallOptions;
     }
+
     if (callback === undefined) {
       return this.routineClient.insertRoutine(request, options);
     }
@@ -2154,6 +2328,7 @@ export class BigQueryClient {
     } else {
       options = optionsOrCallback as CallOptions;
     }
+
     if (callback === undefined) {
       return this.routineClient.updateRoutine(request, options);
     }
@@ -2219,6 +2394,7 @@ export class BigQueryClient {
     } else {
       options = optionsOrCallback as CallOptions;
     }
+
     if (callback === undefined) {
       return this.routineClient.patchRoutine(request, options);
     }
@@ -2276,10 +2452,60 @@ export class BigQueryClient {
     } else {
       options = optionsOrCallback as CallOptions;
     }
+
     if (callback === undefined) {
-      return this.routineClient.deleteRoutine(request, options);
+      // we need a helper function because we can't make this an async function
+      // without causing typing problems
+      return this.deleteRoutineHelperAsync(request, options);
     }
-    return this.routineClient.deleteRoutine(request, options, callback);
+
+    this.routineClient
+      .deleteRoutine(request, options)
+      .then((response) => {
+        // because BigQuery delete calls don't return a response, this bit of code
+        // likely won't ever be hit, but it would be if
+        // the responses ever change to being properly formatted
+        callback!(null, response);
+        return;
+      })
+      .catch((error: any) => {
+        if (error.message === 'Unexpected end of JSON input') {
+          // Gax considers a null, non error response from the service to be a problem
+          // it is for all services that aren't BQ
+          // https://github.com/googleapis/gax-nodejs/pull/1681
+          const empty = protos.google.protobuf.Empty.fromObject({});
+          // "normal" responses would be empty - simulate that to prevent an error
+          callback!(null, [empty, null, null]);
+          return;
+        }
+        callback!(error);
+        return;
+      });
+  }
+  private async deleteRoutineHelperAsync(
+    request?: protos.google.cloud.bigquery.v2.IDeleteRoutineRequest,
+    options?: CallOptions
+  ): Promise<
+    [
+      protos.google.protobuf.IEmpty,
+      protos.google.cloud.bigquery.v2.IDeleteRoutineRequest | undefined,
+      {} | undefined,
+    ]
+  > {
+    try {
+      const response = await this.routineClient.deleteRoutine(request, options);
+      return response;
+    } catch (error: any) {
+      if (error.message === 'Unexpected end of JSON input') {
+        // Gax considers a null, non error response from the service to be a problem
+        // it is for all services that aren't BQ
+        // https://github.com/googleapis/gax-nodejs/pull/1681
+        // "normal" responses would be an empty JSON - simulate that to prevent an error
+        const empty = protos.google.protobuf.Empty.fromObject({});
+        return [empty, undefined, undefined];
+      }
+      throw error;
+    }
   }
 
   /**
@@ -2345,6 +2571,7 @@ export class BigQueryClient {
     } else {
       options = optionsOrCallback as CallOptions;
     }
+
     if (callback === undefined) {
       return this.routineClient.listRoutines(request, options);
     }
@@ -2484,6 +2711,7 @@ export class BigQueryClient {
     } else {
       options = optionsOrCallback as CallOptions;
     }
+
     if (callback === undefined) {
       return this.rowAccessPolicyClient.getRowAccessPolicy(request, options);
     }
@@ -2551,6 +2779,7 @@ export class BigQueryClient {
     } else {
       options = optionsOrCallback as CallOptions;
     }
+
     if (callback === undefined) {
       return this.rowAccessPolicyClient.updateRowAccessPolicy(request, options);
     }
@@ -2620,14 +2849,63 @@ export class BigQueryClient {
     } else {
       options = optionsOrCallback as CallOptions;
     }
+
     if (callback === undefined) {
-      return this.rowAccessPolicyClient.deleteRowAccessPolicy(request, options);
+      // we need a helper function because we can't make this an async function
+      // without causing typing problems
+      return this.deleteRowAccessPolicyHelperAsync(request, options);
     }
-    return this.rowAccessPolicyClient.deleteRowAccessPolicy(
-      request,
-      options,
-      callback
-    );
+
+    this.rowAccessPolicyClient
+      .deleteRowAccessPolicy(request, options)
+      .then((response) => {
+        // because BigQuery delete calls don't return a response, this bit of code
+        // likely won't ever be hit, but it would be if
+        // the responses ever change to being properly formatted
+        callback!(null, response);
+        return;
+      })
+      .catch((error: any) => {
+        if (error.message === 'Unexpected end of JSON input') {
+          // Gax considers a null, non error response from the service to be a problem
+          // it is for all services that aren't BQ
+          // https://github.com/googleapis/gax-nodejs/pull/1681
+          const empty = protos.google.protobuf.Empty.fromObject({});
+          // "normal" responses would be empty - simulate that to prevent an error
+          callback!(null, [empty, null, null]);
+          return;
+        }
+        callback!(error);
+        return;
+      });
+  }
+  private async deleteRowAccessPolicyHelperAsync(
+    request?: protos.google.cloud.bigquery.v2.IDeleteRowAccessPolicyRequest,
+    options?: CallOptions
+  ): Promise<
+    [
+      protos.google.protobuf.IEmpty,
+      protos.google.cloud.bigquery.v2.IDeleteRowAccessPolicyRequest | undefined,
+      {} | undefined,
+    ]
+  > {
+    try {
+      const response = await this.rowAccessPolicyClient.deleteRowAccessPolicy(
+        request,
+        options
+      );
+      return response;
+    } catch (error: any) {
+      if (error.message === 'Unexpected end of JSON input') {
+        // Gax considers a null, non error response from the service to be a problem
+        // it is for all services that aren't BQ
+        // https://github.com/googleapis/gax-nodejs/pull/1681
+        // "normal" responses would be an empty JSON - simulate that to prevent an error
+        const empty = protos.google.protobuf.Empty.fromObject({});
+        return [empty, undefined, undefined];
+      }
+      throw error;
+    }
   }
 
   /**
@@ -2692,6 +2970,7 @@ export class BigQueryClient {
     } else {
       options = optionsOrCallback as CallOptions;
     }
+
     if (callback === undefined) {
       return this.rowAccessPolicyClient.listRowAccessPolicies(request, options);
     }
