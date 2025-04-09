@@ -538,7 +538,7 @@ class Table extends ServiceObject {
    * @returns {object} Table schema in the format the API expects.
    */
   static createSchemaFromString_(str: string): TableSchema {
-    return str.split(/\s*,\s*/).reduce(
+    return str.split(',').reduce(
       (acc: {fields: Array<{name: string; type: string}>}, pair) => {
         acc.fields.push({
           name: pair.split(':')[0].trim(),
