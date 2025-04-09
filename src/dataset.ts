@@ -1220,9 +1220,9 @@ class Dataset extends ServiceObject {
    * See {@link BigQuery#query} for full documentation of this method.
    *
    * @param {object} options See {@link BigQuery#query} for full documentation of this method.
-   * @param {function} [callback] See {@link BigQuery#query} for full documentation of this method.   
+   * @param {function} [callback] See {@link BigQuery#query} for full documentation of this method.
    * @returns {Promise<QueryRowsResponse>} See {@link BigQuery#query} for full documentation of this method.
-   */  
+   */
   query(
     options: Query | string,
     callback?: QueryRowsCallback

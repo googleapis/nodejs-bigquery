@@ -2142,26 +2142,22 @@ export class BigQuery extends Service {
    * });
    * ```
    */
-  query(query: string, options?: QueryOptions): Promise<QueryRowsResponse>;
-  query(query: string, callback?: QueryRowsCallback): Promise<QueryRowsResponse>;
-  query(query: Query, options?: QueryOptions): Promise<QueryRowsResponse>;
-  query(query: Query, callback?: QueryRowsCallback): Promise<QueryRowsResponse>;
   query(
-    query: Query,
-    options: QueryOptions,
+    query: Query | string,
+    options?: QueryOptions
+  ): Promise<QueryRowsResponse>;
+  query(
+    query: Query | string,
     callback?: QueryRowsCallback
-  ): void;
+  ): Promise<QueryRowsResponse>;
   query(
     query: Query | string,
     options: QueryOptions,
     callback?: QueryRowsCallback
   ): void;
-  query(query: string, callback?: QueryRowsCallback): void;
   query(
-    query: string | Query,
-    optionsOrCallback?:
-      | QueryOptions
-      | QueryRowsCallback,
+    query: Query | string,
+    optionsOrCallback?: QueryOptions | QueryRowsCallback,
     cb?: QueryRowsCallback
   ): void | Promise<QueryRowsResponse> {
     let options =
