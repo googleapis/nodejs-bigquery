@@ -202,7 +202,9 @@ describe('v2.ProjectServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      client.initialize().catch(err => {
+        throw err;
+      });
       assert(client.projectServiceStub);
       client.close().then(() => {
         done();
@@ -261,7 +263,7 @@ describe('v2.ProjectServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.GetServiceAccountRequest()
       );
@@ -292,7 +294,7 @@ describe('v2.ProjectServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.GetServiceAccountRequest()
       );
@@ -339,7 +341,7 @@ describe('v2.ProjectServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.GetServiceAccountRequest()
       );
@@ -370,7 +372,7 @@ describe('v2.ProjectServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.GetServiceAccountRequest()
       );

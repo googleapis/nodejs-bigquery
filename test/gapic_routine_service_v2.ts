@@ -265,7 +265,9 @@ describe('v2.RoutineServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      client.initialize().catch(err => {
+        throw err;
+      });
       assert(client.routineServiceStub);
       client.close().then(() => {
         done();
@@ -324,7 +326,7 @@ describe('v2.RoutineServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.GetRoutineRequest()
       );
@@ -365,7 +367,7 @@ describe('v2.RoutineServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.GetRoutineRequest()
       );
@@ -422,7 +424,7 @@ describe('v2.RoutineServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.GetRoutineRequest()
       );
@@ -463,7 +465,7 @@ describe('v2.RoutineServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.GetRoutineRequest()
       );
@@ -494,7 +496,7 @@ describe('v2.RoutineServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.InsertRoutineRequest()
       );
@@ -530,7 +532,7 @@ describe('v2.RoutineServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.InsertRoutineRequest()
       );
@@ -582,7 +584,7 @@ describe('v2.RoutineServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.InsertRoutineRequest()
       );
@@ -618,7 +620,7 @@ describe('v2.RoutineServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.InsertRoutineRequest()
       );
@@ -644,7 +646,7 @@ describe('v2.RoutineServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.UpdateRoutineRequest()
       );
@@ -685,7 +687,7 @@ describe('v2.RoutineServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.UpdateRoutineRequest()
       );
@@ -742,7 +744,7 @@ describe('v2.RoutineServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.UpdateRoutineRequest()
       );
@@ -783,7 +785,7 @@ describe('v2.RoutineServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.UpdateRoutineRequest()
       );
@@ -814,7 +816,7 @@ describe('v2.RoutineServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.PatchRoutineRequest()
       );
@@ -831,7 +833,7 @@ describe('v2.RoutineServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.PatchRoutineRequest()
       );
@@ -864,7 +866,7 @@ describe('v2.RoutineServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.PatchRoutineRequest()
       );
@@ -881,7 +883,7 @@ describe('v2.RoutineServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.PatchRoutineRequest()
       );
@@ -897,7 +899,7 @@ describe('v2.RoutineServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.DeleteRoutineRequest()
       );
@@ -938,7 +940,7 @@ describe('v2.RoutineServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.DeleteRoutineRequest()
       );
@@ -995,7 +997,7 @@ describe('v2.RoutineServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.DeleteRoutineRequest()
       );
@@ -1036,7 +1038,7 @@ describe('v2.RoutineServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.DeleteRoutineRequest()
       );
@@ -1067,7 +1069,7 @@ describe('v2.RoutineServiceClient', () => {
         credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.ListRoutinesRequest()
       );
@@ -1105,7 +1107,7 @@ describe('v2.RoutineServiceClient', () => {
         credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.ListRoutinesRequest()
       );
@@ -1159,7 +1161,7 @@ describe('v2.RoutineServiceClient', () => {
         credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.ListRoutinesRequest()
       );
@@ -1195,7 +1197,7 @@ describe('v2.RoutineServiceClient', () => {
         credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.ListRoutinesRequest()
       );
@@ -1254,7 +1256,7 @@ describe('v2.RoutineServiceClient', () => {
         credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.ListRoutinesRequest()
       );
@@ -1310,7 +1312,7 @@ describe('v2.RoutineServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.ListRoutinesRequest()
       );
@@ -1358,7 +1360,7 @@ describe('v2.RoutineServiceClient', () => {
         credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.ListRoutinesRequest()
       );

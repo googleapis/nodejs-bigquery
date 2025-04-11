@@ -265,7 +265,9 @@ describe('v2.TableServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      client.initialize().catch(err => {
+        throw err;
+      });
       assert(client.tableServiceStub);
       client.close().then(() => {
         done();
@@ -324,7 +326,7 @@ describe('v2.TableServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.GetTableRequest()
       );
@@ -365,7 +367,7 @@ describe('v2.TableServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.GetTableRequest()
       );
@@ -422,7 +424,7 @@ describe('v2.TableServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.GetTableRequest()
       );
@@ -460,7 +462,7 @@ describe('v2.TableServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.GetTableRequest()
       );
@@ -491,7 +493,7 @@ describe('v2.TableServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.InsertTableRequest()
       );
@@ -527,7 +529,7 @@ describe('v2.TableServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.InsertTableRequest()
       );
@@ -579,7 +581,7 @@ describe('v2.TableServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.InsertTableRequest()
       );
@@ -615,7 +617,7 @@ describe('v2.TableServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.InsertTableRequest()
       );
@@ -641,7 +643,7 @@ describe('v2.TableServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.UpdateOrPatchTableRequest()
       );
@@ -682,7 +684,7 @@ describe('v2.TableServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.UpdateOrPatchTableRequest()
       );
@@ -739,7 +741,7 @@ describe('v2.TableServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.UpdateOrPatchTableRequest()
       );
@@ -780,7 +782,7 @@ describe('v2.TableServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.UpdateOrPatchTableRequest()
       );
@@ -811,7 +813,7 @@ describe('v2.TableServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.UpdateOrPatchTableRequest()
       );
@@ -852,7 +854,7 @@ describe('v2.TableServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.UpdateOrPatchTableRequest()
       );
@@ -909,7 +911,7 @@ describe('v2.TableServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.UpdateOrPatchTableRequest()
       );
@@ -950,7 +952,7 @@ describe('v2.TableServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.UpdateOrPatchTableRequest()
       );
@@ -981,7 +983,7 @@ describe('v2.TableServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.DeleteTableRequest()
       );
@@ -1022,7 +1024,7 @@ describe('v2.TableServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.DeleteTableRequest()
       );
@@ -1079,7 +1081,7 @@ describe('v2.TableServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.DeleteTableRequest()
       );
@@ -1120,7 +1122,7 @@ describe('v2.TableServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.DeleteTableRequest()
       );
@@ -1151,7 +1153,7 @@ describe('v2.TableServiceClient', () => {
         credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.ListTablesRequest()
       );
@@ -1195,7 +1197,7 @@ describe('v2.TableServiceClient', () => {
         credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.ListTablesRequest()
       );
@@ -1255,7 +1257,7 @@ describe('v2.TableServiceClient', () => {
         credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.ListTablesRequest()
       );
@@ -1291,7 +1293,7 @@ describe('v2.TableServiceClient', () => {
         credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.ListTablesRequest()
       );
@@ -1356,7 +1358,7 @@ describe('v2.TableServiceClient', () => {
         credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.ListTablesRequest()
       );
@@ -1412,7 +1414,7 @@ describe('v2.TableServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.ListTablesRequest()
       );
@@ -1466,7 +1468,7 @@ describe('v2.TableServiceClient', () => {
         credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.ListTablesRequest()
       );

@@ -278,7 +278,9 @@ describe('v2.RowAccessPolicyServiceClient', () => {
           auth: googleAuth,
           projectId: 'bogus',
         });
-      client.initialize();
+      client.initialize().catch(err => {
+        throw err;
+      });
       assert(client.rowAccessPolicyServiceStub);
       client.close().then(() => {
         done();
@@ -341,7 +343,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
           auth: googleAuth,
           projectId: 'bogus',
         });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.GetRowAccessPolicyRequest()
       );
@@ -389,7 +391,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
           auth: googleAuth,
           projectId: 'bogus',
         });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.GetRowAccessPolicyRequest()
       );
@@ -452,7 +454,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
           auth: googleAuth,
           projectId: 'bogus',
         });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.GetRowAccessPolicyRequest()
       );
@@ -499,7 +501,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
           auth: googleAuth,
           projectId: 'bogus',
         });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.GetRowAccessPolicyRequest()
       );
@@ -536,7 +538,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
           auth: googleAuth,
           projectId: 'bogus',
         });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.CreateRowAccessPolicyRequest()
       );
@@ -579,7 +581,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
           auth: googleAuth,
           projectId: 'bogus',
         });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.CreateRowAccessPolicyRequest()
       );
@@ -637,7 +639,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
           auth: googleAuth,
           projectId: 'bogus',
         });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.CreateRowAccessPolicyRequest()
       );
@@ -682,7 +684,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
           auth: googleAuth,
           projectId: 'bogus',
         });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.CreateRowAccessPolicyRequest()
       );
@@ -717,7 +719,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
           auth: googleAuth,
           projectId: 'bogus',
         });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.UpdateRowAccessPolicyRequest()
       );
@@ -765,7 +767,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
           auth: googleAuth,
           projectId: 'bogus',
         });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.UpdateRowAccessPolicyRequest()
       );
@@ -828,7 +830,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
           auth: googleAuth,
           projectId: 'bogus',
         });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.UpdateRowAccessPolicyRequest()
       );
@@ -878,7 +880,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
           auth: googleAuth,
           projectId: 'bogus',
         });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.UpdateRowAccessPolicyRequest()
       );
@@ -918,7 +920,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
           auth: googleAuth,
           projectId: 'bogus',
         });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.DeleteRowAccessPolicyRequest()
       );
@@ -966,7 +968,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
           auth: googleAuth,
           projectId: 'bogus',
         });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.DeleteRowAccessPolicyRequest()
       );
@@ -1029,7 +1031,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
           auth: googleAuth,
           projectId: 'bogus',
         });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.DeleteRowAccessPolicyRequest()
       );
@@ -1079,7 +1081,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
           auth: googleAuth,
           projectId: 'bogus',
         });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.DeleteRowAccessPolicyRequest()
       );
@@ -1119,7 +1121,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
           auth: googleAuth,
           projectId: 'bogus',
         });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.BatchDeleteRowAccessPoliciesRequest()
       );
@@ -1162,7 +1164,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
           auth: googleAuth,
           projectId: 'bogus',
         });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.BatchDeleteRowAccessPoliciesRequest()
       );
@@ -1220,7 +1222,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
           auth: googleAuth,
           projectId: 'bogus',
         });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.BatchDeleteRowAccessPoliciesRequest()
       );
@@ -1265,7 +1267,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
           auth: googleAuth,
           projectId: 'bogus',
         });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.BatchDeleteRowAccessPoliciesRequest()
       );
@@ -1300,7 +1302,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
           credentials: {client_email: 'bogus', private_key: 'bogus'},
           projectId: 'bogus',
         });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.ListRowAccessPoliciesRequest()
       );
@@ -1351,7 +1353,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
           credentials: {client_email: 'bogus', private_key: 'bogus'},
           projectId: 'bogus',
         });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.ListRowAccessPoliciesRequest()
       );
@@ -1417,7 +1419,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
           credentials: {client_email: 'bogus', private_key: 'bogus'},
           projectId: 'bogus',
         });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.ListRowAccessPoliciesRequest()
       );
@@ -1462,7 +1464,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
           credentials: {client_email: 'bogus', private_key: 'bogus'},
           projectId: 'bogus',
         });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.ListRowAccessPoliciesRequest()
       );
@@ -1539,7 +1541,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
           credentials: {client_email: 'bogus', private_key: 'bogus'},
           projectId: 'bogus',
         });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.ListRowAccessPoliciesRequest()
       );
@@ -1605,7 +1607,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
           auth: googleAuth,
           projectId: 'bogus',
         });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.ListRowAccessPoliciesRequest()
       );
@@ -1669,7 +1671,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
           credentials: {client_email: 'bogus', private_key: 'bogus'},
           projectId: 'bogus',
         });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.ListRowAccessPoliciesRequest()
       );

@@ -29,6 +29,7 @@ import type {
 import {Transform} from 'stream';
 import * as protos from '../../protos/protos';
 import jsonProtos = require('../../protos/protos.json');
+import {loggingUtils as logging} from 'google-gax';
 
 /**
  * Client JSON configuration object, loaded from
@@ -54,6 +55,8 @@ export class TableServiceClient {
   private _defaults: {[method: string]: gax.CallSettings};
   private _universeDomain: string;
   private _servicePath: string;
+  private _log = logging.log('bigquery');
+
   auth: gax.GoogleAuth;
   descriptors: Descriptors = {
     page: {},
@@ -484,8 +487,34 @@ export class TableServiceClient {
         dataset_id: request.datasetId ?? '',
         table_id: request.tableId ?? '',
       });
-    this.initialize();
-    return this.innerApiCalls.getTable(request, options, callback);
+    this.initialize().catch(err => {
+      throw err;
+    });
+    this._log.info('getTable request %j', request);
+    const wrappedCallback:
+      | Callback<
+          protos.google.cloud.bigquery.v2.ITable,
+          protos.google.cloud.bigquery.v2.IGetTableRequest | null | undefined,
+          {} | null | undefined
+        >
+      | undefined = callback
+      ? (error, response, options, rawResponse) => {
+          this._log.info('getTable response %j', response);
+          callback!(error, response, options, rawResponse); // We verified callback above.
+        }
+      : undefined;
+    return this.innerApiCalls
+      .getTable(request, options, wrappedCallback)
+      ?.then(
+        ([response, options, rawResponse]: [
+          protos.google.cloud.bigquery.v2.ITable,
+          protos.google.cloud.bigquery.v2.IGetTableRequest | undefined,
+          {} | undefined,
+        ]) => {
+          this._log.info('getTable response %j', response);
+          return [response, options, rawResponse];
+        }
+      );
   }
   /**
    * Creates a new, empty table in the dataset.
@@ -573,8 +602,36 @@ export class TableServiceClient {
         project_id: request.projectId ?? '',
         dataset_id: request.datasetId ?? '',
       });
-    this.initialize();
-    return this.innerApiCalls.insertTable(request, options, callback);
+    this.initialize().catch(err => {
+      throw err;
+    });
+    this._log.info('insertTable request %j', request);
+    const wrappedCallback:
+      | Callback<
+          protos.google.cloud.bigquery.v2.ITable,
+          | protos.google.cloud.bigquery.v2.IInsertTableRequest
+          | null
+          | undefined,
+          {} | null | undefined
+        >
+      | undefined = callback
+      ? (error, response, options, rawResponse) => {
+          this._log.info('insertTable response %j', response);
+          callback!(error, response, options, rawResponse); // We verified callback above.
+        }
+      : undefined;
+    return this.innerApiCalls
+      .insertTable(request, options, wrappedCallback)
+      ?.then(
+        ([response, options, rawResponse]: [
+          protos.google.cloud.bigquery.v2.ITable,
+          protos.google.cloud.bigquery.v2.IInsertTableRequest | undefined,
+          {} | undefined,
+        ]) => {
+          this._log.info('insertTable response %j', response);
+          return [response, options, rawResponse];
+        }
+      );
   }
   /**
    * Updates information in an existing table. The update method replaces the
@@ -676,8 +733,39 @@ export class TableServiceClient {
         dataset_id: request.datasetId ?? '',
         table_id: request.tableId ?? '',
       });
-    this.initialize();
-    return this.innerApiCalls.patchTable(request, options, callback);
+    this.initialize().catch(err => {
+      throw err;
+    });
+    this._log.info('patchTable request %j', request);
+    const wrappedCallback:
+      | Callback<
+          protos.google.cloud.bigquery.v2.ITable,
+          | protos.google.cloud.bigquery.v2.IUpdateOrPatchTableRequest
+          | null
+          | undefined,
+          {} | null | undefined
+        >
+      | undefined = callback
+      ? (error, response, options, rawResponse) => {
+          this._log.info('patchTable response %j', response);
+          callback!(error, response, options, rawResponse); // We verified callback above.
+        }
+      : undefined;
+    return this.innerApiCalls
+      .patchTable(request, options, wrappedCallback)
+      ?.then(
+        ([response, options, rawResponse]: [
+          protos.google.cloud.bigquery.v2.ITable,
+          (
+            | protos.google.cloud.bigquery.v2.IUpdateOrPatchTableRequest
+            | undefined
+          ),
+          {} | undefined,
+        ]) => {
+          this._log.info('patchTable response %j', response);
+          return [response, options, rawResponse];
+        }
+      );
   }
   /**
    * Updates information in an existing table. The update method replaces the
@@ -778,8 +866,39 @@ export class TableServiceClient {
         dataset_id: request.datasetId ?? '',
         table_id: request.tableId ?? '',
       });
-    this.initialize();
-    return this.innerApiCalls.updateTable(request, options, callback);
+    this.initialize().catch(err => {
+      throw err;
+    });
+    this._log.info('updateTable request %j', request);
+    const wrappedCallback:
+      | Callback<
+          protos.google.cloud.bigquery.v2.ITable,
+          | protos.google.cloud.bigquery.v2.IUpdateOrPatchTableRequest
+          | null
+          | undefined,
+          {} | null | undefined
+        >
+      | undefined = callback
+      ? (error, response, options, rawResponse) => {
+          this._log.info('updateTable response %j', response);
+          callback!(error, response, options, rawResponse); // We verified callback above.
+        }
+      : undefined;
+    return this.innerApiCalls
+      .updateTable(request, options, wrappedCallback)
+      ?.then(
+        ([response, options, rawResponse]: [
+          protos.google.cloud.bigquery.v2.ITable,
+          (
+            | protos.google.cloud.bigquery.v2.IUpdateOrPatchTableRequest
+            | undefined
+          ),
+          {} | undefined,
+        ]) => {
+          this._log.info('updateTable response %j', response);
+          return [response, options, rawResponse];
+        }
+      );
   }
   /**
    * Deletes the table specified by tableId from the dataset.
@@ -869,8 +988,36 @@ export class TableServiceClient {
         dataset_id: request.datasetId ?? '',
         table_id: request.tableId ?? '',
       });
-    this.initialize();
-    return this.innerApiCalls.deleteTable(request, options, callback);
+    this.initialize().catch(err => {
+      throw err;
+    });
+    this._log.info('deleteTable request %j', request);
+    const wrappedCallback:
+      | Callback<
+          protos.google.protobuf.IEmpty,
+          | protos.google.cloud.bigquery.v2.IDeleteTableRequest
+          | null
+          | undefined,
+          {} | null | undefined
+        >
+      | undefined = callback
+      ? (error, response, options, rawResponse) => {
+          this._log.info('deleteTable response %j', response);
+          callback!(error, response, options, rawResponse); // We verified callback above.
+        }
+      : undefined;
+    return this.innerApiCalls
+      .deleteTable(request, options, wrappedCallback)
+      ?.then(
+        ([response, options, rawResponse]: [
+          protos.google.protobuf.IEmpty,
+          protos.google.cloud.bigquery.v2.IDeleteTableRequest | undefined,
+          {} | undefined,
+        ]) => {
+          this._log.info('deleteTable response %j', response);
+          return [response, options, rawResponse];
+        }
+      );
   }
 
   /**
@@ -970,8 +1117,34 @@ export class TableServiceClient {
         project_id: request.projectId ?? '',
         dataset_id: request.datasetId ?? '',
       });
-    this.initialize();
-    return this.innerApiCalls.listTables(request, options, callback);
+    this.initialize().catch(err => {
+      throw err;
+    });
+    const wrappedCallback:
+      | PaginationCallback<
+          protos.google.cloud.bigquery.v2.IListTablesRequest,
+          protos.google.cloud.bigquery.v2.ITableList | null | undefined,
+          protos.google.cloud.bigquery.v2.IListFormatTable
+        >
+      | undefined = callback
+      ? (error, values, nextPageRequest, rawResponse) => {
+          this._log.info('listTables values %j', values);
+          callback!(error, values, nextPageRequest, rawResponse); // We verified callback above.
+        }
+      : undefined;
+    this._log.info('listTables request %j', request);
+    return this.innerApiCalls
+      .listTables(request, options, wrappedCallback)
+      ?.then(
+        ([response, input, output]: [
+          protos.google.cloud.bigquery.v2.IListFormatTable[],
+          protos.google.cloud.bigquery.v2.IListTablesRequest | null,
+          protos.google.cloud.bigquery.v2.ITableList,
+        ]) => {
+          this._log.info('listTables values %j', response);
+          return [response, input, output];
+        }
+      );
   }
 
   /**
@@ -1014,7 +1187,10 @@ export class TableServiceClient {
       });
     const defaultCallSettings = this._defaults['listTables'];
     const callSettings = defaultCallSettings.merge(options);
-    this.initialize();
+    this.initialize().catch(err => {
+      throw err;
+    });
+    this._log.info('listTables stream %j', request);
     return this.descriptors.page.listTables.createStream(
       this.innerApiCalls.listTables as GaxCall,
       request,
@@ -1065,7 +1241,10 @@ export class TableServiceClient {
       });
     const defaultCallSettings = this._defaults['listTables'];
     const callSettings = defaultCallSettings.merge(options);
-    this.initialize();
+    this.initialize().catch(err => {
+      throw err;
+    });
+    this._log.info('listTables iterate %j', request);
     return this.descriptors.page.listTables.asyncIterate(
       this.innerApiCalls['listTables'] as GaxCall,
       request as {},
@@ -1082,6 +1261,7 @@ export class TableServiceClient {
   close(): Promise<void> {
     if (this.tableServiceStub && !this._terminated) {
       return this.tableServiceStub.then(stub => {
+        this._log.info('ending gRPC channel');
         this._terminated = true;
         stub.close();
       });

@@ -4419,6 +4419,12 @@ export namespace google {
 
                     /** CsvOptions nullMarker */
                     nullMarker?: (google.protobuf.IStringValue|null);
+
+                    /** CsvOptions nullMarkers */
+                    nullMarkers?: (string[]|null);
+
+                    /** CsvOptions sourceColumnMatch */
+                    sourceColumnMatch?: (string|null);
                 }
 
                 /** Represents a CsvOptions. */
@@ -4453,6 +4459,12 @@ export namespace google {
 
                     /** CsvOptions nullMarker. */
                     public nullMarker?: (google.protobuf.IStringValue|null);
+
+                    /** CsvOptions nullMarkers. */
+                    public nullMarkers: string[];
+
+                    /** CsvOptions sourceColumnMatch. */
+                    public sourceColumnMatch: string;
 
                     /**
                      * Creates a new CsvOptions instance using the specified properties.
@@ -5160,6 +5172,21 @@ export namespace google {
 
                     /** ExternalDataConfiguration metadataCacheMode */
                     metadataCacheMode?: (google.cloud.bigquery.v2.ExternalDataConfiguration.MetadataCacheMode|keyof typeof google.cloud.bigquery.v2.ExternalDataConfiguration.MetadataCacheMode|null);
+
+                    /** ExternalDataConfiguration timeZone */
+                    timeZone?: (string|null);
+
+                    /** ExternalDataConfiguration dateFormat */
+                    dateFormat?: (string|null);
+
+                    /** ExternalDataConfiguration datetimeFormat */
+                    datetimeFormat?: (string|null);
+
+                    /** ExternalDataConfiguration timeFormat */
+                    timeFormat?: (string|null);
+
+                    /** ExternalDataConfiguration timestampFormat */
+                    timestampFormat?: (string|null);
                 }
 
                 /** Represents an ExternalDataConfiguration. */
@@ -5233,6 +5260,21 @@ export namespace google {
 
                     /** ExternalDataConfiguration metadataCacheMode. */
                     public metadataCacheMode: (google.cloud.bigquery.v2.ExternalDataConfiguration.MetadataCacheMode|keyof typeof google.cloud.bigquery.v2.ExternalDataConfiguration.MetadataCacheMode);
+
+                    /** ExternalDataConfiguration timeZone. */
+                    public timeZone?: (string|null);
+
+                    /** ExternalDataConfiguration dateFormat. */
+                    public dateFormat?: (string|null);
+
+                    /** ExternalDataConfiguration datetimeFormat. */
+                    public datetimeFormat?: (string|null);
+
+                    /** ExternalDataConfiguration timeFormat. */
+                    public timeFormat?: (string|null);
+
+                    /** ExternalDataConfiguration timestampFormat. */
+                    public timestampFormat?: (string|null);
 
                     /**
                      * Creates a new ExternalDataConfiguration instance using the specified properties.
@@ -7184,6 +7226,12 @@ export namespace google {
                     /** QueryRequest timeoutMs */
                     timeoutMs?: (google.protobuf.IUInt32Value|null);
 
+                    /** QueryRequest jobTimeoutMs */
+                    jobTimeoutMs?: (number|Long|string|null);
+
+                    /** QueryRequest destinationEncryptionConfiguration */
+                    destinationEncryptionConfiguration?: (google.cloud.bigquery.v2.IEncryptionConfiguration|null);
+
                     /** QueryRequest dryRun */
                     dryRun?: (boolean|null);
 
@@ -7223,6 +7271,9 @@ export namespace google {
                     /** QueryRequest jobCreationMode */
                     jobCreationMode?: (google.cloud.bigquery.v2.QueryRequest.JobCreationMode|keyof typeof google.cloud.bigquery.v2.QueryRequest.JobCreationMode|null);
 
+                    /** QueryRequest reservation */
+                    reservation?: (string|null);
+
                     /** QueryRequest writeIncrementalResults */
                     writeIncrementalResults?: (boolean|null);
                 }
@@ -7250,6 +7301,12 @@ export namespace google {
 
                     /** QueryRequest timeoutMs. */
                     public timeoutMs?: (google.protobuf.IUInt32Value|null);
+
+                    /** QueryRequest jobTimeoutMs. */
+                    public jobTimeoutMs?: (number|Long|string|null);
+
+                    /** QueryRequest destinationEncryptionConfiguration. */
+                    public destinationEncryptionConfiguration?: (google.cloud.bigquery.v2.IEncryptionConfiguration|null);
 
                     /** QueryRequest dryRun. */
                     public dryRun: boolean;
@@ -7289,6 +7346,9 @@ export namespace google {
 
                     /** QueryRequest jobCreationMode. */
                     public jobCreationMode: (google.cloud.bigquery.v2.QueryRequest.JobCreationMode|keyof typeof google.cloud.bigquery.v2.QueryRequest.JobCreationMode);
+
+                    /** QueryRequest reservation. */
+                    public reservation?: (string|null);
 
                     /** QueryRequest writeIncrementalResults. */
                     public writeIncrementalResults: boolean;
@@ -8283,6 +8343,27 @@ export namespace google {
 
                     /** JobConfigurationLoad copyFilesOnly */
                     copyFilesOnly?: (google.protobuf.IBoolValue|null);
+
+                    /** JobConfigurationLoad timeZone */
+                    timeZone?: (google.protobuf.IStringValue|null);
+
+                    /** JobConfigurationLoad nullMarkers */
+                    nullMarkers?: (string[]|null);
+
+                    /** JobConfigurationLoad dateFormat */
+                    dateFormat?: (string|null);
+
+                    /** JobConfigurationLoad datetimeFormat */
+                    datetimeFormat?: (string|null);
+
+                    /** JobConfigurationLoad timeFormat */
+                    timeFormat?: (string|null);
+
+                    /** JobConfigurationLoad timestampFormat */
+                    timestampFormat?: (string|null);
+
+                    /** JobConfigurationLoad sourceColumnMatch */
+                    sourceColumnMatch?: (google.cloud.bigquery.v2.JobConfigurationLoad.SourceColumnMatch|keyof typeof google.cloud.bigquery.v2.JobConfigurationLoad.SourceColumnMatch|null);
                 }
 
                 /** Represents a JobConfigurationLoad. */
@@ -8399,6 +8480,27 @@ export namespace google {
                     /** JobConfigurationLoad copyFilesOnly. */
                     public copyFilesOnly?: (google.protobuf.IBoolValue|null);
 
+                    /** JobConfigurationLoad timeZone. */
+                    public timeZone?: (google.protobuf.IStringValue|null);
+
+                    /** JobConfigurationLoad nullMarkers. */
+                    public nullMarkers: string[];
+
+                    /** JobConfigurationLoad dateFormat. */
+                    public dateFormat?: (string|null);
+
+                    /** JobConfigurationLoad datetimeFormat. */
+                    public datetimeFormat?: (string|null);
+
+                    /** JobConfigurationLoad timeFormat. */
+                    public timeFormat?: (string|null);
+
+                    /** JobConfigurationLoad timestampFormat. */
+                    public timestampFormat?: (string|null);
+
+                    /** JobConfigurationLoad sourceColumnMatch. */
+                    public sourceColumnMatch: (google.cloud.bigquery.v2.JobConfigurationLoad.SourceColumnMatch|keyof typeof google.cloud.bigquery.v2.JobConfigurationLoad.SourceColumnMatch);
+
                     /**
                      * Creates a new JobConfigurationLoad instance using the specified properties.
                      * @param [properties] Properties to set
@@ -8485,6 +8587,13 @@ export namespace google {
                         STRICT = 1,
                         V1 = 2,
                         V2 = 3
+                    }
+
+                    /** SourceColumnMatch enum. */
+                    enum SourceColumnMatch {
+                        SOURCE_COLUMN_MATCH_UNSPECIFIED = 0,
+                        POSITION = 1,
+                        NAME = 2
                     }
                 }
 
@@ -8913,6 +9022,9 @@ export namespace google {
 
                     /** JobConfiguration labels */
                     labels?: ({ [k: string]: string }|null);
+
+                    /** JobConfiguration reservation */
+                    reservation?: (string|null);
                 }
 
                 /** Represents a JobConfiguration. */
@@ -8947,6 +9059,9 @@ export namespace google {
 
                     /** JobConfiguration labels. */
                     public labels: { [k: string]: string };
+
+                    /** JobConfiguration reservation. */
+                    public reservation?: (string|null);
 
                     /**
                      * Creates a new JobConfiguration instance using the specified properties.
@@ -35297,7 +35412,7 @@ export namespace google {
             doubleValue?: (number|null);
 
             /** UninterpretedOption stringValue */
-            stringValue?: (Uint8Array|string|null);
+            stringValue?: (Uint8Array|Buffer|string|null);
 
             /** UninterpretedOption aggregateValue */
             aggregateValue?: (string|null);
@@ -35328,7 +35443,7 @@ export namespace google {
             public doubleValue: number;
 
             /** UninterpretedOption stringValue. */
-            public stringValue: (Uint8Array|string);
+            public stringValue: (Uint8Array|Buffer|string);
 
             /** UninterpretedOption aggregateValue. */
             public aggregateValue: string;
@@ -37240,7 +37355,7 @@ export namespace google {
         interface IBytesValue {
 
             /** BytesValue value */
-            value?: (Uint8Array|string|null);
+            value?: (Uint8Array|Buffer|string|null);
         }
 
         /** Represents a BytesValue. */
@@ -37253,7 +37368,7 @@ export namespace google {
             constructor(properties?: google.protobuf.IBytesValue);
 
             /** BytesValue value. */
-            public value: (Uint8Array|string);
+            public value: (Uint8Array|Buffer|string);
 
             /**
              * Creates a new BytesValue instance using the specified properties.
