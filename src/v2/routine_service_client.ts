@@ -29,6 +29,7 @@ import type {
 import {Transform} from 'stream';
 import * as protos from '../../protos/protos';
 import jsonProtos = require('../../protos/protos.json');
+import {loggingUtils as logging} from 'google-gax';
 
 /**
  * Client JSON configuration object, loaded from
@@ -53,6 +54,8 @@ export class RoutineServiceClient {
   private _defaults: {[method: string]: gax.CallSettings};
   private _universeDomain: string;
   private _servicePath: string;
+  private _log = logging.log('bigquery');
+
   auth: gax.GoogleAuth;
   descriptors: Descriptors = {
     page: {},
@@ -470,8 +473,34 @@ export class RoutineServiceClient {
         dataset_id: request.datasetId ?? '',
         routine_id: request.routineId ?? '',
       });
-    this.initialize();
-    return this.innerApiCalls.getRoutine(request, options, callback);
+    this.initialize().catch(err => {
+      throw err;
+    });
+    this._log.info('getRoutine request %j', request);
+    const wrappedCallback:
+      | Callback<
+          protos.google.cloud.bigquery.v2.IRoutine,
+          protos.google.cloud.bigquery.v2.IGetRoutineRequest | null | undefined,
+          {} | null | undefined
+        >
+      | undefined = callback
+      ? (error, response, options, rawResponse) => {
+          this._log.info('getRoutine response %j', response);
+          callback!(error, response, options, rawResponse); // We verified callback above.
+        }
+      : undefined;
+    return this.innerApiCalls
+      .getRoutine(request, options, wrappedCallback)
+      ?.then(
+        ([response, options, rawResponse]: [
+          protos.google.cloud.bigquery.v2.IRoutine,
+          protos.google.cloud.bigquery.v2.IGetRoutineRequest | undefined,
+          {} | undefined,
+        ]) => {
+          this._log.info('getRoutine response %j', response);
+          return [response, options, rawResponse];
+        }
+      );
   }
   /**
    * Creates a new routine in the dataset.
@@ -559,8 +588,36 @@ export class RoutineServiceClient {
         project_id: request.projectId ?? '',
         dataset_id: request.datasetId ?? '',
       });
-    this.initialize();
-    return this.innerApiCalls.insertRoutine(request, options, callback);
+    this.initialize().catch(err => {
+      throw err;
+    });
+    this._log.info('insertRoutine request %j', request);
+    const wrappedCallback:
+      | Callback<
+          protos.google.cloud.bigquery.v2.IRoutine,
+          | protos.google.cloud.bigquery.v2.IInsertRoutineRequest
+          | null
+          | undefined,
+          {} | null | undefined
+        >
+      | undefined = callback
+      ? (error, response, options, rawResponse) => {
+          this._log.info('insertRoutine response %j', response);
+          callback!(error, response, options, rawResponse); // We verified callback above.
+        }
+      : undefined;
+    return this.innerApiCalls
+      .insertRoutine(request, options, wrappedCallback)
+      ?.then(
+        ([response, options, rawResponse]: [
+          protos.google.cloud.bigquery.v2.IRoutine,
+          protos.google.cloud.bigquery.v2.IInsertRoutineRequest | undefined,
+          {} | undefined,
+        ]) => {
+          this._log.info('insertRoutine response %j', response);
+          return [response, options, rawResponse];
+        }
+      );
   }
   /**
    * Updates information in an existing routine. The update method replaces the
@@ -652,8 +709,36 @@ export class RoutineServiceClient {
         dataset_id: request.datasetId ?? '',
         routine_id: request.routineId ?? '',
       });
-    this.initialize();
-    return this.innerApiCalls.updateRoutine(request, options, callback);
+    this.initialize().catch(err => {
+      throw err;
+    });
+    this._log.info('updateRoutine request %j', request);
+    const wrappedCallback:
+      | Callback<
+          protos.google.cloud.bigquery.v2.IRoutine,
+          | protos.google.cloud.bigquery.v2.IUpdateRoutineRequest
+          | null
+          | undefined,
+          {} | null | undefined
+        >
+      | undefined = callback
+      ? (error, response, options, rawResponse) => {
+          this._log.info('updateRoutine response %j', response);
+          callback!(error, response, options, rawResponse); // We verified callback above.
+        }
+      : undefined;
+    return this.innerApiCalls
+      .updateRoutine(request, options, wrappedCallback)
+      ?.then(
+        ([response, options, rawResponse]: [
+          protos.google.cloud.bigquery.v2.IRoutine,
+          protos.google.cloud.bigquery.v2.IUpdateRoutineRequest | undefined,
+          {} | undefined,
+        ]) => {
+          this._log.info('updateRoutine response %j', response);
+          return [response, options, rawResponse];
+        }
+      );
   }
   /**
    * Patches information in an existing routine. The patch method does a partial
@@ -744,8 +829,36 @@ export class RoutineServiceClient {
     options = options || {};
     options.otherArgs = options.otherArgs || {};
     options.otherArgs.headers = options.otherArgs.headers || {};
-    this.initialize();
-    return this.innerApiCalls.patchRoutine(request, options, callback);
+    this.initialize().catch(err => {
+      throw err;
+    });
+    this._log.info('patchRoutine request %j', request);
+    const wrappedCallback:
+      | Callback<
+          protos.google.cloud.bigquery.v2.IRoutine,
+          | protos.google.cloud.bigquery.v2.IPatchRoutineRequest
+          | null
+          | undefined,
+          {} | null | undefined
+        >
+      | undefined = callback
+      ? (error, response, options, rawResponse) => {
+          this._log.info('patchRoutine response %j', response);
+          callback!(error, response, options, rawResponse); // We verified callback above.
+        }
+      : undefined;
+    return this.innerApiCalls
+      .patchRoutine(request, options, wrappedCallback)
+      ?.then(
+        ([response, options, rawResponse]: [
+          protos.google.cloud.bigquery.v2.IRoutine,
+          protos.google.cloud.bigquery.v2.IPatchRoutineRequest | undefined,
+          {} | undefined,
+        ]) => {
+          this._log.info('patchRoutine response %j', response);
+          return [response, options, rawResponse];
+        }
+      );
   }
   /**
    * Deletes the routine specified by routineId from the dataset.
@@ -834,8 +947,36 @@ export class RoutineServiceClient {
         dataset_id: request.datasetId ?? '',
         routine_id: request.routineId ?? '',
       });
-    this.initialize();
-    return this.innerApiCalls.deleteRoutine(request, options, callback);
+    this.initialize().catch(err => {
+      throw err;
+    });
+    this._log.info('deleteRoutine request %j', request);
+    const wrappedCallback:
+      | Callback<
+          protos.google.protobuf.IEmpty,
+          | protos.google.cloud.bigquery.v2.IDeleteRoutineRequest
+          | null
+          | undefined,
+          {} | null | undefined
+        >
+      | undefined = callback
+      ? (error, response, options, rawResponse) => {
+          this._log.info('deleteRoutine response %j', response);
+          callback!(error, response, options, rawResponse); // We verified callback above.
+        }
+      : undefined;
+    return this.innerApiCalls
+      .deleteRoutine(request, options, wrappedCallback)
+      ?.then(
+        ([response, options, rawResponse]: [
+          protos.google.protobuf.IEmpty,
+          protos.google.cloud.bigquery.v2.IDeleteRoutineRequest | undefined,
+          {} | undefined,
+        ]) => {
+          this._log.info('deleteRoutine response %j', response);
+          return [response, options, rawResponse];
+        }
+      );
   }
 
   /**
@@ -941,8 +1082,36 @@ export class RoutineServiceClient {
         project_id: request.projectId ?? '',
         dataset_id: request.datasetId ?? '',
       });
-    this.initialize();
-    return this.innerApiCalls.listRoutines(request, options, callback);
+    this.initialize().catch(err => {
+      throw err;
+    });
+    const wrappedCallback:
+      | PaginationCallback<
+          protos.google.cloud.bigquery.v2.IListRoutinesRequest,
+          | protos.google.cloud.bigquery.v2.IListRoutinesResponse
+          | null
+          | undefined,
+          protos.google.cloud.bigquery.v2.IRoutine
+        >
+      | undefined = callback
+      ? (error, values, nextPageRequest, rawResponse) => {
+          this._log.info('listRoutines values %j', values);
+          callback!(error, values, nextPageRequest, rawResponse); // We verified callback above.
+        }
+      : undefined;
+    this._log.info('listRoutines request %j', request);
+    return this.innerApiCalls
+      .listRoutines(request, options, wrappedCallback)
+      ?.then(
+        ([response, input, output]: [
+          protos.google.cloud.bigquery.v2.IRoutine[],
+          protos.google.cloud.bigquery.v2.IListRoutinesRequest | null,
+          protos.google.cloud.bigquery.v2.IListRoutinesResponse,
+        ]) => {
+          this._log.info('listRoutines values %j', response);
+          return [response, input, output];
+        }
+      );
   }
 
   /**
@@ -989,7 +1158,10 @@ export class RoutineServiceClient {
       });
     const defaultCallSettings = this._defaults['listRoutines'];
     const callSettings = defaultCallSettings.merge(options);
-    this.initialize();
+    this.initialize().catch(err => {
+      throw err;
+    });
+    this._log.info('listRoutines stream %j', request);
     return this.descriptors.page.listRoutines.createStream(
       this.innerApiCalls.listRoutines as GaxCall,
       request,
@@ -1044,7 +1216,10 @@ export class RoutineServiceClient {
       });
     const defaultCallSettings = this._defaults['listRoutines'];
     const callSettings = defaultCallSettings.merge(options);
-    this.initialize();
+    this.initialize().catch(err => {
+      throw err;
+    });
+    this._log.info('listRoutines iterate %j', request);
     return this.descriptors.page.listRoutines.asyncIterate(
       this.innerApiCalls['listRoutines'] as GaxCall,
       request as {},
@@ -1061,6 +1236,7 @@ export class RoutineServiceClient {
   close(): Promise<void> {
     if (this.routineServiceStub && !this._terminated) {
       return this.routineServiceStub.then(stub => {
+        this._log.info('ending gRPC channel');
         this._terminated = true;
         stub.close();
       });

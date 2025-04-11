@@ -29,6 +29,7 @@ import type {
 import {Transform} from 'stream';
 import * as protos from '../../protos/protos';
 import jsonProtos = require('../../protos/protos.json');
+import {loggingUtils as logging} from 'google-gax';
 
 /**
  * Client JSON configuration object, loaded from
@@ -53,6 +54,8 @@ export class RowAccessPolicyServiceClient {
   private _defaults: {[method: string]: gax.CallSettings};
   private _universeDomain: string;
   private _servicePath: string;
+  private _log = logging.log('bigquery');
+
   auth: gax.GoogleAuth;
   descriptors: Descriptors = {
     page: {},
@@ -482,8 +485,39 @@ export class RowAccessPolicyServiceClient {
         table_id: request.tableId ?? '',
         policy_id: request.policyId ?? '',
       });
-    this.initialize();
-    return this.innerApiCalls.getRowAccessPolicy(request, options, callback);
+    this.initialize().catch(err => {
+      throw err;
+    });
+    this._log.info('getRowAccessPolicy request %j', request);
+    const wrappedCallback:
+      | Callback<
+          protos.google.cloud.bigquery.v2.IRowAccessPolicy,
+          | protos.google.cloud.bigquery.v2.IGetRowAccessPolicyRequest
+          | null
+          | undefined,
+          {} | null | undefined
+        >
+      | undefined = callback
+      ? (error, response, options, rawResponse) => {
+          this._log.info('getRowAccessPolicy response %j', response);
+          callback!(error, response, options, rawResponse); // We verified callback above.
+        }
+      : undefined;
+    return this.innerApiCalls
+      .getRowAccessPolicy(request, options, wrappedCallback)
+      ?.then(
+        ([response, options, rawResponse]: [
+          protos.google.cloud.bigquery.v2.IRowAccessPolicy,
+          (
+            | protos.google.cloud.bigquery.v2.IGetRowAccessPolicyRequest
+            | undefined
+          ),
+          {} | undefined,
+        ]) => {
+          this._log.info('getRowAccessPolicy response %j', response);
+          return [response, options, rawResponse];
+        }
+      );
   }
   /**
    * Creates a row access policy.
@@ -580,8 +614,39 @@ export class RowAccessPolicyServiceClient {
         dataset_id: request.datasetId ?? '',
         table_id: request.tableId ?? '',
       });
-    this.initialize();
-    return this.innerApiCalls.createRowAccessPolicy(request, options, callback);
+    this.initialize().catch(err => {
+      throw err;
+    });
+    this._log.info('createRowAccessPolicy request %j', request);
+    const wrappedCallback:
+      | Callback<
+          protos.google.cloud.bigquery.v2.IRowAccessPolicy,
+          | protos.google.cloud.bigquery.v2.ICreateRowAccessPolicyRequest
+          | null
+          | undefined,
+          {} | null | undefined
+        >
+      | undefined = callback
+      ? (error, response, options, rawResponse) => {
+          this._log.info('createRowAccessPolicy response %j', response);
+          callback!(error, response, options, rawResponse); // We verified callback above.
+        }
+      : undefined;
+    return this.innerApiCalls
+      .createRowAccessPolicy(request, options, wrappedCallback)
+      ?.then(
+        ([response, options, rawResponse]: [
+          protos.google.cloud.bigquery.v2.IRowAccessPolicy,
+          (
+            | protos.google.cloud.bigquery.v2.ICreateRowAccessPolicyRequest
+            | undefined
+          ),
+          {} | undefined,
+        ]) => {
+          this._log.info('createRowAccessPolicy response %j', response);
+          return [response, options, rawResponse];
+        }
+      );
   }
   /**
    * Updates a row access policy.
@@ -681,8 +746,39 @@ export class RowAccessPolicyServiceClient {
         table_id: request.tableId ?? '',
         policy_id: request.policyId ?? '',
       });
-    this.initialize();
-    return this.innerApiCalls.updateRowAccessPolicy(request, options, callback);
+    this.initialize().catch(err => {
+      throw err;
+    });
+    this._log.info('updateRowAccessPolicy request %j', request);
+    const wrappedCallback:
+      | Callback<
+          protos.google.cloud.bigquery.v2.IRowAccessPolicy,
+          | protos.google.cloud.bigquery.v2.IUpdateRowAccessPolicyRequest
+          | null
+          | undefined,
+          {} | null | undefined
+        >
+      | undefined = callback
+      ? (error, response, options, rawResponse) => {
+          this._log.info('updateRowAccessPolicy response %j', response);
+          callback!(error, response, options, rawResponse); // We verified callback above.
+        }
+      : undefined;
+    return this.innerApiCalls
+      .updateRowAccessPolicy(request, options, wrappedCallback)
+      ?.then(
+        ([response, options, rawResponse]: [
+          protos.google.cloud.bigquery.v2.IRowAccessPolicy,
+          (
+            | protos.google.cloud.bigquery.v2.IUpdateRowAccessPolicyRequest
+            | undefined
+          ),
+          {} | undefined,
+        ]) => {
+          this._log.info('updateRowAccessPolicy response %j', response);
+          return [response, options, rawResponse];
+        }
+      );
   }
   /**
    * Deletes a row access policy.
@@ -784,8 +880,39 @@ export class RowAccessPolicyServiceClient {
         table_id: request.tableId ?? '',
         policy_id: request.policyId ?? '',
       });
-    this.initialize();
-    return this.innerApiCalls.deleteRowAccessPolicy(request, options, callback);
+    this.initialize().catch(err => {
+      throw err;
+    });
+    this._log.info('deleteRowAccessPolicy request %j', request);
+    const wrappedCallback:
+      | Callback<
+          protos.google.protobuf.IEmpty,
+          | protos.google.cloud.bigquery.v2.IDeleteRowAccessPolicyRequest
+          | null
+          | undefined,
+          {} | null | undefined
+        >
+      | undefined = callback
+      ? (error, response, options, rawResponse) => {
+          this._log.info('deleteRowAccessPolicy response %j', response);
+          callback!(error, response, options, rawResponse); // We verified callback above.
+        }
+      : undefined;
+    return this.innerApiCalls
+      .deleteRowAccessPolicy(request, options, wrappedCallback)
+      ?.then(
+        ([response, options, rawResponse]: [
+          protos.google.protobuf.IEmpty,
+          (
+            | protos.google.cloud.bigquery.v2.IDeleteRowAccessPolicyRequest
+            | undefined
+          ),
+          {} | undefined,
+        ]) => {
+          this._log.info('deleteRowAccessPolicy response %j', response);
+          return [response, options, rawResponse];
+        }
+      );
   }
   /**
    * Deletes provided row access policies.
@@ -892,12 +1019,39 @@ export class RowAccessPolicyServiceClient {
         dataset_id: request.datasetId ?? '',
         table_id: request.tableId ?? '',
       });
-    this.initialize();
-    return this.innerApiCalls.batchDeleteRowAccessPolicies(
-      request,
-      options,
-      callback
-    );
+    this.initialize().catch(err => {
+      throw err;
+    });
+    this._log.info('batchDeleteRowAccessPolicies request %j', request);
+    const wrappedCallback:
+      | Callback<
+          protos.google.protobuf.IEmpty,
+          | protos.google.cloud.bigquery.v2.IBatchDeleteRowAccessPoliciesRequest
+          | null
+          | undefined,
+          {} | null | undefined
+        >
+      | undefined = callback
+      ? (error, response, options, rawResponse) => {
+          this._log.info('batchDeleteRowAccessPolicies response %j', response);
+          callback!(error, response, options, rawResponse); // We verified callback above.
+        }
+      : undefined;
+    return this.innerApiCalls
+      .batchDeleteRowAccessPolicies(request, options, wrappedCallback)
+      ?.then(
+        ([response, options, rawResponse]: [
+          protos.google.protobuf.IEmpty,
+          (
+            | protos.google.cloud.bigquery.v2.IBatchDeleteRowAccessPoliciesRequest
+            | undefined
+          ),
+          {} | undefined,
+        ]) => {
+          this._log.info('batchDeleteRowAccessPolicies response %j', response);
+          return [response, options, rawResponse];
+        }
+      );
   }
 
   /**
@@ -1002,8 +1156,36 @@ export class RowAccessPolicyServiceClient {
         dataset_id: request.datasetId ?? '',
         table_id: request.tableId ?? '',
       });
-    this.initialize();
-    return this.innerApiCalls.listRowAccessPolicies(request, options, callback);
+    this.initialize().catch(err => {
+      throw err;
+    });
+    const wrappedCallback:
+      | PaginationCallback<
+          protos.google.cloud.bigquery.v2.IListRowAccessPoliciesRequest,
+          | protos.google.cloud.bigquery.v2.IListRowAccessPoliciesResponse
+          | null
+          | undefined,
+          protos.google.cloud.bigquery.v2.IRowAccessPolicy
+        >
+      | undefined = callback
+      ? (error, values, nextPageRequest, rawResponse) => {
+          this._log.info('listRowAccessPolicies values %j', values);
+          callback!(error, values, nextPageRequest, rawResponse); // We verified callback above.
+        }
+      : undefined;
+    this._log.info('listRowAccessPolicies request %j', request);
+    return this.innerApiCalls
+      .listRowAccessPolicies(request, options, wrappedCallback)
+      ?.then(
+        ([response, input, output]: [
+          protos.google.cloud.bigquery.v2.IRowAccessPolicy[],
+          protos.google.cloud.bigquery.v2.IListRowAccessPoliciesRequest | null,
+          protos.google.cloud.bigquery.v2.IListRowAccessPoliciesResponse,
+        ]) => {
+          this._log.info('listRowAccessPolicies values %j', response);
+          return [response, input, output];
+        }
+      );
   }
 
   /**
@@ -1049,7 +1231,10 @@ export class RowAccessPolicyServiceClient {
       });
     const defaultCallSettings = this._defaults['listRowAccessPolicies'];
     const callSettings = defaultCallSettings.merge(options);
-    this.initialize();
+    this.initialize().catch(err => {
+      throw err;
+    });
+    this._log.info('listRowAccessPolicies stream %j', request);
     return this.descriptors.page.listRowAccessPolicies.createStream(
       this.innerApiCalls.listRowAccessPolicies as GaxCall,
       request,
@@ -1103,7 +1288,10 @@ export class RowAccessPolicyServiceClient {
       });
     const defaultCallSettings = this._defaults['listRowAccessPolicies'];
     const callSettings = defaultCallSettings.merge(options);
-    this.initialize();
+    this.initialize().catch(err => {
+      throw err;
+    });
+    this._log.info('listRowAccessPolicies iterate %j', request);
     return this.descriptors.page.listRowAccessPolicies.asyncIterate(
       this.innerApiCalls['listRowAccessPolicies'] as GaxCall,
       request as {},
@@ -1120,6 +1308,7 @@ export class RowAccessPolicyServiceClient {
   close(): Promise<void> {
     if (this.rowAccessPolicyServiceStub && !this._terminated) {
       return this.rowAccessPolicyServiceStub.then(stub => {
+        this._log.info('ending gRPC channel');
         this._terminated = true;
         stub.close();
       });

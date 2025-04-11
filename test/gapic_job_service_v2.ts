@@ -263,7 +263,9 @@ describe('v2.JobServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      client.initialize().catch(err => {
+        throw err;
+      });
       assert(client.jobServiceStub);
       client.close().then(() => {
         done();
@@ -322,7 +324,7 @@ describe('v2.JobServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.CancelJobRequest()
       );
@@ -358,7 +360,7 @@ describe('v2.JobServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.CancelJobRequest()
       );
@@ -410,7 +412,7 @@ describe('v2.JobServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.CancelJobRequest()
       );
@@ -443,7 +445,7 @@ describe('v2.JobServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.CancelJobRequest()
       );
@@ -469,7 +471,7 @@ describe('v2.JobServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.GetJobRequest()
       );
@@ -505,7 +507,7 @@ describe('v2.JobServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.GetJobRequest()
       );
@@ -557,7 +559,7 @@ describe('v2.JobServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.GetJobRequest()
       );
@@ -590,7 +592,7 @@ describe('v2.JobServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.GetJobRequest()
       );
@@ -616,7 +618,7 @@ describe('v2.JobServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.InsertJobRequest()
       );
@@ -647,7 +649,7 @@ describe('v2.JobServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.InsertJobRequest()
       );
@@ -694,7 +696,7 @@ describe('v2.JobServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.InsertJobRequest()
       );
@@ -722,7 +724,7 @@ describe('v2.JobServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.InsertJobRequest()
       );
@@ -743,7 +745,7 @@ describe('v2.JobServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.DeleteJobRequest()
       );
@@ -779,7 +781,7 @@ describe('v2.JobServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.DeleteJobRequest()
       );
@@ -831,7 +833,7 @@ describe('v2.JobServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.DeleteJobRequest()
       );
@@ -864,7 +866,7 @@ describe('v2.JobServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.DeleteJobRequest()
       );
@@ -890,7 +892,7 @@ describe('v2.JobServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.GetQueryResultsRequest()
       );
@@ -926,7 +928,7 @@ describe('v2.JobServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.GetQueryResultsRequest()
       );
@@ -978,7 +980,7 @@ describe('v2.JobServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.GetQueryResultsRequest()
       );
@@ -1014,7 +1016,7 @@ describe('v2.JobServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.GetQueryResultsRequest()
       );
@@ -1040,7 +1042,7 @@ describe('v2.JobServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.PostQueryRequest()
       );
@@ -1070,7 +1072,7 @@ describe('v2.JobServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.PostQueryRequest()
       );
@@ -1115,7 +1117,7 @@ describe('v2.JobServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.PostQueryRequest()
       );
@@ -1142,7 +1144,7 @@ describe('v2.JobServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.PostQueryRequest()
       );
@@ -1163,7 +1165,7 @@ describe('v2.JobServiceClient', () => {
         credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.ListJobsRequest()
       );
@@ -1202,7 +1204,7 @@ describe('v2.JobServiceClient', () => {
         credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.ListJobsRequest()
       );
@@ -1257,7 +1259,7 @@ describe('v2.JobServiceClient', () => {
         credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.ListJobsRequest()
       );
@@ -1285,7 +1287,7 @@ describe('v2.JobServiceClient', () => {
         credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.ListJobsRequest()
       );
@@ -1345,7 +1347,7 @@ describe('v2.JobServiceClient', () => {
         credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.ListJobsRequest()
       );
@@ -1396,7 +1398,7 @@ describe('v2.JobServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.ListJobsRequest()
       );
@@ -1444,7 +1446,7 @@ describe('v2.JobServiceClient', () => {
         credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.ListJobsRequest()
       );

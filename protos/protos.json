@@ -1298,6 +1298,21 @@
                           "options": {
                             "(google.api.field_behavior)": "OPTIONAL"
                           }
+                        },
+                        "nullMarkers": {
+                          "rule": "repeated",
+                          "type": "string",
+                          "id": 9,
+                          "options": {
+                            "(google.api.field_behavior)": "OPTIONAL"
+                          }
+                        },
+                        "sourceColumnMatch": {
+                          "type": "string",
+                          "id": 10,
+                          "options": {
+                            "(google.api.field_behavior)": "OPTIONAL"
+                          }
                         }
                       }
                     },
@@ -1446,6 +1461,31 @@
                           "oneof": [
                             "objectMetadata"
                           ]
+                        },
+                        "_timeZone": {
+                          "oneof": [
+                            "timeZone"
+                          ]
+                        },
+                        "_dateFormat": {
+                          "oneof": [
+                            "dateFormat"
+                          ]
+                        },
+                        "_datetimeFormat": {
+                          "oneof": [
+                            "datetimeFormat"
+                          ]
+                        },
+                        "_timeFormat": {
+                          "oneof": [
+                            "timeFormat"
+                          ]
+                        },
+                        "_timestampFormat": {
+                          "oneof": [
+                            "timestampFormat"
+                          ]
                         }
                       },
                       "fields": {
@@ -1585,6 +1625,46 @@
                           "id": 24,
                           "options": {
                             "(google.api.field_behavior)": "OPTIONAL"
+                          }
+                        },
+                        "timeZone": {
+                          "type": "string",
+                          "id": 27,
+                          "options": {
+                            "(google.api.field_behavior)": "OPTIONAL",
+                            "proto3_optional": true
+                          }
+                        },
+                        "dateFormat": {
+                          "type": "string",
+                          "id": 28,
+                          "options": {
+                            "(google.api.field_behavior)": "OPTIONAL",
+                            "proto3_optional": true
+                          }
+                        },
+                        "datetimeFormat": {
+                          "type": "string",
+                          "id": 29,
+                          "options": {
+                            "(google.api.field_behavior)": "OPTIONAL",
+                            "proto3_optional": true
+                          }
+                        },
+                        "timeFormat": {
+                          "type": "string",
+                          "id": 30,
+                          "options": {
+                            "(google.api.field_behavior)": "OPTIONAL",
+                            "proto3_optional": true
+                          }
+                        },
+                        "timestampFormat": {
+                          "type": "string",
+                          "id": 31,
+                          "options": {
+                            "(google.api.field_behavior)": "OPTIONAL",
+                            "proto3_optional": true
                           }
                         }
                       },
@@ -2209,6 +2289,18 @@
                       }
                     },
                     "QueryRequest": {
+                      "oneofs": {
+                        "_jobTimeoutMs": {
+                          "oneof": [
+                            "jobTimeoutMs"
+                          ]
+                        },
+                        "_reservation": {
+                          "oneof": [
+                            "reservation"
+                          ]
+                        }
+                      },
                       "fields": {
                         "kind": {
                           "type": "string",
@@ -2238,6 +2330,21 @@
                         "timeoutMs": {
                           "type": "google.protobuf.UInt32Value",
                           "id": 6,
+                          "options": {
+                            "(google.api.field_behavior)": "OPTIONAL"
+                          }
+                        },
+                        "jobTimeoutMs": {
+                          "type": "int64",
+                          "id": 26,
+                          "options": {
+                            "(google.api.field_behavior)": "OPTIONAL",
+                            "proto3_optional": true
+                          }
+                        },
+                        "destinationEncryptionConfiguration": {
+                          "type": "EncryptionConfiguration",
+                          "id": 27,
                           "options": {
                             "(google.api.field_behavior)": "OPTIONAL"
                           }
@@ -2322,6 +2429,15 @@
                           "id": 22,
                           "options": {
                             "(google.api.field_behavior)": "OPTIONAL"
+                          }
+                        },
+                        "reservation": {
+                          "type": "string",
+                          "id": 24,
+                          "options": {
+                            "(google.api.field_behavior)": "OPTIONAL",
+                            "(google.api.resource_reference).type": "bigqueryreservation.googleapis.com/Reservation",
+                            "proto3_optional": true
                           }
                         },
                         "writeIncrementalResults": {
@@ -2722,6 +2838,28 @@
                       }
                     },
                     "JobConfigurationLoad": {
+                      "oneofs": {
+                        "_dateFormat": {
+                          "oneof": [
+                            "dateFormat"
+                          ]
+                        },
+                        "_datetimeFormat": {
+                          "oneof": [
+                            "datetimeFormat"
+                          ]
+                        },
+                        "_timeFormat": {
+                          "oneof": [
+                            "timeFormat"
+                          ]
+                        },
+                        "_timestampFormat": {
+                          "oneof": [
+                            "timestampFormat"
+                          ]
+                        }
+                      },
                       "fields": {
                         "sourceUris": {
                           "rule": "repeated",
@@ -2942,6 +3080,60 @@
                           "options": {
                             "(google.api.field_behavior)": "OPTIONAL"
                           }
+                        },
+                        "timeZone": {
+                          "type": "google.protobuf.StringValue",
+                          "id": 52,
+                          "options": {
+                            "(google.api.field_behavior)": "OPTIONAL"
+                          }
+                        },
+                        "nullMarkers": {
+                          "rule": "repeated",
+                          "type": "string",
+                          "id": 53,
+                          "options": {
+                            "(google.api.field_behavior)": "OPTIONAL"
+                          }
+                        },
+                        "dateFormat": {
+                          "type": "string",
+                          "id": 54,
+                          "options": {
+                            "(google.api.field_behavior)": "OPTIONAL",
+                            "proto3_optional": true
+                          }
+                        },
+                        "datetimeFormat": {
+                          "type": "string",
+                          "id": 55,
+                          "options": {
+                            "(google.api.field_behavior)": "OPTIONAL",
+                            "proto3_optional": true
+                          }
+                        },
+                        "timeFormat": {
+                          "type": "string",
+                          "id": 56,
+                          "options": {
+                            "(google.api.field_behavior)": "OPTIONAL",
+                            "proto3_optional": true
+                          }
+                        },
+                        "timestampFormat": {
+                          "type": "string",
+                          "id": 57,
+                          "options": {
+                            "(google.api.field_behavior)": "OPTIONAL",
+                            "proto3_optional": true
+                          }
+                        },
+                        "sourceColumnMatch": {
+                          "type": "SourceColumnMatch",
+                          "id": 58,
+                          "options": {
+                            "(google.api.field_behavior)": "OPTIONAL"
+                          }
                         }
                       },
                       "nested": {
@@ -2951,6 +3143,13 @@
                             "STRICT": 1,
                             "V1": 2,
                             "V2": 3
+                          }
+                        },
+                        "SourceColumnMatch": {
+                          "values": {
+                            "SOURCE_COLUMN_MATCH_UNSPECIFIED": 0,
+                            "POSITION": 1,
+                            "NAME": 2
                           }
                         }
                       }
@@ -3090,6 +3289,13 @@
                       }
                     },
                     "JobConfiguration": {
+                      "oneofs": {
+                        "_reservation": {
+                          "oneof": [
+                            "reservation"
+                          ]
+                        }
+                      },
                       "fields": {
                         "jobType": {
                           "type": "string",
@@ -3129,6 +3335,15 @@
                           "keyType": "string",
                           "type": "string",
                           "id": 7
+                        },
+                        "reservation": {
+                          "type": "string",
+                          "id": 11,
+                          "options": {
+                            "(google.api.field_behavior)": "OPTIONAL",
+                            "(google.api.resource_reference).type": "bigqueryreservation.googleapis.com/Reservation",
+                            "proto3_optional": true
+                          }
                         }
                       }
                     },

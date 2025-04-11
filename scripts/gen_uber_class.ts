@@ -388,7 +388,6 @@ async function buildOutput() {
     bracketSpacing: false,
   });
 }
-
 async function main() {
   const finaloutput = await buildOutput();
   fs.writeFile('../src/bigquery.ts', finaloutput, err => {

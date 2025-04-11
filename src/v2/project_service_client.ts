@@ -27,6 +27,7 @@ import type {
 
 import * as protos from '../../protos/protos';
 import jsonProtos = require('../../protos/protos.json');
+import {loggingUtils as logging} from 'google-gax';
 
 /**
  * Client JSON configuration object, loaded from
@@ -51,6 +52,8 @@ export class ProjectServiceClient {
   private _defaults: {[method: string]: gax.CallSettings};
   private _universeDomain: string;
   private _servicePath: string;
+  private _log = logging.log('bigquery');
+
   auth: gax.GoogleAuth;
   descriptors: Descriptors = {
     page: {},
@@ -453,8 +456,36 @@ export class ProjectServiceClient {
       this._gaxModule.routingHeader.fromParams({
         project_id: request.projectId ?? '',
       });
-    this.initialize();
-    return this.innerApiCalls.getServiceAccount(request, options, callback);
+    this.initialize().catch(err => {
+      throw err;
+    });
+    this._log.info('getServiceAccount request %j', request);
+    const wrappedCallback:
+      | Callback<
+          protos.google.cloud.bigquery.v2.IGetServiceAccountResponse,
+          | protos.google.cloud.bigquery.v2.IGetServiceAccountRequest
+          | null
+          | undefined,
+          {} | null | undefined
+        >
+      | undefined = callback
+      ? (error, response, options, rawResponse) => {
+          this._log.info('getServiceAccount response %j', response);
+          callback!(error, response, options, rawResponse); // We verified callback above.
+        }
+      : undefined;
+    return this.innerApiCalls
+      .getServiceAccount(request, options, wrappedCallback)
+      ?.then(
+        ([response, options, rawResponse]: [
+          protos.google.cloud.bigquery.v2.IGetServiceAccountResponse,
+          protos.google.cloud.bigquery.v2.IGetServiceAccountRequest | undefined,
+          {} | undefined,
+        ]) => {
+          this._log.info('getServiceAccount response %j', response);
+          return [response, options, rawResponse];
+        }
+      );
   }
 
   /**
@@ -466,6 +497,7 @@ export class ProjectServiceClient {
   close(): Promise<void> {
     if (this.projectServiceStub && !this._terminated) {
       return this.projectServiceStub.then(stub => {
+        this._log.info('ending gRPC channel');
         this._terminated = true;
         stub.close();
       });

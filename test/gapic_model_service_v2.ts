@@ -265,7 +265,9 @@ describe('v2.ModelServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      client.initialize().catch(err => {
+        throw err;
+      });
       assert(client.modelServiceStub);
       client.close().then(() => {
         done();
@@ -324,7 +326,7 @@ describe('v2.ModelServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.GetModelRequest()
       );
@@ -365,7 +367,7 @@ describe('v2.ModelServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.GetModelRequest()
       );
@@ -422,7 +424,7 @@ describe('v2.ModelServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.GetModelRequest()
       );
@@ -460,7 +462,7 @@ describe('v2.ModelServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.GetModelRequest()
       );
@@ -491,7 +493,7 @@ describe('v2.ModelServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.PatchModelRequest()
       );
@@ -532,7 +534,7 @@ describe('v2.ModelServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.PatchModelRequest()
       );
@@ -589,7 +591,7 @@ describe('v2.ModelServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.PatchModelRequest()
       );
@@ -630,7 +632,7 @@ describe('v2.ModelServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.PatchModelRequest()
       );
@@ -661,7 +663,7 @@ describe('v2.ModelServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.DeleteModelRequest()
       );
@@ -702,7 +704,7 @@ describe('v2.ModelServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.DeleteModelRequest()
       );
@@ -759,7 +761,7 @@ describe('v2.ModelServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.DeleteModelRequest()
       );
@@ -800,7 +802,7 @@ describe('v2.ModelServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.DeleteModelRequest()
       );
@@ -831,7 +833,7 @@ describe('v2.ModelServiceClient', () => {
         credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.ListModelsRequest()
       );
@@ -869,7 +871,7 @@ describe('v2.ModelServiceClient', () => {
         credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.ListModelsRequest()
       );
@@ -923,7 +925,7 @@ describe('v2.ModelServiceClient', () => {
         credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.ListModelsRequest()
       );
@@ -959,7 +961,7 @@ describe('v2.ModelServiceClient', () => {
         credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.ListModelsRequest()
       );
@@ -1015,7 +1017,7 @@ describe('v2.ModelServiceClient', () => {
         credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.ListModelsRequest()
       );
@@ -1068,7 +1070,7 @@ describe('v2.ModelServiceClient', () => {
         auth: googleAuth,
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.ListModelsRequest()
       );
@@ -1116,7 +1118,7 @@ describe('v2.ModelServiceClient', () => {
         credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
-      client.initialize();
+      await client.initialize();
       const request = generateSampleMessage(
         new protos.google.cloud.bigquery.v2.ListModelsRequest()
       );

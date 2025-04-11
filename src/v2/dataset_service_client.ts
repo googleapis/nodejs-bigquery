@@ -29,6 +29,7 @@ import type {
 import {Transform} from 'stream';
 import * as protos from '../../protos/protos';
 import jsonProtos = require('../../protos/protos.json');
+import {loggingUtils as logging} from 'google-gax';
 
 /**
  * Client JSON configuration object, loaded from
@@ -53,6 +54,8 @@ export class DatasetServiceClient {
   private _defaults: {[method: string]: gax.CallSettings};
   private _universeDomain: string;
   private _servicePath: string;
+  private _log = logging.log('bigquery');
+
   auth: gax.GoogleAuth;
   descriptors: Descriptors = {
     page: {},
@@ -498,8 +501,34 @@ export class DatasetServiceClient {
         project_id: request.projectId ?? '',
         dataset_id: request.datasetId ?? '',
       });
-    this.initialize();
-    return this.innerApiCalls.getDataset(request, options, callback);
+    this.initialize().catch(err => {
+      throw err;
+    });
+    this._log.info('getDataset request %j', request);
+    const wrappedCallback:
+      | Callback<
+          protos.google.cloud.bigquery.v2.IDataset,
+          protos.google.cloud.bigquery.v2.IGetDatasetRequest | null | undefined,
+          {} | null | undefined
+        >
+      | undefined = callback
+      ? (error, response, options, rawResponse) => {
+          this._log.info('getDataset response %j', response);
+          callback!(error, response, options, rawResponse); // We verified callback above.
+        }
+      : undefined;
+    return this.innerApiCalls
+      .getDataset(request, options, wrappedCallback)
+      ?.then(
+        ([response, options, rawResponse]: [
+          protos.google.cloud.bigquery.v2.IDataset,
+          protos.google.cloud.bigquery.v2.IGetDatasetRequest | undefined,
+          {} | undefined,
+        ]) => {
+          this._log.info('getDataset response %j', response);
+          return [response, options, rawResponse];
+        }
+      );
   }
   /**
    * Creates a new empty dataset.
@@ -604,8 +633,36 @@ export class DatasetServiceClient {
       this._gaxModule.routingHeader.fromParams({
         project_id: request.projectId ?? '',
       });
-    this.initialize();
-    return this.innerApiCalls.insertDataset(request, options, callback);
+    this.initialize().catch(err => {
+      throw err;
+    });
+    this._log.info('insertDataset request %j', request);
+    const wrappedCallback:
+      | Callback<
+          protos.google.cloud.bigquery.v2.IDataset,
+          | protos.google.cloud.bigquery.v2.IInsertDatasetRequest
+          | null
+          | undefined,
+          {} | null | undefined
+        >
+      | undefined = callback
+      ? (error, response, options, rawResponse) => {
+          this._log.info('insertDataset response %j', response);
+          callback!(error, response, options, rawResponse); // We verified callback above.
+        }
+      : undefined;
+    return this.innerApiCalls
+      .insertDataset(request, options, wrappedCallback)
+      ?.then(
+        ([response, options, rawResponse]: [
+          protos.google.cloud.bigquery.v2.IDataset,
+          protos.google.cloud.bigquery.v2.IInsertDatasetRequest | undefined,
+          {} | undefined,
+        ]) => {
+          this._log.info('insertDataset response %j', response);
+          return [response, options, rawResponse];
+        }
+      );
   }
   /**
    * Updates information in an existing dataset. The update method replaces the
@@ -726,8 +783,39 @@ export class DatasetServiceClient {
         project_id: request.projectId ?? '',
         dataset_id: request.datasetId ?? '',
       });
-    this.initialize();
-    return this.innerApiCalls.patchDataset(request, options, callback);
+    this.initialize().catch(err => {
+      throw err;
+    });
+    this._log.info('patchDataset request %j', request);
+    const wrappedCallback:
+      | Callback<
+          protos.google.cloud.bigquery.v2.IDataset,
+          | protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest
+          | null
+          | undefined,
+          {} | null | undefined
+        >
+      | undefined = callback
+      ? (error, response, options, rawResponse) => {
+          this._log.info('patchDataset response %j', response);
+          callback!(error, response, options, rawResponse); // We verified callback above.
+        }
+      : undefined;
+    return this.innerApiCalls
+      .patchDataset(request, options, wrappedCallback)
+      ?.then(
+        ([response, options, rawResponse]: [
+          protos.google.cloud.bigquery.v2.IDataset,
+          (
+            | protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest
+            | undefined
+          ),
+          {} | undefined,
+        ]) => {
+          this._log.info('patchDataset response %j', response);
+          return [response, options, rawResponse];
+        }
+      );
   }
   /**
    * Updates information in an existing dataset. The update method replaces the
@@ -847,8 +935,39 @@ export class DatasetServiceClient {
         project_id: request.projectId ?? '',
         dataset_id: request.datasetId ?? '',
       });
-    this.initialize();
-    return this.innerApiCalls.updateDataset(request, options, callback);
+    this.initialize().catch(err => {
+      throw err;
+    });
+    this._log.info('updateDataset request %j', request);
+    const wrappedCallback:
+      | Callback<
+          protos.google.cloud.bigquery.v2.IDataset,
+          | protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest
+          | null
+          | undefined,
+          {} | null | undefined
+        >
+      | undefined = callback
+      ? (error, response, options, rawResponse) => {
+          this._log.info('updateDataset response %j', response);
+          callback!(error, response, options, rawResponse); // We verified callback above.
+        }
+      : undefined;
+    return this.innerApiCalls
+      .updateDataset(request, options, wrappedCallback)
+      ?.then(
+        ([response, options, rawResponse]: [
+          protos.google.cloud.bigquery.v2.IDataset,
+          (
+            | protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest
+            | undefined
+          ),
+          {} | undefined,
+        ]) => {
+          this._log.info('updateDataset response %j', response);
+          return [response, options, rawResponse];
+        }
+      );
   }
   /**
    * Deletes the dataset specified by the datasetId value. Before you can delete
@@ -941,8 +1060,36 @@ export class DatasetServiceClient {
         project_id: request.projectId ?? '',
         dataset_id: request.datasetId ?? '',
       });
-    this.initialize();
-    return this.innerApiCalls.deleteDataset(request, options, callback);
+    this.initialize().catch(err => {
+      throw err;
+    });
+    this._log.info('deleteDataset request %j', request);
+    const wrappedCallback:
+      | Callback<
+          protos.google.protobuf.IEmpty,
+          | protos.google.cloud.bigquery.v2.IDeleteDatasetRequest
+          | null
+          | undefined,
+          {} | null | undefined
+        >
+      | undefined = callback
+      ? (error, response, options, rawResponse) => {
+          this._log.info('deleteDataset response %j', response);
+          callback!(error, response, options, rawResponse); // We verified callback above.
+        }
+      : undefined;
+    return this.innerApiCalls
+      .deleteDataset(request, options, wrappedCallback)
+      ?.then(
+        ([response, options, rawResponse]: [
+          protos.google.protobuf.IEmpty,
+          protos.google.cloud.bigquery.v2.IDeleteDatasetRequest | undefined,
+          {} | undefined,
+        ]) => {
+          this._log.info('deleteDataset response %j', response);
+          return [response, options, rawResponse];
+        }
+      );
   }
   /**
    * Undeletes a dataset which is within time travel window based on datasetId.
@@ -1040,8 +1187,36 @@ export class DatasetServiceClient {
         project_id: request.projectId ?? '',
         dataset_id: request.datasetId ?? '',
       });
-    this.initialize();
-    return this.innerApiCalls.undeleteDataset(request, options, callback);
+    this.initialize().catch(err => {
+      throw err;
+    });
+    this._log.info('undeleteDataset request %j', request);
+    const wrappedCallback:
+      | Callback<
+          protos.google.cloud.bigquery.v2.IDataset,
+          | protos.google.cloud.bigquery.v2.IUndeleteDatasetRequest
+          | null
+          | undefined,
+          {} | null | undefined
+        >
+      | undefined = callback
+      ? (error, response, options, rawResponse) => {
+          this._log.info('undeleteDataset response %j', response);
+          callback!(error, response, options, rawResponse); // We verified callback above.
+        }
+      : undefined;
+    return this.innerApiCalls
+      .undeleteDataset(request, options, wrappedCallback)
+      ?.then(
+        ([response, options, rawResponse]: [
+          protos.google.cloud.bigquery.v2.IDataset,
+          protos.google.cloud.bigquery.v2.IUndeleteDatasetRequest | undefined,
+          {} | undefined,
+        ]) => {
+          this._log.info('undeleteDataset response %j', response);
+          return [response, options, rawResponse];
+        }
+      );
   }
 
   /**
@@ -1148,8 +1323,34 @@ export class DatasetServiceClient {
       this._gaxModule.routingHeader.fromParams({
         project_id: request.projectId ?? '',
       });
-    this.initialize();
-    return this.innerApiCalls.listDatasets(request, options, callback);
+    this.initialize().catch(err => {
+      throw err;
+    });
+    const wrappedCallback:
+      | PaginationCallback<
+          protos.google.cloud.bigquery.v2.IListDatasetsRequest,
+          protos.google.cloud.bigquery.v2.IDatasetList | null | undefined,
+          protos.google.cloud.bigquery.v2.IListFormatDataset
+        >
+      | undefined = callback
+      ? (error, values, nextPageRequest, rawResponse) => {
+          this._log.info('listDatasets values %j', values);
+          callback!(error, values, nextPageRequest, rawResponse); // We verified callback above.
+        }
+      : undefined;
+    this._log.info('listDatasets request %j', request);
+    return this.innerApiCalls
+      .listDatasets(request, options, wrappedCallback)
+      ?.then(
+        ([response, input, output]: [
+          protos.google.cloud.bigquery.v2.IListFormatDataset[],
+          protos.google.cloud.bigquery.v2.IListDatasetsRequest | null,
+          protos.google.cloud.bigquery.v2.IDatasetList,
+        ]) => {
+          this._log.info('listDatasets values %j', response);
+          return [response, input, output];
+        }
+      );
   }
 
   /**
@@ -1199,7 +1400,10 @@ export class DatasetServiceClient {
       });
     const defaultCallSettings = this._defaults['listDatasets'];
     const callSettings = defaultCallSettings.merge(options);
-    this.initialize();
+    this.initialize().catch(err => {
+      throw err;
+    });
+    this._log.info('listDatasets stream %j', request);
     return this.descriptors.page.listDatasets.createStream(
       this.innerApiCalls.listDatasets as GaxCall,
       request,
@@ -1257,7 +1461,10 @@ export class DatasetServiceClient {
       });
     const defaultCallSettings = this._defaults['listDatasets'];
     const callSettings = defaultCallSettings.merge(options);
-    this.initialize();
+    this.initialize().catch(err => {
+      throw err;
+    });
+    this._log.info('listDatasets iterate %j', request);
     return this.descriptors.page.listDatasets.asyncIterate(
       this.innerApiCalls['listDatasets'] as GaxCall,
       request as {},
@@ -1274,6 +1481,7 @@ export class DatasetServiceClient {
   close(): Promise<void> {
     if (this.datasetServiceStub && !this._terminated) {
       return this.datasetServiceStub.then(stub => {
+        this._log.info('ending gRPC channel');
         this._terminated = true;
         stub.close();
       });

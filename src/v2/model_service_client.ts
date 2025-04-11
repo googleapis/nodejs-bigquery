@@ -29,6 +29,7 @@ import type {
 import {Transform} from 'stream';
 import * as protos from '../../protos/protos';
 import jsonProtos = require('../../protos/protos.json');
+import {loggingUtils as logging} from 'google-gax';
 
 /**
  * Client JSON configuration object, loaded from
@@ -53,6 +54,8 @@ export class ModelServiceClient {
   private _defaults: {[method: string]: gax.CallSettings};
   private _universeDomain: string;
   private _servicePath: string;
+  private _log = logging.log('bigquery');
+
   auth: gax.GoogleAuth;
   descriptors: Descriptors = {
     page: {},
@@ -468,8 +471,34 @@ export class ModelServiceClient {
         dataset_id: request.datasetId ?? '',
         model_id: request.modelId ?? '',
       });
-    this.initialize();
-    return this.innerApiCalls.getModel(request, options, callback);
+    this.initialize().catch(err => {
+      throw err;
+    });
+    this._log.info('getModel request %j', request);
+    const wrappedCallback:
+      | Callback<
+          protos.google.cloud.bigquery.v2.IModel,
+          protos.google.cloud.bigquery.v2.IGetModelRequest | null | undefined,
+          {} | null | undefined
+        >
+      | undefined = callback
+      ? (error, response, options, rawResponse) => {
+          this._log.info('getModel response %j', response);
+          callback!(error, response, options, rawResponse); // We verified callback above.
+        }
+      : undefined;
+    return this.innerApiCalls
+      .getModel(request, options, wrappedCallback)
+      ?.then(
+        ([response, options, rawResponse]: [
+          protos.google.cloud.bigquery.v2.IModel,
+          protos.google.cloud.bigquery.v2.IGetModelRequest | undefined,
+          {} | undefined,
+        ]) => {
+          this._log.info('getModel response %j', response);
+          return [response, options, rawResponse];
+        }
+      );
   }
   /**
    * Patch specific fields in the specified model.
@@ -560,8 +589,34 @@ export class ModelServiceClient {
         dataset_id: request.datasetId ?? '',
         model_id: request.modelId ?? '',
       });
-    this.initialize();
-    return this.innerApiCalls.patchModel(request, options, callback);
+    this.initialize().catch(err => {
+      throw err;
+    });
+    this._log.info('patchModel request %j', request);
+    const wrappedCallback:
+      | Callback<
+          protos.google.cloud.bigquery.v2.IModel,
+          protos.google.cloud.bigquery.v2.IPatchModelRequest | null | undefined,
+          {} | null | undefined
+        >
+      | undefined = callback
+      ? (error, response, options, rawResponse) => {
+          this._log.info('patchModel response %j', response);
+          callback!(error, response, options, rawResponse); // We verified callback above.
+        }
+      : undefined;
+    return this.innerApiCalls
+      .patchModel(request, options, wrappedCallback)
+      ?.then(
+        ([response, options, rawResponse]: [
+          protos.google.cloud.bigquery.v2.IModel,
+          protos.google.cloud.bigquery.v2.IPatchModelRequest | undefined,
+          {} | undefined,
+        ]) => {
+          this._log.info('patchModel response %j', response);
+          return [response, options, rawResponse];
+        }
+      );
   }
   /**
    * Deletes the model specified by modelId from the dataset.
@@ -650,8 +705,36 @@ export class ModelServiceClient {
         dataset_id: request.datasetId ?? '',
         model_id: request.modelId ?? '',
       });
-    this.initialize();
-    return this.innerApiCalls.deleteModel(request, options, callback);
+    this.initialize().catch(err => {
+      throw err;
+    });
+    this._log.info('deleteModel request %j', request);
+    const wrappedCallback:
+      | Callback<
+          protos.google.protobuf.IEmpty,
+          | protos.google.cloud.bigquery.v2.IDeleteModelRequest
+          | null
+          | undefined,
+          {} | null | undefined
+        >
+      | undefined = callback
+      ? (error, response, options, rawResponse) => {
+          this._log.info('deleteModel response %j', response);
+          callback!(error, response, options, rawResponse); // We verified callback above.
+        }
+      : undefined;
+    return this.innerApiCalls
+      .deleteModel(request, options, wrappedCallback)
+      ?.then(
+        ([response, options, rawResponse]: [
+          protos.google.protobuf.IEmpty,
+          protos.google.cloud.bigquery.v2.IDeleteModelRequest | undefined,
+          {} | undefined,
+        ]) => {
+          this._log.info('deleteModel response %j', response);
+          return [response, options, rawResponse];
+        }
+      );
   }
 
   /**
@@ -754,8 +837,36 @@ export class ModelServiceClient {
         project_id: request.projectId ?? '',
         dataset_id: request.datasetId ?? '',
       });
-    this.initialize();
-    return this.innerApiCalls.listModels(request, options, callback);
+    this.initialize().catch(err => {
+      throw err;
+    });
+    const wrappedCallback:
+      | PaginationCallback<
+          protos.google.cloud.bigquery.v2.IListModelsRequest,
+          | protos.google.cloud.bigquery.v2.IListModelsResponse
+          | null
+          | undefined,
+          protos.google.cloud.bigquery.v2.IModel
+        >
+      | undefined = callback
+      ? (error, values, nextPageRequest, rawResponse) => {
+          this._log.info('listModels values %j', values);
+          callback!(error, values, nextPageRequest, rawResponse); // We verified callback above.
+        }
+      : undefined;
+    this._log.info('listModels request %j', request);
+    return this.innerApiCalls
+      .listModels(request, options, wrappedCallback)
+      ?.then(
+        ([response, input, output]: [
+          protos.google.cloud.bigquery.v2.IModel[],
+          protos.google.cloud.bigquery.v2.IListModelsRequest | null,
+          protos.google.cloud.bigquery.v2.IListModelsResponse,
+        ]) => {
+          this._log.info('listModels values %j', response);
+          return [response, input, output];
+        }
+      );
   }
 
   /**
@@ -798,7 +909,10 @@ export class ModelServiceClient {
       });
     const defaultCallSettings = this._defaults['listModels'];
     const callSettings = defaultCallSettings.merge(options);
-    this.initialize();
+    this.initialize().catch(err => {
+      throw err;
+    });
+    this._log.info('listModels stream %j', request);
     return this.descriptors.page.listModels.createStream(
       this.innerApiCalls.listModels as GaxCall,
       request,
@@ -849,7 +963,10 @@ export class ModelServiceClient {
       });
     const defaultCallSettings = this._defaults['listModels'];
     const callSettings = defaultCallSettings.merge(options);
-    this.initialize();
+    this.initialize().catch(err => {
+      throw err;
+    });
+    this._log.info('listModels iterate %j', request);
     return this.descriptors.page.listModels.asyncIterate(
       this.innerApiCalls['listModels'] as GaxCall,
       request as {},
@@ -866,6 +983,7 @@ export class ModelServiceClient {
   close(): Promise<void> {
     if (this.modelServiceStub && !this._terminated) {
       return this.modelServiceStub.then(stub => {
+        this._log.info('ending gRPC channel');
         this._terminated = true;
         stub.close();
       });

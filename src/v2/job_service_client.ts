@@ -29,6 +29,7 @@ import type {
 import {Transform} from 'stream';
 import * as protos from '../../protos/protos';
 import jsonProtos = require('../../protos/protos.json');
+import {loggingUtils as logging} from 'google-gax';
 
 /**
  * Client JSON configuration object, loaded from
@@ -52,6 +53,8 @@ export class JobServiceClient {
   private _defaults: {[method: string]: gax.CallSettings};
   private _universeDomain: string;
   private _servicePath: string;
+  private _log = logging.log('bigquery');
+
   auth: gax.GoogleAuth;
   descriptors: Descriptors = {
     page: {},
@@ -482,8 +485,34 @@ export class JobServiceClient {
         project_id: request.projectId ?? '',
         job_id: request.jobId ?? '',
       });
-    this.initialize();
-    return this.innerApiCalls.cancelJob(request, options, callback);
+    this.initialize().catch(err => {
+      throw err;
+    });
+    this._log.info('cancelJob request %j', request);
+    const wrappedCallback:
+      | Callback<
+          protos.google.cloud.bigquery.v2.IJobCancelResponse,
+          protos.google.cloud.bigquery.v2.ICancelJobRequest | null | undefined,
+          {} | null | undefined
+        >
+      | undefined = callback
+      ? (error, response, options, rawResponse) => {
+          this._log.info('cancelJob response %j', response);
+          callback!(error, response, options, rawResponse); // We verified callback above.
+        }
+      : undefined;
+    return this.innerApiCalls
+      .cancelJob(request, options, wrappedCallback)
+      ?.then(
+        ([response, options, rawResponse]: [
+          protos.google.cloud.bigquery.v2.IJobCancelResponse,
+          protos.google.cloud.bigquery.v2.ICancelJobRequest | undefined,
+          {} | undefined,
+        ]) => {
+          this._log.info('cancelJob response %j', response);
+          return [response, options, rawResponse];
+        }
+      );
   }
   /**
    * Returns information about a specific job. Job information is available for
@@ -581,8 +610,34 @@ export class JobServiceClient {
         project_id: request.projectId ?? '',
         job_id: request.jobId ?? '',
       });
-    this.initialize();
-    return this.innerApiCalls.getJob(request, options, callback);
+    this.initialize().catch(err => {
+      throw err;
+    });
+    this._log.info('getJob request %j', request);
+    const wrappedCallback:
+      | Callback<
+          protos.google.cloud.bigquery.v2.IJob,
+          protos.google.cloud.bigquery.v2.IGetJobRequest | null | undefined,
+          {} | null | undefined
+        >
+      | undefined = callback
+      ? (error, response, options, rawResponse) => {
+          this._log.info('getJob response %j', response);
+          callback!(error, response, options, rawResponse); // We verified callback above.
+        }
+      : undefined;
+    return this.innerApiCalls
+      .getJob(request, options, wrappedCallback)
+      ?.then(
+        ([response, options, rawResponse]: [
+          protos.google.cloud.bigquery.v2.IJob,
+          protos.google.cloud.bigquery.v2.IGetJobRequest | undefined,
+          {} | undefined,
+        ]) => {
+          this._log.info('getJob response %j', response);
+          return [response, options, rawResponse];
+        }
+      );
   }
   /**
    * Starts a new asynchronous job.
@@ -675,8 +730,34 @@ export class JobServiceClient {
       this._gaxModule.routingHeader.fromParams({
         project_id: request.projectId ?? '',
       });
-    this.initialize();
-    return this.innerApiCalls.insertJob(request, options, callback);
+    this.initialize().catch(err => {
+      throw err;
+    });
+    this._log.info('insertJob request %j', request);
+    const wrappedCallback:
+      | Callback<
+          protos.google.cloud.bigquery.v2.IJob,
+          protos.google.cloud.bigquery.v2.IInsertJobRequest | null | undefined,
+          {} | null | undefined
+        >
+      | undefined = callback
+      ? (error, response, options, rawResponse) => {
+          this._log.info('insertJob response %j', response);
+          callback!(error, response, options, rawResponse); // We verified callback above.
+        }
+      : undefined;
+    return this.innerApiCalls
+      .insertJob(request, options, wrappedCallback)
+      ?.then(
+        ([response, options, rawResponse]: [
+          protos.google.cloud.bigquery.v2.IJob,
+          protos.google.cloud.bigquery.v2.IInsertJobRequest | undefined,
+          {} | undefined,
+        ]) => {
+          this._log.info('insertJob response %j', response);
+          return [response, options, rawResponse];
+        }
+      );
   }
   /**
    * Requests the deletion of the metadata of a job. This call returns when the
@@ -770,8 +851,34 @@ export class JobServiceClient {
         project_id: request.projectId ?? '',
         job_id: request.jobId ?? '',
       });
-    this.initialize();
-    return this.innerApiCalls.deleteJob(request, options, callback);
+    this.initialize().catch(err => {
+      throw err;
+    });
+    this._log.info('deleteJob request %j', request);
+    const wrappedCallback:
+      | Callback<
+          protos.google.protobuf.IEmpty,
+          protos.google.cloud.bigquery.v2.IDeleteJobRequest | null | undefined,
+          {} | null | undefined
+        >
+      | undefined = callback
+      ? (error, response, options, rawResponse) => {
+          this._log.info('deleteJob response %j', response);
+          callback!(error, response, options, rawResponse); // We verified callback above.
+        }
+      : undefined;
+    return this.innerApiCalls
+      .deleteJob(request, options, wrappedCallback)
+      ?.then(
+        ([response, options, rawResponse]: [
+          protos.google.protobuf.IEmpty,
+          protos.google.cloud.bigquery.v2.IDeleteJobRequest | undefined,
+          {} | undefined,
+        ]) => {
+          this._log.info('deleteJob response %j', response);
+          return [response, options, rawResponse];
+        }
+      );
   }
   /**
    * RPC to get the results of a query job.
@@ -899,8 +1006,36 @@ export class JobServiceClient {
         project_id: request.projectId ?? '',
         job_id: request.jobId ?? '',
       });
-    this.initialize();
-    return this.innerApiCalls.getQueryResults(request, options, callback);
+    this.initialize().catch(err => {
+      throw err;
+    });
+    this._log.info('getQueryResults request %j', request);
+    const wrappedCallback:
+      | Callback<
+          protos.google.cloud.bigquery.v2.IGetQueryResultsResponse,
+          | protos.google.cloud.bigquery.v2.IGetQueryResultsRequest
+          | null
+          | undefined,
+          {} | null | undefined
+        >
+      | undefined = callback
+      ? (error, response, options, rawResponse) => {
+          this._log.info('getQueryResults response %j', response);
+          callback!(error, response, options, rawResponse); // We verified callback above.
+        }
+      : undefined;
+    return this.innerApiCalls
+      .getQueryResults(request, options, wrappedCallback)
+      ?.then(
+        ([response, options, rawResponse]: [
+          protos.google.cloud.bigquery.v2.IGetQueryResultsResponse,
+          protos.google.cloud.bigquery.v2.IGetQueryResultsRequest | undefined,
+          {} | undefined,
+        ]) => {
+          this._log.info('getQueryResults response %j', response);
+          return [response, options, rawResponse];
+        }
+      );
   }
   /**
    * Runs a BigQuery SQL query synchronously and returns query results if the
@@ -984,8 +1119,34 @@ export class JobServiceClient {
       this._gaxModule.routingHeader.fromParams({
         project_id: request.projectId ?? '',
       });
-    this.initialize();
-    return this.innerApiCalls.query(request, options, callback);
+    this.initialize().catch(err => {
+      throw err;
+    });
+    this._log.info('query request %j', request);
+    const wrappedCallback:
+      | Callback<
+          protos.google.cloud.bigquery.v2.IQueryResponse,
+          protos.google.cloud.bigquery.v2.IPostQueryRequest | null | undefined,
+          {} | null | undefined
+        >
+      | undefined = callback
+      ? (error, response, options, rawResponse) => {
+          this._log.info('query response %j', response);
+          callback!(error, response, options, rawResponse); // We verified callback above.
+        }
+      : undefined;
+    return this.innerApiCalls
+      .query(request, options, wrappedCallback)
+      ?.then(
+        ([response, options, rawResponse]: [
+          protos.google.cloud.bigquery.v2.IQueryResponse,
+          protos.google.cloud.bigquery.v2.IPostQueryRequest | undefined,
+          {} | undefined,
+        ]) => {
+          this._log.info('query response %j', response);
+          return [response, options, rawResponse];
+        }
+      );
   }
 
   /**
@@ -1100,8 +1261,34 @@ export class JobServiceClient {
       this._gaxModule.routingHeader.fromParams({
         project_id: request.projectId ?? '',
       });
-    this.initialize();
-    return this.innerApiCalls.listJobs(request, options, callback);
+    this.initialize().catch(err => {
+      throw err;
+    });
+    const wrappedCallback:
+      | PaginationCallback<
+          protos.google.cloud.bigquery.v2.IListJobsRequest,
+          protos.google.cloud.bigquery.v2.IJobList | null | undefined,
+          protos.google.cloud.bigquery.v2.IListFormatJob
+        >
+      | undefined = callback
+      ? (error, values, nextPageRequest, rawResponse) => {
+          this._log.info('listJobs values %j', values);
+          callback!(error, values, nextPageRequest, rawResponse); // We verified callback above.
+        }
+      : undefined;
+    this._log.info('listJobs request %j', request);
+    return this.innerApiCalls
+      .listJobs(request, options, wrappedCallback)
+      ?.then(
+        ([response, input, output]: [
+          protos.google.cloud.bigquery.v2.IListFormatJob[],
+          protos.google.cloud.bigquery.v2.IListJobsRequest | null,
+          protos.google.cloud.bigquery.v2.IJobList,
+        ]) => {
+          this._log.info('listJobs values %j', response);
+          return [response, input, output];
+        }
+      );
   }
 
   /**
@@ -1156,7 +1343,10 @@ export class JobServiceClient {
       });
     const defaultCallSettings = this._defaults['listJobs'];
     const callSettings = defaultCallSettings.merge(options);
-    this.initialize();
+    this.initialize().catch(err => {
+      throw err;
+    });
+    this._log.info('listJobs stream %j', request);
     return this.descriptors.page.listJobs.createStream(
       this.innerApiCalls.listJobs as GaxCall,
       request,
@@ -1219,7 +1409,10 @@ export class JobServiceClient {
       });
     const defaultCallSettings = this._defaults['listJobs'];
     const callSettings = defaultCallSettings.merge(options);
-    this.initialize();
+    this.initialize().catch(err => {
+      throw err;
+    });
+    this._log.info('listJobs iterate %j', request);
     return this.descriptors.page.listJobs.asyncIterate(
       this.innerApiCalls['listJobs'] as GaxCall,
       request as {},
@@ -1236,6 +1429,7 @@ export class JobServiceClient {
   close(): Promise<void> {
     if (this.jobServiceStub && !this._terminated) {
       return this.jobServiceStub.then(stub => {
+        this._log.info('ending gRPC channel');
         this._terminated = true;
         stub.close();
       });
