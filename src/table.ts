@@ -50,7 +50,7 @@ import {
 } from '.';
 import {GoogleErrorBody} from '@google-cloud/common/build/src/util';
 import {Duplex, Writable} from 'stream';
-import {JobMetadata} from './job';
+import {JobMetadata, JobOptions} from './job';
 import bigquery from './types';
 import {BigQueryRange, IntegerTypeCastOptions} from './bigquery';
 import {RowQueue} from './rowQueue';
@@ -924,8 +924,7 @@ class Table extends ServiceObject {
     const callback =
       typeof metadataOrCallback === 'function' ? metadataOrCallback : cb;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const body: any = {
+    const body: JobOptions = {
       configuration: {
         copy: extend(true, metadata, {
           destinationTable: {
@@ -1046,8 +1045,7 @@ class Table extends ServiceObject {
     const callback =
       typeof metadataOrCallback === 'function' ? metadataOrCallback : cb;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const body: any = {
+    const body: JobOptions = {
       configuration: {
         copy: extend(true, metadata, {
           destinationTable: {
@@ -1219,8 +1217,7 @@ class Table extends ServiceObject {
       delete options.gzip;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const body: any = {
+    const body: JobOptions = {
       configuration: {
         extract: extend(true, options, {
           sourceTable: {
@@ -1400,15 +1397,13 @@ class Table extends ServiceObject {
       return [jobResponse, jobResponse.metadata];
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const body: any = {
-      configuration: {
-        load: {
-          destinationTable: {
-            projectId: this.dataset.projectId,
-            datasetId: this.dataset.id,
-            tableId: this.id,
-          },
+    const body: JobOptions = {};
+    body.configuration = {
+      load: {
+        destinationTable: {
+          projectId: this.dataset.projectId,
+          datasetId: this.dataset.id,
+          tableId: this.id,
         },
       },
     };
@@ -1439,7 +1434,9 @@ class Table extends ServiceObject {
         // to CSV.
         const format = FORMATS[path.extname(src.name).substr(1).toLowerCase()];
         if (!metadata.sourceFormat && format) {
-          body.configuration.load.sourceFormat = format;
+          if (body.configuration && body.configuration.load) {
+            body.configuration.load.sourceFormat = format;
+          }
         }
         return 'gs://' + src.bucket.name + '/' + src.name;
       }),
@@ -1551,11 +1548,11 @@ class Table extends ServiceObject {
             uri: `${this.bigQuery.apiEndpoint}/upload/bigquery/v2/projects/${this.dataset.projectId}/jobs`,
           },
         },
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (data: any) => {
-          const job = this.bigQuery.job(data.jobReference.jobId, {
-            location: data.jobReference.location,
-            projectId: data.jobReference.projectId,
+        (data: JobMetadata) => {
+          const jobRef = data.jobReference!;
+          const job = this.bigQuery.job(jobRef.jobId!, {
+            location: jobRef.location,
+            projectId: jobRef.projectId,
           });
           job.metadata = data;
           dup.emit('job', job);
