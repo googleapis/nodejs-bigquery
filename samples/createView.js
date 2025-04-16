@@ -19,7 +19,7 @@ function main(
   myTableId = 'my_shared_view', // View to be created
   projectId = 'bigquery-public-data', // Source GCP project ID
   sourceDatasetId = 'usa_names', // Source dataset ID
-  sourceTableId = 'usa_1910_current' //Source table ID
+  sourceTableId = 'usa_1910_current', //Source table ID
 ) {
   // [START bigquery_create_view]
   // Import the Google Cloud client library and create a client

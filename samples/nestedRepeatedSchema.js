@@ -30,7 +30,7 @@ function main(
         {name: 'Zip', type: 'STRING'},
       ],
     },
-  ]
+  ],
 ) {
   // [START bigquery_nested_repeated_schema]
   // Import the Google Cloud client library and create a client

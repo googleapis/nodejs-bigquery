@@ -132,9 +132,8 @@ export type QueryResultsOptions = {
 class Job extends Operation {
   bigQuery: BigQuery;
   location?: string;
-  projectId?: string;
   getQueryResultsStream(
-    options?: QueryResultsOptions
+    options?: QueryResultsOptions,
   ): ResourceStream<RowMetadata> {
     // placeholder body, overwritten in constructor
     return new ResourceStream<RowMetadata>({}, () => {});
@@ -382,7 +381,7 @@ class Job extends Operation {
      * ```
      */
     this.getQueryResultsStream = paginator.streamify<RowMetadata>(
-      'getQueryResultsAsStream_'
+      'getQueryResultsAsStream_',
     );
   }
 
@@ -449,7 +448,7 @@ class Job extends Operation {
         uri: '/cancel',
         qs,
       },
-      callback!
+      callback!,
     );
   }
 
@@ -530,12 +529,12 @@ class Job extends Operation {
   getQueryResults(options?: QueryResultsOptions): Promise<QueryRowsResponse>;
   getQueryResults(
     options: QueryResultsOptions,
-    callback?: QueryRowsCallback
+    callback?: QueryRowsCallback,
   ): void;
   getQueryResults(callback: QueryRowsCallback): void;
   getQueryResults(
     optionsOrCallback?: QueryResultsOptions | QueryRowsCallback,
-    cb?: QueryRowsCallback
+    cb?: QueryRowsCallback,
   ): void | Promise<QueryRowsResponse> {
     const options =
       typeof optionsOrCallback === 'object' ? optionsOrCallback : {};
@@ -546,13 +545,13 @@ class Job extends Operation {
         location: this.location,
         'formatOptions.useInt64Timestamp': true,
       },
-      options
+      options,
     );
     this.trace_(
       '[getQueryResults]',
       this.id,
       options.pageToken,
-      options.startIndex
+      options.startIndex,
     );
 
     const wrapIntegers = qs.wrapIntegers ? qs.wrapIntegers : false;
@@ -610,7 +609,7 @@ class Job extends Operation {
           // If timeout override was provided, return error.
           if (timeoutOverride) {
             const err = new Error(
-              `The query did not complete before ${timeoutOverride}ms`
+              `The query did not complete before ${timeoutOverride}ms`,
             );
             callback!(err, null, nextQuery, resp);
             return;
@@ -625,7 +624,7 @@ class Job extends Operation {
         }
         delete resp.rows;
         callback!(null, rows, nextQuery, resp);
-      }
+      },
     );
   }
 
@@ -637,7 +636,7 @@ class Job extends Operation {
    */
   getQueryResultsAsStream_(
     options: QueryResultsOptions,
-    callback: QueryRowsCallback
+    callback: QueryRowsCallback,
   ): void {
     options = extend({autoPaginate: false}, options);
     this.getQueryResults(options, callback);
@@ -655,7 +654,7 @@ class Job extends Operation {
    * @param {function} callback
    */
   poll_(callback: MetadataCallback): void {
-    this.getMetadata((err: Error, metadata: Metadata) => {
+    void this.getMetadata((err: Error, metadata: Metadata) => {
       if (!err && metadata.status && metadata.status.errorResult) {
         err = new util.ApiError(metadata.status);
       }

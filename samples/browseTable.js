@@ -16,7 +16,7 @@
 
 function main(
   datasetId = 'my_dataset', // Existing dataset
-  tableId = 'my_table' // Table to create
+  tableId = 'my_table', // Table to create
 ) {
   // [START bigquery_browse_table]
   // Import the Google Cloud client library using default credentials

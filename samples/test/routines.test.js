@@ -17,7 +17,7 @@
 const {assert} = require('chai');
 const {describe, it, before, beforeEach, after} = require('mocha');
 const cp = require('child_process');
-const uuid = require('uuid');
+const {randomUUID} = require('crypto');
 
 const {BigQuery} = require('@google-cloud/bigquery');
 
@@ -26,7 +26,7 @@ const execSync = cmd => cp.execSync(cmd, {encoding: 'utf-8'});
 const GCLOUD_TESTS_PREFIX = 'nodejs_samples_tests_routines';
 
 const generateUuid = () =>
-  `${GCLOUD_TESTS_PREFIX}_${uuid.v4()}`.replace(/-/gi, '_');
+  `${GCLOUD_TESTS_PREFIX}_${randomUUID()}`.replace(/-/gi, '_');
 
 const datasetId = generateUuid();
 const routineId = generateUuid();
@@ -67,7 +67,7 @@ describe('Routines', () => {
 
   it('should create a routine', async () => {
     const output = execSync(
-      `node createRoutine.js ${datasetId} ${newRoutineId}`
+      `node createRoutine.js ${datasetId} ${newRoutineId}`,
     );
     assert.include(output, `Routine ${newRoutineId} created.`);
   });
@@ -89,8 +89,8 @@ describe('Routines', () => {
   });
 
   describe('Delete Routine', () => {
-    const datasetId = `gcloud_tests_${uuid.v4()}`.replace(/-/gi, '_');
-    const routineId = `gcloud_tests_${uuid.v4()}`.replace(/-/gi, '_');
+    const datasetId = `gcloud_tests_${randomUUID()}`.replace(/-/gi, '_');
+    const routineId = `gcloud_tests_${randomUUID()}`.replace(/-/gi, '_');
 
     before(async () => {
       await bigquery.createDataset(datasetId);
@@ -128,7 +128,7 @@ describe('Routines', () => {
 
     it('should delete a routine', async () => {
       const output = execSync(
-        `node deleteRoutine.js ${datasetId} ${routineId}`
+        `node deleteRoutine.js ${datasetId} ${routineId}`,
       );
       assert.include(output, `Routine ${routineId} deleted.`);
       const [exists] = await bigquery

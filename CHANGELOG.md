@@ -4,6 +4,27 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## [7.9.4](https://github.com/googleapis/nodejs-bigquery/compare/v7.9.3...v7.9.4) (2025-04-02)
+
+
+### Bug Fixes
+
+* MergeSchemaWithRows can be called with empty schema if result set is empty ([#1455](https://github.com/googleapis/nodejs-bigquery/issues/1455)) ([e608601](https://github.com/googleapis/nodejs-bigquery/commit/e608601157a95430a63ce0047194ba40190b2e42))
+
+## [7.9.3](https://github.com/googleapis/nodejs-bigquery/compare/v7.9.2...v7.9.3) (2025-03-17)
+
+
+### Bug Fixes
+
+* Make sure to pass selectedFields to tabledata.list method ([#1449](https://github.com/googleapis/nodejs-bigquery/issues/1449)) ([206aff9](https://github.com/googleapis/nodejs-bigquery/commit/206aff93d3d3520199388fc31314fa7ec221cee8))
+
+## [7.9.2](https://github.com/googleapis/nodejs-bigquery/compare/v7.9.1...v7.9.2) (2025-02-12)
+
+
+### Bug Fixes
+
+* Avoid schema field mutation when passing selectedFields opt ([#1437](https://github.com/googleapis/nodejs-bigquery/issues/1437)) ([27044d5](https://github.com/googleapis/nodejs-bigquery/commit/27044d52e6bb6b4b6dbc746a0cfb02951817d7f1))
+
 ## [7.9.1](https://github.com/googleapis/nodejs-bigquery/compare/v7.9.0...v7.9.1) (2024-09-23)
 
 

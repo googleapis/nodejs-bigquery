@@ -18,7 +18,7 @@ import {BigQuery} from '../src';
 if (process.argv.length < 3) {
   throw new Error(
     'need query file; ' +
-      `usage: '${process.argv[0]} ${process.argv[1]} <queries.json>'`
+      `usage: '${process.argv[0]} ${process.argv[1]} <queries.json>'`,
   );
 }
 
@@ -31,7 +31,7 @@ const client = new BigQuery();
 Promise.all(
   queries.map((query: string) => {
     return doQuery(query).catch(console.error);
-  })
+  }),
 ).catch(console.error);
 
 async function doQuery(queryTxt: string) {
@@ -54,7 +54,7 @@ async function doQuery(queryTxt: string) {
           const receivedCols = Object.keys(row).length;
           const error = new Error(
             `query "${queryTxt}": ` +
-              `wrong number of columns, want ${numCols} got ${receivedCols}`
+              `wrong number of columns, want ${numCols} got ${receivedCols}`,
           );
           reject(error);
         }
@@ -65,7 +65,7 @@ async function doQuery(queryTxt: string) {
         console.log(
           `"${queryTxt}",${numRows},${numCols},${timeFirstByteMilli / 1000},${
             timeTotalMilli / 1000
-          }`
+          }`,
         );
         resolve();
       });

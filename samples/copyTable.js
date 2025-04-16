@@ -18,7 +18,7 @@ function main(
   srcDatasetId = 'my_src_dataset',
   srcTableId = 'my_src_table',
   destDatasetId = 'my_dest_dataset',
-  destTableId = 'my_dest_table'
+  destTableId = 'my_dest_table',
 ) {
   // [START bigquery_copy_table]
   // Import the Google Cloud client library and create a client

@@ -17,7 +17,7 @@
 function main(
   datasetId = 'my_dataset',
   tableId = 'my_table',
-  fileName = '/path/to/file.csv'
+  fileName = '/path/to/file.csv',
 ) {
   // [START bigquery_add_column_load_append]
   // Import the Google Cloud client libraries

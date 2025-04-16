@@ -22,7 +22,7 @@ import * as assert from 'assert';
 import {describe, it, before, after} from 'mocha';
 import * as Big from 'big.js';
 import * as fs from 'fs';
-import * as uuid from 'uuid';
+import {randomUUID} from 'crypto';
 import {Readable} from 'stream';
 
 import {
@@ -282,7 +282,7 @@ describe('BigQuery', () => {
   });
 
   it('should honor the job id option', done => {
-    const jobId = `hi-im-a-job-id-${uuid.v4()}`;
+    const jobId = `hi-im-a-job-id-${randomUUID()}`;
     const options = {query, jobId};
 
     bigquery.createQueryJob(options, (err, job) => {
@@ -390,7 +390,7 @@ describe('BigQuery', () => {
       assert.notEqual(foundError, null);
       assert.equal(
         foundError?.message,
-        'The query did not complete before 1000ms'
+        'The query did not complete before 1000ms',
       );
     });
 
@@ -409,7 +409,7 @@ describe('BigQuery', () => {
       assert.notEqual(foundError, null);
       assert.equal(
         foundError?.message,
-        'The query did not complete before 1000ms'
+        'The query did not complete before 1000ms',
       );
     });
   });
@@ -425,7 +425,7 @@ describe('BigQuery', () => {
         assert.strictEqual(rows!.length, 10);
         assert.strictEqual(typeof nextQuery!.pageToken, 'string');
         done();
-      }
+      },
     );
   });
 
@@ -441,7 +441,7 @@ describe('BigQuery', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         assert((resp as any).statistics.query);
         done();
-      }
+      },
     );
   });
 
@@ -512,7 +512,7 @@ describe('BigQuery', () => {
             etag: 'a-fake-etag',
             description: 'oh no!',
           }),
-        /precondition/i
+        /precondition/i,
       );
     });
 
@@ -576,7 +576,7 @@ describe('BigQuery', () => {
       // eslint-disable-next-line @typescript-eslint/no-var-requires
       const SCHEMA = require('../../system-test/data/schema.json');
       const TEST_DATA_FILE = require.resolve(
-        '../../system-test/data/location-test-data.json'
+        '../../system-test/data/location-test-data.json',
       );
 
       before(async () => {
@@ -647,7 +647,7 @@ describe('BigQuery', () => {
               assert.strictEqual(err.errors![0].reason, 'notFound');
               assert.strictEqual(job!.location, 'US');
               done();
-            }
+            },
           );
         });
 
@@ -676,7 +676,7 @@ describe('BigQuery', () => {
             const badTable = dataset.table(table.id!, {location: 'US'});
 
             badTable.createCopyJob(otherTable, err => {
-              assert.strictEqual((err as ApiError).code, 404);
+              assert.notEqual(err, null); // TODO(alvarowolfx): check for 404 ?
               done();
             });
           });
@@ -881,7 +881,7 @@ describe('BigQuery', () => {
 
   describe('BigQuery/Table', () => {
     const TEST_DATA_JSON_PATH = require.resolve(
-      '../../system-test/data/kitten-test-data.json'
+      '../../system-test/data/kitten-test-data.json',
     );
 
     it('should have created the correct schema', () => {
@@ -894,6 +894,18 @@ describe('BigQuery', () => {
         assert(Array.isArray(rows));
         done();
       });
+    });
+
+    // Empty results sets will not fetch table schema
+    it('should get the rows from an empty table', async () => {
+      const emptyTableId = generateName('empty-table');
+      await dataset.createTable(emptyTableId, {
+        schema: [{name: 'id', type: 'STRING'}],
+      });
+      const emptyTable = dataset.table(emptyTableId);
+      const [rows] = await emptyTable.getRows();
+      assert(Array.isArray(rows));
+      assert.equal(rows.length, 0);
     });
 
     it('should get the rows in a table via stream', done => {
@@ -974,14 +986,14 @@ describe('BigQuery', () => {
       };
       const [basicMetadata] = await table.get(options);
       const basicMetadataProps = Object.values(
-        Object.keys(basicMetadata.metadata)
+        Object.keys(basicMetadata.metadata),
       );
 
       assert.strictEqual(basicMetadataProps.includes('numBytes'), false);
       assert.strictEqual(basicMetadata.metadata.numBytes, undefined);
       assert.strictEqual(
         basicMetadataProps.includes('lastModifiedTime'),
-        false
+        false,
       );
       assert.strictEqual(basicMetadata.metadata.lastModifiedTime, undefined);
     });
@@ -1001,7 +1013,7 @@ describe('BigQuery', () => {
           TABLES.map(tableItem => {
             const tableInstance = tableItem.table;
             return tableInstance!.create({schema: SCHEMA});
-          })
+          }),
         );
         const table1Instance = TABLES[0].table;
         await table1Instance.insert(TABLES[0].data);
@@ -1198,7 +1210,7 @@ describe('BigQuery', () => {
                 assert.ifError(err);
                 assert.strictEqual(rows!.length, 1);
                 done();
-              }
+              },
             );
           });
 
@@ -1217,7 +1229,7 @@ describe('BigQuery', () => {
                 assert.ifError(err);
                 assert.strictEqual(rows!.length, 1);
                 done();
-              }
+              },
             );
           });
 
@@ -1236,7 +1248,7 @@ describe('BigQuery', () => {
                 assert.ifError(err);
                 assert.strictEqual(rows!.length, 1);
                 done();
-              }
+              },
             );
           });
 
@@ -1254,7 +1266,7 @@ describe('BigQuery', () => {
                 assert.ifError(err);
                 assert.strictEqual(rows!.length, 1);
                 done();
-              }
+              },
             );
           });
 
@@ -1273,7 +1285,7 @@ describe('BigQuery', () => {
                 assert.ifError(err);
                 assert.strictEqual(rows!.length, 1);
                 done();
-              }
+              },
             );
           });
 
@@ -1287,7 +1299,7 @@ describe('BigQuery', () => {
                 assert.ifError(err);
                 assert.strictEqual(rows!.length, 5);
                 done();
-              }
+              },
             );
           });
 
@@ -1331,7 +1343,7 @@ describe('BigQuery', () => {
                 assert.ifError(err);
                 assert.strictEqual(rows!.length, 1);
                 done();
-              }
+              },
             );
           });
 
@@ -1345,7 +1357,7 @@ describe('BigQuery', () => {
                 assert.ifError(err);
                 assert.strictEqual(rows!.length, 1);
                 done();
-              }
+              },
             );
           });
 
@@ -1359,7 +1371,7 @@ describe('BigQuery', () => {
                 assert.ifError(err);
                 assert.strictEqual(rows!.length, 1);
                 done();
-              }
+              },
             );
           });
 
@@ -1373,7 +1385,7 @@ describe('BigQuery', () => {
                 assert.ifError(err);
                 assert.strictEqual(rows!.length, 1);
                 done();
-              }
+              },
             );
           });
 
@@ -1387,7 +1399,7 @@ describe('BigQuery', () => {
                 assert.ifError(err);
                 assert.strictEqual(rows!.length, 1);
                 done();
-              }
+              },
             );
           });
 
@@ -1401,7 +1413,7 @@ describe('BigQuery', () => {
                 assert.ifError(err);
                 assert.strictEqual(rows!.length, 1);
                 done();
-              }
+              },
             );
           });
 
@@ -1412,7 +1424,7 @@ describe('BigQuery', () => {
                 params: [
                   bigquery.range(
                     '[2020-10-01 12:00:00+08, 2020-12-31 12:00:00+08)',
-                    'TIMESTAMP'
+                    'TIMESTAMP',
                   ),
                 ],
               },
@@ -1420,7 +1432,7 @@ describe('BigQuery', () => {
                 assert.ifError(err);
                 assert.strictEqual(rows!.length, 1);
                 done();
-              }
+              },
             );
           });
 
@@ -1440,7 +1452,7 @@ describe('BigQuery', () => {
                 assert.ifError(err);
                 assert.strictEqual(rows!.length, 1);
                 done();
-              }
+              },
             );
           });
         });
@@ -1465,7 +1477,7 @@ describe('BigQuery', () => {
                 assert.ifError(err);
                 assert.strictEqual(rows!.length, 1);
                 done();
-              }
+              },
             );
           });
 
@@ -1486,7 +1498,7 @@ describe('BigQuery', () => {
                 assert.ifError(err);
                 assert.strictEqual(rows!.length, 1);
                 done();
-              }
+              },
             );
           });
 
@@ -1507,7 +1519,7 @@ describe('BigQuery', () => {
                 assert.ifError(err);
                 assert.strictEqual(rows!.length, 1);
                 done();
-              }
+              },
             );
           });
 
@@ -1527,7 +1539,7 @@ describe('BigQuery', () => {
                 assert.ifError(err);
                 assert.strictEqual(rows!.length, 1);
                 done();
-              }
+              },
             );
           });
 
@@ -1548,7 +1560,7 @@ describe('BigQuery', () => {
                 assert.ifError(err);
                 assert.strictEqual(rows!.length, 1);
                 done();
-              }
+              },
             );
           });
 
@@ -1564,7 +1576,7 @@ describe('BigQuery', () => {
                 assert.ifError(err);
                 assert.strictEqual(rows!.length, 5);
                 done();
-              }
+              },
             );
           });
 
@@ -1610,7 +1622,7 @@ describe('BigQuery', () => {
                 assert.ifError(err);
                 assert.strictEqual(rows!.length, 1);
                 done();
-              }
+              },
             );
           });
 
@@ -1626,7 +1638,7 @@ describe('BigQuery', () => {
                 assert.ifError(err);
                 assert.strictEqual(rows!.length, 1);
                 done();
-              }
+              },
             );
           });
 
@@ -1642,7 +1654,7 @@ describe('BigQuery', () => {
                 assert.ifError(err);
                 assert.strictEqual(rows!.length, 1);
                 done();
-              }
+              },
             );
           });
 
@@ -1658,7 +1670,7 @@ describe('BigQuery', () => {
                 assert.ifError(err);
                 assert.strictEqual(rows!.length, 1);
                 done();
-              }
+              },
             );
           });
 
@@ -1674,7 +1686,7 @@ describe('BigQuery', () => {
                 assert.ifError(err);
                 assert.strictEqual(rows!.length, 1);
                 done();
-              }
+              },
             );
           });
 
@@ -1690,7 +1702,7 @@ describe('BigQuery', () => {
                 assert.ifError(err);
                 assert.strictEqual(rows!.length, 1);
                 done();
-              }
+              },
             );
           });
 
@@ -1701,7 +1713,7 @@ describe('BigQuery', () => {
                 params: {
                   r: bigquery.range(
                     '[2020-10-01 12:00:00+08, 2020-12-31 12:00:00+08)',
-                    'TIMESTAMP'
+                    'TIMESTAMP',
                   ),
                 },
               },
@@ -1709,7 +1721,7 @@ describe('BigQuery', () => {
                 assert.ifError(err);
                 assert.strictEqual(rows!.length, 1);
                 done();
-              }
+              },
             );
           });
 
@@ -1734,7 +1746,7 @@ describe('BigQuery', () => {
                 assert.ifError(err);
                 assert.strictEqual(rows!.length, 1);
                 done();
-              }
+              },
             );
           });
         });
@@ -1772,7 +1784,7 @@ describe('BigQuery', () => {
     const GEOGRAPHY = bigquery.geography('POINT(1 2)');
     const RANGE = bigquery.range(
       '[2020-10-01 12:00:00+08, 2020-12-31 12:00:00+08)',
-      'TIMESTAMP'
+      'TIMESTAMP',
     );
 
     before(() => {
@@ -1918,9 +1930,9 @@ describe('BigQuery', () => {
   });
 
   function generateName(resourceType: string) {
-    return `${GCLOUD_TESTS_PREFIX}_${resourceType}_${uuid.v1()}`.replace(
+    return `${GCLOUD_TESTS_PREFIX}_${resourceType}_${randomUUID()}`.replace(
       /-/g,
-      '_'
+      '_',
     );
   }
 

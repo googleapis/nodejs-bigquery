@@ -16,7 +16,7 @@
 
 function main(
   datasetId = 'my_dataset', // Existing dataset ID
-  tableId = 'my_view' // Existing table ID
+  tableId = 'my_view', // Existing table ID
 ) {
   // [START bigquery_get_view]
   // Import the Google Cloud client library

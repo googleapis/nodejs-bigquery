@@ -51,13 +51,14 @@ function overridedRender() {
   }
   const patched = source.replaceAll(
     'formatOptions.useInt64Timestamp',
-    "'formatOptions.useInt64Timestamp'"
+    "'formatOptions.useInt64Timestamp'",
   );
   const fullSource = header + patched;
 
   return prettier.format(fullSource, {
     parser: 'typescript',
     singleQuote: true,
+    bracketSpacing: false,
   });
 }
 
