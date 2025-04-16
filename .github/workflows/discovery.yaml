@@ -20,7 +20,7 @@ jobs:
       # Fix formatting
       - run: npm run fix
       # Submit pull request
-      - uses: googleapis/code-suggester@v4
+      - uses: googleapis/code-suggester@v5
         env:
           ACCESS_TOKEN: ${{ secrets.YOSHI_CODE_BOT_TOKEN }}
         with:
