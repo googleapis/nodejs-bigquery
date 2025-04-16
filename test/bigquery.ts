@@ -3095,12 +3095,16 @@ describe('BigQuery', () => {
         return undefined;
       };
 
-      bq.query(QUERY_STRING, (err: Error, rows: {}, resp: {}) => {
-        assert.strictEqual(err, error);
-        assert.strictEqual(rows, null);
-        assert.strictEqual(resp, FAKE_RESPONSE);
-        done();
-      });
+      bq.query(
+        QUERY_STRING,
+        (err: Error, rows: {}, nextQuery: {}, resp: {}) => {
+          assert.strictEqual(err, error);
+          assert.strictEqual(rows, null);
+          assert.strictEqual(nextQuery, null);
+          assert.strictEqual(resp, FAKE_RESPONSE);
+          done();
+        },
+      );
     });
 
     it('should return any errors from jobs.query', done => {
@@ -3110,12 +3114,16 @@ describe('BigQuery', () => {
         callback(error, FAKE_RESPONSE, {});
       };
 
-      bq.query(QUERY_STRING, (err: Error, rows: {}, resp: {}) => {
-        assert.strictEqual(err, error);
-        assert.strictEqual(rows, null);
-        assert.strictEqual(resp, FAKE_RESPONSE);
-        done();
-      });
+      bq.query(
+        QUERY_STRING,
+        (err: Error, rows: {}, nextQuery: {}, resp: {}) => {
+          assert.strictEqual(err, error);
+          assert.strictEqual(rows, null);
+          assert.strictEqual(nextQuery, null);
+          assert.strictEqual(resp, FAKE_RESPONSE);
+          done();
+        },
+      );
     });
 
     it('should return throw error when jobs.query times out', done => {
@@ -3158,9 +3166,10 @@ describe('BigQuery', () => {
         return undefined;
       };
 
-      bq.query(options, (err: Error, rows: {}, resp: {}) => {
+      bq.query(options, (err: Error, rows: {}, nextQuery: {}, resp: {}) => {
         assert.ifError(err);
         assert.deepStrictEqual(rows, []);
+        assert.strictEqual(nextQuery, null);
         assert.strictEqual(resp, FAKE_RESPONSE);
         done();
       });
@@ -3169,7 +3178,7 @@ describe('BigQuery', () => {
     it('should call job#getQueryResults', done => {
       const fakeJob = {
         getQueryResults: (options: {}, callback: Function) => {
-          callback(null, FAKE_ROWS, FAKE_RESPONSE);
+          callback(null, FAKE_ROWS, null, FAKE_RESPONSE);
         },
       };
 
@@ -3181,12 +3190,16 @@ describe('BigQuery', () => {
         return undefined;
       };
 
-      bq.query(QUERY_STRING, (err: Error, rows: {}, resp: {}) => {
-        assert.ifError(err);
-        assert.strictEqual(rows, FAKE_ROWS);
-        assert.strictEqual(resp, FAKE_RESPONSE);
-        done();
-      });
+      bq.query(
+        QUERY_STRING,
+        (err: Error, rows: {}, nextQuery: {}, resp: {}) => {
+          assert.ifError(err);
+          assert.strictEqual(rows, FAKE_ROWS);
+          assert.strictEqual(nextQuery, null);
+          assert.strictEqual(resp, FAKE_RESPONSE);
+          done();
+        },
+      );
     });
 
     it('should call job#getQueryResults with cached rows and response from jobs.query', done => {
@@ -3208,22 +3221,26 @@ describe('BigQuery', () => {
         callback(null, fakeJob, fakeResponse);
       };
 
-      bq.query(QUERY_STRING, (err: Error, rows: {}, query: {}, resp: {}) => {
-        assert.ifError(err);
-        assert.deepStrictEqual(rows, [
-          {
-            value: 1,
-          },
-          {
-            value: 2,
-          },
-          {
-            value: 3,
-          },
-        ]);
-        assert.strictEqual(resp, fakeResponse);
-        done();
-      });
+      bq.query(
+        QUERY_STRING,
+        (err: Error, rows: {}, nextQuery: {}, resp: {}) => {
+          assert.ifError(err);
+          assert.deepStrictEqual(rows, [
+            {
+              value: 1,
+            },
+            {
+              value: 2,
+            },
+            {
+              value: 3,
+            },
+          ]);
+          assert.strictEqual(nextQuery, null);
+          assert.strictEqual(resp, fakeResponse);
+          done();
+        },
+      );
     });
 
     it('should call job#getQueryResults with query options', done => {
@@ -3231,7 +3248,7 @@ describe('BigQuery', () => {
       const fakeJob = {
         getQueryResults: (options: {}, callback: Function) => {
           queryResultsOpts = options;
-          callback(null, FAKE_ROWS, FAKE_RESPONSE);
+          callback(null, FAKE_ROWS, null, FAKE_RESPONSE);
         },
       };
 
@@ -3248,7 +3265,7 @@ describe('BigQuery', () => {
         wrapIntegers: true,
         parseJSON: true,
       };
-      bq.query(query, (err: Error, rows: {}, resp: {}) => {
+      bq.query(query, (err: Error, rows: {}, nextQuery: {}, resp: {}) => {
         assert.ifError(err);
         assert.deepEqual(queryResultsOpts, {
           job: fakeJob,
@@ -3256,6 +3273,7 @@ describe('BigQuery', () => {
           parseJSON: true,
         });
         assert.strictEqual(rows, FAKE_ROWS);
+        assert.strictEqual(nextQuery, null);
         assert.strictEqual(resp, FAKE_RESPONSE);
         done();
       });

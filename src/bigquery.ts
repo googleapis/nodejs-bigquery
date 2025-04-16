@@ -2156,11 +2156,11 @@ export class BigQuery extends Service {
    */
   query(
     query: Query | string,
-    options?: QueryOptions
+    options?: QueryOptions,
   ): Promise<QueryRowsResponse>;
   query(
     query: Query | string,
-    callback?: QueryRowsCallback
+    callback?: QueryRowsCallback,
   ): Promise<QueryRowsResponse>;
   query(
     query: Query | string,
@@ -2200,7 +2200,7 @@ export class BigQuery extends Service {
         // The Job is important for the `queryAsStream_` method, so a new query
         // isn't created each time results are polled for.
         options = extend({job}, queryOpts, options);
-        job!.getQueryResults(options, callback as QueryRowsCallback);
+        job!.getQueryResults(options, callback);
       });
       return;
     }
@@ -2208,7 +2208,7 @@ export class BigQuery extends Service {
     void this.runJobsQuery(queryReq, (err, job, res) => {
       this.trace_('[runJobsQuery callback]: ', query, err, job, res);
       if (err) {
-        (callback as QueryRowsCallback)(err, null, job);
+        callback && callback(err, null, null, job);
         return;
       }
 
@@ -2231,7 +2231,7 @@ export class BigQuery extends Service {
         } else {
           this.trace_('[runJobsQuery] no more pages');
         }
-        job!.getQueryResults(options, callback as QueryRowsCallback);
+        job!.getQueryResults(options, callback);
         return;
       }
       // If timeout override was provided, return error.
@@ -2244,7 +2244,7 @@ export class BigQuery extends Service {
       }
       delete options.timeoutMs;
       this.trace_('[runJobsQuery] job not complete');
-      job!.getQueryResults(options, callback as QueryRowsCallback);
+      job!.getQueryResults(options, callback);
     });
   }
 

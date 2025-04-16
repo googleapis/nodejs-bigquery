@@ -2383,7 +2383,7 @@ class Table extends ServiceObject {
         query,
       };
     }
-    this.dataset.query(query, callback!);
+    this.dataset.query(query, callback);
   }
 
   /**

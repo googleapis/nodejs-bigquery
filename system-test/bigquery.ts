@@ -435,9 +435,10 @@ describe('BigQuery', () => {
         query,
         dryRun: true,
       },
-      (err, rows, resp) => {
+      (err, rows, nextQuery, resp) => {
         assert.ifError(err);
         assert.deepStrictEqual(rows, []);
+        assert.deepStrictEqual(nextQuery, null);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         assert((resp as any).statistics.query);
         done();
