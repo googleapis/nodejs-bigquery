@@ -17,7 +17,7 @@
 function main(
   projectId = 'my_project', // GCP Project ID
   datasetId = 'my_dataset', // Existing dataset
-  tableId = 'my_table' // Existing table
+  tableId = 'my_table', // Existing table
 ) {
   // [START bigquery_relax_column_query_append]
   const {BigQuery} = require('@google-cloud/bigquery');
@@ -39,7 +39,7 @@ function main(
     const [metaData] = await table.getMetadata();
 
     const requiredFields = metaData.schema.fields.filter(
-      ({mode}) => mode === 'REQUIRED'
+      ({mode}) => mode === 'REQUIRED',
     ).length;
 
     console.log(`${requiredFields} fields in the schema are required.`);
@@ -84,11 +84,11 @@ function main(
     const [updatedMetaData] = await updatedTable.getMetadata();
 
     const updatedRequiredFields = updatedMetaData.schema.fields.filter(
-      ({mode}) => mode === 'REQUIRED'
+      ({mode}) => mode === 'REQUIRED',
     ).length;
 
     console.log(
-      `${updatedRequiredFields} fields in the schema are now required.`
+      `${updatedRequiredFields} fields in the schema are now required.`,
     );
   }
   // [END bigquery_relax_column_query_append]

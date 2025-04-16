@@ -68,7 +68,7 @@ function main(datasetId = 'my_dataset', tableId = 'my_table') {
     // load() waits for the job to finish
     console.log(`Job ${job.id} completed.`);
     console.log(
-      `Write disposition used: ${job.configuration.load.writeDisposition}.`
+      `Write disposition used: ${job.configuration.load.writeDisposition}.`,
     );
   }
   // [END bigquery_load_table_gcs_csv_truncate]

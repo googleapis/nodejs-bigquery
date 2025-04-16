@@ -16,7 +16,7 @@
 
 function main(
   datasetId = 'my_dataset', // Existing dataset
-  tableId = 'my_new_table' // Table to be created
+  tableId = 'my_new_table', // Table to be created
 ) {
   // [START bigquery_relax_column]
   // Import the Google Cloud client library and create a client

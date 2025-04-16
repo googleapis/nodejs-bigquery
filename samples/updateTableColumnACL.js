@@ -17,7 +17,7 @@
 function main(
   datasetId = 'my_dataset', // Existing dataset
   tableId = 'my_table', // Table to be created
-  policyTagName = 'projects/myProject/location/us/taxonomies/myTaxonomy/policyTags/myPolicyTag' // Existing policy tag
+  policyTagName = 'projects/myProject/location/us/taxonomies/myTaxonomy/policyTags/myPolicyTag', // Existing policy tag
 ) {
   // [START bigquery_update_table_column_ACL]
   // Import the Google Cloud client library and create a client

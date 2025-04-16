@@ -17,7 +17,7 @@
 const {assert} = require('chai');
 const {describe, it, before, beforeEach, after} = require('mocha');
 const cp = require('child_process');
-const uuid = require('uuid');
+const {randomUUID} = require('crypto');
 
 const {BigQuery} = require('@google-cloud/bigquery');
 
@@ -26,7 +26,7 @@ const execSync = cmd => cp.execSync(cmd, {encoding: 'utf-8'});
 const GCLOUD_TESTS_PREFIX = 'nodejs_samples_tests_queries';
 
 const generateUuid = () =>
-  `${GCLOUD_TESTS_PREFIX}_${uuid.v4()}`.replace(/-/gi, '_');
+  `${GCLOUD_TESTS_PREFIX}_${randomUUID()}`.replace(/-/gi, '_');
 
 const datasetId = generateUuid();
 const tableId = generateUuid();
@@ -134,7 +134,7 @@ describe('Queries', () => {
 
   it('should run a query with a destination table', async () => {
     const output = execSync(
-      `node queryDestinationTable.js ${datasetId} ${tableId}`
+      `node queryDestinationTable.js ${datasetId} ${tableId}`,
     );
     assert.include(output, `Query results loaded to table ${tableId}`);
   });
@@ -148,7 +148,7 @@ describe('Queries', () => {
   it('should run a query with a clustered destination table', async () => {
     const clusteredTableId = generateUuid();
     const output = execSync(
-      `node queryClusteredTable.js ${datasetId} ${clusteredTableId}`
+      `node queryClusteredTable.js ${datasetId} ${clusteredTableId}`,
     );
     assert.match(output, /started/);
     assert.match(output, /Status/);
@@ -157,7 +157,7 @@ describe('Queries', () => {
   it('should run a query with legacy SQL and large results', async () => {
     const destTableId = generateUuid();
     const output = execSync(
-      `node queryLegacyLargeResults.js ${datasetId} ${destTableId} ${projectId}`
+      `node queryLegacyLargeResults.js ${datasetId} ${destTableId} ${projectId}`,
     );
     assert.match(output, /Rows:/);
     assert.match(output, /word/);
@@ -167,7 +167,7 @@ describe('Queries', () => {
     const destTableId = generateUuid();
     execSync(`node createTable.js ${datasetId} ${destTableId} 'name:STRING'`);
     const output = execSync(
-      `node addColumnQueryAppend.js ${datasetId} ${destTableId}`
+      `node addColumnQueryAppend.js ${datasetId} ${destTableId}`,
     );
     assert.match(output, /completed\./);
     const [rows] = await bigquery
@@ -179,7 +179,7 @@ describe('Queries', () => {
 
   it('should relax columns via a query job', async () => {
     const output = execSync(
-      `node relaxColumnQueryAppend.js ${projectId} ${datasetId} ${tableId}`
+      `node relaxColumnQueryAppend.js ${projectId} ${datasetId} ${tableId}`,
     );
 
     assert.match(output, /1 fields in the schema are required\./);
@@ -200,7 +200,7 @@ describe('Queries', () => {
   it('should query an external data source with permanent table', async () => {
     const permTableId = generateUuid();
     const output = execSync(
-      `node queryExternalGCSPerm.js ${datasetId} ${permTableId}`
+      `node queryExternalGCSPerm.js ${datasetId} ${permTableId}`,
     );
     assert.match(output, /Rows:/);
     assert.match(output, /post_abbr/);
@@ -214,7 +214,7 @@ describe('Queries', () => {
 
   it('should create a routine using DDL', async () => {
     const output = execSync(
-      `node createRoutineDDL.js ${projectId} ${datasetId} ${routineId}`
+      `node createRoutineDDL.js ${projectId} ${datasetId} ${routineId}`,
     );
     assert.include(output, `Routine ${routineId} created.`);
   });

@@ -15,7 +15,7 @@
 'use strict';
 
 function main(
-  datasetId = 'my_dataset' // Existing dataset
+  datasetId = 'my_dataset', // Existing dataset
 ) {
   // [START bigquery_list_routines]
   // Import the Google Cloud client library and create a client

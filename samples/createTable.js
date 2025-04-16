@@ -22,7 +22,7 @@ function main(
     {name: 'Age', type: 'INTEGER'},
     {name: 'Weight', type: 'FLOAT'},
     {name: 'IsMagic', type: 'BOOLEAN'},
-  ]
+  ],
 ) {
   // [START bigquery_create_table]
   // Import the Google Cloud client library and create a client

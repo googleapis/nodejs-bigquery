@@ -166,7 +166,7 @@ describe('BigQuery/Model', () => {
         model.createExtractJob(
           URI,
           {format: 'ml_tf_saved_model'},
-          assert.ifError
+          assert.ifError,
         );
       });
 
@@ -180,7 +180,7 @@ describe('BigQuery/Model', () => {
         model.createExtractJob(
           URI,
           {format: 'ml_xgboost_booster'},
-          assert.ifError
+          assert.ifError,
         );
       });
 
@@ -192,7 +192,7 @@ describe('BigQuery/Model', () => {
         model.bigQuery.createJob = (reqOpts: JobOptions) => {
           assert.deepStrictEqual(
             reqOpts.configuration!.extract!.destinationUris,
-            ['gs://' + FILE.bucket.name + '/' + FILE.name]
+            ['gs://' + FILE.bucket.name + '/' + FILE.name],
           );
           done();
         };
@@ -230,7 +230,7 @@ describe('BigQuery/Model', () => {
           model.createExtractJob(
             URI,
             {format: 'interpretive_dance'},
-            util.noop
+            util.noop,
           );
         }, /Destination format not recognized/);
       });
@@ -243,13 +243,13 @@ describe('BigQuery/Model', () => {
 
         model.bigQuery.createJob = (
           reqOpts: JobOptions,
-          callback: Function
+          callback: Function,
         ) => {
           assert.strictEqual(reqOpts.jobPrefix, fakeJobPrefix);
           assert.strictEqual(
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (reqOpts.configuration!.extract as any).jobPrefix,
-            undefined
+            undefined,
           );
           callback(); // the done fn
         };
@@ -263,13 +263,13 @@ describe('BigQuery/Model', () => {
 
         model.bigQuery.createJob = (
           reqOpts: JobOptions,
-          callback: Function
+          callback: Function,
         ) => {
           assert.strictEqual(reqOpts.jobId, jobId);
           assert.strictEqual(
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (reqOpts.configuration!.extract as any).jobId,
-            undefined
+            undefined,
           );
           callback(); // the done fn
         };
@@ -280,7 +280,7 @@ describe('BigQuery/Model', () => {
       it('should pass the callback to createJob', done => {
         model.bigQuery.createJob = (
           reqOpts: JobOptions,
-          callback: Function
+          callback: Function,
         ) => {
           assert.strictEqual(done, callback);
           callback(); // the done fn
@@ -292,7 +292,7 @@ describe('BigQuery/Model', () => {
       it('should optionally accept options', done => {
         model.bigQuery.createJob = (
           reqOpts: JobOptions,
-          callback: Function
+          callback: Function,
         ) => {
           assert.strictEqual(done, callback);
           callback(); // the done fn
@@ -312,7 +312,7 @@ describe('BigQuery/Model', () => {
       model.createExtractJob = (
         destination: {},
         metadata: {},
-        callback: Function
+        callback: Function,
       ) => {
         callback(null, fakeJob);
       };
@@ -347,7 +347,7 @@ describe('BigQuery/Model', () => {
       model.createExtractJob = (
         destination: {},
         metadata: {},
-        callback: Function
+        callback: Function,
       ) => {
         callback(error, null, response);
       };

@@ -14,13 +14,13 @@
 
 import {DecorateRequestOptions, util} from '@google-cloud/common';
 import * as pfy from '@google-cloud/promisify';
-import arrify = require('arrify');
 import * as assert from 'assert';
 import {describe, it, beforeEach, afterEach, before} from 'mocha';
 import * as proxyquire from 'proxyquire';
 import * as sinon from 'sinon';
 
 import {BigQuery} from '../src/bigquery';
+import {toArray} from '../src/util';
 import {QueryResultsOptions} from '../src/job';
 
 class FakeOperation {
@@ -61,7 +61,7 @@ const fakePaginator = {
         return;
       }
 
-      methods = arrify(methods);
+      methods = toArray(methods);
       assert.deepStrictEqual(methods, ['getQueryResults']);
       extended = true;
     },
@@ -217,7 +217,7 @@ describe('BigQuery/Job', () => {
     beforeEach(() => {
       BIGQUERY.request = (
         reqOpts: DecorateRequestOptions,
-        callback: Function
+        callback: Function,
       ) => {
         callback(null, RESPONSE);
       };
@@ -240,7 +240,7 @@ describe('BigQuery/Job', () => {
       const options = {a: 'b'};
       const expectedOptions = Object.assign(
         {location: undefined, 'formatOptions.useInt64Timestamp': true},
-        options
+        options,
       );
 
       BIGQUERY.request = (reqOpts: DecorateRequestOptions) => {
@@ -287,7 +287,7 @@ describe('BigQuery/Job', () => {
 
       BIGQUERY.request = (
         reqOpts: DecorateRequestOptions,
-        callback: Function
+        callback: Function,
       ) => {
         callback(error, response);
       };
@@ -320,7 +320,7 @@ describe('BigQuery/Job', () => {
 
       BIGQUERY.request = (
         reqOpts: DecorateRequestOptions,
-        callback: Function
+        callback: Function,
       ) => {
         callback(null, response);
       };
@@ -406,7 +406,7 @@ describe('BigQuery/Job', () => {
     it('should return the query when the job is not complete', done => {
       BIGQUERY.request = (
         reqOpts: DecorateRequestOptions,
-        callback: Function
+        callback: Function,
       ) => {
         callback(null, {
           jobComplete: false,
@@ -430,7 +430,7 @@ describe('BigQuery/Job', () => {
 
       BIGQUERY.request = (
         reqOpts: DecorateRequestOptions,
-        callback: Function
+        callback: Function,
       ) => {
         callback(null, response);
       };
@@ -443,7 +443,7 @@ describe('BigQuery/Job', () => {
           assert.deepStrictEqual(nextQuery, options);
           assert.strictEqual(resp, response);
           done();
-        }
+        },
       );
     });
 
@@ -454,7 +454,7 @@ describe('BigQuery/Job', () => {
           assert.ifError(err);
           assert.strictEqual(nextQuery.pageToken, pageToken);
           done();
-        }
+        },
       );
     });
   });
@@ -471,7 +471,7 @@ describe('BigQuery/Job', () => {
 
       job.getQueryResults = (
         options_: QueryResultsOptions,
-        callback: Function
+        callback: Function,
       ) => {
         assert.deepStrictEqual(options_, {
           a: 'b',

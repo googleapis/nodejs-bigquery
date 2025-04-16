@@ -16,7 +16,7 @@
 
 function main(
   datasetId = 'my_dataset', // Existing dataset ID
-  tableId = 'us_states' // Existing table ID
+  tableId = 'us_states', // Existing table ID
 ) {
   // [START bigquery_load_table_gcs_avro]
   // Import the Google Cloud client libraries

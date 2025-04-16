@@ -18,7 +18,7 @@ const {BigQuery} = require('@google-cloud/bigquery');
 const {assert} = require('chai');
 const {describe, it, before, beforeEach, after} = require('mocha');
 const cp = require('child_process');
-const uuid = require('uuid');
+const {randomUUID} = require('crypto');
 
 const execSync = cmd => cp.execSync(cmd, {encoding: 'utf-8'});
 
@@ -29,8 +29,11 @@ const bigquery = new BigQuery();
 describe('Models', function () {
   // Increase timeout to accommodate model creation.
   this.timeout(300000);
-  const datasetId = `${GCLOUD_TESTS_PREFIX}_${uuid.v4()}`.replace(/-/gi, '_');
-  const modelId = `${GCLOUD_TESTS_PREFIX}_${uuid.v4()}`.replace(/-/gi, '_');
+  const datasetId = `${GCLOUD_TESTS_PREFIX}_${randomUUID()}`.replace(
+    /-/gi,
+    '_',
+  );
+  const modelId = `${GCLOUD_TESTS_PREFIX}_${randomUUID()}`.replace(/-/gi, '_');
 
   before(async () => {
     const query = `CREATE OR REPLACE MODEL \`${datasetId}.${modelId}\`
@@ -96,13 +99,13 @@ describe('Models', function () {
 });
 
 describe('Create/Delete Model', () => {
-  const datasetId = `${GCLOUD_TESTS_PREFIX}_delete_${uuid.v4()}`.replace(
+  const datasetId = `${GCLOUD_TESTS_PREFIX}_delete_${randomUUID()}`.replace(
     /-/gi,
-    '_'
+    '_',
   );
-  const modelId = `${GCLOUD_TESTS_PREFIX}_delete_${uuid.v4()}`.replace(
+  const modelId = `${GCLOUD_TESTS_PREFIX}_delete_${randomUUID()}`.replace(
     /-/gi,
-    '_'
+    '_',
   );
 
   before(async () => {

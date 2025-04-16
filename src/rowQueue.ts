@@ -16,7 +16,7 @@
 
 import * as common from '@google-cloud/common';
 import * as extend from 'extend';
-import * as uuid from 'uuid';
+import {randomUUID} from 'crypto';
 import {RequestCallback, Table, InsertStreamOptions} from '.';
 import {GoogleErrorBody} from '@google-cloud/common/build/src/util';
 import bigquery from './types';
@@ -108,7 +108,7 @@ export class RowQueue {
       };
 
       if (this.insertRowsOptions.createInsertId !== false) {
-        row.insertId = uuid.v4();
+        row.insertId = randomUUID();
       }
     }
 
@@ -153,7 +153,7 @@ export class RowQueue {
   _insert(
     rows: RowMetadata | RowMetadata[],
     callbacks: InsertRowsCallback[],
-    cb?: InsertRowsCallback
+    cb?: InsertRowsCallback,
   ): void {
     const json = extend(true, {}, this.insertRowsOptions, {rows});
 
@@ -180,7 +180,7 @@ export class RowQueue {
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               row: rows[(insertError as any).index],
             };
-          }
+          },
         );
 
         if (partialFailures.length > 0) {
@@ -197,7 +197,7 @@ export class RowQueue {
           cb?.(err, resp);
         }
         cb?.(err, resp);
-      }
+      },
     );
   }
 
@@ -213,7 +213,7 @@ export class RowQueue {
     const {maxBytes, maxRows, maxMilliseconds} = extend(
       true,
       defaults,
-      options
+      options,
     );
 
     this.batchOptions = {
