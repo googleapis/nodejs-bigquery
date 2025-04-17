@@ -2738,7 +2738,7 @@ export class BigQueryDatetime {
       value = `${y}-${m}-${d}${time}`;
     } else {
       if (value.length > 100) {
-          throw new Error("BigQueryDatetime input too long");
+        throw new Error('BigQueryDatetime input too long');
       }
       value = value.replace(/^(.*)T(.*)Z$/, '$1 $2');
     }
