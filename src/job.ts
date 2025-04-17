@@ -529,7 +529,7 @@ class Job extends Operation {
   getQueryResults(options?: QueryResultsOptions): Promise<QueryRowsResponse>;
   getQueryResults(
     options: QueryResultsOptions,
-    callback: QueryRowsCallback,
+    callback?: QueryRowsCallback,
   ): void;
   getQueryResults(callback: QueryRowsCallback): void;
   getQueryResults(

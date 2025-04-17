@@ -54,8 +54,6 @@ export {
   QueryStreamOptions,
   RequestCallback,
   ResourceCallback,
-  SimpleQueryRowsCallback,
-  SimpleQueryRowsResponse,
   ValueType,
 } from './bigquery';
 
