@@ -1461,7 +1461,7 @@ export class BigQuery extends Service {
    * //-
    * bigquery.createQueryJob(query, function(err, job) {
    *   if (!err) {
-   *     job.getQueryResults(function(err, rows, apiResponse) {});
+   *     job.getQueryResults(function(err, rows, nextQuery, apiResponse) {});
    *   }
    * });
    *
@@ -2158,6 +2158,7 @@ export class BigQuery extends Service {
     query: Query | string,
     options?: QueryOptions,
   ): Promise<QueryRowsResponse>;
+  query(query: Query | string, callback: QueryRowsCallback): void;
   query(
     query: Query | string,
     callback?: QueryRowsCallback,
