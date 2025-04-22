@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * Discovery Revision: 20250404
+ * Discovery Revision: 20250313
  */
 
 /**
@@ -417,7 +417,7 @@ declare namespace bigquery {
   };
 
   /**
-   * Configuration for BigQuery tables for Apache Iceberg (formerly BigLake managed tables.)
+   * Configuration for BigLake managed tables.
    */
   type IBigLakeConfiguration = {
     /**
@@ -4954,7 +4954,7 @@ declare namespace bigquery {
 
   type ITable = {
     /**
-     * Optional. Specifies the configuration of a BigQuery table for Apache Iceberg.
+     * Optional. Specifies the configuration of a BigLake managed table.
      */
     biglakeConfiguration?: IBigLakeConfiguration;
     /**
