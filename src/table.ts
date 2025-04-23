@@ -47,7 +47,6 @@ import {
   PagedCallback,
   JobRequest,
   PagedRequest,
-  QueryRowsResponse,
   QueryRowsCallback,
 } from '.';
 import {GoogleErrorBody} from '@google-cloud/common/build/src/util';
