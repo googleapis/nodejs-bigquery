@@ -4,6 +4,17 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## [8.0.0](https://github.com/googleapis/nodejs-bigquery/compare/v7.9.4...v8.0.0) (2025-04-23)
+
+
+### ⚠ BREAKING CHANGES
+
+* migrate to node 18 ([#1458](https://github.com/googleapis/nodejs-bigquery/issues/1458))
+
+### Miscellaneous Chores
+
+* Migrate to node 18 ([#1458](https://github.com/googleapis/nodejs-bigquery/issues/1458)) ([6cd706b](https://github.com/googleapis/nodejs-bigquery/commit/6cd706b6e96ac54a9289211e7e3d2cc1f4e934e2))
+
 ## [7.9.4](https://github.com/googleapis/nodejs-bigquery/compare/v7.9.3...v7.9.4) (2025-04-02)
 
 
