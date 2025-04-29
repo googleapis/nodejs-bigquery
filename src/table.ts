@@ -52,7 +52,7 @@ import {
 } from '.';
 import {GoogleErrorBody} from '@google-cloud/common/build/src/util';
 import {Duplex, Writable} from 'stream';
-import {JobMetadata} from './job';
+import {JobMetadata, JobOptions} from './job';
 import bigquery from './types';
 import {IntegerTypeCastOptions} from './bigquery';
 import {RowQueue} from './rowQueue';
@@ -923,8 +923,7 @@ class Table extends ServiceObject {
     const callback =
       typeof metadataOrCallback === 'function' ? metadataOrCallback : cb;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const body: any = {
+    const body: JobOptions = {
       configuration: {
         copy: extend(true, metadata, {
           destinationTable: {
@@ -953,6 +952,11 @@ class Table extends ServiceObject {
     if (metadata.jobId) {
       body.jobId = metadata.jobId;
       delete metadata.jobId;
+    }
+
+    if (body.configuration && metadata.reservation) {
+      body.configuration.reservation = metadata.reservation;
+      delete metadata.reservation;
     }
 
     this.bigQuery.createJob(body, callback!);
@@ -1045,8 +1049,7 @@ class Table extends ServiceObject {
     const callback =
       typeof metadataOrCallback === 'function' ? metadataOrCallback : cb;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const body: any = {
+    const body: JobOptions = {
       configuration: {
         copy: extend(true, metadata, {
           destinationTable: {
@@ -1078,6 +1081,11 @@ class Table extends ServiceObject {
     if (metadata.jobId) {
       body.jobId = metadata.jobId;
       delete metadata.jobId;
+    }
+
+    if (body.configuration && metadata.reservation) {
+      body.configuration.reservation = metadata.reservation;
+      delete metadata.reservation;
     }
 
     this.bigQuery.createJob(body, callback!);
@@ -1218,8 +1226,7 @@ class Table extends ServiceObject {
       delete options.gzip;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const body: any = {
+    const body: JobOptions = {
       configuration: {
         extract: extend(true, options, {
           sourceTable: {
@@ -1243,6 +1250,11 @@ class Table extends ServiceObject {
     if (options.jobId) {
       body.jobId = options.jobId;
       delete options.jobId;
+    }
+
+    if (body.configuration && options.reservation) {
+      body.configuration.reservation = options.reservation;
+      delete options.reservation;
     }
 
     this.bigQuery.createJob(body, callback!);
@@ -1399,8 +1411,7 @@ class Table extends ServiceObject {
       return [jobResponse, jobResponse.metadata];
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const body: any = {
+    const body: JobOptions = {
       configuration: {
         load: {
           destinationTable: {
@@ -1427,7 +1438,12 @@ class Table extends ServiceObject {
       delete metadata.jobId;
     }
 
-    extend(true, body.configuration.load, metadata, {
+    if (body.configuration && metadata.reservation) {
+      body.configuration.reservation = metadata.reservation;
+      delete metadata.reservation;
+    }
+
+    extend(true, body.configuration?.load, metadata, {
       sourceUris: toArray(source).map(src => {
         if (!util.isCustomType(src, 'storage/file')) {
           throw new Error('Source must be a File object.');
@@ -1437,7 +1453,12 @@ class Table extends ServiceObject {
         // the file's extension. If no match, don't set, and default upstream
         // to CSV.
         const format = FORMATS[path.extname(src.name).substr(1).toLowerCase()];
-        if (!metadata.sourceFormat && format) {
+        if (
+          !metadata.sourceFormat &&
+          format &&
+          body.configuration &&
+          body.configuration.load
+        ) {
           body.configuration.load.sourceFormat = format;
         }
         return 'gs://' + src.bucket.name + '/' + src.name;
