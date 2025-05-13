@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * Discovery Revision: 20250427
+ * Discovery Revision: 20250404
  */
 
 /**
@@ -2549,7 +2549,7 @@ declare namespace bigquery {
      */
     timePartitioning?: ITimePartitioning;
     /**
-     * Optional. Default time zone that will apply when parsing timestamp values that have no specific time zone.
+     * Optional. [Experimental] Default time zone that will apply when parsing timestamp values that have no specific time zone.
      */
     timeZone?: string;
     /**
@@ -3055,7 +3055,7 @@ declare namespace bigquery {
      */
     referencedRoutines?: Array<IRoutineReference>;
     /**
-     * Output only. Referenced tables for the job.
+     * Output only. Referenced tables for the job. Queries that reference more than 50 tables will not have a complete list.
      */
     referencedTables?: Array<ITableReference>;
     /**
@@ -4149,10 +4149,6 @@ declare namespace bigquery {
      * Total units of work remaining for the query. This number can be revised (increased or decreased) while the query is running.
      */
     pendingUnits?: string;
-    /**
-     * Total shuffle usage ratio in shuffle RAM per reservation of this query. This will be provided for reservation customers only.
-     */
-    shuffleRamUsageRatio?: number;
     /**
      * Cumulative slot-ms consumed by the query.
      */
@@ -6394,14 +6390,6 @@ declare namespace bigquery {
        * Optional. The version of the provided access policy schema. Valid values are 0, 1, and 3. Requests specifying an invalid value will be rejected. This version refers to the schema version of the access policy and not the version of access policy. This field's value can be equal or more than the access policy schema provided in the request. For example, * Operations updating conditional access policy binding in datasets must specify version 3. Some of the operations are : - Adding a new access policy entry with condition. - Removing an access policy entry with condition. - Updating an access policy entry with condition. * But dataset with no conditional role bindings in access policy may specify any valid value or leave the field unset. If unset or if 0 or 1 value is used for dataset with conditional bindings, request will be rejected. This field will be mapped to IAM Policy version (https://cloud.google.com/iam/docs/policies#versions) and will be used to set policy in IAM.
        */
       accessPolicyVersion?: number;
-      /**
-       * Optional. Specifies the fields of dataset that update/patch operation is targeting By default, both metadata and ACL fields are updated.
-       */
-      updateMode?:
-        | 'UPDATE_MODE_UNSPECIFIED'
-        | 'UPDATE_METADATA'
-        | 'UPDATE_ACL'
-        | 'UPDATE_FULL';
     };
 
     /**
@@ -6412,14 +6400,6 @@ declare namespace bigquery {
        * Optional. The version of the provided access policy schema. Valid values are 0, 1, and 3. Requests specifying an invalid value will be rejected. This version refers to the schema version of the access policy and not the version of access policy. This field's value can be equal or more than the access policy schema provided in the request. For example, * Operations updating conditional access policy binding in datasets must specify version 3. Some of the operations are : - Adding a new access policy entry with condition. - Removing an access policy entry with condition. - Updating an access policy entry with condition. * But dataset with no conditional role bindings in access policy may specify any valid value or leave the field unset. If unset or if 0 or 1 value is used for dataset with conditional bindings, request will be rejected. This field will be mapped to IAM Policy version (https://cloud.google.com/iam/docs/policies#versions) and will be used to set policy in IAM.
        */
       accessPolicyVersion?: number;
-      /**
-       * Optional. Specifies the fields of dataset that update/patch operation is targeting By default, both metadata and ACL fields are updated.
-       */
-      updateMode?:
-        | 'UPDATE_MODE_UNSPECIFIED'
-        | 'UPDATE_METADATA'
-        | 'UPDATE_ACL'
-        | 'UPDATE_FULL';
     };
   }
 
