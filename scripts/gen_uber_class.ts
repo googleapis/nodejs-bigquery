@@ -383,7 +383,7 @@ async function buildOutput() {
   output = output.concat('\n}');
   return prettier.format(output, {
     parser: 'typescript',
-    trailingComma: 'es5',
+    trailingComma: 'all',
     singleQuote: true,
     bracketSpacing: false,
   });
