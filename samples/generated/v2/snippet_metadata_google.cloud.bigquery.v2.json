@@ -122,7 +122,7 @@
       "segments": [
         {
           "start": 25,
-          "end": 87,
+          "end": 92,
           "type": "FULL"
         }
       ],
@@ -142,6 +142,10 @@
           {
             "name": "dataset",
             "type": ".google.cloud.bigquery.v2.Dataset"
+          },
+          {
+            "name": "update_mode",
+            "type": ".google.cloud.bigquery.v2.UpdateOrPatchDatasetRequest.UpdateMode"
           },
           {
             "name": "access_policy_version",
@@ -174,7 +178,7 @@
       "segments": [
         {
           "start": 25,
-          "end": 87,
+          "end": 92,
           "type": "FULL"
         }
       ],
@@ -194,6 +198,10 @@
           {
             "name": "dataset",
             "type": ".google.cloud.bigquery.v2.Dataset"
+          },
+          {
+            "name": "update_mode",
+            "type": ".google.cloud.bigquery.v2.UpdateOrPatchDatasetRequest.UpdateMode"
           },
           {
             "name": "access_policy_version",

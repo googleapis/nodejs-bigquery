@@ -30,7 +30,7 @@ import {GoogleAuth, protobuf} from 'google-gax';
 // Dynamically loaded proto JSON is needed to get the type information
 // to fill in default values for request objects
 const root = protobuf.Root.fromJSON(
-  require('../protos/protos.json')
+  require('../protos/protos.json'),
 ).resolveAll();
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -47,7 +47,7 @@ function generateSampleMessage<T extends object>(instance: T) {
     instance.constructor as typeof protobuf.Message
   ).toObject(instance as protobuf.Message<T>, {defaults: true});
   return (instance.constructor as typeof protobuf.Message).fromObject(
-    filledObject
+    filledObject,
   ) as T;
 }
 
@@ -59,7 +59,7 @@ function stubSimpleCall<ResponseType>(response?: ResponseType, error?: Error) {
 
 function stubSimpleCallWithCallback<ResponseType>(
   response?: ResponseType,
-  error?: Error
+  error?: Error,
 ) {
   return error
     ? sinon.stub().callsArgWith(2, error)
@@ -68,7 +68,7 @@ function stubSimpleCallWithCallback<ResponseType>(
 
 function stubPageStreamingCall<ResponseType>(
   responses?: ResponseType[],
-  error?: Error
+  error?: Error,
 ) {
   const pagingStub = sinon.stub();
   if (responses) {
@@ -106,7 +106,7 @@ function stubPageStreamingCall<ResponseType>(
 
 function stubAsyncIterationCall<ResponseType>(
   responses?: ResponseType[],
-  error?: Error
+  error?: Error,
 ) {
   let counter = 0;
   const asyncIterable = {
@@ -269,9 +269,14 @@ describe('v2.RoutineServiceClient', () => {
         throw err;
       });
       assert(client.routineServiceStub);
-      client.close().then(() => {
-        done();
-      });
+      client
+        .close()
+        .then(() => {
+          done();
+        })
+        .catch(err => {
+          throw err;
+        });
     });
 
     it('has close method for the non-initialized client', done => {
@@ -280,9 +285,14 @@ describe('v2.RoutineServiceClient', () => {
         projectId: 'bogus',
       });
       assert.strictEqual(client.routineServiceStub, undefined);
-      client.close().then(() => {
-        done();
-      });
+      client
+        .close()
+        .then(() => {
+          done();
+        })
+        .catch(err => {
+          throw err;
+        });
     });
 
     it('has getProjectId method', async () => {
@@ -328,26 +338,26 @@ describe('v2.RoutineServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.GetRoutineRequest()
+        new protos.google.cloud.bigquery.v2.GetRoutineRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetRoutineRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetRoutineRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const defaultValue3 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetRoutineRequest',
-        ['routineId']
+        ['routineId'],
       );
       request.routineId = defaultValue3;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&dataset_id=${defaultValue2 ?? ''}&routine_id=${defaultValue3 ?? ''}`;
       const expectedResponse = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.Routine()
+        new protos.google.cloud.bigquery.v2.Routine(),
       );
       client.innerApiCalls.getRoutine = stubSimpleCall(expectedResponse);
       const [response] = await client.getRoutine(request);
@@ -369,26 +379,26 @@ describe('v2.RoutineServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.GetRoutineRequest()
+        new protos.google.cloud.bigquery.v2.GetRoutineRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetRoutineRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetRoutineRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const defaultValue3 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetRoutineRequest',
-        ['routineId']
+        ['routineId'],
       );
       request.routineId = defaultValue3;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&dataset_id=${defaultValue2 ?? ''}&routine_id=${defaultValue3 ?? ''}`;
       const expectedResponse = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.Routine()
+        new protos.google.cloud.bigquery.v2.Routine(),
       );
       client.innerApiCalls.getRoutine =
         stubSimpleCallWithCallback(expectedResponse);
@@ -397,14 +407,14 @@ describe('v2.RoutineServiceClient', () => {
           request,
           (
             err?: Error | null,
-            result?: protos.google.cloud.bigquery.v2.IRoutine | null
+            result?: protos.google.cloud.bigquery.v2.IRoutine | null,
           ) => {
             if (err) {
               reject(err);
             } else {
               resolve(result);
             }
-          }
+          },
         );
       });
       const response = await promise;
@@ -426,28 +436,28 @@ describe('v2.RoutineServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.GetRoutineRequest()
+        new protos.google.cloud.bigquery.v2.GetRoutineRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetRoutineRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetRoutineRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const defaultValue3 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetRoutineRequest',
-        ['routineId']
+        ['routineId'],
       );
       request.routineId = defaultValue3;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&dataset_id=${defaultValue2 ?? ''}&routine_id=${defaultValue3 ?? ''}`;
       const expectedError = new Error('expected');
       client.innerApiCalls.getRoutine = stubSimpleCall(
         undefined,
-        expectedError
+        expectedError,
       );
       await assert.rejects(client.getRoutine(request), expectedError);
       const actualRequest = (
@@ -467,25 +477,27 @@ describe('v2.RoutineServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.GetRoutineRequest()
+        new protos.google.cloud.bigquery.v2.GetRoutineRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetRoutineRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetRoutineRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const defaultValue3 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetRoutineRequest',
-        ['routineId']
+        ['routineId'],
       );
       request.routineId = defaultValue3;
       const expectedError = new Error('The client has already been closed.');
-      client.close();
+      client.close().catch(err => {
+        throw err;
+      });
       await assert.rejects(client.getRoutine(request), expectedError);
     });
   });
@@ -498,21 +510,21 @@ describe('v2.RoutineServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.InsertRoutineRequest()
+        new protos.google.cloud.bigquery.v2.InsertRoutineRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.InsertRoutineRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.InsertRoutineRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&dataset_id=${defaultValue2 ?? ''}`;
       const expectedResponse = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.Routine()
+        new protos.google.cloud.bigquery.v2.Routine(),
       );
       client.innerApiCalls.insertRoutine = stubSimpleCall(expectedResponse);
       const [response] = await client.insertRoutine(request);
@@ -534,21 +546,21 @@ describe('v2.RoutineServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.InsertRoutineRequest()
+        new protos.google.cloud.bigquery.v2.InsertRoutineRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.InsertRoutineRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.InsertRoutineRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&dataset_id=${defaultValue2 ?? ''}`;
       const expectedResponse = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.Routine()
+        new protos.google.cloud.bigquery.v2.Routine(),
       );
       client.innerApiCalls.insertRoutine =
         stubSimpleCallWithCallback(expectedResponse);
@@ -557,14 +569,14 @@ describe('v2.RoutineServiceClient', () => {
           request,
           (
             err?: Error | null,
-            result?: protos.google.cloud.bigquery.v2.IRoutine | null
+            result?: protos.google.cloud.bigquery.v2.IRoutine | null,
           ) => {
             if (err) {
               reject(err);
             } else {
               resolve(result);
             }
-          }
+          },
         );
       });
       const response = await promise;
@@ -586,23 +598,23 @@ describe('v2.RoutineServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.InsertRoutineRequest()
+        new protos.google.cloud.bigquery.v2.InsertRoutineRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.InsertRoutineRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.InsertRoutineRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&dataset_id=${defaultValue2 ?? ''}`;
       const expectedError = new Error('expected');
       client.innerApiCalls.insertRoutine = stubSimpleCall(
         undefined,
-        expectedError
+        expectedError,
       );
       await assert.rejects(client.insertRoutine(request), expectedError);
       const actualRequest = (
@@ -622,20 +634,22 @@ describe('v2.RoutineServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.InsertRoutineRequest()
+        new protos.google.cloud.bigquery.v2.InsertRoutineRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.InsertRoutineRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.InsertRoutineRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const expectedError = new Error('The client has already been closed.');
-      client.close();
+      client.close().catch(err => {
+        throw err;
+      });
       await assert.rejects(client.insertRoutine(request), expectedError);
     });
   });
@@ -648,26 +662,26 @@ describe('v2.RoutineServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.UpdateRoutineRequest()
+        new protos.google.cloud.bigquery.v2.UpdateRoutineRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.UpdateRoutineRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.UpdateRoutineRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const defaultValue3 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.UpdateRoutineRequest',
-        ['routineId']
+        ['routineId'],
       );
       request.routineId = defaultValue3;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&dataset_id=${defaultValue2 ?? ''}&routine_id=${defaultValue3 ?? ''}`;
       const expectedResponse = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.Routine()
+        new protos.google.cloud.bigquery.v2.Routine(),
       );
       client.innerApiCalls.updateRoutine = stubSimpleCall(expectedResponse);
       const [response] = await client.updateRoutine(request);
@@ -689,26 +703,26 @@ describe('v2.RoutineServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.UpdateRoutineRequest()
+        new protos.google.cloud.bigquery.v2.UpdateRoutineRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.UpdateRoutineRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.UpdateRoutineRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const defaultValue3 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.UpdateRoutineRequest',
-        ['routineId']
+        ['routineId'],
       );
       request.routineId = defaultValue3;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&dataset_id=${defaultValue2 ?? ''}&routine_id=${defaultValue3 ?? ''}`;
       const expectedResponse = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.Routine()
+        new protos.google.cloud.bigquery.v2.Routine(),
       );
       client.innerApiCalls.updateRoutine =
         stubSimpleCallWithCallback(expectedResponse);
@@ -717,14 +731,14 @@ describe('v2.RoutineServiceClient', () => {
           request,
           (
             err?: Error | null,
-            result?: protos.google.cloud.bigquery.v2.IRoutine | null
+            result?: protos.google.cloud.bigquery.v2.IRoutine | null,
           ) => {
             if (err) {
               reject(err);
             } else {
               resolve(result);
             }
-          }
+          },
         );
       });
       const response = await promise;
@@ -746,28 +760,28 @@ describe('v2.RoutineServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.UpdateRoutineRequest()
+        new protos.google.cloud.bigquery.v2.UpdateRoutineRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.UpdateRoutineRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.UpdateRoutineRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const defaultValue3 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.UpdateRoutineRequest',
-        ['routineId']
+        ['routineId'],
       );
       request.routineId = defaultValue3;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&dataset_id=${defaultValue2 ?? ''}&routine_id=${defaultValue3 ?? ''}`;
       const expectedError = new Error('expected');
       client.innerApiCalls.updateRoutine = stubSimpleCall(
         undefined,
-        expectedError
+        expectedError,
       );
       await assert.rejects(client.updateRoutine(request), expectedError);
       const actualRequest = (
@@ -787,25 +801,27 @@ describe('v2.RoutineServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.UpdateRoutineRequest()
+        new protos.google.cloud.bigquery.v2.UpdateRoutineRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.UpdateRoutineRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.UpdateRoutineRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const defaultValue3 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.UpdateRoutineRequest',
-        ['routineId']
+        ['routineId'],
       );
       request.routineId = defaultValue3;
       const expectedError = new Error('The client has already been closed.');
-      client.close();
+      client.close().catch(err => {
+        throw err;
+      });
       await assert.rejects(client.updateRoutine(request), expectedError);
     });
   });
@@ -818,10 +834,10 @@ describe('v2.RoutineServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.PatchRoutineRequest()
+        new protos.google.cloud.bigquery.v2.PatchRoutineRequest(),
       );
       const expectedResponse = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.Routine()
+        new protos.google.cloud.bigquery.v2.Routine(),
       );
       client.innerApiCalls.patchRoutine = stubSimpleCall(expectedResponse);
       const [response] = await client.patchRoutine(request);
@@ -835,10 +851,10 @@ describe('v2.RoutineServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.PatchRoutineRequest()
+        new protos.google.cloud.bigquery.v2.PatchRoutineRequest(),
       );
       const expectedResponse = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.Routine()
+        new protos.google.cloud.bigquery.v2.Routine(),
       );
       client.innerApiCalls.patchRoutine =
         stubSimpleCallWithCallback(expectedResponse);
@@ -847,14 +863,14 @@ describe('v2.RoutineServiceClient', () => {
           request,
           (
             err?: Error | null,
-            result?: protos.google.cloud.bigquery.v2.IRoutine | null
+            result?: protos.google.cloud.bigquery.v2.IRoutine | null,
           ) => {
             if (err) {
               reject(err);
             } else {
               resolve(result);
             }
-          }
+          },
         );
       });
       const response = await promise;
@@ -868,12 +884,12 @@ describe('v2.RoutineServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.PatchRoutineRequest()
+        new protos.google.cloud.bigquery.v2.PatchRoutineRequest(),
       );
       const expectedError = new Error('expected');
       client.innerApiCalls.patchRoutine = stubSimpleCall(
         undefined,
-        expectedError
+        expectedError,
       );
       await assert.rejects(client.patchRoutine(request), expectedError);
     });
@@ -885,10 +901,12 @@ describe('v2.RoutineServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.PatchRoutineRequest()
+        new protos.google.cloud.bigquery.v2.PatchRoutineRequest(),
       );
       const expectedError = new Error('The client has already been closed.');
-      client.close();
+      client.close().catch(err => {
+        throw err;
+      });
       await assert.rejects(client.patchRoutine(request), expectedError);
     });
   });
@@ -901,26 +919,26 @@ describe('v2.RoutineServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.DeleteRoutineRequest()
+        new protos.google.cloud.bigquery.v2.DeleteRoutineRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.DeleteRoutineRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.DeleteRoutineRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const defaultValue3 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.DeleteRoutineRequest',
-        ['routineId']
+        ['routineId'],
       );
       request.routineId = defaultValue3;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&dataset_id=${defaultValue2 ?? ''}&routine_id=${defaultValue3 ?? ''}`;
       const expectedResponse = generateSampleMessage(
-        new protos.google.protobuf.Empty()
+        new protos.google.protobuf.Empty(),
       );
       client.innerApiCalls.deleteRoutine = stubSimpleCall(expectedResponse);
       const [response] = await client.deleteRoutine(request);
@@ -942,26 +960,26 @@ describe('v2.RoutineServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.DeleteRoutineRequest()
+        new protos.google.cloud.bigquery.v2.DeleteRoutineRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.DeleteRoutineRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.DeleteRoutineRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const defaultValue3 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.DeleteRoutineRequest',
-        ['routineId']
+        ['routineId'],
       );
       request.routineId = defaultValue3;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&dataset_id=${defaultValue2 ?? ''}&routine_id=${defaultValue3 ?? ''}`;
       const expectedResponse = generateSampleMessage(
-        new protos.google.protobuf.Empty()
+        new protos.google.protobuf.Empty(),
       );
       client.innerApiCalls.deleteRoutine =
         stubSimpleCallWithCallback(expectedResponse);
@@ -970,14 +988,14 @@ describe('v2.RoutineServiceClient', () => {
           request,
           (
             err?: Error | null,
-            result?: protos.google.protobuf.IEmpty | null
+            result?: protos.google.protobuf.IEmpty | null,
           ) => {
             if (err) {
               reject(err);
             } else {
               resolve(result);
             }
-          }
+          },
         );
       });
       const response = await promise;
@@ -999,28 +1017,28 @@ describe('v2.RoutineServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.DeleteRoutineRequest()
+        new protos.google.cloud.bigquery.v2.DeleteRoutineRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.DeleteRoutineRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.DeleteRoutineRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const defaultValue3 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.DeleteRoutineRequest',
-        ['routineId']
+        ['routineId'],
       );
       request.routineId = defaultValue3;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&dataset_id=${defaultValue2 ?? ''}&routine_id=${defaultValue3 ?? ''}`;
       const expectedError = new Error('expected');
       client.innerApiCalls.deleteRoutine = stubSimpleCall(
         undefined,
-        expectedError
+        expectedError,
       );
       await assert.rejects(client.deleteRoutine(request), expectedError);
       const actualRequest = (
@@ -1040,25 +1058,27 @@ describe('v2.RoutineServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.DeleteRoutineRequest()
+        new protos.google.cloud.bigquery.v2.DeleteRoutineRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.DeleteRoutineRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.DeleteRoutineRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const defaultValue3 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.DeleteRoutineRequest',
-        ['routineId']
+        ['routineId'],
       );
       request.routineId = defaultValue3;
       const expectedError = new Error('The client has already been closed.');
-      client.close();
+      client.close().catch(err => {
+        throw err;
+      });
       await assert.rejects(client.deleteRoutine(request), expectedError);
     });
   });
@@ -1071,16 +1091,16 @@ describe('v2.RoutineServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.ListRoutinesRequest()
+        new protos.google.cloud.bigquery.v2.ListRoutinesRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.ListRoutinesRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.ListRoutinesRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&dataset_id=${defaultValue2 ?? ''}`;
@@ -1109,16 +1129,16 @@ describe('v2.RoutineServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.ListRoutinesRequest()
+        new protos.google.cloud.bigquery.v2.ListRoutinesRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.ListRoutinesRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.ListRoutinesRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&dataset_id=${defaultValue2 ?? ''}`;
@@ -1134,14 +1154,14 @@ describe('v2.RoutineServiceClient', () => {
           request,
           (
             err?: Error | null,
-            result?: protos.google.cloud.bigquery.v2.IRoutine[] | null
+            result?: protos.google.cloud.bigquery.v2.IRoutine[] | null,
           ) => {
             if (err) {
               reject(err);
             } else {
               resolve(result);
             }
-          }
+          },
         );
       });
       const response = await promise;
@@ -1163,23 +1183,23 @@ describe('v2.RoutineServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.ListRoutinesRequest()
+        new protos.google.cloud.bigquery.v2.ListRoutinesRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.ListRoutinesRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.ListRoutinesRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&dataset_id=${defaultValue2 ?? ''}`;
       const expectedError = new Error('expected');
       client.innerApiCalls.listRoutines = stubSimpleCall(
         undefined,
-        expectedError
+        expectedError,
       );
       await assert.rejects(client.listRoutines(request), expectedError);
       const actualRequest = (
@@ -1199,16 +1219,16 @@ describe('v2.RoutineServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.ListRoutinesRequest()
+        new protos.google.cloud.bigquery.v2.ListRoutinesRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.ListRoutinesRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.ListRoutinesRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&dataset_id=${defaultValue2 ?? ''}`;
@@ -1226,7 +1246,7 @@ describe('v2.RoutineServiceClient', () => {
           'data',
           (response: protos.google.cloud.bigquery.v2.Routine) => {
             responses.push(response);
-          }
+          },
         );
         stream.on('end', () => {
           resolve(responses);
@@ -1240,14 +1260,14 @@ describe('v2.RoutineServiceClient', () => {
       assert(
         (client.descriptors.page.listRoutines.createStream as SinonStub)
           .getCall(0)
-          .calledWith(client.innerApiCalls.listRoutines, request)
+          .calledWith(client.innerApiCalls.listRoutines, request),
       );
       assert(
         (client.descriptors.page.listRoutines.createStream as SinonStub)
           .getCall(0)
           .args[2].otherArgs.headers[
             'x-goog-request-params'
-          ].includes(expectedHeaderRequestParams)
+          ].includes(expectedHeaderRequestParams),
       );
     });
 
@@ -1258,23 +1278,23 @@ describe('v2.RoutineServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.ListRoutinesRequest()
+        new protos.google.cloud.bigquery.v2.ListRoutinesRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.ListRoutinesRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.ListRoutinesRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&dataset_id=${defaultValue2 ?? ''}`;
       const expectedError = new Error('expected');
       client.descriptors.page.listRoutines.createStream = stubPageStreamingCall(
         undefined,
-        expectedError
+        expectedError,
       );
       const stream = client.listRoutinesStream(request);
       const promise = new Promise((resolve, reject) => {
@@ -1283,7 +1303,7 @@ describe('v2.RoutineServiceClient', () => {
           'data',
           (response: protos.google.cloud.bigquery.v2.Routine) => {
             responses.push(response);
-          }
+          },
         );
         stream.on('end', () => {
           resolve(responses);
@@ -1296,14 +1316,14 @@ describe('v2.RoutineServiceClient', () => {
       assert(
         (client.descriptors.page.listRoutines.createStream as SinonStub)
           .getCall(0)
-          .calledWith(client.innerApiCalls.listRoutines, request)
+          .calledWith(client.innerApiCalls.listRoutines, request),
       );
       assert(
         (client.descriptors.page.listRoutines.createStream as SinonStub)
           .getCall(0)
           .args[2].otherArgs.headers[
             'x-goog-request-params'
-          ].includes(expectedHeaderRequestParams)
+          ].includes(expectedHeaderRequestParams),
       );
     });
 
@@ -1314,16 +1334,16 @@ describe('v2.RoutineServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.ListRoutinesRequest()
+        new protos.google.cloud.bigquery.v2.ListRoutinesRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.ListRoutinesRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.ListRoutinesRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&dataset_id=${defaultValue2 ?? ''}`;
@@ -1344,14 +1364,14 @@ describe('v2.RoutineServiceClient', () => {
         (
           client.descriptors.page.listRoutines.asyncIterate as SinonStub
         ).getCall(0).args[1],
-        request
+        request,
       );
       assert(
         (client.descriptors.page.listRoutines.asyncIterate as SinonStub)
           .getCall(0)
           .args[2].otherArgs.headers[
             'x-goog-request-params'
-          ].includes(expectedHeaderRequestParams)
+          ].includes(expectedHeaderRequestParams),
       );
     });
 
@@ -1362,16 +1382,16 @@ describe('v2.RoutineServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.ListRoutinesRequest()
+        new protos.google.cloud.bigquery.v2.ListRoutinesRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.ListRoutinesRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.ListRoutinesRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&dataset_id=${defaultValue2 ?? ''}`;
@@ -1389,14 +1409,14 @@ describe('v2.RoutineServiceClient', () => {
         (
           client.descriptors.page.listRoutines.asyncIterate as SinonStub
         ).getCall(0).args[1],
-        request
+        request,
       );
       assert(
         (client.descriptors.page.listRoutines.asyncIterate as SinonStub)
           .getCall(0)
           .args[2].otherArgs.headers[
             'x-goog-request-params'
-          ].includes(expectedHeaderRequestParams)
+          ].includes(expectedHeaderRequestParams),
       );
     });
   });

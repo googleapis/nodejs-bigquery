@@ -22,6 +22,15 @@
           "rpc_timeout_multiplier": 1,
           "max_rpc_timeout_millis": 60000,
           "total_timeout_millis": 600000
+        },
+        "cbf71b99e5c3bbd64c526c7e742fbf8ad180a617": {
+          "initial_retry_delay_millis": 400,
+          "retry_delay_multiplier": 2,
+          "max_retry_delay_millis": 60000,
+          "initial_rpc_timeout_millis": 60000,
+          "rpc_timeout_multiplier": 1,
+          "max_rpc_timeout_millis": 60000,
+          "total_timeout_millis": 600000
         }
       },
       "methods": {
@@ -48,17 +57,17 @@
         "DeleteDataset": {
           "timeout_millis": 240000,
           "retry_codes_name": "deadline_exceeded_resource_exhausted_unavailable",
-          "retry_params_name": "default"
+          "retry_params_name": "cbf71b99e5c3bbd64c526c7e742fbf8ad180a617"
         },
         "ListDatasets": {
           "timeout_millis": 240000,
           "retry_codes_name": "deadline_exceeded_resource_exhausted_unavailable",
-          "retry_params_name": "default"
+          "retry_params_name": "cbf71b99e5c3bbd64c526c7e742fbf8ad180a617"
         },
         "UndeleteDataset": {
           "timeout_millis": 240000,
           "retry_codes_name": "deadline_exceeded_resource_exhausted_unavailable",
-          "retry_params_name": "default"
+          "retry_params_name": "cbf71b99e5c3bbd64c526c7e742fbf8ad180a617"
         }
       }
     }

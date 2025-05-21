@@ -108,7 +108,7 @@ export class ModelServiceClient {
    */
   constructor(
     opts?: ClientOptions,
-    gaxInstance?: typeof gax | typeof gax.fallback
+    gaxInstance?: typeof gax | typeof gax.fallback,
   ) {
     // Ensure that options include all the required fields.
     const staticMembers = this.constructor as typeof ModelServiceClient;
@@ -118,7 +118,7 @@ export class ModelServiceClient {
       opts?.universe_domain !== opts?.universeDomain
     ) {
       throw new Error(
-        'Please set either universe_domain or universeDomain, but not both.'
+        'Please set either universe_domain or universeDomain, but not both.',
       );
     }
     const universeDomainEnvVar =
@@ -210,7 +210,7 @@ export class ModelServiceClient {
       listModels: new this._gaxModule.PageDescriptor(
         'pageToken',
         'nextPageToken',
-        'models'
+        'models',
       ),
     };
 
@@ -219,7 +219,7 @@ export class ModelServiceClient {
       'google.cloud.bigquery.v2.ModelService',
       gapicConfig as gax.ClientConfig,
       opts.clientConfig || {},
-      {'x-goog-api-client': clientHeader.join(' ')}
+      {'x-goog-api-client': clientHeader.join(' ')},
     );
 
     // Set up a dictionary of "inner API calls"; the core implementation
@@ -253,12 +253,12 @@ export class ModelServiceClient {
     this.modelServiceStub = this._gaxGrpc.createStub(
       this._opts.fallback
         ? (this._protos as protobuf.Root).lookupService(
-            'google.cloud.bigquery.v2.ModelService'
+            'google.cloud.bigquery.v2.ModelService',
           )
         : // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (this._protos as any).google.cloud.bigquery.v2.ModelService,
       this._opts,
-      this._providedCustomServicePath
+      this._providedCustomServicePath,
     ) as Promise<{[method: string]: Function}>;
 
     // Iterate over each of the methods that the service provides
@@ -281,7 +281,7 @@ export class ModelServiceClient {
           },
         (err: Error | null | undefined) => () => {
           throw err;
-        }
+        },
       );
 
       const descriptor = this.descriptors.page[methodName] || undefined;
@@ -289,7 +289,7 @@ export class ModelServiceClient {
         callPromise,
         this._defaults[methodName],
         descriptor,
-        this._opts.fallback
+        this._opts.fallback,
       );
 
       this.innerApiCalls[methodName] = apiCall;
@@ -310,7 +310,7 @@ export class ModelServiceClient {
     ) {
       process.emitWarning(
         'Static servicePath is deprecated, please use the instance method instead.',
-        'DeprecationWarning'
+        'DeprecationWarning',
       );
     }
     return 'bigquery.googleapis.com';
@@ -328,7 +328,7 @@ export class ModelServiceClient {
     ) {
       process.emitWarning(
         'Static apiEndpoint is deprecated, please use the instance method instead.',
-        'DeprecationWarning'
+        'DeprecationWarning',
       );
     }
     return 'bigquery.googleapis.com';
@@ -374,7 +374,7 @@ export class ModelServiceClient {
    * @returns {Promise} A promise that resolves to string containing the project ID.
    */
   getProjectId(
-    callback?: Callback<string, undefined, undefined>
+    callback?: Callback<string, undefined, undefined>,
   ): Promise<string> | void {
     if (callback) {
       this.auth.getProjectId(callback);
@@ -408,7 +408,7 @@ export class ModelServiceClient {
    */
   getModel(
     request?: protos.google.cloud.bigquery.v2.IGetModelRequest,
-    options?: CallOptions
+    options?: CallOptions,
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IModel,
@@ -423,7 +423,7 @@ export class ModelServiceClient {
       protos.google.cloud.bigquery.v2.IModel,
       protos.google.cloud.bigquery.v2.IGetModelRequest | null | undefined,
       {} | null | undefined
-    >
+    >,
   ): void;
   getModel(
     request: protos.google.cloud.bigquery.v2.IGetModelRequest,
@@ -431,7 +431,7 @@ export class ModelServiceClient {
       protos.google.cloud.bigquery.v2.IModel,
       protos.google.cloud.bigquery.v2.IGetModelRequest | null | undefined,
       {} | null | undefined
-    >
+    >,
   ): void;
   getModel(
     request?: protos.google.cloud.bigquery.v2.IGetModelRequest,
@@ -446,7 +446,7 @@ export class ModelServiceClient {
       protos.google.cloud.bigquery.v2.IModel,
       protos.google.cloud.bigquery.v2.IGetModelRequest | null | undefined,
       {} | null | undefined
-    >
+    >,
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IModel,
@@ -497,7 +497,7 @@ export class ModelServiceClient {
         ]) => {
           this._log.info('getModel response %j', response);
           return [response, options, rawResponse];
-        }
+        },
       );
   }
   /**
@@ -526,7 +526,7 @@ export class ModelServiceClient {
    */
   patchModel(
     request?: protos.google.cloud.bigquery.v2.IPatchModelRequest,
-    options?: CallOptions
+    options?: CallOptions,
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IModel,
@@ -541,7 +541,7 @@ export class ModelServiceClient {
       protos.google.cloud.bigquery.v2.IModel,
       protos.google.cloud.bigquery.v2.IPatchModelRequest | null | undefined,
       {} | null | undefined
-    >
+    >,
   ): void;
   patchModel(
     request: protos.google.cloud.bigquery.v2.IPatchModelRequest,
@@ -549,7 +549,7 @@ export class ModelServiceClient {
       protos.google.cloud.bigquery.v2.IModel,
       protos.google.cloud.bigquery.v2.IPatchModelRequest | null | undefined,
       {} | null | undefined
-    >
+    >,
   ): void;
   patchModel(
     request?: protos.google.cloud.bigquery.v2.IPatchModelRequest,
@@ -564,7 +564,7 @@ export class ModelServiceClient {
       protos.google.cloud.bigquery.v2.IModel,
       protos.google.cloud.bigquery.v2.IPatchModelRequest | null | undefined,
       {} | null | undefined
-    >
+    >,
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IModel,
@@ -615,7 +615,7 @@ export class ModelServiceClient {
         ]) => {
           this._log.info('patchModel response %j', response);
           return [response, options, rawResponse];
-        }
+        },
       );
   }
   /**
@@ -640,7 +640,7 @@ export class ModelServiceClient {
    */
   deleteModel(
     request?: protos.google.cloud.bigquery.v2.IDeleteModelRequest,
-    options?: CallOptions
+    options?: CallOptions,
   ): Promise<
     [
       protos.google.protobuf.IEmpty,
@@ -655,7 +655,7 @@ export class ModelServiceClient {
       protos.google.protobuf.IEmpty,
       protos.google.cloud.bigquery.v2.IDeleteModelRequest | null | undefined,
       {} | null | undefined
-    >
+    >,
   ): void;
   deleteModel(
     request: protos.google.cloud.bigquery.v2.IDeleteModelRequest,
@@ -663,7 +663,7 @@ export class ModelServiceClient {
       protos.google.protobuf.IEmpty,
       protos.google.cloud.bigquery.v2.IDeleteModelRequest | null | undefined,
       {} | null | undefined
-    >
+    >,
   ): void;
   deleteModel(
     request?: protos.google.cloud.bigquery.v2.IDeleteModelRequest,
@@ -680,7 +680,7 @@ export class ModelServiceClient {
       protos.google.protobuf.IEmpty,
       protos.google.cloud.bigquery.v2.IDeleteModelRequest | null | undefined,
       {} | null | undefined
-    >
+    >,
   ): Promise<
     [
       protos.google.protobuf.IEmpty,
@@ -733,7 +733,7 @@ export class ModelServiceClient {
         ]) => {
           this._log.info('deleteModel response %j', response);
           return [response, options, rawResponse];
-        }
+        },
       );
   }
 
@@ -768,7 +768,7 @@ export class ModelServiceClient {
    */
   listModels(
     request?: protos.google.cloud.bigquery.v2.IListModelsRequest,
-    options?: CallOptions
+    options?: CallOptions,
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IModel[],
@@ -783,7 +783,7 @@ export class ModelServiceClient {
       protos.google.cloud.bigquery.v2.IListModelsRequest,
       protos.google.cloud.bigquery.v2.IListModelsResponse | null | undefined,
       protos.google.cloud.bigquery.v2.IModel
-    >
+    >,
   ): void;
   listModels(
     request: protos.google.cloud.bigquery.v2.IListModelsRequest,
@@ -791,7 +791,7 @@ export class ModelServiceClient {
       protos.google.cloud.bigquery.v2.IListModelsRequest,
       protos.google.cloud.bigquery.v2.IListModelsResponse | null | undefined,
       protos.google.cloud.bigquery.v2.IModel
-    >
+    >,
   ): void;
   listModels(
     request?: protos.google.cloud.bigquery.v2.IListModelsRequest,
@@ -808,7 +808,7 @@ export class ModelServiceClient {
       protos.google.cloud.bigquery.v2.IListModelsRequest,
       protos.google.cloud.bigquery.v2.IListModelsResponse | null | undefined,
       protos.google.cloud.bigquery.v2.IModel
-    >
+    >,
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IModel[],
@@ -865,7 +865,7 @@ export class ModelServiceClient {
         ]) => {
           this._log.info('listModels values %j', response);
           return [response, input, output];
-        }
+        },
       );
   }
 
@@ -896,7 +896,7 @@ export class ModelServiceClient {
    */
   listModelsStream(
     request?: protos.google.cloud.bigquery.v2.IListModelsRequest,
-    options?: CallOptions
+    options?: CallOptions,
   ): Transform {
     request = request || {};
     options = options || {};
@@ -916,7 +916,7 @@ export class ModelServiceClient {
     return this.descriptors.page.listModels.createStream(
       this.innerApiCalls.listModels as GaxCall,
       request,
-      callSettings
+      callSettings,
     );
   }
 
@@ -950,7 +950,7 @@ export class ModelServiceClient {
    */
   listModelsAsync(
     request?: protos.google.cloud.bigquery.v2.IListModelsRequest,
-    options?: CallOptions
+    options?: CallOptions,
   ): AsyncIterable<protos.google.cloud.bigquery.v2.IModel> {
     request = request || {};
     options = options || {};
@@ -970,7 +970,7 @@ export class ModelServiceClient {
     return this.descriptors.page.listModels.asyncIterate(
       this.innerApiCalls['listModels'] as GaxCall,
       request as {},
-      callSettings
+      callSettings,
     ) as AsyncIterable<protos.google.cloud.bigquery.v2.IModel>;
   }
 

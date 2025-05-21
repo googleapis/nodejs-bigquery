@@ -101,14 +101,14 @@ function extract(node: ts.Node, depth = 0, client): void {
           // gets the text range in the file where the comment for this method is
           const commentRanges = ts.getLeadingCommentRanges(
             sourceFile.getFullText(),
-            node.getFullStart()
+            node.getFullStart(),
           );
           let docString = '';
           // concatenates all parts of the comment into a string
           if (commentRanges) {
             commentRanges.map(r => {
               docString = docString.concat(
-                sourceFile!.getFullText().slice(r.pos, r.end)
+                sourceFile!.getFullText().slice(r.pos, r.end),
               );
               if (r.hasTrailingNewLine) {
                 docString = docString.concat('\n');
@@ -318,7 +318,7 @@ function buildOptionTypes(clients) {
     let variableDecl = '';
     const clientName = parseClientName(clients[client]);
     variableDecl = variableDecl.concat(
-      `\t${clientName}?: ${clients[client]};\n`
+      `\t${clientName}?: ${clients[client]};\n`,
     );
     bigQueryOptionsType = bigQueryOptionsType.concat(variableDecl);
   }
@@ -339,10 +339,10 @@ function buildClientConstructor(clients) {
   for (const client in clients) {
     const clientName = parseClientName(clients[client]);
     variableDecl = variableDecl.concat(
-      `\t${clientName}: ${clients[client]};\n`
+      `\t${clientName}: ${clients[client]};\n`,
     );
     constructorInitializers = constructorInitializers.concat(
-      `\t\tthis.${clientName} = options?.${clientName} ?? new ${clients[client]}(subClientOptions?.opts, subClientOptions?.gaxInstance);\n`
+      `\t\tthis.${clientName} = options?.${clientName} ?? new ${clients[client]}(subClientOptions?.opts, subClientOptions?.gaxInstance);\n`,
     );
   }
   constructorInitializers = constructorInitializers.concat('\t}');
@@ -352,7 +352,7 @@ function buildClientConstructor(clients) {
     '\n',
     comment,
     '\n',
-    constructorInitializers
+    constructorInitializers,
   );
   return output;
 }
@@ -394,4 +394,5 @@ async function main() {
     if (err) throw err;
   });
 }
-main();
+
+main().catch(err => console.error(err));

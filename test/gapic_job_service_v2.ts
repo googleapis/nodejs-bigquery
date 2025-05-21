@@ -30,7 +30,7 @@ import {GoogleAuth, protobuf} from 'google-gax';
 // Dynamically loaded proto JSON is needed to get the type information
 // to fill in default values for request objects
 const root = protobuf.Root.fromJSON(
-  require('../protos/protos.json')
+  require('../protos/protos.json'),
 ).resolveAll();
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -47,7 +47,7 @@ function generateSampleMessage<T extends object>(instance: T) {
     instance.constructor as typeof protobuf.Message
   ).toObject(instance as protobuf.Message<T>, {defaults: true});
   return (instance.constructor as typeof protobuf.Message).fromObject(
-    filledObject
+    filledObject,
   ) as T;
 }
 
@@ -59,7 +59,7 @@ function stubSimpleCall<ResponseType>(response?: ResponseType, error?: Error) {
 
 function stubSimpleCallWithCallback<ResponseType>(
   response?: ResponseType,
-  error?: Error
+  error?: Error,
 ) {
   return error
     ? sinon.stub().callsArgWith(2, error)
@@ -68,7 +68,7 @@ function stubSimpleCallWithCallback<ResponseType>(
 
 function stubPageStreamingCall<ResponseType>(
   responses?: ResponseType[],
-  error?: Error
+  error?: Error,
 ) {
   const pagingStub = sinon.stub();
   if (responses) {
@@ -106,7 +106,7 @@ function stubPageStreamingCall<ResponseType>(
 
 function stubAsyncIterationCall<ResponseType>(
   responses?: ResponseType[],
-  error?: Error
+  error?: Error,
 ) {
   let counter = 0;
   const asyncIterable = {
@@ -267,9 +267,14 @@ describe('v2.JobServiceClient', () => {
         throw err;
       });
       assert(client.jobServiceStub);
-      client.close().then(() => {
-        done();
-      });
+      client
+        .close()
+        .then(() => {
+          done();
+        })
+        .catch(err => {
+          throw err;
+        });
     });
 
     it('has close method for the non-initialized client', done => {
@@ -278,9 +283,14 @@ describe('v2.JobServiceClient', () => {
         projectId: 'bogus',
       });
       assert.strictEqual(client.jobServiceStub, undefined);
-      client.close().then(() => {
-        done();
-      });
+      client
+        .close()
+        .then(() => {
+          done();
+        })
+        .catch(err => {
+          throw err;
+        });
     });
 
     it('has getProjectId method', async () => {
@@ -326,21 +336,21 @@ describe('v2.JobServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.CancelJobRequest()
+        new protos.google.cloud.bigquery.v2.CancelJobRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.CancelJobRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.CancelJobRequest',
-        ['jobId']
+        ['jobId'],
       );
       request.jobId = defaultValue2;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&job_id=${defaultValue2 ?? ''}`;
       const expectedResponse = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.JobCancelResponse()
+        new protos.google.cloud.bigquery.v2.JobCancelResponse(),
       );
       client.innerApiCalls.cancelJob = stubSimpleCall(expectedResponse);
       const [response] = await client.cancelJob(request);
@@ -362,21 +372,21 @@ describe('v2.JobServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.CancelJobRequest()
+        new protos.google.cloud.bigquery.v2.CancelJobRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.CancelJobRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.CancelJobRequest',
-        ['jobId']
+        ['jobId'],
       );
       request.jobId = defaultValue2;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&job_id=${defaultValue2 ?? ''}`;
       const expectedResponse = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.JobCancelResponse()
+        new protos.google.cloud.bigquery.v2.JobCancelResponse(),
       );
       client.innerApiCalls.cancelJob =
         stubSimpleCallWithCallback(expectedResponse);
@@ -385,14 +395,14 @@ describe('v2.JobServiceClient', () => {
           request,
           (
             err?: Error | null,
-            result?: protos.google.cloud.bigquery.v2.IJobCancelResponse | null
+            result?: protos.google.cloud.bigquery.v2.IJobCancelResponse | null,
           ) => {
             if (err) {
               reject(err);
             } else {
               resolve(result);
             }
-          }
+          },
         );
       });
       const response = await promise;
@@ -414,16 +424,16 @@ describe('v2.JobServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.CancelJobRequest()
+        new protos.google.cloud.bigquery.v2.CancelJobRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.CancelJobRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.CancelJobRequest',
-        ['jobId']
+        ['jobId'],
       );
       request.jobId = defaultValue2;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&job_id=${defaultValue2 ?? ''}`;
@@ -447,20 +457,22 @@ describe('v2.JobServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.CancelJobRequest()
+        new protos.google.cloud.bigquery.v2.CancelJobRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.CancelJobRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.CancelJobRequest',
-        ['jobId']
+        ['jobId'],
       );
       request.jobId = defaultValue2;
       const expectedError = new Error('The client has already been closed.');
-      client.close();
+      client.close().catch(err => {
+        throw err;
+      });
       await assert.rejects(client.cancelJob(request), expectedError);
     });
   });
@@ -473,27 +485,27 @@ describe('v2.JobServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.GetJobRequest()
+        new protos.google.cloud.bigquery.v2.GetJobRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetJobRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetJobRequest',
-        ['jobId']
+        ['jobId'],
       );
       request.jobId = defaultValue2;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&job_id=${defaultValue2 ?? ''}`;
       const expectedResponse = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.Job()
+        new protos.google.cloud.bigquery.v2.Job(),
       );
       client.innerApiCalls.getJob = stubSimpleCall(expectedResponse);
       const [response] = await client.getJob(request);
       assert.deepStrictEqual(response, expectedResponse);
       const actualRequest = (client.innerApiCalls.getJob as SinonStub).getCall(
-        0
+        0,
       ).args[0];
       assert.deepStrictEqual(actualRequest, request);
       const actualHeaderRequestParams = (
@@ -509,21 +521,21 @@ describe('v2.JobServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.GetJobRequest()
+        new protos.google.cloud.bigquery.v2.GetJobRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetJobRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetJobRequest',
-        ['jobId']
+        ['jobId'],
       );
       request.jobId = defaultValue2;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&job_id=${defaultValue2 ?? ''}`;
       const expectedResponse = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.Job()
+        new protos.google.cloud.bigquery.v2.Job(),
       );
       client.innerApiCalls.getJob =
         stubSimpleCallWithCallback(expectedResponse);
@@ -532,20 +544,20 @@ describe('v2.JobServiceClient', () => {
           request,
           (
             err?: Error | null,
-            result?: protos.google.cloud.bigquery.v2.IJob | null
+            result?: protos.google.cloud.bigquery.v2.IJob | null,
           ) => {
             if (err) {
               reject(err);
             } else {
               resolve(result);
             }
-          }
+          },
         );
       });
       const response = await promise;
       assert.deepStrictEqual(response, expectedResponse);
       const actualRequest = (client.innerApiCalls.getJob as SinonStub).getCall(
-        0
+        0,
       ).args[0];
       assert.deepStrictEqual(actualRequest, request);
       const actualHeaderRequestParams = (
@@ -561,16 +573,16 @@ describe('v2.JobServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.GetJobRequest()
+        new protos.google.cloud.bigquery.v2.GetJobRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetJobRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetJobRequest',
-        ['jobId']
+        ['jobId'],
       );
       request.jobId = defaultValue2;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&job_id=${defaultValue2 ?? ''}`;
@@ -578,7 +590,7 @@ describe('v2.JobServiceClient', () => {
       client.innerApiCalls.getJob = stubSimpleCall(undefined, expectedError);
       await assert.rejects(client.getJob(request), expectedError);
       const actualRequest = (client.innerApiCalls.getJob as SinonStub).getCall(
-        0
+        0,
       ).args[0];
       assert.deepStrictEqual(actualRequest, request);
       const actualHeaderRequestParams = (
@@ -594,20 +606,22 @@ describe('v2.JobServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.GetJobRequest()
+        new protos.google.cloud.bigquery.v2.GetJobRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetJobRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetJobRequest',
-        ['jobId']
+        ['jobId'],
       );
       request.jobId = defaultValue2;
       const expectedError = new Error('The client has already been closed.');
-      client.close();
+      client.close().catch(err => {
+        throw err;
+      });
       await assert.rejects(client.getJob(request), expectedError);
     });
   });
@@ -620,16 +634,16 @@ describe('v2.JobServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.InsertJobRequest()
+        new protos.google.cloud.bigquery.v2.InsertJobRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.InsertJobRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}`;
       const expectedResponse = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.Job()
+        new protos.google.cloud.bigquery.v2.Job(),
       );
       client.innerApiCalls.insertJob = stubSimpleCall(expectedResponse);
       const [response] = await client.insertJob(request);
@@ -651,16 +665,16 @@ describe('v2.JobServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.InsertJobRequest()
+        new protos.google.cloud.bigquery.v2.InsertJobRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.InsertJobRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}`;
       const expectedResponse = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.Job()
+        new protos.google.cloud.bigquery.v2.Job(),
       );
       client.innerApiCalls.insertJob =
         stubSimpleCallWithCallback(expectedResponse);
@@ -669,14 +683,14 @@ describe('v2.JobServiceClient', () => {
           request,
           (
             err?: Error | null,
-            result?: protos.google.cloud.bigquery.v2.IJob | null
+            result?: protos.google.cloud.bigquery.v2.IJob | null,
           ) => {
             if (err) {
               reject(err);
             } else {
               resolve(result);
             }
-          }
+          },
         );
       });
       const response = await promise;
@@ -698,11 +712,11 @@ describe('v2.JobServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.InsertJobRequest()
+        new protos.google.cloud.bigquery.v2.InsertJobRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.InsertJobRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}`;
@@ -726,15 +740,17 @@ describe('v2.JobServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.InsertJobRequest()
+        new protos.google.cloud.bigquery.v2.InsertJobRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.InsertJobRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const expectedError = new Error('The client has already been closed.');
-      client.close();
+      client.close().catch(err => {
+        throw err;
+      });
       await assert.rejects(client.insertJob(request), expectedError);
     });
   });
@@ -747,21 +763,21 @@ describe('v2.JobServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.DeleteJobRequest()
+        new protos.google.cloud.bigquery.v2.DeleteJobRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.DeleteJobRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.DeleteJobRequest',
-        ['jobId']
+        ['jobId'],
       );
       request.jobId = defaultValue2;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&job_id=${defaultValue2 ?? ''}`;
       const expectedResponse = generateSampleMessage(
-        new protos.google.protobuf.Empty()
+        new protos.google.protobuf.Empty(),
       );
       client.innerApiCalls.deleteJob = stubSimpleCall(expectedResponse);
       const [response] = await client.deleteJob(request);
@@ -783,21 +799,21 @@ describe('v2.JobServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.DeleteJobRequest()
+        new protos.google.cloud.bigquery.v2.DeleteJobRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.DeleteJobRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.DeleteJobRequest',
-        ['jobId']
+        ['jobId'],
       );
       request.jobId = defaultValue2;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&job_id=${defaultValue2 ?? ''}`;
       const expectedResponse = generateSampleMessage(
-        new protos.google.protobuf.Empty()
+        new protos.google.protobuf.Empty(),
       );
       client.innerApiCalls.deleteJob =
         stubSimpleCallWithCallback(expectedResponse);
@@ -806,14 +822,14 @@ describe('v2.JobServiceClient', () => {
           request,
           (
             err?: Error | null,
-            result?: protos.google.protobuf.IEmpty | null
+            result?: protos.google.protobuf.IEmpty | null,
           ) => {
             if (err) {
               reject(err);
             } else {
               resolve(result);
             }
-          }
+          },
         );
       });
       const response = await promise;
@@ -835,16 +851,16 @@ describe('v2.JobServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.DeleteJobRequest()
+        new protos.google.cloud.bigquery.v2.DeleteJobRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.DeleteJobRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.DeleteJobRequest',
-        ['jobId']
+        ['jobId'],
       );
       request.jobId = defaultValue2;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&job_id=${defaultValue2 ?? ''}`;
@@ -868,20 +884,22 @@ describe('v2.JobServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.DeleteJobRequest()
+        new protos.google.cloud.bigquery.v2.DeleteJobRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.DeleteJobRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.DeleteJobRequest',
-        ['jobId']
+        ['jobId'],
       );
       request.jobId = defaultValue2;
       const expectedError = new Error('The client has already been closed.');
-      client.close();
+      client.close().catch(err => {
+        throw err;
+      });
       await assert.rejects(client.deleteJob(request), expectedError);
     });
   });
@@ -894,21 +912,21 @@ describe('v2.JobServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.GetQueryResultsRequest()
+        new protos.google.cloud.bigquery.v2.GetQueryResultsRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetQueryResultsRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetQueryResultsRequest',
-        ['jobId']
+        ['jobId'],
       );
       request.jobId = defaultValue2;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&job_id=${defaultValue2 ?? ''}`;
       const expectedResponse = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.GetQueryResultsResponse()
+        new protos.google.cloud.bigquery.v2.GetQueryResultsResponse(),
       );
       client.innerApiCalls.getQueryResults = stubSimpleCall(expectedResponse);
       const [response] = await client.getQueryResults(request);
@@ -930,21 +948,21 @@ describe('v2.JobServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.GetQueryResultsRequest()
+        new protos.google.cloud.bigquery.v2.GetQueryResultsRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetQueryResultsRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetQueryResultsRequest',
-        ['jobId']
+        ['jobId'],
       );
       request.jobId = defaultValue2;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&job_id=${defaultValue2 ?? ''}`;
       const expectedResponse = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.GetQueryResultsResponse()
+        new protos.google.cloud.bigquery.v2.GetQueryResultsResponse(),
       );
       client.innerApiCalls.getQueryResults =
         stubSimpleCallWithCallback(expectedResponse);
@@ -953,14 +971,14 @@ describe('v2.JobServiceClient', () => {
           request,
           (
             err?: Error | null,
-            result?: protos.google.cloud.bigquery.v2.IGetQueryResultsResponse | null
+            result?: protos.google.cloud.bigquery.v2.IGetQueryResultsResponse | null,
           ) => {
             if (err) {
               reject(err);
             } else {
               resolve(result);
             }
-          }
+          },
         );
       });
       const response = await promise;
@@ -982,23 +1000,23 @@ describe('v2.JobServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.GetQueryResultsRequest()
+        new protos.google.cloud.bigquery.v2.GetQueryResultsRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetQueryResultsRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetQueryResultsRequest',
-        ['jobId']
+        ['jobId'],
       );
       request.jobId = defaultValue2;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&job_id=${defaultValue2 ?? ''}`;
       const expectedError = new Error('expected');
       client.innerApiCalls.getQueryResults = stubSimpleCall(
         undefined,
-        expectedError
+        expectedError,
       );
       await assert.rejects(client.getQueryResults(request), expectedError);
       const actualRequest = (
@@ -1018,20 +1036,22 @@ describe('v2.JobServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.GetQueryResultsRequest()
+        new protos.google.cloud.bigquery.v2.GetQueryResultsRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetQueryResultsRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetQueryResultsRequest',
-        ['jobId']
+        ['jobId'],
       );
       request.jobId = defaultValue2;
       const expectedError = new Error('The client has already been closed.');
-      client.close();
+      client.close().catch(err => {
+        throw err;
+      });
       await assert.rejects(client.getQueryResults(request), expectedError);
     });
   });
@@ -1044,16 +1064,16 @@ describe('v2.JobServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.PostQueryRequest()
+        new protos.google.cloud.bigquery.v2.PostQueryRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.PostQueryRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}`;
       const expectedResponse = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.QueryResponse()
+        new protos.google.cloud.bigquery.v2.QueryResponse(),
       );
       client.innerApiCalls.query = stubSimpleCall(expectedResponse);
       const [response] = await client.query(request);
@@ -1074,16 +1094,16 @@ describe('v2.JobServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.PostQueryRequest()
+        new protos.google.cloud.bigquery.v2.PostQueryRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.PostQueryRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}`;
       const expectedResponse = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.QueryResponse()
+        new protos.google.cloud.bigquery.v2.QueryResponse(),
       );
       client.innerApiCalls.query = stubSimpleCallWithCallback(expectedResponse);
       const promise = new Promise((resolve, reject) => {
@@ -1091,14 +1111,14 @@ describe('v2.JobServiceClient', () => {
           request,
           (
             err?: Error | null,
-            result?: protos.google.cloud.bigquery.v2.IQueryResponse | null
+            result?: protos.google.cloud.bigquery.v2.IQueryResponse | null,
           ) => {
             if (err) {
               reject(err);
             } else {
               resolve(result);
             }
-          }
+          },
         );
       });
       const response = await promise;
@@ -1119,11 +1139,11 @@ describe('v2.JobServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.PostQueryRequest()
+        new protos.google.cloud.bigquery.v2.PostQueryRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.PostQueryRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}`;
@@ -1146,15 +1166,17 @@ describe('v2.JobServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.PostQueryRequest()
+        new protos.google.cloud.bigquery.v2.PostQueryRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.PostQueryRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const expectedError = new Error('The client has already been closed.');
-      client.close();
+      client.close().catch(err => {
+        throw err;
+      });
       await assert.rejects(client.query(request), expectedError);
     });
   });
@@ -1167,23 +1189,23 @@ describe('v2.JobServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.ListJobsRequest()
+        new protos.google.cloud.bigquery.v2.ListJobsRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.ListJobsRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}`;
       const expectedResponse = [
         generateSampleMessage(
-          new protos.google.cloud.bigquery.v2.ListFormatJob()
+          new protos.google.cloud.bigquery.v2.ListFormatJob(),
         ),
         generateSampleMessage(
-          new protos.google.cloud.bigquery.v2.ListFormatJob()
+          new protos.google.cloud.bigquery.v2.ListFormatJob(),
         ),
         generateSampleMessage(
-          new protos.google.cloud.bigquery.v2.ListFormatJob()
+          new protos.google.cloud.bigquery.v2.ListFormatJob(),
         ),
       ];
       client.innerApiCalls.listJobs = stubSimpleCall(expectedResponse);
@@ -1206,23 +1228,23 @@ describe('v2.JobServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.ListJobsRequest()
+        new protos.google.cloud.bigquery.v2.ListJobsRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.ListJobsRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}`;
       const expectedResponse = [
         generateSampleMessage(
-          new protos.google.cloud.bigquery.v2.ListFormatJob()
+          new protos.google.cloud.bigquery.v2.ListFormatJob(),
         ),
         generateSampleMessage(
-          new protos.google.cloud.bigquery.v2.ListFormatJob()
+          new protos.google.cloud.bigquery.v2.ListFormatJob(),
         ),
         generateSampleMessage(
-          new protos.google.cloud.bigquery.v2.ListFormatJob()
+          new protos.google.cloud.bigquery.v2.ListFormatJob(),
         ),
       ];
       client.innerApiCalls.listJobs =
@@ -1232,14 +1254,14 @@ describe('v2.JobServiceClient', () => {
           request,
           (
             err?: Error | null,
-            result?: protos.google.cloud.bigquery.v2.IListFormatJob[] | null
+            result?: protos.google.cloud.bigquery.v2.IListFormatJob[] | null,
           ) => {
             if (err) {
               reject(err);
             } else {
               resolve(result);
             }
-          }
+          },
         );
       });
       const response = await promise;
@@ -1261,11 +1283,11 @@ describe('v2.JobServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.ListJobsRequest()
+        new protos.google.cloud.bigquery.v2.ListJobsRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.ListJobsRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}`;
@@ -1289,23 +1311,23 @@ describe('v2.JobServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.ListJobsRequest()
+        new protos.google.cloud.bigquery.v2.ListJobsRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.ListJobsRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}`;
       const expectedResponse = [
         generateSampleMessage(
-          new protos.google.cloud.bigquery.v2.ListFormatJob()
+          new protos.google.cloud.bigquery.v2.ListFormatJob(),
         ),
         generateSampleMessage(
-          new protos.google.cloud.bigquery.v2.ListFormatJob()
+          new protos.google.cloud.bigquery.v2.ListFormatJob(),
         ),
         generateSampleMessage(
-          new protos.google.cloud.bigquery.v2.ListFormatJob()
+          new protos.google.cloud.bigquery.v2.ListFormatJob(),
         ),
       ];
       client.descriptors.page.listJobs.createStream =
@@ -1317,7 +1339,7 @@ describe('v2.JobServiceClient', () => {
           'data',
           (response: protos.google.cloud.bigquery.v2.ListFormatJob) => {
             responses.push(response);
-          }
+          },
         );
         stream.on('end', () => {
           resolve(responses);
@@ -1331,14 +1353,14 @@ describe('v2.JobServiceClient', () => {
       assert(
         (client.descriptors.page.listJobs.createStream as SinonStub)
           .getCall(0)
-          .calledWith(client.innerApiCalls.listJobs, request)
+          .calledWith(client.innerApiCalls.listJobs, request),
       );
       assert(
         (client.descriptors.page.listJobs.createStream as SinonStub)
           .getCall(0)
           .args[2].otherArgs.headers[
             'x-goog-request-params'
-          ].includes(expectedHeaderRequestParams)
+          ].includes(expectedHeaderRequestParams),
       );
     });
 
@@ -1349,18 +1371,18 @@ describe('v2.JobServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.ListJobsRequest()
+        new protos.google.cloud.bigquery.v2.ListJobsRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.ListJobsRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}`;
       const expectedError = new Error('expected');
       client.descriptors.page.listJobs.createStream = stubPageStreamingCall(
         undefined,
-        expectedError
+        expectedError,
       );
       const stream = client.listJobsStream(request);
       const promise = new Promise((resolve, reject) => {
@@ -1369,7 +1391,7 @@ describe('v2.JobServiceClient', () => {
           'data',
           (response: protos.google.cloud.bigquery.v2.ListFormatJob) => {
             responses.push(response);
-          }
+          },
         );
         stream.on('end', () => {
           resolve(responses);
@@ -1382,14 +1404,14 @@ describe('v2.JobServiceClient', () => {
       assert(
         (client.descriptors.page.listJobs.createStream as SinonStub)
           .getCall(0)
-          .calledWith(client.innerApiCalls.listJobs, request)
+          .calledWith(client.innerApiCalls.listJobs, request),
       );
       assert(
         (client.descriptors.page.listJobs.createStream as SinonStub)
           .getCall(0)
           .args[2].otherArgs.headers[
             'x-goog-request-params'
-          ].includes(expectedHeaderRequestParams)
+          ].includes(expectedHeaderRequestParams),
       );
     });
 
@@ -1400,23 +1422,23 @@ describe('v2.JobServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.ListJobsRequest()
+        new protos.google.cloud.bigquery.v2.ListJobsRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.ListJobsRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}`;
       const expectedResponse = [
         generateSampleMessage(
-          new protos.google.cloud.bigquery.v2.ListFormatJob()
+          new protos.google.cloud.bigquery.v2.ListFormatJob(),
         ),
         generateSampleMessage(
-          new protos.google.cloud.bigquery.v2.ListFormatJob()
+          new protos.google.cloud.bigquery.v2.ListFormatJob(),
         ),
         generateSampleMessage(
-          new protos.google.cloud.bigquery.v2.ListFormatJob()
+          new protos.google.cloud.bigquery.v2.ListFormatJob(),
         ),
       ];
       client.descriptors.page.listJobs.asyncIterate =
@@ -1430,14 +1452,14 @@ describe('v2.JobServiceClient', () => {
       assert.deepStrictEqual(
         (client.descriptors.page.listJobs.asyncIterate as SinonStub).getCall(0)
           .args[1],
-        request
+        request,
       );
       assert(
         (client.descriptors.page.listJobs.asyncIterate as SinonStub)
           .getCall(0)
           .args[2].otherArgs.headers[
             'x-goog-request-params'
-          ].includes(expectedHeaderRequestParams)
+          ].includes(expectedHeaderRequestParams),
       );
     });
 
@@ -1448,18 +1470,18 @@ describe('v2.JobServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.ListJobsRequest()
+        new protos.google.cloud.bigquery.v2.ListJobsRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.ListJobsRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}`;
       const expectedError = new Error('expected');
       client.descriptors.page.listJobs.asyncIterate = stubAsyncIterationCall(
         undefined,
-        expectedError
+        expectedError,
       );
       const iterable = client.listJobsAsync(request);
       await assert.rejects(async () => {
@@ -1471,14 +1493,14 @@ describe('v2.JobServiceClient', () => {
       assert.deepStrictEqual(
         (client.descriptors.page.listJobs.asyncIterate as SinonStub).getCall(0)
           .args[1],
-        request
+        request,
       );
       assert(
         (client.descriptors.page.listJobs.asyncIterate as SinonStub)
           .getCall(0)
           .args[2].otherArgs.headers[
             'x-goog-request-params'
-          ].includes(expectedHeaderRequestParams)
+          ].includes(expectedHeaderRequestParams),
       );
     });
   });
