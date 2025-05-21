@@ -101,43 +101,43 @@ export class BigQueryClient {
    */
   constructor(
     options?: BigQueryClientOptions,
-    subClientOptions?: SubClientOptions,
+    subClientOptions?: SubClientOptions
   ) {
     this.datasetClient =
       options?.datasetClient ??
       new DatasetServiceClient(
         subClientOptions?.opts,
-        subClientOptions?.gaxInstance,
+        subClientOptions?.gaxInstance
       );
     this.tableClient =
       options?.tableClient ??
       new TableServiceClient(
         subClientOptions?.opts,
-        subClientOptions?.gaxInstance,
+        subClientOptions?.gaxInstance
       );
     this.jobClient =
       options?.jobClient ??
       new JobServiceClient(
         subClientOptions?.opts,
-        subClientOptions?.gaxInstance,
+        subClientOptions?.gaxInstance
       );
     this.modelClient =
       options?.modelClient ??
       new ModelServiceClient(
         subClientOptions?.opts,
-        subClientOptions?.gaxInstance,
+        subClientOptions?.gaxInstance
       );
     this.routineClient =
       options?.routineClient ??
       new RoutineServiceClient(
         subClientOptions?.opts,
-        subClientOptions?.gaxInstance,
+        subClientOptions?.gaxInstance
       );
     this.rowAccessPolicyClient =
       options?.rowAccessPolicyClient ??
       new RowAccessPolicyServiceClient(
         subClientOptions?.opts,
-        subClientOptions?.gaxInstance,
+        subClientOptions?.gaxInstance
       );
   }
 
@@ -205,7 +205,7 @@ export class BigQueryClient {
       protos.google.cloud.bigquery.v2.IDataset,
       protos.google.cloud.bigquery.v2.IGetDatasetRequest | null | undefined,
       {} | null | undefined
-    >,
+    >
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IDataset,
@@ -280,7 +280,7 @@ export class BigQueryClient {
       protos.google.cloud.bigquery.v2.IDataset,
       protos.google.cloud.bigquery.v2.IInsertDatasetRequest | null | undefined,
       {} | null | undefined
-    >,
+    >
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IDataset,
@@ -369,7 +369,7 @@ export class BigQueryClient {
       | null
       | undefined,
       {} | null | undefined
-    >,
+    >
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IDataset,
@@ -457,7 +457,7 @@ export class BigQueryClient {
       | null
       | undefined,
       {} | null | undefined
-    >,
+    >
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IDataset,
@@ -519,7 +519,7 @@ export class BigQueryClient {
       protos.google.protobuf.IEmpty,
       protos.google.cloud.bigquery.v2.IDeleteDatasetRequest | null | undefined,
       {} | null | undefined
-    >,
+    >
   ): Promise<
     [
       protos.google.protobuf.IEmpty,
@@ -582,7 +582,7 @@ export class BigQueryClient {
       | null
       | undefined,
       {} | null | undefined
-    >,
+    >
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IDataset,
@@ -653,7 +653,7 @@ export class BigQueryClient {
       protos.google.cloud.bigquery.v2.IListDatasetsRequest,
       protos.google.cloud.bigquery.v2.IDatasetList | null | undefined,
       protos.google.cloud.bigquery.v2.IListFormatDataset
-    >,
+    >
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IListFormatDataset[],
@@ -710,7 +710,7 @@ export class BigQueryClient {
    */
   listDatasetsStream(
     request?: protos.google.cloud.bigquery.v2.IListDatasetsRequest,
-    options?: CallOptions,
+    options?: CallOptions
   ): Transform {
     return this.datasetClient.listDatasetsStream(request, options);
   }
@@ -753,7 +753,7 @@ export class BigQueryClient {
    */
   listDatasetsAsync(
     request?: protos.google.cloud.bigquery.v2.IListDatasetsRequest,
-    options?: CallOptions,
+    options?: CallOptions
   ): AsyncIterable<protos.google.cloud.bigquery.v2.IListFormatDataset> {
     return this.datasetClient.listDatasetsAsync(request, options);
   }
@@ -807,7 +807,7 @@ export class BigQueryClient {
       protos.google.cloud.bigquery.v2.ITable,
       protos.google.cloud.bigquery.v2.IGetTableRequest | null | undefined,
       {} | null | undefined
-    >,
+    >
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.ITable,
@@ -864,7 +864,7 @@ export class BigQueryClient {
       protos.google.cloud.bigquery.v2.ITable,
       protos.google.cloud.bigquery.v2.IInsertTableRequest | null | undefined,
       {} | null | undefined
-    >,
+    >
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.ITable,
@@ -930,7 +930,7 @@ export class BigQueryClient {
       | null
       | undefined,
       {} | null | undefined
-    >,
+    >
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.ITable,
@@ -995,7 +995,7 @@ export class BigQueryClient {
       | null
       | undefined,
       {} | null | undefined
-    >,
+    >
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.ITable,
@@ -1053,7 +1053,7 @@ export class BigQueryClient {
       protos.google.protobuf.IEmpty,
       protos.google.cloud.bigquery.v2.IDeleteTableRequest | null | undefined,
       {} | null | undefined
-    >,
+    >
   ): Promise<
     [
       protos.google.protobuf.IEmpty,
@@ -1116,7 +1116,7 @@ export class BigQueryClient {
       protos.google.cloud.bigquery.v2.IListTablesRequest,
       protos.google.cloud.bigquery.v2.ITableList | null | undefined,
       protos.google.cloud.bigquery.v2.IListFormatTable
-    >,
+    >
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IListFormatTable[],
@@ -1165,7 +1165,7 @@ export class BigQueryClient {
    */
   listTablesStream(
     request?: protos.google.cloud.bigquery.v2.IListTablesRequest,
-    options?: CallOptions,
+    options?: CallOptions
   ): Transform {
     return this.tableClient.listTablesStream(request, options);
   }
@@ -1200,7 +1200,7 @@ export class BigQueryClient {
    */
   listTablesAsync(
     request?: protos.google.cloud.bigquery.v2.IListTablesRequest,
-    options?: CallOptions,
+    options?: CallOptions
   ): AsyncIterable<protos.google.cloud.bigquery.v2.IListFormatTable> {
     return this.tableClient.listTablesAsync(request, options);
   }
@@ -1251,7 +1251,7 @@ export class BigQueryClient {
       protos.google.cloud.bigquery.v2.IJobCancelResponse,
       protos.google.cloud.bigquery.v2.ICancelJobRequest | null | undefined,
       {} | null | undefined
-    >,
+    >
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IJobCancelResponse,
@@ -1318,7 +1318,7 @@ export class BigQueryClient {
       protos.google.cloud.bigquery.v2.IJob,
       protos.google.cloud.bigquery.v2.IGetJobRequest | null | undefined,
       {} | null | undefined
-    >,
+    >
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IJob,
@@ -1381,7 +1381,7 @@ export class BigQueryClient {
       protos.google.cloud.bigquery.v2.IJob,
       protos.google.cloud.bigquery.v2.IInsertJobRequest | null | undefined,
       {} | null | undefined
-    >,
+    >
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IJob,
@@ -1444,7 +1444,7 @@ export class BigQueryClient {
       protos.google.protobuf.IEmpty,
       protos.google.cloud.bigquery.v2.IDeleteJobRequest | null | undefined,
       {} | null | undefined
-    >,
+    >
   ): Promise<
     [
       protos.google.protobuf.IEmpty,
@@ -1523,7 +1523,7 @@ export class BigQueryClient {
       protos.google.cloud.bigquery.v2.IListJobsRequest,
       protos.google.cloud.bigquery.v2.IJobList | null | undefined,
       protos.google.cloud.bigquery.v2.IListFormatJob
-    >,
+    >
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IListFormatJob[],
@@ -1585,7 +1585,7 @@ export class BigQueryClient {
    */
   listJobsStream(
     request?: protos.google.cloud.bigquery.v2.IListJobsRequest,
-    options?: CallOptions,
+    options?: CallOptions
   ): Transform {
     return this.jobClient.listJobsStream(request, options);
   }
@@ -1633,7 +1633,7 @@ export class BigQueryClient {
    */
   listJobsAsync(
     request?: protos.google.cloud.bigquery.v2.IListJobsRequest,
-    options?: CallOptions,
+    options?: CallOptions
   ): AsyncIterable<protos.google.cloud.bigquery.v2.IListFormatJob> {
     return this.jobClient.listJobsAsync(request, options);
   }
@@ -1674,7 +1674,7 @@ export class BigQueryClient {
       protos.google.cloud.bigquery.v2.IModel,
       protos.google.cloud.bigquery.v2.IGetModelRequest | null | undefined,
       {} | null | undefined
-    >,
+    >
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IModel,
@@ -1733,7 +1733,7 @@ export class BigQueryClient {
       protos.google.cloud.bigquery.v2.IModel,
       protos.google.cloud.bigquery.v2.IPatchModelRequest | null | undefined,
       {} | null | undefined
-    >,
+    >
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IModel,
@@ -1790,7 +1790,7 @@ export class BigQueryClient {
       protos.google.protobuf.IEmpty,
       protos.google.cloud.bigquery.v2.IDeleteModelRequest | null | undefined,
       {} | null | undefined
-    >,
+    >
   ): Promise<
     [
       protos.google.protobuf.IEmpty,
@@ -1856,7 +1856,7 @@ export class BigQueryClient {
       protos.google.cloud.bigquery.v2.IListModelsRequest,
       protos.google.cloud.bigquery.v2.IListModelsResponse | null | undefined,
       protos.google.cloud.bigquery.v2.IModel
-    >,
+    >
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IModel[],
@@ -1905,7 +1905,7 @@ export class BigQueryClient {
    */
   listModelsStream(
     request?: protos.google.cloud.bigquery.v2.IListModelsRequest,
-    options?: CallOptions,
+    options?: CallOptions
   ): Transform {
     return this.modelClient.listModelsStream(request, options);
   }
@@ -1940,7 +1940,7 @@ export class BigQueryClient {
    */
   listModelsAsync(
     request?: protos.google.cloud.bigquery.v2.IListModelsRequest,
-    options?: CallOptions,
+    options?: CallOptions
   ): AsyncIterable<protos.google.cloud.bigquery.v2.IModel> {
     return this.modelClient.listModelsAsync(request, options);
   }
@@ -1981,7 +1981,7 @@ export class BigQueryClient {
       protos.google.cloud.bigquery.v2.IRoutine,
       protos.google.cloud.bigquery.v2.IGetRoutineRequest | null | undefined,
       {} | null | undefined
-    >,
+    >
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IRoutine,
@@ -2038,7 +2038,7 @@ export class BigQueryClient {
       protos.google.cloud.bigquery.v2.IRoutine,
       protos.google.cloud.bigquery.v2.IInsertRoutineRequest | null | undefined,
       {} | null | undefined
-    >,
+    >
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IRoutine,
@@ -2098,7 +2098,7 @@ export class BigQueryClient {
       protos.google.cloud.bigquery.v2.IRoutine,
       protos.google.cloud.bigquery.v2.IUpdateRoutineRequest | null | undefined,
       {} | null | undefined
-    >,
+    >
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IRoutine,
@@ -2163,7 +2163,7 @@ export class BigQueryClient {
       protos.google.cloud.bigquery.v2.IRoutine,
       protos.google.cloud.bigquery.v2.IPatchRoutineRequest | null | undefined,
       {} | null | undefined
-    >,
+    >
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IRoutine,
@@ -2220,7 +2220,7 @@ export class BigQueryClient {
       protos.google.protobuf.IEmpty,
       protos.google.cloud.bigquery.v2.IDeleteRoutineRequest | null | undefined,
       {} | null | undefined
-    >,
+    >
   ): Promise<
     [
       protos.google.protobuf.IEmpty,
@@ -2289,7 +2289,7 @@ export class BigQueryClient {
       protos.google.cloud.bigquery.v2.IListRoutinesRequest,
       protos.google.cloud.bigquery.v2.IListRoutinesResponse | null | undefined,
       protos.google.cloud.bigquery.v2.IRoutine
-    >,
+    >
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IRoutine[],
@@ -2342,7 +2342,7 @@ export class BigQueryClient {
    */
   listRoutinesStream(
     request?: protos.google.cloud.bigquery.v2.IListRoutinesRequest,
-    options?: CallOptions,
+    options?: CallOptions
   ): Transform {
     return this.routineClient.listRoutinesStream(request, options);
   }
@@ -2381,7 +2381,7 @@ export class BigQueryClient {
    */
   listRoutinesAsync(
     request?: protos.google.cloud.bigquery.v2.IListRoutinesRequest,
-    options?: CallOptions,
+    options?: CallOptions
   ): AsyncIterable<protos.google.cloud.bigquery.v2.IRoutine> {
     return this.routineClient.listRoutinesAsync(request, options);
   }
@@ -2428,7 +2428,7 @@ export class BigQueryClient {
       | null
       | undefined,
       {} | null | undefined
-    >,
+    >
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IRowAccessPolicy,
@@ -2450,7 +2450,7 @@ export class BigQueryClient {
     return this.rowAccessPolicyClient.getRowAccessPolicy(
       request,
       options,
-      callback,
+      callback
     );
   }
 
@@ -2495,7 +2495,7 @@ export class BigQueryClient {
       | null
       | undefined,
       {} | null | undefined
-    >,
+    >
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IRowAccessPolicy,
@@ -2517,7 +2517,7 @@ export class BigQueryClient {
     return this.rowAccessPolicyClient.updateRowAccessPolicy(
       request,
       options,
-      callback,
+      callback
     );
   }
 
@@ -2564,7 +2564,7 @@ export class BigQueryClient {
       | null
       | undefined,
       {} | null | undefined
-    >,
+    >
   ): Promise<
     [
       protos.google.protobuf.IEmpty,
@@ -2586,7 +2586,7 @@ export class BigQueryClient {
     return this.rowAccessPolicyClient.deleteRowAccessPolicy(
       request,
       options,
-      callback,
+      callback
     );
   }
 
@@ -2636,7 +2636,7 @@ export class BigQueryClient {
       | null
       | undefined,
       protos.google.cloud.bigquery.v2.IRowAccessPolicy
-    >,
+    >
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IRowAccessPolicy[],
@@ -2658,7 +2658,7 @@ export class BigQueryClient {
     return this.rowAccessPolicyClient.listRowAccessPolicies(
       request,
       options,
-      callback,
+      callback
     );
   }
 
@@ -2691,11 +2691,11 @@ export class BigQueryClient {
    */
   listRowAccessPoliciesStream(
     request?: protos.google.cloud.bigquery.v2.IListRowAccessPoliciesRequest,
-    options?: CallOptions,
+    options?: CallOptions
   ): Transform {
     return this.rowAccessPolicyClient.listRowAccessPoliciesStream(
       request,
-      options,
+      options
     );
   }
 
@@ -2731,11 +2731,11 @@ export class BigQueryClient {
    */
   listRowAccessPoliciesAsync(
     request?: protos.google.cloud.bigquery.v2.IListRowAccessPoliciesRequest,
-    options?: CallOptions,
+    options?: CallOptions
   ): AsyncIterable<protos.google.cloud.bigquery.v2.IRowAccessPolicy> {
     return this.rowAccessPolicyClient.listRowAccessPoliciesAsync(
       request,
-      options,
+      options
     );
   }
 
