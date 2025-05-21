@@ -73,7 +73,7 @@ function getEscapedText(name: ts.PropertyName | ts.BindingName): string {
   const nameEscapedText = name.escapedText as string;
   return nameEscapedText;
 }
-function extract(node: ts.Node, depth = 0, client): void {
+function extract(node: ts.Node, depth = 0, client:string): void {
   function getKind(node: ts.Node) {
     return ts.SyntaxKind[node.kind];
   }
@@ -134,7 +134,7 @@ function extract(node: ts.Node, depth = 0, client): void {
 
 // contains the logic to traverse each file and pull in the nodes from the AST
 // that contain elements we want to use
-function ast(file, client) {
+function ast(file:string, client:string) {
   let output = '';
   const program = ts.createProgram([file], {allowJs: true});
   sourceFile = program.getSourceFile(file)!;
@@ -231,7 +231,7 @@ function ast(file, client) {
 }
 
 // loop through the files and call the AST function on them
-function astHelper(files, clients) {
+function astHelper(files: string[], clients: string[]) {
   let output = '';
   for (const f in files) {
     foundNodes = [];
@@ -241,7 +241,7 @@ function astHelper(files, clients) {
   return output;
 }
 
-function makeImports(clients) {
+function makeImports(clients: string[]) {
   let imports = 'import {protos';
   for (const client in clients) {
     imports = imports.concat(`, ${clients[client]}`);
@@ -259,7 +259,7 @@ function makeImports(clients) {
 }
 
 // convert client types to the names we'll use for variables
-function parseClientName(client) {
+function parseClientName(client: string) {
   // without this we'd end up with rowaccesspolicyClient
 
   return client.search('RowAccessPolicy') >= 0
@@ -267,7 +267,7 @@ function parseClientName(client) {
     : client.split('ServiceClient')[0].toLowerCase() + 'Client';
 }
 
-function buildOptionTypes(clients) {
+function buildOptionTypes(clients: string[]) {
   let output = '';
   const docstring = `/**
    * Options passed to the underlying client.
@@ -327,7 +327,7 @@ function buildOptionTypes(clients) {
   return output;
 }
 
-function buildClientConstructor(clients) {
+function buildClientConstructor(clients: string[]) {
   let variableDecl = '';
   const comment = `\t/**
   * @param {object} [BigQueryClientOptions] - Enables user to instantiate clients separately and use those as the subclients.
