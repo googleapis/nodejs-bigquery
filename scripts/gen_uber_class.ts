@@ -73,7 +73,7 @@ function getEscapedText(name: ts.PropertyName | ts.BindingName): string {
   const nameEscapedText = name.escapedText as string;
   return nameEscapedText;
 }
-function extract(node: ts.Node, depth = 0, client:string): void {
+function extract(node: ts.Node, depth = 0, client: string): void {
   function getKind(node: ts.Node) {
     return ts.SyntaxKind[node.kind];
   }
@@ -134,7 +134,7 @@ function extract(node: ts.Node, depth = 0, client:string): void {
 
 // contains the logic to traverse each file and pull in the nodes from the AST
 // that contain elements we want to use
-function ast(file:string, client:string) {
+function ast(file: string, client: string) {
   let output = '';
   const program = ts.createProgram([file], {allowJs: true});
   sourceFile = program.getSourceFile(file)!;
