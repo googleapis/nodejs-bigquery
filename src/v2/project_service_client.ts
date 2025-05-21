@@ -106,7 +106,7 @@ export class ProjectServiceClient {
    */
   constructor(
     opts?: ClientOptions,
-    gaxInstance?: typeof gax | typeof gax.fallback
+    gaxInstance?: typeof gax | typeof gax.fallback,
   ) {
     // Ensure that options include all the required fields.
     const staticMembers = this.constructor as typeof ProjectServiceClient;
@@ -116,7 +116,7 @@ export class ProjectServiceClient {
       opts?.universe_domain !== opts?.universeDomain
     ) {
       throw new Error(
-        'Please set either universe_domain or universeDomain, but not both.'
+        'Please set either universe_domain or universeDomain, but not both.',
       );
     }
     const universeDomainEnvVar =
@@ -206,7 +206,7 @@ export class ProjectServiceClient {
       'google.cloud.bigquery.v2.ProjectService',
       gapicConfig as gax.ClientConfig,
       opts.clientConfig || {},
-      {'x-goog-api-client': clientHeader.join(' ')}
+      {'x-goog-api-client': clientHeader.join(' ')},
     );
 
     // Set up a dictionary of "inner API calls"; the core implementation
@@ -240,12 +240,12 @@ export class ProjectServiceClient {
     this.projectServiceStub = this._gaxGrpc.createStub(
       this._opts.fallback
         ? (this._protos as protobuf.Root).lookupService(
-            'google.cloud.bigquery.v2.ProjectService'
+            'google.cloud.bigquery.v2.ProjectService',
           )
         : // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (this._protos as any).google.cloud.bigquery.v2.ProjectService,
       this._opts,
-      this._providedCustomServicePath
+      this._providedCustomServicePath,
     ) as Promise<{[method: string]: Function}>;
 
     // Iterate over each of the methods that the service provides
@@ -263,7 +263,7 @@ export class ProjectServiceClient {
           },
         (err: Error | null | undefined) => () => {
           throw err;
-        }
+        },
       );
 
       const descriptor = undefined;
@@ -271,7 +271,7 @@ export class ProjectServiceClient {
         callPromise,
         this._defaults[methodName],
         descriptor,
-        this._opts.fallback
+        this._opts.fallback,
       );
 
       this.innerApiCalls[methodName] = apiCall;
@@ -292,7 +292,7 @@ export class ProjectServiceClient {
     ) {
       process.emitWarning(
         'Static servicePath is deprecated, please use the instance method instead.',
-        'DeprecationWarning'
+        'DeprecationWarning',
       );
     }
     return 'bigquery.googleapis.com';
@@ -310,7 +310,7 @@ export class ProjectServiceClient {
     ) {
       process.emitWarning(
         'Static apiEndpoint is deprecated, please use the instance method instead.',
-        'DeprecationWarning'
+        'DeprecationWarning',
       );
     }
     return 'bigquery.googleapis.com';
@@ -356,7 +356,7 @@ export class ProjectServiceClient {
    * @returns {Promise} A promise that resolves to string containing the project ID.
    */
   getProjectId(
-    callback?: Callback<string, undefined, undefined>
+    callback?: Callback<string, undefined, undefined>,
   ): Promise<string> | void {
     if (callback) {
       this.auth.getProjectId(callback);
@@ -387,7 +387,7 @@ export class ProjectServiceClient {
    */
   getServiceAccount(
     request?: protos.google.cloud.bigquery.v2.IGetServiceAccountRequest,
-    options?: CallOptions
+    options?: CallOptions,
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IGetServiceAccountResponse,
@@ -404,7 +404,7 @@ export class ProjectServiceClient {
       | null
       | undefined,
       {} | null | undefined
-    >
+    >,
   ): void;
   getServiceAccount(
     request: protos.google.cloud.bigquery.v2.IGetServiceAccountRequest,
@@ -414,7 +414,7 @@ export class ProjectServiceClient {
       | null
       | undefined,
       {} | null | undefined
-    >
+    >,
   ): void;
   getServiceAccount(
     request?: protos.google.cloud.bigquery.v2.IGetServiceAccountRequest,
@@ -433,7 +433,7 @@ export class ProjectServiceClient {
       | null
       | undefined,
       {} | null | undefined
-    >
+    >,
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IGetServiceAccountResponse,
@@ -484,7 +484,7 @@ export class ProjectServiceClient {
         ]) => {
           this._log.info('getServiceAccount response %j', response);
           return [response, options, rawResponse];
-        }
+        },
       );
   }
 

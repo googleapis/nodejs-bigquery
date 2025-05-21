@@ -107,7 +107,7 @@ export class JobServiceClient {
    */
   constructor(
     opts?: ClientOptions,
-    gaxInstance?: typeof gax | typeof gax.fallback
+    gaxInstance?: typeof gax | typeof gax.fallback,
   ) {
     // Ensure that options include all the required fields.
     const staticMembers = this.constructor as typeof JobServiceClient;
@@ -117,7 +117,7 @@ export class JobServiceClient {
       opts?.universe_domain !== opts?.universeDomain
     ) {
       throw new Error(
-        'Please set either universe_domain or universeDomain, but not both.'
+        'Please set either universe_domain or universeDomain, but not both.',
       );
     }
     const universeDomainEnvVar =
@@ -209,7 +209,7 @@ export class JobServiceClient {
       listJobs: new this._gaxModule.PageDescriptor(
         'pageToken',
         'nextPageToken',
-        'jobs'
+        'jobs',
       ),
     };
 
@@ -218,7 +218,7 @@ export class JobServiceClient {
       'google.cloud.bigquery.v2.JobService',
       gapicConfig as gax.ClientConfig,
       opts.clientConfig || {},
-      {'x-goog-api-client': clientHeader.join(' ')}
+      {'x-goog-api-client': clientHeader.join(' ')},
     );
 
     // Set up a dictionary of "inner API calls"; the core implementation
@@ -252,12 +252,12 @@ export class JobServiceClient {
     this.jobServiceStub = this._gaxGrpc.createStub(
       this._opts.fallback
         ? (this._protos as protobuf.Root).lookupService(
-            'google.cloud.bigquery.v2.JobService'
+            'google.cloud.bigquery.v2.JobService',
           )
         : // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (this._protos as any).google.cloud.bigquery.v2.JobService,
       this._opts,
-      this._providedCustomServicePath
+      this._providedCustomServicePath,
     ) as Promise<{[method: string]: Function}>;
 
     // Iterate over each of the methods that the service provides
@@ -283,7 +283,7 @@ export class JobServiceClient {
           },
         (err: Error | null | undefined) => () => {
           throw err;
-        }
+        },
       );
 
       const descriptor = this.descriptors.page[methodName] || undefined;
@@ -291,7 +291,7 @@ export class JobServiceClient {
         callPromise,
         this._defaults[methodName],
         descriptor,
-        this._opts.fallback
+        this._opts.fallback,
       );
 
       this.innerApiCalls[methodName] = apiCall;
@@ -312,7 +312,7 @@ export class JobServiceClient {
     ) {
       process.emitWarning(
         'Static servicePath is deprecated, please use the instance method instead.',
-        'DeprecationWarning'
+        'DeprecationWarning',
       );
     }
     return 'bigquery.googleapis.com';
@@ -330,7 +330,7 @@ export class JobServiceClient {
     ) {
       process.emitWarning(
         'Static apiEndpoint is deprecated, please use the instance method instead.',
-        'DeprecationWarning'
+        'DeprecationWarning',
       );
     }
     return 'bigquery.googleapis.com';
@@ -379,7 +379,7 @@ export class JobServiceClient {
    * @returns {Promise} A promise that resolves to string containing the project ID.
    */
   getProjectId(
-    callback?: Callback<string, undefined, undefined>
+    callback?: Callback<string, undefined, undefined>,
   ): Promise<string> | void {
     if (callback) {
       this.auth.getProjectId(callback);
@@ -423,7 +423,7 @@ export class JobServiceClient {
    */
   cancelJob(
     request?: protos.google.cloud.bigquery.v2.ICancelJobRequest,
-    options?: CallOptions
+    options?: CallOptions,
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IJobCancelResponse,
@@ -438,7 +438,7 @@ export class JobServiceClient {
       protos.google.cloud.bigquery.v2.IJobCancelResponse,
       protos.google.cloud.bigquery.v2.ICancelJobRequest | null | undefined,
       {} | null | undefined
-    >
+    >,
   ): void;
   cancelJob(
     request: protos.google.cloud.bigquery.v2.ICancelJobRequest,
@@ -446,7 +446,7 @@ export class JobServiceClient {
       protos.google.cloud.bigquery.v2.IJobCancelResponse,
       protos.google.cloud.bigquery.v2.ICancelJobRequest | null | undefined,
       {} | null | undefined
-    >
+    >,
   ): void;
   cancelJob(
     request?: protos.google.cloud.bigquery.v2.ICancelJobRequest,
@@ -461,7 +461,7 @@ export class JobServiceClient {
       protos.google.cloud.bigquery.v2.IJobCancelResponse,
       protos.google.cloud.bigquery.v2.ICancelJobRequest | null | undefined,
       {} | null | undefined
-    >
+    >,
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IJobCancelResponse,
@@ -511,7 +511,7 @@ export class JobServiceClient {
         ]) => {
           this._log.info('cancelJob response %j', response);
           return [response, options, rawResponse];
-        }
+        },
       );
   }
   /**
@@ -548,7 +548,7 @@ export class JobServiceClient {
    */
   getJob(
     request?: protos.google.cloud.bigquery.v2.IGetJobRequest,
-    options?: CallOptions
+    options?: CallOptions,
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IJob,
@@ -563,7 +563,7 @@ export class JobServiceClient {
       protos.google.cloud.bigquery.v2.IJob,
       protos.google.cloud.bigquery.v2.IGetJobRequest | null | undefined,
       {} | null | undefined
-    >
+    >,
   ): void;
   getJob(
     request: protos.google.cloud.bigquery.v2.IGetJobRequest,
@@ -571,7 +571,7 @@ export class JobServiceClient {
       protos.google.cloud.bigquery.v2.IJob,
       protos.google.cloud.bigquery.v2.IGetJobRequest | null | undefined,
       {} | null | undefined
-    >
+    >,
   ): void;
   getJob(
     request?: protos.google.cloud.bigquery.v2.IGetJobRequest,
@@ -586,7 +586,7 @@ export class JobServiceClient {
       protos.google.cloud.bigquery.v2.IJob,
       protos.google.cloud.bigquery.v2.IGetJobRequest | null | undefined,
       {} | null | undefined
-    >
+    >,
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IJob,
@@ -636,7 +636,7 @@ export class JobServiceClient {
         ]) => {
           this._log.info('getJob response %j', response);
           return [response, options, rawResponse];
-        }
+        },
       );
   }
   /**
@@ -669,7 +669,7 @@ export class JobServiceClient {
    */
   insertJob(
     request?: protos.google.cloud.bigquery.v2.IInsertJobRequest,
-    options?: CallOptions
+    options?: CallOptions,
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IJob,
@@ -684,7 +684,7 @@ export class JobServiceClient {
       protos.google.cloud.bigquery.v2.IJob,
       protos.google.cloud.bigquery.v2.IInsertJobRequest | null | undefined,
       {} | null | undefined
-    >
+    >,
   ): void;
   insertJob(
     request: protos.google.cloud.bigquery.v2.IInsertJobRequest,
@@ -692,7 +692,7 @@ export class JobServiceClient {
       protos.google.cloud.bigquery.v2.IJob,
       protos.google.cloud.bigquery.v2.IInsertJobRequest | null | undefined,
       {} | null | undefined
-    >
+    >,
   ): void;
   insertJob(
     request?: protos.google.cloud.bigquery.v2.IInsertJobRequest,
@@ -707,7 +707,7 @@ export class JobServiceClient {
       protos.google.cloud.bigquery.v2.IJob,
       protos.google.cloud.bigquery.v2.IInsertJobRequest | null | undefined,
       {} | null | undefined
-    >
+    >,
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IJob,
@@ -756,7 +756,7 @@ export class JobServiceClient {
         ]) => {
           this._log.info('insertJob response %j', response);
           return [response, options, rawResponse];
-        }
+        },
       );
   }
   /**
@@ -789,7 +789,7 @@ export class JobServiceClient {
    */
   deleteJob(
     request?: protos.google.cloud.bigquery.v2.IDeleteJobRequest,
-    options?: CallOptions
+    options?: CallOptions,
   ): Promise<
     [
       protos.google.protobuf.IEmpty,
@@ -804,7 +804,7 @@ export class JobServiceClient {
       protos.google.protobuf.IEmpty,
       protos.google.cloud.bigquery.v2.IDeleteJobRequest | null | undefined,
       {} | null | undefined
-    >
+    >,
   ): void;
   deleteJob(
     request: protos.google.cloud.bigquery.v2.IDeleteJobRequest,
@@ -812,7 +812,7 @@ export class JobServiceClient {
       protos.google.protobuf.IEmpty,
       protos.google.cloud.bigquery.v2.IDeleteJobRequest | null | undefined,
       {} | null | undefined
-    >
+    >,
   ): void;
   deleteJob(
     request?: protos.google.cloud.bigquery.v2.IDeleteJobRequest,
@@ -827,7 +827,7 @@ export class JobServiceClient {
       protos.google.protobuf.IEmpty,
       protos.google.cloud.bigquery.v2.IDeleteJobRequest | null | undefined,
       {} | null | undefined
-    >
+    >,
   ): Promise<
     [
       protos.google.protobuf.IEmpty,
@@ -877,7 +877,7 @@ export class JobServiceClient {
         ]) => {
           this._log.info('deleteJob response %j', response);
           return [response, options, rawResponse];
-        }
+        },
       );
   }
   /**
@@ -936,7 +936,7 @@ export class JobServiceClient {
    */
   getQueryResults(
     request?: protos.google.cloud.bigquery.v2.IGetQueryResultsRequest,
-    options?: CallOptions
+    options?: CallOptions,
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IGetQueryResultsResponse,
@@ -953,7 +953,7 @@ export class JobServiceClient {
       | null
       | undefined,
       {} | null | undefined
-    >
+    >,
   ): void;
   getQueryResults(
     request: protos.google.cloud.bigquery.v2.IGetQueryResultsRequest,
@@ -963,7 +963,7 @@ export class JobServiceClient {
       | null
       | undefined,
       {} | null | undefined
-    >
+    >,
   ): void;
   getQueryResults(
     request?: protos.google.cloud.bigquery.v2.IGetQueryResultsRequest,
@@ -982,7 +982,7 @@ export class JobServiceClient {
       | null
       | undefined,
       {} | null | undefined
-    >
+    >,
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IGetQueryResultsResponse,
@@ -1034,7 +1034,7 @@ export class JobServiceClient {
         ]) => {
           this._log.info('getQueryResults response %j', response);
           return [response, options, rawResponse];
-        }
+        },
       );
   }
   /**
@@ -1058,7 +1058,7 @@ export class JobServiceClient {
    */
   query(
     request?: protos.google.cloud.bigquery.v2.IPostQueryRequest,
-    options?: CallOptions
+    options?: CallOptions,
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IQueryResponse,
@@ -1073,7 +1073,7 @@ export class JobServiceClient {
       protos.google.cloud.bigquery.v2.IQueryResponse,
       protos.google.cloud.bigquery.v2.IPostQueryRequest | null | undefined,
       {} | null | undefined
-    >
+    >,
   ): void;
   query(
     request: protos.google.cloud.bigquery.v2.IPostQueryRequest,
@@ -1081,7 +1081,7 @@ export class JobServiceClient {
       protos.google.cloud.bigquery.v2.IQueryResponse,
       protos.google.cloud.bigquery.v2.IPostQueryRequest | null | undefined,
       {} | null | undefined
-    >
+    >,
   ): void;
   query(
     request?: protos.google.cloud.bigquery.v2.IPostQueryRequest,
@@ -1096,7 +1096,7 @@ export class JobServiceClient {
       protos.google.cloud.bigquery.v2.IQueryResponse,
       protos.google.cloud.bigquery.v2.IPostQueryRequest | null | undefined,
       {} | null | undefined
-    >
+    >,
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IQueryResponse,
@@ -1145,7 +1145,7 @@ export class JobServiceClient {
         ]) => {
           this._log.info('query response %j', response);
           return [response, options, rawResponse];
-        }
+        },
       );
   }
 
@@ -1195,7 +1195,7 @@ export class JobServiceClient {
    */
   listJobs(
     request?: protos.google.cloud.bigquery.v2.IListJobsRequest,
-    options?: CallOptions
+    options?: CallOptions,
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IListFormatJob[],
@@ -1210,7 +1210,7 @@ export class JobServiceClient {
       protos.google.cloud.bigquery.v2.IListJobsRequest,
       protos.google.cloud.bigquery.v2.IJobList | null | undefined,
       protos.google.cloud.bigquery.v2.IListFormatJob
-    >
+    >,
   ): void;
   listJobs(
     request: protos.google.cloud.bigquery.v2.IListJobsRequest,
@@ -1218,7 +1218,7 @@ export class JobServiceClient {
       protos.google.cloud.bigquery.v2.IListJobsRequest,
       protos.google.cloud.bigquery.v2.IJobList | null | undefined,
       protos.google.cloud.bigquery.v2.IListFormatJob
-    >
+    >,
   ): void;
   listJobs(
     request?: protos.google.cloud.bigquery.v2.IListJobsRequest,
@@ -1233,7 +1233,7 @@ export class JobServiceClient {
       protos.google.cloud.bigquery.v2.IListJobsRequest,
       protos.google.cloud.bigquery.v2.IJobList | null | undefined,
       protos.google.cloud.bigquery.v2.IListFormatJob
-    >
+    >,
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IListFormatJob[],
@@ -1287,7 +1287,7 @@ export class JobServiceClient {
         ]) => {
           this._log.info('listJobs values %j', response);
           return [response, input, output];
-        }
+        },
       );
   }
 
@@ -1331,7 +1331,7 @@ export class JobServiceClient {
    */
   listJobsStream(
     request?: protos.google.cloud.bigquery.v2.IListJobsRequest,
-    options?: CallOptions
+    options?: CallOptions,
   ): Transform {
     request = request || {};
     options = options || {};
@@ -1350,7 +1350,7 @@ export class JobServiceClient {
     return this.descriptors.page.listJobs.createStream(
       this.innerApiCalls.listJobs as GaxCall,
       request,
-      callSettings
+      callSettings,
     );
   }
 
@@ -1397,7 +1397,7 @@ export class JobServiceClient {
    */
   listJobsAsync(
     request?: protos.google.cloud.bigquery.v2.IListJobsRequest,
-    options?: CallOptions
+    options?: CallOptions,
   ): AsyncIterable<protos.google.cloud.bigquery.v2.IListFormatJob> {
     request = request || {};
     options = options || {};
@@ -1416,7 +1416,7 @@ export class JobServiceClient {
     return this.descriptors.page.listJobs.asyncIterate(
       this.innerApiCalls['listJobs'] as GaxCall,
       request as {},
-      callSettings
+      callSettings,
     ) as AsyncIterable<protos.google.cloud.bigquery.v2.IListFormatJob>;
   }
 

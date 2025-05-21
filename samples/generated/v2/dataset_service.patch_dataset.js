@@ -42,6 +42,11 @@ function main(projectId, datasetId, dataset) {
    */
   // const dataset = {}
   /**
+   *  Optional. Specifies the fields of dataset that update/patch operation is
+   *  targeting By default, both metadata and ACL fields are updated.
+   */
+  // const updateMode = {}
+  /**
    *  Optional. The version of the provided access policy schema.
    *  Valid values are 0, 1, and 3. Requests specifying an invalid value will be
    *  rejected.

@@ -30,7 +30,7 @@ import {GoogleAuth, protobuf} from 'google-gax';
 // Dynamically loaded proto JSON is needed to get the type information
 // to fill in default values for request objects
 const root = protobuf.Root.fromJSON(
-  require('../protos/protos.json')
+  require('../protos/protos.json'),
 ).resolveAll();
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -47,7 +47,7 @@ function generateSampleMessage<T extends object>(instance: T) {
     instance.constructor as typeof protobuf.Message
   ).toObject(instance as protobuf.Message<T>, {defaults: true});
   return (instance.constructor as typeof protobuf.Message).fromObject(
-    filledObject
+    filledObject,
   ) as T;
 }
 
@@ -59,7 +59,7 @@ function stubSimpleCall<ResponseType>(response?: ResponseType, error?: Error) {
 
 function stubSimpleCallWithCallback<ResponseType>(
   response?: ResponseType,
-  error?: Error
+  error?: Error,
 ) {
   return error
     ? sinon.stub().callsArgWith(2, error)
@@ -68,7 +68,7 @@ function stubSimpleCallWithCallback<ResponseType>(
 
 function stubPageStreamingCall<ResponseType>(
   responses?: ResponseType[],
-  error?: Error
+  error?: Error,
 ) {
   const pagingStub = sinon.stub();
   if (responses) {
@@ -106,7 +106,7 @@ function stubPageStreamingCall<ResponseType>(
 
 function stubAsyncIterationCall<ResponseType>(
   responses?: ResponseType[],
-  error?: Error
+  error?: Error,
 ) {
   let counter = 0;
   const asyncIterable = {
@@ -282,9 +282,14 @@ describe('v2.RowAccessPolicyServiceClient', () => {
         throw err;
       });
       assert(client.rowAccessPolicyServiceStub);
-      client.close().then(() => {
-        done();
-      });
+      client
+        .close()
+        .then(() => {
+          done();
+        })
+        .catch(err => {
+          throw err;
+        });
     });
 
     it('has close method for the non-initialized client', done => {
@@ -294,9 +299,14 @@ describe('v2.RowAccessPolicyServiceClient', () => {
           projectId: 'bogus',
         });
       assert.strictEqual(client.rowAccessPolicyServiceStub, undefined);
-      client.close().then(() => {
-        done();
-      });
+      client
+        .close()
+        .then(() => {
+          done();
+        })
+        .catch(err => {
+          throw err;
+        });
     });
 
     it('has getProjectId method', async () => {
@@ -345,31 +355,31 @@ describe('v2.RowAccessPolicyServiceClient', () => {
         });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.GetRowAccessPolicyRequest()
+        new protos.google.cloud.bigquery.v2.GetRowAccessPolicyRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetRowAccessPolicyRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetRowAccessPolicyRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const defaultValue3 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetRowAccessPolicyRequest',
-        ['tableId']
+        ['tableId'],
       );
       request.tableId = defaultValue3;
       const defaultValue4 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetRowAccessPolicyRequest',
-        ['policyId']
+        ['policyId'],
       );
       request.policyId = defaultValue4;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&dataset_id=${defaultValue2 ?? ''}&table_id=${defaultValue3 ?? ''}&policy_id=${defaultValue4 ?? ''}`;
       const expectedResponse = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.RowAccessPolicy()
+        new protos.google.cloud.bigquery.v2.RowAccessPolicy(),
       );
       client.innerApiCalls.getRowAccessPolicy =
         stubSimpleCall(expectedResponse);
@@ -393,31 +403,31 @@ describe('v2.RowAccessPolicyServiceClient', () => {
         });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.GetRowAccessPolicyRequest()
+        new protos.google.cloud.bigquery.v2.GetRowAccessPolicyRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetRowAccessPolicyRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetRowAccessPolicyRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const defaultValue3 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetRowAccessPolicyRequest',
-        ['tableId']
+        ['tableId'],
       );
       request.tableId = defaultValue3;
       const defaultValue4 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetRowAccessPolicyRequest',
-        ['policyId']
+        ['policyId'],
       );
       request.policyId = defaultValue4;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&dataset_id=${defaultValue2 ?? ''}&table_id=${defaultValue3 ?? ''}&policy_id=${defaultValue4 ?? ''}`;
       const expectedResponse = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.RowAccessPolicy()
+        new protos.google.cloud.bigquery.v2.RowAccessPolicy(),
       );
       client.innerApiCalls.getRowAccessPolicy =
         stubSimpleCallWithCallback(expectedResponse);
@@ -426,14 +436,14 @@ describe('v2.RowAccessPolicyServiceClient', () => {
           request,
           (
             err?: Error | null,
-            result?: protos.google.cloud.bigquery.v2.IRowAccessPolicy | null
+            result?: protos.google.cloud.bigquery.v2.IRowAccessPolicy | null,
           ) => {
             if (err) {
               reject(err);
             } else {
               resolve(result);
             }
-          }
+          },
         );
       });
       const response = await promise;
@@ -456,33 +466,33 @@ describe('v2.RowAccessPolicyServiceClient', () => {
         });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.GetRowAccessPolicyRequest()
+        new protos.google.cloud.bigquery.v2.GetRowAccessPolicyRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetRowAccessPolicyRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetRowAccessPolicyRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const defaultValue3 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetRowAccessPolicyRequest',
-        ['tableId']
+        ['tableId'],
       );
       request.tableId = defaultValue3;
       const defaultValue4 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetRowAccessPolicyRequest',
-        ['policyId']
+        ['policyId'],
       );
       request.policyId = defaultValue4;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&dataset_id=${defaultValue2 ?? ''}&table_id=${defaultValue3 ?? ''}&policy_id=${defaultValue4 ?? ''}`;
       const expectedError = new Error('expected');
       client.innerApiCalls.getRowAccessPolicy = stubSimpleCall(
         undefined,
-        expectedError
+        expectedError,
       );
       await assert.rejects(client.getRowAccessPolicy(request), expectedError);
       const actualRequest = (
@@ -503,30 +513,32 @@ describe('v2.RowAccessPolicyServiceClient', () => {
         });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.GetRowAccessPolicyRequest()
+        new protos.google.cloud.bigquery.v2.GetRowAccessPolicyRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetRowAccessPolicyRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetRowAccessPolicyRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const defaultValue3 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetRowAccessPolicyRequest',
-        ['tableId']
+        ['tableId'],
       );
       request.tableId = defaultValue3;
       const defaultValue4 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetRowAccessPolicyRequest',
-        ['policyId']
+        ['policyId'],
       );
       request.policyId = defaultValue4;
       const expectedError = new Error('The client has already been closed.');
-      client.close();
+      client.close().catch(err => {
+        throw err;
+      });
       await assert.rejects(client.getRowAccessPolicy(request), expectedError);
     });
   });
@@ -540,26 +552,26 @@ describe('v2.RowAccessPolicyServiceClient', () => {
         });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.CreateRowAccessPolicyRequest()
+        new protos.google.cloud.bigquery.v2.CreateRowAccessPolicyRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.CreateRowAccessPolicyRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.CreateRowAccessPolicyRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const defaultValue3 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.CreateRowAccessPolicyRequest',
-        ['tableId']
+        ['tableId'],
       );
       request.tableId = defaultValue3;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&dataset_id=${defaultValue2 ?? ''}&table_id=${defaultValue3 ?? ''}`;
       const expectedResponse = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.RowAccessPolicy()
+        new protos.google.cloud.bigquery.v2.RowAccessPolicy(),
       );
       client.innerApiCalls.createRowAccessPolicy =
         stubSimpleCall(expectedResponse);
@@ -583,26 +595,26 @@ describe('v2.RowAccessPolicyServiceClient', () => {
         });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.CreateRowAccessPolicyRequest()
+        new protos.google.cloud.bigquery.v2.CreateRowAccessPolicyRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.CreateRowAccessPolicyRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.CreateRowAccessPolicyRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const defaultValue3 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.CreateRowAccessPolicyRequest',
-        ['tableId']
+        ['tableId'],
       );
       request.tableId = defaultValue3;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&dataset_id=${defaultValue2 ?? ''}&table_id=${defaultValue3 ?? ''}`;
       const expectedResponse = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.RowAccessPolicy()
+        new protos.google.cloud.bigquery.v2.RowAccessPolicy(),
       );
       client.innerApiCalls.createRowAccessPolicy =
         stubSimpleCallWithCallback(expectedResponse);
@@ -611,14 +623,14 @@ describe('v2.RowAccessPolicyServiceClient', () => {
           request,
           (
             err?: Error | null,
-            result?: protos.google.cloud.bigquery.v2.IRowAccessPolicy | null
+            result?: protos.google.cloud.bigquery.v2.IRowAccessPolicy | null,
           ) => {
             if (err) {
               reject(err);
             } else {
               resolve(result);
             }
-          }
+          },
         );
       });
       const response = await promise;
@@ -641,32 +653,32 @@ describe('v2.RowAccessPolicyServiceClient', () => {
         });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.CreateRowAccessPolicyRequest()
+        new protos.google.cloud.bigquery.v2.CreateRowAccessPolicyRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.CreateRowAccessPolicyRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.CreateRowAccessPolicyRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const defaultValue3 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.CreateRowAccessPolicyRequest',
-        ['tableId']
+        ['tableId'],
       );
       request.tableId = defaultValue3;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&dataset_id=${defaultValue2 ?? ''}&table_id=${defaultValue3 ?? ''}`;
       const expectedError = new Error('expected');
       client.innerApiCalls.createRowAccessPolicy = stubSimpleCall(
         undefined,
-        expectedError
+        expectedError,
       );
       await assert.rejects(
         client.createRowAccessPolicy(request),
-        expectedError
+        expectedError,
       );
       const actualRequest = (
         client.innerApiCalls.createRowAccessPolicy as SinonStub
@@ -686,28 +698,30 @@ describe('v2.RowAccessPolicyServiceClient', () => {
         });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.CreateRowAccessPolicyRequest()
+        new protos.google.cloud.bigquery.v2.CreateRowAccessPolicyRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.CreateRowAccessPolicyRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.CreateRowAccessPolicyRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const defaultValue3 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.CreateRowAccessPolicyRequest',
-        ['tableId']
+        ['tableId'],
       );
       request.tableId = defaultValue3;
       const expectedError = new Error('The client has already been closed.');
-      client.close();
+      client.close().catch(err => {
+        throw err;
+      });
       await assert.rejects(
         client.createRowAccessPolicy(request),
-        expectedError
+        expectedError,
       );
     });
   });
@@ -721,31 +735,31 @@ describe('v2.RowAccessPolicyServiceClient', () => {
         });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.UpdateRowAccessPolicyRequest()
+        new protos.google.cloud.bigquery.v2.UpdateRowAccessPolicyRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.UpdateRowAccessPolicyRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.UpdateRowAccessPolicyRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const defaultValue3 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.UpdateRowAccessPolicyRequest',
-        ['tableId']
+        ['tableId'],
       );
       request.tableId = defaultValue3;
       const defaultValue4 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.UpdateRowAccessPolicyRequest',
-        ['policyId']
+        ['policyId'],
       );
       request.policyId = defaultValue4;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&dataset_id=${defaultValue2 ?? ''}&table_id=${defaultValue3 ?? ''}&policy_id=${defaultValue4 ?? ''}`;
       const expectedResponse = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.RowAccessPolicy()
+        new protos.google.cloud.bigquery.v2.RowAccessPolicy(),
       );
       client.innerApiCalls.updateRowAccessPolicy =
         stubSimpleCall(expectedResponse);
@@ -769,31 +783,31 @@ describe('v2.RowAccessPolicyServiceClient', () => {
         });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.UpdateRowAccessPolicyRequest()
+        new protos.google.cloud.bigquery.v2.UpdateRowAccessPolicyRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.UpdateRowAccessPolicyRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.UpdateRowAccessPolicyRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const defaultValue3 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.UpdateRowAccessPolicyRequest',
-        ['tableId']
+        ['tableId'],
       );
       request.tableId = defaultValue3;
       const defaultValue4 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.UpdateRowAccessPolicyRequest',
-        ['policyId']
+        ['policyId'],
       );
       request.policyId = defaultValue4;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&dataset_id=${defaultValue2 ?? ''}&table_id=${defaultValue3 ?? ''}&policy_id=${defaultValue4 ?? ''}`;
       const expectedResponse = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.RowAccessPolicy()
+        new protos.google.cloud.bigquery.v2.RowAccessPolicy(),
       );
       client.innerApiCalls.updateRowAccessPolicy =
         stubSimpleCallWithCallback(expectedResponse);
@@ -802,14 +816,14 @@ describe('v2.RowAccessPolicyServiceClient', () => {
           request,
           (
             err?: Error | null,
-            result?: protos.google.cloud.bigquery.v2.IRowAccessPolicy | null
+            result?: protos.google.cloud.bigquery.v2.IRowAccessPolicy | null,
           ) => {
             if (err) {
               reject(err);
             } else {
               resolve(result);
             }
-          }
+          },
         );
       });
       const response = await promise;
@@ -832,37 +846,37 @@ describe('v2.RowAccessPolicyServiceClient', () => {
         });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.UpdateRowAccessPolicyRequest()
+        new protos.google.cloud.bigquery.v2.UpdateRowAccessPolicyRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.UpdateRowAccessPolicyRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.UpdateRowAccessPolicyRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const defaultValue3 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.UpdateRowAccessPolicyRequest',
-        ['tableId']
+        ['tableId'],
       );
       request.tableId = defaultValue3;
       const defaultValue4 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.UpdateRowAccessPolicyRequest',
-        ['policyId']
+        ['policyId'],
       );
       request.policyId = defaultValue4;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&dataset_id=${defaultValue2 ?? ''}&table_id=${defaultValue3 ?? ''}&policy_id=${defaultValue4 ?? ''}`;
       const expectedError = new Error('expected');
       client.innerApiCalls.updateRowAccessPolicy = stubSimpleCall(
         undefined,
-        expectedError
+        expectedError,
       );
       await assert.rejects(
         client.updateRowAccessPolicy(request),
-        expectedError
+        expectedError,
       );
       const actualRequest = (
         client.innerApiCalls.updateRowAccessPolicy as SinonStub
@@ -882,33 +896,35 @@ describe('v2.RowAccessPolicyServiceClient', () => {
         });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.UpdateRowAccessPolicyRequest()
+        new protos.google.cloud.bigquery.v2.UpdateRowAccessPolicyRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.UpdateRowAccessPolicyRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.UpdateRowAccessPolicyRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const defaultValue3 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.UpdateRowAccessPolicyRequest',
-        ['tableId']
+        ['tableId'],
       );
       request.tableId = defaultValue3;
       const defaultValue4 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.UpdateRowAccessPolicyRequest',
-        ['policyId']
+        ['policyId'],
       );
       request.policyId = defaultValue4;
       const expectedError = new Error('The client has already been closed.');
-      client.close();
+      client.close().catch(err => {
+        throw err;
+      });
       await assert.rejects(
         client.updateRowAccessPolicy(request),
-        expectedError
+        expectedError,
       );
     });
   });
@@ -922,31 +938,31 @@ describe('v2.RowAccessPolicyServiceClient', () => {
         });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.DeleteRowAccessPolicyRequest()
+        new protos.google.cloud.bigquery.v2.DeleteRowAccessPolicyRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.DeleteRowAccessPolicyRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.DeleteRowAccessPolicyRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const defaultValue3 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.DeleteRowAccessPolicyRequest',
-        ['tableId']
+        ['tableId'],
       );
       request.tableId = defaultValue3;
       const defaultValue4 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.DeleteRowAccessPolicyRequest',
-        ['policyId']
+        ['policyId'],
       );
       request.policyId = defaultValue4;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&dataset_id=${defaultValue2 ?? ''}&table_id=${defaultValue3 ?? ''}&policy_id=${defaultValue4 ?? ''}`;
       const expectedResponse = generateSampleMessage(
-        new protos.google.protobuf.Empty()
+        new protos.google.protobuf.Empty(),
       );
       client.innerApiCalls.deleteRowAccessPolicy =
         stubSimpleCall(expectedResponse);
@@ -970,31 +986,31 @@ describe('v2.RowAccessPolicyServiceClient', () => {
         });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.DeleteRowAccessPolicyRequest()
+        new protos.google.cloud.bigquery.v2.DeleteRowAccessPolicyRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.DeleteRowAccessPolicyRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.DeleteRowAccessPolicyRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const defaultValue3 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.DeleteRowAccessPolicyRequest',
-        ['tableId']
+        ['tableId'],
       );
       request.tableId = defaultValue3;
       const defaultValue4 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.DeleteRowAccessPolicyRequest',
-        ['policyId']
+        ['policyId'],
       );
       request.policyId = defaultValue4;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&dataset_id=${defaultValue2 ?? ''}&table_id=${defaultValue3 ?? ''}&policy_id=${defaultValue4 ?? ''}`;
       const expectedResponse = generateSampleMessage(
-        new protos.google.protobuf.Empty()
+        new protos.google.protobuf.Empty(),
       );
       client.innerApiCalls.deleteRowAccessPolicy =
         stubSimpleCallWithCallback(expectedResponse);
@@ -1003,14 +1019,14 @@ describe('v2.RowAccessPolicyServiceClient', () => {
           request,
           (
             err?: Error | null,
-            result?: protos.google.protobuf.IEmpty | null
+            result?: protos.google.protobuf.IEmpty | null,
           ) => {
             if (err) {
               reject(err);
             } else {
               resolve(result);
             }
-          }
+          },
         );
       });
       const response = await promise;
@@ -1033,37 +1049,37 @@ describe('v2.RowAccessPolicyServiceClient', () => {
         });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.DeleteRowAccessPolicyRequest()
+        new protos.google.cloud.bigquery.v2.DeleteRowAccessPolicyRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.DeleteRowAccessPolicyRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.DeleteRowAccessPolicyRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const defaultValue3 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.DeleteRowAccessPolicyRequest',
-        ['tableId']
+        ['tableId'],
       );
       request.tableId = defaultValue3;
       const defaultValue4 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.DeleteRowAccessPolicyRequest',
-        ['policyId']
+        ['policyId'],
       );
       request.policyId = defaultValue4;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&dataset_id=${defaultValue2 ?? ''}&table_id=${defaultValue3 ?? ''}&policy_id=${defaultValue4 ?? ''}`;
       const expectedError = new Error('expected');
       client.innerApiCalls.deleteRowAccessPolicy = stubSimpleCall(
         undefined,
-        expectedError
+        expectedError,
       );
       await assert.rejects(
         client.deleteRowAccessPolicy(request),
-        expectedError
+        expectedError,
       );
       const actualRequest = (
         client.innerApiCalls.deleteRowAccessPolicy as SinonStub
@@ -1083,33 +1099,35 @@ describe('v2.RowAccessPolicyServiceClient', () => {
         });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.DeleteRowAccessPolicyRequest()
+        new protos.google.cloud.bigquery.v2.DeleteRowAccessPolicyRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.DeleteRowAccessPolicyRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.DeleteRowAccessPolicyRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const defaultValue3 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.DeleteRowAccessPolicyRequest',
-        ['tableId']
+        ['tableId'],
       );
       request.tableId = defaultValue3;
       const defaultValue4 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.DeleteRowAccessPolicyRequest',
-        ['policyId']
+        ['policyId'],
       );
       request.policyId = defaultValue4;
       const expectedError = new Error('The client has already been closed.');
-      client.close();
+      client.close().catch(err => {
+        throw err;
+      });
       await assert.rejects(
         client.deleteRowAccessPolicy(request),
-        expectedError
+        expectedError,
       );
     });
   });
@@ -1123,26 +1141,26 @@ describe('v2.RowAccessPolicyServiceClient', () => {
         });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.BatchDeleteRowAccessPoliciesRequest()
+        new protos.google.cloud.bigquery.v2.BatchDeleteRowAccessPoliciesRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.BatchDeleteRowAccessPoliciesRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.BatchDeleteRowAccessPoliciesRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const defaultValue3 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.BatchDeleteRowAccessPoliciesRequest',
-        ['tableId']
+        ['tableId'],
       );
       request.tableId = defaultValue3;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&dataset_id=${defaultValue2 ?? ''}&table_id=${defaultValue3 ?? ''}`;
       const expectedResponse = generateSampleMessage(
-        new protos.google.protobuf.Empty()
+        new protos.google.protobuf.Empty(),
       );
       client.innerApiCalls.batchDeleteRowAccessPolicies =
         stubSimpleCall(expectedResponse);
@@ -1166,26 +1184,26 @@ describe('v2.RowAccessPolicyServiceClient', () => {
         });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.BatchDeleteRowAccessPoliciesRequest()
+        new protos.google.cloud.bigquery.v2.BatchDeleteRowAccessPoliciesRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.BatchDeleteRowAccessPoliciesRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.BatchDeleteRowAccessPoliciesRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const defaultValue3 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.BatchDeleteRowAccessPoliciesRequest',
-        ['tableId']
+        ['tableId'],
       );
       request.tableId = defaultValue3;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&dataset_id=${defaultValue2 ?? ''}&table_id=${defaultValue3 ?? ''}`;
       const expectedResponse = generateSampleMessage(
-        new protos.google.protobuf.Empty()
+        new protos.google.protobuf.Empty(),
       );
       client.innerApiCalls.batchDeleteRowAccessPolicies =
         stubSimpleCallWithCallback(expectedResponse);
@@ -1194,14 +1212,14 @@ describe('v2.RowAccessPolicyServiceClient', () => {
           request,
           (
             err?: Error | null,
-            result?: protos.google.protobuf.IEmpty | null
+            result?: protos.google.protobuf.IEmpty | null,
           ) => {
             if (err) {
               reject(err);
             } else {
               resolve(result);
             }
-          }
+          },
         );
       });
       const response = await promise;
@@ -1224,32 +1242,32 @@ describe('v2.RowAccessPolicyServiceClient', () => {
         });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.BatchDeleteRowAccessPoliciesRequest()
+        new protos.google.cloud.bigquery.v2.BatchDeleteRowAccessPoliciesRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.BatchDeleteRowAccessPoliciesRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.BatchDeleteRowAccessPoliciesRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const defaultValue3 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.BatchDeleteRowAccessPoliciesRequest',
-        ['tableId']
+        ['tableId'],
       );
       request.tableId = defaultValue3;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&dataset_id=${defaultValue2 ?? ''}&table_id=${defaultValue3 ?? ''}`;
       const expectedError = new Error('expected');
       client.innerApiCalls.batchDeleteRowAccessPolicies = stubSimpleCall(
         undefined,
-        expectedError
+        expectedError,
       );
       await assert.rejects(
         client.batchDeleteRowAccessPolicies(request),
-        expectedError
+        expectedError,
       );
       const actualRequest = (
         client.innerApiCalls.batchDeleteRowAccessPolicies as SinonStub
@@ -1269,28 +1287,30 @@ describe('v2.RowAccessPolicyServiceClient', () => {
         });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.BatchDeleteRowAccessPoliciesRequest()
+        new protos.google.cloud.bigquery.v2.BatchDeleteRowAccessPoliciesRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.BatchDeleteRowAccessPoliciesRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.BatchDeleteRowAccessPoliciesRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const defaultValue3 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.BatchDeleteRowAccessPoliciesRequest',
-        ['tableId']
+        ['tableId'],
       );
       request.tableId = defaultValue3;
       const expectedError = new Error('The client has already been closed.');
-      client.close();
+      client.close().catch(err => {
+        throw err;
+      });
       await assert.rejects(
         client.batchDeleteRowAccessPolicies(request),
-        expectedError
+        expectedError,
       );
     });
   });
@@ -1304,33 +1324,33 @@ describe('v2.RowAccessPolicyServiceClient', () => {
         });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.ListRowAccessPoliciesRequest()
+        new protos.google.cloud.bigquery.v2.ListRowAccessPoliciesRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.ListRowAccessPoliciesRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.ListRowAccessPoliciesRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const defaultValue3 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.ListRowAccessPoliciesRequest',
-        ['tableId']
+        ['tableId'],
       );
       request.tableId = defaultValue3;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&dataset_id=${defaultValue2 ?? ''}&table_id=${defaultValue3 ?? ''}`;
       const expectedResponse = [
         generateSampleMessage(
-          new protos.google.cloud.bigquery.v2.RowAccessPolicy()
+          new protos.google.cloud.bigquery.v2.RowAccessPolicy(),
         ),
         generateSampleMessage(
-          new protos.google.cloud.bigquery.v2.RowAccessPolicy()
+          new protos.google.cloud.bigquery.v2.RowAccessPolicy(),
         ),
         generateSampleMessage(
-          new protos.google.cloud.bigquery.v2.RowAccessPolicy()
+          new protos.google.cloud.bigquery.v2.RowAccessPolicy(),
         ),
       ];
       client.innerApiCalls.listRowAccessPolicies =
@@ -1355,33 +1375,33 @@ describe('v2.RowAccessPolicyServiceClient', () => {
         });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.ListRowAccessPoliciesRequest()
+        new protos.google.cloud.bigquery.v2.ListRowAccessPoliciesRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.ListRowAccessPoliciesRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.ListRowAccessPoliciesRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const defaultValue3 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.ListRowAccessPoliciesRequest',
-        ['tableId']
+        ['tableId'],
       );
       request.tableId = defaultValue3;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&dataset_id=${defaultValue2 ?? ''}&table_id=${defaultValue3 ?? ''}`;
       const expectedResponse = [
         generateSampleMessage(
-          new protos.google.cloud.bigquery.v2.RowAccessPolicy()
+          new protos.google.cloud.bigquery.v2.RowAccessPolicy(),
         ),
         generateSampleMessage(
-          new protos.google.cloud.bigquery.v2.RowAccessPolicy()
+          new protos.google.cloud.bigquery.v2.RowAccessPolicy(),
         ),
         generateSampleMessage(
-          new protos.google.cloud.bigquery.v2.RowAccessPolicy()
+          new protos.google.cloud.bigquery.v2.RowAccessPolicy(),
         ),
       ];
       client.innerApiCalls.listRowAccessPolicies =
@@ -1391,14 +1411,14 @@ describe('v2.RowAccessPolicyServiceClient', () => {
           request,
           (
             err?: Error | null,
-            result?: protos.google.cloud.bigquery.v2.IRowAccessPolicy[] | null
+            result?: protos.google.cloud.bigquery.v2.IRowAccessPolicy[] | null,
           ) => {
             if (err) {
               reject(err);
             } else {
               resolve(result);
             }
-          }
+          },
         );
       });
       const response = await promise;
@@ -1421,32 +1441,32 @@ describe('v2.RowAccessPolicyServiceClient', () => {
         });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.ListRowAccessPoliciesRequest()
+        new protos.google.cloud.bigquery.v2.ListRowAccessPoliciesRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.ListRowAccessPoliciesRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.ListRowAccessPoliciesRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const defaultValue3 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.ListRowAccessPoliciesRequest',
-        ['tableId']
+        ['tableId'],
       );
       request.tableId = defaultValue3;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&dataset_id=${defaultValue2 ?? ''}&table_id=${defaultValue3 ?? ''}`;
       const expectedError = new Error('expected');
       client.innerApiCalls.listRowAccessPolicies = stubSimpleCall(
         undefined,
-        expectedError
+        expectedError,
       );
       await assert.rejects(
         client.listRowAccessPolicies(request),
-        expectedError
+        expectedError,
       );
       const actualRequest = (
         client.innerApiCalls.listRowAccessPolicies as SinonStub
@@ -1466,33 +1486,33 @@ describe('v2.RowAccessPolicyServiceClient', () => {
         });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.ListRowAccessPoliciesRequest()
+        new protos.google.cloud.bigquery.v2.ListRowAccessPoliciesRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.ListRowAccessPoliciesRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.ListRowAccessPoliciesRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const defaultValue3 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.ListRowAccessPoliciesRequest',
-        ['tableId']
+        ['tableId'],
       );
       request.tableId = defaultValue3;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&dataset_id=${defaultValue2 ?? ''}&table_id=${defaultValue3 ?? ''}`;
       const expectedResponse = [
         generateSampleMessage(
-          new protos.google.cloud.bigquery.v2.RowAccessPolicy()
+          new protos.google.cloud.bigquery.v2.RowAccessPolicy(),
         ),
         generateSampleMessage(
-          new protos.google.cloud.bigquery.v2.RowAccessPolicy()
+          new protos.google.cloud.bigquery.v2.RowAccessPolicy(),
         ),
         generateSampleMessage(
-          new protos.google.cloud.bigquery.v2.RowAccessPolicy()
+          new protos.google.cloud.bigquery.v2.RowAccessPolicy(),
         ),
       ];
       client.descriptors.page.listRowAccessPolicies.createStream =
@@ -1504,7 +1524,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
           'data',
           (response: protos.google.cloud.bigquery.v2.RowAccessPolicy) => {
             responses.push(response);
-          }
+          },
         );
         stream.on('end', () => {
           resolve(responses);
@@ -1521,7 +1541,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
             .createStream as SinonStub
         )
           .getCall(0)
-          .calledWith(client.innerApiCalls.listRowAccessPolicies, request)
+          .calledWith(client.innerApiCalls.listRowAccessPolicies, request),
       );
       assert(
         (
@@ -1530,8 +1550,8 @@ describe('v2.RowAccessPolicyServiceClient', () => {
         )
           .getCall(0)
           .args[2].otherArgs.headers['x-goog-request-params'].includes(
-            expectedHeaderRequestParams
-          )
+            expectedHeaderRequestParams,
+          ),
       );
     });
 
@@ -1543,21 +1563,21 @@ describe('v2.RowAccessPolicyServiceClient', () => {
         });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.ListRowAccessPoliciesRequest()
+        new protos.google.cloud.bigquery.v2.ListRowAccessPoliciesRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.ListRowAccessPoliciesRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.ListRowAccessPoliciesRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const defaultValue3 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.ListRowAccessPoliciesRequest',
-        ['tableId']
+        ['tableId'],
       );
       request.tableId = defaultValue3;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&dataset_id=${defaultValue2 ?? ''}&table_id=${defaultValue3 ?? ''}`;
@@ -1571,7 +1591,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
           'data',
           (response: protos.google.cloud.bigquery.v2.RowAccessPolicy) => {
             responses.push(response);
-          }
+          },
         );
         stream.on('end', () => {
           resolve(responses);
@@ -1587,7 +1607,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
             .createStream as SinonStub
         )
           .getCall(0)
-          .calledWith(client.innerApiCalls.listRowAccessPolicies, request)
+          .calledWith(client.innerApiCalls.listRowAccessPolicies, request),
       );
       assert(
         (
@@ -1596,8 +1616,8 @@ describe('v2.RowAccessPolicyServiceClient', () => {
         )
           .getCall(0)
           .args[2].otherArgs.headers['x-goog-request-params'].includes(
-            expectedHeaderRequestParams
-          )
+            expectedHeaderRequestParams,
+          ),
       );
     });
 
@@ -1609,33 +1629,33 @@ describe('v2.RowAccessPolicyServiceClient', () => {
         });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.ListRowAccessPoliciesRequest()
+        new protos.google.cloud.bigquery.v2.ListRowAccessPoliciesRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.ListRowAccessPoliciesRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.ListRowAccessPoliciesRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const defaultValue3 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.ListRowAccessPoliciesRequest',
-        ['tableId']
+        ['tableId'],
       );
       request.tableId = defaultValue3;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&dataset_id=${defaultValue2 ?? ''}&table_id=${defaultValue3 ?? ''}`;
       const expectedResponse = [
         generateSampleMessage(
-          new protos.google.cloud.bigquery.v2.RowAccessPolicy()
+          new protos.google.cloud.bigquery.v2.RowAccessPolicy(),
         ),
         generateSampleMessage(
-          new protos.google.cloud.bigquery.v2.RowAccessPolicy()
+          new protos.google.cloud.bigquery.v2.RowAccessPolicy(),
         ),
         generateSampleMessage(
-          new protos.google.cloud.bigquery.v2.RowAccessPolicy()
+          new protos.google.cloud.bigquery.v2.RowAccessPolicy(),
         ),
       ];
       client.descriptors.page.listRowAccessPolicies.asyncIterate =
@@ -1651,7 +1671,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
           client.descriptors.page.listRowAccessPolicies
             .asyncIterate as SinonStub
         ).getCall(0).args[1],
-        request
+        request,
       );
       assert(
         (
@@ -1660,8 +1680,8 @@ describe('v2.RowAccessPolicyServiceClient', () => {
         )
           .getCall(0)
           .args[2].otherArgs.headers['x-goog-request-params'].includes(
-            expectedHeaderRequestParams
-          )
+            expectedHeaderRequestParams,
+          ),
       );
     });
 
@@ -1673,21 +1693,21 @@ describe('v2.RowAccessPolicyServiceClient', () => {
         });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.ListRowAccessPoliciesRequest()
+        new protos.google.cloud.bigquery.v2.ListRowAccessPoliciesRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.ListRowAccessPoliciesRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.ListRowAccessPoliciesRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const defaultValue3 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.ListRowAccessPoliciesRequest',
-        ['tableId']
+        ['tableId'],
       );
       request.tableId = defaultValue3;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&dataset_id=${defaultValue2 ?? ''}&table_id=${defaultValue3 ?? ''}`;
@@ -1707,7 +1727,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
           client.descriptors.page.listRowAccessPolicies
             .asyncIterate as SinonStub
         ).getCall(0).args[1],
-        request
+        request,
       );
       assert(
         (
@@ -1716,8 +1736,8 @@ describe('v2.RowAccessPolicyServiceClient', () => {
         )
           .getCall(0)
           .args[2].otherArgs.headers['x-goog-request-params'].includes(
-            expectedHeaderRequestParams
-          )
+            expectedHeaderRequestParams,
+          ),
       );
     });
   });

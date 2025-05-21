@@ -108,7 +108,7 @@ export class DatasetServiceClient {
    */
   constructor(
     opts?: ClientOptions,
-    gaxInstance?: typeof gax | typeof gax.fallback
+    gaxInstance?: typeof gax | typeof gax.fallback,
   ) {
     // Ensure that options include all the required fields.
     const staticMembers = this.constructor as typeof DatasetServiceClient;
@@ -118,7 +118,7 @@ export class DatasetServiceClient {
       opts?.universe_domain !== opts?.universeDomain
     ) {
       throw new Error(
-        'Please set either universe_domain or universeDomain, but not both.'
+        'Please set either universe_domain or universeDomain, but not both.',
       );
     }
     const universeDomainEnvVar =
@@ -210,7 +210,7 @@ export class DatasetServiceClient {
       listDatasets: new this._gaxModule.PageDescriptor(
         'pageToken',
         'nextPageToken',
-        'datasets'
+        'datasets',
       ),
     };
 
@@ -219,7 +219,7 @@ export class DatasetServiceClient {
       'google.cloud.bigquery.v2.DatasetService',
       gapicConfig as gax.ClientConfig,
       opts.clientConfig || {},
-      {'x-goog-api-client': clientHeader.join(' ')}
+      {'x-goog-api-client': clientHeader.join(' ')},
     );
 
     // Set up a dictionary of "inner API calls"; the core implementation
@@ -253,12 +253,12 @@ export class DatasetServiceClient {
     this.datasetServiceStub = this._gaxGrpc.createStub(
       this._opts.fallback
         ? (this._protos as protobuf.Root).lookupService(
-            'google.cloud.bigquery.v2.DatasetService'
+            'google.cloud.bigquery.v2.DatasetService',
           )
         : // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (this._protos as any).google.cloud.bigquery.v2.DatasetService,
       this._opts,
-      this._providedCustomServicePath
+      this._providedCustomServicePath,
     ) as Promise<{[method: string]: Function}>;
 
     // Iterate over each of the methods that the service provides
@@ -284,7 +284,7 @@ export class DatasetServiceClient {
           },
         (err: Error | null | undefined) => () => {
           throw err;
-        }
+        },
       );
 
       const descriptor = this.descriptors.page[methodName] || undefined;
@@ -292,7 +292,7 @@ export class DatasetServiceClient {
         callPromise,
         this._defaults[methodName],
         descriptor,
-        this._opts.fallback
+        this._opts.fallback,
       );
 
       this.innerApiCalls[methodName] = apiCall;
@@ -313,7 +313,7 @@ export class DatasetServiceClient {
     ) {
       process.emitWarning(
         'Static servicePath is deprecated, please use the instance method instead.',
-        'DeprecationWarning'
+        'DeprecationWarning',
       );
     }
     return 'bigquery.googleapis.com';
@@ -331,7 +331,7 @@ export class DatasetServiceClient {
     ) {
       process.emitWarning(
         'Static apiEndpoint is deprecated, please use the instance method instead.',
-        'DeprecationWarning'
+        'DeprecationWarning',
       );
     }
     return 'bigquery.googleapis.com';
@@ -377,7 +377,7 @@ export class DatasetServiceClient {
    * @returns {Promise} A promise that resolves to string containing the project ID.
    */
   getProjectId(
-    callback?: Callback<string, undefined, undefined>
+    callback?: Callback<string, undefined, undefined>,
   ): Promise<string> | void {
     if (callback) {
       this.auth.getProjectId(callback);
@@ -439,7 +439,7 @@ export class DatasetServiceClient {
    */
   getDataset(
     request?: protos.google.cloud.bigquery.v2.IGetDatasetRequest,
-    options?: CallOptions
+    options?: CallOptions,
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IDataset,
@@ -454,7 +454,7 @@ export class DatasetServiceClient {
       protos.google.cloud.bigquery.v2.IDataset,
       protos.google.cloud.bigquery.v2.IGetDatasetRequest | null | undefined,
       {} | null | undefined
-    >
+    >,
   ): void;
   getDataset(
     request: protos.google.cloud.bigquery.v2.IGetDatasetRequest,
@@ -462,7 +462,7 @@ export class DatasetServiceClient {
       protos.google.cloud.bigquery.v2.IDataset,
       protos.google.cloud.bigquery.v2.IGetDatasetRequest | null | undefined,
       {} | null | undefined
-    >
+    >,
   ): void;
   getDataset(
     request?: protos.google.cloud.bigquery.v2.IGetDatasetRequest,
@@ -477,7 +477,7 @@ export class DatasetServiceClient {
       protos.google.cloud.bigquery.v2.IDataset,
       protos.google.cloud.bigquery.v2.IGetDatasetRequest | null | undefined,
       {} | null | undefined
-    >
+    >,
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IDataset,
@@ -527,7 +527,7 @@ export class DatasetServiceClient {
         ]) => {
           this._log.info('getDataset response %j', response);
           return [response, options, rawResponse];
-        }
+        },
       );
   }
   /**
@@ -570,7 +570,7 @@ export class DatasetServiceClient {
    */
   insertDataset(
     request?: protos.google.cloud.bigquery.v2.IInsertDatasetRequest,
-    options?: CallOptions
+    options?: CallOptions,
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IDataset,
@@ -585,7 +585,7 @@ export class DatasetServiceClient {
       protos.google.cloud.bigquery.v2.IDataset,
       protos.google.cloud.bigquery.v2.IInsertDatasetRequest | null | undefined,
       {} | null | undefined
-    >
+    >,
   ): void;
   insertDataset(
     request: protos.google.cloud.bigquery.v2.IInsertDatasetRequest,
@@ -593,7 +593,7 @@ export class DatasetServiceClient {
       protos.google.cloud.bigquery.v2.IDataset,
       protos.google.cloud.bigquery.v2.IInsertDatasetRequest | null | undefined,
       {} | null | undefined
-    >
+    >,
   ): void;
   insertDataset(
     request?: protos.google.cloud.bigquery.v2.IInsertDatasetRequest,
@@ -610,7 +610,7 @@ export class DatasetServiceClient {
       protos.google.cloud.bigquery.v2.IDataset,
       protos.google.cloud.bigquery.v2.IInsertDatasetRequest | null | undefined,
       {} | null | undefined
-    >
+    >,
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IDataset,
@@ -661,7 +661,7 @@ export class DatasetServiceClient {
         ]) => {
           this._log.info('insertDataset response %j', response);
           return [response, options, rawResponse];
-        }
+        },
       );
   }
   /**
@@ -679,6 +679,9 @@ export class DatasetServiceClient {
    * @param {google.cloud.bigquery.v2.Dataset} request.dataset
    *   Required. Datasets resource which will replace or patch the specified
    *   dataset.
+   * @param {google.cloud.bigquery.v2.UpdateOrPatchDatasetRequest.UpdateMode} [request.updateMode]
+   *   Optional. Specifies the fields of dataset that update/patch operation is
+   *   targeting By default, both metadata and ACL fields are updated.
    * @param {number} [request.accessPolicyVersion]
    *   Optional. The version of the provided access policy schema.
    *   Valid values are 0, 1, and 3. Requests specifying an invalid value will be
@@ -713,7 +716,7 @@ export class DatasetServiceClient {
    */
   patchDataset(
     request?: protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest,
-    options?: CallOptions
+    options?: CallOptions,
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IDataset,
@@ -730,7 +733,7 @@ export class DatasetServiceClient {
       | null
       | undefined,
       {} | null | undefined
-    >
+    >,
   ): void;
   patchDataset(
     request: protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest,
@@ -740,7 +743,7 @@ export class DatasetServiceClient {
       | null
       | undefined,
       {} | null | undefined
-    >
+    >,
   ): void;
   patchDataset(
     request?: protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest,
@@ -759,7 +762,7 @@ export class DatasetServiceClient {
       | null
       | undefined,
       {} | null | undefined
-    >
+    >,
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IDataset,
@@ -814,7 +817,7 @@ export class DatasetServiceClient {
         ]) => {
           this._log.info('patchDataset response %j', response);
           return [response, options, rawResponse];
-        }
+        },
       );
   }
   /**
@@ -831,6 +834,9 @@ export class DatasetServiceClient {
    * @param {google.cloud.bigquery.v2.Dataset} request.dataset
    *   Required. Datasets resource which will replace or patch the specified
    *   dataset.
+   * @param {google.cloud.bigquery.v2.UpdateOrPatchDatasetRequest.UpdateMode} [request.updateMode]
+   *   Optional. Specifies the fields of dataset that update/patch operation is
+   *   targeting By default, both metadata and ACL fields are updated.
    * @param {number} [request.accessPolicyVersion]
    *   Optional. The version of the provided access policy schema.
    *   Valid values are 0, 1, and 3. Requests specifying an invalid value will be
@@ -865,7 +871,7 @@ export class DatasetServiceClient {
    */
   updateDataset(
     request?: protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest,
-    options?: CallOptions
+    options?: CallOptions,
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IDataset,
@@ -882,7 +888,7 @@ export class DatasetServiceClient {
       | null
       | undefined,
       {} | null | undefined
-    >
+    >,
   ): void;
   updateDataset(
     request: protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest,
@@ -892,7 +898,7 @@ export class DatasetServiceClient {
       | null
       | undefined,
       {} | null | undefined
-    >
+    >,
   ): void;
   updateDataset(
     request?: protos.google.cloud.bigquery.v2.IUpdateOrPatchDatasetRequest,
@@ -911,7 +917,7 @@ export class DatasetServiceClient {
       | null
       | undefined,
       {} | null | undefined
-    >
+    >,
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IDataset,
@@ -966,7 +972,7 @@ export class DatasetServiceClient {
         ]) => {
           this._log.info('updateDataset response %j', response);
           return [response, options, rawResponse];
-        }
+        },
       );
   }
   /**
@@ -996,7 +1002,7 @@ export class DatasetServiceClient {
    */
   deleteDataset(
     request?: protos.google.cloud.bigquery.v2.IDeleteDatasetRequest,
-    options?: CallOptions
+    options?: CallOptions,
   ): Promise<
     [
       protos.google.protobuf.IEmpty,
@@ -1011,7 +1017,7 @@ export class DatasetServiceClient {
       protos.google.protobuf.IEmpty,
       protos.google.cloud.bigquery.v2.IDeleteDatasetRequest | null | undefined,
       {} | null | undefined
-    >
+    >,
   ): void;
   deleteDataset(
     request: protos.google.cloud.bigquery.v2.IDeleteDatasetRequest,
@@ -1019,7 +1025,7 @@ export class DatasetServiceClient {
       protos.google.protobuf.IEmpty,
       protos.google.cloud.bigquery.v2.IDeleteDatasetRequest | null | undefined,
       {} | null | undefined
-    >
+    >,
   ): void;
   deleteDataset(
     request?: protos.google.cloud.bigquery.v2.IDeleteDatasetRequest,
@@ -1036,7 +1042,7 @@ export class DatasetServiceClient {
       protos.google.protobuf.IEmpty,
       protos.google.cloud.bigquery.v2.IDeleteDatasetRequest | null | undefined,
       {} | null | undefined
-    >
+    >,
   ): Promise<
     [
       protos.google.protobuf.IEmpty,
@@ -1088,7 +1094,7 @@ export class DatasetServiceClient {
         ]) => {
           this._log.info('deleteDataset response %j', response);
           return [response, options, rawResponse];
-        }
+        },
       );
   }
   /**
@@ -1117,7 +1123,7 @@ export class DatasetServiceClient {
    */
   undeleteDataset(
     request?: protos.google.cloud.bigquery.v2.IUndeleteDatasetRequest,
-    options?: CallOptions
+    options?: CallOptions,
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IDataset,
@@ -1134,7 +1140,7 @@ export class DatasetServiceClient {
       | null
       | undefined,
       {} | null | undefined
-    >
+    >,
   ): void;
   undeleteDataset(
     request: protos.google.cloud.bigquery.v2.IUndeleteDatasetRequest,
@@ -1144,7 +1150,7 @@ export class DatasetServiceClient {
       | null
       | undefined,
       {} | null | undefined
-    >
+    >,
   ): void;
   undeleteDataset(
     request?: protos.google.cloud.bigquery.v2.IUndeleteDatasetRequest,
@@ -1163,7 +1169,7 @@ export class DatasetServiceClient {
       | null
       | undefined,
       {} | null | undefined
-    >
+    >,
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IDataset,
@@ -1215,7 +1221,7 @@ export class DatasetServiceClient {
         ]) => {
           this._log.info('undeleteDataset response %j', response);
           return [response, options, rawResponse];
-        }
+        },
       );
   }
 
@@ -1257,7 +1263,7 @@ export class DatasetServiceClient {
    */
   listDatasets(
     request?: protos.google.cloud.bigquery.v2.IListDatasetsRequest,
-    options?: CallOptions
+    options?: CallOptions,
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IListFormatDataset[],
@@ -1272,7 +1278,7 @@ export class DatasetServiceClient {
       protos.google.cloud.bigquery.v2.IListDatasetsRequest,
       protos.google.cloud.bigquery.v2.IDatasetList | null | undefined,
       protos.google.cloud.bigquery.v2.IListFormatDataset
-    >
+    >,
   ): void;
   listDatasets(
     request: protos.google.cloud.bigquery.v2.IListDatasetsRequest,
@@ -1280,7 +1286,7 @@ export class DatasetServiceClient {
       protos.google.cloud.bigquery.v2.IListDatasetsRequest,
       protos.google.cloud.bigquery.v2.IDatasetList | null | undefined,
       protos.google.cloud.bigquery.v2.IListFormatDataset
-    >
+    >,
   ): void;
   listDatasets(
     request?: protos.google.cloud.bigquery.v2.IListDatasetsRequest,
@@ -1295,7 +1301,7 @@ export class DatasetServiceClient {
       protos.google.cloud.bigquery.v2.IListDatasetsRequest,
       protos.google.cloud.bigquery.v2.IDatasetList | null | undefined,
       protos.google.cloud.bigquery.v2.IListFormatDataset
-    >
+    >,
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IListFormatDataset[],
@@ -1349,7 +1355,7 @@ export class DatasetServiceClient {
         ]) => {
           this._log.info('listDatasets values %j', response);
           return [response, input, output];
-        }
+        },
       );
   }
 
@@ -1388,7 +1394,7 @@ export class DatasetServiceClient {
    */
   listDatasetsStream(
     request?: protos.google.cloud.bigquery.v2.IListDatasetsRequest,
-    options?: CallOptions
+    options?: CallOptions,
   ): Transform {
     request = request || {};
     options = options || {};
@@ -1407,7 +1413,7 @@ export class DatasetServiceClient {
     return this.descriptors.page.listDatasets.createStream(
       this.innerApiCalls.listDatasets as GaxCall,
       request,
-      callSettings
+      callSettings,
     );
   }
 
@@ -1449,7 +1455,7 @@ export class DatasetServiceClient {
    */
   listDatasetsAsync(
     request?: protos.google.cloud.bigquery.v2.IListDatasetsRequest,
-    options?: CallOptions
+    options?: CallOptions,
   ): AsyncIterable<protos.google.cloud.bigquery.v2.IListFormatDataset> {
     request = request || {};
     options = options || {};
@@ -1468,7 +1474,7 @@ export class DatasetServiceClient {
     return this.descriptors.page.listDatasets.asyncIterate(
       this.innerApiCalls['listDatasets'] as GaxCall,
       request as {},
-      callSettings
+      callSettings,
     ) as AsyncIterable<protos.google.cloud.bigquery.v2.IListFormatDataset>;
   }
 
