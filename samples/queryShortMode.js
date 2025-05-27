@@ -17,12 +17,13 @@
 function main() {
   // [START bigquery_query_shortmode]
   // Demonstrates issuing a query that may be run in short query mode.
-  // To enable the short query mode preview feature, the QUERY_PREVIEW_ENABLED
-  // environmental variable should be set to `TRUE`.
 
   // Import the Google Cloud client library
   const {BigQuery} = require('@google-cloud/bigquery');
-  const bigquery = new BigQuery();
+  const bigquery = new BigQuery({
+    // default behavior is to create jobs when using the jobs.query API
+    defaultJobCreationMode: 'JOB_CREATION_REQUIRED',
+  });
 
   async function queryShortMode() {
     // SQL query to run.
@@ -35,7 +36,11 @@ function main() {
       LIMIT 10`;
 
     // Run the query
-    const [rows, , res] = await bigquery.query(sqlQuery);
+    const [rows, , res] = await bigquery.query({
+      query: sqlQuery,
+      // Skip job creation to enable short mode.
+      jobCreationMode: 'JOB_CREATION_OPTIONAL',
+    });
 
     if (!res.jobReference) {
       console.log(`Query was run in short mode. Query ID: ${res.queryId}`);

@@ -104,6 +104,8 @@ export type SimpleQueryRowsCallback = ResourceCallback<
   bigquery.IJob
 >;
 
+type JobCreationMode = bigquery.IQueryRequest['jobCreationMode'];
+
 export type Query = JobRequest<bigquery.IJobConfigurationQuery> & {
   destination?: Table;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -117,6 +119,8 @@ export type Query = JobRequest<bigquery.IJobConfigurationQuery> & {
   pageToken?: string;
   wrapIntegers?: boolean | IntegerTypeCastOptions;
   parseJSON?: boolean;
+  // Overrides default job creation mode set on the client.
+  jobCreationMode?: JobCreationMode;
 };
 
 export type QueryParamTypeStruct = {
@@ -269,6 +273,13 @@ export interface BigQueryOptions extends GoogleAuthOptions {
    * Defaults to `googleapis.com`.
    */
   universeDomain?: string;
+
+  /**
+   * Controls the job creation mode used when executing queries that can be
+   * accelerated via the jobs.Query API. Users may experience performance
+   * improvements by leveraging the JOB_CREATION_OPTIONAL mode.
+   */
+  defaultJobCreationMode?: JobCreationMode;
 }
 
 export interface IntegerTypeCastOptions {
@@ -318,12 +329,6 @@ export const PROTOCOL_REGEX = /^(\w*):\/\//;
  * We will create a table with the correct schema, import the public CSV file
  * into that table, and query it for data.
  *
- * This client supports enabling query-related preview features via environmental
- * variables.  By setting the environment variable QUERY_PREVIEW_ENABLED to the string
- * "TRUE", the client will enable preview features, though behavior may still be
- * controlled via the bigquery service as well.  Currently, the feature(s) in scope
- * include: stateless queries (query execution without corresponding job metadata).
- *
  * @class
  *
  * See {@link https://cloud.google.com/bigquery/what-is-bigquery| What is BigQuery?}
@@ -360,7 +365,7 @@ export const PROTOCOL_REGEX = /^(\w*):\/\//;
 export class BigQuery extends Service {
   location?: string;
   private _universeDomain: string;
-  private _enableQueryPreview: boolean;
+  private _defaultJobCreationMode: JobCreationMode;
 
   createQueryStream(options?: Query | string): ResourceStream<RowMetadata> {
     // placeholder body, overwritten in constructor
@@ -419,12 +424,8 @@ export class BigQuery extends Service {
 
     super(config, options);
 
-    const QUERY_PREVIEW_ENABLED = process.env.QUERY_PREVIEW_ENABLED;
-    this._enableQueryPreview = false;
-    if (typeof QUERY_PREVIEW_ENABLED === 'string') {
-      if (QUERY_PREVIEW_ENABLED.toUpperCase() === 'TRUE') {
-        this._enableQueryPreview = true;
-      }
+    if (options.defaultJobCreationMode) {
+      this._defaultJobCreationMode = options.defaultJobCreationMode;
     }
 
     this._universeDomain = universeDomain;
@@ -2326,10 +2327,11 @@ export class BigQuery extends Service {
       query: queryObj.query,
       useLegacySql: false,
       requestId: randomUUID(),
-      jobCreationMode: 'JOB_CREATION_OPTIONAL',
+      jobCreationMode: this._defaultJobCreationMode,
     };
-    if (!this._enableQueryPreview) {
-      delete req.jobCreationMode;
+    if (queryObj.jobCreationMode) {
+      // override default job creation mode
+      req.jobCreationMode = queryObj.jobCreationMode;
     }
     const {parameterMode, params} = this.buildQueryParams_(
       queryObj.params,
