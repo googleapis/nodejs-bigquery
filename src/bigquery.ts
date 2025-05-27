@@ -2340,6 +2340,12 @@ export class BigQuery extends Service {
       requestId: randomUUID(),
       jobCreationMode: 'JOB_CREATION_OPTIONAL',
       reservation: queryObj.reservation,
+      continuous: queryObj.continuous,
+      destinationEncryptionConfiguration:
+        queryObj.destinationEncryptionConfiguration,
+      writeIncrementalResults: queryObj.writeIncrementalResults,
+      connectionProperties: queryObj.connectionProperties,
+      preserveNulls: queryObj.preserveNulls,
     };
     if (!this._enableQueryPreview) {
       delete req.jobCreationMode;
