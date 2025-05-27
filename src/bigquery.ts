@@ -76,6 +76,7 @@ export type JobRequest<J> = J & {
   jobPrefix?: string;
   location?: string;
   projectId?: string;
+  reservation?: string;
 };
 
 export type PagedRequest<P> = P & {
@@ -114,6 +115,7 @@ export type Query = JobRequest<bigquery.IJobConfigurationQuery> & {
   job?: Job;
   maxResults?: number;
   jobTimeoutMs?: number;
+  reservation?: string;
   pageToken?: string;
   wrapIntegers?: boolean | IntegerTypeCastOptions;
   parseJSON?: boolean;
@@ -1562,6 +1564,11 @@ export class BigQuery extends Service {
       delete query.jobId;
     }
 
+    if (query.reservation) {
+      reqOpts.configuration.reservation = query.reservation;
+      delete query.reservation;
+    }
+
     this.createJob(reqOpts, callback!);
   }
 
@@ -1731,9 +1738,14 @@ export class BigQuery extends Service {
       location: this.location,
     };
 
-    if (options.location) {
-      reqOpts.jobReference.location = options.location;
+    if (reqOpts.location) {
+      reqOpts.jobReference.location = reqOpts.location;
       delete reqOpts.location;
+    }
+
+    if (reqOpts.configuration && reqOpts.reservation) {
+      reqOpts.configuration.reservation = reqOpts.reservation;
+      delete reqOpts.reservation;
     }
 
     const job = this.job(jobId!, {
@@ -2327,6 +2339,13 @@ export class BigQuery extends Service {
       useLegacySql: false,
       requestId: randomUUID(),
       jobCreationMode: 'JOB_CREATION_OPTIONAL',
+      reservation: queryObj.reservation,
+      continuous: queryObj.continuous,
+      destinationEncryptionConfiguration:
+        queryObj.destinationEncryptionConfiguration,
+      writeIncrementalResults: queryObj.writeIncrementalResults,
+      connectionProperties: queryObj.connectionProperties,
+      preserveNulls: queryObj.preserveNulls,
     };
     if (!this._enableQueryPreview) {
       delete req.jobCreationMode;

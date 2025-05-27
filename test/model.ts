@@ -257,6 +257,25 @@ describe('BigQuery/Model', () => {
         model.createExtractJob(URI, options, done);
       });
 
+      it('should accept a reservation id', done => {
+        const options = {
+          reservation: 'reservation/1',
+        };
+
+        model.bigQuery.createJob = (
+          reqOpts: JobOptions,
+          callback: Function,
+        ) => {
+          assert.strictEqual(
+            reqOpts.configuration?.reservation,
+            'reservation/1',
+          );
+          callback(); // the done fn
+        };
+
+        model.createExtractJob(URI, options, done);
+      });
+
       it('should accept a job id', done => {
         const jobId = 'job-id';
         const options = {jobId};
