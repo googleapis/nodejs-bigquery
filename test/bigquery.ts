@@ -2644,6 +2644,20 @@ describe('BigQuery', () => {
       bq.createQueryJob(options, assert.ifError);
     });
 
+    it('should accept a reservation id', done => {
+      const options = {
+        query: QUERY_STRING,
+        reservation: 'reservation/1',
+      };
+
+      bq.createJob = (reqOpts: JobOptions) => {
+        assert.strictEqual(reqOpts.configuration?.reservation, 'reservation/1');
+        done();
+      };
+
+      bq.createQueryJob(options, assert.ifError);
+    });
+
     it('should accept a location', done => {
       const options = {
         query: QUERY_STRING,
@@ -3299,6 +3313,29 @@ describe('BigQuery', () => {
       };
 
       bq.query(QUERY_STRING, fakeOptions, assert.ifError);
+    });
+
+    it('should accept a reservation id', done => {
+      const query: Query = {
+        query: QUERY_STRING,
+        reservation: 'reservation/1',
+      };
+      const fakeJob = {
+        getQueryResults: (options: {}) => {
+          done();
+        },
+      };
+
+      bq.createJob = (reqOpts: JobOptions, callback: Function) => {
+        assert(reqOpts.configuration?.reservation, 'reservation/1');
+        callback(null, fakeJob, FAKE_RESPONSE);
+      };
+
+      bq.buildQueryRequest_ = (query: {}, opts: {}) => {
+        return undefined;
+      };
+
+      bq.query(query, assert.ifError);
     });
   });
 

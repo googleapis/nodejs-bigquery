@@ -767,6 +767,19 @@ describe('BigQuery/Table', () => {
       table.createCopyJob(DEST_TABLE, options, done);
     });
 
+    it('should accept a reservation id', done => {
+      const options = {
+        reservation: 'reservation/1',
+      };
+
+      table.bigQuery.createJob = (reqOpts: JobOptions, callback: Function) => {
+        assert.strictEqual(reqOpts.configuration?.reservation, 'reservation/1');
+        callback(); // the done fn
+      };
+
+      table.createCopyJob(DEST_TABLE, options, done);
+    });
+
     it('should use the default location', done => {
       table.bigQuery.createJob = (reqOpts: JobOptions, callback: Function) => {
         assert.strictEqual(reqOpts.location, LOCATION);
@@ -905,6 +918,19 @@ describe('BigQuery/Table', () => {
           (reqOpts.configuration!.copy as any).jobPrefix,
           undefined,
         );
+        callback(); // the done fn
+      };
+
+      table.createCopyFromJob(SOURCE_TABLE, options, done);
+    });
+
+    it('should accept a reservation id', done => {
+      const options = {
+        reservation: 'reservation/1',
+      };
+
+      table.bigQuery.createJob = (reqOpts: JobOptions, callback: Function) => {
+        assert.strictEqual(reqOpts.configuration?.reservation, 'reservation/1');
         callback(); // the done fn
       };
 
@@ -1195,6 +1221,19 @@ describe('BigQuery/Table', () => {
       table.createExtractJob(FILE, options, done);
     });
 
+    it('should accept a reservation id', done => {
+      const options = {
+        reservation: 'reservation/1',
+      };
+
+      table.bigQuery.createJob = (reqOpts: JobOptions, callback: Function) => {
+        assert.strictEqual(reqOpts.configuration?.reservation, 'reservation/1');
+        callback(); // the done fn
+      };
+
+      table.createExtractJob(FILE, options, done);
+    });
+
     it('should use the default location', done => {
       const table = new Table(DATASET, TABLE_ID, {location: LOCATION});
 
@@ -1420,6 +1459,19 @@ describe('BigQuery/Table', () => {
             load: {
               jobPrefix: undefined,
             },
+          },
+        }),
+      );
+    });
+
+    it('should set the job reservation', async () => {
+      const reservation = 'reservation/1';
+      await table.createLoadJob(FILE, {reservation});
+      assert(bqCreateJobStub.calledOnce);
+      assert(
+        bqCreateJobStub.calledWithMatch({
+          configuration: {
+            reservation,
           },
         }),
       );

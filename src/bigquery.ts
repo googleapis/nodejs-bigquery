@@ -1564,6 +1564,11 @@ export class BigQuery extends Service {
       delete query.jobId;
     }
 
+    if (query.reservation) {
+      reqOpts.configuration.reservation = query.reservation;
+      delete query.reservation;
+    }
+
     this.createJob(reqOpts, callback!);
   }
 
