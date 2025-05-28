@@ -26,7 +26,7 @@ import {
   RequestCallback,
   JobRequest,
 } from '.';
-import {JobMetadata} from './job';
+import {JobMetadata, JobOptions} from './job';
 import bigquery from './types';
 
 // This is supposed to be a @google-cloud/storage `File` type. The storage npm
@@ -424,8 +424,7 @@ class Model extends ServiceObject {
       }
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const body: any = {
+    const body: JobOptions = {
       configuration: {
         extract: extend(true, options, {
           sourceModel: {
@@ -445,6 +444,11 @@ class Model extends ServiceObject {
     if (options.jobId) {
       body.jobId = options.jobId;
       delete options.jobId;
+    }
+
+    if (body.configuration && options.reservation) {
+      body.configuration.reservation = options.reservation;
+      delete options.reservation;
     }
 
     this.bigQuery.createJob(body, callback!);
