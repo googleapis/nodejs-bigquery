@@ -70,8 +70,8 @@ describe('Queries', () => {
     assert.match(output, /name/);
   });
 
-  it('should run a query in short mode', async () => {
-    const output = execSync('node queryShortMode.js');
+  it('should run a query stateless mode', async () => {
+    const output = execSync('node queryJobOptional.js');
     assert.match(output, /Rows:/);
     assert.match(output, /name/);
   });

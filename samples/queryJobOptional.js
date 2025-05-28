@@ -15,7 +15,7 @@
 'use strict';
 
 function main() {
-  // [START bigquery_query_shortmode]
+  // [START bigquery_query_job_optional]
   // Demonstrates issuing a query that may be run in short query mode.
 
   // Import the Google Cloud client library
@@ -25,7 +25,7 @@ function main() {
     defaultJobCreationMode: 'JOB_CREATION_REQUIRED',
   });
 
-  async function queryShortMode() {
+  async function queryJobOptional() {
     // SQL query to run.
 
     const sqlQuery = `
@@ -55,7 +55,7 @@ function main() {
     console.log('Rows:');
     rows.forEach(row => console.log(row));
   }
-  // [END bigquery_query_shortmode]
-  queryShortMode();
+  // [END bigquery_query_job_optional]
+  queryJobOptional();
 }
 main(...process.argv.slice(2));
