@@ -189,8 +189,10 @@ describe('BigQuery', () => {
   beforeEach(() => {
     Object.assign(fakeUtil, originalFakeUtil);
     BigQuery = Object.assign(BigQuery, BigQueryCached);
-    bq = new BigQuery({projectId: PROJECT_ID});
-    bq._enableQueryPreview = true;
+    bq = new BigQuery({
+      projectId: PROJECT_ID,
+      defaultJobCreationMode: 'JOB_CREATION_OPTIONAL',
+    });
   });
 
   after(() => {
@@ -3360,6 +3362,7 @@ describe('BigQuery', () => {
         labels: {
           key: 'value',
         },
+        jobCreationMode: 'JOB_CREATION_REQUIRED',
       };
       const req = bq.buildQueryRequest_(q, {});
       for (const key in req) {
@@ -3392,7 +3395,7 @@ describe('BigQuery', () => {
         labels: {
           key: 'value',
         },
-        jobCreationMode: 'JOB_CREATION_OPTIONAL',
+        jobCreationMode: 'JOB_CREATION_REQUIRED',
         formatOptions: {
           useInt64Timestamp: true,
         },
