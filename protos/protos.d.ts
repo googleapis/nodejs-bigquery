@@ -12145,6 +12145,7 @@ export namespace google {
                         BASE_TABLE_TOO_SMALL = 13,
                         BASE_TABLE_TOO_LARGE = 14,
                         ESTIMATED_PERFORMANCE_GAIN_TOO_LOW = 15,
+                        COLUMN_METADATA_INDEX_NOT_USED = 21,
                         NOT_SUPPORTED_IN_STANDARD_EDITION = 17,
                         INDEX_SUPPRESSED_BY_FUNCTION_OPTION = 18,
                         QUERY_CACHE_HIT = 19,
@@ -23840,7 +23841,7 @@ export namespace google {
                 enum ManagedTableType {
                     MANAGED_TABLE_TYPE_UNSPECIFIED = 0,
                     NATIVE = 1,
-                    ICEBERG = 2
+                    BIGLAKE = 2
                 }
 
                 /** Properties of a PartitioningDefinition. */
@@ -24957,6 +24958,12 @@ export namespace google {
 
                     /** Routine dataGovernanceType */
                     dataGovernanceType?: (google.cloud.bigquery.v2.Routine.DataGovernanceType|keyof typeof google.cloud.bigquery.v2.Routine.DataGovernanceType|null);
+
+                    /** Routine pythonOptions */
+                    pythonOptions?: (google.cloud.bigquery.v2.IPythonOptions|null);
+
+                    /** Routine externalRuntimeOptions */
+                    externalRuntimeOptions?: (google.cloud.bigquery.v2.IExternalRuntimeOptions|null);
                 }
 
                 /** Represents a Routine. */
@@ -25021,6 +25028,12 @@ export namespace google {
 
                     /** Routine dataGovernanceType. */
                     public dataGovernanceType: (google.cloud.bigquery.v2.Routine.DataGovernanceType|keyof typeof google.cloud.bigquery.v2.Routine.DataGovernanceType);
+
+                    /** Routine pythonOptions. */
+                    public pythonOptions?: (google.cloud.bigquery.v2.IPythonOptions|null);
+
+                    /** Routine externalRuntimeOptions. */
+                    public externalRuntimeOptions?: (google.cloud.bigquery.v2.IExternalRuntimeOptions|null);
 
                     /**
                      * Creates a new Routine instance using the specified properties.
@@ -25394,6 +25407,230 @@ export namespace google {
                         DATA_GOVERNANCE_TYPE_UNSPECIFIED = 0,
                         DATA_MASKING = 1
                     }
+                }
+
+                /** Properties of a PythonOptions. */
+                interface IPythonOptions {
+
+                    /** PythonOptions entryPoint */
+                    entryPoint?: (string|null);
+
+                    /** PythonOptions packages */
+                    packages?: (string[]|null);
+                }
+
+                /** Represents a PythonOptions. */
+                class PythonOptions implements IPythonOptions {
+
+                    /**
+                     * Constructs a new PythonOptions.
+                     * @param [properties] Properties to set
+                     */
+                    constructor(properties?: google.cloud.bigquery.v2.IPythonOptions);
+
+                    /** PythonOptions entryPoint. */
+                    public entryPoint: string;
+
+                    /** PythonOptions packages. */
+                    public packages: string[];
+
+                    /**
+                     * Creates a new PythonOptions instance using the specified properties.
+                     * @param [properties] Properties to set
+                     * @returns PythonOptions instance
+                     */
+                    public static create(properties?: google.cloud.bigquery.v2.IPythonOptions): google.cloud.bigquery.v2.PythonOptions;
+
+                    /**
+                     * Encodes the specified PythonOptions message. Does not implicitly {@link google.cloud.bigquery.v2.PythonOptions.verify|verify} messages.
+                     * @param message PythonOptions message or plain object to encode
+                     * @param [writer] Writer to encode to
+                     * @returns Writer
+                     */
+                    public static encode(message: google.cloud.bigquery.v2.IPythonOptions, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                    /**
+                     * Encodes the specified PythonOptions message, length delimited. Does not implicitly {@link google.cloud.bigquery.v2.PythonOptions.verify|verify} messages.
+                     * @param message PythonOptions message or plain object to encode
+                     * @param [writer] Writer to encode to
+                     * @returns Writer
+                     */
+                    public static encodeDelimited(message: google.cloud.bigquery.v2.IPythonOptions, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                    /**
+                     * Decodes a PythonOptions message from the specified reader or buffer.
+                     * @param reader Reader or buffer to decode from
+                     * @param [length] Message length if known beforehand
+                     * @returns PythonOptions
+                     * @throws {Error} If the payload is not a reader or valid buffer
+                     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                     */
+                    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): google.cloud.bigquery.v2.PythonOptions;
+
+                    /**
+                     * Decodes a PythonOptions message from the specified reader or buffer, length delimited.
+                     * @param reader Reader or buffer to decode from
+                     * @returns PythonOptions
+                     * @throws {Error} If the payload is not a reader or valid buffer
+                     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                     */
+                    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): google.cloud.bigquery.v2.PythonOptions;
+
+                    /**
+                     * Verifies a PythonOptions message.
+                     * @param message Plain object to verify
+                     * @returns `null` if valid, otherwise the reason why it is not
+                     */
+                    public static verify(message: { [k: string]: any }): (string|null);
+
+                    /**
+                     * Creates a PythonOptions message from a plain object. Also converts values to their respective internal types.
+                     * @param object Plain object
+                     * @returns PythonOptions
+                     */
+                    public static fromObject(object: { [k: string]: any }): google.cloud.bigquery.v2.PythonOptions;
+
+                    /**
+                     * Creates a plain object from a PythonOptions message. Also converts values to other types if specified.
+                     * @param message PythonOptions
+                     * @param [options] Conversion options
+                     * @returns Plain object
+                     */
+                    public static toObject(message: google.cloud.bigquery.v2.PythonOptions, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                    /**
+                     * Converts this PythonOptions to JSON.
+                     * @returns JSON object
+                     */
+                    public toJSON(): { [k: string]: any };
+
+                    /**
+                     * Gets the default type url for PythonOptions
+                     * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+                     * @returns The default type url
+                     */
+                    public static getTypeUrl(typeUrlPrefix?: string): string;
+                }
+
+                /** Properties of an ExternalRuntimeOptions. */
+                interface IExternalRuntimeOptions {
+
+                    /** ExternalRuntimeOptions containerMemory */
+                    containerMemory?: (string|null);
+
+                    /** ExternalRuntimeOptions containerCpu */
+                    containerCpu?: (number|null);
+
+                    /** ExternalRuntimeOptions runtimeConnection */
+                    runtimeConnection?: (string|null);
+
+                    /** ExternalRuntimeOptions maxBatchingRows */
+                    maxBatchingRows?: (number|Long|string|null);
+
+                    /** ExternalRuntimeOptions runtimeVersion */
+                    runtimeVersion?: (string|null);
+                }
+
+                /** Represents an ExternalRuntimeOptions. */
+                class ExternalRuntimeOptions implements IExternalRuntimeOptions {
+
+                    /**
+                     * Constructs a new ExternalRuntimeOptions.
+                     * @param [properties] Properties to set
+                     */
+                    constructor(properties?: google.cloud.bigquery.v2.IExternalRuntimeOptions);
+
+                    /** ExternalRuntimeOptions containerMemory. */
+                    public containerMemory: string;
+
+                    /** ExternalRuntimeOptions containerCpu. */
+                    public containerCpu: number;
+
+                    /** ExternalRuntimeOptions runtimeConnection. */
+                    public runtimeConnection: string;
+
+                    /** ExternalRuntimeOptions maxBatchingRows. */
+                    public maxBatchingRows: (number|Long|string);
+
+                    /** ExternalRuntimeOptions runtimeVersion. */
+                    public runtimeVersion: string;
+
+                    /**
+                     * Creates a new ExternalRuntimeOptions instance using the specified properties.
+                     * @param [properties] Properties to set
+                     * @returns ExternalRuntimeOptions instance
+                     */
+                    public static create(properties?: google.cloud.bigquery.v2.IExternalRuntimeOptions): google.cloud.bigquery.v2.ExternalRuntimeOptions;
+
+                    /**
+                     * Encodes the specified ExternalRuntimeOptions message. Does not implicitly {@link google.cloud.bigquery.v2.ExternalRuntimeOptions.verify|verify} messages.
+                     * @param message ExternalRuntimeOptions message or plain object to encode
+                     * @param [writer] Writer to encode to
+                     * @returns Writer
+                     */
+                    public static encode(message: google.cloud.bigquery.v2.IExternalRuntimeOptions, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                    /**
+                     * Encodes the specified ExternalRuntimeOptions message, length delimited. Does not implicitly {@link google.cloud.bigquery.v2.ExternalRuntimeOptions.verify|verify} messages.
+                     * @param message ExternalRuntimeOptions message or plain object to encode
+                     * @param [writer] Writer to encode to
+                     * @returns Writer
+                     */
+                    public static encodeDelimited(message: google.cloud.bigquery.v2.IExternalRuntimeOptions, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                    /**
+                     * Decodes an ExternalRuntimeOptions message from the specified reader or buffer.
+                     * @param reader Reader or buffer to decode from
+                     * @param [length] Message length if known beforehand
+                     * @returns ExternalRuntimeOptions
+                     * @throws {Error} If the payload is not a reader or valid buffer
+                     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                     */
+                    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): google.cloud.bigquery.v2.ExternalRuntimeOptions;
+
+                    /**
+                     * Decodes an ExternalRuntimeOptions message from the specified reader or buffer, length delimited.
+                     * @param reader Reader or buffer to decode from
+                     * @returns ExternalRuntimeOptions
+                     * @throws {Error} If the payload is not a reader or valid buffer
+                     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                     */
+                    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): google.cloud.bigquery.v2.ExternalRuntimeOptions;
+
+                    /**
+                     * Verifies an ExternalRuntimeOptions message.
+                     * @param message Plain object to verify
+                     * @returns `null` if valid, otherwise the reason why it is not
+                     */
+                    public static verify(message: { [k: string]: any }): (string|null);
+
+                    /**
+                     * Creates an ExternalRuntimeOptions message from a plain object. Also converts values to their respective internal types.
+                     * @param object Plain object
+                     * @returns ExternalRuntimeOptions
+                     */
+                    public static fromObject(object: { [k: string]: any }): google.cloud.bigquery.v2.ExternalRuntimeOptions;
+
+                    /**
+                     * Creates a plain object from an ExternalRuntimeOptions message. Also converts values to other types if specified.
+                     * @param message ExternalRuntimeOptions
+                     * @param [options] Conversion options
+                     * @returns Plain object
+                     */
+                    public static toObject(message: google.cloud.bigquery.v2.ExternalRuntimeOptions, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                    /**
+                     * Converts this ExternalRuntimeOptions to JSON.
+                     * @returns JSON object
+                     */
+                    public toJSON(): { [k: string]: any };
+
+                    /**
+                     * Gets the default type url for ExternalRuntimeOptions
+                     * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+                     * @returns The default type url
+                     */
+                    public static getTypeUrl(typeUrlPrefix?: string): string;
                 }
 
                 /** Properties of a SparkOptions. */

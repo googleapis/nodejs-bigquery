@@ -30,7 +30,7 @@ import "google/protobuf/duration.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/wrappers.proto";
 
-option go_package = "cloud.google.com/go/bigquery/apiv2/bigquerypb;bigquerypb";
+option go_package = "cloud.google.com/go/bigquery/v2/apiv2/bigquerypb;bigquerypb";
 option java_outer_classname = "JobStatsProto";
 option java_package = "com.google.cloud.bigquery.v2";
 option (google.api.resource_definition) = {
@@ -393,6 +393,12 @@ message IndexUnusedReason {
     // Indicates that the estimated performance gain from using the search index
     // is too low for the given search query.
     ESTIMATED_PERFORMANCE_GAIN_TOO_LOW = 15;
+
+    // Indicates that the column metadata index (which the search index depends
+    // on) is not used. User can refer to the [column metadata index
+    // usage](https://cloud.google.com/bigquery/docs/metadata-indexing-managed-tables#view_column_metadata_index_usage)
+    // for more details on why it was not used.
+    COLUMN_METADATA_INDEX_NOT_USED = 21;
 
     // Indicates that search indexes can not be used for search query with
     // STANDARD edition.

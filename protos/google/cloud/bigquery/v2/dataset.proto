@@ -32,7 +32,7 @@ import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
 import "google/type/expr.proto";
 
-option go_package = "cloud.google.com/go/bigquery/apiv2/bigquerypb;bigquerypb";
+option go_package = "cloud.google.com/go/bigquery/v2/apiv2/bigquerypb;bigquerypb";
 option java_outer_classname = "DatasetProto";
 option java_package = "com.google.cloud.bigquery.v2";
 
@@ -473,15 +473,15 @@ message GetDatasetRequest {
     // Default to the FULL view.
     DATASET_VIEW_UNSPECIFIED = 0;
 
-    // Updates metadata information for the dataset, such as friendlyName,
+    // View metadata information for the dataset, such as friendlyName,
     // description, labels, etc.
     METADATA = 1;
 
-    // Updates ACL information for the dataset, which defines dataset access
+    // View ACL information for the dataset, which defines dataset access
     // for one or more entities.
     ACL = 2;
 
-    // Updates both dataset metadata and ACL information.
+    // View both dataset metadata and ACL information.
     FULL = 3;
   }
 
