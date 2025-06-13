@@ -30,7 +30,7 @@ import {GoogleAuth, protobuf} from 'google-gax';
 // Dynamically loaded proto JSON is needed to get the type information
 // to fill in default values for request objects
 const root = protobuf.Root.fromJSON(
-  require('../protos/protos.json')
+  require('../protos/protos.json'),
 ).resolveAll();
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -47,7 +47,7 @@ function generateSampleMessage<T extends object>(instance: T) {
     instance.constructor as typeof protobuf.Message
   ).toObject(instance as protobuf.Message<T>, {defaults: true});
   return (instance.constructor as typeof protobuf.Message).fromObject(
-    filledObject
+    filledObject,
   ) as T;
 }
 
@@ -59,7 +59,7 @@ function stubSimpleCall<ResponseType>(response?: ResponseType, error?: Error) {
 
 function stubSimpleCallWithCallback<ResponseType>(
   response?: ResponseType,
-  error?: Error
+  error?: Error,
 ) {
   return error
     ? sinon.stub().callsArgWith(2, error)
@@ -68,7 +68,7 @@ function stubSimpleCallWithCallback<ResponseType>(
 
 function stubPageStreamingCall<ResponseType>(
   responses?: ResponseType[],
-  error?: Error
+  error?: Error,
 ) {
   const pagingStub = sinon.stub();
   if (responses) {
@@ -106,7 +106,7 @@ function stubPageStreamingCall<ResponseType>(
 
 function stubAsyncIterationCall<ResponseType>(
   responses?: ResponseType[],
-  error?: Error
+  error?: Error,
 ) {
   let counter = 0;
   const asyncIterable = {
@@ -269,9 +269,14 @@ describe('v2.ModelServiceClient', () => {
         throw err;
       });
       assert(client.modelServiceStub);
-      client.close().then(() => {
-        done();
-      });
+      client
+        .close()
+        .then(() => {
+          done();
+        })
+        .catch(err => {
+          throw err;
+        });
     });
 
     it('has close method for the non-initialized client', done => {
@@ -280,9 +285,14 @@ describe('v2.ModelServiceClient', () => {
         projectId: 'bogus',
       });
       assert.strictEqual(client.modelServiceStub, undefined);
-      client.close().then(() => {
-        done();
-      });
+      client
+        .close()
+        .then(() => {
+          done();
+        })
+        .catch(err => {
+          throw err;
+        });
     });
 
     it('has getProjectId method', async () => {
@@ -328,26 +338,26 @@ describe('v2.ModelServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.GetModelRequest()
+        new protos.google.cloud.bigquery.v2.GetModelRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetModelRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetModelRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const defaultValue3 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetModelRequest',
-        ['modelId']
+        ['modelId'],
       );
       request.modelId = defaultValue3;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&dataset_id=${defaultValue2 ?? ''}&model_id=${defaultValue3 ?? ''}`;
       const expectedResponse = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.Model()
+        new protos.google.cloud.bigquery.v2.Model(),
       );
       client.innerApiCalls.getModel = stubSimpleCall(expectedResponse);
       const [response] = await client.getModel(request);
@@ -369,26 +379,26 @@ describe('v2.ModelServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.GetModelRequest()
+        new protos.google.cloud.bigquery.v2.GetModelRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetModelRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetModelRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const defaultValue3 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetModelRequest',
-        ['modelId']
+        ['modelId'],
       );
       request.modelId = defaultValue3;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&dataset_id=${defaultValue2 ?? ''}&model_id=${defaultValue3 ?? ''}`;
       const expectedResponse = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.Model()
+        new protos.google.cloud.bigquery.v2.Model(),
       );
       client.innerApiCalls.getModel =
         stubSimpleCallWithCallback(expectedResponse);
@@ -397,14 +407,14 @@ describe('v2.ModelServiceClient', () => {
           request,
           (
             err?: Error | null,
-            result?: protos.google.cloud.bigquery.v2.IModel | null
+            result?: protos.google.cloud.bigquery.v2.IModel | null,
           ) => {
             if (err) {
               reject(err);
             } else {
               resolve(result);
             }
-          }
+          },
         );
       });
       const response = await promise;
@@ -426,21 +436,21 @@ describe('v2.ModelServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.GetModelRequest()
+        new protos.google.cloud.bigquery.v2.GetModelRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetModelRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetModelRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const defaultValue3 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetModelRequest',
-        ['modelId']
+        ['modelId'],
       );
       request.modelId = defaultValue3;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&dataset_id=${defaultValue2 ?? ''}&model_id=${defaultValue3 ?? ''}`;
@@ -464,25 +474,27 @@ describe('v2.ModelServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.GetModelRequest()
+        new protos.google.cloud.bigquery.v2.GetModelRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetModelRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetModelRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const defaultValue3 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetModelRequest',
-        ['modelId']
+        ['modelId'],
       );
       request.modelId = defaultValue3;
       const expectedError = new Error('The client has already been closed.');
-      client.close();
+      client.close().catch(err => {
+        throw err;
+      });
       await assert.rejects(client.getModel(request), expectedError);
     });
   });
@@ -495,26 +507,26 @@ describe('v2.ModelServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.PatchModelRequest()
+        new protos.google.cloud.bigquery.v2.PatchModelRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.PatchModelRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.PatchModelRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const defaultValue3 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.PatchModelRequest',
-        ['modelId']
+        ['modelId'],
       );
       request.modelId = defaultValue3;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&dataset_id=${defaultValue2 ?? ''}&model_id=${defaultValue3 ?? ''}`;
       const expectedResponse = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.Model()
+        new protos.google.cloud.bigquery.v2.Model(),
       );
       client.innerApiCalls.patchModel = stubSimpleCall(expectedResponse);
       const [response] = await client.patchModel(request);
@@ -536,26 +548,26 @@ describe('v2.ModelServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.PatchModelRequest()
+        new protos.google.cloud.bigquery.v2.PatchModelRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.PatchModelRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.PatchModelRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const defaultValue3 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.PatchModelRequest',
-        ['modelId']
+        ['modelId'],
       );
       request.modelId = defaultValue3;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&dataset_id=${defaultValue2 ?? ''}&model_id=${defaultValue3 ?? ''}`;
       const expectedResponse = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.Model()
+        new protos.google.cloud.bigquery.v2.Model(),
       );
       client.innerApiCalls.patchModel =
         stubSimpleCallWithCallback(expectedResponse);
@@ -564,14 +576,14 @@ describe('v2.ModelServiceClient', () => {
           request,
           (
             err?: Error | null,
-            result?: protos.google.cloud.bigquery.v2.IModel | null
+            result?: protos.google.cloud.bigquery.v2.IModel | null,
           ) => {
             if (err) {
               reject(err);
             } else {
               resolve(result);
             }
-          }
+          },
         );
       });
       const response = await promise;
@@ -593,28 +605,28 @@ describe('v2.ModelServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.PatchModelRequest()
+        new protos.google.cloud.bigquery.v2.PatchModelRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.PatchModelRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.PatchModelRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const defaultValue3 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.PatchModelRequest',
-        ['modelId']
+        ['modelId'],
       );
       request.modelId = defaultValue3;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&dataset_id=${defaultValue2 ?? ''}&model_id=${defaultValue3 ?? ''}`;
       const expectedError = new Error('expected');
       client.innerApiCalls.patchModel = stubSimpleCall(
         undefined,
-        expectedError
+        expectedError,
       );
       await assert.rejects(client.patchModel(request), expectedError);
       const actualRequest = (
@@ -634,25 +646,27 @@ describe('v2.ModelServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.PatchModelRequest()
+        new protos.google.cloud.bigquery.v2.PatchModelRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.PatchModelRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.PatchModelRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const defaultValue3 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.PatchModelRequest',
-        ['modelId']
+        ['modelId'],
       );
       request.modelId = defaultValue3;
       const expectedError = new Error('The client has already been closed.');
-      client.close();
+      client.close().catch(err => {
+        throw err;
+      });
       await assert.rejects(client.patchModel(request), expectedError);
     });
   });
@@ -665,26 +679,26 @@ describe('v2.ModelServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.DeleteModelRequest()
+        new protos.google.cloud.bigquery.v2.DeleteModelRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.DeleteModelRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.DeleteModelRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const defaultValue3 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.DeleteModelRequest',
-        ['modelId']
+        ['modelId'],
       );
       request.modelId = defaultValue3;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&dataset_id=${defaultValue2 ?? ''}&model_id=${defaultValue3 ?? ''}`;
       const expectedResponse = generateSampleMessage(
-        new protos.google.protobuf.Empty()
+        new protos.google.protobuf.Empty(),
       );
       client.innerApiCalls.deleteModel = stubSimpleCall(expectedResponse);
       const [response] = await client.deleteModel(request);
@@ -706,26 +720,26 @@ describe('v2.ModelServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.DeleteModelRequest()
+        new protos.google.cloud.bigquery.v2.DeleteModelRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.DeleteModelRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.DeleteModelRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const defaultValue3 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.DeleteModelRequest',
-        ['modelId']
+        ['modelId'],
       );
       request.modelId = defaultValue3;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&dataset_id=${defaultValue2 ?? ''}&model_id=${defaultValue3 ?? ''}`;
       const expectedResponse = generateSampleMessage(
-        new protos.google.protobuf.Empty()
+        new protos.google.protobuf.Empty(),
       );
       client.innerApiCalls.deleteModel =
         stubSimpleCallWithCallback(expectedResponse);
@@ -734,14 +748,14 @@ describe('v2.ModelServiceClient', () => {
           request,
           (
             err?: Error | null,
-            result?: protos.google.protobuf.IEmpty | null
+            result?: protos.google.protobuf.IEmpty | null,
           ) => {
             if (err) {
               reject(err);
             } else {
               resolve(result);
             }
-          }
+          },
         );
       });
       const response = await promise;
@@ -763,28 +777,28 @@ describe('v2.ModelServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.DeleteModelRequest()
+        new protos.google.cloud.bigquery.v2.DeleteModelRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.DeleteModelRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.DeleteModelRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const defaultValue3 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.DeleteModelRequest',
-        ['modelId']
+        ['modelId'],
       );
       request.modelId = defaultValue3;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&dataset_id=${defaultValue2 ?? ''}&model_id=${defaultValue3 ?? ''}`;
       const expectedError = new Error('expected');
       client.innerApiCalls.deleteModel = stubSimpleCall(
         undefined,
-        expectedError
+        expectedError,
       );
       await assert.rejects(client.deleteModel(request), expectedError);
       const actualRequest = (
@@ -804,25 +818,27 @@ describe('v2.ModelServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.DeleteModelRequest()
+        new protos.google.cloud.bigquery.v2.DeleteModelRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.DeleteModelRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.DeleteModelRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const defaultValue3 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.DeleteModelRequest',
-        ['modelId']
+        ['modelId'],
       );
       request.modelId = defaultValue3;
       const expectedError = new Error('The client has already been closed.');
-      client.close();
+      client.close().catch(err => {
+        throw err;
+      });
       await assert.rejects(client.deleteModel(request), expectedError);
     });
   });
@@ -835,16 +851,16 @@ describe('v2.ModelServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.ListModelsRequest()
+        new protos.google.cloud.bigquery.v2.ListModelsRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.ListModelsRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.ListModelsRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&dataset_id=${defaultValue2 ?? ''}`;
@@ -873,16 +889,16 @@ describe('v2.ModelServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.ListModelsRequest()
+        new protos.google.cloud.bigquery.v2.ListModelsRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.ListModelsRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.ListModelsRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&dataset_id=${defaultValue2 ?? ''}`;
@@ -898,14 +914,14 @@ describe('v2.ModelServiceClient', () => {
           request,
           (
             err?: Error | null,
-            result?: protos.google.cloud.bigquery.v2.IModel[] | null
+            result?: protos.google.cloud.bigquery.v2.IModel[] | null,
           ) => {
             if (err) {
               reject(err);
             } else {
               resolve(result);
             }
-          }
+          },
         );
       });
       const response = await promise;
@@ -927,23 +943,23 @@ describe('v2.ModelServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.ListModelsRequest()
+        new protos.google.cloud.bigquery.v2.ListModelsRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.ListModelsRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.ListModelsRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&dataset_id=${defaultValue2 ?? ''}`;
       const expectedError = new Error('expected');
       client.innerApiCalls.listModels = stubSimpleCall(
         undefined,
-        expectedError
+        expectedError,
       );
       await assert.rejects(client.listModels(request), expectedError);
       const actualRequest = (
@@ -963,16 +979,16 @@ describe('v2.ModelServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.ListModelsRequest()
+        new protos.google.cloud.bigquery.v2.ListModelsRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.ListModelsRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.ListModelsRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&dataset_id=${defaultValue2 ?? ''}`;
@@ -1001,14 +1017,14 @@ describe('v2.ModelServiceClient', () => {
       assert(
         (client.descriptors.page.listModels.createStream as SinonStub)
           .getCall(0)
-          .calledWith(client.innerApiCalls.listModels, request)
+          .calledWith(client.innerApiCalls.listModels, request),
       );
       assert(
         (client.descriptors.page.listModels.createStream as SinonStub)
           .getCall(0)
           .args[2].otherArgs.headers[
             'x-goog-request-params'
-          ].includes(expectedHeaderRequestParams)
+          ].includes(expectedHeaderRequestParams),
       );
     });
 
@@ -1019,23 +1035,23 @@ describe('v2.ModelServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.ListModelsRequest()
+        new protos.google.cloud.bigquery.v2.ListModelsRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.ListModelsRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.ListModelsRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&dataset_id=${defaultValue2 ?? ''}`;
       const expectedError = new Error('expected');
       client.descriptors.page.listModels.createStream = stubPageStreamingCall(
         undefined,
-        expectedError
+        expectedError,
       );
       const stream = client.listModelsStream(request);
       const promise = new Promise((resolve, reject) => {
@@ -1054,14 +1070,14 @@ describe('v2.ModelServiceClient', () => {
       assert(
         (client.descriptors.page.listModels.createStream as SinonStub)
           .getCall(0)
-          .calledWith(client.innerApiCalls.listModels, request)
+          .calledWith(client.innerApiCalls.listModels, request),
       );
       assert(
         (client.descriptors.page.listModels.createStream as SinonStub)
           .getCall(0)
           .args[2].otherArgs.headers[
             'x-goog-request-params'
-          ].includes(expectedHeaderRequestParams)
+          ].includes(expectedHeaderRequestParams),
       );
     });
 
@@ -1072,16 +1088,16 @@ describe('v2.ModelServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.ListModelsRequest()
+        new protos.google.cloud.bigquery.v2.ListModelsRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.ListModelsRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.ListModelsRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&dataset_id=${defaultValue2 ?? ''}`;
@@ -1100,16 +1116,16 @@ describe('v2.ModelServiceClient', () => {
       assert.deepStrictEqual(responses, expectedResponse);
       assert.deepStrictEqual(
         (client.descriptors.page.listModels.asyncIterate as SinonStub).getCall(
-          0
+          0,
         ).args[1],
-        request
+        request,
       );
       assert(
         (client.descriptors.page.listModels.asyncIterate as SinonStub)
           .getCall(0)
           .args[2].otherArgs.headers[
             'x-goog-request-params'
-          ].includes(expectedHeaderRequestParams)
+          ].includes(expectedHeaderRequestParams),
       );
     });
 
@@ -1120,23 +1136,23 @@ describe('v2.ModelServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.ListModelsRequest()
+        new protos.google.cloud.bigquery.v2.ListModelsRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.ListModelsRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const defaultValue2 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.ListModelsRequest',
-        ['datasetId']
+        ['datasetId'],
       );
       request.datasetId = defaultValue2;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}&dataset_id=${defaultValue2 ?? ''}`;
       const expectedError = new Error('expected');
       client.descriptors.page.listModels.asyncIterate = stubAsyncIterationCall(
         undefined,
-        expectedError
+        expectedError,
       );
       const iterable = client.listModelsAsync(request);
       await assert.rejects(async () => {
@@ -1147,16 +1163,16 @@ describe('v2.ModelServiceClient', () => {
       });
       assert.deepStrictEqual(
         (client.descriptors.page.listModels.asyncIterate as SinonStub).getCall(
-          0
+          0,
         ).args[1],
-        request
+        request,
       );
       assert(
         (client.descriptors.page.listModels.asyncIterate as SinonStub)
           .getCall(0)
           .args[2].otherArgs.headers[
             'x-goog-request-params'
-          ].includes(expectedHeaderRequestParams)
+          ].includes(expectedHeaderRequestParams),
       );
     });
   });

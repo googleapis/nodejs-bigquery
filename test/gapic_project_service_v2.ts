@@ -28,7 +28,7 @@ import {GoogleAuth, protobuf} from 'google-gax';
 // Dynamically loaded proto JSON is needed to get the type information
 // to fill in default values for request objects
 const root = protobuf.Root.fromJSON(
-  require('../protos/protos.json')
+  require('../protos/protos.json'),
 ).resolveAll();
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -45,7 +45,7 @@ function generateSampleMessage<T extends object>(instance: T) {
     instance.constructor as typeof protobuf.Message
   ).toObject(instance as protobuf.Message<T>, {defaults: true});
   return (instance.constructor as typeof protobuf.Message).fromObject(
-    filledObject
+    filledObject,
   ) as T;
 }
 
@@ -57,7 +57,7 @@ function stubSimpleCall<ResponseType>(response?: ResponseType, error?: Error) {
 
 function stubSimpleCallWithCallback<ResponseType>(
   response?: ResponseType,
-  error?: Error
+  error?: Error,
 ) {
   return error
     ? sinon.stub().callsArgWith(2, error)
@@ -206,9 +206,14 @@ describe('v2.ProjectServiceClient', () => {
         throw err;
       });
       assert(client.projectServiceStub);
-      client.close().then(() => {
-        done();
-      });
+      client
+        .close()
+        .then(() => {
+          done();
+        })
+        .catch(err => {
+          throw err;
+        });
     });
 
     it('has close method for the non-initialized client', done => {
@@ -217,9 +222,14 @@ describe('v2.ProjectServiceClient', () => {
         projectId: 'bogus',
       });
       assert.strictEqual(client.projectServiceStub, undefined);
-      client.close().then(() => {
-        done();
-      });
+      client
+        .close()
+        .then(() => {
+          done();
+        })
+        .catch(err => {
+          throw err;
+        });
     });
 
     it('has getProjectId method', async () => {
@@ -265,16 +275,16 @@ describe('v2.ProjectServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.GetServiceAccountRequest()
+        new protos.google.cloud.bigquery.v2.GetServiceAccountRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetServiceAccountRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}`;
       const expectedResponse = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.GetServiceAccountResponse()
+        new protos.google.cloud.bigquery.v2.GetServiceAccountResponse(),
       );
       client.innerApiCalls.getServiceAccount = stubSimpleCall(expectedResponse);
       const [response] = await client.getServiceAccount(request);
@@ -296,16 +306,16 @@ describe('v2.ProjectServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.GetServiceAccountRequest()
+        new protos.google.cloud.bigquery.v2.GetServiceAccountRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetServiceAccountRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}`;
       const expectedResponse = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.GetServiceAccountResponse()
+        new protos.google.cloud.bigquery.v2.GetServiceAccountResponse(),
       );
       client.innerApiCalls.getServiceAccount =
         stubSimpleCallWithCallback(expectedResponse);
@@ -314,14 +324,14 @@ describe('v2.ProjectServiceClient', () => {
           request,
           (
             err?: Error | null,
-            result?: protos.google.cloud.bigquery.v2.IGetServiceAccountResponse | null
+            result?: protos.google.cloud.bigquery.v2.IGetServiceAccountResponse | null,
           ) => {
             if (err) {
               reject(err);
             } else {
               resolve(result);
             }
-          }
+          },
         );
       });
       const response = await promise;
@@ -343,18 +353,18 @@ describe('v2.ProjectServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.GetServiceAccountRequest()
+        new protos.google.cloud.bigquery.v2.GetServiceAccountRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetServiceAccountRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const expectedHeaderRequestParams = `project_id=${defaultValue1 ?? ''}`;
       const expectedError = new Error('expected');
       client.innerApiCalls.getServiceAccount = stubSimpleCall(
         undefined,
-        expectedError
+        expectedError,
       );
       await assert.rejects(client.getServiceAccount(request), expectedError);
       const actualRequest = (
@@ -374,15 +384,17 @@ describe('v2.ProjectServiceClient', () => {
       });
       await client.initialize();
       const request = generateSampleMessage(
-        new protos.google.cloud.bigquery.v2.GetServiceAccountRequest()
+        new protos.google.cloud.bigquery.v2.GetServiceAccountRequest(),
       );
       const defaultValue1 = getTypeDefaultValue(
         '.google.cloud.bigquery.v2.GetServiceAccountRequest',
-        ['projectId']
+        ['projectId'],
       );
       request.projectId = defaultValue1;
       const expectedError = new Error('The client has already been closed.');
-      client.close();
+      client.close().catch(err => {
+        throw err;
+      });
       await assert.rejects(client.getServiceAccount(request), expectedError);
     });
   });

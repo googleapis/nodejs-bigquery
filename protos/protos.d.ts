@@ -1620,6 +1620,9 @@ export namespace google {
                     /** UpdateOrPatchDatasetRequest dataset */
                     dataset?: (google.cloud.bigquery.v2.IDataset|null);
 
+                    /** UpdateOrPatchDatasetRequest updateMode */
+                    updateMode?: (google.cloud.bigquery.v2.UpdateOrPatchDatasetRequest.UpdateMode|keyof typeof google.cloud.bigquery.v2.UpdateOrPatchDatasetRequest.UpdateMode|null);
+
                     /** UpdateOrPatchDatasetRequest accessPolicyVersion */
                     accessPolicyVersion?: (number|null);
                 }
@@ -1641,6 +1644,9 @@ export namespace google {
 
                     /** UpdateOrPatchDatasetRequest dataset. */
                     public dataset?: (google.cloud.bigquery.v2.IDataset|null);
+
+                    /** UpdateOrPatchDatasetRequest updateMode. */
+                    public updateMode: (google.cloud.bigquery.v2.UpdateOrPatchDatasetRequest.UpdateMode|keyof typeof google.cloud.bigquery.v2.UpdateOrPatchDatasetRequest.UpdateMode);
 
                     /** UpdateOrPatchDatasetRequest accessPolicyVersion. */
                     public accessPolicyVersion: number;
@@ -1721,6 +1727,17 @@ export namespace google {
                      * @returns The default type url
                      */
                     public static getTypeUrl(typeUrlPrefix?: string): string;
+                }
+
+                namespace UpdateOrPatchDatasetRequest {
+
+                    /** UpdateMode enum. */
+                    enum UpdateMode {
+                        UPDATE_MODE_UNSPECIFIED = 0,
+                        UPDATE_METADATA = 1,
+                        UPDATE_ACL = 2,
+                        UPDATE_FULL = 3
+                    }
                 }
 
                 /** Properties of a DeleteDatasetRequest. */
@@ -1973,6 +1990,9 @@ export namespace google {
 
                     /** ListFormatDataset location */
                     location?: (string|null);
+
+                    /** ListFormatDataset externalDatasetReference */
+                    externalDatasetReference?: (google.cloud.bigquery.v2.IExternalDatasetReference|null);
                 }
 
                 /** Represents a ListFormatDataset. */
@@ -2001,6 +2021,9 @@ export namespace google {
 
                     /** ListFormatDataset location. */
                     public location: string;
+
+                    /** ListFormatDataset externalDatasetReference. */
+                    public externalDatasetReference?: (google.cloud.bigquery.v2.IExternalDatasetReference|null);
 
                     /**
                      * Creates a new ListFormatDataset instance using the specified properties.
@@ -11403,6 +11426,9 @@ export namespace google {
                     /** QueryTimelineSample activeUnits */
                     activeUnits?: (google.protobuf.IInt64Value|null);
 
+                    /** QueryTimelineSample shuffleRamUsageRatio */
+                    shuffleRamUsageRatio?: (google.protobuf.IDoubleValue|null);
+
                     /** QueryTimelineSample estimatedRunnableUnits */
                     estimatedRunnableUnits?: (google.protobuf.IInt64Value|null);
                 }
@@ -11430,6 +11456,9 @@ export namespace google {
 
                     /** QueryTimelineSample activeUnits. */
                     public activeUnits?: (google.protobuf.IInt64Value|null);
+
+                    /** QueryTimelineSample shuffleRamUsageRatio. */
+                    public shuffleRamUsageRatio?: (google.protobuf.IDoubleValue|null);
 
                     /** QueryTimelineSample estimatedRunnableUnits. */
                     public estimatedRunnableUnits?: (google.protobuf.IInt64Value|null);
@@ -35412,7 +35441,7 @@ export namespace google {
             doubleValue?: (number|null);
 
             /** UninterpretedOption stringValue */
-            stringValue?: (Uint8Array|string|null);
+            stringValue?: (Uint8Array|Buffer|string|null);
 
             /** UninterpretedOption aggregateValue */
             aggregateValue?: (string|null);
@@ -35443,7 +35472,7 @@ export namespace google {
             public doubleValue: number;
 
             /** UninterpretedOption stringValue. */
-            public stringValue: (Uint8Array|string);
+            public stringValue: (Uint8Array|Buffer|string);
 
             /** UninterpretedOption aggregateValue. */
             public aggregateValue: string;
@@ -37355,7 +37384,7 @@ export namespace google {
         interface IBytesValue {
 
             /** BytesValue value */
-            value?: (Uint8Array|string|null);
+            value?: (Uint8Array|Buffer|string|null);
         }
 
         /** Represents a BytesValue. */
@@ -37368,7 +37397,7 @@ export namespace google {
             constructor(properties?: google.protobuf.IBytesValue);
 
             /** BytesValue value. */
-            public value: (Uint8Array|string);
+            public value: (Uint8Array|Buffer|string);
 
             /**
              * Creates a new BytesValue instance using the specified properties.

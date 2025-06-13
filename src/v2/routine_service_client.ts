@@ -108,7 +108,7 @@ export class RoutineServiceClient {
    */
   constructor(
     opts?: ClientOptions,
-    gaxInstance?: typeof gax | typeof gax.fallback
+    gaxInstance?: typeof gax | typeof gax.fallback,
   ) {
     // Ensure that options include all the required fields.
     const staticMembers = this.constructor as typeof RoutineServiceClient;
@@ -118,7 +118,7 @@ export class RoutineServiceClient {
       opts?.universe_domain !== opts?.universeDomain
     ) {
       throw new Error(
-        'Please set either universe_domain or universeDomain, but not both.'
+        'Please set either universe_domain or universeDomain, but not both.',
       );
     }
     const universeDomainEnvVar =
@@ -210,7 +210,7 @@ export class RoutineServiceClient {
       listRoutines: new this._gaxModule.PageDescriptor(
         'pageToken',
         'nextPageToken',
-        'routines'
+        'routines',
       ),
     };
 
@@ -219,7 +219,7 @@ export class RoutineServiceClient {
       'google.cloud.bigquery.v2.RoutineService',
       gapicConfig as gax.ClientConfig,
       opts.clientConfig || {},
-      {'x-goog-api-client': clientHeader.join(' ')}
+      {'x-goog-api-client': clientHeader.join(' ')},
     );
 
     // Set up a dictionary of "inner API calls"; the core implementation
@@ -253,12 +253,12 @@ export class RoutineServiceClient {
     this.routineServiceStub = this._gaxGrpc.createStub(
       this._opts.fallback
         ? (this._protos as protobuf.Root).lookupService(
-            'google.cloud.bigquery.v2.RoutineService'
+            'google.cloud.bigquery.v2.RoutineService',
           )
         : // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (this._protos as any).google.cloud.bigquery.v2.RoutineService,
       this._opts,
-      this._providedCustomServicePath
+      this._providedCustomServicePath,
     ) as Promise<{[method: string]: Function}>;
 
     // Iterate over each of the methods that the service provides
@@ -283,7 +283,7 @@ export class RoutineServiceClient {
           },
         (err: Error | null | undefined) => () => {
           throw err;
-        }
+        },
       );
 
       const descriptor = this.descriptors.page[methodName] || undefined;
@@ -291,7 +291,7 @@ export class RoutineServiceClient {
         callPromise,
         this._defaults[methodName],
         descriptor,
-        this._opts.fallback
+        this._opts.fallback,
       );
 
       this.innerApiCalls[methodName] = apiCall;
@@ -312,7 +312,7 @@ export class RoutineServiceClient {
     ) {
       process.emitWarning(
         'Static servicePath is deprecated, please use the instance method instead.',
-        'DeprecationWarning'
+        'DeprecationWarning',
       );
     }
     return 'bigquery.googleapis.com';
@@ -330,7 +330,7 @@ export class RoutineServiceClient {
     ) {
       process.emitWarning(
         'Static apiEndpoint is deprecated, please use the instance method instead.',
-        'DeprecationWarning'
+        'DeprecationWarning',
       );
     }
     return 'bigquery.googleapis.com';
@@ -376,7 +376,7 @@ export class RoutineServiceClient {
    * @returns {Promise} A promise that resolves to string containing the project ID.
    */
   getProjectId(
-    callback?: Callback<string, undefined, undefined>
+    callback?: Callback<string, undefined, undefined>,
   ): Promise<string> | void {
     if (callback) {
       this.auth.getProjectId(callback);
@@ -410,7 +410,7 @@ export class RoutineServiceClient {
    */
   getRoutine(
     request?: protos.google.cloud.bigquery.v2.IGetRoutineRequest,
-    options?: CallOptions
+    options?: CallOptions,
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IRoutine,
@@ -425,7 +425,7 @@ export class RoutineServiceClient {
       protos.google.cloud.bigquery.v2.IRoutine,
       protos.google.cloud.bigquery.v2.IGetRoutineRequest | null | undefined,
       {} | null | undefined
-    >
+    >,
   ): void;
   getRoutine(
     request: protos.google.cloud.bigquery.v2.IGetRoutineRequest,
@@ -433,7 +433,7 @@ export class RoutineServiceClient {
       protos.google.cloud.bigquery.v2.IRoutine,
       protos.google.cloud.bigquery.v2.IGetRoutineRequest | null | undefined,
       {} | null | undefined
-    >
+    >,
   ): void;
   getRoutine(
     request?: protos.google.cloud.bigquery.v2.IGetRoutineRequest,
@@ -448,7 +448,7 @@ export class RoutineServiceClient {
       protos.google.cloud.bigquery.v2.IRoutine,
       protos.google.cloud.bigquery.v2.IGetRoutineRequest | null | undefined,
       {} | null | undefined
-    >
+    >,
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IRoutine,
@@ -499,7 +499,7 @@ export class RoutineServiceClient {
         ]) => {
           this._log.info('getRoutine response %j', response);
           return [response, options, rawResponse];
-        }
+        },
       );
   }
   /**
@@ -524,7 +524,7 @@ export class RoutineServiceClient {
    */
   insertRoutine(
     request?: protos.google.cloud.bigquery.v2.IInsertRoutineRequest,
-    options?: CallOptions
+    options?: CallOptions,
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IRoutine,
@@ -539,7 +539,7 @@ export class RoutineServiceClient {
       protos.google.cloud.bigquery.v2.IRoutine,
       protos.google.cloud.bigquery.v2.IInsertRoutineRequest | null | undefined,
       {} | null | undefined
-    >
+    >,
   ): void;
   insertRoutine(
     request: protos.google.cloud.bigquery.v2.IInsertRoutineRequest,
@@ -547,7 +547,7 @@ export class RoutineServiceClient {
       protos.google.cloud.bigquery.v2.IRoutine,
       protos.google.cloud.bigquery.v2.IInsertRoutineRequest | null | undefined,
       {} | null | undefined
-    >
+    >,
   ): void;
   insertRoutine(
     request?: protos.google.cloud.bigquery.v2.IInsertRoutineRequest,
@@ -564,7 +564,7 @@ export class RoutineServiceClient {
       protos.google.cloud.bigquery.v2.IRoutine,
       protos.google.cloud.bigquery.v2.IInsertRoutineRequest | null | undefined,
       {} | null | undefined
-    >
+    >,
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IRoutine,
@@ -616,7 +616,7 @@ export class RoutineServiceClient {
         ]) => {
           this._log.info('insertRoutine response %j', response);
           return [response, options, rawResponse];
-        }
+        },
       );
   }
   /**
@@ -644,7 +644,7 @@ export class RoutineServiceClient {
    */
   updateRoutine(
     request?: protos.google.cloud.bigquery.v2.IUpdateRoutineRequest,
-    options?: CallOptions
+    options?: CallOptions,
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IRoutine,
@@ -659,7 +659,7 @@ export class RoutineServiceClient {
       protos.google.cloud.bigquery.v2.IRoutine,
       protos.google.cloud.bigquery.v2.IUpdateRoutineRequest | null | undefined,
       {} | null | undefined
-    >
+    >,
   ): void;
   updateRoutine(
     request: protos.google.cloud.bigquery.v2.IUpdateRoutineRequest,
@@ -667,7 +667,7 @@ export class RoutineServiceClient {
       protos.google.cloud.bigquery.v2.IRoutine,
       protos.google.cloud.bigquery.v2.IUpdateRoutineRequest | null | undefined,
       {} | null | undefined
-    >
+    >,
   ): void;
   updateRoutine(
     request?: protos.google.cloud.bigquery.v2.IUpdateRoutineRequest,
@@ -684,7 +684,7 @@ export class RoutineServiceClient {
       protos.google.cloud.bigquery.v2.IRoutine,
       protos.google.cloud.bigquery.v2.IUpdateRoutineRequest | null | undefined,
       {} | null | undefined
-    >
+    >,
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IRoutine,
@@ -737,7 +737,7 @@ export class RoutineServiceClient {
         ]) => {
           this._log.info('updateRoutine response %j', response);
           return [response, options, rawResponse];
-        }
+        },
       );
   }
   /**
@@ -770,7 +770,7 @@ export class RoutineServiceClient {
    */
   patchRoutine(
     request?: protos.google.cloud.bigquery.v2.IPatchRoutineRequest,
-    options?: CallOptions
+    options?: CallOptions,
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IRoutine,
@@ -785,7 +785,7 @@ export class RoutineServiceClient {
       protos.google.cloud.bigquery.v2.IRoutine,
       protos.google.cloud.bigquery.v2.IPatchRoutineRequest | null | undefined,
       {} | null | undefined
-    >
+    >,
   ): void;
   patchRoutine(
     request: protos.google.cloud.bigquery.v2.IPatchRoutineRequest,
@@ -793,7 +793,7 @@ export class RoutineServiceClient {
       protos.google.cloud.bigquery.v2.IRoutine,
       protos.google.cloud.bigquery.v2.IPatchRoutineRequest | null | undefined,
       {} | null | undefined
-    >
+    >,
   ): void;
   patchRoutine(
     request?: protos.google.cloud.bigquery.v2.IPatchRoutineRequest,
@@ -810,7 +810,7 @@ export class RoutineServiceClient {
       protos.google.cloud.bigquery.v2.IRoutine,
       protos.google.cloud.bigquery.v2.IPatchRoutineRequest | null | undefined,
       {} | null | undefined
-    >
+    >,
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IRoutine,
@@ -857,7 +857,7 @@ export class RoutineServiceClient {
         ]) => {
           this._log.info('patchRoutine response %j', response);
           return [response, options, rawResponse];
-        }
+        },
       );
   }
   /**
@@ -882,7 +882,7 @@ export class RoutineServiceClient {
    */
   deleteRoutine(
     request?: protos.google.cloud.bigquery.v2.IDeleteRoutineRequest,
-    options?: CallOptions
+    options?: CallOptions,
   ): Promise<
     [
       protos.google.protobuf.IEmpty,
@@ -897,7 +897,7 @@ export class RoutineServiceClient {
       protos.google.protobuf.IEmpty,
       protos.google.cloud.bigquery.v2.IDeleteRoutineRequest | null | undefined,
       {} | null | undefined
-    >
+    >,
   ): void;
   deleteRoutine(
     request: protos.google.cloud.bigquery.v2.IDeleteRoutineRequest,
@@ -905,7 +905,7 @@ export class RoutineServiceClient {
       protos.google.protobuf.IEmpty,
       protos.google.cloud.bigquery.v2.IDeleteRoutineRequest | null | undefined,
       {} | null | undefined
-    >
+    >,
   ): void;
   deleteRoutine(
     request?: protos.google.cloud.bigquery.v2.IDeleteRoutineRequest,
@@ -922,7 +922,7 @@ export class RoutineServiceClient {
       protos.google.protobuf.IEmpty,
       protos.google.cloud.bigquery.v2.IDeleteRoutineRequest | null | undefined,
       {} | null | undefined
-    >
+    >,
   ): Promise<
     [
       protos.google.protobuf.IEmpty,
@@ -975,7 +975,7 @@ export class RoutineServiceClient {
         ]) => {
           this._log.info('deleteRoutine response %j', response);
           return [response, options, rawResponse];
-        }
+        },
       );
   }
 
@@ -1013,7 +1013,7 @@ export class RoutineServiceClient {
    */
   listRoutines(
     request?: protos.google.cloud.bigquery.v2.IListRoutinesRequest,
-    options?: CallOptions
+    options?: CallOptions,
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IRoutine[],
@@ -1028,7 +1028,7 @@ export class RoutineServiceClient {
       protos.google.cloud.bigquery.v2.IListRoutinesRequest,
       protos.google.cloud.bigquery.v2.IListRoutinesResponse | null | undefined,
       protos.google.cloud.bigquery.v2.IRoutine
-    >
+    >,
   ): void;
   listRoutines(
     request: protos.google.cloud.bigquery.v2.IListRoutinesRequest,
@@ -1036,7 +1036,7 @@ export class RoutineServiceClient {
       protos.google.cloud.bigquery.v2.IListRoutinesRequest,
       protos.google.cloud.bigquery.v2.IListRoutinesResponse | null | undefined,
       protos.google.cloud.bigquery.v2.IRoutine
-    >
+    >,
   ): void;
   listRoutines(
     request?: protos.google.cloud.bigquery.v2.IListRoutinesRequest,
@@ -1053,7 +1053,7 @@ export class RoutineServiceClient {
       protos.google.cloud.bigquery.v2.IListRoutinesRequest,
       protos.google.cloud.bigquery.v2.IListRoutinesResponse | null | undefined,
       protos.google.cloud.bigquery.v2.IRoutine
-    >
+    >,
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IRoutine[],
@@ -1110,7 +1110,7 @@ export class RoutineServiceClient {
         ]) => {
           this._log.info('listRoutines values %j', response);
           return [response, input, output];
-        }
+        },
       );
   }
 
@@ -1145,7 +1145,7 @@ export class RoutineServiceClient {
    */
   listRoutinesStream(
     request?: protos.google.cloud.bigquery.v2.IListRoutinesRequest,
-    options?: CallOptions
+    options?: CallOptions,
   ): Transform {
     request = request || {};
     options = options || {};
@@ -1165,7 +1165,7 @@ export class RoutineServiceClient {
     return this.descriptors.page.listRoutines.createStream(
       this.innerApiCalls.listRoutines as GaxCall,
       request,
-      callSettings
+      callSettings,
     );
   }
 
@@ -1203,7 +1203,7 @@ export class RoutineServiceClient {
    */
   listRoutinesAsync(
     request?: protos.google.cloud.bigquery.v2.IListRoutinesRequest,
-    options?: CallOptions
+    options?: CallOptions,
   ): AsyncIterable<protos.google.cloud.bigquery.v2.IRoutine> {
     request = request || {};
     options = options || {};
@@ -1223,7 +1223,7 @@ export class RoutineServiceClient {
     return this.descriptors.page.listRoutines.asyncIterate(
       this.innerApiCalls['listRoutines'] as GaxCall,
       request as {},
-      callSettings
+      callSettings,
     ) as AsyncIterable<protos.google.cloud.bigquery.v2.IRoutine>;
   }
 

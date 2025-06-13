@@ -109,7 +109,7 @@ export class TableServiceClient {
    */
   constructor(
     opts?: ClientOptions,
-    gaxInstance?: typeof gax | typeof gax.fallback
+    gaxInstance?: typeof gax | typeof gax.fallback,
   ) {
     // Ensure that options include all the required fields.
     const staticMembers = this.constructor as typeof TableServiceClient;
@@ -119,7 +119,7 @@ export class TableServiceClient {
       opts?.universe_domain !== opts?.universeDomain
     ) {
       throw new Error(
-        'Please set either universe_domain or universeDomain, but not both.'
+        'Please set either universe_domain or universeDomain, but not both.',
       );
     }
     const universeDomainEnvVar =
@@ -211,7 +211,7 @@ export class TableServiceClient {
       listTables: new this._gaxModule.PageDescriptor(
         'pageToken',
         'nextPageToken',
-        'tables'
+        'tables',
       ),
     };
 
@@ -220,7 +220,7 @@ export class TableServiceClient {
       'google.cloud.bigquery.v2.TableService',
       gapicConfig as gax.ClientConfig,
       opts.clientConfig || {},
-      {'x-goog-api-client': clientHeader.join(' ')}
+      {'x-goog-api-client': clientHeader.join(' ')},
     );
 
     // Set up a dictionary of "inner API calls"; the core implementation
@@ -254,12 +254,12 @@ export class TableServiceClient {
     this.tableServiceStub = this._gaxGrpc.createStub(
       this._opts.fallback
         ? (this._protos as protobuf.Root).lookupService(
-            'google.cloud.bigquery.v2.TableService'
+            'google.cloud.bigquery.v2.TableService',
           )
         : // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (this._protos as any).google.cloud.bigquery.v2.TableService,
       this._opts,
-      this._providedCustomServicePath
+      this._providedCustomServicePath,
     ) as Promise<{[method: string]: Function}>;
 
     // Iterate over each of the methods that the service provides
@@ -284,7 +284,7 @@ export class TableServiceClient {
           },
         (err: Error | null | undefined) => () => {
           throw err;
-        }
+        },
       );
 
       const descriptor = this.descriptors.page[methodName] || undefined;
@@ -292,7 +292,7 @@ export class TableServiceClient {
         callPromise,
         this._defaults[methodName],
         descriptor,
-        this._opts.fallback
+        this._opts.fallback,
       );
 
       this.innerApiCalls[methodName] = apiCall;
@@ -313,7 +313,7 @@ export class TableServiceClient {
     ) {
       process.emitWarning(
         'Static servicePath is deprecated, please use the instance method instead.',
-        'DeprecationWarning'
+        'DeprecationWarning',
       );
     }
     return 'bigquery.googleapis.com';
@@ -331,7 +331,7 @@ export class TableServiceClient {
     ) {
       process.emitWarning(
         'Static apiEndpoint is deprecated, please use the instance method instead.',
-        'DeprecationWarning'
+        'DeprecationWarning',
       );
     }
     return 'bigquery.googleapis.com';
@@ -377,7 +377,7 @@ export class TableServiceClient {
    * @returns {Promise} A promise that resolves to string containing the project ID.
    */
   getProjectId(
-    callback?: Callback<string, undefined, undefined>
+    callback?: Callback<string, undefined, undefined>,
   ): Promise<string> | void {
     if (callback) {
       this.auth.getProjectId(callback);
@@ -424,7 +424,7 @@ export class TableServiceClient {
    */
   getTable(
     request?: protos.google.cloud.bigquery.v2.IGetTableRequest,
-    options?: CallOptions
+    options?: CallOptions,
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.ITable,
@@ -439,7 +439,7 @@ export class TableServiceClient {
       protos.google.cloud.bigquery.v2.ITable,
       protos.google.cloud.bigquery.v2.IGetTableRequest | null | undefined,
       {} | null | undefined
-    >
+    >,
   ): void;
   getTable(
     request: protos.google.cloud.bigquery.v2.IGetTableRequest,
@@ -447,7 +447,7 @@ export class TableServiceClient {
       protos.google.cloud.bigquery.v2.ITable,
       protos.google.cloud.bigquery.v2.IGetTableRequest | null | undefined,
       {} | null | undefined
-    >
+    >,
   ): void;
   getTable(
     request?: protos.google.cloud.bigquery.v2.IGetTableRequest,
@@ -462,7 +462,7 @@ export class TableServiceClient {
       protos.google.cloud.bigquery.v2.ITable,
       protos.google.cloud.bigquery.v2.IGetTableRequest | null | undefined,
       {} | null | undefined
-    >
+    >,
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.ITable,
@@ -513,7 +513,7 @@ export class TableServiceClient {
         ]) => {
           this._log.info('getTable response %j', response);
           return [response, options, rawResponse];
-        }
+        },
       );
   }
   /**
@@ -538,7 +538,7 @@ export class TableServiceClient {
    */
   insertTable(
     request?: protos.google.cloud.bigquery.v2.IInsertTableRequest,
-    options?: CallOptions
+    options?: CallOptions,
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.ITable,
@@ -553,7 +553,7 @@ export class TableServiceClient {
       protos.google.cloud.bigquery.v2.ITable,
       protos.google.cloud.bigquery.v2.IInsertTableRequest | null | undefined,
       {} | null | undefined
-    >
+    >,
   ): void;
   insertTable(
     request: protos.google.cloud.bigquery.v2.IInsertTableRequest,
@@ -561,7 +561,7 @@ export class TableServiceClient {
       protos.google.cloud.bigquery.v2.ITable,
       protos.google.cloud.bigquery.v2.IInsertTableRequest | null | undefined,
       {} | null | undefined
-    >
+    >,
   ): void;
   insertTable(
     request?: protos.google.cloud.bigquery.v2.IInsertTableRequest,
@@ -578,7 +578,7 @@ export class TableServiceClient {
       protos.google.cloud.bigquery.v2.ITable,
       protos.google.cloud.bigquery.v2.IInsertTableRequest | null | undefined,
       {} | null | undefined
-    >
+    >,
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.ITable,
@@ -630,7 +630,7 @@ export class TableServiceClient {
         ]) => {
           this._log.info('insertTable response %j', response);
           return [response, options, rawResponse];
-        }
+        },
       );
   }
   /**
@@ -662,7 +662,7 @@ export class TableServiceClient {
    */
   patchTable(
     request?: protos.google.cloud.bigquery.v2.IUpdateOrPatchTableRequest,
-    options?: CallOptions
+    options?: CallOptions,
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.ITable,
@@ -679,7 +679,7 @@ export class TableServiceClient {
       | null
       | undefined,
       {} | null | undefined
-    >
+    >,
   ): void;
   patchTable(
     request: protos.google.cloud.bigquery.v2.IUpdateOrPatchTableRequest,
@@ -689,7 +689,7 @@ export class TableServiceClient {
       | null
       | undefined,
       {} | null | undefined
-    >
+    >,
   ): void;
   patchTable(
     request?: protos.google.cloud.bigquery.v2.IUpdateOrPatchTableRequest,
@@ -708,7 +708,7 @@ export class TableServiceClient {
       | null
       | undefined,
       {} | null | undefined
-    >
+    >,
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.ITable,
@@ -764,7 +764,7 @@ export class TableServiceClient {
         ]) => {
           this._log.info('patchTable response %j', response);
           return [response, options, rawResponse];
-        }
+        },
       );
   }
   /**
@@ -795,7 +795,7 @@ export class TableServiceClient {
    */
   updateTable(
     request?: protos.google.cloud.bigquery.v2.IUpdateOrPatchTableRequest,
-    options?: CallOptions
+    options?: CallOptions,
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.ITable,
@@ -812,7 +812,7 @@ export class TableServiceClient {
       | null
       | undefined,
       {} | null | undefined
-    >
+    >,
   ): void;
   updateTable(
     request: protos.google.cloud.bigquery.v2.IUpdateOrPatchTableRequest,
@@ -822,7 +822,7 @@ export class TableServiceClient {
       | null
       | undefined,
       {} | null | undefined
-    >
+    >,
   ): void;
   updateTable(
     request?: protos.google.cloud.bigquery.v2.IUpdateOrPatchTableRequest,
@@ -841,7 +841,7 @@ export class TableServiceClient {
       | null
       | undefined,
       {} | null | undefined
-    >
+    >,
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.ITable,
@@ -897,7 +897,7 @@ export class TableServiceClient {
         ]) => {
           this._log.info('updateTable response %j', response);
           return [response, options, rawResponse];
-        }
+        },
       );
   }
   /**
@@ -923,7 +923,7 @@ export class TableServiceClient {
    */
   deleteTable(
     request?: protos.google.cloud.bigquery.v2.IDeleteTableRequest,
-    options?: CallOptions
+    options?: CallOptions,
   ): Promise<
     [
       protos.google.protobuf.IEmpty,
@@ -938,7 +938,7 @@ export class TableServiceClient {
       protos.google.protobuf.IEmpty,
       protos.google.cloud.bigquery.v2.IDeleteTableRequest | null | undefined,
       {} | null | undefined
-    >
+    >,
   ): void;
   deleteTable(
     request: protos.google.cloud.bigquery.v2.IDeleteTableRequest,
@@ -946,7 +946,7 @@ export class TableServiceClient {
       protos.google.protobuf.IEmpty,
       protos.google.cloud.bigquery.v2.IDeleteTableRequest | null | undefined,
       {} | null | undefined
-    >
+    >,
   ): void;
   deleteTable(
     request?: protos.google.cloud.bigquery.v2.IDeleteTableRequest,
@@ -963,7 +963,7 @@ export class TableServiceClient {
       protos.google.protobuf.IEmpty,
       protos.google.cloud.bigquery.v2.IDeleteTableRequest | null | undefined,
       {} | null | undefined
-    >
+    >,
   ): Promise<
     [
       protos.google.protobuf.IEmpty,
@@ -1016,7 +1016,7 @@ export class TableServiceClient {
         ]) => {
           this._log.info('deleteTable response %j', response);
           return [response, options, rawResponse];
-        }
+        },
       );
   }
 
@@ -1050,7 +1050,7 @@ export class TableServiceClient {
    */
   listTables(
     request?: protos.google.cloud.bigquery.v2.IListTablesRequest,
-    options?: CallOptions
+    options?: CallOptions,
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IListFormatTable[],
@@ -1065,7 +1065,7 @@ export class TableServiceClient {
       protos.google.cloud.bigquery.v2.IListTablesRequest,
       protos.google.cloud.bigquery.v2.ITableList | null | undefined,
       protos.google.cloud.bigquery.v2.IListFormatTable
-    >
+    >,
   ): void;
   listTables(
     request: protos.google.cloud.bigquery.v2.IListTablesRequest,
@@ -1073,7 +1073,7 @@ export class TableServiceClient {
       protos.google.cloud.bigquery.v2.IListTablesRequest,
       protos.google.cloud.bigquery.v2.ITableList | null | undefined,
       protos.google.cloud.bigquery.v2.IListFormatTable
-    >
+    >,
   ): void;
   listTables(
     request?: protos.google.cloud.bigquery.v2.IListTablesRequest,
@@ -1088,7 +1088,7 @@ export class TableServiceClient {
       protos.google.cloud.bigquery.v2.IListTablesRequest,
       protos.google.cloud.bigquery.v2.ITableList | null | undefined,
       protos.google.cloud.bigquery.v2.IListFormatTable
-    >
+    >,
   ): Promise<
     [
       protos.google.cloud.bigquery.v2.IListFormatTable[],
@@ -1143,7 +1143,7 @@ export class TableServiceClient {
         ]) => {
           this._log.info('listTables values %j', response);
           return [response, input, output];
-        }
+        },
       );
   }
 
@@ -1174,7 +1174,7 @@ export class TableServiceClient {
    */
   listTablesStream(
     request?: protos.google.cloud.bigquery.v2.IListTablesRequest,
-    options?: CallOptions
+    options?: CallOptions,
   ): Transform {
     request = request || {};
     options = options || {};
@@ -1194,7 +1194,7 @@ export class TableServiceClient {
     return this.descriptors.page.listTables.createStream(
       this.innerApiCalls.listTables as GaxCall,
       request,
-      callSettings
+      callSettings,
     );
   }
 
@@ -1228,7 +1228,7 @@ export class TableServiceClient {
    */
   listTablesAsync(
     request?: protos.google.cloud.bigquery.v2.IListTablesRequest,
-    options?: CallOptions
+    options?: CallOptions,
   ): AsyncIterable<protos.google.cloud.bigquery.v2.IListFormatTable> {
     request = request || {};
     options = options || {};
@@ -1248,7 +1248,7 @@ export class TableServiceClient {
     return this.descriptors.page.listTables.asyncIterate(
       this.innerApiCalls['listTables'] as GaxCall,
       request as {},
-      callSettings
+      callSettings,
     ) as AsyncIterable<protos.google.cloud.bigquery.v2.IListFormatTable>;
   }
 

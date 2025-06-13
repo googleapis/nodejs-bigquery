@@ -73,7 +73,7 @@ function getEscapedText(name: ts.PropertyName | ts.BindingName): string {
   const nameEscapedText = name.escapedText as string;
   return nameEscapedText;
 }
-function extract(node: ts.Node, depth = 0, client): void {
+function extract(node: ts.Node, depth = 0, client: string): void {
   function getKind(node: ts.Node) {
     return ts.SyntaxKind[node.kind];
   }
@@ -101,14 +101,14 @@ function extract(node: ts.Node, depth = 0, client): void {
           // gets the text range in the file where the comment for this method is
           const commentRanges = ts.getLeadingCommentRanges(
             sourceFile.getFullText(),
-            node.getFullStart()
+            node.getFullStart(),
           );
           let docString = '';
           // concatenates all parts of the comment into a string
           if (commentRanges) {
             commentRanges.map(r => {
               docString = docString.concat(
-                sourceFile!.getFullText().slice(r.pos, r.end)
+                sourceFile!.getFullText().slice(r.pos, r.end),
               );
               if (r.hasTrailingNewLine) {
                 docString = docString.concat('\n');
@@ -134,7 +134,7 @@ function extract(node: ts.Node, depth = 0, client): void {
 
 // contains the logic to traverse each file and pull in the nodes from the AST
 // that contain elements we want to use
-function ast(file, client) {
+function ast(file: string, client: string) {
   let output = '';
   const program = ts.createProgram([file], {allowJs: true});
   sourceFile = program.getSourceFile(file)!;
@@ -231,7 +231,7 @@ function ast(file, client) {
 }
 
 // loop through the files and call the AST function on them
-function astHelper(files, clients) {
+function astHelper(files: string[], clients: string[]) {
   let output = '';
   for (const f in files) {
     foundNodes = [];
@@ -241,7 +241,7 @@ function astHelper(files, clients) {
   return output;
 }
 
-function makeImports(clients) {
+function makeImports(clients: string[]) {
   let imports = 'import {protos';
   for (const client in clients) {
     imports = imports.concat(`, ${clients[client]}`);
@@ -259,7 +259,7 @@ function makeImports(clients) {
 }
 
 // convert client types to the names we'll use for variables
-function parseClientName(client) {
+function parseClientName(client: string) {
   // without this we'd end up with rowaccesspolicyClient
 
   return client.search('RowAccessPolicy') >= 0
@@ -267,7 +267,7 @@ function parseClientName(client) {
     : client.split('ServiceClient')[0].toLowerCase() + 'Client';
 }
 
-function buildOptionTypes(clients) {
+function buildOptionTypes(clients: string[]) {
   let output = '';
   const docstring = `/**
    * Options passed to the underlying client.
@@ -318,7 +318,7 @@ function buildOptionTypes(clients) {
     let variableDecl = '';
     const clientName = parseClientName(clients[client]);
     variableDecl = variableDecl.concat(
-      `\t${clientName}?: ${clients[client]};\n`
+      `\t${clientName}?: ${clients[client]};\n`,
     );
     bigQueryOptionsType = bigQueryOptionsType.concat(variableDecl);
   }
@@ -327,7 +327,7 @@ function buildOptionTypes(clients) {
   return output;
 }
 
-function buildClientConstructor(clients) {
+function buildClientConstructor(clients: string[]) {
   let variableDecl = '';
   const comment = `\t/**
   * @param {object} [BigQueryClientOptions] - Enables user to instantiate clients separately and use those as the subclients.
@@ -339,10 +339,10 @@ function buildClientConstructor(clients) {
   for (const client in clients) {
     const clientName = parseClientName(clients[client]);
     variableDecl = variableDecl.concat(
-      `\t${clientName}: ${clients[client]};\n`
+      `\t${clientName}: ${clients[client]};\n`,
     );
     constructorInitializers = constructorInitializers.concat(
-      `\t\tthis.${clientName} = options?.${clientName} ?? new ${clients[client]}(subClientOptions?.opts, subClientOptions?.gaxInstance);\n`
+      `\t\tthis.${clientName} = options?.${clientName} ?? new ${clients[client]}(subClientOptions?.opts, subClientOptions?.gaxInstance);\n`,
     );
   }
   constructorInitializers = constructorInitializers.concat('\t}');
@@ -352,7 +352,7 @@ function buildClientConstructor(clients) {
     '\n',
     comment,
     '\n',
-    constructorInitializers
+    constructorInitializers,
   );
   return output;
 }
@@ -383,7 +383,7 @@ async function buildOutput() {
   output = output.concat('\n}');
   return prettier.format(output, {
     parser: 'typescript',
-    trailingComma: 'es5',
+    trailingComma: 'all',
     singleQuote: true,
     bracketSpacing: false,
   });
@@ -394,4 +394,5 @@ async function main() {
     if (err) throw err;
   });
 }
-main();
+
+main().catch(err => console.error(err));
