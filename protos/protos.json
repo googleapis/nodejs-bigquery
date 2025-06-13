@@ -8,7 +8,7 @@
               "nested": {
                 "v2": {
                   "options": {
-                    "go_package": "cloud.google.com/go/bigquery/apiv2/bigquerypb;bigquerypb",
+                    "go_package": "cloud.google.com/go/bigquery/v2/apiv2/bigquerypb;bigquerypb",
                     "java_multiple_files": true,
                     "java_outer_classname": "TableConstraintsProto",
                     "java_package": "com.google.cloud.bigquery.v2",
@@ -4134,6 +4134,7 @@
                             "BASE_TABLE_TOO_SMALL": 13,
                             "BASE_TABLE_TOO_LARGE": 14,
                             "ESTIMATED_PERFORMANCE_GAIN_TOO_LOW": 15,
+                            "COLUMN_METADATA_INDEX_NOT_USED": 21,
                             "NOT_SUPPORTED_IN_STANDARD_EDITION": 17,
                             "INDEX_SUPPRESSED_BY_FUNCTION_OPTION": 18,
                             "QUERY_CACHE_HIT": 19,
@@ -7650,7 +7651,7 @@
                       "values": {
                         "MANAGED_TABLE_TYPE_UNSPECIFIED": 0,
                         "NATIVE": 1,
-                        "ICEBERG": 2
+                        "BIGLAKE": 2
                       }
                     },
                     "PartitioningDefinition": {
@@ -8146,6 +8147,20 @@
                           "options": {
                             "(google.api.field_behavior)": "OPTIONAL"
                           }
+                        },
+                        "pythonOptions": {
+                          "type": "PythonOptions",
+                          "id": 20,
+                          "options": {
+                            "(google.api.field_behavior)": "OPTIONAL"
+                          }
+                        },
+                        "externalRuntimeOptions": {
+                          "type": "ExternalRuntimeOptions",
+                          "id": 21,
+                          "options": {
+                            "(google.api.field_behavior)": "OPTIONAL"
+                          }
                         }
                       },
                       "nested": {
@@ -8257,6 +8272,64 @@
                           "values": {
                             "DATA_GOVERNANCE_TYPE_UNSPECIFIED": 0,
                             "DATA_MASKING": 1
+                          }
+                        }
+                      }
+                    },
+                    "PythonOptions": {
+                      "fields": {
+                        "entryPoint": {
+                          "type": "string",
+                          "id": 1,
+                          "options": {
+                            "(google.api.field_behavior)": "REQUIRED"
+                          }
+                        },
+                        "packages": {
+                          "rule": "repeated",
+                          "type": "string",
+                          "id": 2,
+                          "options": {
+                            "(google.api.field_behavior)": "OPTIONAL"
+                          }
+                        }
+                      }
+                    },
+                    "ExternalRuntimeOptions": {
+                      "fields": {
+                        "containerMemory": {
+                          "type": "string",
+                          "id": 1,
+                          "options": {
+                            "(google.api.field_behavior)": "OPTIONAL"
+                          }
+                        },
+                        "containerCpu": {
+                          "type": "double",
+                          "id": 2,
+                          "options": {
+                            "(google.api.field_behavior)": "OPTIONAL"
+                          }
+                        },
+                        "runtimeConnection": {
+                          "type": "string",
+                          "id": 3,
+                          "options": {
+                            "(google.api.field_behavior)": "OPTIONAL"
+                          }
+                        },
+                        "maxBatchingRows": {
+                          "type": "int64",
+                          "id": 4,
+                          "options": {
+                            "(google.api.field_behavior)": "OPTIONAL"
+                          }
+                        },
+                        "runtimeVersion": {
+                          "type": "string",
+                          "id": 5,
+                          "options": {
+                            "(google.api.field_behavior)": "OPTIONAL"
                           }
                         }
                       }
