@@ -33,7 +33,6 @@ async function main(projectId, datasetId, location = 'US') {
     // Construct the dataset resource.
     const dataset = {
       datasetReference: {
-        projectId: projectId,
         datasetId: datasetId,
       },
       location: location,
@@ -47,7 +46,7 @@ async function main(projectId, datasetId, location = 'US') {
 
     try {
       // Make the API request.
-      const [response] = await bigqueryClient.datasetClient.insertDataset(request);
+      const [response] = await bigqueryClient.insertDataset(request);
       console.log(`Dataset ${response.id} created successfully.`);
     } catch (err) {
       console.error('ERROR creating dataset:', err);
