@@ -121,6 +121,7 @@ export type Query = JobRequest<bigquery.IJobConfigurationQuery> & {
   pageToken?: string;
   wrapIntegers?: boolean | IntegerTypeCastOptions;
   parseJSON?: boolean;
+  skipWrapCustomTypes?: boolean;
   // Overrides default job creation mode set on the client.
   jobCreationMode?: JobCreationMode;
 };
@@ -141,6 +142,8 @@ export type QueryParamTypes =
 export type QueryOptions = QueryResultsOptions;
 export type QueryStreamOptions = {
   wrapIntegers?: boolean | IntegerTypeCastOptions;
+  skipWrapBig?: boolean;
+  skipWrapBigQueryCustomTypes?: boolean;
   parseJSON?: boolean;
 };
 export type DatasetResource = bigquery.IDataset & {
@@ -579,7 +582,8 @@ export class BigQuery extends Service {
    *     Please see {@link IntegerTypeCastOptions} for options descriptions.
    * @param {array} options.selectedFields List of fields to return.
    * If unspecified, all fields are returned.
-   * @param {array} options.parseJSON parse a 'JSON' field into a JSON object.
+   * @param {boolean} options.parseJSON parse a 'JSON' field into a JSON object.
+   * @param {boolean} options.skipWrapCustomTypes skip converting values into BigQuery custom types.
    * @returns Fields using their matching names from the table's schema.
    */
   static mergeSchemaWithRows_(
@@ -587,6 +591,7 @@ export class BigQuery extends Service {
     rows: TableRow[],
     options: {
       wrapIntegers: boolean | IntegerTypeCastOptions;
+      skipWrapCustomTypes?: boolean;
       selectedFields?: string[];
       parseJSON?: boolean;
     },
@@ -1429,6 +1434,7 @@ export class BigQuery extends Service {
    * @param {boolean} [options.wrapIntegers] Optionally wrap INT64 in BigQueryInt
    *     or custom INT64 value type.
    * @param {boolean} [options.parseJSON] Optionally parse JSON as a JSON Object.
+   * @param {boolean} [options.skipWrapCustomTypes] Optionally skip wrapping values into BigQuery Custom Types.
    * @param {object|array} [options.params] Option to provide query prarameters.
    * @param {JobCallback} [callback] The callback function.
    * @param {?error} callback.err An error returned while making this request.
@@ -2202,6 +2208,7 @@ export class BigQuery extends Service {
         ? {
             wrapIntegers: query.wrapIntegers,
             parseJSON: query.parseJSON,
+            skipWrapCustomTypes: query.skipWrapCustomTypes,
           }
         : {};
     const callback =
@@ -2241,6 +2248,7 @@ export class BigQuery extends Service {
         if (res.schema && res.rows) {
           rows = BigQuery.mergeSchemaWithRows_(res.schema, res.rows, {
             wrapIntegers: options.wrapIntegers || false,
+            skipWrapCustomTypes: options.skipWrapCustomTypes,
             parseJSON: options.parseJSON,
           });
           delete res.rows;
@@ -2408,13 +2416,21 @@ export class BigQuery extends Service {
       return;
     }
 
-    const {location, maxResults, pageToken, wrapIntegers, parseJSON} = query;
+    const {
+      location,
+      maxResults,
+      pageToken,
+      wrapIntegers,
+      parseJSON,
+      skipWrapCustomTypes,
+    } = query;
 
     const opts = {
       location,
       maxResults,
       pageToken,
       wrapIntegers,
+      skipWrapCustomTypes,
       parseJSON,
       autoPaginate: false,
     };
@@ -2423,6 +2439,7 @@ export class BigQuery extends Service {
     delete query.maxResults;
     delete query.pageToken;
     delete query.wrapIntegers;
+    delete query.skipWrapCustomTypes;
     delete query.parseJSON;
 
     this.query(query, opts, callback);
@@ -2462,6 +2479,7 @@ function convertSchemaFieldValue(
   value: any,
   options: {
     wrapIntegers: boolean | IntegerTypeCastOptions;
+    skipWrapCustomTypes?: boolean;
     selectedFields?: string[];
     parseJSON?: boolean;
   },
@@ -2469,7 +2487,10 @@ function convertSchemaFieldValue(
   if (is.null(value)) {
     return value;
   }
-
+  let {skipWrapCustomTypes, wrapIntegers, parseJSON} = options;
+  if (skipWrapCustomTypes) {
+    wrapIntegers = false;
+  }
   switch (schemaField.type) {
     case 'BOOLEAN':
     case 'BOOL': {
@@ -2487,7 +2508,6 @@ function convertSchemaFieldValue(
     }
     case 'INTEGER':
     case 'INT64': {
-      const {wrapIntegers} = options;
       value = wrapIntegers
         ? typeof wrapIntegers === 'object'
           ? BigQuery.int(
@@ -2498,12 +2518,12 @@ function convertSchemaFieldValue(
         : Number(value);
       break;
     }
+    case 'BIGNUMERIC':
     case 'NUMERIC': {
       value = new Big(value);
-      break;
-    }
-    case 'BIGNUMERIC': {
-      value = new Big(value);
+      if (skipWrapCustomTypes) {
+        value = value.toFixed();
+      }
       break;
     }
     case 'RECORD': {
@@ -2512,36 +2532,52 @@ function convertSchemaFieldValue(
     }
     case 'DATE': {
       value = BigQuery.date(value);
+      if (skipWrapCustomTypes) {
+        value = value.value;
+      }
       break;
     }
     case 'DATETIME': {
       value = BigQuery.datetime(value);
+      if (skipWrapCustomTypes) {
+        value = value.value;
+      }
       break;
     }
     case 'TIME': {
       value = BigQuery.time(value);
+      if (skipWrapCustomTypes) {
+        value = value.value;
+      }
       break;
     }
     case 'TIMESTAMP': {
       const pd = new PreciseDate();
       pd.setFullTime(PreciseDate.parseFull(BigInt(value) * BigInt(1000)));
       value = BigQuery.timestamp(pd);
+      if (skipWrapCustomTypes) {
+        value = value.value;
+      }
       break;
     }
     case 'GEOGRAPHY': {
       value = BigQuery.geography(value);
+      if (skipWrapCustomTypes) {
+        value = value.value;
+      }
       break;
     }
     case 'JSON': {
-      const {parseJSON} = options;
       value = parseJSON ? JSON.parse(value) : value;
       break;
     }
     case 'RANGE': {
-      value = BigQueryRange.fromSchemaValue_(
-        value,
-        schemaField.rangeElementType!.type!,
-      );
+      value = skipWrapCustomTypes
+        ? value
+        : BigQueryRange.fromSchemaValue_(
+            value,
+            schemaField.rangeElementType!.type!,
+          );
       break;
     }
     default:
@@ -2645,6 +2681,7 @@ export class BigQueryRange {
       }
       return convertSchemaFieldValue({type: elementType}, value, {
         wrapIntegers: false,
+        skipWrapCustomTypes: false,
       });
     };
     return BigQuery.range(

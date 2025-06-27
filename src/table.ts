@@ -113,6 +113,7 @@ export type TableRowValue = string | TableRow;
 
 export type GetRowsOptions = PagedRequest<bigquery.tabledata.IListParams> & {
   wrapIntegers?: boolean | IntegerTypeCastOptions;
+  skipWrapCustomTypes?: boolean;
   parseJSON?: boolean;
 };
 
@@ -1851,6 +1852,10 @@ class Table extends ServiceObject {
       typeof optionsOrCallback === 'function' ? optionsOrCallback : cb;
     const wrapIntegers = options.wrapIntegers ? options.wrapIntegers : false;
     delete options.wrapIntegers;
+    const skipWrapCustomTypes = options.skipWrapCustomTypes
+      ? options.skipWrapCustomTypes
+      : false;
+    delete options.skipWrapCustomTypes;
     const parseJSON = options.parseJSON ? options.parseJSON : false;
     delete options.parseJSON;
     const selectedFields = options.selectedFields
@@ -1868,6 +1873,7 @@ class Table extends ServiceObject {
       }
       rows = BigQuery.mergeSchemaWithRows_(this.metadata.schema, rows || [], {
         wrapIntegers,
+        skipWrapCustomTypes,
         selectedFields,
         parseJSON,
       });

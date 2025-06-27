@@ -444,52 +444,53 @@ describe('BigQuery', () => {
     } as {fields: TableField[]};
 
     beforeEach(() => {
-      sandbox.stub(BigQuery, 'date').callsFake(input => {
+      sandbox.stub(BigQuery, 'date').callsFake(value => {
         return {
           type: 'fakeDate',
-          input,
+          value,
         };
       });
 
-      sandbox.stub(BigQuery, 'datetime').callsFake(input => {
+      sandbox.stub(BigQuery, 'datetime').callsFake(value => {
         return {
           type: 'fakeDatetime',
-          input,
+          value,
         };
       });
 
-      sandbox.stub(BigQuery, 'time').callsFake(input => {
+      sandbox.stub(BigQuery, 'time').callsFake(value => {
         return {
           type: 'fakeTime',
-          input,
+          value,
         };
       });
 
-      sandbox.stub(BigQuery, 'timestamp').callsFake(input => {
+      sandbox.stub(BigQuery, 'timestamp').callsFake(value => {
         return {
           type: 'fakeTimestamp',
-          input,
+          value,
         };
       });
 
-      sandbox.stub(BigQuery, 'geography').callsFake(input => {
+      sandbox.stub(BigQuery, 'geography').callsFake(value => {
         return {
           type: 'fakeGeography',
-          input,
+          value,
         };
       });
 
-      sandbox.stub(BigQuery, 'range').callsFake((input, elementType) => {
+      sandbox.stub(BigQuery, 'range').callsFake((value, elementType) => {
         return {
           type: 'fakeRange',
-          input,
           elementType,
+          value,
         };
       });
     });
 
-    it('should merge the schema and flatten the rows', () => {
+    describe('should merge the schema and flatten the rows', () => {
       const now = new Date();
+      const pd = new PreciseDate(BigInt(now.valueOf()) * BigInt(1_000_000));
       const buffer = Buffer.from('test');
 
       const rows = [
@@ -551,7 +552,7 @@ describe('BigQuery', () => {
             id: 3,
             name: 'Milo',
             dob: {
-              input: new PreciseDate(BigInt(now.valueOf()) * BigInt(1_000_000)),
+              value: pd,
               type: 'fakeTimestamp',
             },
             has_claws: false,
@@ -572,35 +573,62 @@ describe('BigQuery', () => {
               },
             ],
             date: {
-              input: 'date-input',
+              value: 'date-input',
               type: 'fakeDate',
             },
             datetime: {
-              input: 'datetime-input',
+              value: 'datetime-input',
               type: 'fakeDatetime',
             },
             time: {
-              input: 'time-input',
+              value: 'time-input',
               type: 'fakeTime',
             },
             geography: {
-              input: 'geography-input',
+              value: 'geography-input',
               type: 'fakeGeography',
             },
             range: {
+              elementType: 'DATETIME',
               type: 'fakeRange',
-              input: {
+              value: {
                 end: {
-                  input: '2020-12-31 12:00:00+08',
+                  value: '2020-12-31 12:00:00+08',
                   type: 'fakeDatetime',
                 },
                 start: {
-                  input: '2020-10-01 12:00:00+08',
+                  value: '2020-10-01 12:00:00+08',
                   type: 'fakeDatetime',
                 },
               },
-              elementType: 'DATETIME',
             },
+          },
+          expectedWithoutTypes: {
+            id: 3,
+            name: 'Milo',
+            dob: pd,
+            has_claws: false,
+            has_fangs: true,
+            hair_count: 5.222330009847,
+            teeth_count: 30.2232138,
+            numeric_col: '3.14',
+            bignumeric_col: '9.9876543210123456789',
+            arr: [10],
+            arr2: [2],
+            nullable: null,
+            buffer,
+            objects: [
+              {
+                nested_object: {
+                  nested_property: 'nested_value',
+                },
+              },
+            ],
+            date: 'date-input',
+            datetime: 'datetime-input',
+            time: 'time-input',
+            geography: 'geography-input',
+            range: '[2020-10-01 12:00:00+08, 2020-12-31 12:00:00+08)',
           },
         },
       ];
@@ -677,12 +705,33 @@ describe('BigQuery', () => {
       });
 
       const rawRows = rows.map(x => x.raw);
-      const mergedRows = BigQuery.mergeSchemaWithRows_(schemaObject, rawRows, {
-        wrapIntegers: false,
+
+      it('with custom types', () => {
+        const mergedRows = BigQuery.mergeSchemaWithRows_(
+          schemaObject,
+          rawRows,
+          {
+            wrapIntegers: false,
+          },
+        );
+
+        mergedRows.forEach((mergedRow: {}, index: number) => {
+          assert.deepStrictEqual(mergedRow, rows[index].expected);
+        });
       });
 
-      mergedRows.forEach((mergedRow: {}, index: number) => {
-        assert.deepStrictEqual(mergedRow, rows[index].expected);
+      it('without custom types', () => {
+        const mergedRows = BigQuery.mergeSchemaWithRows_(
+          schemaObject,
+          rawRows,
+          {
+            skipWrapCustomTypes: true,
+          },
+        );
+
+        mergedRows.forEach((mergedRow: {}, index: number) => {
+          assert.deepStrictEqual(mergedRow, rows[index].expectedWithoutTypes);
+        });
       });
     });
 
@@ -3263,6 +3312,7 @@ describe('BigQuery', () => {
         query: QUERY_STRING,
         wrapIntegers: true,
         parseJSON: true,
+        skipWrapCustomTypes: true,
       };
       bq.query(query, (err: Error, rows: {}, resp: {}) => {
         assert.ifError(err);
@@ -3270,6 +3320,7 @@ describe('BigQuery', () => {
           job: fakeJob,
           wrapIntegers: true,
           parseJSON: true,
+          skipWrapCustomTypes: true,
         });
         assert.strictEqual(rows, FAKE_ROWS);
         assert.strictEqual(resp, FAKE_RESPONSE);
@@ -3486,6 +3537,7 @@ describe('BigQuery', () => {
       maxResults: undefined,
       pageToken: undefined,
       wrapIntegers: undefined,
+      skipWrapCustomTypes: undefined,
       parseJSON: undefined,
       autoPaginate: false,
     };
@@ -3503,10 +3555,16 @@ describe('BigQuery', () => {
     });
 
     it('should call query correctly with a Query object', done => {
-      const query = {query: 'SELECT', wrapIntegers: true, parseJSON: true};
+      const query = {
+        query: 'SELECT',
+        wrapIntegers: true,
+        parseJSON: true,
+        skipWrapCustomTypes: true,
+      };
       bq.queryAsStream_(query, done);
       const opts = {
         ...defaultOpts,
+        skipWrapCustomTypes: true,
         wrapIntegers: true,
         parseJSON: true,
       };
@@ -3556,6 +3614,23 @@ describe('BigQuery', () => {
       const opts = {
         ...defaultOpts,
         parseJSON,
+      };
+
+      assert(queryStub.calledOnceWithExactly(query, opts, sinon.match.func));
+    });
+
+    it('should pass skipWrapCustomTypes if supplied', done => {
+      const skipWrapCustomTypes = true;
+      const query = {
+        query: 'SELECT',
+        skipWrapCustomTypes,
+      };
+
+      bq.queryAsStream_(query, done);
+
+      const opts = {
+        ...defaultOpts,
+        skipWrapCustomTypes,
       };
 
       assert(queryStub.calledOnceWithExactly(query, opts, sinon.match.func));
