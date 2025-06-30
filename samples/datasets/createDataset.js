@@ -13,7 +13,6 @@
 // limitations under the License.
 
 'use strict';
-
 async function main(projectId, datasetId, location = 'US') {
   // [START bigquery_create_dataset]
   /**
@@ -27,8 +26,8 @@ async function main(projectId, datasetId, location = 'US') {
   const {BigQueryClient} = require('@google-cloud/bigquery');
 
   // Creates a client
-  const bigqueryClient = new BigQueryClient();
-
+  //TODO(coleleah): remove fallback:false if obsolete
+  const bigqueryClient = new BigQueryClient({}, {opts:{fallback: false}});
   async function createDataset() {
     // Construct the dataset resource.
     const dataset = {
@@ -59,7 +58,6 @@ async function main(projectId, datasetId, location = 'US') {
   await createDataset();
   // [END bigquery_create_dataset]
 }
-
 process.on('unhandledRejection', err => {
   console.error(err.message);
   process.exitCode = 1;
