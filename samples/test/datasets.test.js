@@ -31,7 +31,6 @@ const datasetId = `${GCLOUD_TESTS_PREFIX}_datasets_${randomUUID()}`.replace(
 const bigquery = new BigQueryClient({}, {opts:{fallback: false}});
 // the GCLOUD_PROJECT environment variable is set as part of test harness setup
 const projectId = process.env.GCLOUD_PROJECT;
-console.log('proejctId', projectId)
 
 describe.only('Datasets', () => {
   //TODO(coleleah): update
@@ -51,8 +50,16 @@ describe.only('Datasets', () => {
   // after(async () => {
   //   await bigquery.dataset(datasetId).delete({force: true}).catch(console.warn);
   // });
+  describe('dataset creation', () => {
+  //TODO(coleleah): update
+  after(async () => {
+    const request = {
+      projectId: projectId,
+      datasetId: datasetId,
+    };
+    await bigquery.deleteDataset(request)
 
-  // //TODO(coleleah): update
+  })
   it('should create a dataset', async () => {
     const output = execSync(`node datasets/createDataset.js ${projectId} ${datasetId}`);
     assert.include(output, `Dataset ${projectId}:${datasetId} created`);
@@ -95,6 +102,10 @@ describe.only('Datasets', () => {
   //   assert.isNotNull(error);
   //   assert.include(error.message, 'Invalid storage region');
   // });
+
+  })
+
+
   // //TODO(coleleah): update
 
   // it('should create/update a dataset with a different default collation', async () => {
