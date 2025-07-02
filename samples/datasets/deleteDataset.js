@@ -41,7 +41,6 @@ async function main(projectId, datasetId) {
 
     try {
       // Make the API request.
-      console.log('in try block')
       await bigqueryClient.deleteDataset(request);
       console.log(`Dataset ${datasetId} deleted.`);
     } catch (err) {

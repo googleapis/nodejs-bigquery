@@ -197,7 +197,7 @@ describe.only('Datasets', () => {
   //   assert.match(output, new RegExp(datasetId));
   // });
 
-  describe.only('delete dataset', () => {
+  describe('delete dataset', () => {
     // create the dataset we need to delete
     before('create a dataset to be deleted', async () => {
       const dataset = {
