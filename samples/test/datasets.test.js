@@ -196,14 +196,44 @@ describe.only('Datasets', () => {
   //   assert.match(output, /Datasets:/);
   //   assert.match(output, new RegExp(datasetId));
   // });
-  // //TODO(coleleah): update
 
-  // it('should delete a dataset', async () => {
-  //   const output = execSync(`node deleteDataset.js ${datasetId}`);
-  //   assert.include(output, `Dataset ${datasetId} deleted.`);
-  //   const [exists] = await bigquery.dataset(datasetId).exists();
-  //   assert.strictEqual(exists, false);
-  // });
+  describe.only('delete dataset', () => {
+    // create the dataset we need to delete
+    before('create a dataset to be deleted', async () => {
+      const dataset = {
+      datasetReference: {
+        datasetId: datasetId,
+      },
+      location: 'US',
+    };
+      const request = {
+      projectId: projectId,
+      dataset: dataset,
+    };
+    const [response] = await bigquery.insertDataset(request)
+    assert.ok(response)
+
+    })
+
+    it('should delete a dataset', async () => {
+    const request = {
+      projectId: projectId,
+      datasetId: datasetId,
+    };
+    let [dataset] = await bigquery.getDataset(request);
+    assert.ok(dataset);
+
+    const output = execSync(`node datasets/deleteDataset.js ${projectId} ${datasetId}`);
+    assert.include(output, `Dataset ${datasetId} deleted.`);
+
+    try{
+      await bigquery.getDataset(request);
+    }catch(err){
+      assert.strictEqual(err.details, `Not found: Dataset ${projectId}:${datasetId}`)
+    }
+  });
+})
+  
   // // TODO(coleleah): update
 
   // // Only delete a resource if it is older than 24 hours. That will prevent
