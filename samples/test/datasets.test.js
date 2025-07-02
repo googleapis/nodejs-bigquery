@@ -126,25 +126,70 @@ describe.only('Datasets', () => {
   // });
   // //TODO(coleleah): update
 
-  // it('should list datasets', async () => {
-  //   const output = execSync('node listDatasets.js');
-  //   assert.match(output, /Datasets:/);
-  //   assert.match(output, new RegExp(datasetId));
-  // });
-  // //TODO(coleleah): update
+  describe.only('list + get datasets', async() => {
+     before('create two datasets to be gotten/listed', async () => {
+      const dataset = {
+      datasetReference: {
+        datasetId: datasetId,
+      },
+      location: 'US',
+    };
+    const dataset2 = {
+      datasetReference: {
+        datasetId: datasetId+"_2",
+      },
+      location: 'US',
+    };
+      const request = {
+      projectId: projectId,
+      dataset: dataset,
+    };
+      const request2 = {
+      projectId: projectId,
+      dataset: dataset2,
+    };
+    const [response] = await bigquery.insertDataset(request)
+    assert.ok(response)
+    const [response2] = await bigquery.insertDataset(request2)
 
-  // it('should list datasets on a different project', async () => {
-  //   const output = execSync('node listDatasets.js bigquery-public-data');
-  //   assert.match(output, /Datasets:/);
-  //   assert.match(output, new RegExp('usa_names'));
-  // });
-  // //TODO(coleleah): update
+    assert.ok(response2)
 
-  // it('should retrieve a dataset if it exists', async () => {
-  //   const output = execSync(`node getDataset.js ${datasetId}`);
-  //   assert.include(output, 'Dataset:');
-  //   assert.include(output, datasetId);
-  // });
+    })
+    after('delete two datasets that were created for these tests', async () => {
+    const request = {
+      projectId: projectId,
+      datasetId: datasetId,
+    };
+    const request2 = {
+      projectId: projectId,
+      datasetId: datasetId+"_2",
+    };
+    await bigquery.deleteDataset(request)
+    await bigquery.deleteDataset(request2)
+
+  })
+    it('should list datasets', async () => {
+      const output = execSync(`node datasets/listDatasets.js ${projectId}`);
+      console.log('output', output)
+      assert.match(output, /Datasets:/);
+      assert.match(output, new RegExp(datasetId));
+    });
+
+    it('should list datasets on a different project', async () => {
+      const output = execSync('node datasets/listDatasets.js bigquery-public-data');
+      assert.match(output, /Datasets:/);
+      assert.match(output, new RegExp('usa_names'));
+    });
+
+    it('should retrieve a dataset if it exists', async () => {
+      const output = execSync(`node datasets/getDataset.js ${projectId} ${datasetId}`);
+      assert.include(output, 'Dataset');
+      assert.include(output, 'retrieved successfully');
+      assert.include(output, datasetId);
+    });
+
+  })
+  
   // //TODO(coleleah): update
 
   // it("should update dataset's description", async () => {
