@@ -52,7 +52,6 @@ describe('Datasets', () => {
   describe('dataset creation', () => {
     const usCentral1Bigquery = new BigQueryClient({}, {opts: {
       apiEndpoint: 'bigquery.us-central1.rep.googleapis.com',
-      fallback: false
   }});
       const usCentral1DatasetId = datasetId + '_uscentral1';
 
