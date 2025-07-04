@@ -17,8 +17,7 @@ import {
   BigQueryClientOptions,
   SubClientOptions,
 } from '../bigquery';
-import {QueryJob} from './job';
-import {CallOptions} from 'google-gax';
+import {QueryJob, CallOptions} from './job';
 import {protos} from '../';
 import {queryFromSQL as builderQueryFromSQL} from './builder';
 import {QueryReader} from './reader';
@@ -28,8 +27,8 @@ import {QueryReader} from './reader';
  */
 export class QueryClient {
   private client: BigQueryClient;
-  private projectID: string;
-  private billingProjectID: string;
+  projectId: string;
+  private billingProjectId: string;
 
   /**
    * @param {BigQueryClientOptions} options - The configuration object.
@@ -39,18 +38,18 @@ export class QueryClient {
     subClientOptions?: SubClientOptions,
   ) {
     this.client = new BigQueryClient(options, subClientOptions);
-    this.projectID = '';
-    this.billingProjectID = '';
+    this.projectId = '';
+    this.billingProjectId = '';
     void this.client.jobClient.getProjectId().then(projectId => {
-      this.projectID = projectId;
-      if (this.billingProjectID !== '') {
-        this.billingProjectID = projectId;
+      this.projectId = projectId;
+      if (this.billingProjectId !== '') {
+        this.billingProjectId = projectId;
       }
     });
   }
 
-  setBillingProjectID(projectID: string) {
-    this.billingProjectID = projectID;
+  setBillingProjectId(projectId: string) {
+    this.billingProjectId = projectId;
   }
 
   /**
@@ -59,7 +58,7 @@ export class QueryClient {
    * @returns {protos.google.cloud.bigquery.v2.IPostQueryRequest}
    */
   queryFromSQL(sql: string): protos.google.cloud.bigquery.v2.IPostQueryRequest {
-    const req = builderQueryFromSQL(this.projectID, sql);
+    const req = builderQueryFromSQL(this.projectId, sql);
     return req;
   }
 
@@ -104,7 +103,7 @@ export class QueryClient {
     return this.startQuery(
       {
         queryRequest: request,
-        projectId: this.projectID,
+        projectId: this.projectId,
       },
       options,
     );
@@ -125,7 +124,7 @@ export class QueryClient {
   ): Promise<QueryJob> {
     const [response] = await this.client.jobClient.insertJob(
       {
-        projectId: this.projectID,
+        projectId: this.projectId,
         job,
       },
       options,
@@ -133,23 +132,7 @@ export class QueryClient {
     return new QueryJob(this, {jobReference: response.jobReference});
   }
 
-  /**
-   * Gets the results of a query job.
-   *
-   * @param {protos.google.cloud.bigquery.v2.IGetQueryResultsRequest} request
-   *   The request object that will be sent.
-   * @param {CallOptions} [options]
-   *   Call options. See {@link https://googleapis.dev/nodejs/google-gax/latest/interfaces/CallOptions.html|CallOptions} for more details.
-   * @returns {Promise<protos.google.cloud.bigquery.v2.IGetQueryResultsResponse>}
-   */
-  async _getQueryResults(
-    request: protos.google.cloud.bigquery.v2.IGetQueryResultsRequest,
-    options?: CallOptions,
-  ): Promise<[protos.google.cloud.bigquery.v2.IGetQueryResultsResponse]> {
-    const [response] = await this.client.jobClient.getQueryResults(
-      request,
-      options,
-    );
-    return [response];
+  getBigQueryClient(): BigQueryClient {
+    return this.client;
   }
 }

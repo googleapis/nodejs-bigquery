@@ -18,10 +18,10 @@ export function civilDateString(d: Date): string {
 
 export function civilTimeString(value: string | Date): string {
   if (value instanceof Date) {
-    const h = `${value.getHours()}`.padStart(2, "0");
-    const m = `${value.getMinutes()}`.padStart(2, "0");
-    const s = `${value.getSeconds()}`.padStart(2, "0");
-    const f = `${value.getMilliseconds()}`.padStart(3, "0");
+    const h = `${value.getHours()}`.padStart(2, '0');
+    const m = `${value.getMinutes()}`.padStart(2, '0');
+    const s = `${value.getSeconds()}`.padStart(2, '0');
+    const f = `${value.getMilliseconds()}`.padStart(3, '0');
     return `${h}:${m}:${s}.${f}`;
   }
   return value;
@@ -33,9 +33,9 @@ export function civilDateTimeString(value: Date | string): string {
     if (value.getHours()) {
       time = civilTimeString(value);
     }
-    const y = `${value.getFullYear()}`.padStart(2, "0");
-    const m = `${value.getMonth()+1}`.padStart(2, "0");
-    const d = `${value.getDate()}`.padStart(2, "0");
+    const y = `${value.getFullYear()}`.padStart(2, '0');
+    const m = `${value.getMonth() + 1}`.padStart(2, '0');
+    const d = `${value.getDate()}`.padStart(2, '0');
     time = time ? ' ' + time : '';
     return `${y}-${m}-${d}${time}`;
   }

@@ -13,18 +13,34 @@
 // limitations under the License.
 
 import * as assert from 'assert';
+import * as sinon from 'sinon';
 import {describe, it} from 'mocha';
 import {query, protos} from '../../src';
 
+const sleep = (ms: number) =>
+  new Promise(resolve => {
+    setTimeout(resolve, ms);
+  });
+
 describe('Run Query', () => {
   const client = new query.QueryClient();
+  let getQueryResultsSpy: sinon.SinonSpy;
+
+  beforeEach(() => {
+    const {jobClient} = client.getBigQueryClient();
+    getQueryResultsSpy = sinon.spy(jobClient, 'getQueryResults');
+  });
+
+  afterEach(() => {
+    getQueryResultsSpy.restore();
+  });
 
   it('should run a stateless query', async () => {
     const req = client.queryFromSQL(
       'SELECT CURRENT_TIMESTAMP() as foo, SESSION_USER() as bar',
     );
     req.queryRequest!.jobCreationMode =
-      protos.google.cloud.bigquery.v2.QueryRequest.JobCreationMode.JOB_CREATION_OPTIONAL;    
+      protos.google.cloud.bigquery.v2.QueryRequest.JobCreationMode.JOB_CREATION_OPTIONAL;
 
     const q = await client.startQuery(req);
     await q.wait();
@@ -37,12 +53,35 @@ describe('Run Query', () => {
     assert.strictEqual(rows.length, 1);
   });
 
+  it('should stop waiting for query to complete', async () => {
+    const req = client.queryFromSQL(
+      'SELECT num FROM UNNEST(GENERATE_ARRAY(1,1000000)) as num',
+    );
+    req.queryRequest!.useQueryCache = {value: false};
+    req.queryRequest!.jobCreationMode =
+      protos.google.cloud.bigquery.v2.QueryRequest.JobCreationMode.JOB_CREATION_REQUIRED;
+    req.queryRequest!.timeoutMs = {value: 500};
+
+    const abortCtrl = new AbortController();
+    const q = await client.startQuery(req);
+    q.wait({
+      signal: abortCtrl.signal,
+    }).catch(err => {
+      assert(err, 'aborted');
+    });
+    await sleep(1000);
+    abortCtrl.abort();
+
+    assert(getQueryResultsSpy.callCount >= 1);
+    assert(getQueryResultsSpy.callCount <= 2);
+  }).timeout(5000);
+
   it('should read a query job without cache', async () => {
     const req = client.queryFromSQL(
       'SELECT CURRENT_TIMESTAMP() as foo, SESSION_USER() as bar',
     );
     req.queryRequest!.jobCreationMode =
-      protos.google.cloud.bigquery.v2.QueryRequest.JobCreationMode.JOB_CREATION_REQUIRED;    
+      protos.google.cloud.bigquery.v2.QueryRequest.JobCreationMode.JOB_CREATION_REQUIRED;
 
     const q = await client.startQuery(req);
     await q.wait();

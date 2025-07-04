@@ -36,7 +36,7 @@ export class RowIterator {
   }
 
   async fetchRows() {
-    const [rows, _, pageToken] = await this.job.getRows(this.pageToken);
+    const [rows, _, pageToken] = await this.job._getRows(this.pageToken);
     this.rows = rows;
     this.pageToken = pageToken || undefined;
   }

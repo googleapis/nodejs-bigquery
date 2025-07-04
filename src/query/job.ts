@@ -18,7 +18,11 @@ import {RowIterator} from './iterator';
 import {Row} from './row';
 import {Schema} from './schema';
 import {convertRows} from './value';
-import {CallOptions} from 'google-gax';
+import {CallOptions as GaxCallOptions} from 'google-gax';
+
+export interface CallOptions extends GaxCallOptions {
+  signal?: AbortSignal;
+}
 
 /**
  * Query represents a query job.
@@ -55,15 +59,16 @@ export class QueryJob {
       rows: response.rows,
     });
 
+    this.jobID = '';
+    this.location = response.location ?? '';
+    this.projectID = '';
     if (response.jobReference) {
       this.projectID = response.jobReference.projectId!;
       this.jobID = response.jobReference.jobId!;
       this.location = response.jobReference.location?.value || '';
-    } else {
-      // This should not happen, but we need to initialize the properties.
-      this.projectID = '';
-      this.jobID = '';
-      this.location = '';
+    }
+    if (response.queryId) {
+      this.jobID = response.queryId;
     }
   }
 
@@ -86,12 +91,27 @@ export class QueryJob {
    *   Call options. See {@link https://googleapis.dev/nodejs/google-gax/latest/interfaces/CallOptions.html|CallOptions} for more details.
    */
   async wait(options?: CallOptions): Promise<void> {
+    const signal = options?.signal;
     while (!this.complete) {
+      if (signal?.aborted) {
+        throw new Error('The operation was aborted.');
+      }
       await this.checkStatus(options);
       if (!this.complete) {
-        await new Promise(resolve => setTimeout(resolve, 1000)); // TODO: exponential backoff
+        await this.waitFor(signal);
       }
     }
+  }
+
+  private async waitFor(signal?: AbortSignal): Promise<void> {
+    const delay = 1000; // TODO: backoff settings
+    return new Promise((resolve, reject) => {
+      const timeout = setTimeout(resolve, delay);
+      signal?.addEventListener('abort', () => {
+        clearTimeout(timeout);
+        reject(new Error('The operation was aborted.'));
+      });
+    });
   }
 
   /**
@@ -107,12 +127,16 @@ export class QueryJob {
     return it;
   }
 
-  async getRows(
+  /**
+   * @internal
+   */
+  async _getRows(
     pageToken?: string,
   ): Promise<
     [Row[], protos.google.cloud.bigquery.v2.ITableSchema | null, string | null]
   > {
-    const [response] = await this.client._getQueryResults({
+    const {jobClient} = this.client.getBigQueryClient();
+    const [response] = await jobClient.getQueryResults({
       projectId: this.projectID,
       jobId: this.jobID,
       location: this.location,
@@ -140,7 +164,8 @@ export class QueryJob {
   }
 
   private async checkStatus(options?: CallOptions): Promise<void> {
-    const [response] = await this.client._getQueryResults(
+    const {jobClient} = this.client.getBigQueryClient();
+    const [response] = await jobClient.getQueryResults(
       {
         projectId: this.projectID,
         jobId: this.jobID,
