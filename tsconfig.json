@@ -15,11 +15,14 @@
     "test/*.ts",
     "test/**/*.ts",
     "system-test/*.ts",
+    "system-test/**/*.ts",
     "src/**/*.json",
     "protos/protos.json",
     "benchmark/*.ts",
     "scripts/*.ts",
     "samples/**/*.json"
-
+  ],
+  "exclude": [
+    "system-test/fixtures/sample/**/*.ts"
   ]
 }
