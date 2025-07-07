@@ -1,4 +1,4 @@
-// Copyright 2017 Google LLC
+// Copyright 2025 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -70,39 +70,6 @@ describe.only('Datasets', () => {
     const [exists] = await bigquery.getDataset(request);
     assert.ok(exists);
   });
-
-  //   //TODO(coleleah): update
-
-  // it('should create a dataset using a regional endpoint', async () => {
-  //   const euBigquery = new BigQuery({
-  //     apiEndpoint: 'eu-bigquery.googleapis.com',
-  //   });
-  //   const euDatasetId = datasetId + '_eu';
-  //   await euBigquery.createDataset(euDatasetId, {
-  //     location: 'eu',
-  //   });
-  //   const [exists] = await euBigquery.dataset(euDatasetId).exists();
-  //   assert.ok(exists);
-  // });
-  // //TODO(coleleah): update
-
-  // it('should fail to create a dataset using a different region from the client endpoint', async () => {
-  //   const usEast4Bigquery = new BigQuery({
-  //     apiEndpoint: 'us-east4-bigquery.googleapis.com',
-  //   });
-  //   const usDatasetId = datasetId + '_us';
-  //   let error;
-  //   try {
-  //     await usEast4Bigquery.createDataset(usDatasetId, {
-  //       location: 'us-central1',
-  //     });
-  //   } catch (err) {
-  //     error = err;
-  //   }
-  //   assert.isNotNull(error);
-  //   assert.include(error.message, 'Invalid storage region');
-  // });
-
   })
 
 
@@ -126,7 +93,7 @@ describe.only('Datasets', () => {
   // });
   // //TODO(coleleah): update
 
-  describe.only('list + get datasets', async() => {
+  describe('list + get datasets', async() => {
      before('create two datasets to be gotten/listed', async () => {
       const dataset = {
       datasetReference: {
@@ -190,15 +157,40 @@ describe.only('Datasets', () => {
 
   })
   
-  // //TODO(coleleah): update
+describe.only('update dataset', async() => {
+    before('create a dataset to be updated', async () => {
+    const dataset = {
+      datasetReference: {
+        datasetId: datasetId,
+      },
+      location: 'US',
+    };
+      const request = {
+      projectId: projectId,
+      dataset: dataset,
+    };
+   
+    const [response] = await bigquery.insertDataset(request)
+    assert.ok(response)
 
-  // it("should update dataset's description", async () => {
-  //   const output = execSync(`node updateDatasetDescription.js ${datasetId}`);
-  //   assert.include(
-  //     output,
-  //     `${datasetId} description: New dataset description.`,
-  //   );
-  // });
+    })
+    after('delete two datasets that were created for these tests', async () => {
+    const request = {
+      projectId: projectId,
+      datasetId: datasetId,
+    };
+    await bigquery.deleteDataset(request)
+  })
+    it("should update dataset's description", async () => {
+    const output = execSync(`node datasets/updateDataset.js ${projectId} ${datasetId} description`);
+    assert.include(
+      output,
+      `${projectId}:${datasetId} description: wow! new description!`,
+    );
+  });
+
+})
+
   // //TODO(coleleah): update
 
   // it("should update dataset's expiration", async () => {
