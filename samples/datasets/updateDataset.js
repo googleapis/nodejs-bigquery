@@ -19,6 +19,7 @@
 async function main(projectId, datasetId, updateOption) {
 
 // [START bigquery_update_dataset_description]  
+// [START bigquery_update_dataset_expiration]
   /**
    * TODO(developer): Uncomment these variables before running the sample.
    */
@@ -29,6 +30,7 @@ async function main(projectId, datasetId, updateOption) {
 
   // Creates a client
   const bigqueryClient = new BigQueryClient();
+ // [END bigquery_update_dataset_expiration]
 
   async function updateDatasetDescription() {
    const description = "wow! new description!"
@@ -60,9 +62,44 @@ async function main(projectId, datasetId, updateOption) {
   }
  // [END bigquery_update_dataset_description]
 
+ // [START bigquery_update_dataset_expiration]
+
+  async function updateDatasetExpiration() {
+   const expirationTime = 24 * 60 * 60 * 1000;
+   const datasetToUpdate = {
+      projectId: projectId,
+      datasetId: datasetId, 
+      datasetReference: {
+        datasetId: datasetId,
+      },
+      defaultTableExpirationMs: {value: expirationTime},
+    };
+    // Construct the request object.
+    const request = {
+      projectId: projectId,
+      datasetId: datasetId,
+      dataset: datasetToUpdate,
+    };
+
+    try {
+      // Make the API request.
+      const [response] = await bigqueryClient.updateDataset(request);
+      console.log(`Dataset ${response.id} expiration: ${response.defaultTableExpirationMs.value}`);
+    } catch (err) {
+      console.error('ERROR updating dataset:', err);
+      if (err.errors) {
+        err.errors.forEach(e => console.error(e.message));
+      }
+    }
+  }
+   // [END bigquery_update_dataset_expiration]
+
   switch (updateOption){
     case "description":
         await updateDatasetDescription();
+        break
+    case "expiration":
+        await updateDatasetExpiration();
         break
     default:
         //TODO(coleleah): improve

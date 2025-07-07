@@ -157,7 +157,7 @@ describe.only('Datasets', () => {
 
   })
   
-describe.only('update dataset', async() => {
+describe('update dataset', async() => {
     before('create a dataset to be updated', async () => {
     const dataset = {
       datasetReference: {
@@ -182,21 +182,37 @@ describe.only('update dataset', async() => {
     await bigquery.deleteDataset(request)
   })
     it("should update dataset's description", async () => {
+    const request = {
+      projectId: projectId,
+      datasetId: datasetId,
+    };
+    let [dataset] = await bigquery.getDataset(request);
+    assert.ok(dataset, dataset.description);
+    assert.isNull(dataset.description)
     const output = execSync(`node datasets/updateDataset.js ${projectId} ${datasetId} description`);
     assert.include(
       output,
       `${projectId}:${datasetId} description: wow! new description!`,
     );
+
+ 
+  });
+
+   it.only("should update dataset's expiration", async () => {
+    const request = {
+      projectId: projectId,
+      datasetId: datasetId,
+    };
+    let [dataset] = await bigquery.getDataset(request);
+    assert.ok(dataset, dataset.defaultTableExpirationMs);
+    assert.isNull(dataset.defaultTableExpirationMs)
+    const output = execSync(`node datasets/updateDataset.js ${projectId} ${datasetId} expiration`);
+    assert.include(output, `${datasetId} expiration: 86400000`);
   });
 
 })
 
-  // //TODO(coleleah): update
-
-  // it("should update dataset's expiration", async () => {
-  //   const output = execSync(`node updateDatasetExpiration.js ${datasetId}`);
-  //   assert.include(output, `${datasetId} expiration: 86400000`);
-  // });
+  
   // //TODO(coleleah): update
 
   // it('should add label to a dataset', async () => {
