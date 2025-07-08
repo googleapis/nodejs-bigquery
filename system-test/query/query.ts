@@ -14,16 +14,17 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import {describe, it} from 'mocha';
-import {query, protos} from '../../src';
+import {it} from 'mocha';
+
+import {protos} from '../../src';
+import {describeWithBothTransports} from '../fixtures/transport';
 
 const sleep = (ms: number) =>
   new Promise(resolve => {
     setTimeout(resolve, ms);
   });
 
-describe('Run Query', () => {
-  const client = new query.QueryClient();
+describeWithBothTransports('Run Query', client => {
   let getQueryResultsSpy: sinon.SinonSpy;
 
   beforeEach(() => {

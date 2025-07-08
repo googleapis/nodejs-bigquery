@@ -14,13 +14,11 @@
 
 import * as assert from 'assert';
 import {describe, it} from 'mocha';
-import {query} from '../../src';
 
 import {queryParameterTestCases} from '../fixtures/query';
+import {describeWithBothTransports} from '../fixtures/transport';
 
-describe('Read Query Values', () => {
-  const client = new query.QueryClient();
-
+describeWithBothTransports('Read Query Values', client => {
   describe('types', () => {
     for (const tc of queryParameterTestCases()) {
       it(tc.name, async () => {

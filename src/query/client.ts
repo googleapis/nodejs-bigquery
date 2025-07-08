@@ -40,13 +40,41 @@ export class QueryClient {
     this.client = new BigQueryClient(options, subClientOptions);
     this.projectId = '';
     this.billingProjectId = '';
-    void this.client.jobClient.getProjectId().then(projectId => {
-      this.projectId = projectId;
-      if (this.billingProjectId !== '') {
-        this.billingProjectId = projectId;
-      }
-    });
+    void this.initialize();
   }
+
+  async getProjectId(): Promise<string> {
+    if (this.projectId) {
+      return this.projectId;
+    }
+    const {jobClient} = this.getBigQueryClient();
+    const projectId = await jobClient.getProjectId();
+    this.projectId = projectId;
+    return projectId;
+  }
+  /**
+   * Initialize the client.
+   * Performs asynchronous operations (such as authentication) and prepares the client.
+   * This function will be called automatically when any class method is called for the
+   * first time, but if you need to initialize it before calling an actual method,
+   * feel free to call initialize() directly.
+   *
+   * You can await on this method if you want to make sure the client is initialized.
+   *
+   * @returns {Promise} A promise that resolves when auth is complete.
+   */
+  initialize = async (): Promise<void> => {
+    if (this.projectId) {
+      return;
+    }
+    const {jobClient} = this.getBigQueryClient();
+    await jobClient.initialize();
+    const projectId = await this.getProjectId();
+    this.projectId = projectId;
+    if (this.billingProjectId !== '') {
+      this.billingProjectId = projectId;
+    }
+  };
 
   setBillingProjectId(projectId: string) {
     this.billingProjectId = projectId;

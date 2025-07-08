@@ -30,8 +30,8 @@ export interface CallOptions extends GaxCallOptions {
 export class QueryJob {
   private client: QueryClient;
   private complete: boolean;
-  private projectID: string;
-  private jobID: string;
+  private projectId: string;
+  private jobId: string;
   private location: string;
 
   private cachedRows: Row[];
@@ -59,23 +59,23 @@ export class QueryJob {
       rows: response.rows,
     });
 
-    this.jobID = '';
+    this.jobId = '';
     this.location = response.location ?? '';
-    this.projectID = '';
+    this.projectId = '';
     if (response.jobReference) {
-      this.projectID = response.jobReference.projectId!;
-      this.jobID = response.jobReference.jobId!;
+      this.projectId = response.jobReference.projectId!;
+      this.jobId = response.jobReference.jobId!;
       this.location = response.jobReference.location?.value || '';
     }
     if (response.queryId) {
-      this.jobID = response.queryId;
+      this.jobId = response.queryId;
     }
   }
 
   jobReference(): protos.google.cloud.bigquery.v2.IJobReference {
     return {
-      jobId: this.jobID,
-      projectId: this.projectID,
+      jobId: this.jobId,
+      projectId: this.projectId,
       location: {value: this.location},
     };
   }
@@ -137,8 +137,8 @@ export class QueryJob {
   > {
     const {jobClient} = this.client.getBigQueryClient();
     const [response] = await jobClient.getQueryResults({
-      projectId: this.projectID,
-      jobId: this.jobID,
+      projectId: this.projectId,
+      jobId: this.jobId,
       location: this.location,
       pageToken,
       formatOptions: {
@@ -167,8 +167,8 @@ export class QueryJob {
     const {jobClient} = this.client.getBigQueryClient();
     const [response] = await jobClient.getQueryResults(
       {
-        projectId: this.projectID,
-        jobId: this.jobID,
+        projectId: this.projectId,
+        jobId: this.jobId,
         location: this.location,
         maxResults: {value: 0},
         formatOptions: {
