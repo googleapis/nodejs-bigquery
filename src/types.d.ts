@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * Discovery Revision: 20250511
+ * Discovery Revision: 20250706
  */
 
 /**
@@ -1711,9 +1711,39 @@ declare namespace bigquery {
   };
 
   /**
+   * Options for the runtime of the external system.
+   */
+  type IExternalRuntimeOptions = {
+    /**
+     * Optional. Amount of CPU provisioned for the container instance. If not specified, the default value is 0.33 vCPUs.
+     */
+    containerCpu?: number;
+    /**
+     * Optional. Amount of memory provisioned for the container instance. Format: {number}{unit} where unit is one of "M", "G", "Mi" and "Gi" (e.g. 1G, 512Mi). If not specified, the default value is 512Mi.
+     */
+    containerMemory?: string;
+    /**
+     * Optional. Maximum number of rows in each batch sent to the external runtime. If absent or if 0, BigQuery dynamically decides the number of rows in a batch.
+     */
+    maxBatchingRows?: string;
+    /**
+     * Optional. Fully qualified name of the connection whose service account will be used to execute the code in the container. Format: ```"projects/{project_id}/locations/{location_id}/connections/{connection_id}"```
+     */
+    runtimeConnection?: string;
+    /**
+     * Optional. Language runtime version (e.g. python-3.11).
+     */
+    runtimeVersion?: string;
+  };
+
+  /**
    * The external service cost is a portion of the total cost, these costs are not additive with total_bytes_billed. Moreover, this field only track external service costs that will show up as BigQuery costs (e.g. training BigQuery ML job with google cloud CAIP or Automl Tables services), not other costs which may be accrued by running the query (e.g. reading from Bigtable or Cloud Storage). The external service costs with different billing sku (e.g. CAIP job is charged based on VM usage) are converted to BigQuery billed_bytes and slot_ms with equivalent amount of US dollars. Services may not directly correlate to these metrics, but these are the equivalents for billing purposes. Output only.
    */
   type IExternalServiceCost = {
+    /**
+     * The billing method used for the external job. This field is only used when billed on the services sku, set to "SERVICES_SKU". Otherwise, it is unspecified for backward compatibility.
+     */
+    billingMethod?: string;
     /**
      * External service cost in terms of bigquery bytes billed.
      */
@@ -2112,6 +2142,7 @@ declare namespace bigquery {
       | 'BASE_TABLE_TOO_SMALL'
       | 'BASE_TABLE_TOO_LARGE'
       | 'ESTIMATED_PERFORMANCE_GAIN_TOO_LOW'
+      | 'COLUMN_METADATA_INDEX_NOT_USED'
       | 'NOT_SUPPORTED_IN_STANDARD_EDITION'
       | 'INDEX_SUPPRESSED_BY_FUNCTION_OPTION'
       | 'QUERY_CACHE_HIT'
@@ -2248,7 +2279,7 @@ declare namespace bigquery {
      */
     id?: string;
     /**
-     * Output only. The reason why a Job was created. [Preview](https://cloud.google.com/products/#product-launch-stages)
+     * Output only. The reason why a Job was created.
      */
     jobCreationReason?: IJobCreationReason;
     /**
@@ -2732,7 +2763,7 @@ declare namespace bigquery {
   };
 
   /**
-   * Reason about why a Job was created from a [`jobs.query`](https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs/query) method when used with `JOB_CREATION_OPTIONAL` Job creation mode. For [`jobs.insert`](https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs/insert) method calls it will always be `REQUESTED`. [Preview](https://cloud.google.com/products/#product-launch-stages)
+   * Reason about why a Job was created from a [`jobs.query`](https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs/query) method when used with `JOB_CREATION_OPTIONAL` Job creation mode. For [`jobs.insert`](https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs/insert) method calls it will always be `REQUESTED`.
    */
   type IJobCreationReason = {
     /**
@@ -3111,6 +3142,10 @@ declare namespace bigquery {
      * Output only. Total number of partitions processed from all partitioned tables referenced in the job.
      */
     totalPartitionsProcessed?: string;
+    /**
+     * Output only. Total slot-milliseconds for the job that run on external services and billed on the service SKU. This field is only populated for jobs that have external service costs, and is the total of the usage for costs whose billing method is "SERVICES_SKU".
+     */
+    totalServicesSkuSlotMs?: string;
     /**
      * Output only. Slot-milliseconds for the job.
      */
@@ -3853,6 +3888,20 @@ declare namespace bigquery {
   };
 
   /**
+   * Options for a user-defined Python function.
+   */
+  type IPythonOptions = {
+    /**
+     * Required. The entry point function in the user's Python code.
+     */
+    entryPoint?: string;
+    /**
+     * Optional. A list of package names along with versions to be installed. Follows requirements.txt syntax (e.g. numpy==2.0, permutation, urllib3<2.2.1)
+     */
+    packages?: Array<string>;
+  };
+
+  /**
    * Query optimization information for a QUERY job.
    */
   type IQueryInfo = {
@@ -3970,7 +4019,7 @@ declare namespace bigquery {
      */
     formatOptions?: IDataFormatOptions;
     /**
-     * Optional. If not set, jobs are always required. If set, the query request will follow the behavior described JobCreationMode. [Preview](https://cloud.google.com/products/#product-launch-stages)
+     * Optional. If not set, jobs are always required. If set, the query request will follow the behavior described JobCreationMode.
      */
     jobCreationMode?:
       | 'JOB_CREATION_MODE_UNSPECIFIED'
@@ -4068,7 +4117,7 @@ declare namespace bigquery {
      */
     jobComplete?: boolean;
     /**
-     * Optional. The reason why a Job was created. Only relevant when a job_reference is present in the response. If job_reference is not present it will always be unset. [Preview](https://cloud.google.com/products/#product-launch-stages)
+     * Optional. The reason why a Job was created. Only relevant when a job_reference is present in the response. If job_reference is not present it will always be unset.
      */
     jobCreationReason?: IJobCreationReason;
     /**
@@ -4092,7 +4141,7 @@ declare namespace bigquery {
      */
     pageToken?: string;
     /**
-     * Auto-generated ID for the query. [Preview](https://cloud.google.com/products/#product-launch-stages)
+     * Auto-generated ID for the query.
      */
     queryId?: string;
     /**
@@ -4349,6 +4398,10 @@ declare namespace bigquery {
      */
     etag?: string;
     /**
+     * Optional. Options for the runtime of the external system executing the routine. This field is only applicable for Python UDFs. [Preview](https://cloud.google.com/products/#product-launch-stages)
+     */
+    externalRuntimeOptions?: IExternalRuntimeOptions;
+    /**
      * Optional. If language = "JAVASCRIPT", this field stores the path of the imported JAVASCRIPT libraries.
      */
     importedLibraries?: Array<string>;
@@ -4366,6 +4419,10 @@ declare namespace bigquery {
      * Output only. The time when this routine was last modified, in milliseconds since the epoch.
      */
     lastModifiedTime?: string;
+    /**
+     * Optional. Options for Python UDF. [Preview](https://cloud.google.com/products/#product-launch-stages)
+     */
+    pythonOptions?: IPythonOptions;
     /**
      * Optional. Remote function specific options.
      */
@@ -5039,7 +5096,7 @@ declare namespace bigquery {
     /**
      * Optional. If set, overrides the default managed table type configured in the dataset.
      */
-    managedTableType?: 'MANAGED_TABLE_TYPE_UNSPECIFIED' | 'NATIVE' | 'ICEBERG';
+    managedTableType?: 'MANAGED_TABLE_TYPE_UNSPECIFIED' | 'NATIVE' | 'BIGLAKE';
     /**
      * Optional. The materialized view definition.
      */
