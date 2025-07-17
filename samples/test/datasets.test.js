@@ -28,30 +28,69 @@ const datasetId = `${GCLOUD_TESTS_PREFIX}_datasets_${randomUUID()}`.replace(
 );
 
 //TODO(coleleah): remove fallback: false if needed
+// tracked in b/429226336
 const bigquery = new BigQueryClient({}, {opts:{fallback: false}});
 // the GCLOUD_PROJECT environment variable is set as part of test harness setup
 const projectId = process.env.GCLOUD_PROJECT;
 
 describe.only('Datasets', () => {
-  //TODO(coleleah): update
+  // Only delete a resource if it is older than 24 hours. That will prevent
+  // collisions with parallel CI test runs.
+  function isResourceStale(creationTime) {
+    const oneDayMs = 86400000;
+    const now = new Date();
+    const created = new Date(creationTime);
+    return now.getTime() - created.getTime() >= oneDayMs;
+  }
+
+  // utility function to clean up stale resources
+  async function deleteDatasets() {
+    const listRequest = {
+      projectId: projectId
+    }
+    let [datasets] = await bigquery.listDatasets(listRequest);
+    datasets = datasets.filter(dataset =>
+      dataset.id.includes(GCLOUD_TESTS_PREFIX),
+    );
+
+    for (const dataset of datasets) {
+      let datasetRequest = {
+        projectId: projectId,
+        datasetId: dataset.datasetReference.datasetId,
+      };
+      let datasetInfo;
+      try {
+        datasetInfo = await bigquery.getDataset(datasetRequest);
+      } catch (e) {
+        console.log(`dataset(${dataset.id}).getMetadata() failed`);
+        console.log(e);
+        return;
+      }
+      const creationTime = Number(datasetInfo.creationTime);
+      if (isResourceStale(creationTime)) {
+        try {
+          await bigquery.deleteDataset(datasetRequest)
+        } catch (e) {
+          console.log(`dataset ${dataset.id} deletion failed`);
+          console.log(e);
+        }
+      }
+    }
+  }
   before(async () => {
     // // Delete any stale datasets from samples tests
-    // await deleteDatasets();
+    await deleteDatasets();
     if (projectId===undefined){
       throw Error("GCLOUD_PROJECT must be defined as an environment variable before tests can be run")
 
     }
   });
 
-  // beforeEach(async function () {
-  //   this.currentTest.retries(2);
-  // });
+  beforeEach(async function () {
+    this.currentTest.retries(2);
+  });
 
-  // after(async () => {
-  //   await bigquery.dataset(datasetId).delete({force: true}).catch(console.warn);
-  // });
   describe('dataset creation', () => {
-  //TODO(coleleah): update
   after(async () => {
     const request = {
       projectId: projectId,
@@ -71,27 +110,6 @@ describe.only('Datasets', () => {
     assert.ok(exists);
   });
   })
-
-
-  // //TODO(coleleah): update
-
-  // it('should create/update a dataset with a different default collation', async () => {
-  //   const bigquery = new BigQuery({});
-  //   const collationDatasetId = datasetId + '_collation_test';
-  //   await bigquery.createDataset(collationDatasetId, {
-  //     defaultCollation: 'und:ci',
-  //   });
-  //   const dataset = await bigquery.dataset(collationDatasetId);
-  //   const [exists] = await dataset.exists();
-  //   assert.ok(exists);
-  //   let [md] = await dataset.getMetadata();
-  //   assert.equal(md.defaultCollation, 'und:ci');
-  //   md.defaultCollation = '';
-  //   await dataset.setMetadata(md);
-  //   [md] = await dataset.getMetadata();
-  //   assert.equal(md.defaultCollation, '');
-  // });
-  // //TODO(coleleah): update
 
   describe('list + get datasets', async() => {
      before('create two datasets to be gotten/listed', async () => {
@@ -137,7 +155,6 @@ describe.only('Datasets', () => {
   })
     it('should list datasets', async () => {
       const output = execSync(`node datasets/listDatasets.js ${projectId}`);
-      console.log('output', output)
       assert.match(output, /Datasets:/);
       assert.match(output, new RegExp(datasetId));
     });
@@ -198,7 +215,7 @@ describe('update dataset', async() => {
  
   });
 
-   it.only("should update dataset's expiration", async () => {
+   it("should update dataset's expiration", async () => {
     const request = {
       projectId: projectId,
       datasetId: datasetId,
@@ -211,45 +228,6 @@ describe('update dataset', async() => {
   });
 
 })
-
-  
-  // //TODO(coleleah): update
-
-  // it('should add label to a dataset', async () => {
-  //   const output = execSync(`node labelDataset.js ${datasetId}`);
-  //   assert.include(output, `${datasetId} labels:`);
-  //   assert.include(output, "{ color: 'green' }");
-  // });
-  // //TODO(coleleah): update
-
-  // it("should list a dataset's labels", async () => {
-  //   const output = execSync(`node getDatasetLabels.js ${datasetId}`);
-  //   assert.include(output, `${datasetId} Labels:`);
-  //   assert.include(output, 'color: green');
-  // });
-  // //TODO(coleleah): update
-
-  // it('should delete a label from a dataset', async () => {
-  //   const output = execSync(`node deleteLabelDataset.js ${datasetId}`);
-  //   assert.include(output, `${datasetId} labels:`);
-  //   assert.include(output, 'undefined');
-  // });
-  // //TODO(coleleah): update
-
-  // it("should update dataset's access", async () => {
-  //   const output = execSync(`node updateDatasetAccess.js ${datasetId}`);
-  //   assert.include(output, "role: 'READER'");
-  //   assert.include(output, "userByEmail: 'sample.bigquery.dev@gmail.com'");
-  // });
-  // //TODO(coleleah): update
-
-  // it('should filter datasets by label', async () => {
-  //   execSync(`node labelDataset.js ${datasetId}`);
-  //   const output = execSync('node listDatasetsByLabel.js');
-  //   assert.match(output, /Datasets:/);
-  //   assert.match(output, new RegExp(datasetId));
-  // });
-
   describe('delete dataset', () => {
     // create the dataset we need to delete
     before('create a dataset to be deleted', async () => {
@@ -287,42 +265,5 @@ describe('update dataset', async() => {
   });
 })
   
-  // // TODO(coleleah): update
-
-  // // Only delete a resource if it is older than 24 hours. That will prevent
-  // // collisions with parallel CI test runs.
-  // function isResourceStale(creationTime) {
-  //   const oneDayMs = 86400000;
-  //   const now = new Date();
-  //   const created = new Date(creationTime);
-  //   return now.getTime() - created.getTime() >= oneDayMs;
-  // }
-  // //TODO(coleleah): update
-
-  // async function deleteDatasets() {
-  //   let [datasets] = await bigquery.getDatasets();
-  //   datasets = datasets.filter(dataset =>
-  //     dataset.id.includes(GCLOUD_TESTS_PREFIX),
-  //   );
-
-  //   for (const dataset of datasets) {
-  //     let metadata;
-  //     try {
-  //       [metadata] = await dataset.getMetadata();
-  //     } catch (e) {
-  //       console.log(`dataset(${dataset.id}).getMetadata() failed`);
-  //       console.log(e);
-  //       return;
-  //     }
-  //     const creationTime = Number(metadata.creationTime);
-  //     if (isResourceStale(creationTime)) {
-  //       try {
-  //         await dataset.delete({force: true});
-  //       } catch (e) {
-  //         console.log(`dataset(${dataset.id}).delete() failed`);
-  //         console.log(e);
-  //       }
-  //     }
-  //   }
-  // }
+ 
 });
