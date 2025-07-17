@@ -28,7 +28,6 @@ async function main(projectId, datasetId, location = 'US') {
   // Creates a client
   //TODO(coleleah): remove fallback:false if obsolete
   // tracked in b/429226336
-
   const bigqueryClient = new BigQueryClient({}, {opts: {fallback: false}});
   async function createDataset() {
     // Construct the dataset resource.
