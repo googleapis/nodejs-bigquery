@@ -37,6 +37,7 @@
     "fix": "gts fix",
     "gen-central-client": "tsc scripts/gen_uber_class.ts && cd scripts && node gen_uber_class.js && cd ..",
     "lint": "gts check",
+    "prelint": "cd samples; npm link ../; npm install",
     "prepare": "npm run compile-protos && npm run gen-central-client && npm run compile",
     "pretest": "npm run prepare",
     "samples-test": "cd samples/ && npm link ../ && npm test && cd ../",

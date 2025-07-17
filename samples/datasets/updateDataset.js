@@ -103,7 +103,9 @@ async function main(projectId, datasetId, updateOption) {
       await updateDatasetExpiration();
       break;
     default:
-      console.log('Invalid update option - please choose "description" or "expiration"');
+      console.log(
+        'Invalid update option - please choose "description" or "expiration"',
+      );
   }
 }
 
