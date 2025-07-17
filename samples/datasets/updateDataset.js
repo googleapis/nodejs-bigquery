@@ -13,13 +13,10 @@
 // limitations under the License.
 
 'use strict';
-// TODO(coleleah): add a test
-// TODO(coleleah): manually test
-// TODO(coleleah): make three samples in one
-async function main(projectId, datasetId, updateOption) {
 
-// [START bigquery_update_dataset_description]  
-// [START bigquery_update_dataset_expiration]
+async function main(projectId, datasetId, updateOption) {
+  // [START bigquery_update_dataset_description]
+  // [START bigquery_update_dataset_expiration]
   /**
    * TODO(developer): Uncomment these variables before running the sample.
    */
@@ -30,13 +27,13 @@ async function main(projectId, datasetId, updateOption) {
 
   // Creates a client
   const bigqueryClient = new BigQueryClient();
- // [END bigquery_update_dataset_expiration]
+  // [END bigquery_update_dataset_expiration]
 
   async function updateDatasetDescription() {
-   const description = "wow! new description!"
-   const datasetToUpdate = {
+    const description = 'wow! new description!';
+    const datasetToUpdate = {
       projectId: projectId,
-      datasetId: datasetId, 
+      datasetId: datasetId,
       datasetReference: {
         datasetId: datasetId,
       },
@@ -52,7 +49,9 @@ async function main(projectId, datasetId, updateOption) {
     try {
       // Make the API request.
       const [response] = await bigqueryClient.updateDataset(request);
-      console.log(`Dataset ${response.id} description: ${response.description.value}`);
+      console.log(
+        `Dataset ${response.id} description: ${response.description.value}`,
+      );
     } catch (err) {
       console.error('ERROR updating dataset:', err);
       if (err.errors) {
@@ -60,15 +59,15 @@ async function main(projectId, datasetId, updateOption) {
       }
     }
   }
- // [END bigquery_update_dataset_description]
+  // [END bigquery_update_dataset_description]
 
- // [START bigquery_update_dataset_expiration]
+  // [START bigquery_update_dataset_expiration]
 
   async function updateDatasetExpiration() {
-   const expirationTime = 24 * 60 * 60 * 1000;
-   const datasetToUpdate = {
+    const expirationTime = 24 * 60 * 60 * 1000;
+    const datasetToUpdate = {
       projectId: projectId,
-      datasetId: datasetId, 
+      datasetId: datasetId,
       datasetReference: {
         datasetId: datasetId,
       },
@@ -84,7 +83,9 @@ async function main(projectId, datasetId, updateOption) {
     try {
       // Make the API request.
       const [response] = await bigqueryClient.updateDataset(request);
-      console.log(`Dataset ${response.id} expiration: ${response.defaultTableExpirationMs.value}`);
+      console.log(
+        `Dataset ${response.id} expiration: ${response.defaultTableExpirationMs.value}`,
+      );
     } catch (err) {
       console.error('ERROR updating dataset:', err);
       if (err.errors) {
@@ -92,18 +93,17 @@ async function main(projectId, datasetId, updateOption) {
       }
     }
   }
-   // [END bigquery_update_dataset_expiration]
+  // [END bigquery_update_dataset_expiration]
 
-  switch (updateOption){
-    case "description":
-        await updateDatasetDescription();
-        break
-    case "expiration":
-        await updateDatasetExpiration();
-        break
+  switch (updateOption) {
+    case 'description':
+      await updateDatasetDescription();
+      break;
+    case 'expiration':
+      await updateDatasetExpiration();
+      break;
     default:
-        //TODO(coleleah): improve
-        console.log('Invalid update option')
+      console.log('Invalid update option - please choose "description" or "expiration"');
   }
 }
 
@@ -113,7 +113,8 @@ process.on('unhandledRejection', err => {
 });
 
 if (process.argv.length < 3) {
-  // TODO(coleleah): change how we call this
-  console.log('Usage: node updateDataset.js <projectId> <datasetId> <updateOption>');
+  console.log(
+    'Usage: node updateDataset.js <projectId> <datasetId> <updateOption>',
+  );
 }
 main(...process.argv.slice(2)).catch(console.error);

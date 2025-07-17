@@ -39,6 +39,7 @@
     "lint": "gts check",
     "prepare": "npm run compile-protos && npm run gen-central-client && npm run compile",
     "pretest": "npm run prepare",
+    "samples-test": "cd samples/ && npm link ../ && npm test && cd ../",
     "system-test": "c8 mocha build/system-test",
     "test": "c8 mocha build/test"
   },

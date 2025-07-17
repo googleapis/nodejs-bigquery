@@ -13,11 +13,8 @@
 // limitations under the License.
 
 'use strict';
-// TODO(coleleah): add a test
-// TODO(coleleah): manually test
 
 async function main(projectId, datasetId) {
-  console.log('executing delete file')
   // [START bigquery_delete_dataset]
   /**
    * TODO(developer): Uncomment these variables before running the sample.

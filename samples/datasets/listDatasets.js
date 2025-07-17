@@ -13,8 +13,7 @@
 // limitations under the License.
 
 'use strict';
-// TODO(coleleah): add a test
-// TODO(coleleah): manually test
+
 async function main(projectId) {
   // [START bigquery_list_datasets]
   /**
@@ -31,7 +30,7 @@ async function main(projectId) {
   async function listDatasets() {
     // Construct the request object.
     const request = {
-      projectId: projectId
+      projectId: projectId,
     };
 
     try {

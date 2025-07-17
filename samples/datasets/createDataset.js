@@ -27,7 +27,9 @@ async function main(projectId, datasetId, location = 'US') {
 
   // Creates a client
   //TODO(coleleah): remove fallback:false if obsolete
-  const bigqueryClient = new BigQueryClient({}, {opts:{fallback: false}});
+  // tracked in b/429226336
+
+  const bigqueryClient = new BigQueryClient({}, {opts: {fallback: false}});
   async function createDataset() {
     // Construct the dataset resource.
     const dataset = {
@@ -64,7 +66,9 @@ process.on('unhandledRejection', err => {
 });
 
 if (process.argv.length < 4) {
-  console.error('Usage: node createDataset.js <projectId> <datasetId> [location]');
+  console.error(
+    'Usage: node createDataset.js <projectId> <datasetId> [location]',
+  );
   process.exitCode = 1;
 }
 main(...process.argv.slice(2)).catch(console.error);

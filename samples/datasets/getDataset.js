@@ -13,8 +13,7 @@
 // limitations under the License.
 
 'use strict';
-// TODO(coleleah): add a test
-// TODO(coleleah): manually test
+
 async function main(projectId, datasetId) {
   // [START bigquery_get_dataset]
   /**

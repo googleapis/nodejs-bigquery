@@ -29,11 +29,11 @@ const datasetId = `${GCLOUD_TESTS_PREFIX}_datasets_${randomUUID()}`.replace(
 
 //TODO(coleleah): remove fallback: false if needed
 // tracked in b/429226336
-const bigquery = new BigQueryClient({}, {opts:{fallback: false}});
+const bigquery = new BigQueryClient({}, {opts: {fallback: false}});
 // the GCLOUD_PROJECT environment variable is set as part of test harness setup
 const projectId = process.env.GCLOUD_PROJECT;
 
-describe.only('Datasets', () => {
+describe('Datasets', () => {
   // Only delete a resource if it is older than 24 hours. That will prevent
   // collisions with parallel CI test runs.
   function isResourceStale(creationTime) {
@@ -46,15 +46,15 @@ describe.only('Datasets', () => {
   // utility function to clean up stale resources
   async function deleteDatasets() {
     const listRequest = {
-      projectId: projectId
-    }
+      projectId: projectId,
+    };
     let [datasets] = await bigquery.listDatasets(listRequest);
     datasets = datasets.filter(dataset =>
       dataset.id.includes(GCLOUD_TESTS_PREFIX),
     );
 
     for (const dataset of datasets) {
-      let datasetRequest = {
+      const datasetRequest = {
         projectId: projectId,
         datasetId: dataset.datasetReference.datasetId,
       };
@@ -62,14 +62,14 @@ describe.only('Datasets', () => {
       try {
         datasetInfo = await bigquery.getDataset(datasetRequest);
       } catch (e) {
-        console.log(`dataset(${dataset.id}).getMetadata() failed`);
+        console.log(`dataset(${dataset.id}).getDataset failed`);
         console.log(e);
         return;
       }
       const creationTime = Number(datasetInfo.creationTime);
       if (isResourceStale(creationTime)) {
         try {
-          await bigquery.deleteDataset(datasetRequest)
+          await bigquery.deleteDataset(datasetRequest);
         } catch (e) {
           console.log(`dataset ${dataset.id} deletion failed`);
           console.log(e);
@@ -80,9 +80,10 @@ describe.only('Datasets', () => {
   before(async () => {
     // // Delete any stale datasets from samples tests
     await deleteDatasets();
-    if (projectId===undefined){
-      throw Error("GCLOUD_PROJECT must be defined as an environment variable before tests can be run")
-
+    if (projectId === undefined) {
+      throw Error(
+        'GCLOUD_PROJECT must be defined as an environment variable before tests can be run',
+      );
     }
   });
 
@@ -91,68 +92,67 @@ describe.only('Datasets', () => {
   });
 
   describe('dataset creation', () => {
-  after(async () => {
-    const request = {
-      projectId: projectId,
-      datasetId: datasetId,
-    };
-    await bigquery.deleteDataset(request)
-
-  })
-  it('should create a dataset', async () => {
-    const output = execSync(`node datasets/createDataset.js ${projectId} ${datasetId}`);
-    assert.include(output, `Dataset ${projectId}:${datasetId} created`);
-    const request = {
-      projectId: projectId,
-      datasetId: datasetId,
-    };
-    const [exists] = await bigquery.getDataset(request);
-    assert.ok(exists);
-  });
-  })
-
-  describe('list + get datasets', async() => {
-     before('create two datasets to be gotten/listed', async () => {
-      const dataset = {
-      datasetReference: {
-        datasetId: datasetId,
-      },
-      location: 'US',
-    };
-    const dataset2 = {
-      datasetReference: {
-        datasetId: datasetId+"_2",
-      },
-      location: 'US',
-    };
+    after(async () => {
       const request = {
-      projectId: projectId,
-      dataset: dataset,
-    };
+        projectId: projectId,
+        datasetId: datasetId,
+      };
+      await bigquery.deleteDataset(request);
+    });
+    it('should create a dataset', async () => {
+      const output = execSync(
+        `node datasets/createDataset.js ${projectId} ${datasetId}`,
+      );
+      assert.include(output, `Dataset ${projectId}:${datasetId} created`);
+      const request = {
+        projectId: projectId,
+        datasetId: datasetId,
+      };
+      const [exists] = await bigquery.getDataset(request);
+      assert.ok(exists);
+    });
+  });
+
+  describe('list + get datasets', async () => {
+    before('create two datasets to be gotten/listed', async () => {
+      const dataset = {
+        datasetReference: {
+          datasetId: datasetId,
+        },
+        location: 'US',
+      };
+      const dataset2 = {
+        datasetReference: {
+          datasetId: datasetId + '_2',
+        },
+        location: 'US',
+      };
+      const request = {
+        projectId: projectId,
+        dataset: dataset,
+      };
       const request2 = {
-      projectId: projectId,
-      dataset: dataset2,
-    };
-    const [response] = await bigquery.insertDataset(request)
-    assert.ok(response)
-    const [response2] = await bigquery.insertDataset(request2)
+        projectId: projectId,
+        dataset: dataset2,
+      };
+      const [response] = await bigquery.insertDataset(request);
+      assert.ok(response);
+      const [response2] = await bigquery.insertDataset(request2);
 
-    assert.ok(response2)
-
-    })
+      assert.ok(response2);
+    });
     after('delete two datasets that were created for these tests', async () => {
-    const request = {
-      projectId: projectId,
-      datasetId: datasetId,
-    };
-    const request2 = {
-      projectId: projectId,
-      datasetId: datasetId+"_2",
-    };
-    await bigquery.deleteDataset(request)
-    await bigquery.deleteDataset(request2)
-
-  })
+      const request = {
+        projectId: projectId,
+        datasetId: datasetId,
+      };
+      const request2 = {
+        projectId: projectId,
+        datasetId: datasetId + '_2',
+      };
+      await bigquery.deleteDataset(request);
+      await bigquery.deleteDataset(request2);
+    });
     it('should list datasets', async () => {
       const output = execSync(`node datasets/listDatasets.js ${projectId}`);
       assert.match(output, /Datasets:/);
@@ -160,110 +160,115 @@ describe.only('Datasets', () => {
     });
 
     it('should list datasets on a different project', async () => {
-      const output = execSync('node datasets/listDatasets.js bigquery-public-data');
+      const output = execSync(
+        'node datasets/listDatasets.js bigquery-public-data',
+      );
       assert.match(output, /Datasets:/);
       assert.match(output, new RegExp('usa_names'));
     });
 
     it('should retrieve a dataset if it exists', async () => {
-      const output = execSync(`node datasets/getDataset.js ${projectId} ${datasetId}`);
+      const output = execSync(
+        `node datasets/getDataset.js ${projectId} ${datasetId}`,
+      );
       assert.include(output, 'Dataset');
       assert.include(output, 'retrieved successfully');
       assert.include(output, datasetId);
     });
+  });
 
-  })
-  
-describe('update dataset', async() => {
+  describe('update dataset', async () => {
     before('create a dataset to be updated', async () => {
-    const dataset = {
-      datasetReference: {
-        datasetId: datasetId,
-      },
-      location: 'US',
-    };
+      const dataset = {
+        datasetReference: {
+          datasetId: datasetId,
+        },
+        location: 'US',
+      };
       const request = {
-      projectId: projectId,
-      dataset: dataset,
-    };
-   
-    const [response] = await bigquery.insertDataset(request)
-    assert.ok(response)
+        projectId: projectId,
+        dataset: dataset,
+      };
 
-    })
+      const [response] = await bigquery.insertDataset(request);
+      assert.ok(response);
+    });
     after('delete two datasets that were created for these tests', async () => {
-    const request = {
-      projectId: projectId,
-      datasetId: datasetId,
-    };
-    await bigquery.deleteDataset(request)
-  })
+      const request = {
+        projectId: projectId,
+        datasetId: datasetId,
+      };
+      await bigquery.deleteDataset(request);
+    });
     it("should update dataset's description", async () => {
-    const request = {
-      projectId: projectId,
-      datasetId: datasetId,
-    };
-    let [dataset] = await bigquery.getDataset(request);
-    assert.ok(dataset, dataset.description);
-    assert.isNull(dataset.description)
-    const output = execSync(`node datasets/updateDataset.js ${projectId} ${datasetId} description`);
-    assert.include(
-      output,
-      `${projectId}:${datasetId} description: wow! new description!`,
-    );
+      const request = {
+        projectId: projectId,
+        datasetId: datasetId,
+      };
+      const [dataset] = await bigquery.getDataset(request);
+      assert.ok(dataset, dataset.description);
+      assert.isNull(dataset.description);
+      const output = execSync(
+        `node datasets/updateDataset.js ${projectId} ${datasetId} description`,
+      );
+      assert.include(
+        output,
+        `${projectId}:${datasetId} description: wow! new description!`,
+      );
+    });
 
- 
+    it("should update dataset's expiration", async () => {
+      const request = {
+        projectId: projectId,
+        datasetId: datasetId,
+      };
+      const [dataset] = await bigquery.getDataset(request);
+      assert.ok(dataset, dataset.defaultTableExpirationMs);
+      assert.isNull(dataset.defaultTableExpirationMs);
+      const output = execSync(
+        `node datasets/updateDataset.js ${projectId} ${datasetId} expiration`,
+      );
+      assert.include(output, `${datasetId} expiration: 86400000`);
+    });
   });
-
-   it("should update dataset's expiration", async () => {
-    const request = {
-      projectId: projectId,
-      datasetId: datasetId,
-    };
-    let [dataset] = await bigquery.getDataset(request);
-    assert.ok(dataset, dataset.defaultTableExpirationMs);
-    assert.isNull(dataset.defaultTableExpirationMs)
-    const output = execSync(`node datasets/updateDataset.js ${projectId} ${datasetId} expiration`);
-    assert.include(output, `${datasetId} expiration: 86400000`);
-  });
-
-})
   describe('delete dataset', () => {
     // create the dataset we need to delete
     before('create a dataset to be deleted', async () => {
       const dataset = {
-      datasetReference: {
-        datasetId: datasetId,
-      },
-      location: 'US',
-    };
+        datasetReference: {
+          datasetId: datasetId,
+        },
+        location: 'US',
+      };
       const request = {
-      projectId: projectId,
-      dataset: dataset,
-    };
-    const [response] = await bigquery.insertDataset(request)
-    assert.ok(response)
-
-    })
+        projectId: projectId,
+        dataset: dataset,
+      };
+      const [response] = await bigquery.insertDataset(request);
+      assert.ok(response);
+    });
 
     it('should delete a dataset', async () => {
-    const request = {
-      projectId: projectId,
-      datasetId: datasetId,
-    };
-    let [dataset] = await bigquery.getDataset(request);
-    assert.ok(dataset);
+      const request = {
+        projectId: projectId,
+        datasetId: datasetId,
+      };
+      const [dataset] = await bigquery.getDataset(request);
+      assert.ok(dataset);
 
-    const output = execSync(`node datasets/deleteDataset.js ${projectId} ${datasetId}`);
-    assert.include(output, `Dataset ${datasetId} deleted.`);
+      const output = execSync(
+        `node datasets/deleteDataset.js ${projectId} ${datasetId}`,
+      );
+      assert.include(output, `Dataset ${datasetId} deleted.`);
 
-    try{
-      await bigquery.getDataset(request);
-    }catch(err){
-      assert.strictEqual(err.details, `Not found: Dataset ${projectId}:${datasetId}`)
-    }
+      try {
+        await bigquery.getDataset(request);
+      } catch (err) {
+        assert.strictEqual(
+          err.details,
+          `Not found: Dataset ${projectId}:${datasetId}`,
+        );
+      }
+    });
   });
-})
-  
- 
 });
