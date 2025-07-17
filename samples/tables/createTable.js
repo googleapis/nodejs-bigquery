@@ -1,0 +1,74 @@
+// Copyright 2019 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+'use strict';
+
+function main(
+  datasetId = 'my_dataset', // Existing dataset
+  tableId = 'my_new_table', // Table to be created
+  schema = [
+    {name: 'Name', type: 'STRING', mode: 'REQUIRED'},
+    {name: 'Age', type: 'INTEGER'},
+    {name: 'Weight', type: 'FLOAT'},
+    {name: 'IsMagic', type: 'BOOLEAN'},
+  ],
+) {
+  // [START bigquery_create_table]
+  // Import the Google Cloud client library and create a client
+  const {BigQueryClient} = require('@google-cloud/bigquery');
+  //TODO(coleleah): remove fallback: false if needed
+// tracked in b/429226336
+  const bigquery = new BigQueryClient({}, {opts: {fallback: false}});
+
+  async function createTable() {
+    // Creates a new table named "my_table" in "my_dataset".
+
+    /**
+     * TODO(developer): Uncomment the following lines before running the sample.
+     */
+    // const datasetId = "my_dataset";
+    // const tableId = "my_table";
+    /* const schema = [
+      {name: 'Name', type: 'STRING', mode: 'REQUIRED'},
+      {name: 'Age', type: 'INTEGER'},
+      {name: 'Weight', type: 'FLOAT'},
+      {name: 'IsMagic', type: 'BOOLEAN'},
+    ]; */
+
+    const projectId = await bigquery.tableClient.getProjectId();
+
+    // For all options, see https://cloud.google.com/bigquery/docs/reference/v2/tables#resource
+    const request = {
+      projectId,
+      datasetId,
+      table: {
+        tableReference: {
+          projectId,
+          datasetId,
+          tableId,
+        },
+        schema: {fields: schema},
+        location: 'US',
+      },
+    };
+
+    // Create a new table in the dataset
+    const [table] = await bigquery.insertTable(request);
+
+    console.log(`Table ${table.tableReference.tableId} created.`);
+  }
+  // [END bigquery_create_table]
+  createTable();
+}
+main(...process.argv.slice(2));
