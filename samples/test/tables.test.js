@@ -15,7 +15,7 @@
 'use strict';
 
 const {assert} = require('chai');
-const {describe, it, before, after} = require('mocha');
+const {describe, it, before, after, beforeEach} = require('mocha');
 const {randomUUID} = require('crypto');
 const cp = require('child_process');
 const {BigQueryClient} = require('@google-cloud/bigquery');
