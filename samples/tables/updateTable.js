@@ -24,12 +24,10 @@ function main(datasetId = 'my_dataset', tableId = 'my_table') {
     // Updates a table's description.
     const projectId = await bigquery.tableClient.getProjectId();
 
-
-
     // Set new table description
     const description = {value: 'New table description.'};
 
-     const request = {
+    const request = {
       projectId: projectId,
       datasetId: datasetId,
       tableId: tableId,
@@ -38,7 +36,7 @@ function main(datasetId = 'my_dataset', tableId = 'my_table') {
         description: description,
       },
     };
-   
+
     const [response] = await bigquery.updateTable(request);
 
     console.log(`${tableId} description: ${response.description.value}`);

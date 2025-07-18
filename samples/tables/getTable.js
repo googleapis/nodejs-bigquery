@@ -35,7 +35,7 @@ function main(datasetId = 'my_dataset', tableId = 'my_table') {
     const request = {
       projectId: projectId,
       datasetId: datasetId,
-      tableId: tableId
+      tableId: tableId,
     };
 
     const [table] = await bigquery.getTable(request);

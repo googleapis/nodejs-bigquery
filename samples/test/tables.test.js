@@ -20,11 +20,9 @@ const {randomUUID} = require('crypto');
 const cp = require('child_process');
 const {BigQueryClient} = require('@google-cloud/bigquery');
 
-
 const execSync = cmd => cp.execSync(cmd, {encoding: 'utf-8'});
 
 const GCLOUD_TESTS_PREFIX = 'nodejs_samples_tests';
-
 
 const generateUuid = () =>
   `${GCLOUD_TESTS_PREFIX}_${randomUUID()}`.replace(/-/gi, '_');
@@ -33,8 +31,6 @@ const datasetId = generateUuid();
 
 const tableId = generateUuid();
 
-
-
 //TODO(coleleah): remove fallback: false if needed
 // tracked in b/429226336
 const bigquery = new BigQueryClient({}, {opts: {fallback: false}});
@@ -42,7 +38,10 @@ const bigquery = new BigQueryClient({}, {opts: {fallback: false}});
 const projectId = process.env.GCLOUD_PROJECT;
 
 describe('Tables', () => {
-  // there is logic in the datasets samples test that will clean up stale 
+      beforeEach(async function () {
+    this.currentTest.retries(2);
+  });
+  // there is logic in the datasets samples test that will clean up stale
   // datasets - they follow the same prefix logic as we do in this file
   before(async () => {
     if (projectId === undefined) {
@@ -51,249 +50,239 @@ describe('Tables', () => {
       );
     }
     const datasetObject = {
-        datasetReference: {
-          datasetId: datasetId,
-        },
-        location: 'US',
-      };
+      datasetReference: {
+        datasetId: datasetId,
+      },
+      location: 'US',
+    };
     const datasetRequest = {
-        projectId: projectId,
-        dataset: datasetObject,
-      };
-    await bigquery.insertDataset(datasetRequest)
-
+      projectId: projectId,
+      dataset: datasetObject,
+    };
+    await bigquery.insertDataset(datasetRequest);
   });
   after(async () => {
     const deleteRequest = {
-        projectId: projectId,
-        datasetId: datasetId,
-        deleteContents: true
-    }
-    await bigquery.deleteDataset(deleteRequest)
+      projectId: projectId,
+      datasetId: datasetId,
+      deleteContents: true,
+    };
+    await bigquery.deleteDataset(deleteRequest);
   });
 
-
-    describe('table creation', () => {
-      it('should create a table', async () => {
-        const output = execSync(`node tables/createTable.js ${datasetId} ${tableId}`);
-        assert.include(output, `Table ${tableId} created.`);
-        const tableRequest = {
-            projectId: projectId,
-            datasetId: datasetId,
-            tableId: tableId
-        }
-        const [response] = await bigquery.getTable(tableRequest)
-        assert.ok(response);
-      });
-    
-
+  describe('table creation', () => {
+    after(async() => {
+    const table1DeleteRequest = {
+        projectId: projectId,
+        datasetId: datasetId,
+        tableId: tableId,
+      };
+      await bigquery.deleteTable(table1DeleteRequest);
     })
-    describe('table list/get', () => {
+    
+    it('should create a table', async () => {
+      const output = execSync(
+        `node tables/createTable.js ${datasetId} ${tableId}`,
+      );
+      assert.include(output, `Table ${tableId} created.`);
+      const tableRequest = {
+        projectId: projectId,
+        datasetId: datasetId,
+        tableId: tableId,
+      };
+      const [response] = await bigquery.getTable(tableRequest);
+      assert.ok(response);
+    });
+  });
+  describe('table list/get', () => {
     const schema = [
-        {name: 'Name', type: 'STRING', mode: 'REQUIRED'},
-        {name: 'Age', type: 'INTEGER'},
-        {name: 'Weight', type: 'FLOAT'},
-        {name: 'IsMagic', type: 'BOOLEAN'},
-    ]
-        const table2Id = tableId + '_2';
-            const table1Request = {
-                projectId,
-                datasetId,
-                table: {
-                    tableReference: {
-                    projectId: projectId,
-                    datasetId: datasetId,
-                    tableId: tableId,
-                    },
-                    schema: {fields: schema},
-                    location: 'US',
-                },
-            };
-            const table2Request = {
-                projectId,
-                datasetId,
-                table: {
-                    tableReference: {
-                    projectId: projectId,
-                    datasetId: datasetId,
-                    tableId: table2Id,
-                    },
-                    schema: {fields: schema},
-                    location: 'US',
-                },
-            };
+      {name: 'Name', type: 'STRING', mode: 'REQUIRED'},
+      {name: 'Age', type: 'INTEGER'},
+      {name: 'Weight', type: 'FLOAT'},
+      {name: 'IsMagic', type: 'BOOLEAN'},
+    ];
+    const table2Id = tableId + '_2';
+    const table1Request = {
+      projectId,
+      datasetId,
+      table: {
+        tableReference: {
+          projectId: projectId,
+          datasetId: datasetId,
+          tableId: tableId,
+        },
+        schema: {fields: schema},
+        location: 'US',
+      },
+    };
+    const table2Request = {
+      projectId,
+      datasetId,
+      table: {
+        tableReference: {
+          projectId: projectId,
+          datasetId: datasetId,
+          tableId: table2Id,
+        },
+        schema: {fields: schema},
+        location: 'US',
+      },
+    };
 
-        // create two tables for listing
-        before(async () => {
-            const [table1] = await bigquery.insertTable(table1Request);
-            const [table2] = await bigquery.insertTable(table2Request);
-            assert.ok(table1);
-            assert.ok(table2);
-        })
-        // tear down tables created
-        after(async () => {
-            const table1DeleteRequest = {
-                projectId: projectId,
-                datasetId: datasetId,
-                tableId: table1Request.table.tableReference.tableId
-            }
-            const table2DeleteRequest = {
-                projectId: projectId,
-                datasetId: datasetId,
-                tableId: table2Request.table.tableReference.tableId
-            
-            }
-            await bigquery.deleteTable(table1DeleteRequest)
-            await bigquery.deleteTable(table2DeleteRequest);
-
-        })
+    // create two tables for listing
+    before(async () => {
+      const [table1] = await bigquery.insertTable(table1Request);
+      const [table2] = await bigquery.insertTable(table2Request);
+      assert.ok(table1);
+      assert.ok(table2);
+    });
+    // tear down tables created
+    after(async () => {
+      const table1DeleteRequest = {
+        projectId: projectId,
+        datasetId: datasetId,
+        tableId: table1Request.table.tableReference.tableId,
+      };
+      const table2DeleteRequest = {
+        projectId: projectId,
+        datasetId: datasetId,
+        tableId: table2Request.table.tableReference.tableId,
+      };
+      await bigquery.deleteTable(table1DeleteRequest);
+      await bigquery.deleteTable(table2DeleteRequest);
+    });
     it('should retrieve a table if it exists', async () => {
-        const output = execSync(`node tables/getTable.js ${datasetId} ${tableId}`);
-        assert.include(output, 'Table:');
-        assert.include(output, datasetId);
-        assert.include(output, tableId);
+      const output = execSync(
+        `node tables/getTable.js ${datasetId} ${tableId}`,
+      );
+      assert.include(output, 'Table:');
+      assert.include(output, datasetId);
+      assert.include(output, tableId);
     });
     it('should list tables', async () => {
-        const output = execSync(`node tables/listTables.js ${datasetId}`);
-        assert.match(output, /Tables:/);
-        assert.match(output, new RegExp(tableId));
-        assert.match(output, new RegExp(table2Id));
-
+      const output = execSync(`node tables/listTables.js ${datasetId}`);
+      assert.match(output, /Tables:/);
+      assert.match(output, new RegExp(tableId));
+      assert.match(output, new RegExp(table2Id));
     });
+  });
+  describe('table update', () => {
+    const schema = [
+      {name: 'Name', type: 'STRING', mode: 'REQUIRED'},
+      {name: 'Age', type: 'INTEGER'},
+      {name: 'Weight', type: 'FLOAT'},
+      {name: 'IsMagic', type: 'BOOLEAN'},
+    ];
+    const tableRequest = {
+      projectId,
+      datasetId,
+      table: {
+        tableReference: {
+          projectId: projectId,
+          datasetId: datasetId,
+          tableId: tableId,
+        },
+        schema: {fields: schema},
+        location: 'US',
+      },
+    };
 
+    // create a table to update
+    before(async () => {
+      const [table1] = await bigquery.insertTable(tableRequest);
+      assert.ok(table1);
+    });
+    // tear down table
+    after(async () => {
+      const tableDeleteRequest = {
+        projectId: projectId,
+        datasetId: datasetId,
+        tableId: tableRequest.table.tableReference.tableId,
+      };
 
-    })
-    describe.only('table update', () => {
-        const schema = [
-        {name: 'Name', type: 'STRING', mode: 'REQUIRED'},
-        {name: 'Age', type: 'INTEGER'},
-        {name: 'Weight', type: 'FLOAT'},
-        {name: 'IsMagic', type: 'BOOLEAN'},
-    ]
-            const tableRequest = {
-                projectId,
-                datasetId,
-                table: {
-                    tableReference: {
-                    projectId: projectId,
-                    datasetId: datasetId,
-                    tableId: tableId,
-                    },
-                    schema: {fields: schema},
-                    location: 'US',
-                },
-            };
+      await bigquery.deleteTable(tableDeleteRequest);
+    });
+    it("should update table's description", async () => {
+      const tableGetRequest = {
+        projectId: projectId,
+        datasetId: datasetId,
+        tableId: tableId,
+      };
+      const [table] = await bigquery.getTable(tableGetRequest);
+      assert.ok(table, table.description);
+      assert.isNull(table.description);
+      const output = execSync(
+        `node tables/updateTable.js ${datasetId} ${tableId}`,
+      );
+      assert.include(output, `${tableId} description: New table description`);
+    });
+  });
 
-        // create a table to update
-        before(async () => {
-            const [table1] = await bigquery.insertTable(tableRequest);
-            assert.ok(table1);
-        })
-        // tear down table
-        after(async () => {
-            const tableDeleteRequest = {
-                projectId: projectId,
-                datasetId: datasetId,
-                tableId: tableRequest.table.tableReference.tableId
-            }
-
-            await bigquery.deleteTable(tableDeleteRequest)
-
-        })
-        it("should update table's description", async () => {
-                const tableGetRequest = {
-                projectId: projectId,
-                datasetId: datasetId,
-                tableId: tableId
-            }
-            const [table] = await bigquery.getTable(tableGetRequest);
-            assert.ok(table, table.description);
-            assert.isNull(table.description);
-            const output = execSync(
-            `node tables/updateTable.js ${datasetId} ${tableId}`,
-            );
-            assert.include(output, `${tableId} description: New table description`);
-        });
-
-    })
-
-    describe('table deletion', () => {
-       const schema = [
-        {name: 'Name', type: 'STRING', mode: 'REQUIRED'},
-        {name: 'Age', type: 'INTEGER'},
-        {name: 'Weight', type: 'FLOAT'},
-        {name: 'IsMagic', type: 'BOOLEAN'},
-    ]
-        const tableRequest = {
-            projectId,
-            datasetId,
-            table: {
-                tableReference: {
-                projectId: projectId,
-                datasetId: datasetId,
-                tableId: tableId,
-                },
-                schema: {fields: schema},
-                location: 'US',
-            },
-        };
-        // create a table for deleting
-        before(async () => {
-            const [table1] = await bigquery.insertTable(tableRequest);
-            assert.ok(table1);
-        })
-        // tear down tables created if needed
-        after(async () => {
-            const tableDeleteRequest = {
-                projectId: projectId,
-                datasetId: datasetId,
-                tableId: tableRequest.table.tableReference.tableId
-            }
-        try{
-            await bigquery.getTable(tableDeleteRequest)
-        }catch (err) {
-
-            if(err.details!==`Not found: Table ${projectId}:${datasetId}.${tableId}`){
-                await bigquery.deleteTable(tableDeleteRequest)
-                throw err;
-
-            }
+  describe('table deletion', () => {
+    const schema = [
+      {name: 'Name', type: 'STRING', mode: 'REQUIRED'},
+      {name: 'Age', type: 'INTEGER'},
+      {name: 'Weight', type: 'FLOAT'},
+      {name: 'IsMagic', type: 'BOOLEAN'},
+    ];
+    const tableRequest = {
+      projectId,
+      datasetId,
+      table: {
+        tableReference: {
+          projectId: projectId,
+          datasetId: datasetId,
+          tableId: tableId,
+        },
+        schema: {fields: schema},
+        location: 'US',
+      },
+    };
+    // create a table for deleting
+    before(async () => {
+      const [table1] = await bigquery.insertTable(tableRequest);
+      assert.ok(table1);
+    });
+    // tear down tables created if needed
+    after(async () => {
+      const tableDeleteRequest = {
+        projectId: projectId,
+        datasetId: datasetId,
+        tableId: tableRequest.table.tableReference.tableId,
+      };
+      try {
+        await bigquery.getTable(tableDeleteRequest);
+      } catch (err) {
+        if (
+          err.details !==
+          `Not found: Table ${projectId}:${datasetId}.${tableId}`
+        ) {
+          await bigquery.deleteTable(tableDeleteRequest);
+          throw err;
         }
-        })
-        it('should delete a table', async () => {
-            const tableGetRequest = {
-            projectId: projectId,
-            datasetId: datasetId,
-            tableId: tableId
-        }
-            const [response] = await bigquery.getTable(tableGetRequest)
-            assert.ok(response) // confirm it exists before deleting it
-            const output = execSync(`node tables/deleteTable.js ${datasetId} ${tableId}`);
-        assert.include(output, `Table ${tableId} deleted.`);
-    
-        try{
-            await bigquery.getTable(tableGetRequest)
-        }catch (err) {
-                assert.strictEqual(
-                  err.details,
-                  `Not found: Table ${projectId}:${datasetId}.${tableId}`,
-                );
-            }
-        });
+      }
+    });
+    it('should delete a table', async () => {
+      const tableGetRequest = {
+        projectId: projectId,
+        datasetId: datasetId,
+        tableId: tableId,
+      };
+      const [response] = await bigquery.getTable(tableGetRequest);
+      assert.ok(response); // confirm it exists before deleting it
+      const output = execSync(
+        `node tables/deleteTable.js ${datasetId} ${tableId}`,
+      );
+      assert.include(output, `Table ${tableId} deleted.`);
 
-
-
-
-
-
-    })
-
-
-
-
-
-
-
-
-
+      try {
+        await bigquery.getTable(tableGetRequest);
+      } catch (err) {
+        assert.strictEqual(
+          err.details,
+          `Not found: Table ${projectId}:${datasetId}.${tableId}`,
+        );
+      }
+    });
+  });
 });

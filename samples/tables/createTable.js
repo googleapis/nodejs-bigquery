@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2025 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ function main(
   // Import the Google Cloud client library and create a client
   const {BigQueryClient} = require('@google-cloud/bigquery');
   //TODO(coleleah): remove fallback: false if needed
-// tracked in b/429226336
+  // tracked in b/429226336
   const bigquery = new BigQueryClient({}, {opts: {fallback: false}});
 
   async function createTable() {
