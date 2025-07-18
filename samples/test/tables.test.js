@@ -38,7 +38,7 @@ const bigquery = new BigQueryClient({}, {opts: {fallback: false}});
 const projectId = process.env.GCLOUD_PROJECT;
 
 describe('Tables', () => {
-      beforeEach(async function () {
+  beforeEach(async function () {
     this.currentTest.retries(2);
   });
   // there is logic in the datasets samples test that will clean up stale
@@ -71,15 +71,15 @@ describe('Tables', () => {
   });
 
   describe('table creation', () => {
-    after(async() => {
-    const table1DeleteRequest = {
+    after(async () => {
+      const table1DeleteRequest = {
         projectId: projectId,
         datasetId: datasetId,
         tableId: tableId,
       };
       await bigquery.deleteTable(table1DeleteRequest);
-    })
-    
+    });
+
     it('should create a table', async () => {
       const output = execSync(
         `node tables/createTable.js ${datasetId} ${tableId}`,
