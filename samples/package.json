@@ -1,0 +1,25 @@
+{
+  "name": "nodejs-docs-samples-bigquery-gapic",
+  "private": true,
+  "license": "Apache-2.0",
+  "author": "Google LLC",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "files": [
+    "*.js"
+  ],
+  "scripts": {
+    "test": "c8 mocha --timeout 600000 test/*.js"
+  },
+  "dependencies": {
+    "@google-cloud/bigquery": "../build/src",
+    "protobufjs": "^7.2.4"
+  },
+  "devDependencies": {
+    "c8": "^9.0.0",
+    "chai": "^4.2.0",
+    "mocha": "^10.2.0",
+    "uuid": "^9.0.0"
+  }
+}
