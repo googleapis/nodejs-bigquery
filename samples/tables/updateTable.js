@@ -14,6 +14,7 @@
 
 'use strict';
 function main(datasetId = 'my_dataset', tableId = 'my_table') {
+  // [START bigquery_update_table_description_preview]
   // Import the Google Cloud client library
   const {BigQueryClient} = require('@google-cloud/bigquery');
   //TODO(coleleah): remove fallback: false if needed
@@ -41,6 +42,8 @@ function main(datasetId = 'my_dataset', tableId = 'my_table') {
 
     console.log(`${tableId} description: ${response.description.value}`);
   }
+  // [END bigquery_update_table_description_preview]
+
   updateTableDescription();
 }
 main(...process.argv.slice(2));

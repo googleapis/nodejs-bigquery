@@ -14,7 +14,7 @@
 
 'use strict';
 function main(datasetId = 'my_dataset') {
-  // [START bigquery_list_tables]
+  // [START bigquery_list_tables_preview]
   // Import the Google Cloud client library
   const {BigQueryClient} = require('@google-cloud/bigquery');
   //TODO(coleleah): remove fallback: false if needed
@@ -41,7 +41,7 @@ function main(datasetId = 'my_dataset') {
     console.log('Tables:');
     tables.forEach(table => console.log(table.tableReference.tableId));
   }
-  // [END bigquery_list_tables]
+  // [END bigquery_list_tables_preview]
   listTables();
 }
 

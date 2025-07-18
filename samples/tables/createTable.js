@@ -24,7 +24,7 @@ function main(
     {name: 'IsMagic', type: 'BOOLEAN'},
   ],
 ) {
-  // [START bigquery_create_table]
+  // [START bigquery_create_table_preview]
   // Import the Google Cloud client library and create a client
   const {BigQueryClient} = require('@google-cloud/bigquery');
   //TODO(coleleah): remove fallback: false if needed
@@ -68,7 +68,7 @@ function main(
 
     console.log(`Table ${table.tableReference.tableId} created.`);
   }
-  // [END bigquery_create_table]
+  // [END bigquery_create_table_preview]
   createTable();
 }
 main(...process.argv.slice(2));
