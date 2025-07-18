@@ -15,7 +15,7 @@
 'use strict';
 
 async function main(projectId) {
-  // [START bigquery_list_datasets]
+  // [START bigquery_list_datasets_preview]
   /**
    * TODO(developer): Uncomment these variables before running the sample.
    */
@@ -51,7 +51,7 @@ async function main(projectId) {
   }
 
   await listDatasets();
-  // [END bigquery_list_datasets]
+  // [END bigquery_list_datasets_preview]
 }
 
 process.on('unhandledRejection', err => {

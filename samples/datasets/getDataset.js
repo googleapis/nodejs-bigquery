@@ -15,7 +15,7 @@
 'use strict';
 
 async function main(projectId, datasetId) {
-  // [START bigquery_get_dataset]
+  // [START bigquery_get_dataset_preview]
   /**
    * TODO(developer): Uncomment these variables before running the sample.
    */
@@ -49,7 +49,7 @@ async function main(projectId, datasetId) {
   }
 
   await getDataset();
-  // [END bigquery_get_dataset]
+  // [END bigquery_get_dataset_preview]
 }
 
 process.on('unhandledRejection', err => {

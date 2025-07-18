@@ -14,7 +14,7 @@
 
 'use strict';
 async function main(projectId, datasetId, location = 'US') {
-  // [START bigquery_create_dataset]
+  // [START bigquery_create_dataset_preview]
   /**
    * TODO(developer): Uncomment these variables before running the sample.
    */
@@ -57,7 +57,7 @@ async function main(projectId, datasetId, location = 'US') {
   }
 
   await createDataset();
-  // [END bigquery_create_dataset]
+  // [END bigquery_create_dataset_preview]
 }
 process.on('unhandledRejection', err => {
   console.error(err.message);

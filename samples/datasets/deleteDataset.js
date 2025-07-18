@@ -15,7 +15,7 @@
 'use strict';
 
 async function main(projectId, datasetId) {
-  // [START bigquery_delete_dataset]
+  // [START bigquery_delete_dataset_preview]
   /**
    * TODO(developer): Uncomment these variables before running the sample.
    */
@@ -49,7 +49,7 @@ async function main(projectId, datasetId) {
   }
 
   await deleteDataset();
-  // [END bigquery_delete_dataset]
+  // [END bigquery_delete_dataset_preview]
 }
 
 process.on('unhandledRejection', err => {

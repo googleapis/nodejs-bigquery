@@ -27,7 +27,7 @@ async function main(projectId, datasetId, updateOption) {
 
   // Creates a client
   const bigqueryClient = new BigQueryClient();
-  // [END bigquery_update_dataset_expiration]
+  // [END bigquery_update_dataset_expiration_preview]
 
   async function updateDatasetDescription() {
     const description = 'wow! new description!';
@@ -59,9 +59,9 @@ async function main(projectId, datasetId, updateOption) {
       }
     }
   }
-  // [END bigquery_update_dataset_description]
+  // [END bigquery_update_dataset_description_preview]
 
-  // [START bigquery_update_dataset_expiration]
+  // [START bigquery_update_dataset_expiration_preview]
 
   async function updateDatasetExpiration() {
     const expirationTime = 24 * 60 * 60 * 1000;
@@ -93,7 +93,7 @@ async function main(projectId, datasetId, updateOption) {
       }
     }
   }
-  // [END bigquery_update_dataset_expiration]
+  // [END bigquery_update_dataset_expiration_preview]
 
   switch (updateOption) {
     case 'description':
