@@ -15,8 +15,8 @@
 'use strict';
 
 async function main(projectId, datasetId, updateOption) {
-  // [START bigquery_update_dataset_description]
-  // [START bigquery_update_dataset_expiration]
+  // [START bigquery_update_dataset_description_preview]
+  // [START bigquery_update_dataset_expiration_preview]
   /**
    * TODO(developer): Uncomment these variables before running the sample.
    */
