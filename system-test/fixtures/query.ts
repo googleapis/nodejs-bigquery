@@ -103,8 +103,8 @@ export function queryParameterTestCases(): QueryParameterTestCase[] {
           },
         },
       ],
-      wantRowJSON: {f0_: Buffer.from('foo')},
-      wantRowValues: [Buffer.from('foo')],
+      wantRowJSON: {f0_: Buffer.from('foo').toString('base64')},
+      wantRowValues: [Buffer.from('foo').toString('base64')],
     },
     {
       name: 'TimestampParam',
@@ -116,8 +116,8 @@ export function queryParameterTestCases(): QueryParameterTestCase[] {
           parameterValue: {value: {value:timestampString(ts)}},
         },
       ],
-      wantRowJSON: {f0_: ts},
-      wantRowValues: [ts],
+      wantRowJSON: {f0_: String(ts.valueOf() * 1000)},
+      wantRowValues: [String(ts.valueOf() * 1000)],
     },
     {
       name: 'TimestampArrayParam',
@@ -136,8 +136,8 @@ export function queryParameterTestCases(): QueryParameterTestCase[] {
           },
         },
       ],
-      wantRowJSON: {f0_: [ts, ts]},
-      wantRowValues: [[ts, ts]],
+      wantRowJSON: {f0_: [String(ts.valueOf() * 1000), String(ts.valueOf() * 1000)]},
+      wantRowValues: [[String(ts.valueOf() * 1000), String(ts.valueOf() * 1000)]],
     },
     {
       name: 'DatetimeParam',
@@ -149,8 +149,8 @@ export function queryParameterTestCases(): QueryParameterTestCase[] {
           parameterValue: {value: {value: civilDateTimeString(dtm)}},
         },
       ],
-      wantRowJSON: {f0_: dtm},
-      wantRowValues: [dtm],
+      wantRowJSON: {f0_: civilDateTimeString(dtm)},
+      wantRowValues: [civilDateTimeString(dtm)],
     },
     {
       name: 'DateParam',
@@ -162,8 +162,8 @@ export function queryParameterTestCases(): QueryParameterTestCase[] {
           parameterValue: {value: {value:civilDateString(d)}},
         },
       ],
-      wantRowJSON: {f0_: d},
-      wantRowValues: [d],
+      wantRowJSON: {f0_: civilDateString(d)},
+      wantRowValues: [civilDateString(d)],
     },
     {
       name: 'TimeParam',
@@ -289,7 +289,7 @@ export function queryParameterTestCases(): QueryParameterTestCase[] {
       ],
       wantRowJSON: {
         f0_: {
-          Datetime: dtm,
+          Datetime: civilDateTimeString(dtm),
           StringArray: ['a', 'b'],
           SubStruct: {
             String: 'c',
@@ -305,7 +305,7 @@ export function queryParameterTestCases(): QueryParameterTestCase[] {
         },
       },
       wantRowValues: [
-        [dtm, ['a', 'b'], ['c'], [['d'], ['e']]],
+        [civilDateTimeString(dtm), ['a', 'b'], ['c'], [['d'], ['e']]],
       ],
     },
   ];

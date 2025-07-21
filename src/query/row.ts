@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {protos} from '../';
 import {Schema} from './schema';
 import {Value} from './value';
 
@@ -20,50 +21,106 @@ import {Value} from './value';
  */
 export class Row {
   private schema: Schema;
-  private value: {[key: string]: Value};
+  private value: protos.google.protobuf.Struct;
 
   constructor(schema: Schema) {
     this.schema = schema;
-    this.value = {};
+    this.value = protos.google.protobuf.Struct.create({
+      fields: this.schema.pb.fields?.reduce(
+        (fields, f) => {
+          fields[f.name!] = {};
+          return fields;
+        },
+        {} as {[key: string]: protos.google.protobuf.IValue},
+      ),
+    });
   }
 
   set(columnName: string, value: Value) {
-    this.value[columnName] = value;
+    if (this.value.fields) {
+      this.value.fields[columnName] = value;
+    }
   }
 
   /**
    * toJSON returns the row as a JSON object.
    */
-  toJSON(): {[key: string]: Value} {
-    const values: {[key: string]: Value} = {};
+  toJSON(): {[key: string]: any} {
+    const value: {[key: string]: any} = {};
     for (const field of this.schema.pb.fields!) {
-      let fval = this.value[field.name!];
-      if (fval instanceof Row) {
-        fval = fval.toJSON();
-      }
-      if (Array.isArray(fval)) {
-        fval = fval.map(v => (v instanceof Row ? v.toJSON() : v));
-      }
-      values[field.name!] = fval;
+      const fieldValue = this.value.fields[field.name!];
+      value[field.name!] = this.fieldValueToJSON(field, fieldValue);
     }
-    return values;
+    return value;
+  }
+
+  private fieldValueToJSON(
+    field: protos.google.cloud.bigquery.v2.ITableFieldSchema,
+    value: protos.google.protobuf.IValue,
+  ): any {
+    if (value.structValue) {
+      const subrow = new Row(Schema.fromField(field));
+      subrow.value = protos.google.protobuf.Struct.create(value.structValue);
+      return subrow.toJSON();
+    } else if (value.listValue) {
+      const arr: any[] = [];
+      for (const row of value.listValue.values ?? []) {
+        const subvalue = this.fieldValueToJSON(field, row);
+        arr.push(subvalue);
+      }
+      return arr;
+    } else if (value.nullValue) {
+      return null;
+    } else if (value.numberValue) {
+      return value.numberValue;
+    } else if (value.boolValue) {
+      return value.boolValue;
+    }
+    return value.stringValue;
+  }
+
+  /**
+   * toStruct returns the row as a protobuf Struct object.
+   */
+  toStruct(): protos.google.protobuf.IStruct {
+    return this.value;
   }
 
   /**
    * toValues encodes the row into an array of Value.
    */
-  toValues(): Value[] {
-    const values: Value[] = [];
+  toValues(): any[] {
+    const values: any[] = [];
     for (const field of this.schema.pb.fields!) {
-      let v = this.value[field.name!];
-      if (v instanceof Row) {
-        v = v.toValues();
-      }
-      if (Array.isArray(v)) {
-        v = v.map(r => (r instanceof Row ? r.toValues() : r));
-      }
-      values.push(v);
+      const fieldValue = this.value.fields[field.name!];
+      const value = this.fieldValueToValues(field, fieldValue);
+      values.push(value);
     }
     return values;
+  }
+
+  private fieldValueToValues(
+    field: protos.google.cloud.bigquery.v2.ITableFieldSchema,
+    value: protos.google.protobuf.IValue,
+  ): any {
+    if (value.structValue) {
+      const subrow = new Row(Schema.fromField(field));
+      subrow.value = protos.google.protobuf.Struct.create(value.structValue);
+      return subrow.toValues();
+    } else if (value.listValue) {
+      const arr: any[] = [];
+      for (const row of value.listValue.values ?? []) {
+        const subvalue = this.fieldValueToValues(field, row);
+        arr.push(subvalue);
+      }
+      return arr;
+    } else if (value.nullValue) {
+      return null;
+    } else if (value.numberValue) {
+      return value.numberValue;
+    } else if (value.boolValue) {
+      return value.boolValue;
+    }
+    return value.stringValue;
   }
 }

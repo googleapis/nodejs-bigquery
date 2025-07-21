@@ -21,7 +21,7 @@ export function civilTimeString(value: string | Date): string {
     const h = `${value.getHours()}`.padStart(2, '0');
     const m = `${value.getMinutes()}`.padStart(2, '0');
     const s = `${value.getSeconds()}`.padStart(2, '0');
-    const f = `${value.getMilliseconds()}`.padStart(3, '0');
+    const f = `${value.getMilliseconds() * 1000}`.padStart(6, '0');
     return `${h}:${m}:${s}.${f}`;
   }
   return value;
@@ -36,7 +36,7 @@ export function civilDateTimeString(value: Date | string): string {
     const y = `${value.getFullYear()}`.padStart(2, '0');
     const m = `${value.getMonth() + 1}`.padStart(2, '0');
     const d = `${value.getDate()}`.padStart(2, '0');
-    time = time ? ' ' + time : '';
+    time = time ? 'T' + time : '';
     return `${y}-${m}-${d}${time}`;
   }
   return value.replace(/^(.*)T(.*)Z$/, '$1 $2');

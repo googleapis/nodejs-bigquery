@@ -15,9 +15,8 @@
 import {protos} from '../';
 import {Row} from './row';
 import {Schema} from './schema';
-import * as Big from 'big.js';
 
-export type Value = any;
+export type Value = protos.google.protobuf.IValue;
 
 export function convertRows(
   rows: protos.google.protobuf.IStruct[],
@@ -52,7 +51,9 @@ function convertValue(
   schema: Schema,
 ): Value {
   if (val.nullValue !== undefined && val.nullValue !== null) {
-    return null;
+    return {
+      nullValue: 'NULL_VALUE',
+    };
   }
   if (val.listValue) {
     return convertRepeatedRecord(val.listValue, typ, schema);
@@ -70,18 +71,25 @@ function convertRepeatedRecord(
   vals: protos.google.protobuf.IListValue,
   typ: string,
   schema: Schema,
-): Value[] {
-  return vals.values!.map(cell => {
-    const val = getFieldValue(cell);
-    return convertValue(val, typ, schema);
-  });
+): Value {
+  return {
+    listValue: {
+      values: vals.values!.map(cell => {
+        const val = getFieldValue(cell);
+        return convertValue(val, typ, schema);
+      }),
+    },
+  };
 }
 
 function convertNestedRecord(
   val: protos.google.protobuf.IStruct,
   schema: Schema,
-): Row {
-  return convertRow(val, schema);
+): Value {
+  const row = convertRow(val, schema);
+  return {
+    structValue: row.toStruct(),
+  };
 }
 
 function convertBasicType(val: string, typ: string): Value {
@@ -89,27 +97,22 @@ function convertBasicType(val: string, typ: string): Value {
     case 'STRING':
     case 'GEOGRAPHY':
     case 'JSON':
-      return val;
-    case 'BYTES':
-      return Buffer.from(val, 'base64');
-    case 'INTEGER':
-      return parseInt(val, 10);
-    case 'FLOAT':
-      return parseFloat(val);
-    case 'BOOLEAN':
-      return val.toLowerCase() === 'true';
     case 'TIMESTAMP':
-      return new Date(parseInt(val, 10) / 1000);
     case 'DATE':
-      return new Date(val);
     case 'TIME':
-      return val;
     case 'DATETIME':
-      return new Date(val);
     case 'NUMERIC':
     case 'BIGNUMERIC':
-      return Big(val);
     case 'INTERVAL':
+      return {stringValue: val};
+    case 'BYTES':
+      return {stringValue: val};
+    case 'INTEGER':
+      return {numberValue: parseInt(val, 10)};
+    case 'FLOAT':
+      return {numberValue: parseFloat(val)};
+    case 'BOOLEAN':
+      return {boolValue: val.toLowerCase() === 'true'};
     default:
       throw new Error(`Unsupported type: ${typ}`);
   }
