@@ -25,7 +25,15 @@ import * as common from '@google-cloud/common';
 import {paginator, ResourceStream} from '@google-cloud/paginator';
 import {promisifyAll} from '@google-cloud/promisify';
 import {PreciseDate} from '@google-cloud/precise-date';
-import {toArray, isArray, isObject, isDate, isBoolean, isNumber} from './util';
+import {
+  toArray,
+  isArray,
+  isString,
+  isObject,
+  isDate,
+  isBoolean,
+  isNumber,
+} from './util';
 import * as Big from 'big.js';
 import * as extend from 'extend';
 import {randomUUID} from 'crypto';
@@ -1171,7 +1179,7 @@ export class BigQuery extends Service {
           };
         }),
       };
-    } else if (is.string(value)) {
+    } else if (isString(value)) {
       typeName = 'STRING';
     }
 
@@ -2465,7 +2473,7 @@ function convertSchemaFieldValue(
     parseJSON?: boolean;
   },
 ) {
-  if (is.null(value)) {
+  if (value === null) {
     return value;
   }
 
@@ -2782,7 +2790,7 @@ export class BigQueryTime {
       const h = value.hours;
       const m = value.minutes || 0;
       const s = value.seconds || 0;
-      const f = is.defined(value.fractional) ? '.' + value.fractional : '';
+      const f = value.fractional !== undefined ? '.' + value.fractional : '';
       value = `${h}:${m}:${s}${f}`;
     }
     this.value = value as string;

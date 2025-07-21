@@ -643,14 +643,14 @@ class Table extends ServiceObject {
       });
     }
 
-    if (is.string(options.partitioning)) {
+    if (isString(options.partitioning)) {
       body.timePartitioning = {
         type: options.partitioning!.toUpperCase(),
       };
       delete (body as TableMetadata).partitioning;
     }
 
-    if (is.string(options.view)) {
+    if (isString(options.view)) {
       body.view = {
         query: options.view! as string,
         useLegacySql: false,
