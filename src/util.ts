@@ -35,3 +35,51 @@ export function toArray(value: any) {
 
   return [value];
 }
+
+/**
+ * Check if value is an object.
+ * @internal
+ */
+export function isObject(value: any) {
+  return value && [undefined, Object].includes(value.constructor);
+}
+
+/**
+ * Check if value is an object.
+ * @internal
+ */
+export function isString(value: any) {
+  return Object.prototype.toString.call(value) === '[object String]';
+}
+
+/**
+ * Check if value is an array.
+ * @internal
+ */
+export function isArray(value: any) {
+  return Array.isArray(value);
+}
+
+/**
+ * Check if value is an instance of Date.
+ * @internal
+ */
+export function isDate(value: any) {
+  return value instanceof Date;
+}
+
+/**
+ * Check if value is a boolean.
+ * @internal
+ */
+export function isBoolean(value: any) {
+  return Object.prototype.toString.call(value) === '[object Boolean]';
+}
+
+/**
+ * Check if value is a number.
+ * @internal
+ */
+export function isNumber(value: any) {
+  return Object.prototype.toString.call(value) === '[object Number]';
+}

@@ -25,12 +25,11 @@ import {
 } from '@google-cloud/common';
 import {paginator, ResourceStream} from '@google-cloud/paginator';
 import {promisifyAll} from '@google-cloud/promisify';
-import {toArray} from './util';
+import {isArray, isString, isDate, toArray} from './util';
 import * as Big from 'big.js';
 import * as extend from 'extend';
 import {once} from 'events';
 import * as fs from 'fs';
-import * as is from 'is';
 import * as path from 'path';
 import * as streamEvents from 'stream-events';
 import {randomUUID} from 'crypto';
@@ -592,11 +591,11 @@ class Table extends ServiceObject {
       return (value as {value: {}}).value;
     }
 
-    if (is.date(value)) {
+    if (isDate(value)) {
       return (value as Date).toJSON();
     }
 
-    if (is.array(value)) {
+    if (isArray(value)) {
       return (value as []).map(Table.encodeValue_);
     }
 
@@ -625,11 +624,11 @@ class Table extends ServiceObject {
       delete (body as TableMetadata).name;
     }
 
-    if (is.string(options.schema)) {
+    if (isString(options.schema)) {
       body.schema = Table.createSchemaFromString_(options.schema as string);
     }
 
-    if (is.array(options.schema)) {
+    if (isArray(options.schema)) {
       body.schema = {
         fields: options.schema as [],
       };

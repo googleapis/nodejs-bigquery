@@ -25,10 +25,9 @@ import * as common from '@google-cloud/common';
 import {paginator, ResourceStream} from '@google-cloud/paginator';
 import {promisifyAll} from '@google-cloud/promisify';
 import {PreciseDate} from '@google-cloud/precise-date';
-import {toArray} from './util';
+import {toArray, isArray, isObject, isDate, isBoolean, isNumber} from './util';
 import * as Big from 'big.js';
 import * as extend from 'extend';
-import * as is from 'is';
 import {randomUUID} from 'crypto';
 
 import {Dataset, DatasetOptions} from './dataset';
@@ -1071,13 +1070,13 @@ export class BigQuery extends Service {
       'RANGE',
     ];
 
-    if (is.array(providedType)) {
+    if (isArray(providedType)) {
       providedType = providedType as Array<ProvidedTypeStruct | string | []>;
       return {
         type: 'ARRAY',
         arrayType: BigQuery.getTypeDescriptorFromProvidedType_(providedType[0]),
       };
-    } else if (is.object(providedType)) {
+    } else if (isObject(providedType)) {
       return {
         type: 'STRUCT',
         structTypes: Object.keys(providedType).map(prop => {
@@ -1147,7 +1146,7 @@ export class BigQuery extends Service {
           type: value.elementType,
         },
       };
-    } else if (Array.isArray(value)) {
+    } else if (isArray(value)) {
       if (value.length === 0) {
         throw new Error(
           "Parameter types must be provided for empty arrays via the 'types' field in query options.",
@@ -1157,11 +1156,11 @@ export class BigQuery extends Service {
         type: 'ARRAY',
         arrayType: BigQuery.getTypeDescriptorFromValue_(value[0]),
       };
-    } else if (is.boolean(value)) {
+    } else if (isBoolean(value)) {
       typeName = 'BOOL';
-    } else if (is.number(value)) {
+    } else if (isNumber(value)) {
       typeName = (value as number) % 1 === 0 ? 'INT64' : 'FLOAT64';
-    } else if (is.object(value)) {
+    } else if (isObject(value)) {
       return {
         type: 'STRUCT',
         structTypes: Object.keys(value as object).map(prop => {
@@ -1207,7 +1206,7 @@ export class BigQuery extends Service {
     value: any,
     providedType?: string | ProvidedTypeStruct | ProvidedTypeArray,
   ) {
-    if (is.date(value)) {
+    if (isDate(value)) {
       value = BigQuery.timestamp(value as Date);
     }
     let parameterType: bigquery.IQueryParameterType;
@@ -1223,8 +1222,8 @@ export class BigQuery extends Service {
       queryParameter.parameterValue!.arrayValues = (value as Array<{}>).map(
         itemValue => {
           const value = BigQuery._getValue(itemValue, parameterType.arrayType!);
-          if (is.object(value) || is.array(value)) {
-            if (is.array(providedType)) {
+          if (isObject(value) || isArray(value)) {
+            if (isArray(providedType)) {
               providedType = providedType as [];
               return BigQuery.valueToQueryParameter_(value, providedType[0])
                 .parameterValue!;
@@ -1271,7 +1270,7 @@ export class BigQuery extends Service {
           value: rangeValue.value.end,
         },
       };
-    } else if (typeName === 'JSON' && is.object(value)) {
+    } else if (typeName === 'JSON' && isObject(value)) {
       queryParameter.parameterValue!.value = JSON.stringify(value);
     } else {
       queryParameter.parameterValue!.value = BigQuery._getValue(
@@ -1586,7 +1585,7 @@ export class BigQuery extends Service {
         params: undefined,
       };
     }
-    const parameterMode = is.array(params) ? 'positional' : 'named';
+    const parameterMode = isArray(params) ? 'positional' : 'named';
     const queryParameters: bigquery.IQueryParameter[] = [];
     if (parameterMode === 'named') {
       const namedParams = params as {[param: string]: any};
@@ -1595,7 +1594,7 @@ export class BigQuery extends Service {
         let queryParameter;
 
         if (types) {
-          if (!is.object(types)) {
+          if (!isObject(types)) {
             throw new Error(
               'Provided types must match the value type passed to `params`',
             );
@@ -1620,7 +1619,7 @@ export class BigQuery extends Service {
       }
     } else {
       if (types) {
-        if (!is.array(types)) {
+        if (!isArray(types)) {
           throw new Error(
             'Provided types must match the value type passed to `params`',
           );
