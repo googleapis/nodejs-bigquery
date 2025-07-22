@@ -213,7 +213,7 @@ describe('Datasets', () => {
       );
       assert.include(
         output,
-        `${projectId}:${datasetId} description: wow! new description!`,
+        `${projectId}:${datasetId} description: This is a new description`,
       );
     });
 

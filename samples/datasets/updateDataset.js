@@ -30,7 +30,7 @@ async function main(projectId, datasetId, updateOption) {
   // [END bigquery_update_dataset_expiration_preview]
 
   async function updateDatasetDescription() {
-    const description = 'wow! new description!';
+    const description = 'This is a new description';
     const datasetToUpdate = {
       projectId: projectId,
       datasetId: datasetId,
