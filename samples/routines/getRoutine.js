@@ -1,4 +1,4 @@
-// Copyright 2020 Google LLC
+// Copyright 2025 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,10 +21,9 @@ function main(
   // Import the Google Cloud client library.
   const {BigQueryClient} = require('@google-cloud/bigquery');
 
-//TODO(coleleah): remove fallback:false if obsolete
+  //TODO(coleleah): remove fallback:false if obsolete
   // tracked in b/429226336
-const bigqueryClient = new BigQueryClient({},{opts: {fallback: false}});
-
+  const bigqueryClient = new BigQueryClient({}, {opts: {fallback: false}});
 
   async function getRoutine() {
     // Gets an existing routine named "my_routine" in "my_dataset".
@@ -39,10 +38,10 @@ const bigqueryClient = new BigQueryClient({},{opts: {fallback: false}});
     const projectId = await bigqueryClient.routineClient.getProjectId();
 
     const getRequest = {
-        projectId: projectId,
-        datasetId: datasetId,
-        routineId: routineId
-    }
+      projectId: projectId,
+      datasetId: datasetId,
+      routineId: routineId,
+    };
     // Create routine reference and make API call
     const [routine] = await bigqueryClient.getRoutine(getRequest);
 

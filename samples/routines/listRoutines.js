@@ -1,4 +1,4 @@
-// Copyright 2020 Google LLC
+// Copyright 2025 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,10 +21,9 @@ function main(
   // Import the Google Cloud client library.
   const {BigQueryClient} = require('@google-cloud/bigquery');
 
-
-//TODO(coleleah): remove fallback:false if obsolete
+  //TODO(coleleah): remove fallback:false if obsolete
   // tracked in b/429226336
-const bigqueryClient = new BigQueryClient({},{opts: {fallback: false}});
+  const bigqueryClient = new BigQueryClient({}, {opts: {fallback: false}});
 
   async function listRoutines() {
     // Lists routines in "my_dataset".
@@ -35,16 +34,18 @@ const bigqueryClient = new BigQueryClient({},{opts: {fallback: false}});
     // const projectId = 'my-project';
     // const datasetId = 'my_dataset';
 
-    const projectId = await bigqueryClient.routineClient.getProjectId() 
+    const projectId = await bigqueryClient.routineClient.getProjectId();
     const listRequest = {
       projectId: projectId,
-      datasetId:datasetId,
-    }
+      datasetId: datasetId,
+    };
     // List all routines in the dataset
     const [routines] = await bigqueryClient.listRoutines(listRequest);
 
     console.log('Routines:');
-    routines.forEach(routine => console.log(routine.routineReference.routineId));
+    routines.forEach(routine =>
+      console.log(routine.routineReference.routineId),
+    );
   }
   listRoutines();
   // [END bigquery_list_routines_preview]

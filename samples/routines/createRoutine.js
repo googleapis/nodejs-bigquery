@@ -1,4 +1,4 @@
-// Copyright 2020 Google LLC
+// Copyright 2025 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ function main(
   const {BigQueryClient} = require('@google-cloud/bigquery');
 
   // Create a client
-    //TODO(coleleah): remove fallback:false if obsolete
+  //TODO(coleleah): remove fallback:false if obsolete
   // tracked in b/429226336
   const bigqueryClient = new BigQueryClient({}, {opts: {fallback: false}});
 
@@ -58,8 +58,8 @@ function main(
     const insertRequest = {
       projectId: projectId,
       datasetId: datasetId,
-      routine: routine
-    }
+      routine: routine,
+    };
     // Make API call
     const [response] = await bigqueryClient.insertRoutine(insertRequest);
 
