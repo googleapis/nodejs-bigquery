@@ -76,6 +76,7 @@ describe('Routines', () => {
     };
     await bigquery.insertDataset(datasetRequest);
   });
+
   after(async () => {
     const deleteRequest = {
       projectId: projectId,
@@ -83,9 +84,11 @@ describe('Routines', () => {
     };
     await bigquery.deleteDataset(deleteRequest);
   });
+
   beforeEach(async function () {
     this.currentTest.retries(2);
   });
+
   describe('routine creation', () => {
     it('should create a routine', async () => {
       const output = execSync(
@@ -93,6 +96,7 @@ describe('Routines', () => {
       );
       assert.include(output, `Routine ${newRoutineId} created.`);
     });
+
     after('deletes created routine', async () => {
       const deleteRequest = {
         projectId: projectId,
@@ -122,6 +126,7 @@ describe('Routines', () => {
       assert.ok(response);
       assert.ok(response2);
     });
+
     after('delete created routines', async () => {
       const deleteRequest = {
         projectId: projectId,
@@ -136,12 +141,14 @@ describe('Routines', () => {
       await bigquery.deleteRoutine(deleteRequest);
       await bigquery.deleteRoutine(deleteRequest2);
     });
+
     it('should get a routine', async () => {
       const output = execSync(
         `node routines/getRoutine.js ${datasetId} ${routineId}`,
       );
       assert.include(output, `Routine ${routineId} retrieved.`);
     });
+
     it('should list routines', async () => {
       const output = execSync(`node routines/listRoutines.js ${datasetId}`);
       assert.match(output, /Routines:/);
@@ -174,6 +181,7 @@ describe('Routines', () => {
       });
       assert.ok(response);
     });
+
     beforeEach(async function () {
       this.currentTest.retries(2);
     });
