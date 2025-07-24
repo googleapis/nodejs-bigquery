@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * Discovery Revision: 20250706
+ * Discovery Revision: 20250615
  */
 
 /**
@@ -1741,10 +1741,6 @@ declare namespace bigquery {
    */
   type IExternalServiceCost = {
     /**
-     * The billing method used for the external job. This field is only used when billed on the services sku, set to "SERVICES_SKU". Otherwise, it is unspecified for backward compatibility.
-     */
-    billingMethod?: string;
-    /**
      * External service cost in terms of bigquery bytes billed.
      */
     bytesBilled?: string;
@@ -3142,10 +3138,6 @@ declare namespace bigquery {
      * Output only. Total number of partitions processed from all partitioned tables referenced in the job.
      */
     totalPartitionsProcessed?: string;
-    /**
-     * Output only. Total slot-milliseconds for the job that run on external services and billed on the service SKU. This field is only populated for jobs that have external service costs, and is the total of the usage for costs whose billing method is "SERVICES_SKU".
-     */
-    totalServicesSkuSlotMs?: string;
     /**
      * Output only. Slot-milliseconds for the job.
      */
