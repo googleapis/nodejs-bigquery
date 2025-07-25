@@ -20,12 +20,12 @@ import * as protos from '../protos/protos';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import {SinonStub} from 'sinon';
-import {describe, it, beforeEach, afterEach} from 'mocha';
+import {describe, it} from 'mocha';
 import * as jobserviceModule from '../src';
 
 import {PassThrough} from 'stream';
 
-import {GoogleAuth, protobuf} from 'google-gax';
+import {protobuf} from 'google-gax';
 
 // Dynamically loaded proto JSON is needed to get the type information
 // to fill in default values for request objects
@@ -128,19 +128,6 @@ function stubAsyncIterationCall<ResponseType>(
 }
 
 describe('v2.JobServiceClient', () => {
-  let googleAuth: GoogleAuth;
-  beforeEach(() => {
-    googleAuth = {
-      getClient: sinon.stub().resolves({
-        getRequestHeaders: sinon
-          .stub()
-          .resolves({Authorization: 'Bearer SOME_TOKEN'}),
-      }),
-    } as unknown as GoogleAuth;
-  });
-  afterEach(() => {
-    sinon.restore();
-  });
   describe('Common methods', () => {
     it('has apiEndpoint', () => {
       const client = new jobserviceModule.v2.JobServiceClient();
@@ -250,7 +237,7 @@ describe('v2.JobServiceClient', () => {
 
     it('has initialize method and supports deferred initialization', async () => {
       const client = new jobserviceModule.v2.JobServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       assert.strictEqual(client.jobServiceStub, undefined);
@@ -260,7 +247,7 @@ describe('v2.JobServiceClient', () => {
 
     it('has close method for the initialized client', done => {
       const client = new jobserviceModule.v2.JobServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       client.initialize().catch(err => {
@@ -279,7 +266,7 @@ describe('v2.JobServiceClient', () => {
 
     it('has close method for the non-initialized client', done => {
       const client = new jobserviceModule.v2.JobServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       assert.strictEqual(client.jobServiceStub, undefined);
@@ -296,7 +283,7 @@ describe('v2.JobServiceClient', () => {
     it('has getProjectId method', async () => {
       const fakeProjectId = 'fake-project-id';
       const client = new jobserviceModule.v2.JobServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       client.auth.getProjectId = sinon.stub().resolves(fakeProjectId);
@@ -308,7 +295,7 @@ describe('v2.JobServiceClient', () => {
     it('has getProjectId method with callback', async () => {
       const fakeProjectId = 'fake-project-id';
       const client = new jobserviceModule.v2.JobServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       client.auth.getProjectId = sinon
@@ -331,7 +318,7 @@ describe('v2.JobServiceClient', () => {
   describe('cancelJob', () => {
     it('invokes cancelJob without error', async () => {
       const client = new jobserviceModule.v2.JobServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -367,7 +354,7 @@ describe('v2.JobServiceClient', () => {
 
     it('invokes cancelJob without error using callback', async () => {
       const client = new jobserviceModule.v2.JobServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -419,7 +406,7 @@ describe('v2.JobServiceClient', () => {
 
     it('invokes cancelJob with error', async () => {
       const client = new jobserviceModule.v2.JobServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -452,7 +439,7 @@ describe('v2.JobServiceClient', () => {
 
     it('invokes cancelJob with closed client', async () => {
       const client = new jobserviceModule.v2.JobServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -480,7 +467,7 @@ describe('v2.JobServiceClient', () => {
   describe('getJob', () => {
     it('invokes getJob without error', async () => {
       const client = new jobserviceModule.v2.JobServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -516,7 +503,7 @@ describe('v2.JobServiceClient', () => {
 
     it('invokes getJob without error using callback', async () => {
       const client = new jobserviceModule.v2.JobServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -568,7 +555,7 @@ describe('v2.JobServiceClient', () => {
 
     it('invokes getJob with error', async () => {
       const client = new jobserviceModule.v2.JobServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -601,7 +588,7 @@ describe('v2.JobServiceClient', () => {
 
     it('invokes getJob with closed client', async () => {
       const client = new jobserviceModule.v2.JobServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -629,7 +616,7 @@ describe('v2.JobServiceClient', () => {
   describe('insertJob', () => {
     it('invokes insertJob without error', async () => {
       const client = new jobserviceModule.v2.JobServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -660,7 +647,7 @@ describe('v2.JobServiceClient', () => {
 
     it('invokes insertJob without error using callback', async () => {
       const client = new jobserviceModule.v2.JobServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -707,7 +694,7 @@ describe('v2.JobServiceClient', () => {
 
     it('invokes insertJob with error', async () => {
       const client = new jobserviceModule.v2.JobServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -735,7 +722,7 @@ describe('v2.JobServiceClient', () => {
 
     it('invokes insertJob with closed client', async () => {
       const client = new jobserviceModule.v2.JobServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -758,7 +745,7 @@ describe('v2.JobServiceClient', () => {
   describe('deleteJob', () => {
     it('invokes deleteJob without error', async () => {
       const client = new jobserviceModule.v2.JobServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -794,7 +781,7 @@ describe('v2.JobServiceClient', () => {
 
     it('invokes deleteJob without error using callback', async () => {
       const client = new jobserviceModule.v2.JobServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -846,7 +833,7 @@ describe('v2.JobServiceClient', () => {
 
     it('invokes deleteJob with error', async () => {
       const client = new jobserviceModule.v2.JobServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -879,7 +866,7 @@ describe('v2.JobServiceClient', () => {
 
     it('invokes deleteJob with closed client', async () => {
       const client = new jobserviceModule.v2.JobServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -907,7 +894,7 @@ describe('v2.JobServiceClient', () => {
   describe('getQueryResults', () => {
     it('invokes getQueryResults without error', async () => {
       const client = new jobserviceModule.v2.JobServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -943,7 +930,7 @@ describe('v2.JobServiceClient', () => {
 
     it('invokes getQueryResults without error using callback', async () => {
       const client = new jobserviceModule.v2.JobServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -995,7 +982,7 @@ describe('v2.JobServiceClient', () => {
 
     it('invokes getQueryResults with error', async () => {
       const client = new jobserviceModule.v2.JobServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -1031,7 +1018,7 @@ describe('v2.JobServiceClient', () => {
 
     it('invokes getQueryResults with closed client', async () => {
       const client = new jobserviceModule.v2.JobServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -1059,7 +1046,7 @@ describe('v2.JobServiceClient', () => {
   describe('query', () => {
     it('invokes query without error', async () => {
       const client = new jobserviceModule.v2.JobServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -1089,7 +1076,7 @@ describe('v2.JobServiceClient', () => {
 
     it('invokes query without error using callback', async () => {
       const client = new jobserviceModule.v2.JobServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -1134,7 +1121,7 @@ describe('v2.JobServiceClient', () => {
 
     it('invokes query with error', async () => {
       const client = new jobserviceModule.v2.JobServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -1161,7 +1148,7 @@ describe('v2.JobServiceClient', () => {
 
     it('invokes query with closed client', async () => {
       const client = new jobserviceModule.v2.JobServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -1417,7 +1404,7 @@ describe('v2.JobServiceClient', () => {
 
     it('uses async iteration with listJobs without error', async () => {
       const client = new jobserviceModule.v2.JobServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();

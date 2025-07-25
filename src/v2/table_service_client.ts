@@ -29,7 +29,7 @@ import type {
 import {Transform} from 'stream';
 import * as protos from '../../protos/protos';
 import jsonProtos = require('../../protos/protos.json');
-import {loggingUtils as logging} from 'google-gax';
+import {loggingUtils as logging, decodeAnyProtosInArray} from 'google-gax';
 
 /**
  * Client JSON configuration object, loaded from
@@ -139,12 +139,6 @@ export class TableServiceClient {
     );
     const port = opts?.port || staticMembers.port;
     const clientConfig = opts?.clientConfig ?? {};
-    // Implicitly enable HTTP transport for the APIs that use REST as transport (e.g. Google Cloud Compute).
-    if (!opts) {
-      opts = {fallback: true};
-    } else {
-      opts.fallback = opts.fallback ?? true;
-    }
     const fallback =
       opts?.fallback ??
       (typeof window !== 'undefined' && typeof window?.fetch === 'function');
@@ -514,7 +508,23 @@ export class TableServiceClient {
           this._log.info('getTable response %j', response);
           return [response, options, rawResponse];
         },
-      );
+      )
+      .catch((error: any) => {
+        if (
+          error &&
+          'statusDetails' in error &&
+          error.statusDetails instanceof Array
+        ) {
+          const protos = this._gaxModule.protobuf.Root.fromJSON(
+            jsonProtos,
+          ) as unknown as gax.protobuf.Type;
+          error.statusDetails = decodeAnyProtosInArray(
+            error.statusDetails,
+            protos,
+          );
+        }
+        throw error;
+      });
   }
   /**
    * Creates a new, empty table in the dataset.
@@ -631,7 +641,23 @@ export class TableServiceClient {
           this._log.info('insertTable response %j', response);
           return [response, options, rawResponse];
         },
-      );
+      )
+      .catch((error: any) => {
+        if (
+          error &&
+          'statusDetails' in error &&
+          error.statusDetails instanceof Array
+        ) {
+          const protos = this._gaxModule.protobuf.Root.fromJSON(
+            jsonProtos,
+          ) as unknown as gax.protobuf.Type;
+          error.statusDetails = decodeAnyProtosInArray(
+            error.statusDetails,
+            protos,
+          );
+        }
+        throw error;
+      });
   }
   /**
    * Updates information in an existing table. The update method replaces the
@@ -765,7 +791,23 @@ export class TableServiceClient {
           this._log.info('patchTable response %j', response);
           return [response, options, rawResponse];
         },
-      );
+      )
+      .catch((error: any) => {
+        if (
+          error &&
+          'statusDetails' in error &&
+          error.statusDetails instanceof Array
+        ) {
+          const protos = this._gaxModule.protobuf.Root.fromJSON(
+            jsonProtos,
+          ) as unknown as gax.protobuf.Type;
+          error.statusDetails = decodeAnyProtosInArray(
+            error.statusDetails,
+            protos,
+          );
+        }
+        throw error;
+      });
   }
   /**
    * Updates information in an existing table. The update method replaces the
@@ -898,7 +940,23 @@ export class TableServiceClient {
           this._log.info('updateTable response %j', response);
           return [response, options, rawResponse];
         },
-      );
+      )
+      .catch((error: any) => {
+        if (
+          error &&
+          'statusDetails' in error &&
+          error.statusDetails instanceof Array
+        ) {
+          const protos = this._gaxModule.protobuf.Root.fromJSON(
+            jsonProtos,
+          ) as unknown as gax.protobuf.Type;
+          error.statusDetails = decodeAnyProtosInArray(
+            error.statusDetails,
+            protos,
+          );
+        }
+        throw error;
+      });
   }
   /**
    * Deletes the table specified by tableId from the dataset.
@@ -1017,7 +1075,23 @@ export class TableServiceClient {
           this._log.info('deleteTable response %j', response);
           return [response, options, rawResponse];
         },
-      );
+      )
+      .catch((error: any) => {
+        if (
+          error &&
+          'statusDetails' in error &&
+          error.statusDetails instanceof Array
+        ) {
+          const protos = this._gaxModule.protobuf.Root.fromJSON(
+            jsonProtos,
+          ) as unknown as gax.protobuf.Type;
+          error.statusDetails = decodeAnyProtosInArray(
+            error.statusDetails,
+            protos,
+          );
+        }
+        throw error;
+      });
   }
 
   /**

@@ -29,7 +29,7 @@ import type {
 import {Transform} from 'stream';
 import * as protos from '../../protos/protos';
 import jsonProtos = require('../../protos/protos.json');
-import {loggingUtils as logging} from 'google-gax';
+import {loggingUtils as logging, decodeAnyProtosInArray} from 'google-gax';
 
 /**
  * Client JSON configuration object, loaded from
@@ -137,12 +137,6 @@ export class JobServiceClient {
     );
     const port = opts?.port || staticMembers.port;
     const clientConfig = opts?.clientConfig ?? {};
-    // Implicitly enable HTTP transport for the APIs that use REST as transport (e.g. Google Cloud Compute).
-    if (!opts) {
-      opts = {fallback: true};
-    } else {
-      opts.fallback = opts.fallback ?? true;
-    }
     const fallback =
       opts?.fallback ??
       (typeof window !== 'undefined' && typeof window?.fetch === 'function');
@@ -512,7 +506,23 @@ export class JobServiceClient {
           this._log.info('cancelJob response %j', response);
           return [response, options, rawResponse];
         },
-      );
+      )
+      .catch((error: any) => {
+        if (
+          error &&
+          'statusDetails' in error &&
+          error.statusDetails instanceof Array
+        ) {
+          const protos = this._gaxModule.protobuf.Root.fromJSON(
+            jsonProtos,
+          ) as unknown as gax.protobuf.Type;
+          error.statusDetails = decodeAnyProtosInArray(
+            error.statusDetails,
+            protos,
+          );
+        }
+        throw error;
+      });
   }
   /**
    * Returns information about a specific job. Job information is available for
@@ -637,7 +647,23 @@ export class JobServiceClient {
           this._log.info('getJob response %j', response);
           return [response, options, rawResponse];
         },
-      );
+      )
+      .catch((error: any) => {
+        if (
+          error &&
+          'statusDetails' in error &&
+          error.statusDetails instanceof Array
+        ) {
+          const protos = this._gaxModule.protobuf.Root.fromJSON(
+            jsonProtos,
+          ) as unknown as gax.protobuf.Type;
+          error.statusDetails = decodeAnyProtosInArray(
+            error.statusDetails,
+            protos,
+          );
+        }
+        throw error;
+      });
   }
   /**
    * Starts a new asynchronous job.
@@ -757,7 +783,23 @@ export class JobServiceClient {
           this._log.info('insertJob response %j', response);
           return [response, options, rawResponse];
         },
-      );
+      )
+      .catch((error: any) => {
+        if (
+          error &&
+          'statusDetails' in error &&
+          error.statusDetails instanceof Array
+        ) {
+          const protos = this._gaxModule.protobuf.Root.fromJSON(
+            jsonProtos,
+          ) as unknown as gax.protobuf.Type;
+          error.statusDetails = decodeAnyProtosInArray(
+            error.statusDetails,
+            protos,
+          );
+        }
+        throw error;
+      });
   }
   /**
    * Requests the deletion of the metadata of a job. This call returns when the
@@ -878,7 +920,23 @@ export class JobServiceClient {
           this._log.info('deleteJob response %j', response);
           return [response, options, rawResponse];
         },
-      );
+      )
+      .catch((error: any) => {
+        if (
+          error &&
+          'statusDetails' in error &&
+          error.statusDetails instanceof Array
+        ) {
+          const protos = this._gaxModule.protobuf.Root.fromJSON(
+            jsonProtos,
+          ) as unknown as gax.protobuf.Type;
+          error.statusDetails = decodeAnyProtosInArray(
+            error.statusDetails,
+            protos,
+          );
+        }
+        throw error;
+      });
   }
   /**
    * RPC to get the results of a query job.
@@ -1035,7 +1093,23 @@ export class JobServiceClient {
           this._log.info('getQueryResults response %j', response);
           return [response, options, rawResponse];
         },
-      );
+      )
+      .catch((error: any) => {
+        if (
+          error &&
+          'statusDetails' in error &&
+          error.statusDetails instanceof Array
+        ) {
+          const protos = this._gaxModule.protobuf.Root.fromJSON(
+            jsonProtos,
+          ) as unknown as gax.protobuf.Type;
+          error.statusDetails = decodeAnyProtosInArray(
+            error.statusDetails,
+            protos,
+          );
+        }
+        throw error;
+      });
   }
   /**
    * Runs a BigQuery SQL query synchronously and returns query results if the
@@ -1146,7 +1220,23 @@ export class JobServiceClient {
           this._log.info('query response %j', response);
           return [response, options, rawResponse];
         },
-      );
+      )
+      .catch((error: any) => {
+        if (
+          error &&
+          'statusDetails' in error &&
+          error.statusDetails instanceof Array
+        ) {
+          const protos = this._gaxModule.protobuf.Root.fromJSON(
+            jsonProtos,
+          ) as unknown as gax.protobuf.Type;
+          error.statusDetails = decodeAnyProtosInArray(
+            error.statusDetails,
+            protos,
+          );
+        }
+        throw error;
+      });
   }
 
   /**
