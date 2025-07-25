@@ -17,9 +17,8 @@ function main(datasetId = 'my_dataset', tableId = 'my_table') {
   // [START bigquery_update_table_description_preview]
   // Import the Google Cloud client library
   const {BigQueryClient} = require('@google-cloud/bigquery');
-  //TODO(coleleah): remove fallback: false if needed
-  // tracked in b/429226336
-  const bigquery = new BigQueryClient({}, {opts: {fallback: false}});
+
+  const bigquery = new BigQueryClient();
 
   async function updateTableDescription() {
     // Updates a table's description.

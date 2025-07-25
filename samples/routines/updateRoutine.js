@@ -21,9 +21,7 @@ function main(
   // Import the Google Cloud client library.
   const {BigQueryClient} = require('@google-cloud/bigquery');
 
-  //TODO(coleleah): remove fallback:false if obsolete
-  // tracked in b/429226336
-  const bigqueryClient = new BigQueryClient({}, {opts: {fallback: false}});
+  const bigqueryClient = new BigQueryClient();
 
   async function updateRoutine() {
     // Updates a routine named "my_routine" in "my_dataset".
