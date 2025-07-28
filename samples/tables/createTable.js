@@ -27,9 +27,8 @@ function main(
   // [START bigquery_create_table_preview]
   // Import the Google Cloud client library and create a client
   const {BigQueryClient} = require('@google-cloud/bigquery');
-  //TODO(coleleah): remove fallback: false if needed
-  // tracked in b/429226336
-  const bigquery = new BigQueryClient({}, {opts: {fallback: false}});
+
+  const bigquery = new BigQueryClient();
 
   async function createTable() {
     // Creates a new table named "my_table" in "my_dataset".

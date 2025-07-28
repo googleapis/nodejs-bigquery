@@ -23,9 +23,7 @@ function main(
   const {BigQueryClient} = require('@google-cloud/bigquery');
 
   // Create a client
-  //TODO(coleleah): remove fallback:false if obsolete
-  // tracked in b/429226336
-  const bigqueryClient = new BigQueryClient({}, {opts: {fallback: false}});
+  const bigqueryClient = new BigQueryClient();
 
   async function createRoutine() {
     // Creates a new routine named "my_routine" in "my_dataset".

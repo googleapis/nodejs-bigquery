@@ -26,9 +26,7 @@ async function main(projectId, datasetId, location = 'US') {
   const {BigQueryClient} = require('@google-cloud/bigquery');
 
   // Creates a client
-  //TODO(coleleah): remove fallback:false if obsolete
-  // tracked in b/429226336
-  const bigqueryClient = new BigQueryClient({}, {opts: {fallback: false}});
+  const bigqueryClient = new BigQueryClient();
   async function createDataset() {
     // Construct the dataset resource.
     const dataset = {

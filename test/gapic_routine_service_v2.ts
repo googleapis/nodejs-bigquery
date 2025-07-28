@@ -20,12 +20,12 @@ import * as protos from '../protos/protos';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import {SinonStub} from 'sinon';
-import {describe, it, beforeEach, afterEach} from 'mocha';
+import {describe, it} from 'mocha';
 import * as routineserviceModule from '../src';
 
 import {PassThrough} from 'stream';
 
-import {GoogleAuth, protobuf} from 'google-gax';
+import {protobuf} from 'google-gax';
 
 // Dynamically loaded proto JSON is needed to get the type information
 // to fill in default values for request objects
@@ -128,19 +128,6 @@ function stubAsyncIterationCall<ResponseType>(
 }
 
 describe('v2.RoutineServiceClient', () => {
-  let googleAuth: GoogleAuth;
-  beforeEach(() => {
-    googleAuth = {
-      getClient: sinon.stub().resolves({
-        getRequestHeaders: sinon
-          .stub()
-          .resolves({Authorization: 'Bearer SOME_TOKEN'}),
-      }),
-    } as unknown as GoogleAuth;
-  });
-  afterEach(() => {
-    sinon.restore();
-  });
   describe('Common methods', () => {
     it('has apiEndpoint', () => {
       const client = new routineserviceModule.v2.RoutineServiceClient();
@@ -252,7 +239,7 @@ describe('v2.RoutineServiceClient', () => {
 
     it('has initialize method and supports deferred initialization', async () => {
       const client = new routineserviceModule.v2.RoutineServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       assert.strictEqual(client.routineServiceStub, undefined);
@@ -262,7 +249,7 @@ describe('v2.RoutineServiceClient', () => {
 
     it('has close method for the initialized client', done => {
       const client = new routineserviceModule.v2.RoutineServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       client.initialize().catch(err => {
@@ -281,7 +268,7 @@ describe('v2.RoutineServiceClient', () => {
 
     it('has close method for the non-initialized client', done => {
       const client = new routineserviceModule.v2.RoutineServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       assert.strictEqual(client.routineServiceStub, undefined);
@@ -298,7 +285,7 @@ describe('v2.RoutineServiceClient', () => {
     it('has getProjectId method', async () => {
       const fakeProjectId = 'fake-project-id';
       const client = new routineserviceModule.v2.RoutineServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       client.auth.getProjectId = sinon.stub().resolves(fakeProjectId);
@@ -310,7 +297,7 @@ describe('v2.RoutineServiceClient', () => {
     it('has getProjectId method with callback', async () => {
       const fakeProjectId = 'fake-project-id';
       const client = new routineserviceModule.v2.RoutineServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       client.auth.getProjectId = sinon
@@ -333,7 +320,7 @@ describe('v2.RoutineServiceClient', () => {
   describe('getRoutine', () => {
     it('invokes getRoutine without error', async () => {
       const client = new routineserviceModule.v2.RoutineServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -374,7 +361,7 @@ describe('v2.RoutineServiceClient', () => {
 
     it('invokes getRoutine without error using callback', async () => {
       const client = new routineserviceModule.v2.RoutineServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -431,7 +418,7 @@ describe('v2.RoutineServiceClient', () => {
 
     it('invokes getRoutine with error', async () => {
       const client = new routineserviceModule.v2.RoutineServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -472,7 +459,7 @@ describe('v2.RoutineServiceClient', () => {
 
     it('invokes getRoutine with closed client', async () => {
       const client = new routineserviceModule.v2.RoutineServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -505,7 +492,7 @@ describe('v2.RoutineServiceClient', () => {
   describe('insertRoutine', () => {
     it('invokes insertRoutine without error', async () => {
       const client = new routineserviceModule.v2.RoutineServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -541,7 +528,7 @@ describe('v2.RoutineServiceClient', () => {
 
     it('invokes insertRoutine without error using callback', async () => {
       const client = new routineserviceModule.v2.RoutineServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -593,7 +580,7 @@ describe('v2.RoutineServiceClient', () => {
 
     it('invokes insertRoutine with error', async () => {
       const client = new routineserviceModule.v2.RoutineServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -629,7 +616,7 @@ describe('v2.RoutineServiceClient', () => {
 
     it('invokes insertRoutine with closed client', async () => {
       const client = new routineserviceModule.v2.RoutineServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -657,7 +644,7 @@ describe('v2.RoutineServiceClient', () => {
   describe('updateRoutine', () => {
     it('invokes updateRoutine without error', async () => {
       const client = new routineserviceModule.v2.RoutineServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -698,7 +685,7 @@ describe('v2.RoutineServiceClient', () => {
 
     it('invokes updateRoutine without error using callback', async () => {
       const client = new routineserviceModule.v2.RoutineServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -755,7 +742,7 @@ describe('v2.RoutineServiceClient', () => {
 
     it('invokes updateRoutine with error', async () => {
       const client = new routineserviceModule.v2.RoutineServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -796,7 +783,7 @@ describe('v2.RoutineServiceClient', () => {
 
     it('invokes updateRoutine with closed client', async () => {
       const client = new routineserviceModule.v2.RoutineServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -829,7 +816,7 @@ describe('v2.RoutineServiceClient', () => {
   describe('patchRoutine', () => {
     it('invokes patchRoutine without error', async () => {
       const client = new routineserviceModule.v2.RoutineServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -846,7 +833,7 @@ describe('v2.RoutineServiceClient', () => {
 
     it('invokes patchRoutine without error using callback', async () => {
       const client = new routineserviceModule.v2.RoutineServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -879,7 +866,7 @@ describe('v2.RoutineServiceClient', () => {
 
     it('invokes patchRoutine with error', async () => {
       const client = new routineserviceModule.v2.RoutineServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -896,7 +883,7 @@ describe('v2.RoutineServiceClient', () => {
 
     it('invokes patchRoutine with closed client', async () => {
       const client = new routineserviceModule.v2.RoutineServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -914,7 +901,7 @@ describe('v2.RoutineServiceClient', () => {
   describe('deleteRoutine', () => {
     it('invokes deleteRoutine without error', async () => {
       const client = new routineserviceModule.v2.RoutineServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -955,7 +942,7 @@ describe('v2.RoutineServiceClient', () => {
 
     it('invokes deleteRoutine without error using callback', async () => {
       const client = new routineserviceModule.v2.RoutineServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -1012,7 +999,7 @@ describe('v2.RoutineServiceClient', () => {
 
     it('invokes deleteRoutine with error', async () => {
       const client = new routineserviceModule.v2.RoutineServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -1053,7 +1040,7 @@ describe('v2.RoutineServiceClient', () => {
 
     it('invokes deleteRoutine with closed client', async () => {
       const client = new routineserviceModule.v2.RoutineServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -1329,7 +1316,7 @@ describe('v2.RoutineServiceClient', () => {
 
     it('uses async iteration with listRoutines without error', async () => {
       const client = new routineserviceModule.v2.RoutineServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();

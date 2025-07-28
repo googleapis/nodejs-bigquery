@@ -17,9 +17,8 @@ function main(datasetId = 'my_dataset') {
   // [START bigquery_list_tables_preview]
   // Import the Google Cloud client library
   const {BigQueryClient} = require('@google-cloud/bigquery');
-  //TODO(coleleah): remove fallback: false if needed
-  // tracked in b/429226336
-  const bigquery = new BigQueryClient({}, {opts: {fallback: false}});
+
+  const bigquery = new BigQueryClient();
 
   async function listTables() {
     // Lists tables in 'my_dataset'.

@@ -20,12 +20,12 @@ import * as protos from '../protos/protos';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import {SinonStub} from 'sinon';
-import {describe, it, beforeEach, afterEach} from 'mocha';
+import {describe, it} from 'mocha';
 import * as modelserviceModule from '../src';
 
 import {PassThrough} from 'stream';
 
-import {GoogleAuth, protobuf} from 'google-gax';
+import {protobuf} from 'google-gax';
 
 // Dynamically loaded proto JSON is needed to get the type information
 // to fill in default values for request objects
@@ -128,19 +128,6 @@ function stubAsyncIterationCall<ResponseType>(
 }
 
 describe('v2.ModelServiceClient', () => {
-  let googleAuth: GoogleAuth;
-  beforeEach(() => {
-    googleAuth = {
-      getClient: sinon.stub().resolves({
-        getRequestHeaders: sinon
-          .stub()
-          .resolves({Authorization: 'Bearer SOME_TOKEN'}),
-      }),
-    } as unknown as GoogleAuth;
-  });
-  afterEach(() => {
-    sinon.restore();
-  });
   describe('Common methods', () => {
     it('has apiEndpoint', () => {
       const client = new modelserviceModule.v2.ModelServiceClient();
@@ -252,7 +239,7 @@ describe('v2.ModelServiceClient', () => {
 
     it('has initialize method and supports deferred initialization', async () => {
       const client = new modelserviceModule.v2.ModelServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       assert.strictEqual(client.modelServiceStub, undefined);
@@ -262,7 +249,7 @@ describe('v2.ModelServiceClient', () => {
 
     it('has close method for the initialized client', done => {
       const client = new modelserviceModule.v2.ModelServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       client.initialize().catch(err => {
@@ -281,7 +268,7 @@ describe('v2.ModelServiceClient', () => {
 
     it('has close method for the non-initialized client', done => {
       const client = new modelserviceModule.v2.ModelServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       assert.strictEqual(client.modelServiceStub, undefined);
@@ -298,7 +285,7 @@ describe('v2.ModelServiceClient', () => {
     it('has getProjectId method', async () => {
       const fakeProjectId = 'fake-project-id';
       const client = new modelserviceModule.v2.ModelServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       client.auth.getProjectId = sinon.stub().resolves(fakeProjectId);
@@ -310,7 +297,7 @@ describe('v2.ModelServiceClient', () => {
     it('has getProjectId method with callback', async () => {
       const fakeProjectId = 'fake-project-id';
       const client = new modelserviceModule.v2.ModelServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       client.auth.getProjectId = sinon
@@ -333,7 +320,7 @@ describe('v2.ModelServiceClient', () => {
   describe('getModel', () => {
     it('invokes getModel without error', async () => {
       const client = new modelserviceModule.v2.ModelServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -374,7 +361,7 @@ describe('v2.ModelServiceClient', () => {
 
     it('invokes getModel without error using callback', async () => {
       const client = new modelserviceModule.v2.ModelServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -431,7 +418,7 @@ describe('v2.ModelServiceClient', () => {
 
     it('invokes getModel with error', async () => {
       const client = new modelserviceModule.v2.ModelServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -469,7 +456,7 @@ describe('v2.ModelServiceClient', () => {
 
     it('invokes getModel with closed client', async () => {
       const client = new modelserviceModule.v2.ModelServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -502,7 +489,7 @@ describe('v2.ModelServiceClient', () => {
   describe('patchModel', () => {
     it('invokes patchModel without error', async () => {
       const client = new modelserviceModule.v2.ModelServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -543,7 +530,7 @@ describe('v2.ModelServiceClient', () => {
 
     it('invokes patchModel without error using callback', async () => {
       const client = new modelserviceModule.v2.ModelServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -600,7 +587,7 @@ describe('v2.ModelServiceClient', () => {
 
     it('invokes patchModel with error', async () => {
       const client = new modelserviceModule.v2.ModelServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -641,7 +628,7 @@ describe('v2.ModelServiceClient', () => {
 
     it('invokes patchModel with closed client', async () => {
       const client = new modelserviceModule.v2.ModelServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -674,7 +661,7 @@ describe('v2.ModelServiceClient', () => {
   describe('deleteModel', () => {
     it('invokes deleteModel without error', async () => {
       const client = new modelserviceModule.v2.ModelServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -715,7 +702,7 @@ describe('v2.ModelServiceClient', () => {
 
     it('invokes deleteModel without error using callback', async () => {
       const client = new modelserviceModule.v2.ModelServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -772,7 +759,7 @@ describe('v2.ModelServiceClient', () => {
 
     it('invokes deleteModel with error', async () => {
       const client = new modelserviceModule.v2.ModelServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -813,7 +800,7 @@ describe('v2.ModelServiceClient', () => {
 
     it('invokes deleteModel with closed client', async () => {
       const client = new modelserviceModule.v2.ModelServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -1083,7 +1070,7 @@ describe('v2.ModelServiceClient', () => {
 
     it('uses async iteration with listModels without error', async () => {
       const client = new modelserviceModule.v2.ModelServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
