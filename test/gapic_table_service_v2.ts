@@ -20,12 +20,12 @@ import * as protos from '../protos/protos';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import {SinonStub} from 'sinon';
-import {describe, it, beforeEach, afterEach} from 'mocha';
+import {describe, it} from 'mocha';
 import * as tableserviceModule from '../src';
 
 import {PassThrough} from 'stream';
 
-import {GoogleAuth, protobuf} from 'google-gax';
+import {protobuf} from 'google-gax';
 
 // Dynamically loaded proto JSON is needed to get the type information
 // to fill in default values for request objects
@@ -128,19 +128,6 @@ function stubAsyncIterationCall<ResponseType>(
 }
 
 describe('v2.TableServiceClient', () => {
-  let googleAuth: GoogleAuth;
-  beforeEach(() => {
-    googleAuth = {
-      getClient: sinon.stub().resolves({
-        getRequestHeaders: sinon
-          .stub()
-          .resolves({Authorization: 'Bearer SOME_TOKEN'}),
-      }),
-    } as unknown as GoogleAuth;
-  });
-  afterEach(() => {
-    sinon.restore();
-  });
   describe('Common methods', () => {
     it('has apiEndpoint', () => {
       const client = new tableserviceModule.v2.TableServiceClient();
@@ -252,7 +239,7 @@ describe('v2.TableServiceClient', () => {
 
     it('has initialize method and supports deferred initialization', async () => {
       const client = new tableserviceModule.v2.TableServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       assert.strictEqual(client.tableServiceStub, undefined);
@@ -262,7 +249,7 @@ describe('v2.TableServiceClient', () => {
 
     it('has close method for the initialized client', done => {
       const client = new tableserviceModule.v2.TableServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       client.initialize().catch(err => {
@@ -281,7 +268,7 @@ describe('v2.TableServiceClient', () => {
 
     it('has close method for the non-initialized client', done => {
       const client = new tableserviceModule.v2.TableServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       assert.strictEqual(client.tableServiceStub, undefined);
@@ -298,7 +285,7 @@ describe('v2.TableServiceClient', () => {
     it('has getProjectId method', async () => {
       const fakeProjectId = 'fake-project-id';
       const client = new tableserviceModule.v2.TableServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       client.auth.getProjectId = sinon.stub().resolves(fakeProjectId);
@@ -310,7 +297,7 @@ describe('v2.TableServiceClient', () => {
     it('has getProjectId method with callback', async () => {
       const fakeProjectId = 'fake-project-id';
       const client = new tableserviceModule.v2.TableServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       client.auth.getProjectId = sinon
@@ -333,7 +320,7 @@ describe('v2.TableServiceClient', () => {
   describe('getTable', () => {
     it('invokes getTable without error', async () => {
       const client = new tableserviceModule.v2.TableServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -374,7 +361,7 @@ describe('v2.TableServiceClient', () => {
 
     it('invokes getTable without error using callback', async () => {
       const client = new tableserviceModule.v2.TableServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -431,7 +418,7 @@ describe('v2.TableServiceClient', () => {
 
     it('invokes getTable with error', async () => {
       const client = new tableserviceModule.v2.TableServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -469,7 +456,7 @@ describe('v2.TableServiceClient', () => {
 
     it('invokes getTable with closed client', async () => {
       const client = new tableserviceModule.v2.TableServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -502,7 +489,7 @@ describe('v2.TableServiceClient', () => {
   describe('insertTable', () => {
     it('invokes insertTable without error', async () => {
       const client = new tableserviceModule.v2.TableServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -538,7 +525,7 @@ describe('v2.TableServiceClient', () => {
 
     it('invokes insertTable without error using callback', async () => {
       const client = new tableserviceModule.v2.TableServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -590,7 +577,7 @@ describe('v2.TableServiceClient', () => {
 
     it('invokes insertTable with error', async () => {
       const client = new tableserviceModule.v2.TableServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -626,7 +613,7 @@ describe('v2.TableServiceClient', () => {
 
     it('invokes insertTable with closed client', async () => {
       const client = new tableserviceModule.v2.TableServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -654,7 +641,7 @@ describe('v2.TableServiceClient', () => {
   describe('patchTable', () => {
     it('invokes patchTable without error', async () => {
       const client = new tableserviceModule.v2.TableServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -695,7 +682,7 @@ describe('v2.TableServiceClient', () => {
 
     it('invokes patchTable without error using callback', async () => {
       const client = new tableserviceModule.v2.TableServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -752,7 +739,7 @@ describe('v2.TableServiceClient', () => {
 
     it('invokes patchTable with error', async () => {
       const client = new tableserviceModule.v2.TableServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -793,7 +780,7 @@ describe('v2.TableServiceClient', () => {
 
     it('invokes patchTable with closed client', async () => {
       const client = new tableserviceModule.v2.TableServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -826,7 +813,7 @@ describe('v2.TableServiceClient', () => {
   describe('updateTable', () => {
     it('invokes updateTable without error', async () => {
       const client = new tableserviceModule.v2.TableServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -867,7 +854,7 @@ describe('v2.TableServiceClient', () => {
 
     it('invokes updateTable without error using callback', async () => {
       const client = new tableserviceModule.v2.TableServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -924,7 +911,7 @@ describe('v2.TableServiceClient', () => {
 
     it('invokes updateTable with error', async () => {
       const client = new tableserviceModule.v2.TableServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -965,7 +952,7 @@ describe('v2.TableServiceClient', () => {
 
     it('invokes updateTable with closed client', async () => {
       const client = new tableserviceModule.v2.TableServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -998,7 +985,7 @@ describe('v2.TableServiceClient', () => {
   describe('deleteTable', () => {
     it('invokes deleteTable without error', async () => {
       const client = new tableserviceModule.v2.TableServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -1039,7 +1026,7 @@ describe('v2.TableServiceClient', () => {
 
     it('invokes deleteTable without error using callback', async () => {
       const client = new tableserviceModule.v2.TableServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -1096,7 +1083,7 @@ describe('v2.TableServiceClient', () => {
 
     it('invokes deleteTable with error', async () => {
       const client = new tableserviceModule.v2.TableServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -1137,7 +1124,7 @@ describe('v2.TableServiceClient', () => {
 
     it('invokes deleteTable with closed client', async () => {
       const client = new tableserviceModule.v2.TableServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -1431,7 +1418,7 @@ describe('v2.TableServiceClient', () => {
 
     it('uses async iteration with listTables without error', async () => {
       const client = new tableserviceModule.v2.TableServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
