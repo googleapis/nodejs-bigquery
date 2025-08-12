@@ -49,10 +49,15 @@ function overridedRender() {
     header =
       header + `\n/**\n * Discovery Revision: ${discoveryRevision} \n */\n`;
   }
-  const patched = source.replaceAll(
-    'formatOptions.useInt64Timestamp',
-    "'formatOptions.useInt64Timestamp'",
-  );
+  const patched = source
+    .replaceAll(
+      'formatOptions.useInt64Timestamp',
+      "'formatOptions.useInt64Timestamp'",
+    )
+    .replaceAll(
+      'formatOptions.timestampOutputFormat',
+      "'formatOptions.timestampOutputFormat'",
+    );
   const fullSource = header + patched;
 
   return prettier.format(fullSource, {
