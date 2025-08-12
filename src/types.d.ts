@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * Discovery Revision: 20250706
+ * Discovery Revision: 20250713
  */
 
 /**
@@ -841,6 +841,14 @@ declare namespace bigquery {
    * Options for data format adjustments.
    */
   type IDataFormatOptions = {
+    /**
+     * Optional. The API output format for a timestamp. This offers more explicit control over the timestamp output format as compared to the existing `use_int64_timestamp` option.
+     */
+    timestampOutputFormat?:
+      | 'TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED'
+      | 'FLOAT64'
+      | 'INT64'
+      | 'ISO8601_STRING';
     /**
      * Optional. Output timestamp as usec int64. Default is false.
      */
@@ -1715,11 +1723,11 @@ declare namespace bigquery {
    */
   type IExternalRuntimeOptions = {
     /**
-     * Optional. Amount of CPU provisioned for the container instance. If not specified, the default value is 0.33 vCPUs.
+     * Optional. Amount of CPU provisioned for a Python UDF container instance. For more information, see [Configure container limits for Python UDFs](https://cloud.google.com/bigquery/docs/user-defined-functions-python#configure-container-limits)
      */
     containerCpu?: number;
     /**
-     * Optional. Amount of memory provisioned for the container instance. Format: {number}{unit} where unit is one of "M", "G", "Mi" and "Gi" (e.g. 1G, 512Mi). If not specified, the default value is 512Mi.
+     * Optional. Amount of memory provisioned for a Python UDF container instance. Format: {number}{unit} where unit is one of "M", "G", "Mi" and "Gi" (e.g. 1G, 512Mi). If not specified, the default value is 512Mi. For more information, see [Configure container limits for Python UDFs](https://cloud.google.com/bigquery/docs/user-defined-functions-python#configure-container-limits)
      */
     containerMemory?: string;
     /**
@@ -1731,7 +1739,7 @@ declare namespace bigquery {
      */
     runtimeConnection?: string;
     /**
-     * Optional. Language runtime version (e.g. python-3.11).
+     * Optional. Language runtime version. Example: `python-3.11`.
      */
     runtimeVersion?: string;
   };
@@ -3892,11 +3900,11 @@ declare namespace bigquery {
    */
   type IPythonOptions = {
     /**
-     * Required. The entry point function in the user's Python code.
+     * Required. The name of the function defined in Python code as the entry point when the Python UDF is invoked.
      */
     entryPoint?: string;
     /**
-     * Optional. A list of package names along with versions to be installed. Follows requirements.txt syntax (e.g. numpy==2.0, permutation, urllib3<2.2.1)
+     * Optional. A list of Python package names along with versions to be installed. Example: ["pandas>=2.1", "google-cloud-translate==3.11"]. For more information, see [Use third-party packages](https://cloud.google.com/bigquery/docs/user-defined-functions-python#third-party-packages).
      */
     packages?: Array<string>;
   };
@@ -3958,6 +3966,10 @@ declare namespace bigquery {
        */
       type?: IQueryParameterType;
     }>;
+    /**
+     * Optional. Precision (maximum number of total digits in base 10) for seconds of TIMESTAMP type. Possible values include: * 6 (Default, for TIMESTAMP type with microsecond precision) * 12 (For TIMESTAMP type with picosecond precision)
+     */
+    timestampPrecision?: string;
     /**
      * Required. The top level type of this field.
      */
@@ -4420,7 +4432,7 @@ declare namespace bigquery {
      */
     lastModifiedTime?: string;
     /**
-     * Optional. Options for Python UDF. [Preview](https://cloud.google.com/products/#product-launch-stages)
+     * Optional. Options for the Python UDF. [Preview](https://cloud.google.com/products/#product-launch-stages)
      */
     pythonOptions?: IPythonOptions;
     /**
@@ -6520,6 +6532,14 @@ declare namespace bigquery {
      */
     type IGetQueryResultsParams = {
       /**
+       * Optional. The API output format for a timestamp. This offers more explicit control over the timestamp output format as compared to the existing `use_int64_timestamp` option.
+       */
+      'formatOptionsformatOptions.timestampOutputFormat'?:
+        | 'TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED'
+        | 'FLOAT64'
+        | 'INT64'
+        | 'ISO8601_STRING';
+      /**
        * Optional. Output timestamp as usec int64. Default is false.
        */
       'formatOptions.useInt64Timestamp'?: boolean;
@@ -6681,6 +6701,14 @@ declare namespace bigquery {
      * List the content of a table in rows.
      */
     type IListParams = {
+      /**
+       * Optional. The API output format for a timestamp. This offers more explicit control over the timestamp output format as compared to the existing `use_int64_timestamp` option.
+       */
+      'formatOptionsformatOptions.timestampOutputFormat'?:
+        | 'TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED'
+        | 'FLOAT64'
+        | 'INT64'
+        | 'ISO8601_STRING';
       /**
        * Optional. Output timestamp as usec int64. Default is false.
        */
