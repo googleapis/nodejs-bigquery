@@ -6534,7 +6534,7 @@ declare namespace bigquery {
       /**
        * Optional. The API output format for a timestamp. This offers more explicit control over the timestamp output format as compared to the existing `use_int64_timestamp` option.
        */
-      'formatOptionsformatOptions.timestampOutputFormat'?:
+      'formatOptions.timestampOutputFormat'?:
         | 'TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED'
         | 'FLOAT64'
         | 'INT64'
@@ -6704,7 +6704,7 @@ declare namespace bigquery {
       /**
        * Optional. The API output format for a timestamp. This offers more explicit control over the timestamp output format as compared to the existing `use_int64_timestamp` option.
        */
-      'formatOptionsformatOptions.timestampOutputFormat'?:
+      'formatOptions.timestampOutputFormat'?:
         | 'TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED'
         | 'FLOAT64'
         | 'INT64'

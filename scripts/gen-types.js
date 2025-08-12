@@ -56,7 +56,7 @@ function overridedRender() {
     )
     .replaceAll(
       'formatOptions.timestampOutputFormat',
-      "'formatOptionsformatOptions.timestampOutputFormat'",
+      "'formatOptions.timestampOutputFormat'",
     );
   const fullSource = header + patched;
 
