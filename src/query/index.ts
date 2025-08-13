@@ -17,4 +17,3 @@ export {QueryJob} from './job';
 export {Row} from './row';
 export {RowIterator} from './iterator';
 export {queryFromSQL} from './builder';
-export {QueryReader, withPageToken} from './reader';

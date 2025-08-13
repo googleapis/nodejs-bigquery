@@ -20,7 +20,6 @@ import {
 import {QueryJob, CallOptions} from './job';
 import {protos} from '../';
 import {queryFromSQL as builderQueryFromSQL} from './builder';
-import {QueryReader} from './reader';
 
 /**
  * QueryClient is a client for running queries in BigQuery.
@@ -91,14 +90,6 @@ export class QueryClient {
   }
 
   /**
-   * NewQueryReader creates a new QueryReader.
-   * @returns {QueryReader}
-   */
-  newQueryReader(): QueryReader {
-    return new QueryReader(this);
-  }
-
-  /**
    * Runs a query and returns a QueryJob handle.
    *
    * @param {protos.google.cloud.bigquery.v2.IPostQueryRequest} request
@@ -158,6 +149,23 @@ export class QueryClient {
       options,
     );
     return new QueryJob(this, {jobReference: response.jobReference});
+  }
+
+  /**
+   * Create a managed QueryJob from a job reference.
+   *
+   * @param {protos.google.cloud.bigquery.v2.IJob} job
+   *   A job resource to insert
+   * @param {CallOptions} [options]
+   *   Call options. See {@link https://googleapis.dev/nodejs/google-gax/latest/interfaces/CallOptions.html|CallOptions} for more details.
+   * @returns {Promise<QueryJob>}
+   */
+  async attachJob(
+    jobRef: protos.google.cloud.bigquery.v2.IJobReference,
+  ): Promise<QueryJob> {
+    return new QueryJob(this, {
+      jobReference: jobRef,
+    });
   }
 
   getBigQueryClient(): BigQueryClient {

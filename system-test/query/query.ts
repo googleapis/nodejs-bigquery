@@ -46,7 +46,7 @@ describeWithBothTransports('Run Query', client => {
     const q = await client.startQuery(req);
     await q.wait();
 
-    const it = q.read();
+    const it = await q.read();
     const rows = [];
     for await (const row of it) {
       rows.push(row.toJSON());
@@ -63,8 +63,8 @@ describeWithBothTransports('Run Query', client => {
       protos.google.cloud.bigquery.v2.QueryRequest.JobCreationMode.JOB_CREATION_REQUIRED;
     req.queryRequest!.timeoutMs = {value: 500};
 
-    const abortCtrl = new AbortController();
     const q = await client.startQuery(req);
+    const abortCtrl = new AbortController();
     q.wait({
       signal: abortCtrl.signal,
     }).catch(err => {
@@ -84,13 +84,13 @@ describeWithBothTransports('Run Query', client => {
     req.queryRequest!.jobCreationMode =
       protos.google.cloud.bigquery.v2.QueryRequest.JobCreationMode.JOB_CREATION_REQUIRED;
 
-    const q = await client.startQuery(req);
+    let q = await client.startQuery(req);
     await q.wait();
 
-    const reader = client.newQueryReader();
     const jobRef = q.jobReference();
+    q = await client.attachJob(jobRef);
 
-    const it = await reader.read(jobRef, q.schema);
+    const it = await q.read();
     const rows = [];
     for await (const row of it) {
       rows.push(row.toJSON());
@@ -109,7 +109,7 @@ describeWithBothTransports('Run Query', client => {
     });
     await q.wait();
 
-    const it = q.read();
+    const it = await q.read();
     const rows = [];
     for await (const row of it) {
       rows.push(row);

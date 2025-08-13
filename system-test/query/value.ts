@@ -28,7 +28,7 @@ describeWithBothTransports('Read Query Values', client => {
         const q = await client.startQuery(req);
         await q.wait();
 
-        const it = q.read();
+        const it = await q.read();
         const rows = [];
         for await (const row of it) {
           rows.push(row);
@@ -46,7 +46,7 @@ describeWithBothTransports('Read Query Values', client => {
     const q = await client.startQuery(req);
     await q.wait();
 
-    const it = q.read();
+    const it = await q.read();
     const rows = [];
     for await (const row of it) {
       rows.push(row);

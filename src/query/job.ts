@@ -119,11 +119,14 @@ export class QueryJob {
    *
    * @returns {RowIterator}
    */
-  read(): RowIterator {
+  async read(): Promise<RowIterator> {
     const it = new RowIterator(this, {
       pageToken: this.cachedPageToken,
       rows: this.cachedRows,
     });
+    if (this.cachedRows.length === 0) {
+      await it.fetchRows();
+    }
     return it;
   }
 
