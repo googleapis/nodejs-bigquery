@@ -139,13 +139,15 @@ describe.only('get/list/update model', async () => {
   it.only('should list models', async () => {
     const output = execSync(`node models/listModels.js ${projectId} ${datasetId}`);
     assert.include(output, 'Models:');
-    assert.include(output, datasetId);
-  });
-//TODO(coleleah): update
+    assert.include(output, datasetId && modelId);
 
-  it('should list models streaming', async () => {
-    const output = execSync(`node getModel.js ${datasetId} ${modelId}`);
-    assert.include(output, modelId);
+  });
+
+  it.only('should list models streaming', async () => {
+    const output = execSync(`node models/listModelsStreaming.js ${projectId} ${datasetId}`);
+    assert.include(output, 'Models:');
+    assert.include(output, datasetId && modelId);
+    assert.include(output, 'All models have been retrieved.')
   });
 //TODO(coleleah): update
 

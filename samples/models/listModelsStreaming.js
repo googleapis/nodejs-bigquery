@@ -20,7 +20,7 @@
 //   description: Lists all existing models in the dataset using streaming method.
 //   usage: node listModelsStreaming.js <DATASET_ID>
 
-function main(datasetId = 'my_dataset') {
+function main(projectId = 'my_project', datasetId = 'my_dataset') {
   // [START bigquery_list_models_streaming]
 
   // Import the Google Cloud client library
@@ -37,20 +37,20 @@ function main(datasetId = 'my_dataset') {
     const bigqueryClient = new BigQueryClient();
 
     const request = {
-      projectId: bigqueryClient.projectId,
+      projectId: projectId,
       datasetId: datasetId,
     };
 
     const stream = bigqueryClient.listModelsStream(request);
+    console.log('Models:')
 
     stream.on('error', err => {
       console.error(err);
     });
 
     stream
-
       .on('data', model => {
-        console.log(model.metadata);
+        console.log(model);
       })
       .on('end', () => {
         console.log('All models have been retrieved.');
