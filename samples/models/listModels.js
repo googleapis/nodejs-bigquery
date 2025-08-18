@@ -13,14 +13,8 @@
 // limitations under the License.
 
 'use strict';
-//TODO(coleleah): update
 
-// sample-metadata:
-//   title: BigQuery List Models
-//   description: Lists all existing models in the dataset.
-//   usage: node listModels.js <DATASET_ID>
-
-function main(datasetId = 'my_dataset') {
+function main(projectId = 'my_project', datasetId = 'my_dataset') {
   // [START bigquery_list_models]
 
   // Import the Google Cloud client library
@@ -37,7 +31,7 @@ function main(datasetId = 'my_dataset') {
     const bigqueryClient = new BigQueryClient();
 
     const request = {
-      projectId: bigqueryClient.projectId,
+      projectId: projectId,
       datasetId: datasetId,
     };
 
@@ -45,7 +39,7 @@ function main(datasetId = 'my_dataset') {
 
     if (models && models.length > 0) {
       console.log('Models:');
-      models.forEach(model => console.log(model.metadata));
+      models.forEach(model => console.log(model));
     } else {
       console.log(`No models found in dataset ${datasetId}.`);
     }

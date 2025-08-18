@@ -129,17 +129,15 @@ describe.only('get/list/update model', async () => {
   // after('delete the model we created', async () => {
   //   console.log('to be implemented')
   // })
-  //TODO(coleleah): update
 
    it.only('should retrieve a model if it exists', async () => {
     const output = execSync(`node models/getModel.js ${projectId} ${datasetId} ${modelId}`);
     assert.include(output, 'Model:');
     assert.include(output, datasetId && modelId);
   });
-//TODO(coleleah): update
 
-  it('should list models', async () => {
-    const output = execSync(`node listModels.js ${datasetId}`);
+  it.only('should list models', async () => {
+    const output = execSync(`node models/listModels.js ${projectId} ${datasetId}`);
     assert.include(output, 'Models:');
     assert.include(output, datasetId);
   });
