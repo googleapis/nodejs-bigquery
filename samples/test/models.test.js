@@ -27,7 +27,7 @@ const GCLOUD_TESTS_PREFIX = 'nodejs_samples_tests_models';
 // the GCLOUD_PROJECT environment variable is set as part of test harness setup
 const projectId = process.env.GCLOUD_PROJECT;
 
-const bigquery = new BigQueryClient();
+const bigquery = new BigQueryClient({}, {opts: {fallback: false}});
 
 //TODO(coleleah): update
 describe.only('Models', function () {
@@ -94,110 +94,118 @@ describe.only('Models', function () {
 const deleteRequest = {
       projectId: projectId,
       datasetId: datasetId,
+      deleteContents: true
     };
-    await bigquery.deleteDataset(deleteRequest);  });
+    await bigquery.deleteDataset(deleteRequest);  
+  });
 //TODO(coleleah): update
 
-describe('get/list/update model', async () => {
-  before('create a model to get/list/update', async() => {
-    const jobConfig = {
-      jobType: "query",
-      query: {query:query, useLegacySql: {value:false}},
-      destinationTable: {tableId: tableId, datasetId: datasetId, projectId: projectId},
-      defaultDataset:{
-        datasetId: datasetId,
-        projectId: projectId
-      }
+// describe('get/list/update model', async () => {
+//   before('create a model to get/list/update', async() => {
+//     const jobConfig = {
+//       jobType: "query",
+//       query: {query:query, useLegacySql: {value:false}},
+//       destinationTable: {tableId: tableId, datasetId: datasetId, projectId: projectId},
+//       defaultDataset:{
+//         datasetId: datasetId,
+//         projectId: projectId
+//       }
 
-    }
-    const jobObject = {
-      id: modelId,
-      configuration: jobConfig,
+//     }
+//     const jobObject = {
+//       id: modelId,
+//       configuration: jobConfig,
 
-    }
-    const insertJobRequest = {
+//     }
+//     const insertJobRequest = {
+//       projectId: projectId,
+//       job: jobObject
+
+//     }
+
+//     // Run query to create a model
+//     const [job] = await bigquery.insertJob(insertJobRequest);
+//     assert.ok(job)
+//     console.log("JOB!", job)
+//     // Wait for the query to finish
+//     const resp = await bigquery.jobClient.getQueryResults();
+//     console.log('resp', resp)
+
+//   })
+//     //TODO(coleleah): update
+
+//   after('delete the model we created', async () => {
+//     console.log('to be implemented')
+//   })
+//   //TODO(coleleah): update
+
+//    it.only('should retrieve a model if it exists', async () => {
+//     const output = execSync(`node getModel.js ${datasetId} ${modelId}`);
+//     assert.include(output, 'Model:');
+//     assert.include(output, datasetId && modelId);
+//   });
+// //TODO(coleleah): update
+
+//   it('should list models', async () => {
+//     const output = execSync(`node listModels.js ${datasetId}`);
+//     assert.include(output, 'Models:');
+//     assert.include(output, datasetId);
+//   });
+// //TODO(coleleah): update
+
+//   it('should list models streaming', async () => {
+//     const output = execSync(`node getModel.js ${datasetId} ${modelId}`);
+//     assert.include(output, modelId);
+//   });
+// //TODO(coleleah): update
+
+//   it("should update model's metadata", async () => {
+//     const output = execSync(`node updateModel.js ${datasetId} ${modelId}`);
+//     assert.include(output, `${modelId} description: A really great model.`);
+//   });
+
+// })
+
+//TODO(coleleah): update
+  describe.only('Create/Delete Model', () => {
+    const modelRequest = {
       projectId: projectId,
-      job: jobObject
-
+      datasetId: datasetId,
+      modelId: modelId
     }
-
-    // Run query to create a model
-    const [job] = await bigquery.insertJob(insertJobRequest);
-    assert.ok(job)
-    console.log("JOB!", job)
-    // Wait for the query to finish
-    const resp = await bigquery.jobClient.getQueryResults();
-    console.log('resp', resp)
-
-  })
-    //TODO(coleleah): update
-
-  after('delete the model we created', async () => {
-    console.log('to be implemented')
-  })
+    // const datasetId = `${GCLOUD_TESTS_PREFIX}_delete_${randomUUID()}`.replace(
+    //   /-/gi,
+    //   '_',
+    // );
+    // const modelId = `${GCLOUD_TESTS_PREFIX}_delete_${randomUUID()}`.replace(
+    //   /-/gi,
+    //   '_',
+    // );
   //TODO(coleleah): update
 
-   it.only('should retrieve a model if it exists', async () => {
-    const output = execSync(`node getModel.js ${datasetId} ${modelId}`);
-    assert.include(output, 'Model:');
-    assert.include(output, datasetId && modelId);
-  });
-//TODO(coleleah): update
-
-  it('should list models', async () => {
-    const output = execSync(`node listModels.js ${datasetId}`);
-    assert.include(output, 'Models:');
-    assert.include(output, datasetId);
-  });
-//TODO(coleleah): update
-
-  it('should list models streaming', async () => {
-    const output = execSync(`node getModel.js ${datasetId} ${modelId}`);
-    assert.include(output, modelId);
-  });
-//TODO(coleleah): update
-
-  it("should update model's metadata", async () => {
-    const output = execSync(`node updateModel.js ${datasetId} ${modelId}`);
-    assert.include(output, `${modelId} description: A really great model.`);
-  });
-
-})
-
-//TODO(coleleah): update
-
-  describe('Create/Delete Model', () => {
-    const datasetId = `${GCLOUD_TESTS_PREFIX}_delete_${randomUUID()}`.replace(
-      /-/gi,
-      '_',
-    );
-    const modelId = `${GCLOUD_TESTS_PREFIX}_delete_${randomUUID()}`.replace(
-      /-/gi,
-      '_',
-    );
+    // before(async () => {
+    //   const datasetOptions = {
+    //     location: 'US',
+    //   };
+    //   await bigquery.createDataset(datasetId, datasetOptions);
+    // });
   //TODO(coleleah): update
-
-    before(async () => {
-      const datasetOptions = {
-        location: 'US',
-      };
-      await bigquery.createDataset(datasetId, datasetOptions);
-    });
 
     beforeEach(async function () {
       this.currentTest.retries(2);
     });
+  // //TODO(coleleah): update
 
-    after(async () => {
-      await bigquery.dataset(datasetId).delete({force: true}).catch(console.warn);
-    });
+  //   after(async () => {
+  //     await bigquery.dataset(datasetId).delete({force: true}).catch(console.warn);
+  //   });
   //TODO(coleleah): update
 
-    it('should create a model', async () => {
-      const output = execSync(`node createModel.js ${datasetId} ${modelId}`);
+    it.only('should create a model', async () => {
+      const output = execSync(`node models/createModel.js ${projectId} ${datasetId} ${modelId}`);
       assert.include(output, `Model ${modelId} created.`);
-      const [exists] = await bigquery.dataset(datasetId).model(modelId).exists();
-      assert.strictEqual(exists, true);
+      const [exists] = await bigquery.getModel(modelRequest)
+      assert.ok(exists)
     });
   //TODO(coleleah): update
 

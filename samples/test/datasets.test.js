@@ -27,9 +27,8 @@ const datasetId = `${GCLOUD_TESTS_PREFIX}_datasets_${randomUUID()}`.replace(
   '_',
 );
 
-//TODO(coleleah): remove fallback: false if needed
-// tracked in b/429226336
-const bigquery = new BigQueryClient({}, {opts: {fallback: false}});
+
+const bigquery = new BigQueryClient({});
 // the GCLOUD_PROJECT environment variable is set as part of test harness setup
 const projectId = process.env.GCLOUD_PROJECT;
 
