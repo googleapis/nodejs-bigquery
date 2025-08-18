@@ -13,7 +13,6 @@
 // limitations under the License.
 
 'use strict';
-//TODO(coleleah): update
 
 function main(projectId = 'my_project', datasetId = 'my_dataset', modelId = 'my_model') {
   // [START bigquery_delete_model]
@@ -30,8 +29,7 @@ function main(projectId = 'my_project', datasetId = 'my_dataset', modelId = 'my_
     // const datasetId = "my_dataset";
     // const modelId = "my_model";
 
-    //TODO(coleleah): update
-    const bigqueryClient = new BigQueryClient({}, {opts: {fallback: false}});
+    const bigqueryClient = new BigQueryClient();
 
     const request = {
       projectId: projectId,

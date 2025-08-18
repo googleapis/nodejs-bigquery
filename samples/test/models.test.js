@@ -38,20 +38,6 @@ describe.only('Models', function () {
     '_',
   );
   const modelId = `${GCLOUD_TESTS_PREFIX}_${randomUUID()}`.replace(/-/gi, '_');
-//TODO(coleleah): update
-    // const query = `CREATE OR REPLACE MODEL \`${projectId}.${datasetId}.${modelId}\`
-    //     OPTIONS(model_type='logistic_reg') AS
-    //     SELECT
-    //       IF(totals.transactions IS NULL, 0, 1) AS label,
-    //       IFNULL(device.operatingSystem, "") AS os,
-    //       device.isMobile AS is_mobile,
-    //       IFNULL(geoNetwork.country, "") AS country,
-    //       IFNULL(totals.pageviews, 0) AS pageviews
-    //     FROM
-    //       \`bigquery-public-data.google_analytics_sample.ga_sessions_*\`
-    //     WHERE
-    //       _TABLE_SUFFIX BETWEEN '20160801' AND '20170631'
-    //     LIMIT  100000;`;
     const query = `CREATE MODEL \`${projectId}.${datasetId}.${modelId}\`
                    OPTIONS ( 
                             model_type='linear_reg',
@@ -100,74 +86,80 @@ const deleteRequest = {
   });
 //TODO(coleleah): update
 
-// describe('get/list/update model', async () => {
-//   before('create a model to get/list/update', async() => {
-//     const jobConfig = {
-//       jobType: "query",
-//       query: {query:query, useLegacySql: {value:false}},
-//       destinationTable: {tableId: tableId, datasetId: datasetId, projectId: projectId},
-//       defaultDataset:{
-//         datasetId: datasetId,
-//         projectId: projectId
-//       }
+describe.only('get/list/update model', async () => {
+  before('create a model to get/list/update', async() => {
+    const insertJobRequest = {
+      projectId: projectId,
+      job: {
+        configuration: {
+          query: {
+            query: query,
+            useLegacySql: {value: false}
+          },
+        },
+      },
+    };
+  
 
-//     }
-//     const jobObject = {
-//       id: modelId,
-//       configuration: jobConfig,
+    // Run query to create a model
+    const [job] = await bigquery.insertJob(insertJobRequest);
+    assert.ok(job)
+    const jobReference = job.jobReference;
+       const getQueryResultsRequest = {
+      projectId: projectId,
+      jobId: jobReference.jobId,
+      location: jobReference.location.value,
+      timeoutMs: {value:120000}
 
-//     }
-//     const insertJobRequest = {
-//       projectId: projectId,
-//       job: jobObject
+    }
 
-//     }
+    // Wait for the query to finish
+    let [resp] = await bigquery.jobClient.getQueryResults(getQueryResultsRequest)
+    // poll the job status every 3 seconds until complete
+    while(resp.status==="RUNNING"){
+      setTimeout([resp] = await bigquery.jobClient.getQueryResults(getQueryResultsRequest), 3000)
+    }
+    if (resp.errors.length!==0){
+      throw new Error(`Something failed in model creation`)
+    }
 
-//     // Run query to create a model
-//     const [job] = await bigquery.insertJob(insertJobRequest);
-//     assert.ok(job)
-//     console.log("JOB!", job)
-//     // Wait for the query to finish
-//     const resp = await bigquery.jobClient.getQueryResults();
-//     console.log('resp', resp)
+  })
+    //TODO(coleleah): update
 
-//   })
-//     //TODO(coleleah): update
+  // after('delete the model we created', async () => {
+  //   console.log('to be implemented')
+  // })
+  //TODO(coleleah): update
 
-//   after('delete the model we created', async () => {
-//     console.log('to be implemented')
-//   })
-//   //TODO(coleleah): update
+   it.only('should retrieve a model if it exists', async () => {
+    const output = execSync(`node models/getModel.js ${projectId} ${datasetId} ${modelId}`);
+    assert.include(output, 'Model:');
+    assert.include(output, datasetId && modelId);
+  });
+//TODO(coleleah): update
 
-//    it.only('should retrieve a model if it exists', async () => {
-//     const output = execSync(`node getModel.js ${datasetId} ${modelId}`);
-//     assert.include(output, 'Model:');
-//     assert.include(output, datasetId && modelId);
-//   });
-// //TODO(coleleah): update
+  it('should list models', async () => {
+    const output = execSync(`node listModels.js ${datasetId}`);
+    assert.include(output, 'Models:');
+    assert.include(output, datasetId);
+  });
+//TODO(coleleah): update
 
-//   it('should list models', async () => {
-//     const output = execSync(`node listModels.js ${datasetId}`);
-//     assert.include(output, 'Models:');
-//     assert.include(output, datasetId);
-//   });
-// //TODO(coleleah): update
+  it('should list models streaming', async () => {
+    const output = execSync(`node getModel.js ${datasetId} ${modelId}`);
+    assert.include(output, modelId);
+  });
+//TODO(coleleah): update
 
-//   it('should list models streaming', async () => {
-//     const output = execSync(`node getModel.js ${datasetId} ${modelId}`);
-//     assert.include(output, modelId);
-//   });
-// //TODO(coleleah): update
+  it("should update model's metadata", async () => {
+    const output = execSync(`node updateModel.js ${datasetId} ${modelId}`);
+    assert.include(output, `${modelId} description: A really great model.`);
+  });
 
-//   it("should update model's metadata", async () => {
-//     const output = execSync(`node updateModel.js ${datasetId} ${modelId}`);
-//     assert.include(output, `${modelId} description: A really great model.`);
-//   });
-
-// })
+})
 
 //TODO(coleleah): update
-  describe.only('Create/Delete Model', () => {
+  describe('Create/Delete Model', () => {
     const modelRequest = {
       projectId: projectId,
       datasetId: datasetId,
@@ -200,14 +192,14 @@ const deleteRequest = {
   //     await bigquery.dataset(datasetId).delete({force: true}).catch(console.warn);
   //   });
 
-    it.only('should create a model', async () => {
+    it('should create a model', async () => {
       const output = execSync(`node models/createModel.js ${projectId} ${datasetId} ${modelId}`);
       assert.include(output, `Model ${modelId} created.`);
       const [exists] = await bigquery.getModel(modelRequest)
       assert.ok(exists)
     });
 
-    it.only('should delete a model', async () => {
+    it('should delete a model', async () => {
       const output = execSync(`node models/deleteModel.js ${projectId} ${datasetId} ${modelId}`);
       assert.include(output, `Model ${modelId} deleted.`);
       try{

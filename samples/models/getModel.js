@@ -20,7 +20,7 @@
 //   description: Retrieves an existing model from a dataset.
 //   usage: node getModel.js <DATASET_ID> <MODEL_ID>
 
-function main(datasetId = 'my_dataset', modelId = 'my_existing_model') {
+function main(projectId = 'my_project', datasetId = 'my_dataset', modelId = 'my_existing_model') {
   // [START bigquery_get_model]
   // Import the Google Cloud client library
   const {BigQueryClient} = require('@google-cloud/bigquery');
@@ -37,7 +37,7 @@ function main(datasetId = 'my_dataset', modelId = 'my_existing_model') {
     const bigqueryClient = new BigQueryClient();
 
     const request = {
-      projectId: bigqueryClient.projectId,
+      projectId: projectId,
       datasetId: datasetId,
       modelId: modelId,
     };
