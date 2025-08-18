@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2025 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,14 +13,12 @@
 // limitations under the License.
 
 'use strict';
-//TODO(coleleah): update
 
-// sample-metadata:
-//   title: BigQuery Get Model
-//   description: Retrieves an existing model from a dataset.
-//   usage: node getModel.js <DATASET_ID> <MODEL_ID>
-
-function main(projectId = 'my_project', datasetId = 'my_dataset', modelId = 'my_existing_model') {
+function main(
+  projectId = 'my_project',
+  datasetId = 'my_dataset',
+  modelId = 'my_existing_model',
+) {
   // [START bigquery_get_model]
   // Import the Google Cloud client library
   const {BigQueryClient} = require('@google-cloud/bigquery');

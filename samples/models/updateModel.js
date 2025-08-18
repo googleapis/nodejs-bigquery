@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2025 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,13 +14,11 @@
 
 'use strict';
 
-// sample-metadata:
-//   title: BigQuery Update Model
-//   description: Updates a model's metadata.
-//   usage: node updateModel.js <DATASET_ID> <MODEL_ID>
-//TODO(coleleah): update
-
-function main(datasetId = 'my_datset', modelId = 'my_model') {
+function main(
+  projectId = 'my_project',
+  datasetId = 'my_datset',
+  modelId = 'my_model',
+) {
   // [START bigquery_update_model_description]
   // Import the Google Cloud client library
   const {BigQueryClient} = require('@google-cloud/bigquery');
@@ -31,21 +29,26 @@ function main(datasetId = 'my_datset', modelId = 'my_model') {
     /**
      * TODO(developer): Uncomment the following lines before running the sample
      */
+    // const projectId = "my_project"
     // const datasetId = "my_dataset";
     // const modelId = "my__model";
 
-    const metadata = {
-      description: 'A really great model.',
-    };
+    const description = 'A really great model.';
 
-    const bigqueryClient = new BigQueryClient();
+    // known limitation: patchModel must be called in REST fallback mode
+    const bigqueryClient = new BigQueryClient({}, {opts: {fallback: true}});
 
     const request = {
-      projectId: bigqueryClient.projectId,
+      projectId: projectId,
       datasetId: datasetId,
       modelId: modelId,
       model: {
-        description: metadata.description,
+        modelReference: {
+          projectId: projectId,
+          datasetId: datasetId,
+          modelId: modelId,
+        },
+        description: description,
       },
     };
 

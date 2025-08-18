@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2025 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ function main(projectId = 'my_project', datasetId = 'my_dataset') {
     };
 
     const stream = bigqueryClient.listModelsStream(request);
-    console.log('Models:')
+    console.log('Models:');
 
     stream.on('error', err => {
       console.error(err);

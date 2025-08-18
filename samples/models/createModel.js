@@ -1,4 +1,4 @@
-// Copyright 2020 Google LLC
+// Copyright 2025 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,8 +14,11 @@
 
 'use strict';
 
-
-function main(projectId = 'my_project', datasetId = 'my_dataset', modelId = 'my_model') {
+function main(
+  projectId = 'my_project',
+  datasetId = 'my_dataset',
+  modelId = 'my_model',
+) {
   // [START bigquery_create_model]
   // Import the Google Cloud client library
   const {BigQueryClient} = require('@google-cloud/bigquery');
@@ -44,14 +47,13 @@ function main(projectId = 'my_project', datasetId = 'my_dataset', modelId = 'my_
            _TABLE_SUFFIX BETWEEN '20160801' AND '20170631'
          LIMIT  100000;`;
 
-
     const request = {
       projectId: projectId,
       job: {
         configuration: {
           query: {
             query: query,
-            useLegacySql: {value: false}
+            useLegacySql: {value: false},
           },
         },
       },
@@ -65,24 +67,24 @@ function main(projectId = 'my_project', datasetId = 'my_dataset', modelId = 'my_
       projectId: projectId,
       jobId: jobReference.jobId,
       location: jobReference.location.value,
-      timeoutMs: {value:120000}
-
-    }
-    let [resp] = await bigquery.jobClient.getQueryResults(getQueryResultsRequest)
+      timeoutMs: {value: 120000},
+    };
+    let [resp] = await bigquery.jobClient.getQueryResults(
+      getQueryResultsRequest,
+    );
     // poll the job status every 3 seconds until complete
-    while(resp.status==="RUNNING"){
-      setTimeout([resp] = await bigquery.jobClient.getQueryResults(getQueryResultsRequest), 3000)
+    while (resp.status === 'RUNNING') {
+      setTimeout(
+        ([resp] = await bigquery.jobClient.getQueryResults(
+          getQueryResultsRequest,
+        )),
+        3000,
+      );
     }
-    if (resp.errors.length!==0){
-      throw new Error(`Something failed in model creation`)
+    if (resp.errors.length !== 0) {
+      throw new Error('Something failed in model creation');
     }
     console.log(`Model ${modelId} created.`);
-    
-
-    
-   
-    
-
   }
   createModel();
   // [END bigquery_create_model]

@@ -27,7 +27,6 @@ const datasetId = `${GCLOUD_TESTS_PREFIX}_datasets_${randomUUID()}`.replace(
   '_',
 );
 
-
 const bigquery = new BigQueryClient({});
 // the GCLOUD_PROJECT environment variable is set as part of test harness setup
 const projectId = process.env.GCLOUD_PROJECT;
