@@ -15,7 +15,7 @@
 'use strict';
 //TODO(coleleah): update
 
-function main(datasetId = 'my_dataset', modelId = 'my_model') {
+function main(projectId = 'my_project', datasetId = 'my_dataset', modelId = 'my_model') {
   // [START bigquery_delete_model]
   // Import the Google Cloud client library
   const {BigQueryClient} = require('@google-cloud/bigquery');
@@ -26,13 +26,15 @@ function main(datasetId = 'my_dataset', modelId = 'my_model') {
     /**
      * TODO(developer): Uncomment the following lines before running the sample
      */
+    // const projectId = "my_project"
     // const datasetId = "my_dataset";
     // const modelId = "my_model";
 
-    const bigqueryClient = new BigQueryClient();
+    //TODO(coleleah): update
+    const bigqueryClient = new BigQueryClient({}, {opts: {fallback: false}});
 
     const request = {
-      projectId: bigqueryClient.projectId,
+      projectId: projectId,
       datasetId: datasetId,
       modelId: modelId,
     };

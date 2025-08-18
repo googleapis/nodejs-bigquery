@@ -14,17 +14,12 @@
 
 'use strict';
 
-// sample-metadata:
-//   title: Create Model
-//   description: Creates a model in a dataset.
-//   usage: node createModel.js <DATASET_ID> <MODEL_ID>
-//TODO(coleleah): update
 
 function main(projectId = 'my_project', datasetId = 'my_dataset', modelId = 'my_model') {
   // [START bigquery_create_model]
   // Import the Google Cloud client library
   const {BigQueryClient} = require('@google-cloud/bigquery');
-  const bigquery = new BigQueryClient({}, {opts:{fallback: false}});
+  const bigquery = new BigQueryClient();
 
   async function createModel() {
     // Creates a model named "my_model" in "my_dataset".
@@ -64,7 +59,6 @@ function main(projectId = 'my_project', datasetId = 'my_dataset', modelId = 'my_
 
     // Run query to create a model
     const [jobResponse] = await bigquery.insertJob(request);
-    console.log('jobResponse', jobResponse)
     const jobReference = jobResponse.jobReference;
 
     const getQueryResultsRequest = {
@@ -74,13 +68,11 @@ function main(projectId = 'my_project', datasetId = 'my_dataset', modelId = 'my_
       timeoutMs: {value:120000}
 
     }
-    // Wait for the job to finish
     let [resp] = await bigquery.jobClient.getQueryResults(getQueryResultsRequest)
-    console.log("gqr result", resp)
+    // poll the job status every 3 seconds until complete
     while(resp.status==="RUNNING"){
       setTimeout([resp] = await bigquery.jobClient.getQueryResults(getQueryResultsRequest), 3000)
     }
-    console.log("RESP", resp)
     if (resp.errors.length!==0){
       throw new Error(`Something failed in model creation`)
     }

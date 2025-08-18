@@ -199,7 +199,6 @@ const deleteRequest = {
   //   after(async () => {
   //     await bigquery.dataset(datasetId).delete({force: true}).catch(console.warn);
   //   });
-  //TODO(coleleah): update
 
     it.only('should create a model', async () => {
       const output = execSync(`node models/createModel.js ${projectId} ${datasetId} ${modelId}`);
@@ -207,13 +206,15 @@ const deleteRequest = {
       const [exists] = await bigquery.getModel(modelRequest)
       assert.ok(exists)
     });
-  //TODO(coleleah): update
 
-    it('should delete a model', async () => {
-      const output = execSync(`node deleteModel.js ${datasetId} ${modelId}`);
+    it.only('should delete a model', async () => {
+      const output = execSync(`node models/deleteModel.js ${projectId} ${datasetId} ${modelId}`);
       assert.include(output, `Model ${modelId} deleted.`);
-      const [exists] = await bigquery.dataset(datasetId).model(modelId).exists();
-      assert.strictEqual(exists, false);
+      try{
+        await bigquery.getModel(modelRequest)
+      }catch(err){
+        assert.strictEqual(err.details, `Not found: Model ${projectId}:${datasetId}.${modelId}`)
+      }
     });
   });
 });
