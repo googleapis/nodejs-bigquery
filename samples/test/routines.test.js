@@ -33,9 +33,8 @@ const routineId = generateUuid();
 const newRoutineId = generateUuid();
 // the GCLOUD_PROJECT environment variable is set as part of test harness setup
 const projectId = process.env.GCLOUD_PROJECT;
-//TODO(coleleah): remove fallback:false if obsolete
-// tracked in b/429226336
-const bigquery = new BigQueryClient({}, {opts: {fallback: false}});
+
+const bigquery = new BigQueryClient();
 
 // helper function used in before/after blocks
 function buildRoutineObject(projectId, datasetId, routineId) {
