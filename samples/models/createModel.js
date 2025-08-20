@@ -23,6 +23,7 @@ function main(
   // Import the Google Cloud client library
   const {BigQueryClient} = require('@google-cloud/bigquery');
   const bigquery = new BigQueryClient();
+  const { setInterval} = require('node:timers/promises');
 
   async function createModel() {
     // Creates a model named "my_model" in "my_dataset".
@@ -65,23 +66,21 @@ function main(
       projectId: projectId,
       jobId: jobReference.jobId,
       location: jobReference.location.value,
-      timeoutMs: {value: 120000},
     };
-    let [resp] = await bigquery.jobClient.getQueryResults(
-      getQueryResultsRequest,
-    );
+
     // poll the job status every 3 seconds until complete
-    while (resp.status === 'RUNNING') {
-      setTimeout(
-        ([resp] = await bigquery.jobClient.getQueryResults(
-          getQueryResultsRequest,
-        )),
-        3000,
+    for await (const t of setInterval(3000)){
+      const [resp] = await bigquery.jobClient.getQueryResults(
+        getQueryResultsRequest,
       );
+      if (resp.errors.length !== 0) {
+        throw new Error('Something failed in model creation');
+      }
+      if (resp.jobComplete?.value){
+        break;
+      }
     }
-    if (resp.errors.length !== 0) {
-      throw new Error('Something failed in model creation');
-    }
+
     console.log(`Model ${modelId} created.`);
   }
   createModel();
