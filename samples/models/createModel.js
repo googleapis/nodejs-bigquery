@@ -34,18 +34,16 @@ function main(
     // const modelId = "my_model";
 
     const query = `CREATE OR REPLACE MODEL \`${projectId}.${datasetId}.${modelId}\`
-         OPTIONS(model_type='logistic_reg') AS
-         SELECT
-           IF(totals.transactions IS NULL, 0, 1) AS label,
-           IFNULL(device.operatingSystem, "") AS os,
-           device.isMobile AS is_mobile,
-           IFNULL(geoNetwork.country, "") AS country,
-           IFNULL(totals.pageviews, 0) AS pageviews
-         FROM
-           \`bigquery-public-data.google_analytics_sample.ga_sessions_*\`
-         WHERE
-           _TABLE_SUFFIX BETWEEN '20160801' AND '20170631'
-         LIMIT  100000;`;
+    OPTIONS (
+			model_type='linear_reg',
+			max_iterations=1,
+			learn_rate=0.4,
+			learn_rate_strategy='constant'
+		) AS (
+			SELECT 'a' AS f1, 2.0 AS label
+			UNION ALL
+			SELECT 'b' AS f1, 3.8 AS label
+		)`;
 
     const request = {
       projectId: projectId,
