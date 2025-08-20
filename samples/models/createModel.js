@@ -21,9 +21,9 @@ function main(
 ) {
   // [START bigquery_create_model]
   // Import the Google Cloud client library
+  const {setInterval} = require('node:timers/promises');
   const {BigQueryClient} = require('@google-cloud/bigquery');
   const bigquery = new BigQueryClient();
-  const { setInterval} = require('node:timers/promises');
 
   async function createModel() {
     // Creates a model named "my_model" in "my_dataset".
@@ -69,14 +69,15 @@ function main(
     };
 
     // poll the job status every 3 seconds until complete
-    for await (const t of setInterval(3000)){
+    // eslint-disable-next-line
+    for await (const t of setInterval(3000)) { // no-unused-vars - this is the syntax for promise based setInterval
       const [resp] = await bigquery.jobClient.getQueryResults(
         getQueryResultsRequest,
       );
       if (resp.errors.length !== 0) {
         throw new Error('Something failed in model creation');
       }
-      if (resp.jobComplete?.value){
+      if (resp.jobComplete.value) {
         break;
       }
     }

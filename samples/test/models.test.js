@@ -19,6 +19,7 @@ const {assert} = require('chai');
 const {describe, it, before, beforeEach, after} = require('mocha');
 const cp = require('child_process');
 const {randomUUID} = require('crypto');
+const {setInterval} = require('node:timers/promises');
 
 const execSync = cmd => cp.execSync(cmd, {encoding: 'utf-8'});
 
@@ -116,24 +117,20 @@ describe('Models', function () {
         projectId: projectId,
         jobId: jobReference.jobId,
         location: jobReference.location.value,
-        timeoutMs: {value: 120000},
       };
 
-      // Wait for the query to finish
-      let [resp] = await bigquery.jobClient.getQueryResults(
-        getQueryResultsRequest,
-      );
       // poll the job status every 3 seconds until complete
-      while (resp.status === 'RUNNING') {
-        setTimeout(
-          ([resp] = await bigquery.jobClient.getQueryResults(
-            getQueryResultsRequest,
-          )),
-          3000,
+      // eslint-disable-next-line
+      for await (const t of setInterval(3000)) { // no-unused-vars - this is the syntax for promise based setInterval
+        const [resp] = await bigquery.jobClient.getQueryResults(
+          getQueryResultsRequest,
         );
-      }
-      if (resp.errors.length !== 0) {
-        throw new Error('Something failed in model creation');
+        if (resp.errors.length !== 0) {
+          throw new Error('Something failed in model creation');
+        }
+        if (resp.jobComplete.value) {
+          break;
+        }
       }
     });
 
@@ -179,10 +176,11 @@ describe('Models', function () {
   });
 
   describe('Create/Delete Model', () => {
+    const modelIdCreateDelete = modelId + '_2';
     const modelRequest = {
       projectId: projectId,
       datasetId: datasetId,
-      modelId: modelId,
+      modelId: modelIdCreateDelete,
     };
 
     beforeEach(async function () {
@@ -191,24 +189,24 @@ describe('Models', function () {
 
     it('should create a model', async () => {
       const output = execSync(
-        `node models/createModel.js ${projectId} ${datasetId} ${modelId}`,
+        `node models/createModel.js ${projectId} ${datasetId} ${modelIdCreateDelete}`,
       );
-      assert.include(output, `Model ${modelId} created.`);
+      assert.include(output, `Model ${modelIdCreateDelete} created.`);
       const [exists] = await bigquery.getModel(modelRequest);
       assert.ok(exists);
     });
 
     it('should delete a model', async () => {
       const output = execSync(
-        `node models/deleteModel.js ${projectId} ${datasetId} ${modelId}`,
+        `node models/deleteModel.js ${projectId} ${datasetId} ${modelIdCreateDelete}`,
       );
-      assert.include(output, `Model ${modelId} deleted.`);
+      assert.include(output, `Model ${modelIdCreateDelete} deleted.`);
       try {
         await bigquery.getModel(modelRequest);
       } catch (err) {
         assert.strictEqual(
           err.details,
-          `Not found: Model ${projectId}:${datasetId}.${modelId}`,
+          `Not found: Model ${projectId}:${datasetId}.${modelIdCreateDelete}`,
         );
       }
     });
