@@ -1,5 +1,5 @@
 /**
- * Copyright 2019 Google LLC
+ * Copyright 2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,9 +28,7 @@ function main(projectId='my_project') {
     // List the 10 most recent jobs in reverse chronological order.
     //  Omit the max_results parameter to list jobs from the past 6 months.
     const request = {projectId: projectId, maxResults: 10};
-    console.log('before request')
     const [jobs] = await bigquery.listJobs(request);
-    console.log('after')
 
     console.log('Jobs:');
     jobs.forEach(job => console.log(job.id));

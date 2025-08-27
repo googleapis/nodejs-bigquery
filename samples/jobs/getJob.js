@@ -1,5 +1,5 @@
 /**
- * Copyright 2019 Google LLC
+ * Copyright 2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,12 @@
  */
 
 'use strict';
-//TODO(coleleah): update
 
-function main(jobId = 'existing-job-id') {
+function main(projectId = 'my_project', jobId = 'existing-job-id') {
   // [START bigquery_get_job]
   // Import the Google Cloud client library
-  const {BigQuery} = require('@google-cloud/bigquery');
-  const bigquery = new BigQuery();
+  const {BigQueryClient} = require('@google-cloud/bigquery');
+  const bigquery = new BigQueryClient();
 
   async function getJob() {
     // Get job properties.
@@ -29,15 +28,17 @@ function main(jobId = 'existing-job-id') {
     /**
      * TODO(developer): Uncomment the following lines before running the sample.
      */
+    // const projectId = "my_project";
     // const jobId = "existing-job-id";
 
-    // Create a job reference
-    const job = bigquery.job(jobId);
+    const request = {
+      projectId,
+      jobId,
+      location: 'US'  
+    };
+    const [job] = await bigquery.getJob(request);
 
-    // Retrieve job
-    const [jobResult] = await job.get();
-
-    console.log(jobResult.metadata.jobReference);
+    console.log(`Job ${job.id} status: ${job.status.state}`);
   }
   // [END bigquery_get_job]
   getJob();

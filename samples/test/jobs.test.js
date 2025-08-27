@@ -102,18 +102,16 @@ describe('Jobs', () => {
       }
     });
       
-    //TODO(coleleah): update to actually create a job to list
-  it.only('should list jobs', async () => {
+  it('should list jobs', async () => {
     const output = execSync(`node jobs/listJobs.js ${projectId}`);
     assert.match(output, /Jobs:/);
     assert.include(output, jobId);
 
   });
-  //TODO(coleleah): update
 
-  it('should retrieve a job', async () => {
-    const output = execSync(`node getJob.js ${jobId}`);
-    assert.include(output, `jobId: '${jobId}'`);
+  it.only('should retrieve a job', async () => {
+    const output = execSync(`node jobs/getJob.js ${projectId} ${jobId}`);
+    assert.include(output, `Job ${projectId}:US.${jobId}`);
   });
 
   })
