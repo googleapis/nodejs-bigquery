@@ -102,17 +102,17 @@ describe('Jobs', () => {
       }
     });
       
-  it('should list jobs', async () => {
-    const output = execSync(`node jobs/listJobs.js ${projectId}`);
-    assert.match(output, /Jobs:/);
-    assert.include(output, jobId);
+    it('should list jobs', async () => {
+      const output = execSync(`node jobs/listJobs.js ${projectId}`);
+      assert.match(output, /Jobs:/);
+      assert.include(output, jobId);
 
-  });
+    });
 
-  it.only('should retrieve a job', async () => {
-    const output = execSync(`node jobs/getJob.js ${projectId} ${jobId}`);
-    assert.include(output, `Job ${projectId}:US.${jobId}`);
-  });
+    it('should retrieve a job', async () => {
+      const output = execSync(`node jobs/getJob.js ${projectId} ${jobId}`);
+      assert.include(output, `Job ${projectId}:US.${jobId}`);
+    });
 
   })
 
@@ -123,11 +123,12 @@ describe('Jobs', () => {
     const output = execSync(`node cancelJob.js ${jobId}`);
     assert.include(output, 'state:');
   });
-//TODO(coleleah): update
 
-  it('should create a job', async () => {
-    const output = execSync('node createJob.js');
+  it.only('should create a job', async () => {
+    const output = execSync(`node jobs/createJob.js ${projectId}`);
     assert.include(output, 'Rows:');
+    assert.include(output, 'Tromelin Island');
+
   });
   })
 
