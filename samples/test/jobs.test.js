@@ -30,14 +30,26 @@ const GCLOUD_TESTS_PREFIX = 'nodejs_samples_tests_jobs';
 
 // the GCLOUD_PROJECT environment variable is set as part of test harness setup
 const projectId = process.env.GCLOUD_PROJECT;
-//TODO(coleleah): update
 
 describe('Jobs', () => {
     const datasetId = `${GCLOUD_TESTS_PREFIX}_${randomUUID()}`.replace(
     /-/gi,
     '_',
   );
-    //TODO(coleleah): update
+     const query = `SELECT country_name 
+                FROM \`bigquery-public-data.utility_us.country_code_iso\` 
+                LIMIT 10`
+  const insertJobRequest = {
+        projectId: projectId,
+        job: {
+          configuration: {
+            query: {
+              query: query,
+              useLegacySql: {value: false},
+            },
+          },
+        },
+      };
 
   before(async () => {
      if (projectId === undefined) {
@@ -58,26 +70,34 @@ describe('Jobs', () => {
     const [datasetResponse] = await bigquery.insertDataset(datasetRequest);
     assert.ok(datasetResponse);
   });
+  after(async () => {
+      const deleteRequest = {
+        projectId: projectId,
+        datasetId: datasetId,
+        deleteContents: true,
+      };
+      await bigquery.deleteDataset(deleteRequest);
+      const getDatasetRequest = {
+        projectId: projectId,
+        datasetId: datasetId,
+      };
+      try {
+        await bigquery.getDataset(getDatasetRequest);
+      } catch (err) {
+        assert.strictEqual(
+          err.details,
+          `Not found: Dataset ${projectId}:${datasetId}`,
+        );
+      }
+    });
   
 
   describe('get + list jobs', () => {
-   const query = `SELECT country_name 
-                FROM \`bigquery-public-data.utility_us.country_code_iso\` 
-                LIMIT 10`
-    before('create a job to get/list', async () => {
-      const insertJobRequest = {
-        projectId: projectId,
-        job: {
-          configuration: {
-            query: {
-              query: query,
-              useLegacySql: {value: false},
-            },
-          },
-        },
-      };
 
-      // Run query to create a model
+    before('create a job to get/list', async () => {
+      
+
+      // Run query to create a job
       const [job] = await bigquery.insertJob(insertJobRequest);
       assert.ok(job);
       const jobReference = job.jobReference;
@@ -117,19 +137,29 @@ describe('Jobs', () => {
   })
 
   describe('create + cancel jobs', () => {
-//TODO(coleleah): update
+    let jobId;
+    before('create a job to cancel', async () => {
+      
 
+      // Run query to create a job
+      const [job] = await bigquery.insertJob(insertJobRequest);
+      assert.ok(job);
+      jobId = job.jobReference.jobId
+     
+    });
   it('should attempt to cancel a job', async () => {
-    const output = execSync(`node cancelJob.js ${jobId}`);
+    assert.exists(jobId)
+    const output = execSync(`node jobs/cancelJob.js ${projectId} ${jobId}`);
     assert.include(output, 'state:');
+    assert.include(output, 'errorResult: null')
   });
 
-  it.only('should create a job', async () => {
-    const output = execSync(`node jobs/createJob.js ${projectId}`);
-    assert.include(output, 'Rows:');
-    assert.include(output, 'Tromelin Island');
+    it('should create a job', async () => {
+      const output = execSync(`node jobs/createJob.js ${projectId}`);
+      assert.include(output, 'Rows:');
+      assert.include(output, 'Tromelin Island');
 
-  });
+    });
   })
 
 });

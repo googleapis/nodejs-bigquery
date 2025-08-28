@@ -46,14 +46,13 @@ function main(projectId = 'my-project') {
     // Make API request.
     const [job] = await bigquery.insertJob(request);
     const jobReference = job.jobReference;
-
+    const jobId = jobReference.jobId;
     const getQueryResultsRequest = {
       projectId: projectId,
-      jobId: jobReference.jobId,
+      jobId: jobId,
       location: jobReference.location.value,
     };
-
-    // poll the job status every 3 seconds until complete
+      // poll the job status every 3 seconds until complete
       // eslint-disable-next-line
       for await (const t of setInterval(3000)) { // no-unused-vars - this is the syntax for promise based setInterval
         const [resp] = await bigquery.jobClient.getQueryResults(
