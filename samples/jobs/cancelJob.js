@@ -19,7 +19,7 @@
 function main(projectId = 'my-project-id', jobId = 'existing-job-id') {
   // [START bigquery_cancel_job]
   // Import the Google Cloud client library
-  const {BigQueryClient} = require('@google-cloud/bigquery');  
+  const {BigQueryClient} = require('@google-cloud/bigquery');
   const bigqueryClient = new BigQueryClient();
 
   async function cancelJob() {

@@ -52,22 +52,22 @@ function main(projectId = 'my-project') {
       jobId: jobId,
       location: jobReference.location.value,
     };
-      // poll the job status every 3 seconds until complete
-      // eslint-disable-next-line
+    // poll the job status every 3 seconds until complete
+    // eslint-disable-next-line
       for await (const t of setInterval(3000)) { // no-unused-vars - this is the syntax for promise based setInterval
-        const [resp] = await bigquery.jobClient.getQueryResults(
-          getQueryResultsRequest,
-        );
-        if (resp.errors.length !== 0) {
-          throw new Error('Something failed in job creation');
-        }
-        if (resp.jobComplete.value) {
-          const rows = resp.rows
-          console.log("Rows:")
-          rows.forEach(row => console.log(JSON.stringify(row)))
-          break;
-        }
+      const [resp] = await bigquery.jobClient.getQueryResults(
+        getQueryResultsRequest,
+      );
+      if (resp.errors.length !== 0) {
+        throw new Error('Something failed in job creation');
       }
+      if (resp.jobComplete.value) {
+        const rows = resp.rows;
+        console.log('Rows:');
+        rows.forEach(row => console.log(JSON.stringify(row)));
+        break;
+      }
+    }
   }
   // [END bigquery_create_job]
   createJob();

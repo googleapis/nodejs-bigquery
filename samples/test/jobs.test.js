@@ -16,7 +16,7 @@
 
 const {BigQueryClient} = require('@google-cloud/bigquery');
 const {assert} = require('chai');
-const {describe, it, before, beforeEach} = require('mocha');
+const {describe, it, before, after} = require('mocha');
 const {randomUUID} = require('crypto');
 const {setInterval} = require('node:timers/promises');
 
@@ -32,27 +32,27 @@ const GCLOUD_TESTS_PREFIX = 'nodejs_samples_tests_jobs';
 const projectId = process.env.GCLOUD_PROJECT;
 
 describe('Jobs', () => {
-    const datasetId = `${GCLOUD_TESTS_PREFIX}_${randomUUID()}`.replace(
+  const datasetId = `${GCLOUD_TESTS_PREFIX}_${randomUUID()}`.replace(
     /-/gi,
     '_',
   );
-     const query = `SELECT country_name 
+  const query = `SELECT country_name 
                 FROM \`bigquery-public-data.utility_us.country_code_iso\` 
-                LIMIT 10`
+                LIMIT 10`;
   const insertJobRequest = {
-        projectId: projectId,
-        job: {
-          configuration: {
-            query: {
-              query: query,
-              useLegacySql: {value: false},
-            },
-          },
+    projectId: projectId,
+    job: {
+      configuration: {
+        query: {
+          query: query,
+          useLegacySql: {value: false},
         },
-      };
+      },
+    },
+  };
 
   before(async () => {
-     if (projectId === undefined) {
+    if (projectId === undefined) {
       throw Error(
         'GCLOUD_PROJECT must be defined as an environment variable before tests can be run',
       );
@@ -71,32 +71,28 @@ describe('Jobs', () => {
     assert.ok(datasetResponse);
   });
   after(async () => {
-      const deleteRequest = {
-        projectId: projectId,
-        datasetId: datasetId,
-        deleteContents: true,
-      };
-      await bigquery.deleteDataset(deleteRequest);
-      const getDatasetRequest = {
-        projectId: projectId,
-        datasetId: datasetId,
-      };
-      try {
-        await bigquery.getDataset(getDatasetRequest);
-      } catch (err) {
-        assert.strictEqual(
-          err.details,
-          `Not found: Dataset ${projectId}:${datasetId}`,
-        );
-      }
-    });
-  
+    const deleteRequest = {
+      projectId: projectId,
+      datasetId: datasetId,
+      deleteContents: true,
+    };
+    await bigquery.deleteDataset(deleteRequest);
+    const getDatasetRequest = {
+      projectId: projectId,
+      datasetId: datasetId,
+    };
+    try {
+      await bigquery.getDataset(getDatasetRequest);
+    } catch (err) {
+      assert.strictEqual(
+        err.details,
+        `Not found: Dataset ${projectId}:${datasetId}`,
+      );
+    }
+  });
 
   describe('get + list jobs', () => {
-
     before('create a job to get/list', async () => {
-      
-
       // Run query to create a job
       const [job] = await bigquery.insertJob(insertJobRequest);
       assert.ok(job);
@@ -106,7 +102,7 @@ describe('Jobs', () => {
         jobId: jobReference.jobId,
         location: jobReference.location.value,
       };
-      jobId = getQueryResultsRequest.jobId
+      jobId = getQueryResultsRequest.jobId;
       // poll the job status every 3 seconds until complete
       // eslint-disable-next-line
       for await (const t of setInterval(3000)) { // no-unused-vars - this is the syntax for promise based setInterval
@@ -121,45 +117,38 @@ describe('Jobs', () => {
         }
       }
     });
-      
+
     it('should list jobs', async () => {
       const output = execSync(`node jobs/listJobs.js ${projectId}`);
       assert.match(output, /Jobs:/);
       assert.include(output, jobId);
-
     });
 
     it('should retrieve a job', async () => {
       const output = execSync(`node jobs/getJob.js ${projectId} ${jobId}`);
       assert.include(output, `Job ${projectId}:US.${jobId}`);
     });
-
-  })
+  });
 
   describe('create + cancel jobs', () => {
     let jobId;
     before('create a job to cancel', async () => {
-      
-
       // Run query to create a job
       const [job] = await bigquery.insertJob(insertJobRequest);
       assert.ok(job);
-      jobId = job.jobReference.jobId
-     
+      jobId = job.jobReference.jobId;
     });
-  it('should attempt to cancel a job', async () => {
-    assert.exists(jobId)
-    const output = execSync(`node jobs/cancelJob.js ${projectId} ${jobId}`);
-    assert.include(output, 'state:');
-    assert.include(output, 'errorResult: null')
-  });
+    it('should attempt to cancel a job', async () => {
+      assert.exists(jobId);
+      const output = execSync(`node jobs/cancelJob.js ${projectId} ${jobId}`);
+      assert.include(output, 'state:');
+      assert.include(output, 'errorResult: null');
+    });
 
     it('should create a job', async () => {
       const output = execSync(`node jobs/createJob.js ${projectId}`);
       assert.include(output, 'Rows:');
       assert.include(output, 'Tromelin Island');
-
     });
-  })
-
+  });
 });

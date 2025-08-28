@@ -34,7 +34,7 @@ function main(projectId = 'my_project', jobId = 'existing-job-id') {
     const request = {
       projectId,
       jobId,
-      location: 'US'  
+      location: 'US',
     };
     const [job] = await bigquery.getJob(request);
 

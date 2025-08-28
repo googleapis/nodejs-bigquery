@@ -16,7 +16,7 @@
 
 'use strict';
 
-function main(projectId='my_project') {
+function main(projectId = 'my_project') {
   // [START bigquery_list_jobs]
   // Import the Google Cloud client library
   const {BigQueryClient} = require('@google-cloud/bigquery');
