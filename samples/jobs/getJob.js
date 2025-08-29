@@ -17,7 +17,7 @@
 'use strict';
 
 function main(projectId = 'my_project', jobId = 'existing-job-id') {
-  // [START bigquery_get_job]
+  // [START bigquery_get_job_preview]
   // Import the Google Cloud client library
   const {BigQueryClient} = require('@google-cloud/bigquery');
   const bigquery = new BigQueryClient();
@@ -40,7 +40,7 @@ function main(projectId = 'my_project', jobId = 'existing-job-id') {
 
     console.log(`Job ${job.id} status: ${job.status.state}`);
   }
-  // [END bigquery_get_job]
+  // [END bigquery_get_job_preview]
   getJob();
 }
 main(...process.argv.slice(2));
