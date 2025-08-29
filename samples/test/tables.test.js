@@ -38,6 +38,24 @@ const projectId = process.env.GCLOUD_PROJECT;
 describe('Tables', () => {
   beforeEach(async function () {
     this.currentTest.retries(2);
+
+    if (!this.currentTest) {
+      return;
+    }
+    const retryCount = this.currentTest.currentRetry();
+
+    if (retryCount > 0) {
+      // Calculate delay (e.g., exponential backoff)
+      const defaultBackOffTime = 500; // milliseconds
+      const backOffTime = retryCount * defaultBackOffTime * retryCount;
+
+      console.log({
+        message: `Retrying test '${this.currentTest.title}'`,
+        retryCount,
+        backOffTime,
+      });
+      await new Promise(resolve => setTimeout(resolve, backOffTime));
+    }
   });
   // there is logic in the datasets samples test that will clean up stale
   // datasets - they follow the same prefix logic as we do in this file
