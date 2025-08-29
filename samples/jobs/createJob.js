@@ -54,7 +54,7 @@ function main(projectId = 'my-project') {
     };
     // poll the job status every 3 seconds until complete
     // eslint-disable-next-line
-      for await (const t of setInterval(3000)) { // no-unused-vars - this is the syntax for promise based setInterval
+    for await (const t of setInterval(3000)) { // no-unused-vars - this is the syntax for promise based setInterval
       const [resp] = await bigquery.jobClient.getQueryResults(
         getQueryResultsRequest,
       );
