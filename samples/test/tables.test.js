@@ -46,7 +46,7 @@ describe('Tables', () => {
 
     if (retryCount > 0) {
       // Calculate delay (e.g., exponential backoff)
-      const defaultBackOffTime = 500; // milliseconds
+      const defaultBackOffTime = 5000; // milliseconds
       const backOffTime = retryCount * defaultBackOffTime * retryCount;
 
       console.log({
