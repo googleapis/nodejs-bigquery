@@ -31,15 +31,31 @@ const datasetId = generateUuid();
 
 const tableId = generateUuid();
 
-//TODO(coleleah): remove fallback: false if needed
-// tracked in b/429226336
-const bigquery = new BigQueryClient({}, {opts: {fallback: false}});
+const bigquery = new BigQueryClient();
 // the GCLOUD_PROJECT environment variable is set as part of test harness setup
 const projectId = process.env.GCLOUD_PROJECT;
 
 describe('Tables', () => {
   beforeEach(async function () {
     this.currentTest.retries(2);
+
+    if (!this.currentTest) {
+      return;
+    }
+    const retryCount = this.currentTest.currentRetry();
+
+    if (retryCount > 0) {
+      // Calculate delay (e.g., exponential backoff)
+      const defaultBackOffTime = 5000; // milliseconds
+      const backOffTime = retryCount * defaultBackOffTime * retryCount;
+
+      console.log({
+        message: `Retrying test '${this.currentTest.title}'`,
+        retryCount,
+        backOffTime,
+      });
+      await new Promise(resolve => setTimeout(resolve, backOffTime));
+    }
   });
   // there is logic in the datasets samples test that will clean up stale
   // datasets - they follow the same prefix logic as we do in this file
