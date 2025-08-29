@@ -19,7 +19,7 @@ function main(
   datasetId = 'my_datset',
   modelId = 'my_model',
 ) {
-  // [START bigquery_update_model_description]
+  // [START bigquery_update_model_description_preview]
   // Import the Google Cloud client library
   const {BigQueryClient} = require('@google-cloud/bigquery');
 
@@ -56,7 +56,7 @@ function main(
 
     console.log(`${modelId} description: ${model.description}`);
   }
-  // [END bigquery_update_model_description]
+  // [END bigquery_update_model_description_preview]
   updateModel();
 }
 

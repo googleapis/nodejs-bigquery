@@ -15,7 +15,7 @@
 'use strict';
 
 function main(projectId = 'my-project') {
-  // [START bigquery_create_job]
+  // [START bigquery_create_job_preview]
   // Import the Google Cloud client library and create a client
   const {BigQueryClient} = require('@google-cloud/bigquery');
   const {setInterval} = require('node:timers/promises');
@@ -69,7 +69,7 @@ function main(projectId = 'my-project') {
       }
     }
   }
-  // [END bigquery_create_job]
+  // [END bigquery_create_job_preview]
   createJob();
 }
 main(...process.argv.slice(2));

@@ -20,7 +20,7 @@
 //   usage: node listModelsStreaming.js <DATASET_ID>
 
 function main(projectId = 'my_project', datasetId = 'my_dataset') {
-  // [START bigquery_list_models_streaming]
+  // [START bigquery_list_models_streaming_preview]
 
   // Import the Google Cloud client library
   const {BigQueryClient} = require('@google-cloud/bigquery');
@@ -56,7 +56,7 @@ function main(projectId = 'my_project', datasetId = 'my_dataset') {
       });
   }
 
-  // [END bigquery_list_models_streaming]
+  // [END bigquery_list_models_streaming_preview]
   listModels();
 }
 

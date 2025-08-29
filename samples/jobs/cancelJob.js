@@ -17,7 +17,7 @@
 'use strict';
 
 function main(projectId = 'my-project-id', jobId = 'existing-job-id') {
-  // [START bigquery_cancel_job]
+  // [START bigquery_cancel_job_preview]
   // Import the Google Cloud client library
   const {BigQueryClient} = require('@google-cloud/bigquery');
   const bigqueryClient = new BigQueryClient();
@@ -40,7 +40,7 @@ function main(projectId = 'my-project-id', jobId = 'existing-job-id') {
 
     console.log(response.job.status);
   }
-  // [END bigquery_cancel_job]
+  // [END bigquery_cancel_job_preview]
   cancelJob();
 }
 main(...process.argv.slice(2));

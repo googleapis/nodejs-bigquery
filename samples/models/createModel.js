@@ -19,7 +19,7 @@ function main(
   datasetId = 'my_dataset',
   modelId = 'my_model',
 ) {
-  // [START bigquery_create_model]
+  // [START bigquery_create_model_preview]
   // Import the Google Cloud client library
   const {setInterval} = require('node:timers/promises');
   const {BigQueryClient} = require('@google-cloud/bigquery');
@@ -85,6 +85,6 @@ function main(
     console.log(`Model ${modelId} created.`);
   }
   createModel();
-  // [END bigquery_create_model]
+  // [END bigquery_create_model_preview]
 }
 main(...process.argv.slice(2));
