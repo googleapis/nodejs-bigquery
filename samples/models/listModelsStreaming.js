@@ -13,7 +13,6 @@
 // limitations under the License.
 
 'use strict';
-//TODO(coleleah): update
 
 // sample-metadata:
 //   title: BigQuery List Models Streaming
