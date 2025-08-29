@@ -25,16 +25,13 @@ function main(projectId = 'my_project') {
   async function listJobs() {
     // Lists all jobs in current GCP project.
     const request = {projectId: projectId};
-    // utilize the async listJobs method to fetch results
-    // in an iterable manner
-    // see https://github.com/googleapis/gax-nodejs/blob/main/client-libraries.md#auto-pagination
-    // for more info on using *Async versus *Stream list methods
+    // limit results to 10
+    const maxResults = 10
     const iterable = bigquery.listJobsAsync(request);
     console.log('Jobs:');
     let i = 0;
     for await (const job of iterable) {
-      //limit number of iterations to 5 to speed up results
-      if (i >= 5) {
+      if (i >= maxResults) {
         break;
       }
       console.log(job.id);
