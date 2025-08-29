@@ -26,7 +26,7 @@ function main(projectId = 'my_project') {
     // Lists all jobs in current GCP project.
     const request = {projectId: projectId};
     // limit results to 10
-    const maxResults = 10
+    const maxResults = 10;
     const iterable = bigquery.listJobsAsync(request);
     console.log('Jobs:');
     let i = 0;
