@@ -24,14 +24,22 @@ function main(projectId = 'my_project') {
 
   async function listJobs() {
     // Lists all jobs in current GCP project.
-
-    // List the 10 most recent jobs in reverse chronological order.
-    //  Omit the max_results parameter to list jobs from the past 6 months.
-    const request = {projectId: projectId, maxResults: 10};
-    const [jobs] = await bigquery.listJobs(request);
-
+    const request = {projectId: projectId};
+    // utilize the async listJobs method to fetch results
+    // in an iterable manner
+    // see https://github.com/googleapis/gax-nodejs/blob/main/client-libraries.md#auto-pagination
+    // for more info on using *Async versus *Stream list methods
+    const iterable = bigquery.listJobsAsync(request);
     console.log('Jobs:');
-    jobs.forEach(job => console.log(job.id));
+    let i = 0;
+    for await (const job of iterable) {
+      //limit number of iterations to 5 to speed up results
+      if (i >= 5) {
+        break;
+      }
+      console.log(job.id);
+      i++;
+    }
   }
   // [END bigquery_list_jobs]
   listJobs();
