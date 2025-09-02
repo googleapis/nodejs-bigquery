@@ -29,6 +29,7 @@ import {
   Callback,
   CallOptions,
   ClientOptions,
+  GoogleAuth,
   PaginationCallback,
 } from 'google-gax';
 import {Transform} from 'stream';
@@ -103,6 +104,13 @@ export class BigQueryClient {
     options?: BigQueryClientOptions,
     subClientOptions?: SubClientOptions,
   ) {
+    // if the user has passed in auth, use it, otherwise
+    // initialize auth with default so it gets passed to the sub clients
+    // and doesn't need to be re initialized each time
+    subClientOptions = subClientOptions || {};
+    subClientOptions.opts = subClientOptions.opts || {};
+    subClientOptions.opts.auth = subClientOptions.opts.auth || new GoogleAuth();
+
     this.datasetClient =
       options?.datasetClient ??
       new DatasetServiceClient(

@@ -250,7 +250,7 @@ function makeImports(clients: string[]) {
   imports = imports.concat('} from ".";');
   const staticImports = `
   import type * as gax from "google-gax";
-  import {Callback, CallOptions, ClientOptions, PaginationCallback} from "google-gax";
+  import {Callback, CallOptions, ClientOptions, GoogleAuth, PaginationCallback} from "google-gax";
   import {Transform} from 'stream';
   `;
 
@@ -334,8 +334,13 @@ function buildClientConstructor(clients: string[]) {
   * @param {object} [SubClientOptions] - These options will be shared across subclients.
   * To have sub-clients with different options, instantiate each client separately.
   */`;
-  let constructorInitializers =
-    '\tconstructor(options?: BigQueryClientOptions, subClientOptions?: SubClientOptions){\n';
+  let constructorInitializers = `\tconstructor(options?: BigQueryClientOptions, subClientOptions?: SubClientOptions){
+        // if the user has passed in auth, use it, otherwise
+        // initialize auth with default so it gets passed to the sub clients
+        // and doesn't need to be re initialized each time
+        subClientOptions = subClientOptions || {};
+        subClientOptions.opts = subClientOptions.opts || {};
+        subClientOptions.opts.auth = subClientOptions.opts.auth || new GoogleAuth();\n\n`;
   for (const client in clients) {
     const clientName = parseClientName(clients[client]);
     variableDecl = variableDecl.concat(
