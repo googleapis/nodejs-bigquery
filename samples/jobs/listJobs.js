@@ -17,7 +17,7 @@
 'use strict';
 
 function main(projectId = 'my_project') {
-  // [START bigquery_list_jobs]
+  // [START bigquery_list_jobs_preview]
   // Import the Google Cloud client library
   const {BigQueryClient} = require('@google-cloud/bigquery');
   const bigquery = new BigQueryClient();
@@ -38,7 +38,7 @@ function main(projectId = 'my_project') {
       i++;
     }
   }
-  // [END bigquery_list_jobs]
+  // [END bigquery_list_jobs_preview]
   listJobs();
 }
 main(...process.argv.slice(2));

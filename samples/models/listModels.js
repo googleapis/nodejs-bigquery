@@ -15,7 +15,7 @@
 'use strict';
 
 function main(projectId = 'my_project', datasetId = 'my_dataset') {
-  // [START bigquery_list_models]
+  // [START bigquery_list_models_preview]
 
   // Import the Google Cloud client library
   const {BigQueryClient} = require('@google-cloud/bigquery');
@@ -44,7 +44,7 @@ function main(projectId = 'my_project', datasetId = 'my_dataset') {
       console.log(`No models found in dataset ${datasetId}.`);
     }
   }
-  // [END bigquery_list_models]
+  // [END bigquery_list_models_preview]
   listModels();
 }
 

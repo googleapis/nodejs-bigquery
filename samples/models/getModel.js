@@ -19,7 +19,7 @@ function main(
   datasetId = 'my_dataset',
   modelId = 'my_existing_model',
 ) {
-  // [START bigquery_get_model]
+  // [START bigquery_get_model_preview]
   // Import the Google Cloud client library
   const {BigQueryClient} = require('@google-cloud/bigquery');
 
@@ -45,7 +45,7 @@ function main(
     console.log('Model:');
     console.log(model);
   }
-  // [END bigquery_get_model]
+  // [END bigquery_get_model_preview]
   getModel();
 }
 main(...process.argv.slice(2));
