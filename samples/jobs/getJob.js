@@ -16,11 +16,16 @@
 
 'use strict';
 
-function main(projectId = 'my_project', jobId = 'existing-job-id') {
+function main(projectId = 'my_project', jobId = 'existing-job-id', transport = 'grpc') {
   // [START bigquery_get_job_preview]
   // Import the Google Cloud client library
   const {BigQueryClient} = require('@google-cloud/bigquery');
-  const bigquery = new BigQueryClient();
+  let bigqueryClient;
+  if (transport==='grpc'){
+    bigqueryClient = new BigQueryClient()
+  }else{
+    bigqueryClient = new BigQueryClient({}, {opts: {fallback: true}})
+  }
 
   async function getJob() {
     // Get job properties.
@@ -36,7 +41,7 @@ function main(projectId = 'my_project', jobId = 'existing-job-id') {
       jobId,
       location: 'US',
     };
-    const [job] = await bigquery.getJob(request);
+    const [job] = await bigqueryClient.getJob(request);
 
     console.log(`Job ${job.id} status: ${job.status.state}`);
   }

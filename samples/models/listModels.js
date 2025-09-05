@@ -14,7 +14,7 @@
 
 'use strict';
 
-function main(projectId = 'my_project', datasetId = 'my_dataset') {
+function main(projectId = 'my_project', datasetId = 'my_dataset', transport = 'grpc') {
   // [START bigquery_list_models_preview]
 
   // Import the Google Cloud client library
@@ -28,7 +28,12 @@ function main(projectId = 'my_project', datasetId = 'my_dataset') {
      */
     // const datasetId = "my_dataset";
 
-    const bigqueryClient = new BigQueryClient();
+    let bigqueryClient;
+    if (transport==='grpc'){
+      bigqueryClient = new BigQueryClient()
+    }else{
+      bigqueryClient = new BigQueryClient({}, {opts: {fallback: true}})
+    }
 
     const request = {
       projectId: projectId,

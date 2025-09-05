@@ -14,13 +14,18 @@
 
 'use strict';
 
-function main(projectId = 'my-project') {
+function main(projectId = 'my-project', transport = 'grpc') {
   // [START bigquery_create_job_preview]
   // Import the Google Cloud client library and create a client
   const {BigQueryClient} = require('@google-cloud/bigquery');
   const {setInterval} = require('node:timers/promises');
 
-  const bigquery = new BigQueryClient();
+  let bigqueryClient;
+  if (transport==='grpc'){
+    bigqueryClient = new BigQueryClient()
+  }else{
+    bigqueryClient = new BigQueryClient({}, {opts: {fallback: true}})
+  }
 
   async function createJob() {
     // Run a BigQuery query job.
@@ -44,7 +49,7 @@ function main(projectId = 'my-project') {
     };
 
     // Make API request.
-    const [job] = await bigquery.insertJob(request);
+    const [job] = await bigqueryClient.insertJob(request);
     const jobReference = job.jobReference;
     const jobId = jobReference.jobId;
     const getQueryResultsRequest = {
@@ -55,7 +60,7 @@ function main(projectId = 'my-project') {
     // poll the job status every 3 seconds until complete
     // eslint-disable-next-line
     for await (const t of setInterval(3000)) { // no-unused-vars - this is the syntax for promise based setInterval
-      const [resp] = await bigquery.jobClient.getQueryResults(
+      const [resp] = await bigqueryClient.jobClient.getQueryResults(
         getQueryResultsRequest,
       );
       if (resp.errors.length !== 0) {

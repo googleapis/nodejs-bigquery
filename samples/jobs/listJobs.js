@@ -16,18 +16,23 @@
 
 'use strict';
 
-function main(projectId = 'my_project') {
+function main(projectId = 'my_project', transport = 'grpc') {
   // [START bigquery_list_jobs_preview]
   // Import the Google Cloud client library
   const {BigQueryClient} = require('@google-cloud/bigquery');
-  const bigquery = new BigQueryClient();
+  let bigqueryClient;
+  if (transport==='grpc'){
+    bigqueryClient = new BigQueryClient()
+  }else{
+    bigqueryClient = new BigQueryClient({}, {opts: {fallback: true}})
+  }
 
   async function listJobs() {
     // Lists all jobs in current GCP project.
     const request = {projectId: projectId};
     // limit results to 10
     const maxResults = 10;
-    const iterable = bigquery.listJobsAsync(request);
+    const iterable = bigqueryClient.listJobsAsync(request);
     console.log('Jobs:');
     let i = 0;
     for await (const job of iterable) {

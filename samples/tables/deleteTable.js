@@ -14,16 +14,21 @@
 
 'use strict';
 
-function main(datasetId = 'my_dataset', tableId = 'my_table') {
+function main(datasetId = 'my_dataset', tableId = 'my_table', transport='grpc') {
   // [START bigquery_delete_table_preview]
   // Import the Google Cloud client library
   const {BigQueryClient} = require('@google-cloud/bigquery');
 
-  const bigquery = new BigQueryClient();
+  let bigqueryClient;
+  if (transport==='grpc'){
+    bigqueryClient = new BigQueryClient()
+  }else{
+    bigqueryClient = new BigQueryClient({}, {opts: {fallback: true}})
+  }
 
   async function deleteTable() {
     // Deletes "my_table" from "my_dataset".
-    const projectId = await bigquery.tableClient.getProjectId();
+    const projectId = await bigqueryClient.tableClient.getProjectId();
     /**
      * TODO(developer): Uncomment the following lines before running the sample.
      */
@@ -37,7 +42,7 @@ function main(datasetId = 'my_dataset', tableId = 'my_table') {
     };
 
     // Delete the table
-    await bigquery.deleteTable(request);
+    await bigqueryClient.deleteTable(request);
 
     console.log(`Table ${tableId} deleted.`);
   }

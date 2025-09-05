@@ -13,16 +13,21 @@
 // limitations under the License.
 
 'use strict';
-function main(datasetId = 'my_dataset', tableId = 'my_table') {
+function main(datasetId = 'my_dataset', tableId = 'my_table', transport = 'grpc') {
   // [START bigquery_update_table_description_preview]
   // Import the Google Cloud client library
   const {BigQueryClient} = require('@google-cloud/bigquery');
 
-  const bigquery = new BigQueryClient();
+  let bigqueryClient;
+  if (transport==='grpc'){
+    bigqueryClient = new BigQueryClient()
+  }else{
+    bigqueryClient = new BigQueryClient({}, {opts: {fallback: true}})
+  }
 
   async function updateTableDescription() {
     // Updates a table's description.
-    const projectId = await bigquery.tableClient.getProjectId();
+    const projectId = await bigqueryClient.tableClient.getProjectId();
 
     // Set new table description
     const description = {value: 'New table description.'};
@@ -37,7 +42,7 @@ function main(datasetId = 'my_dataset', tableId = 'my_table') {
       },
     };
 
-    const [response] = await bigquery.updateTable(request);
+    const [response] = await bigqueryClient.updateTable(request);
 
     console.log(`${tableId} description: ${response.description.value}`);
   }

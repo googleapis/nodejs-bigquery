@@ -14,7 +14,7 @@
 
 'use strict';
 
-async function main(projectId, datasetId) {
+async function main(projectId, datasetId, transport = 'grpc') {
   // [START bigquery_delete_dataset_preview]
   /**
    * TODO(developer): Uncomment these variables before running the sample.
@@ -26,7 +26,12 @@ async function main(projectId, datasetId) {
   const {BigQueryClient} = require('@google-cloud/bigquery');
 
   // Creates a client
-  const bigqueryClient = new BigQueryClient();
+  let bigqueryClient;
+  if (transport === 'grpc'){
+    bigqueryClient = new BigQueryClient(); 
+  }else{
+    bigqueryClient = new BigQueryClient({}, {opts: {fallback: true}})
+  }
 
   async function deleteDataset() {
     // Construct the request object.

@@ -13,12 +13,17 @@
 // limitations under the License.
 
 'use strict';
-function main(datasetId = 'my_dataset') {
+function main(datasetId = 'my_dataset', transport = 'grpc') {
   // [START bigquery_list_tables_preview]
   // Import the Google Cloud client library
   const {BigQueryClient} = require('@google-cloud/bigquery');
 
-  const bigquery = new BigQueryClient();
+  let bigqueryClient;
+  if (transport==='grpc'){
+    bigqueryClient = new BigQueryClient()
+  }else{
+    bigqueryClient = new BigQueryClient({}, {opts: {fallback: true}})
+  }
 
   async function listTables() {
     // Lists tables in 'my_dataset'.
@@ -27,7 +32,7 @@ function main(datasetId = 'my_dataset') {
      * TODO(developer): Uncomment the following line before running the sample.
      */
     // const datasetId = 'my_dataset';
-    const projectId = await bigquery.tableClient.getProjectId();
+    const projectId = await bigqueryClient.tableClient.getProjectId();
 
     const request = {
       projectId,

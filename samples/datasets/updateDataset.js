@@ -14,7 +14,7 @@
 
 'use strict';
 
-async function main(projectId, datasetId, updateOption) {
+async function main(projectId, datasetId, updateOption, transport = 'grpc') {
   // [START bigquery_update_dataset_description_preview]
   // [START bigquery_update_dataset_expiration_preview]
   /**
@@ -26,7 +26,12 @@ async function main(projectId, datasetId, updateOption) {
   const {BigQueryClient} = require('@google-cloud/bigquery');
 
   // Creates a client
-  const bigqueryClient = new BigQueryClient();
+  let bigqueryClient;
+  if (transport === 'grpc'){
+    bigqueryClient = new BigQueryClient(); 
+  }else{
+    bigqueryClient = new BigQueryClient({}, {opts: {fallback: true}})
+  }
   // [END bigquery_update_dataset_expiration_preview]
 
   async function updateDatasetDescription() {

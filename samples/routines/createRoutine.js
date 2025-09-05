@@ -17,13 +17,19 @@
 function main(
   datasetId = 'my_dataset', // Existing dataset
   routineId = 'my_routine', // Routine to be created
+  transport = 'grpc'
 ) {
   // [START bigquery_create_routine_preview]
   // Import the Google Cloud client library.
   const {BigQueryClient} = require('@google-cloud/bigquery');
 
   // Create a client
-  const bigqueryClient = new BigQueryClient();
+  let bigqueryClient;
+  if (transport==='grpc'){
+    bigqueryClient = new BigQueryClient()
+  }else{
+    bigqueryClient = new BigQueryClient({}, {opts: {fallback: true}})
+  }
 
   async function createRoutine() {
     // Creates a new routine named "my_routine" in "my_dataset".

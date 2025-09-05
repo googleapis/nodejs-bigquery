@@ -23,12 +23,18 @@ function main(
     {name: 'Weight', type: 'FLOAT'},
     {name: 'IsMagic', type: 'BOOLEAN'},
   ],
+  transport = 'grpc'
 ) {
   // [START bigquery_create_table_preview]
   // Import the Google Cloud client library and create a client
   const {BigQueryClient} = require('@google-cloud/bigquery');
 
-  const bigquery = new BigQueryClient();
+  let bigqueryClient;
+  if (transport==='grpc'){
+    bigqueryClient = new BigQueryClient()
+  }else{
+    bigqueryClient = new BigQueryClient({}, {opts: {fallback: true}})
+  }
 
   async function createTable() {
     // Creates a new table named "my_table" in "my_dataset".
@@ -45,7 +51,7 @@ function main(
       {name: 'IsMagic', type: 'BOOLEAN'},
     ]; */
 
-    const projectId = await bigquery.tableClient.getProjectId();
+    const projectId = await bigqueryClient.tableClient.getProjectId();
 
     // For all options, see https://cloud.google.com/bigquery/docs/reference/v2/tables#resource
     const request = {
@@ -63,7 +69,7 @@ function main(
     };
 
     // Create a new table in the dataset
-    const [table] = await bigquery.insertTable(request);
+    const [table] = await bigqueryClient.insertTable(request);
 
     console.log(`Table ${table.tableReference.tableId} created.`);
   }

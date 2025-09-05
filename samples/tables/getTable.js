@@ -14,17 +14,22 @@
 
 'use strict';
 
-function main(datasetId = 'my_dataset', tableId = 'my_table') {
+function main(datasetId = 'my_dataset', tableId = 'my_table', transport = 'grpc') {
   // [START bigquery_get_table_preview]
   // Import the Google Cloud client library
   const {BigQueryClient} = require('@google-cloud/bigquery');
 
-  const bigquery = new BigQueryClient();
+  let bigqueryClient;
+  if (transport==='grpc'){
+    bigqueryClient = new BigQueryClient()
+  }else{
+    bigqueryClient = new BigQueryClient({}, {opts: {fallback: true}})
+  }
 
   async function getTable() {
     // Retrieves table named "my_table" in "my_dataset".
 
-    const projectId = await bigquery.tableClient.getProjectId();
+    const projectId = await bigqueryClient.tableClient.getProjectId();
     /**
      * TODO(developer): Uncomment the following lines before running the sample
      */
@@ -37,7 +42,7 @@ function main(datasetId = 'my_dataset', tableId = 'my_table') {
       tableId: tableId,
     };
 
-    const [table] = await bigquery.getTable(request);
+    const [table] = await bigqueryClient.getTable(request);
 
     console.log('Table:');
     console.log(table.id);

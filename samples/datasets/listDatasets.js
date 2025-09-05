@@ -14,7 +14,7 @@
 
 'use strict';
 
-async function main(projectId) {
+async function main(projectId, transport='grpc') {
   // [START bigquery_list_datasets_preview]
   /**
    * TODO(developer): Uncomment these variables before running the sample.
@@ -25,7 +25,12 @@ async function main(projectId) {
   const {BigQueryClient} = require('@google-cloud/bigquery');
 
   // Creates a client
-  const bigqueryClient = new BigQueryClient();
+  let bigqueryClient;
+  if (transport === 'grpc'){
+    bigqueryClient = new BigQueryClient(); 
+  }else{
+    bigqueryClient = new BigQueryClient({}, {opts: {fallback: true}})
+  }
 
   async function listDatasets() {
     // Construct the request object.

@@ -18,6 +18,7 @@ function main(
   projectId = 'my_project',
   datasetId = 'my_dataset',
   modelId = 'my_model',
+  transport = 'grpc'
 ) {
   // [START bigquery_delete_model_preview]
   // Import the Google Cloud client library
@@ -33,7 +34,12 @@ function main(
     // const datasetId = "my_dataset";
     // const modelId = "my_model";
 
-    const bigqueryClient = new BigQueryClient();
+    let bigqueryClient;
+    if (transport==='grpc'){
+      bigqueryClient = new BigQueryClient()
+    }else{
+      bigqueryClient = new BigQueryClient({}, {opts: {fallback: true}})
+    }
 
     const request = {
       projectId: projectId,
@@ -41,7 +47,7 @@ function main(
       modelId: modelId,
     };
 
-    await bigqueryClient.deleteModel(request);
+    await bigqueryClient.deleteModel(request, {transport});
 
     console.log(`Model ${modelId} deleted.`);
   }

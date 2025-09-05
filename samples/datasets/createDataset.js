@@ -13,7 +13,7 @@
 // limitations under the License.
 
 'use strict';
-async function main(projectId, datasetId, location = 'US') {
+async function main(projectId, datasetId, location = 'US', transport = 'grpc') {
   // [START bigquery_create_dataset_preview]
   /**
    * TODO(developer): Uncomment these variables before running the sample.
@@ -24,9 +24,13 @@ async function main(projectId, datasetId, location = 'US') {
 
   // Imports the Google Cloud client library
   const {BigQueryClient} = require('@google-cloud/bigquery');
+  let bigqueryClient;
 
-  // Creates a client
-  const bigqueryClient = new BigQueryClient();
+  if (transport === 'grpc'){
+    bigqueryClient = new BigQueryClient(); 
+  }else{
+    bigqueryClient = new BigQueryClient({}, {opts: {fallback: true}})
+  }
   async function createDataset() {
     // Construct the dataset resource.
     const dataset = {
