@@ -347,14 +347,14 @@ function buildClientConstructor(clients: string[]) {
       `\t\tthis.${clientName} = options?.${clientName} ?? new ${clients[client]}(subClientOptions?.opts, subClientOptions?.gaxInstance);\n`,
     );
     // add statement about auth only after the first subClient
-    if(clientCounter===0){
-      constructorInitializers = constructorInitializers.concat(`\n\t\t// utilize whatever auth was created with the first client for the rest of the clients
+    if (clientCounter === 0) {
+      constructorInitializers =
+        constructorInitializers.concat(`\n\t\t// utilize whatever auth was created with the first client for the rest of the clients
     // this will either be what the user passed into subClientOptions.opts.auth, or whatever was
     // initialized by default in gax. We reuse this auth rather than instantiating a default ourselves
     // so that we do not have to keep this code in sync with gax
     subClientOptions.opts.auth = this.${clientName}.auth;\n\n`);
-    clientCounter++
-
+      clientCounter++;
     }
   }
   constructorInitializers = constructorInitializers.concat('\t}');
