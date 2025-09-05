@@ -44,7 +44,6 @@ function main(projectId = 'my-project-id', jobId = 'existing-job-id', transport 
 
     // Attempt to cancel job
     const [response] = await bigqueryClient.cancelJob(request);
-
     console.log(response.job.status);
   }
   // [END bigquery_cancel_job_preview]

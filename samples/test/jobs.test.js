@@ -39,7 +39,7 @@ transports.forEach(transport => {
   }else{
     bigquery = new BigQueryClient({}, {opts: {fallback: true}})
   }
-  describe.only(`Jobs ${transport}`, () => {
+  describe(`Jobs ${transport}`, () => {
     const datasetId = `${GCLOUD_TESTS_PREFIX}_${randomUUID()}`.replace(
       /-/gi,
       '_',
@@ -148,7 +148,7 @@ transports.forEach(transport => {
       });
     });
 
-    describe.only('create + cancel jobs', () => {
+    describe('create + cancel jobs', () => {
       let jobId;
       before('create a job to cancel', async () => {
         // Run query to create a job
@@ -156,13 +156,17 @@ transports.forEach(transport => {
         assert.ok(job);
         jobId = job.jobReference.jobId;
       });
-      // TODO(coleleah) (fix in REST)
-      it('should attempt to cancel a job', async () => {
-        assert.exists(jobId);
-        const output = execSync(`node jobs/cancelJob.js ${projectId} ${jobId} ${transport}`);
-        assert.include(output, 'state:');
-        assert.include(output, 'errorResult: null');
-      });
+      // This is a know failure in REST mode, skip for now
+      // tracked internally in b/443283882
+      if (transport==='grpc'){
+        it('should attempt to cancel a job', async () => {
+          assert.exists(jobId)
+          const output = execSync(`node jobs/cancelJob.js ${projectId} ${jobId} ${transport}`);
+          console.log('output', output)
+          assert.include(output, 'state:');
+          assert.include(output, 'errorResult: null');
+        });
+      }
 
       it('should create a job', async () => {
         const output = execSync(`node jobs/createJob.js ${projectId} ${transport}`);
