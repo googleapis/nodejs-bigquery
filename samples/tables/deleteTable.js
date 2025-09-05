@@ -14,16 +14,20 @@
 
 'use strict';
 
-function main(datasetId = 'my_dataset', tableId = 'my_table', transport='grpc') {
+function main(
+  datasetId = 'my_dataset',
+  tableId = 'my_table',
+  transport = 'grpc',
+) {
   // [START bigquery_delete_table_preview]
   // Import the Google Cloud client library
   const {BigQueryClient} = require('@google-cloud/bigquery');
 
   let bigqueryClient;
-  if (transport==='grpc'){
-    bigqueryClient = new BigQueryClient()
-  }else{
-    bigqueryClient = new BigQueryClient({}, {opts: {fallback: true}})
+  if (transport === 'grpc') {
+    bigqueryClient = new BigQueryClient();
+  } else {
+    bigqueryClient = new BigQueryClient({}, {opts: {fallback: true}});
   }
 
   async function deleteTable() {

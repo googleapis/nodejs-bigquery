@@ -16,17 +16,17 @@
 function main(
   datasetId = 'my_dataset', // Existing dataset
   routineId = 'my_routine', // Existing routine
-  transport = 'grpc'
+  transport = 'grpc',
 ) {
   // [START bigquery_update_routine_preview]
   // Import the Google Cloud client library.
   const {BigQueryClient} = require('@google-cloud/bigquery');
 
   let bigqueryClient;
-  if (transport==='grpc'){
-    bigqueryClient = new BigQueryClient()
-  }else{
-    bigqueryClient = new BigQueryClient({}, {opts: {fallback: true}})
+  if (transport === 'grpc') {
+    bigqueryClient = new BigQueryClient();
+  } else {
+    bigqueryClient = new BigQueryClient({}, {opts: {fallback: true}});
   }
 
   async function updateRoutine() {

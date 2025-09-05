@@ -27,10 +27,10 @@ async function main(projectId, datasetId, transport = 'grpc') {
 
   // Creates a client
   let bigqueryClient;
-  if (transport === 'grpc'){
-    bigqueryClient = new BigQueryClient(); 
-  }else{
-    bigqueryClient = new BigQueryClient({}, {opts: {fallback: true}})
+  if (transport === 'grpc') {
+    bigqueryClient = new BigQueryClient();
+  } else {
+    bigqueryClient = new BigQueryClient({}, {opts: {fallback: true}});
   }
 
   async function deleteDataset() {

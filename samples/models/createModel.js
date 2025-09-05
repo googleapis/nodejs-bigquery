@@ -18,17 +18,17 @@ function main(
   projectId = 'my_project',
   datasetId = 'my_dataset',
   modelId = 'my_model',
-  transport = 'grpc'
+  transport = 'grpc',
 ) {
   // [START bigquery_create_model_preview]
   // Import the Google Cloud client library
   const {setInterval} = require('node:timers/promises');
   const {BigQueryClient} = require('@google-cloud/bigquery');
   let bigqueryClient;
-  if (transport==='grpc'){
-    bigqueryClient = new BigQueryClient()
-  }else{
-    bigqueryClient = new BigQueryClient({}, {opts: {fallback: true}})
+  if (transport === 'grpc') {
+    bigqueryClient = new BigQueryClient();
+  } else {
+    bigqueryClient = new BigQueryClient({}, {opts: {fallback: true}});
   }
 
   async function createModel() {

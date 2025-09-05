@@ -23,17 +23,17 @@ function main(
     {name: 'Weight', type: 'FLOAT'},
     {name: 'IsMagic', type: 'BOOLEAN'},
   ],
-  transport = 'grpc'
+  transport = 'grpc',
 ) {
   // [START bigquery_create_table_preview]
   // Import the Google Cloud client library and create a client
   const {BigQueryClient} = require('@google-cloud/bigquery');
 
   let bigqueryClient;
-  if (transport==='grpc'){
-    bigqueryClient = new BigQueryClient()
-  }else{
-    bigqueryClient = new BigQueryClient({}, {opts: {fallback: true}})
+  if (transport === 'grpc') {
+    bigqueryClient = new BigQueryClient();
+  } else {
+    bigqueryClient = new BigQueryClient({}, {opts: {fallback: true}});
   }
 
   async function createTable() {

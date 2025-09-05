@@ -16,18 +16,21 @@
 
 'use strict';
 
-function main(projectId = 'my-project-id', jobId = 'existing-job-id', transport = 'grpc') {
+function main(
+  projectId = 'my-project-id',
+  jobId = 'existing-job-id',
+  transport = 'grpc',
+) {
   // [START bigquery_cancel_job_preview]
   // Import the Google Cloud client library
   const {BigQueryClient} = require('@google-cloud/bigquery');
 
   let bigqueryClient;
-  if (transport==='grpc'){
-    bigqueryClient = new BigQueryClient()
-  }else{
-    bigqueryClient = new BigQueryClient({}, {opts: {fallback: true}})
+  if (transport === 'grpc') {
+    bigqueryClient = new BigQueryClient();
+  } else {
+    bigqueryClient = new BigQueryClient({}, {opts: {fallback: true}});
   }
-
 
   async function cancelJob() {
     // Attempts to cancel a job.

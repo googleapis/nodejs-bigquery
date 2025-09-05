@@ -29,15 +29,15 @@ const GCLOUD_TESTS_PREFIX = 'nodejs_samples_tests_jobs';
 
 // the GCLOUD_PROJECT environment variable is set as part of test harness setup
 const projectId = process.env.GCLOUD_PROJECT;
-const transports = ["grpc","rest"]
+const transports = ['grpc', 'rest'];
 
 // run tests with the gRPC client and the REST fallback client
 transports.forEach(transport => {
   let bigquery;
-  if(transport === "grpc"){
+  if (transport === 'grpc') {
     bigquery = new BigQueryClient({});
-  }else{
-    bigquery = new BigQueryClient({}, {opts: {fallback: true}})
+  } else {
+    bigquery = new BigQueryClient({}, {opts: {fallback: true}});
   }
   describe(`Jobs ${transport}`, () => {
     const datasetId = `${GCLOUD_TESTS_PREFIX}_${randomUUID()}`.replace(
@@ -92,20 +92,17 @@ transports.forEach(transport => {
       try {
         await bigquery.getDataset(getDatasetRequest);
       } catch (err) {
-        if (transport === "grpc"){
-            assert.strictEqual(
-              err.details,
-              `Not found: Dataset ${projectId}:${datasetId}`,
-            );
-          }else{
-            // REST errors are not surfacing full details
-            // tracked internally b/429419330
-            // we rely on the 404 error code to validate that it is not found
-            assert.strictEqual(
-              err.code,
-              404
-            )
-          }
+        if (transport === 'grpc') {
+          assert.strictEqual(
+            err.details,
+            `Not found: Dataset ${projectId}:${datasetId}`,
+          );
+        } else {
+          // REST errors are not surfacing full details
+          // tracked internally b/429419330
+          // we rely on the 404 error code to validate that it is not found
+          assert.strictEqual(err.code, 404);
+        }
       }
     });
 
@@ -137,13 +134,17 @@ transports.forEach(transport => {
       });
 
       it('should list jobs', async () => {
-        const output = execSync(`node jobs/listJobs.js ${projectId} ${transport}`);
+        const output = execSync(
+          `node jobs/listJobs.js ${projectId} ${transport}`,
+        );
         assert.match(output, /Jobs:/);
         assert.include(output, jobId);
       });
 
       it('should retrieve a job', async () => {
-        const output = execSync(`node jobs/getJob.js ${projectId} ${jobId} ${transport}`);
+        const output = execSync(
+          `node jobs/getJob.js ${projectId} ${jobId} ${transport}`,
+        );
         assert.include(output, `Job ${projectId}:US.${jobId}`);
       });
     });
@@ -158,22 +159,25 @@ transports.forEach(transport => {
       });
       // This is a know failure in REST mode, skip for now
       // tracked internally in b/443283882
-      if (transport==='grpc'){
+      if (transport === 'grpc') {
         it('should attempt to cancel a job', async () => {
-          assert.exists(jobId)
-          const output = execSync(`node jobs/cancelJob.js ${projectId} ${jobId} ${transport}`);
-          console.log('output', output)
+          assert.exists(jobId);
+          const output = execSync(
+            `node jobs/cancelJob.js ${projectId} ${jobId} ${transport}`,
+          );
+          console.log('output', output);
           assert.include(output, 'state:');
           assert.include(output, 'errorResult: null');
         });
       }
 
       it('should create a job', async () => {
-        const output = execSync(`node jobs/createJob.js ${projectId} ${transport}`);
+        const output = execSync(
+          `node jobs/createJob.js ${projectId} ${transport}`,
+        );
         assert.include(output, 'Rows:');
         assert.include(output, 'Tromelin Island');
       });
     });
   });
 });
-

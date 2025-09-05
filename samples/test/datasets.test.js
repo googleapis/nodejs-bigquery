@@ -23,24 +23,23 @@ const {randomUUID} = require('crypto');
 const execSync = cmd => cp.execSync(cmd, {encoding: 'utf-8'});
 const GCLOUD_TESTS_PREFIX = 'nodejs_samples_tests';
 
-
 // the GCLOUD_PROJECT environment variable is set as part of test harness setup
 const projectId = process.env.GCLOUD_PROJECT;
 
-const transports = ["grpc","rest"]
+const transports = ['grpc', 'rest'];
 // run tests with the gRPC client and the REST fallback client
 transports.forEach(transport => {
   let bigquery;
-  if(transport === "grpc"){
+  if (transport === 'grpc') {
     bigquery = new BigQueryClient({});
   }else{
     bigquery = new BigQueryClient({fallback: true})
   }
 
-describe(`Datasets ${transport}`, () => {
+  describe(`Datasets ${transport}`, () => {
     const datasetId = `${GCLOUD_TESTS_PREFIX}_datasets_${randomUUID()}`.replace(
-    /-/gi,
-    '_',
+      /-/gi,
+      '_',
     );
     // Only delete a resource if it is older than 24 hours. That will prevent
     // collisions with parallel CI test runs.
@@ -150,20 +149,25 @@ describe(`Datasets ${transport}`, () => {
 
         assert.ok(response2);
       });
-      after('delete two datasets that were created for these tests', async () => {
-        const request = {
-          projectId: projectId,
-          datasetId: datasetId,
-        };
-        const request2 = {
-          projectId: projectId,
-          datasetId: datasetId + '_2',
-        };
-        await bigquery.deleteDataset(request);
-        await bigquery.deleteDataset(request2);
-      });
+      after(
+        'delete two datasets that were created for these tests',
+        async () => {
+          const request = {
+            projectId: projectId,
+            datasetId: datasetId,
+          };
+          const request2 = {
+            projectId: projectId,
+            datasetId: datasetId + '_2',
+          };
+          await bigquery.deleteDataset(request);
+          await bigquery.deleteDataset(request2);
+        },
+      );
       it('should list datasets', async () => {
-        const output = execSync(`node datasets/listDatasets.js ${projectId} ${transport}`);
+        const output = execSync(
+          `node datasets/listDatasets.js ${projectId} ${transport}`,
+        );
         assert.match(output, /Datasets:/);
         assert.match(output, new RegExp(datasetId));
       });
@@ -202,13 +206,16 @@ describe(`Datasets ${transport}`, () => {
         const [response] = await bigquery.insertDataset(request);
         assert.ok(response);
       });
-      after('delete two datasets that were created for these tests', async () => {
-        const request = {
-          projectId: projectId,
-          datasetId: datasetId,
-        };
-        await bigquery.deleteDataset(request);
-      });
+      after(
+        'delete two datasets that were created for these tests',
+        async () => {
+          const request = {
+            projectId: projectId,
+            datasetId: datasetId,
+          };
+          await bigquery.deleteDataset(request);
+        },
+      );
       it("should update dataset's description", async () => {
         const request = {
           projectId: projectId,
@@ -273,23 +280,19 @@ describe(`Datasets ${transport}`, () => {
         try {
           await bigquery.getDataset(request);
         } catch (err) {
-          if (transport === "grpc"){
+          if (transport === 'grpc') {
             assert.strictEqual(
               err.details,
               `Not found: Dataset ${projectId}:${datasetId}`,
             );
-          }else{
+          } else {
             // REST errors are not surfacing full details
             // tracked internally b/429419330
             // we rely on the 404 error code to validate that it is not found
-            assert.strictEqual(
-              err.code,
-              404
-            )
+            assert.strictEqual(err.code, 404);
           }
         }
       });
     });
   });
-})  
-
+});

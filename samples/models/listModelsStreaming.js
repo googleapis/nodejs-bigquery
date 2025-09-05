@@ -19,7 +19,11 @@
 //   description: Lists all existing models in the dataset using streaming method.
 //   usage: node listModelsStreaming.js <DATASET_ID>
 
-function main(projectId = 'my_project', datasetId = 'my_dataset', transport = 'grpc') {
+function main(
+  projectId = 'my_project',
+  datasetId = 'my_dataset',
+  transport = 'grpc',
+) {
   // [START bigquery_list_models_streaming_preview]
 
   // Import the Google Cloud client library
@@ -34,10 +38,10 @@ function main(projectId = 'my_project', datasetId = 'my_dataset', transport = 'g
     // const datasetId = "my_dataset";
 
     let bigqueryClient;
-    if (transport==='grpc'){
-      bigqueryClient = new BigQueryClient()
-    }else{
-      bigqueryClient = new BigQueryClient({}, {opts: {fallback: true}})
+    if (transport === 'grpc') {
+      bigqueryClient = new BigQueryClient();
+    } else {
+      bigqueryClient = new BigQueryClient({}, {opts: {fallback: true}});
     }
 
     const request = {

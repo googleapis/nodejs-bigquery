@@ -26,10 +26,10 @@ async function main(projectId, datasetId, location = 'US', transport = 'grpc') {
   const {BigQueryClient} = require('@google-cloud/bigquery');
   let bigqueryClient;
 
-  if (transport === 'grpc'){
-    bigqueryClient = new BigQueryClient(); 
-  }else{
-    bigqueryClient = new BigQueryClient({}, {opts: {fallback: true}})
+  if (transport === 'grpc') {
+    bigqueryClient = new BigQueryClient();
+  } else {
+    bigqueryClient = new BigQueryClient({}, {opts: {fallback: true}});
   }
   async function createDataset() {
     // Construct the dataset resource.

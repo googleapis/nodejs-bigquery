@@ -14,7 +14,7 @@
 
 'use strict';
 
-async function main(projectId, transport='grpc') {
+async function main(projectId, transport = 'grpc') {
   // [START bigquery_list_datasets_preview]
   /**
    * TODO(developer): Uncomment these variables before running the sample.
@@ -26,10 +26,10 @@ async function main(projectId, transport='grpc') {
 
   // Creates a client
   let bigqueryClient;
-  if (transport === 'grpc'){
-    bigqueryClient = new BigQueryClient(); 
-  }else{
-    bigqueryClient = new BigQueryClient({}, {opts: {fallback: true}})
+  if (transport === 'grpc') {
+    bigqueryClient = new BigQueryClient();
+  } else {
+    bigqueryClient = new BigQueryClient({}, {opts: {fallback: true}});
   }
 
   async function listDatasets() {

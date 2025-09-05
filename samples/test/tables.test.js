@@ -27,18 +27,16 @@ const GCLOUD_TESTS_PREFIX = 'nodejs_samples_tests';
 const generateUuid = () =>
   `${GCLOUD_TESTS_PREFIX}_${randomUUID()}`.replace(/-/gi, '_');
 
-
-
 // the GCLOUD_PROJECT environment variable is set as part of test harness setup
 const projectId = process.env.GCLOUD_PROJECT;
-const transports = ["grpc","rest"]
+const transports = ['grpc', 'rest'];
 // run tests with the gRPC client and the REST fallback client
 transports.forEach(transport => {
   let bigquery;
-  if(transport === "grpc"){
+  if (transport === 'grpc') {
     bigquery = new BigQueryClient({});
-  }else{
-    bigquery = new BigQueryClient({}, {opts: {fallback: true}})
+  } else {
+    bigquery = new BigQueryClient({}, {opts: {fallback: true}});
   }
 
   describe(`Tables ${transport}`, () => {
@@ -178,14 +176,16 @@ transports.forEach(transport => {
       });
       it('should retrieve a table if it exists', async () => {
         const output = execSync(
-          `node tables/getTable.js ${datasetId} ${tableId}`,
+          `node tables/getTable.js ${datasetId} ${tableId} ${transport}`,
         );
         assert.include(output, 'Table:');
         assert.include(output, datasetId);
         assert.include(output, tableId);
       });
       it('should list tables', async () => {
-        const output = execSync(`node tables/listTables.js ${datasetId}`);
+        const output = execSync(
+          `node tables/listTables.js ${datasetId} ${transport}`,
+        );
         assert.match(output, /Tables:/);
         assert.match(output, new RegExp(tableId));
         assert.match(output, new RegExp(table2Id));
@@ -237,7 +237,7 @@ transports.forEach(transport => {
         assert.ok(table, table.description);
         assert.isNull(table.description);
         const output = execSync(
-          `node tables/updateTable.js ${datasetId} ${tableId}`,
+          `node tables/updateTable.js ${datasetId} ${tableId} ${transport}`,
         );
         assert.include(output, `${tableId} description: New table description`);
       });
@@ -278,26 +278,23 @@ transports.forEach(transport => {
         try {
           await bigquery.getTable(tableDeleteRequest);
         } catch (err) {
-          if(transport==='grpc'){
-             if (
+          if (transport === 'grpc') {
+            if (
               err.details !==
               `Not found: Table ${projectId}:${datasetId}.${tableId}`
             ) {
               await bigquery.deleteTable(tableDeleteRequest);
               throw err;
             }
-          }else{
+          } else {
             // REST errors are not surfacing full details
             // tracked internally b/429419330
             // we rely on the 404 error code to validate that it is not found
-            if (
-              err.code !==404
-            ) {
+            if (err.code !== 404) {
               await bigquery.deleteTable(tableDeleteRequest);
               throw err;
             }
           }
-         
         }
       });
       it('should delete a table', async () => {
@@ -309,26 +306,23 @@ transports.forEach(transport => {
         const [response] = await bigquery.getTable(tableGetRequest);
         assert.ok(response); // confirm it exists before deleting it
         const output = execSync(
-          `node tables/deleteTable.js ${datasetId} ${tableId}`,
+          `node tables/deleteTable.js ${datasetId} ${tableId} ${transport}`,
         );
         assert.include(output, `Table ${tableId} deleted.`);
 
         try {
           await bigquery.getTable(tableGetRequest);
         } catch (err) {
-          if(transport==='grpc'){
+          if (transport === 'grpc') {
             assert.strictEqual(
               err.details,
               `Not found: Table ${projectId}:${datasetId}.${tableId}`,
             );
-          }else{
+          } else {
             // REST errors are not surfacing full details
             // tracked internally b/429419330
             // we rely on the 404 error code to validate that it is not found
-            assert.strictEqual(
-              err.code,
-              404
-            )
+            assert.strictEqual(err.code, 404);
           }
         }
       });

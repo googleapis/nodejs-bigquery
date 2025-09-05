@@ -31,7 +31,6 @@ const generateUuid = () =>
 // the GCLOUD_PROJECT environment variable is set as part of test harness setup
 const projectId = process.env.GCLOUD_PROJECT;
 
-
 // helper function used in before/after blocks
 function buildRoutineObject(projectId, datasetId, routineId) {
   const routine = {
@@ -52,18 +51,17 @@ function buildRoutineObject(projectId, datasetId, routineId) {
   };
   return routine;
 }
-const transports = ["grpc","rest"]
+const transports = ['grpc', 'rest'];
 // run tests with the gRPC client and the REST fallback client
 transports.forEach(transport => {
   let bigquery;
-  if(transport === "grpc"){
+  if (transport === 'grpc') {
     bigquery = new BigQueryClient({});
-  }else{
-    bigquery = new BigQueryClient({}, {opts: {fallback: true}})
+  } else {
+    bigquery = new BigQueryClient({}, {opts: {fallback: true}});
   }
 
   describe(`Routines ${transport}`, () => {
-
     const datasetId = generateUuid();
     const routineId = generateUuid();
     const newRoutineId = generateUuid();
@@ -101,7 +99,7 @@ transports.forEach(transport => {
     describe('routine creation', () => {
       it('should create a routine', async () => {
         const output = execSync(
-          `node routines/createRoutine.js ${datasetId} ${newRoutineId}`,
+          `node routines/createRoutine.js ${datasetId} ${newRoutineId} ${transport}`,
         );
         assert.include(output, `Routine ${newRoutineId} created.`);
       });
@@ -153,13 +151,15 @@ transports.forEach(transport => {
 
       it('should get a routine', async () => {
         const output = execSync(
-          `node routines/getRoutine.js ${datasetId} ${routineId}`,
+          `node routines/getRoutine.js ${datasetId} ${routineId} ${transport}`,
         );
         assert.include(output, `Routine ${routineId} retrieved.`);
       });
 
       it('should list routines', async () => {
-        const output = execSync(`node routines/listRoutines.js ${datasetId}`);
+        const output = execSync(
+          `node routines/listRoutines.js ${datasetId} ${transport}`,
+        );
         assert.match(output, /Routines:/);
         assert.include(output, routineId);
         assert.include(output, routineId2);
@@ -173,9 +173,12 @@ transports.forEach(transport => {
         const [getResponse] = await bigquery.getRoutine(getRequest);
         assert.isEmpty(getResponse.description);
         const output = execSync(
-          `node routines/updateRoutine.js ${datasetId} ${routineId}`,
+          `node routines/updateRoutine.js ${datasetId} ${routineId} ${transport}`,
         );
-        assert.include(output, 'Routine description: This is a new description');
+        assert.include(
+          output,
+          'Routine description: This is a new description',
+        );
       });
     });
 
@@ -204,26 +207,23 @@ transports.forEach(transport => {
         const [beforeGetResponse] = await bigquery.getRoutine(getRequest);
         assert.ok(beforeGetResponse);
         const output = execSync(
-          `node routines/deleteRoutine.js ${datasetId} ${routineId}`,
+          `node routines/deleteRoutine.js ${datasetId} ${routineId} ${transport}`,
         );
         assert.include(output, `Routine ${routineId} deleted.`);
         try {
           await bigquery.getRoutine(getRequest);
         } catch (err) {
-            if(transport==='grpc'){
-              assert.strictEqual(
-                err.details,
-                `Not found: Routine ${projectId}:${datasetId}.${routineId}`,
-              );
-            }else{
-              // REST errors are not surfacing full details
-              // tracked internally b/429419330
-              // we rely on the 404 error code to validate that it is not found
-              assert.strictEqual(
-                err.code,
-                404
-              )
-            }
+          if (transport === 'grpc') {
+            assert.strictEqual(
+              err.details,
+              `Not found: Routine ${projectId}:${datasetId}.${routineId}`,
+            );
+          } else {
+            // REST errors are not surfacing full details
+            // tracked internally b/429419330
+            // we rely on the 404 error code to validate that it is not found
+            assert.strictEqual(err.code, 404);
+          }
         }
       });
     });

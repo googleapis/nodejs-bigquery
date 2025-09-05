@@ -33,7 +33,7 @@ const transports = ["grpc","rest"]
 // run tests with the gRPC client and the REST fallback client
 transports.forEach(transport => {
   let bigquery;
-  if(transport === "grpc"){
+  if (transport === 'grpc') {
     bigquery = new BigQueryClient({});
   }else{
     bigquery = new BigQueryClient({fallback: true})
@@ -46,7 +46,10 @@ transports.forEach(transport => {
       /-/gi,
       '_',
     );
-    const modelId = `${GCLOUD_TESTS_PREFIX}_${randomUUID()}`.replace(/-/gi, '_');
+    const modelId = `${GCLOUD_TESTS_PREFIX}_${randomUUID()}`.replace(
+      /-/gi,
+      '_',
+    );
     const query = `CREATE MODEL \`${projectId}.${datasetId}.${modelId}\`
                     OPTIONS ( 
                               model_type='linear_reg',
@@ -97,19 +100,16 @@ transports.forEach(transport => {
       try {
         await bigquery.getDataset(getDatasetRequest);
       } catch (err) {
-        if (transport === "grpc"){
+        if (transport === 'grpc') {
           assert.strictEqual(
             err.details,
             `Not found: Dataset ${projectId}:${datasetId}`,
           );
-        }else{
+        } else {
           // REST errors are not surfacing full details
           // tracked internally b/429419330
           // we rely on the 404 error code to validate that it is not found
-          assert.strictEqual(
-            err.code,
-            404
-          )
+          assert.strictEqual(err.code, 404);
         }
       }
     });
@@ -155,7 +155,7 @@ transports.forEach(transport => {
 
       it('should retrieve a model if it exists', async () => {
         const output = execSync(
-          `node models/getModel.js ${projectId} ${datasetId} ${modelId}`,
+          `node models/getModel.js ${projectId} ${datasetId} ${modelId} ${transport}`,
         );
         assert.include(output, 'Model:');
         assert.include(output, datasetId && modelId);
@@ -163,7 +163,7 @@ transports.forEach(transport => {
 
       it('should list models', async () => {
         const output = execSync(
-          `node models/listModels.js ${projectId} ${datasetId}`,
+          `node models/listModels.js ${projectId} ${datasetId} ${transport}`,
         );
         assert.include(output, 'Models:');
         assert.include(output, datasetId && modelId);
@@ -171,28 +171,34 @@ transports.forEach(transport => {
 
       it('should list models streaming', async () => {
         const output = execSync(
-          `node models/listModelsStreaming.js ${projectId} ${datasetId}`,
+          `node models/listModelsStreaming.js ${projectId} ${datasetId} ${transport}`,
         );
         assert.include(output, 'Models:');
         assert.include(output, datasetId && modelId);
         assert.include(output, 'All models have been retrieved.');
       });
 
-      // TODO(coleleah): skip for gRPC 
-      it("should update model's description", async () => {
-        const getModelRequest = {
-          projectId: projectId,
-          datasetId: datasetId,
-          modelId: modelId,
-        };
-        const [model] = await bigquery.getModel(getModelRequest);
-        assert.strictEqual(model.description, '');
+      // Skipping for gRPC - known issue tracked internally
+      // at b/439612831
+      if (transport === 'rest') {
+        it("should update model's description", async () => {
+          const getModelRequest = {
+            projectId: projectId,
+            datasetId: datasetId,
+            modelId: modelId,
+          };
+          const [model] = await bigquery.getModel(getModelRequest);
+          assert.strictEqual(model.description, '');
 
-        const output = execSync(
-          `node models/updateModel.js ${projectId} ${datasetId} ${modelId}`,
-        );
-        assert.include(output, `${modelId} description: A really great model.`);
-      });
+          const output = execSync(
+            `node models/updateModel.js ${projectId} ${datasetId} ${modelId} ${transport}`,
+          );
+          assert.include(
+            output,
+            `${modelId} description: A really great model.`,
+          );
+        });
+      }
     });
 
     describe('Create/Delete Model', () => {
@@ -209,7 +215,7 @@ transports.forEach(transport => {
 
       it('should create a model', async () => {
         const output = execSync(
-          `node models/createModel.js ${projectId} ${datasetId} ${modelIdCreateDelete}`,
+          `node models/createModel.js ${projectId} ${datasetId} ${modelIdCreateDelete} ${transport}`,
         );
         assert.include(output, `Model ${modelIdCreateDelete} created.`);
         const [exists] = await bigquery.getModel(modelRequest);
@@ -218,28 +224,25 @@ transports.forEach(transport => {
 
       it('should delete a model', async () => {
         const output = execSync(
-          `node models/deleteModel.js ${projectId} ${datasetId} ${modelIdCreateDelete}`,
+          `node models/deleteModel.js ${projectId} ${datasetId} ${modelIdCreateDelete} ${transport}`,
         );
         assert.include(output, `Model ${modelIdCreateDelete} deleted.`);
         try {
           await bigquery.getModel(modelRequest);
         } catch (err) {
-          if(transport==='grpc'){
+          if (transport === 'grpc') {
             assert.strictEqual(
               err.details,
               `Not found: Model ${projectId}:${datasetId}.${modelIdCreateDelete}`,
             );
-          }else{
+          } else {
             // REST errors are not surfacing full details
             // tracked internally b/429419330
             // we rely on the 404 error code to validate that it is not found
-            assert.strictEqual(
-              err.code,
-              404
-            )
+            assert.strictEqual(err.code, 404);
           }
         }
       });
     });
   });
-})
+});
