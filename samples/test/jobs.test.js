@@ -165,7 +165,6 @@ transports.forEach(transport => {
           const output = execSync(
             `node jobs/cancelJob.js ${projectId} ${jobId} ${transport}`,
           );
-          console.log('output', output);
           assert.include(output, 'state:');
           assert.include(output, 'errorResult: null');
         });
