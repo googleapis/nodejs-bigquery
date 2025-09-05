@@ -104,12 +104,8 @@ export class BigQueryClient {
     options?: BigQueryClientOptions,
     subClientOptions?: SubClientOptions,
   ) {
-    // if the user has passed in auth, use it, otherwise
-    // initialize auth with default so it gets passed to the sub clients
-    // and doesn't need to be re initialized each time
     subClientOptions = subClientOptions || {};
     subClientOptions.opts = subClientOptions.opts || {};
-    subClientOptions.opts.auth = subClientOptions.opts.auth || new GoogleAuth();
 
     this.datasetClient =
       options?.datasetClient ??
@@ -117,6 +113,13 @@ export class BigQueryClient {
         subClientOptions?.opts,
         subClientOptions?.gaxInstance,
       );
+
+    // utilize whatever auth was created with the first client for the rest of the clients
+    // this will either be what the user passed into subClientOptions.opts.auth, or whatever was
+    // initialized by default in gax. We reuse this auth rather than instantiating a default ourselves
+    // so that we do not have to keep this code in sync with gax
+    subClientOptions.opts.auth = this.datasetClient.auth;
+
     this.tableClient =
       options?.tableClient ??
       new TableServiceClient(

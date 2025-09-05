@@ -335,12 +335,9 @@ function buildClientConstructor(clients: string[]) {
   * To have sub-clients with different options, instantiate each client separately.
   */`;
   let constructorInitializers = `\tconstructor(options?: BigQueryClientOptions, subClientOptions?: SubClientOptions){
-        // if the user has passed in auth, use it, otherwise
-        // initialize auth with default so it gets passed to the sub clients
-        // and doesn't need to be re initialized each time
         subClientOptions = subClientOptions || {};
-        subClientOptions.opts = subClientOptions.opts || {};
-        subClientOptions.opts.auth = subClientOptions.opts.auth || new GoogleAuth();\n\n`;
+        subClientOptions.opts = subClientOptions.opts || {};\n\n`;
+  let clientCounter = 0;
   for (const client in clients) {
     const clientName = parseClientName(clients[client]);
     variableDecl = variableDecl.concat(
@@ -349,6 +346,16 @@ function buildClientConstructor(clients: string[]) {
     constructorInitializers = constructorInitializers.concat(
       `\t\tthis.${clientName} = options?.${clientName} ?? new ${clients[client]}(subClientOptions?.opts, subClientOptions?.gaxInstance);\n`,
     );
+    // add statement about auth only after the first subClient
+    if(clientCounter===0){
+      constructorInitializers = constructorInitializers.concat(`\n\t\t// utilize whatever auth was created with the first client for the rest of the clients
+    // this will either be what the user passed into subClientOptions.opts.auth, or whatever was
+    // initialized by default in gax. We reuse this auth rather than instantiating a default ourselves
+    // so that we do not have to keep this code in sync with gax
+    subClientOptions.opts.auth = this.${clientName}.auth;\n\n`);
+    clientCounter++
+
+    }
   }
   constructorInitializers = constructorInitializers.concat('\t}');
   let output = 'export class BigQueryClient{\n';
