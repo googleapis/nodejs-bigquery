@@ -35,10 +35,10 @@ const {BigQuery} = require('@google-cloud/bigquery');
 const bigquery = new BigQueryClient();
 ```
 
-<!-- TODO(coleleah) -->
+<!-- TODO(coleleah) wait until talking to Alvaro -->
 ### Instantiating a client with custom options
 
-<!-- TODO(coleleah) -->
+<!-- TODO(coleleah) wait until talking to Alvaro -->
 ### Instantiating subclients
 
 ## Importing types 
