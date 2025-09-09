@@ -16,10 +16,7 @@
 // ** https://github.com/googleapis/gapic-generator-typescript **
 // ** All changes to this file may be overwritten. **
 
-import {
-  BigQueryClient,
-  BigQueryClientOptions,
-} from '../src/bigquery';
+import {BigQueryClient, BigQueryClientOptions} from '../src/bigquery';
 
 import * as protos from '../protos/protos';
 import * as assert from 'assert';
