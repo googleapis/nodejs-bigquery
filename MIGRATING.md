@@ -18,18 +18,59 @@ This code is published to `npm` with the version naming convention `9.0.0-alpha.
 <!-- TODO(coleleah) -->
 ## Instantiating preview SDK clients
 
-<!-- TODO(coleleah) -->
+<!-- TODO(coleleah) - note about various subclients -->
 ### Instantiating a client with default settings
 
+#### Before
+
+```javascript
+const {BigQuery} = require('@google-cloud/bigquery');
+const bigquery = new BigQuery();
+```
+
+#### After
+
+```javascript
+const {BigQuery} = require('@google-cloud/bigquery');
+const bigquery = new BigQueryClient();
+```
 
 <!-- TODO(coleleah) -->
+### Instantiating a client with custom options
+
+<!-- TODO(coleleah) -->
+### Instantiating subclients
+
 ## Importing types 
 
+For users working in Typescript, the organization and formatting of type definitions has changed.
+
+### Before
+These types are defined in the [types.d.ts](https://github.com/googleapis/nodejs-bigquery/blob/main/src/types.d.ts) and are derived from the [discovery document](https://cloud.google.com/bigquery/docs/reference/rest#discovery-document).
+
+```typescript
+import type * as BigQueryType from '@google-cloud/bigquery';
+```
+
+### After
+
+The import stays the same, but these types are defined in the [protos.d.ts](/protos/protos.d.ts) file and are derived from the protobuf definitions found in the [`protos` directory](/protos). Additionally, the request and response types can be derived from the method signatures, most of which are found in [`bigquery.ts`](/src/bigquery.ts).
+
+```typescript
+import type * as BigQueryType from '@google-cloud/bigquery';
+```
 <!-- TODO(coleleah) -->
 ## Known issues
 
+
+<!-- TODO(coleleah) -->
+## Migration using Gemini
+
 <!-- TODO(coleleah) -->
 ## Code Samples
+
+Note: The code snippets in this guide are written in Javascript, not Typescript, and are meant to be a quick way of comparing the differences between the 8.x.x and 9.x.x packages; they may not compile as is. Complete samples can be found in the `samples` directory.
+
 
 <!-- TODO(coleleah) -->
 ### Datasets
