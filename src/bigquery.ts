@@ -72,7 +72,7 @@ import {Transform} from 'stream';
  *     const client = new DatasetServiceClient({fallback: true}, gax);
  *     ```
  */
-export type BigQueryClientOptions = ClientOptions & {
+export interface BigQueryClientOptions extends ClientOptions {
   gaxInstance?: typeof gax | typeof gax.fallback;
   datasetClient?: DatasetServiceClient;
   tableClient?: TableServiceClient;
@@ -80,7 +80,7 @@ export type BigQueryClientOptions = ClientOptions & {
   modelClient?: ModelServiceClient;
   routineClient?: RoutineServiceClient;
   rowAccessPolicyClient?: RowAccessPolicyServiceClient;
-};
+}
 
 export class BigQueryClient {
   datasetClient: DatasetServiceClient;

@@ -312,7 +312,7 @@ function buildOptionTypes(clients: string[]) {
   output = output.concat(docstring);
 
   let bigQueryOptionsType =
-    'export type BigQueryClientOptions = ClientOptions & {\n';
+    'export interface BigQueryClientOptions extends ClientOptions {\n';
   bigQueryOptionsType = bigQueryOptionsType.concat(
     'gaxInstance?: typeof gax | typeof gax.fallback;\n',
   );
@@ -324,7 +324,7 @@ function buildOptionTypes(clients: string[]) {
     );
     bigQueryOptionsType = bigQueryOptionsType.concat(variableDecl);
   }
-  bigQueryOptionsType = bigQueryOptionsType.concat('};\n\n');
+  bigQueryOptionsType = bigQueryOptionsType.concat('}\n\n');
   output = output.concat(bigQueryOptionsType);
   return output;
 }
