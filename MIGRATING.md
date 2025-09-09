@@ -74,15 +74,85 @@ Note: The code snippets in this guide are written in Javascript, not Typescript,
 
 <!-- TODO(coleleah) -->
 ### Datasets
+<details open>
+<summary>Code snippets and explanations for Datasets CRUDL methods</summary>
+
+<!-- TODO(coleleah) -->
+#### Create
+<!-- TODO(coleleah) -->
+#### Delete
+<!-- TODO(coleleah) -->
+#### Get
+<!-- TODO(coleleah) -->
+#### List
+<!-- TODO(coleleah) -->
+#### Update
+</details>
 
 <!-- TODO(coleleah) -->
 ### Tables
+<details open>
+<summary>Code snippets and explanations for Tables CRUDL methods</summary>
+
+<!-- TODO(coleleah) -->
+#### Create
+<!-- TODO(coleleah) -->
+#### Delete
+<!-- TODO(coleleah) -->
+#### Get
+<!-- TODO(coleleah) -->
+#### List
+<!-- TODO(coleleah) -->
+#### Update
+</details>
 
 <!-- TODO(coleleah) -->
 ### Routines
+<details open>
+<summary>Code snippets and explanations for Routines CRUDL methods</summary>
+
+<!-- TODO(coleleah) -->
+#### Create
+<!-- TODO(coleleah) -->
+#### Delete
+<!-- TODO(coleleah) -->
+#### Get
+<!-- TODO(coleleah) -->
+#### List
+<!-- TODO(coleleah) -->
+#### Update
+</details>
 
 <!-- TODO(coleleah) -->
 ### Models
+<details open>
+<summary>Code snippets and explanations for Models CRUDL methods</summary>
+
+<!-- TODO(coleleah) -->
+#### Create
+<!-- TODO(coleleah) -->
+#### Delete
+<!-- TODO(coleleah) -->
+#### Get
+<!-- TODO(coleleah) -->
+#### List
+<!-- TODO(coleleah) -->
+#### Update
+</details>
 
 <!-- TODO(coleleah) -->
 ### Jobs
+<details open>
+<summary>Code snippets and explanations for Jobs CRUDL methods</summary>
+
+<!-- TODO(coleleah) -->
+#### Create
+<!-- TODO(coleleah) -->
+#### Delete
+<!-- TODO(coleleah) -->
+#### Get
+<!-- TODO(coleleah) -->
+#### List
+<!-- TODO(coleleah) -->
+#### Update
+</details>
