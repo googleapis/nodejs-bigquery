@@ -38,12 +38,18 @@ function main(
       datasetId: datasetId,
     };
     // List all routines in the dataset
-    const [routines] = await bigqueryClient.listRoutines(listRequest);
-
+    // limit results to 10
+    const maxResults = 10;
+    const iterable = bigqueryClient.listRoutinesAsync(listRequest);
     console.log('Routines:');
-    routines.forEach(routine =>
-      console.log(routine.routineReference.routineId),
-    );
+    let i = 0;
+    for await (const routine of iterable) {
+      if (i >= maxResults) {
+        break;
+      }
+      console.log(routine.routineReference.routineId);
+      i++;
+    }
   }
   listRoutines();
   // [END bigquery_list_routines_preview]
