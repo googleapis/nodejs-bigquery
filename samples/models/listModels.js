@@ -35,13 +35,17 @@ function main(projectId = 'my_project', datasetId = 'my_dataset') {
       datasetId: datasetId,
     };
 
-    const [models] = await bigqueryClient.listModels(request);
-
-    if (models && models.length > 0) {
-      console.log('Models:');
-      models.forEach(model => console.log(model));
-    } else {
-      console.log(`No models found in dataset ${datasetId}.`);
+    // limit results to 10
+    const maxResults = 10;
+    const iterable = bigqueryClient.listModelsAsync(request);
+    console.log('Models:');
+    let i = 0;
+    for await (const model of iterable) {
+      if (i >= maxResults) {
+        break;
+      }
+      console.log(model);
+      i++;
     }
   }
   // [END bigquery_list_models_preview]

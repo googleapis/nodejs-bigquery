@@ -162,7 +162,7 @@ describe('Datasets', () => {
         'node datasets/listDatasets.js bigquery-public-data',
       );
       assert.match(output, /Datasets:/);
-      assert.match(output, new RegExp('usa_names'));
+      assert.match(output, new RegExp('census_bureau_usa'));
     });
 
     it('should retrieve a dataset if it exists', async () => {
