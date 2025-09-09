@@ -29,7 +29,6 @@ import {
   Callback,
   CallOptions,
   ClientOptions,
-  GoogleAuth,
   PaginationCallback,
 } from 'google-gax';
 import {Transform} from 'stream';
@@ -73,12 +72,8 @@ import {Transform} from 'stream';
  *     const client = new DatasetServiceClient({fallback: true}, gax);
  *     ```
  */
-export type SubClientOptions = {
-  opts?: ClientOptions;
+export type BigQueryClientOptions = ClientOptions & {
   gaxInstance?: typeof gax | typeof gax.fallback;
-};
-
-export type BigQueryClientOptions = {
   datasetClient?: DatasetServiceClient;
   tableClient?: TableServiceClient;
   jobClient?: JobServiceClient;
@@ -97,59 +92,34 @@ export class BigQueryClient {
 
   /**
    * @param {object} [BigQueryClientOptions] - Enables user to instantiate clients separately and use those as the subclients.
-   * @param {object} [SubClientOptions] - These options will be shared across subclients.
    * To have sub-clients with different options, instantiate each client separately.
    */
-  constructor(
-    options?: BigQueryClientOptions,
-    subClientOptions?: SubClientOptions,
-  ) {
-    subClientOptions = subClientOptions || {};
-    subClientOptions.opts = subClientOptions.opts || {};
-
+  constructor(options?: BigQueryClientOptions) {
+    options = options || {};
     this.datasetClient =
       options?.datasetClient ??
-      new DatasetServiceClient(
-        subClientOptions?.opts,
-        subClientOptions?.gaxInstance,
-      );
+      new DatasetServiceClient(options, options?.gaxInstance);
 
     // utilize whatever auth was created with the first client for the rest of the clients
-    // this will either be what the user passed into subClientOptions.opts.auth, or whatever was
+    // this will either be what the user passed into options.auth, or whatever was
     // initialized by default in gax. We reuse this auth rather than instantiating a default ourselves
     // so that we do not have to keep this code in sync with gax
-    subClientOptions.opts.auth = this.datasetClient.auth;
+    options.auth = this.datasetClient.auth;
 
     this.tableClient =
       options?.tableClient ??
-      new TableServiceClient(
-        subClientOptions?.opts,
-        subClientOptions?.gaxInstance,
-      );
+      new TableServiceClient(options, options?.gaxInstance);
     this.jobClient =
-      options?.jobClient ??
-      new JobServiceClient(
-        subClientOptions?.opts,
-        subClientOptions?.gaxInstance,
-      );
+      options?.jobClient ?? new JobServiceClient(options, options?.gaxInstance);
     this.modelClient =
       options?.modelClient ??
-      new ModelServiceClient(
-        subClientOptions?.opts,
-        subClientOptions?.gaxInstance,
-      );
+      new ModelServiceClient(options, options?.gaxInstance);
     this.routineClient =
       options?.routineClient ??
-      new RoutineServiceClient(
-        subClientOptions?.opts,
-        subClientOptions?.gaxInstance,
-      );
+      new RoutineServiceClient(options, options?.gaxInstance);
     this.rowAccessPolicyClient =
       options?.rowAccessPolicyClient ??
-      new RowAccessPolicyServiceClient(
-        subClientOptions?.opts,
-        subClientOptions?.gaxInstance,
-      );
+      new RowAccessPolicyServiceClient(options, options?.gaxInstance);
   }
 
   // -------------------
