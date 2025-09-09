@@ -35,17 +35,10 @@ async function main(projectId) {
 
     try {
       // Make the API request.
-      // limit results to 100
-      const maxResults = 100;
       const iterable = bigqueryClient.listDatasetsAsync(request);
       console.log('Datasets:');
-      let i = 0;
       for await (const dataset of iterable) {
-        if (i >= maxResults) {
-          break;
-        }
         console.log('-' + dataset.id);
-        i++;
       }
     } catch (err) {
       console.error('ERROR listing datasets:', err);
