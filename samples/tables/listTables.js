@@ -35,10 +35,18 @@ function main(datasetId = 'my_dataset') {
     };
 
     // List all tables in the dataset
-    const [tables] = await bigquery.listTables(request);
-
+    // limit results to 10
+    const maxResults = 10;
+    const iterable = bigquery.listTablesAsync(request);
     console.log('Tables:');
-    tables.forEach(table => console.log(table.tableReference.tableId));
+    let i = 0;
+    for await (const table of iterable) {
+      if (i >= maxResults) {
+        break;
+      }
+      console.log(table.id);
+      i++;
+    }
   }
   // [END bigquery_list_tables_preview]
   listTables();
