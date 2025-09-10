@@ -689,82 +689,363 @@ updateTableDescription();
 <details open>
 <summary>Code snippets and explanations for Routines CRUDL methods</summary>
 
-<!-- TODO(coleleah) -->
 #### Create
 **Key differences**
 
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
+* Instead of calling `.routine` on a `dataset` object, we utilize the `insertRoutine` method
+* Instead of only passing a `routineId` parameter to the `routine` method, we pass an [`insertRoutineRequest`](https://github.com/googleapis/nodejs-bigquery/blob/11b16d84aef3ff09bb99d37ab103b0a04969b4b7/protos/protos.d.ts#L25897-L25907) that contains the `projectId`, `datasetId`, and a `routine` object
+
 ##### Before
 
 ```javascript
+// Import the Google Cloud client library and create a client
+const {BigQuery} = require('@google-cloud/bigquery');
+const bigquery = new BigQuery();
+
+async function createRoutine() {
+  // Creates a new routine named "my_routine" in "my_dataset".
+
+  const datasetId = 'my_dataset';
+  const routineId = 'my_routine';
+
+  const dataset = bigquery.dataset(datasetId);
+
+  // Create routine reference
+  let routine = dataset.routine(routineId);
+
+  const config = {
+    arguments: [
+      {
+        name: 'x',
+        dataType: {
+          typeKind: 'INT64',
+        },
+      },
+    ],
+    definitionBody: 'x * 3',
+    routineType: 'SCALAR_FUNCTION',
+    returnType: {
+      typeKind: 'INT64',
+    },
+  };
+
+  // Make API call
+  [routine] = await routine.create(config);
+
+  console.log(`Routine ${routineId} created.`);
+}
+createRoutine();
 ```
 
 ##### After
-TODO link to full sample
+[Full sample](/samples/routines/createRoutine.js)
 
 ```javascript
+// Import the Google Cloud client library.
+const {BigQueryClient} = require('@google-cloud/bigquery');
+
+// Create a client
+const bigqueryClient = new BigQueryClient();
+
+async function createRoutine() {
+  // Creates a new routine named "my_routine" in "my_dataset".
+  const projectId = 'my-project';
+  const datasetId = 'my_dataset';
+  const routineId = 'my_routine';
+
+  const routine = {
+    routineReference: {
+      projectId,
+      datasetId,
+      routineId,
+    },
+    arguments: [
+      {
+        name: 'x',
+        dataType: {typeKind: 'INT64'},
+      },
+    ],
+    definitionBody: 'x * 3',
+    routineType: 'SCALAR_FUNCTION',
+    returnType: {typeKind: 'INT64'},
+  };
+
+  // Make API call
+  const [response] = await bigqueryClient.insertRoutine({
+    projectId,
+    datasetId,
+    routine,
+  });
+
+  console.log(`Routine ${response.routineReference.routineId} created.`);
+}
+createRoutine();
 ```
-<!-- TODO(coleleah) -->
+
 #### Delete
 **Key differences**
 
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
+* Previously we used the `routine` method to access the `routine` object and the `dataset` method to access the `dataset` object, and then one to call `delete` on it - now we use one method, `deleteRoutine` on the client
+* `deleteRoutine` takes in a [`request` object](https://github.com/googleapis/nodejs-bigquery/blob/11b16d84aef3ff09bb99d37ab103b0a04969b4b7/protos/protos.d.ts#L26242-L26252) containing the `projectId`, `datasetId` and `routineId`
+
 ##### Before
 
 ```javascript
+// Import the Google Cloud client library and create a client
+const {BigQuery} = require('@google-cloud/bigquery');
+const bigquery = new BigQuery();
+
+async function deleteRoutine() {
+  // Deletes a routine named "my_routine" in "my_dataset".
+
+
+  const datasetId = 'my_dataset';
+  const routineId = 'my_routine';
+
+  const dataset = bigquery.dataset(datasetId);
+
+  // Create routine reference
+  let routine = dataset.routine(routineId);
+
+  // Make API call
+  [routine] = await routine.delete();
+
+  console.log(`Routine ${routineId} deleted.`);
+}
 ```
 
 ##### After
-TODO link to full sample
+[Full sample](/samples/routines/deleteRoutine.js)
 
 ```javascript
+// Import the Google Cloud client library.
+const {BigQueryClient} = require('@google-cloud/bigquery');
+
+
+const bigqueryClient = new BigQueryClient();
+
+
+async function deleteRoutine() {
+  // Deletes a routine named "my_routine" in "my_dataset".
+
+
+  const projectId = 'my-project';
+  const datasetId = 'my_dataset';
+  const routineId = 'my_routine';
+
+  const deleteRequest = {
+      projectId: projectId,
+      datasetId: datasetId,
+      routineId: routineId
+  }
+  // Make API call
+  await bigqueryClient.deleteRoutine(deleteRequest);
+
+  console.log(`Routine ${routineId} deleted.`);
+}
 ```
-<!-- TODO(coleleah) -->
+
 #### Get
 **Key differences**
 
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
+* Instead of calling `.get` on a `routine` object chained to a `dataset` object, we call `getRoutine` using the `BigQueryClient`
+* Instead of passing the `datasetId` to the `dataset` object and the `routineId` to the `routine` object, we construct a [`request`](https://github.com/googleapis/nodejs-bigquery/blob/11b16d84aef3ff09bb99d37ab103b0a04969b4b7/protos/protos.d.ts#L25788-L25798) that takes in the `projectId`, `datasetId`, and `routineId` that gets passed to the `getRoutine` call
+
 ##### Before
 
 ```javascript
+const {BigQuery} = require('@google-cloud/bigquery');
+const bigquery = new BigQuery();
+
+async function getRoutine() {
+  // Gets an existing routine named "my_routine" in "my_dataset".
+
+  const datasetId = 'my_dataset';
+  const routineId = 'my_routine';
+
+  const dataset = bigquery.dataset(datasetId);
+
+  // Create routine reference and make API call
+  const [routine] = await dataset.routine(routineId).get();
+
+  console.log(
+    `Routine ${routine.metadata.routineReference.routineId} retrieved.`,
+  );
+}
+
 ```
 
 ##### After
-TODO link to full sample
+[Full sample](/samples/routines/getRoutine.js)
 
 ```javascript
+// Import the Google Cloud client library.
+const {BigQueryClient} = require('@google-cloud/bigquery');
+
+const bigqueryClient = new BigQueryClient();
+
+async function getRoutine() {
+  // Gets an existing routine named "my_routine" in "my_dataset".
+
+  const projectId = 'my-project';
+  const datasetId = 'my_dataset';
+  const routineId = 'my_routine';
+
+
+  const getRequest = {
+      projectId: projectId,
+      datasetId: datasetId,
+      routineId: routineId
+  }
+  // Create routine reference and make API call
+  const [routine] = await bigqueryClient.getRoutine(getRequest);
+
+  console.log(`Routine ${routine.routineReference.routineId} retrieved.`);
+}
 ```
-<!-- TODO(coleleah) -->
+
 #### List
 **Key differences**
-TODO(coleleah) update text
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
-In the BigQueryClient, there are [three options for every list method](https://github.com/googleapis/gax-nodejs/blob/main/client-libraries.md#auto-pagination). For datasets, there is `listDatasets` (least efficient, but supports manual paging), `listDatasetsAsync` (returns an iterable, recommended over the non-async method) and `listDatasetsStream` (returns results as a stream)
-* Any of these list methods take in a [request object](https://github.com/googleapis/nodejs-bigquery/blob/5e17911a35e76677705c6227dd896fb1ffc39b0e/protos/protos.d.ts#L1853-L1868) that must minimally takes in the `projectId`
+* Instead of calling `getRoutines` on the `dataset` object, we call one of the `listRoutines*` methods using the `BigQueryClient`
+* In the BigQueryClient, there are [three options for every list method](https://github.com/googleapis/gax-nodejs/blob/main/client-libraries.md#auto-pagination). For datasets, there is `listRoutines` (least efficient, but supports manual paging), `listRoutinesAsync` (returns an iterable, recommended over the non-async method) and `listRoutinesStream` (returns results as a stream)
+* Any of these list methods take in a [request object](https://github.com/googleapis/nodejs-bigquery/blob/11b16d84aef3ff09bb99d37ab103b0a04969b4b7/protos/protos.d.ts#L26351-L26367) that must minimally takes in the `projectId` and `datasetId`
+
 ##### Before
 
 ```javascript
+// Import the Google Cloud client library and create a client
+const {BigQuery} = require('@google-cloud/bigquery');
+const bigquery = new BigQuery();
+
+async function listRoutines() {
+  // Lists routines in "my_dataset".
+
+  const datasetId = 'my_dataset';
+
+  // List all routines in the dataset
+  const [routines] = await bigquery.dataset(datasetId).getRoutines();
+
+  console.log('Routines:');
+  routines.forEach(routine => console.log(routine.id));
+}
 ```
 
 ##### After
-TODO link to full sample
+[Full sample](/samples/routines/listRoutines.js)
 
 ```javascript
+// Import the Google Cloud client library.
+const {BigQueryClient} = require('@google-cloud/bigquery');
+
+const bigqueryClient = new BigQueryClient();
+
+async function listRoutines() {
+  // Lists routines in "my_dataset".
+
+  const projectId = 'my-project';
+  const datasetId = 'my_dataset';
+
+  const projectId = await bigqueryClient.routineClient.getProjectId();
+  const listRequest = {
+    projectId: projectId,
+    datasetId: datasetId,
+  };
+  // List all routines in the dataset
+  // limit results to 10
+  const maxResults = 10;
+  const iterable = bigqueryClient.listRoutinesAsync(listRequest);
+  console.log('Routines:');
+  let i = 0;
+  for await (const routine of iterable) {
+    if (i >= maxResults) {
+      break;
+    }
+    console.log(routine.routineReference.routineId);
+    i++;
+  }
+}
+listRoutines();
 ```
-<!-- TODO(coleleah) -->
+
 #### Update
 **Key differences**
 
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
+* Instead of calling the `setMetadata` function on a `routine` object, we utilize the `updateRoutine` function of the `BigQueryClient`
+* Instead of passing an object with the updated description, we pass a [`request`](https://github.com/googleapis/nodejs-bigquery/blob/11b16d84aef3ff09bb99d37ab103b0a04969b4b7/protos/protos.d.ts#L26006-L26019) that contains a [`routine` object](https://github.com/googleapis/nodejs-bigquery/blob/11b16d84aef3ff09bb99d37ab103b0a04969b4b7/protos/protos.d.ts#L24906-L24967) with the field(s) we want to update - this case, the description
+
 ##### Before
 
 ```javascript
+// Import the Google Cloud client library and create a client
+const {BigQuery} = require('@google-cloud/bigquery');
+const bigquery = new BigQuery();
+
+async function updateRoutine() {
+  // Updates a routine named "my_routine" in "my_dataset".
+
+
+  const datasetId = 'my_dataset';
+  const routineId = 'my_routine';
+
+  const updates = {
+    description: 'New description',
+  };
+
+  const dataset = bigquery.dataset(datasetId);
+
+  // Create routine reference
+  let routine = dataset.routine(routineId);
+
+  // Make API call
+  [routine] = await routine.setMetadata(updates);
+
+  console.log(`Routine description: ${routine.description}`);
+}
 ```
 
 ##### After
-TODO link to full sample
+[Full sample](/samples/routines/updateRoutine.js)
 
 ```javascript
+// Import the Google Cloud client library.
+const {BigQueryClient} = require('@google-cloud/bigquery');
+
+const bigqueryClient = new BigQueryClient();
+
+async function updateRoutine() {
+  // Updates a routine named "my_routine" in "my_dataset".
+
+  const projectId = 'my-project';
+  const datasetId = 'my_dataset';
+  const routineId = 'my_routine';
+
+  const projectId = await bigqueryClient.routineClient.getProjectId();
+
+  const getRequest = {
+      projectId: projectId,
+      datasetId: datasetId,
+      routineId: routineId
+  }
+  const [routine] = await bigqueryClient.getRoutine(getRequest)
+  routine.description = "This is a new description"
+
+  const updateRequest = {
+      projectId: projectId,
+      datasetId: datasetId,
+      routineId: routineId,
+      routine: routine
+  }
+  // Make API call
+  const [response] =
+    await bigqueryClient.updateRoutine(updateRequest);
+
+  console.log(`Routine description: ${response.description}`);
+}
 ```
 </details>
 
