@@ -28,15 +28,14 @@ const GCLOUD_TESTS_PREFIX = 'nodejs_samples_tests_models';
 // the GCLOUD_PROJECT environment variable is set as part of test harness setup
 const projectId = process.env.GCLOUD_PROJECT;
 
-
-const transports = ["grpc","rest"]
+const transports = ['grpc', 'rest'];
 // run tests with the gRPC client and the REST fallback client
 transports.forEach(transport => {
   let bigquery;
   if (transport === 'grpc') {
     bigquery = new BigQueryClient({});
-  }else{
-    bigquery = new BigQueryClient({fallback: true})
+  } else {
+    bigquery = new BigQueryClient({fallback: true});
   }
 
   describe(`Models ${transport}`, function () {

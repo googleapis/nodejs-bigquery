@@ -38,10 +38,10 @@ function main(
 
     // known limitation: patchModel must be called in REST fallback mode
     let bigqueryClient;
-    if (transport==='grpc'){
-      bigqueryClient = new BigQueryClient()
-    }else{
-      bigqueryClient = new BigQueryClient({fallback: true})
+    if (transport === 'grpc') {
+      bigqueryClient = new BigQueryClient();
+    } else {
+      bigqueryClient = new BigQueryClient({fallback: true});
     }
 
     const request = {

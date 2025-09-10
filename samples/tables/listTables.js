@@ -42,7 +42,7 @@ function main(datasetId = 'my_dataset', transport = 'grpc') {
     // List all tables in the dataset
     // limit results to 10
     const maxResults = 10;
-    const iterable = bigquery.listTablesAsync(request);
+    const iterable = bigqueryClient.listTablesAsync(request);
     console.log('Tables:');
     let i = 0;
     for await (const table of iterable) {

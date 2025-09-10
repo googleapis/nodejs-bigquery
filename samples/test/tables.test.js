@@ -36,7 +36,7 @@ transports.forEach(transport => {
   if (transport === 'grpc') {
     bigquery = new BigQueryClient({});
   } else {
-    bigquery = new BigQueryClient({}, {opts: {fallback: true}});
+    bigquery = new BigQueryClient({fallback: true});
   }
 
   describe(`Tables ${transport}`, () => {

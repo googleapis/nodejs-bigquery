@@ -32,8 +32,8 @@ transports.forEach(transport => {
   let bigquery;
   if (transport === 'grpc') {
     bigquery = new BigQueryClient({});
-  }else{
-    bigquery = new BigQueryClient({fallback: true})
+  } else {
+    bigquery = new BigQueryClient({fallback: true});
   }
 
   describe(`Datasets ${transport}`, () => {
@@ -172,13 +172,13 @@ transports.forEach(transport => {
         assert.match(output, new RegExp(datasetId));
       });
 
-    it('should list datasets on a different project', async () => {
-      const output = execSync(
-        'node datasets/listDatasets.js bigquery-public-data',
-      );
-      assert.match(output, /Datasets:/);
-      assert.match(output, new RegExp('census_bureau_usa'));
-    });
+      it('should list datasets on a different project', async () => {
+        const output = execSync(
+          'node datasets/listDatasets.js bigquery-public-data',
+        );
+        assert.match(output, /Datasets:/);
+        assert.match(output, new RegExp('census_bureau_usa'));
+      });
 
       it('should retrieve a dataset if it exists', async () => {
         const output = execSync(
