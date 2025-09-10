@@ -546,35 +546,141 @@ async function getTable() {
 }
 getTable();
 ```
-<!-- TODO(coleleah) -->
+
 #### List
 **Key differences**
 
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
+* Previously we called the `.getTables()` method on a `dataset` object, now we call the one of the `listTables*` methods on the client
+* In the BigQueryClient, there are [three options for every list method](https://github.com/googleapis/gax-nodejs/blob/main/client-libraries.md#auto-pagination). For tables, there is `listTables` (least efficient, but supports manual paging), `listTablesAsync` (returns an iterable, recommended over the non-async method) and `listTablesStream` (returns results as a stream)
+* Any of these list methods take in a [request object](https://github.com/googleapis/nodejs-bigquery/blob/4f95cabbd2dbb5c749a158b57ba95b1905429c57/protos/protos.d.ts#L29589-L29602) that must minimally takes in the `projectId` and the `datasetId`
+
 ##### Before
 
 ```javascript
+// Import the Google Cloud client library
+const {BigQuery} = require('@google-cloud/bigquery');
+const bigquery = new BigQuery();
+
+async function listTables() {
+  // Lists tables in 'my_dataset'.
+
+
+  const datasetId = 'my_dataset';
+
+  // List all tables in the dataset
+  const [tables] = await bigquery.dataset(datasetId).getTables();
+
+  console.log('Tables:');
+  tables.forEach(table => console.log(table.id));
+}
+
+listTables();
 ```
 
 ##### After
-TODO link to full sample
+[Full sample](/samples/tables/listTables.js)
 
 ```javascript
+const {BigQueryClient} = require('@google-cloud/bigquery');
+
+const bigquery = new BigQueryClient();
+
+async function listTables() {
+  // Lists tables in 'my_dataset'.
+  const projectId = await bigquery.tableClient.getProjectId();
+  const datasetId = 'my_dataset';
+
+  const request = {
+    projectId,
+    datasetId,
+  };
+
+  // List all tables in the dataset
+  // limit results to 10
+  const maxResults = 10;
+  const iterable = bigquery.listTablesAsync(request);
+  console.log('Tables:');
+  let i = 0;
+  for await (const table of iterable) {
+    if (i >= maxResults) {
+      break;
+    }
+    console.log(table.id);
+    i++;
+  }
+}
+listTables();
 ```
-<!-- TODO(coleleah) -->
+
 #### Update
 **Key differences**
 
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
+* The dataset description is now set with the `updateTable` function rather than with `setMetadata`
+* `updateTable` takes in a [`request` object](https://github.com/googleapis/nodejs-bigquery/blob/4f95cabbd2dbb5c749a158b57ba95b1905429c57/protos/protos.d.ts#L29359-L29375) - this contains a [`table` object](https://github.com/googleapis/nodejs-bigquery/blob/4f95cabbd2dbb5c749a158b57ba95b1905429c57/protos/protos.d.ts#L28721-L28875), which contains a description - an object with a single `value`: the string to use for the description
+
 ##### Before
 
 ```javascript
+// Import the Google Cloud client library
+const {BigQuery} = require('@google-cloud/bigquery');
+const bigquery = new BigQuery();
+
+async function updateTableDescription() {
+  // Updates a table's description.
+  const datasetId = 'my_dataset';
+  const tableId = 'my_table';
+
+  // Retreive current table metadata
+  const table = bigquery.dataset(datasetId).table(tableId);
+  const [metadata] = await table.getMetadata();
+
+  // Set new table description
+  const description = 'New table description.';
+  metadata.description = description;
+  const [apiResponse] = await table.setMetadata(metadata);
+  const newDescription = apiResponse.description;
+
+  console.log(`${tableId} description: ${newDescription}`);
+}
+updateTableDescription();
 ```
 
 ##### After
-TODO link to full sample
+[Full sample](/samples/tables/updateTable.js)
 
 ```javascript
+// Import the Google Cloud client library
+const {BigQueryClient} = require('@google-cloud/bigquery');
+const bigquery = new BigQueryClient();
+
+async function updateTableDescription() {
+  // Updates a table's description.
+  const projectId = "my_project";
+  const tableId = "my_table";
+  const datasetId = "my_dataset";
+
+  // Set new table description
+  const description = {value: 'New table description.'};
+
+  const request = {
+    projectId: projectId,
+    datasetId: datasetId,
+    tableId: tableId,
+    table: {
+      tableReference: {tableId: tableId},
+      description: description,
+    },
+  };
+
+  const [response] = await bigquery.updateTable(request);
+
+  console.log(`${tableId} description: ${response.description.value}`);
+}
+
+updateTableDescription();
+
 ```
 </details>
 
@@ -631,8 +737,10 @@ TODO link to full sample
 <!-- TODO(coleleah) -->
 #### List
 **Key differences**
-
+TODO(coleleah) update text
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
+In the BigQueryClient, there are [three options for every list method](https://github.com/googleapis/gax-nodejs/blob/main/client-libraries.md#auto-pagination). For datasets, there is `listDatasets` (least efficient, but supports manual paging), `listDatasetsAsync` (returns an iterable, recommended over the non-async method) and `listDatasetsStream` (returns results as a stream)
+* Any of these list methods take in a [request object](https://github.com/googleapis/nodejs-bigquery/blob/5e17911a35e76677705c6227dd896fb1ffc39b0e/protos/protos.d.ts#L1853-L1868) that must minimally takes in the `projectId`
 ##### Before
 
 ```javascript
@@ -713,8 +821,10 @@ TODO link to full sample
 <!-- TODO(coleleah) -->
 #### List
 **Key differences**
-
+TODO(coleleah) update text
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
+In the BigQueryClient, there are [three options for every list method](https://github.com/googleapis/gax-nodejs/blob/main/client-libraries.md#auto-pagination). For datasets, there is `listDatasets` (least efficient, but supports manual paging), `listDatasetsAsync` (returns an iterable, recommended over the non-async method) and `listDatasetsStream` (returns results as a stream)
+* Any of these list methods take in a [request object](https://github.com/googleapis/nodejs-bigquery/blob/5e17911a35e76677705c6227dd896fb1ffc39b0e/protos/protos.d.ts#L1853-L1868) that must minimally takes in the `projectId`
 ##### Before
 
 ```javascript
@@ -795,8 +905,10 @@ TODO link to full sample
 <!-- TODO(coleleah) -->
 #### List
 **Key differences**
-
+TODO(coleleah) update text
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
+In the BigQueryClient, there are [three options for every list method](https://github.com/googleapis/gax-nodejs/blob/main/client-libraries.md#auto-pagination). For datasets, there is `listDatasets` (least efficient, but supports manual paging), `listDatasetsAsync` (returns an iterable, recommended over the non-async method) and `listDatasetsStream` (returns results as a stream)
+* Any of these list methods take in a [request object](https://github.com/googleapis/nodejs-bigquery/blob/5e17911a35e76677705c6227dd896fb1ffc39b0e/protos/protos.d.ts#L1853-L1868) that must minimally takes in the `projectId`
 ##### Before
 
 ```javascript
