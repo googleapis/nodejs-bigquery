@@ -250,7 +250,7 @@ function makeImports(clients: string[]) {
   imports = imports.concat('} from ".";');
   const staticImports = `
   import type * as gax from "google-gax";
-  import {Callback, CallOptions, ClientOptions, GoogleAuth, PaginationCallback} from "google-gax";
+  import {Callback, CallOptions, ClientOptions, PaginationCallback} from "google-gax";
   import {Transform} from 'stream';
   `;
 
@@ -309,11 +309,13 @@ function buildOptionTypes(clients: string[]) {
    *     \`\`\`
    */\n`;
 
-  const subClientOptionsType = `export type SubClientOptions = {opts?: ClientOptions,
-    gaxInstance?: typeof gax | typeof gax.fallback};\n\n`;
-  output = output.concat(docstring, subClientOptionsType);
+  output = output.concat(docstring);
 
-  let bigQueryOptionsType = 'export type BigQueryClientOptions = {\n';
+  let bigQueryOptionsType =
+    'export interface BigQueryClientOptions extends ClientOptions {\n';
+  bigQueryOptionsType = bigQueryOptionsType.concat(
+    'gaxInstance?: typeof gax | typeof gax.fallback;\n',
+  );
   for (const client in clients) {
     let variableDecl = '';
     const clientName = parseClientName(clients[client]);
@@ -322,7 +324,7 @@ function buildOptionTypes(clients: string[]) {
     );
     bigQueryOptionsType = bigQueryOptionsType.concat(variableDecl);
   }
-  bigQueryOptionsType = bigQueryOptionsType.concat('};\n\n');
+  bigQueryOptionsType = bigQueryOptionsType.concat('}\n\n');
   output = output.concat(bigQueryOptionsType);
   return output;
 }
@@ -331,12 +333,10 @@ function buildClientConstructor(clients: string[]) {
   let variableDecl = '';
   const comment = `\t/**
   * @param {object} [BigQueryClientOptions] - Enables user to instantiate clients separately and use those as the subclients.
-  * @param {object} [SubClientOptions] - These options will be shared across subclients.
   * To have sub-clients with different options, instantiate each client separately.
   */`;
-  let constructorInitializers = `\tconstructor(options?: BigQueryClientOptions, subClientOptions?: SubClientOptions){
-        subClientOptions = subClientOptions || {};
-        subClientOptions.opts = subClientOptions.opts || {};\n\n`;
+  let constructorInitializers = `\tconstructor(options?: BigQueryClientOptions){
+    options = options || {};\n`;
   let clientCounter = 0;
   for (const client in clients) {
     const clientName = parseClientName(clients[client]);
@@ -344,16 +344,16 @@ function buildClientConstructor(clients: string[]) {
       `\t${clientName}: ${clients[client]};\n`,
     );
     constructorInitializers = constructorInitializers.concat(
-      `\t\tthis.${clientName} = options?.${clientName} ?? new ${clients[client]}(subClientOptions?.opts, subClientOptions?.gaxInstance);\n`,
+      `\t\tthis.${clientName} = options?.${clientName} ?? new ${clients[client]}(options, options?.gaxInstance);\n`,
     );
     // add statement about auth only after the first subClient
     if (clientCounter === 0) {
       constructorInitializers =
         constructorInitializers.concat(`\n\t\t// utilize whatever auth was created with the first client for the rest of the clients
-    // this will either be what the user passed into subClientOptions.opts.auth, or whatever was
+    // this will either be what the user passed into options.auth, or whatever was
     // initialized by default in gax. We reuse this auth rather than instantiating a default ourselves
     // so that we do not have to keep this code in sync with gax
-    subClientOptions.opts.auth = this.${clientName}.auth;\n\n`);
+    options.auth = this.${clientName}.auth;\n\n`);
       clientCounter++;
     }
   }

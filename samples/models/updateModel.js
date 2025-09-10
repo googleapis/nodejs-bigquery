@@ -36,7 +36,7 @@ function main(
     const description = 'A really great model.';
 
     // known limitation: patchModel must be called in REST fallback mode
-    const bigqueryClient = new BigQueryClient({}, {opts: {fallback: true}});
+    const bigqueryClient = new BigQueryClient({fallback: true});
 
     const request = {
       projectId: projectId,
