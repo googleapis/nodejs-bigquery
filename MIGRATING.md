@@ -210,8 +210,8 @@ const bigqueryClient = new BigQueryClient();
 
 async function getDataset() {
   const request = {
-    projectId: projectId,
-    datasetId: datasetId,
+    projectId: 'my-project',
+    datasetId: 'my-dataset',
   };
 
   try {
@@ -228,7 +228,7 @@ async function getDataset() {
 
 await getDataset();
 ```
-<!-- TODO(coleleah) -->
+
 #### List
 **Key differences**
 
@@ -255,21 +255,99 @@ const projectId = "my-project"
 [Full sample](/samples/datasets/listDatasets.js)
 
 ```javascript
+const {BigQueryClient} = require('@google-cloud/bigquery');
+
+const bigqueryClient = new BigQueryClient();
+
+async function listDatasets() {
+  // Construct the request object.
+  const request = {
+    projectId: 'my-project',
+  };
+
+  try {
+    // Make the API request.
+    const iterable = bigqueryClient.listDatasetsAsync(request);
+    console.log('Datasets:');
+    for await (const dataset of iterable) {
+      console.log('-' + dataset.id);
+    }
+  } catch (err) {
+    console.error('ERROR listing datasets:', err);
+    if (err.errors) {
+      err.errors.forEach(e => console.error(e.message));
+    }
+  }
+}
+
+await listDatasets();
 
 ```
-<!-- TODO(coleleah) -->
+
 #### Update
 **Key differences**
 
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
+* The dataset description is now set with the `updateDataset` function rather than with `setMetadata`
+* `updateDataset` takes in a [`request` object](https://github.com/googleapis/nodejs-bigquery/blob/5e17911a35e76677705c6227dd896fb1ffc39b0e/protos/protos.d.ts#L1612-L1628) - this contains a [dataset object](https://github.com/googleapis/nodejs-bigquery/blob/5e17911a35e76677705c6227dd896fb1ffc39b0e/protos/protos.d.ts#L789-L880), which contains a description - an object with a single value: the string to use for the description
+
 ##### Before
 
 ```javascript
+
+  const {BigQuery} = require('@google-cloud/bigquery');
+  const bigquery = new BigQuery();
+  const datasetId = 'my-dataset' // must already exist
+  // Updates a dataset's description.
+
+  // Retreive current dataset metadata
+  const dataset = bigquery.dataset(datasetId);
+  const [metadata] = await dataset.getMetadata();
+
+    // Set new dataset description
+  const description = 'Description set with legacy library';
+  metadata.description = description;
+
+  const [apiResponse] = await dataset.setMetadata(metadata);
+  const newDescription = apiResponse.description;
+
+  console.log(`${datasetId} description: ${newDescription}`);
 ```
 
 ##### After
 [Full sample](/samples/datasets/updateDataset.js)
 ```javascript
+const {BigQueryClient} = require('@google-cloud/bigquery');
+const bigqueryClient = new BigQueryClient();
+
+async function updateDatasetDescription() {
+  const description = "wow! new description!"
+  const datasetToUpdate = {
+    projectId: 'my-project',
+    datasetId: 'my-dataset',
+    datasetReference: {
+      datasetId: 'my-dataset',
+    },
+    description: {value: description},
+  };
+  const request = {
+    projectId: projectId,
+    datasetId: 'my-dataset',
+    dataset: datasetToUpdate,
+  };
+
+  try {
+    const [response] = await bigqueryClient.updateDataset(request);
+    console.log(`Dataset ${response.id} description: ${response.description.value}`);
+  } catch (err) {
+    console.error('ERROR updating dataset:', err);
+    if (err.errors) {
+      err.errors.forEach(e => console.error(e.message));
+    }
+  }
+}
+
+await updateDatasetDescription();
 ```
 </details>
 
