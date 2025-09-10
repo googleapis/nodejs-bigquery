@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * Discovery Revision: 20250713
+ * Discovery Revision: 20250816
  */
 
 /**
@@ -161,6 +161,7 @@ declare namespace bigquery {
       | 'MONTHLY'
       | 'QUARTERLY'
       | 'YEARLY'
+      | 'HOURLY'
     >;
     /**
      * Id to differentiate different time series for the large-scale case.
@@ -211,6 +212,7 @@ declare namespace bigquery {
       | 'MONTHLY'
       | 'QUARTERLY'
       | 'YEARLY'
+      | 'HOURLY'
     >;
     /**
      * The time_series_id value for this time series. It will be one of the unique values from the time_series_id_column specified during ARIMA model training. Only present when time_series_id_column training option was used.
@@ -259,6 +261,7 @@ declare namespace bigquery {
       | 'MONTHLY'
       | 'QUARTERLY'
       | 'YEARLY'
+      | 'HOURLY'
     >;
   };
 
@@ -301,6 +304,7 @@ declare namespace bigquery {
       | 'MONTHLY'
       | 'QUARTERLY'
       | 'YEARLY'
+      | 'HOURLY'
     >;
     /**
      * The time_series_id value for this time series. It will be one of the unique values from the time_series_id_column specified during ARIMA model training. Only present when time_series_id_column training option was used.
@@ -866,7 +870,7 @@ declare namespace bigquery {
   };
 
   /**
-   * Data policy option proto, it currently supports name only, will support precedence later.
+   * Data policy option. For more information, see [Mask data by applying data policies to a column](https://cloud.google.com/bigquery/docs/column-data-masking#data-policies-on-column/).
    */
   type IDataPolicyOption = {
     /**
@@ -2363,6 +2367,10 @@ declare namespace bigquery {
      * [Pick one] Configures a load job.
      */
     load?: IJobConfigurationLoad;
+    /**
+     * Optional. INTERNAL: DO NOT USE. The maximum rate of slot consumption to allow for this job. If set, the number of slots used to execute the job will be throttled to try and keep its slot consumption below the requested rate.
+     */
+    maxSlots?: number;
     /**
      * [Pick one] Configures a query job.
      */
@@ -4058,6 +4066,10 @@ declare namespace bigquery {
      */
     maxResults?: number;
     /**
+     * Optional. INTERNAL: DO NOT USE. The maximum rate of slot consumption to allow for this job. If set, the number of slots used to execute the job will be throttled to try and keep its slot consumption below the requested rate. This limit is best effort.
+     */
+    maxSlots?: number;
+    /**
      * Optional. Limits the bytes billed for this query. Queries with bytes billed above this limit will fail (without incurring a charge). If unspecified, the project default is used.
      */
     maximumBytesBilled?: string;
@@ -4391,7 +4403,7 @@ declare namespace bigquery {
      */
     dataGovernanceType?: 'DATA_GOVERNANCE_TYPE_UNSPECIFIED' | 'DATA_MASKING';
     /**
-     * Required. The body of the routine. For functions, this is the expression in the AS clause. If language=SQL, it is the substring inside (but excluding) the parentheses. For example, for the function created with the following statement: `CREATE FUNCTION JoinLines(x string, y string) as (concat(x, "\n", y))` The definition_body is `concat(x, "\n", y)` (\n is not replaced with linebreak). If language=JAVASCRIPT, it is the evaluated string in the AS clause. For example, for the function created with the following statement: `CREATE FUNCTION f() RETURNS STRING LANGUAGE js AS 'return "\n";\n'` The definition_body is `return "\n";\n` Note that both \n are replaced with linebreaks.
+     * Required. The body of the routine. For functions, this is the expression in the AS clause. If `language = "SQL"`, it is the substring inside (but excluding) the parentheses. For example, for the function created with the following statement: `CREATE FUNCTION JoinLines(x string, y string) as (concat(x, "\n", y))` The definition_body is `concat(x, "\n", y)` (\n is not replaced with linebreak). If `language="JAVASCRIPT"`, it is the evaluated string in the AS clause. For example, for the function created with the following statement: `CREATE FUNCTION f() RETURNS STRING LANGUAGE js AS 'return "\n";\n'` The definition_body is `return "\n";\n` Note that both \n are replaced with linebreaks. If `definition_body` references another routine, then that routine must be fully qualified with its project ID.
      */
     definitionBody?: string;
     /**
@@ -5387,7 +5399,7 @@ declare namespace bigquery {
      */
     collation?: string;
     /**
-     * Optional. Data policy options, will replace the data_policies.
+     * Optional. Data policies attached to this field, used for field-level access control.
      */
     dataPolicies?: Array<IDataPolicyOption>;
     /**
