@@ -61,7 +61,7 @@
   },
   "overrides": {
     "@google-cloud/common": {
-      "google-auth-library": "10.2.1"
+      "google-auth-library": "10.3.0"
     }
   },
   "devDependencies": {
