@@ -82,7 +82,7 @@ Note: The code snippets in this guide are written in Javascript, not Typescript,
 
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
 * The dataset creation method was renamed from `createDataset` to `insertDataset`
-* `createDataset` expected a dataset ID and an options object, whereas `insertDataset` takes in a [`request` object](https://github.com/googleapis/nodejs-bigquery/blob/5e17911a35e76677705c6227dd896fb1ffc39b0e/protos/protos.d.ts#L1503-L1513) minimally containing the `projectId` and a dataset reference object, which contains the datasetId. 
+* `createDataset` expected a dataset ID and an options object, whereas `insertDataset` takes in a [`request` object](https://github.com/googleapis/nodejs-bigquery/blob/5e17911a35e76677705c6227dd896fb1ffc39b0e/protos/protos.d.ts#L1503-L1513) minimally containing the `projectId` and a dataset reference object, which contains the datasetId
 
 
 ##### Before
@@ -134,13 +134,13 @@ await createDataset();
 ```
 
 
-<!-- TODO(coleleah) -->
 #### Delete
 **Key differences**
 
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
-Previously we used a combination of two methods - one to access the dataset object, and one to call delete on it - now we use one method, deleteDataset on the client
-deleteDataset takes in a request object containing the projectId and a datasetId. It also optionally takes the deleteContents parameter, which will delete all tables in the dataset if set to true.
+* Previously we used a combination of two methods - one to access the `dataset` object, and one to call delete on it - now we use one method, `deleteDataset` on the client
+* `deleteDataset` takes in a [`request` object](https://github.com/googleapis/nodejs-bigquery/blob/5e17911a35e76677705c6227dd896fb1ffc39b0e/protos/protos.d.ts#L1744-L1754) minimally containing the `projectId` and a `datasetId`. It also optionally takes the `deleteContents` parameter, which will delete all tables in the dataset if set to true
+
 ##### Before
 
 ```javascript
@@ -156,6 +156,8 @@ console.log(`Dataset ${dataset.id} deleted.`);
 ```
 
 ##### After
+[Full sample](/samples/datasets/deleteDataset.js)
+
 ```javascript
 const {BigQueryClient} = require('@google-cloud/bigquery');
 const bigqueryClient = new BigQueryClient();
@@ -181,32 +183,79 @@ async function deleteDataset() {
 await deleteDataset();
 ```
 
-<!-- TODO(coleleah) -->
 #### Get
 **Key differences**
 
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
+* Previously we used a combination of two methods - one to access the `dataset` object, and one to call `get` on it - now we use one method, `getDataset`, which is a method of the client
+* The previous `dataset` method only took in a `datasetId`, but `getDataset` takes in a [`request` object](https://github.com/googleapis/nodejs-bigquery/blob/5e17911a35e76677705c6227dd896fb1ffc39b0e/protos/protos.d.ts#L1377-L1390) minimally containing the `projectId` and a `datasetId`. There are additional optional parameters for the DatasetView and accessPolicyVersion
+
 ##### Before
 
 ```javascript
+const {BigQuery} = require('@google-cloud/bigquery');
+const bigquery = new BigQuery();
+const datasetId = "my-dataset"
+
+ // Create a new dataset
+ const [dataset] = await bigquery.dataset(datasetId).get();
 ```
 
 ##### After
+[Full sample](/samples/datasets/getDataset.js)
+
 ```javascript
+const {BigQueryClient} = require('@google-cloud/bigquery');
+const bigqueryClient = new BigQueryClient();
+
+async function getDataset() {
+  const request = {
+    projectId: projectId,
+    datasetId: datasetId,
+  };
+
+  try {
+    const [response] = await bigqueryClient.getDataset(request);
+    console.log(`Dataset ${response.id} retrieved successfully.`);
+    console.log('Details:', response);
+  } catch (err) {
+    console.error('ERROR getting dataset:', err);
+    if (err.errors) {
+      err.errors.forEach(e => console.error(e.message));
+    }
+  }
+}
+
+await getDataset();
 ```
 <!-- TODO(coleleah) -->
 #### List
 **Key differences**
 
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
+* `getDatasets` no longer exists
+* In the BigQueryClient, there are [three options for every list method](https://github.com/googleapis/gax-nodejs/blob/main/client-libraries.md#auto-pagination). For datasets, there is `listDatasets` (least efficient, but supports manual paging), `listDatasetsAsync` (returns an iterable, recommended over the non-async method) and `listDatasetsStream` (returns results as a stream)
+* Any of these list methods take in a [request object](https://github.com/googleapis/nodejs-bigquery/blob/5e17911a35e76677705c6227dd896fb1ffc39b0e/protos/protos.d.ts#L1853-L1868) that must minimally takes in the `projectId`
 
 ##### Before
 
 ```javascript
+const {BigQuery} = require('@google-cloud/bigquery');
+const bigquery = new BigQuery();
+const projectId = "my-project"
+
+ // List datasets
+ const [datasets] = await bigquery.getDatasets({projectId});
+ console.log('Datasets:');
+ datasets.forEach(dataset => console.log(dataset.id));
+
 ```
 
 ##### After
+[Full sample](/samples/datasets/listDatasets.js)
+
 ```javascript
+
 ```
 <!-- TODO(coleleah) -->
 #### Update
@@ -219,6 +268,7 @@ await deleteDataset();
 ```
 
 ##### After
+[Full sample](/samples/datasets/updateDataset.js)
 ```javascript
 ```
 </details>
@@ -239,6 +289,7 @@ await deleteDataset();
 ```
 
 ##### After
+TODO link to full sample
 ```javascript
 ```
 <!-- TODO(coleleah) -->
@@ -252,6 +303,8 @@ await deleteDataset();
 ```
 
 ##### After
+TODO link to full sample
+
 ```javascript
 ```
 <!-- TODO(coleleah) -->
@@ -265,6 +318,8 @@ await deleteDataset();
 ```
 
 ##### After
+TODO link to full sample
+
 ```javascript
 ```
 <!-- TODO(coleleah) -->
@@ -278,6 +333,8 @@ await deleteDataset();
 ```
 
 ##### After
+TODO link to full sample
+
 ```javascript
 ```
 <!-- TODO(coleleah) -->
@@ -291,6 +348,8 @@ await deleteDataset();
 ```
 
 ##### After
+TODO link to full sample
+
 ```javascript
 ```
 </details>
@@ -311,6 +370,8 @@ await deleteDataset();
 ```
 
 ##### After
+TODO link to full sample
+
 ```javascript
 ```
 <!-- TODO(coleleah) -->
@@ -324,6 +385,8 @@ await deleteDataset();
 ```
 
 ##### After
+TODO link to full sample
+
 ```javascript
 ```
 <!-- TODO(coleleah) -->
@@ -337,6 +400,8 @@ await deleteDataset();
 ```
 
 ##### After
+TODO link to full sample
+
 ```javascript
 ```
 <!-- TODO(coleleah) -->
@@ -350,6 +415,8 @@ await deleteDataset();
 ```
 
 ##### After
+TODO link to full sample
+
 ```javascript
 ```
 <!-- TODO(coleleah) -->
@@ -363,6 +430,8 @@ await deleteDataset();
 ```
 
 ##### After
+TODO link to full sample
+
 ```javascript
 ```
 </details>
@@ -383,6 +452,8 @@ await deleteDataset();
 ```
 
 ##### After
+TODO link to full sample
+
 ```javascript
 ```
 <!-- TODO(coleleah) -->
@@ -396,6 +467,8 @@ await deleteDataset();
 ```
 
 ##### After
+TODO link to full sample
+
 ```javascript
 ```
 <!-- TODO(coleleah) -->
@@ -409,6 +482,8 @@ await deleteDataset();
 ```
 
 ##### After
+TODO link to full sample
+
 ```javascript
 ```
 <!-- TODO(coleleah) -->
@@ -422,6 +497,8 @@ await deleteDataset();
 ```
 
 ##### After
+TODO link to full sample
+
 ```javascript
 ```
 <!-- TODO(coleleah) -->
@@ -435,6 +512,8 @@ await deleteDataset();
 ```
 
 ##### After
+TODO link to full sample
+
 ```javascript
 ```
 </details>
@@ -455,6 +534,8 @@ await deleteDataset();
 ```
 
 ##### After
+TODO link to full sample
+
 ```javascript
 ```
 <!-- TODO(coleleah) -->
@@ -468,6 +549,8 @@ await deleteDataset();
 ```
 
 ##### After
+TODO link to full sample
+
 ```javascript
 ```
 <!-- TODO(coleleah) -->
@@ -481,6 +564,8 @@ await deleteDataset();
 ```
 
 ##### After
+TODO link to full sample
+
 ```javascript
 ```
 <!-- TODO(coleleah) -->
@@ -494,6 +579,8 @@ await deleteDataset();
 ```
 
 ##### After
+TODO link to full sample
+
 ```javascript
 ```
 <!-- TODO(coleleah) -->
@@ -507,6 +594,8 @@ await deleteDataset();
 ```
 
 ##### After
+TODO link to full sample
+
 ```javascript
 ```
 </details>
