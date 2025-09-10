@@ -9,7 +9,6 @@ Blurb about holistic changes related to code generation, ensuring faster updates
 
 This code is published to `npm` with the version naming convention `9.0.0-alpha.x`(aligned with [node-semver](https://github.com/npm/node-semver?tab=readme-ov-file#prerelease-tags) conventions), where the `x` will be incremented with each subsequent preview release. This convention ensures that the preview version is excluded from typical range matching semantics in your `package.json` file. In order to utilize this preview version, you will need to explicitly specify the prerelease identifier in your `package.json`. The following example snippet of a `package.json` file would include all alpha versions of `@google-cloud/bigquery` version `9.0.0`, i.e. `9.0.0-alpha.0`, `9.0.0-alpha.1`, etc., but would NOT include version `9.0.1-alpha.0`. Please refer to the [advanced range syntax guide](https://github.com/npm/node-semver?tab=readme-ov-file#advanced-range-syntax) to determine what is right for you.
 
-
 ```json
   "dependencies": {
     "@google-cloud/bigquery": "^9.0.0-alpha.0"
@@ -41,11 +40,12 @@ const bigquery = new BigQueryClient();
 <!-- TODO(coleleah) wait until talking to Alvaro -->
 ### Instantiating subclients
 
-## Importing types 
+## Importing types
 
 For users working in Typescript, the organization and formatting of type definitions has changed.
 
 ### Before
+
 These types are defined in the [types.d.ts](https://github.com/googleapis/nodejs-bigquery/blob/main/src/types.d.ts) and are derived from the [discovery document](https://cloud.google.com/bigquery/docs/reference/rest#discovery-document).
 
 ```typescript
@@ -71,19 +71,19 @@ import type * as BigQueryType from '@google-cloud/bigquery';
 
 Note: The code snippets in this guide are written in Javascript, not Typescript, and are meant to be a quick way of comparing the differences between the 8.x.x and 9.x.x packages; they may not compile as is. Complete samples can be found in the `samples` directory.
 
-
 <!-- TODO(coleleah) -->
 ### Datasets
+
 <details open>
 <summary>Code snippets and explanations for Datasets CRUDL methods</summary>
 
 #### Create
-**Key differences**
+
+##### Key differences
 
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
 * The dataset creation method was renamed from `createDataset` to `insertDataset`
 * `createDataset` expected a dataset ID and an options object, whereas `insertDataset` takes in a [`request` object](https://github.com/googleapis/nodejs-bigquery/blob/5e17911a35e76677705c6227dd896fb1ffc39b0e/protos/protos.d.ts#L1503-L1513) minimally containing the `projectId` and a dataset reference object, which contains the datasetId
-
 
 ##### Before
 
@@ -100,6 +100,7 @@ const options = {
 ```
 
 ##### After
+
 [Full sample](/samples/datasets/createDataset.js)
 
 ```javascript
@@ -133,9 +134,9 @@ async function createDataset() {
 await createDataset();
 ```
 
-
 #### Delete
-**Key differences**
+
+##### Key differences
 
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
 * Previously we used a combination of two methods - one to access the `dataset` object, and one to call delete on it - now we use one method, `deleteDataset` on the client
@@ -156,6 +157,7 @@ console.log(`Dataset ${dataset.id} deleted.`);
 ```
 
 ##### After
+
 [Full sample](/samples/datasets/deleteDataset.js)
 
 ```javascript
@@ -184,7 +186,8 @@ await deleteDataset();
 ```
 
 #### Get
-**Key differences**
+
+##### Key differences
 
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
 * Previously we used a combination of two methods - one to access the `dataset` object, and one to call `get` on it - now we use one method, `getDataset`, which is a method of the client
@@ -202,6 +205,7 @@ const datasetId = "my-dataset"
 ```
 
 ##### After
+
 [Full sample](/samples/datasets/getDataset.js)
 
 ```javascript
@@ -230,7 +234,8 @@ await getDataset();
 ```
 
 #### List
-**Key differences**
+
+##### Key differences
 
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
 * `getDatasets` no longer exists
@@ -252,6 +257,7 @@ const projectId = "my-project"
 ```
 
 ##### After
+
 [Full sample](/samples/datasets/listDatasets.js)
 
 ```javascript
@@ -285,7 +291,8 @@ await listDatasets();
 ```
 
 #### Update
-**Key differences**
+
+##### Key differences
 
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
 * The dataset description is now set with the `updateDataset` function rather than with `setMetadata`
@@ -315,7 +322,9 @@ await listDatasets();
 ```
 
 ##### After
+
 [Full sample](/samples/datasets/updateDataset.js)
+
 ```javascript
 const {BigQueryClient} = require('@google-cloud/bigquery');
 const bigqueryClient = new BigQueryClient();
@@ -349,15 +358,18 @@ async function updateDatasetDescription() {
 
 await updateDatasetDescription();
 ```
+
 </details>
 
 <!-- TODO(coleleah) -->
 ### Tables
+
 <details open>
 <summary>Code snippets and explanations for Tables CRUDL methods</summary>
 
 #### Create
-**Key differences**
+
+##### Key differences
 
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
 * Instead of calling `createTable` on a `dataset` object, the `insertTable` method is called using the client
@@ -395,6 +407,7 @@ createTable();
 ```
 
 ##### After
+
 [Full sample](/samples/tables/createTable.js)
 
 ```javascript
@@ -435,7 +448,8 @@ createTable();
 ```
 
 #### Delete
-**Key differences**
+
+##### Key differences
 
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
 * Previously we called `.delete()` on a dataset/table object - now, we call `deleteTable()` using the client
@@ -463,6 +477,7 @@ deleteTable();
 ```
 
 ##### After
+
 [Full sample](/samples/tables/deleteTable.js)
 
 ```javascript
@@ -491,7 +506,8 @@ deleteTable();
 ```
 
 #### Get
-**Key differences**
+
+##### Key differences
 
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
 * Previously, we called `.table().get` on a `dataset` object. Now, we call the `getTable()` method using the client
@@ -520,6 +536,7 @@ getTable();
 ```
 
 ##### After
+
 [Full sample](/samples/tables/getTable.js)
 
 ```javascript
@@ -548,7 +565,8 @@ getTable();
 ```
 
 #### List
-**Key differences**
+
+##### Key differences
 
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
 * Previously we called the `.getTables()` method on a `dataset` object, now we call the one of the `listTables*` methods on the client
@@ -579,6 +597,7 @@ listTables();
 ```
 
 ##### After
+
 [Full sample](/samples/tables/listTables.js)
 
 ```javascript
@@ -614,7 +633,8 @@ listTables();
 ```
 
 #### Update
-**Key differences**
+
+##### Key differences
 
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
 * The dataset description is now set with the `updateTable` function rather than with `setMetadata`
@@ -648,6 +668,7 @@ updateTableDescription();
 ```
 
 ##### After
+
 [Full sample](/samples/tables/updateTable.js)
 
 ```javascript
@@ -680,17 +701,19 @@ async function updateTableDescription() {
 }
 
 updateTableDescription();
-
 ```
+
 </details>
 
 <!-- TODO(coleleah) -->
 ### Routines
+
 <details open>
 <summary>Code snippets and explanations for Routines CRUDL methods</summary>
 
 #### Create
-**Key differences**
+
+##### Key differences
 
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
 * Instead of calling `.routine` on a `dataset` object, we utilize the `insertRoutine` method
@@ -739,6 +762,7 @@ createRoutine();
 ```
 
 ##### After
+
 [Full sample](/samples/routines/createRoutine.js)
 
 ```javascript
@@ -784,7 +808,8 @@ createRoutine();
 ```
 
 #### Delete
-**Key differences**
+
+##### Key differences
 
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
 * Previously we used the `routine` method to access the `routine` object and the `dataset` method to access the `dataset` object, and then one to call `delete` on it - now we use one method, `deleteRoutine` on the client
@@ -817,6 +842,7 @@ async function deleteRoutine() {
 ```
 
 ##### After
+
 [Full sample](/samples/routines/deleteRoutine.js)
 
 ```javascript
@@ -848,7 +874,8 @@ async function deleteRoutine() {
 ```
 
 #### Get
-**Key differences**
+
+##### Key differences
 
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
 * Instead of calling `.get` on a `routine` object chained to a `dataset` object, we call `getRoutine` using the `BigQueryClient`
@@ -879,6 +906,7 @@ async function getRoutine() {
 ```
 
 ##### After
+
 [Full sample](/samples/routines/getRoutine.js)
 
 ```javascript
@@ -908,7 +936,9 @@ async function getRoutine() {
 ```
 
 #### List
-**Key differences**
+
+##### Key differences
+
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
 * Instead of calling `getRoutines` on the `dataset` object, we call one of the `listRoutines*` methods using the `BigQueryClient`
 * In the BigQueryClient, there are [three options for every list method](https://github.com/googleapis/gax-nodejs/blob/main/client-libraries.md#auto-pagination). For datasets, there is `listRoutines` (least efficient, but supports manual paging), `listRoutinesAsync` (returns an iterable, recommended over the non-async method) and `listRoutinesStream` (returns results as a stream)
@@ -935,6 +965,7 @@ async function listRoutines() {
 ```
 
 ##### After
+
 [Full sample](/samples/routines/listRoutines.js)
 
 ```javascript
@@ -972,7 +1003,8 @@ listRoutines();
 ```
 
 #### Update
-**Key differences**
+
+##### Key differences
 
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
 * Instead of calling the `setMetadata` function on a `routine` object, we utilize the `updateRoutine` function of the `BigQueryClient`
@@ -1009,6 +1041,7 @@ async function updateRoutine() {
 ```
 
 ##### After
+
 [Full sample](/samples/routines/updateRoutine.js)
 
 ```javascript
@@ -1047,16 +1080,19 @@ async function updateRoutine() {
   console.log(`Routine description: ${response.description}`);
 }
 ```
+
 </details>
 
 <!-- TODO(coleleah) -->
 ### Models
+
 <details open>
 <summary>Code snippets and explanations for Models CRUDL methods</summary>
 TODO(coleleah) - note about this likely changing?
 
 #### Create
-**Key differences**
+
+##### Key differences
 
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
 * Calling `insertJob` with an [`insertJobRequest`](https://github.com/googleapis/nodejs-bigquery/blob/bebe6fb1a817542d2359a8abcff0d5756a1941ac/protos/protos.d.ts#L6180-L6187) instead of `createQueryJob`
@@ -1109,6 +1145,7 @@ createModel();
 ```
 
 ##### After
+
 [Full sample](/samples/models/createModel.js)
 
 ```javascript
@@ -1179,7 +1216,7 @@ createModel();
 ```
 
 #### Delete
-**Key differences**
+##### Key differences
 
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
 * Previously we used the `model` method on the `dataset` object and then called `delete` on that result. Now we call `deleteModel` using the `BigQueryClient` and pass it a [`deleteModelRequest`](https://github.com/googleapis/nodejs-bigquery/blob/bebe6fb1a817542d2359a8abcff0d5756a1941ac/protos/protos.d.ts#L23096-L23106)
@@ -1208,6 +1245,7 @@ deleteModel();
 ```
 
 ##### After
+
 [Full sample](/samples/models/deleteModel.js)
 
 ```javascript
@@ -1237,7 +1275,8 @@ deleteModel();
 ```
 
 #### Get
-**Key differences**
+
+##### Key differences
 
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
 * Instead of calling `.get` on a `model` object chained to a `dataset` object, we call `getModel` using the `BigQueryClient`
@@ -1268,6 +1307,7 @@ getModel()
 ```
 
 ##### After
+
 [Full sample](/samples/models/getModel.js)
 
 ```javascript
@@ -1296,9 +1336,10 @@ async function getModel() {
 getModel();
 ```
 
-
 #### List
-**Key differences**
+
+##### Key differences
+
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
 * Instead of calling `getModels` on a `dataset` object, we call the one of the `listModels*` functions using the `BigQueryClient`
 * In the BigQueryClient, there are [three options for every list method](https://github.com/googleapis/gax-nodejs/blob/main/client-libraries.md#auto-pagination). For models, there is `listModels` (least efficient, but supports manual paging), `listModelsAsync` (returns an iterable, recommended over the non-async method) and `listModelsStream` (returns results as a stream)
@@ -1329,6 +1370,7 @@ listModels()
 ```
 
 ##### After
+
 [Full sample](/samples/models/listModels.js)
 
 ```javascript
@@ -1364,7 +1406,9 @@ listModels();
 ```
 
 #### List Streaming
-**Key differences**
+
+##### Key differences
+
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
 * Instead of calling `getModelsStream` on a `dataset` object, we call the `listModelsStream` function using the `BigQueryClient`
 * Instead of passing a `datasetId` to the `dataset` object, we construct a [`request`](https://github.com/googleapis/nodejs-bigquery/blob/bebe6fb1a817542d2359a8abcff0d5756a1941ac/protos/protos.d.ts#L23205-L23218) that contains the `projectId` and `datasetId` and pass that to the `listModelsStream` function
@@ -1397,6 +1441,7 @@ async function listModels() {
 ```
 
 ##### After
+
 [Full sample](/samples/models/listModelsStreaming.js)
 
 ```javascript
@@ -1435,7 +1480,8 @@ async function listModels() {
 ```
 
 #### Update
-**Key differences**
+
+##### Key differences
 
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
 * The dataset description is now set with the `patchModel` function rather than with `setMetadata`
@@ -1467,6 +1513,7 @@ async function updateModel() {
 ```
 
 ##### After
+
 [Full sample](/samples/models/updateModel.js)
 
 ```javascript
@@ -1504,88 +1551,107 @@ async function updateModel() {
   console.log(`${modelId} description: ${model.description}`);
 }
 ```
+
 </details>
 
 <!-- TODO(coleleah) -->
 ### Jobs
+
 <details open>
 <summary>Code snippets and explanations for Jobs CRUDL methods</summary>
 
 <!-- TODO(coleleah) -->
 #### Create
-**Key differences**
+
+##### Key differences
 
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
+
 ##### Before
 
 ```javascript
 ```
 
 ##### After
+
 TODO link to full sample
 
 ```javascript
 ```
 <!-- TODO(coleleah) -->
 #### Delete
-**Key differences**
+
+##### Key differences
 
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
+
 ##### Before
 
 ```javascript
 ```
 
 ##### After
+
 TODO link to full sample
 
 ```javascript
 ```
 <!-- TODO(coleleah) -->
 #### Get
-**Key differences**
+
+##### Key differences
 
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
+
 ##### Before
 
 ```javascript
 ```
 
 ##### After
+
 TODO link to full sample
 
 ```javascript
 ```
 <!-- TODO(coleleah) -->
 #### List
-**Key differences**
+
+##### Key differences
+
 TODO(coleleah) update text
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
 In the BigQueryClient, there are [three options for every list method](https://github.com/googleapis/gax-nodejs/blob/main/client-libraries.md#auto-pagination). For datasets, there is `listDatasets` (least efficient, but supports manual paging), `listDatasetsAsync` (returns an iterable, recommended over the non-async method) and `listDatasetsStream` (returns results as a stream)
 * Any of these list methods take in a [request object](https://github.com/googleapis/nodejs-bigquery/blob/5e17911a35e76677705c6227dd896fb1ffc39b0e/protos/protos.d.ts#L1853-L1868) that must minimally takes in the `projectId`
+
 ##### Before
 
 ```javascript
 ```
 
 ##### After
+
 TODO link to full sample
 
 ```javascript
 ```
 <!-- TODO(coleleah) -->
 #### Update
-**Key differences**
+
+##### Key differences
 
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
+
 ##### Before
 
 ```javascript
 ```
 
 ##### After
+
 TODO link to full sample
 
 ```javascript
 ```
+
 </details>
