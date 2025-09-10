@@ -28,7 +28,7 @@ const GCLOUD_TESTS_PREFIX = 'nodejs_samples_tests_models';
 // the GCLOUD_PROJECT environment variable is set as part of test harness setup
 const projectId = process.env.GCLOUD_PROJECT;
 
-const bigquery = new BigQueryClient({}, {opts: {fallback: false}});
+const bigquery = new BigQueryClient({fallback: false});
 
 describe('Models', function () {
   // Increase timeout to accommodate model creation.
