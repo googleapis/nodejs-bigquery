@@ -22,7 +22,7 @@ function main(datasetId = 'my_dataset', transport = 'grpc') {
   if (transport === 'grpc') {
     bigqueryClient = new BigQueryClient();
   } else {
-    bigqueryClient = new BigQueryClient({}, {opts: {fallback: true}});
+    bigqueryClient = new BigQueryClient({fallback: true});
   }
 
   async function listTables() {

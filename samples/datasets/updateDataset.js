@@ -30,7 +30,7 @@ async function main(projectId, datasetId, updateOption, transport = 'grpc') {
   if (transport === 'grpc') {
     bigqueryClient = new BigQueryClient();
   } else {
-    bigqueryClient = new BigQueryClient({}, {opts: {fallback: true}});
+    bigqueryClient = new BigQueryClient({fallback: true});
   }
   // [END bigquery_update_dataset_expiration_preview]
 
