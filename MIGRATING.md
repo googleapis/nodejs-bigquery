@@ -77,16 +77,150 @@ Note: The code snippets in this guide are written in Javascript, not Typescript,
 <details open>
 <summary>Code snippets and explanations for Datasets CRUDL methods</summary>
 
-<!-- TODO(coleleah) -->
 #### Create
+**Key differences**
+
+* Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
+* The dataset creation method was renamed from `createDataset` to `insertDataset`
+* `createDataset` expected a dataset ID and an options object, whereas `insertDataset` takes in a [`request` object](https://github.com/googleapis/nodejs-bigquery/blob/5e17911a35e76677705c6227dd896fb1ffc39b0e/protos/protos.d.ts#L1503-L1513) minimally containing the `projectId` and a dataset reference object, which contains the datasetId. 
+
+
+##### Before
+
+```javascript
+const {BigQuery} = require('@google-cloud/bigquery');
+const bigquery = new BigQuery();
+const datasetId = "my-dataset"
+const options = {
+     location: 'US',
+ };
+
+ // Create a new dataset
+ const [dataset] = await bigquery.createDataset(datasetId, options);
+```
+
+##### After
+[Full sample](/samples/datasets/createDataset.js)
+
+```javascript
+const {BigQueryClient} = require('@google-cloud/bigquery');
+const bigqueryClient = new BigQueryClient();
+
+async function createDataset() {
+  const dataset = {
+    datasetReference: {
+      datasetId: 'my-dataset',
+    },
+    location: 'US',
+  };
+
+  const request = {
+    projectId: 'my-project'
+    dataset: dataset,
+  };
+
+  try {
+    const [response] = await bigqueryClient.insertDataset(request);
+    console.log(`Dataset ${response.id} created successfully.`);
+  } catch (err) {
+    console.error('ERROR creating dataset:', err);
+    if (err.errors) {
+      err.errors.forEach(e => console.error(e.message));
+    }
+  }
+}
+
+await createDataset();
+```
+
+
 <!-- TODO(coleleah) -->
 #### Delete
+**Key differences**
+
+* Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
+Previously we used a combination of two methods - one to access the dataset object, and one to call delete on it - now we use one method, deleteDataset on the client
+deleteDataset takes in a request object containing the projectId and a datasetId. It also optionally takes the deleteContents parameter, which will delete all tables in the dataset if set to true.
+##### Before
+
+```javascript
+const {BigQuery} = require('@google-cloud/bigquery');
+const bigquery = new BigQuery();
+const datasetId = "my-dataset"
+
+// Delete a dataset
+const dataset = bigquery.dataset(datasetId);
+
+await dataset.delete({force: true});
+console.log(`Dataset ${dataset.id} deleted.`);
+```
+
+##### After
+```javascript
+const {BigQueryClient} = require('@google-cloud/bigquery');
+const bigqueryClient = new BigQueryClient();
+
+async function deleteDataset() {
+  const request = {
+    projectId: 'my-project',
+    datasetId: 'my-dataset',
+    deleteContents: true, // Set to true to delete all tables in the dataset
+  };
+
+  try {
+    await bigqueryClient.deleteDataset(request);
+    console.log(`Dataset ${datasetId} deleted.`);
+  } catch (err) {
+    console.error('ERROR deleting dataset:', err);
+    if (err.errors) {
+      err.errors.forEach(e => console.error(e.message));
+    }
+  }
+}
+
+await deleteDataset();
+```
+
 <!-- TODO(coleleah) -->
 #### Get
+**Key differences**
+
+* Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
+##### Before
+
+```javascript
+```
+
+##### After
+```javascript
+```
 <!-- TODO(coleleah) -->
 #### List
+**Key differences**
+
+* Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
+
+##### Before
+
+```javascript
+```
+
+##### After
+```javascript
+```
 <!-- TODO(coleleah) -->
 #### Update
+**Key differences**
+
+* Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
+##### Before
+
+```javascript
+```
+
+##### After
+```javascript
+```
 </details>
 
 <!-- TODO(coleleah) -->
@@ -96,14 +230,69 @@ Note: The code snippets in this guide are written in Javascript, not Typescript,
 
 <!-- TODO(coleleah) -->
 #### Create
+**Key differences**
+
+* Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
+##### Before
+
+```javascript
+```
+
+##### After
+```javascript
+```
 <!-- TODO(coleleah) -->
 #### Delete
+**Key differences**
+
+* Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
+##### Before
+
+```javascript
+```
+
+##### After
+```javascript
+```
 <!-- TODO(coleleah) -->
 #### Get
+**Key differences**
+
+* Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
+##### Before
+
+```javascript
+```
+
+##### After
+```javascript
+```
 <!-- TODO(coleleah) -->
 #### List
+**Key differences**
+
+* Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
+##### Before
+
+```javascript
+```
+
+##### After
+```javascript
+```
 <!-- TODO(coleleah) -->
 #### Update
+**Key differences**
+
+* Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
+##### Before
+
+```javascript
+```
+
+##### After
+```javascript
+```
 </details>
 
 <!-- TODO(coleleah) -->
@@ -113,14 +302,69 @@ Note: The code snippets in this guide are written in Javascript, not Typescript,
 
 <!-- TODO(coleleah) -->
 #### Create
+**Key differences**
+
+* Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
+##### Before
+
+```javascript
+```
+
+##### After
+```javascript
+```
 <!-- TODO(coleleah) -->
 #### Delete
+**Key differences**
+
+* Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
+##### Before
+
+```javascript
+```
+
+##### After
+```javascript
+```
 <!-- TODO(coleleah) -->
 #### Get
+**Key differences**
+
+* Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
+##### Before
+
+```javascript
+```
+
+##### After
+```javascript
+```
 <!-- TODO(coleleah) -->
 #### List
+**Key differences**
+
+* Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
+##### Before
+
+```javascript
+```
+
+##### After
+```javascript
+```
 <!-- TODO(coleleah) -->
 #### Update
+**Key differences**
+
+* Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
+##### Before
+
+```javascript
+```
+
+##### After
+```javascript
+```
 </details>
 
 <!-- TODO(coleleah) -->
@@ -130,14 +374,69 @@ Note: The code snippets in this guide are written in Javascript, not Typescript,
 
 <!-- TODO(coleleah) -->
 #### Create
+**Key differences**
+
+* Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
+##### Before
+
+```javascript
+```
+
+##### After
+```javascript
+```
 <!-- TODO(coleleah) -->
 #### Delete
+**Key differences**
+
+* Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
+##### Before
+
+```javascript
+```
+
+##### After
+```javascript
+```
 <!-- TODO(coleleah) -->
 #### Get
+**Key differences**
+
+* Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
+##### Before
+
+```javascript
+```
+
+##### After
+```javascript
+```
 <!-- TODO(coleleah) -->
 #### List
+**Key differences**
+
+* Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
+##### Before
+
+```javascript
+```
+
+##### After
+```javascript
+```
 <!-- TODO(coleleah) -->
 #### Update
+**Key differences**
+
+* Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
+##### Before
+
+```javascript
+```
+
+##### After
+```javascript
+```
 </details>
 
 <!-- TODO(coleleah) -->
@@ -147,12 +446,67 @@ Note: The code snippets in this guide are written in Javascript, not Typescript,
 
 <!-- TODO(coleleah) -->
 #### Create
+**Key differences**
+
+* Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
+##### Before
+
+```javascript
+```
+
+##### After
+```javascript
+```
 <!-- TODO(coleleah) -->
 #### Delete
+**Key differences**
+
+* Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
+##### Before
+
+```javascript
+```
+
+##### After
+```javascript
+```
 <!-- TODO(coleleah) -->
 #### Get
+**Key differences**
+
+* Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
+##### Before
+
+```javascript
+```
+
+##### After
+```javascript
+```
 <!-- TODO(coleleah) -->
 #### List
+**Key differences**
+
+* Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
+##### Before
+
+```javascript
+```
+
+##### After
+```javascript
+```
 <!-- TODO(coleleah) -->
 #### Update
+**Key differences**
+
+* Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
+##### Before
+
+```javascript
+```
+
+##### After
+```javascript
+```
 </details>
