@@ -1053,83 +1053,456 @@ async function updateRoutine() {
 ### Models
 <details open>
 <summary>Code snippets and explanations for Models CRUDL methods</summary>
+TODO(coleleah) - note about this likely changing?
 
-<!-- TODO(coleleah) -->
 #### Create
 **Key differences**
 
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
+* Calling `insertJob` with an [`insertJobRequest`](https://github.com/googleapis/nodejs-bigquery/blob/bebe6fb1a817542d2359a8abcff0d5756a1941ac/protos/protos.d.ts#L6180-L6187) instead of `createQueryJob`
+  * In this request, we need to manually specify the `useLegacySql` value as `false` in order for the underlying BigQuery engine to properly parse the creation query
+* Accessing the underlying `jobClient` that is part of the `BigQueryClient` to call `getQueryResults`
+* `getQueryResults` takes in a [`getQueryResultsRequest`](https://github.com/googleapis/nodejs-bigquery/blob/bebe6fb1a817542d2359a8abcff0d5756a1941ac/protos/protos.d.ts#L6830-L6855)
+* We manually poll `getQueryResults` periodically to await the results of the model creation job
+
 ##### Before
 
 ```javascript
+// Import the Google Cloud client library
+const {BigQuery} = require('@google-cloud/bigquery');
+const bigquery = new BigQuery();
+
+async function createModel() {
+  // Creates a model named "my_model" in "my_dataset".
+
+  const datasetId = "my_dataset";
+  const modelId = "my_model";
+
+  const query = `CREATE OR REPLACE MODEL \`${datasetId}.${modelId}\`
+        OPTIONS(model_type='logistic_reg') AS
+        SELECT
+          IF(totals.transactions IS NULL, 0, 1) AS label,
+          IFNULL(device.operatingSystem, "") AS os,
+          device.isMobile AS is_mobile,
+          IFNULL(geoNetwork.country, "") AS country,
+          IFNULL(totals.pageviews, 0) AS pageviews
+        FROM
+          \`bigquery-public-data.google_analytics_sample.ga_sessions_*\`
+        WHERE
+          _TABLE_SUFFIX BETWEEN '20160801' AND '20170631'
+        LIMIT  100000;`;
+
+  const queryOptions = {
+    query: query,
+  };
+
+  // Run query to create a model
+  const [job] = await bigquery.createQueryJob(queryOptions);
+
+  // Wait for the query to finish
+  await job.getQueryResults();
+
+  console.log(`Model ${modelId} created.`);
+}
+createModel();
+
 ```
 
 ##### After
-TODO link to full sample
+[Full sample](/samples/models/createModel.js)
 
 ```javascript
+const {BigQueryClient} = require('@google-cloud/bigquery');
+const bigquery = new BigQueryClient();
+
+async function createModel() {
+  // Creates a model named "my_model" in "my_dataset".
+
+  /**
+   * TODO(developer): Uncomment the following lines before running the sample
+   */
+  // const datasetId = "my_dataset";
+  // const modelId = "my_model";
+
+  const query = `CREATE OR REPLACE MODEL \`${projectId}.${datasetId}.${modelId}\`
+        OPTIONS(model_type='logistic_reg') AS
+        SELECT
+          IF(totals.transactions IS NULL, 0, 1) AS label,
+          IFNULL(device.operatingSystem, "") AS os,
+          device.isMobile AS is_mobile,
+          IFNULL(geoNetwork.country, "") AS country,
+          IFNULL(totals.pageviews, 0) AS pageviews
+        FROM
+          \`bigquery-public-data.google_analytics_sample.ga_sessions_*\`
+        WHERE
+          _TABLE_SUFFIX BETWEEN '20160801' AND '20170631'
+        LIMIT  100000;`;
+
+
+  const request = {
+    projectId: projectId,
+    job: {
+      configuration: {
+        query: {
+          query: query,
+          useLegacySql: {value: false}
+        },
+      },
+    },
+  };
+
+  // Run query to create a model
+  const [jobResponse] = await bigquery.insertJob(request);
+  console.log('jobResponse', jobResponse)
+  const jobReference = jobResponse.jobReference;
+
+  const getQueryResultsRequest = {
+    projectId: projectId,
+    jobId: jobReference.jobId,
+    location: jobReference.location.value,
+    timeoutMs: {value:120000}
+
+  }
+  // Wait for the job to finish
+  let [resp] = await bigquery.jobClient.getQueryResults(getQueryResultsRequest)
+  // poll the job status every 3 seconds until complete
+  while(resp.status==="RUNNING"){
+    setTimeout([resp] = await bigquery.jobClient.getQueryResults(getQueryResultsRequest), 3000)
+  }
+  if (resp.errors.length!==0){
+    throw new Error(`Something failed in model creation`)
+  }
+  console.log(`Model ${modelId} created.`);
+}
+createModel();
+
 ```
-<!-- TODO(coleleah) -->
+
 #### Delete
 **Key differences**
 
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
+* Previously we used the `model` method on the `dataset` object and then called `delete` on that result. Now we call `deleteModel` using the `BigQueryClient` and pass it a [`deleteModelRequest`](https://github.com/googleapis/nodejs-bigquery/blob/bebe6fb1a817542d2359a8abcff0d5756a1941ac/protos/protos.d.ts#L23096-L23106)
+
 ##### Before
 
 ```javascript
+// Import the Google Cloud client library
+const {BigQuery} = require('@google-cloud/bigquery');
+const bigquery = new BigQuery();
+
+async function deleteModel() {
+  // Deletes a model named "my_model" from "my_dataset".
+
+
+  const datasetId = "my_dataset";
+  const modelId = "my_model";
+
+  const dataset = bigquery.dataset(datasetId);
+  const model = dataset.model(modelId);
+  await model.delete();
+
+  console.log(`Model ${modelId} deleted.`);
+}
+deleteModel();
 ```
 
 ##### After
-TODO link to full sample
+[Full sample](/samples/models/deleteModel.js)
 
 ```javascript
+// Import the Google Cloud client library
+const {BigQueryClient} = require('@google-cloud/bigquery');
+
+async function deleteModel() {
+  // Deletes a model named "my_model" from "my_dataset".
+
+  const projectId = "my_project"
+  const datasetId = "my_dataset";
+  const modelId = "my_model";
+
+  const bigqueryClient = new BigQueryClient();
+
+  const request = {
+    projectId: projectId,
+    datasetId: datasetId,
+    modelId: modelId,
+  };
+
+  await bigqueryClient.deleteModel(request);
+
+  console.log(`Model ${modelId} deleted.`);
+}
+deleteModel();
 ```
-<!-- TODO(coleleah) -->
+
 #### Get
 **Key differences**
 
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
+* Instead of calling `.get` on a `model` object chained to a `dataset` object, we call `getModel` using the `BigQueryClient`
+* Instead of passing the `datasetId` to the `dataset` object and the `modelId` to the `model` object, we pass a [`GetModelRequest`](https://github.com/googleapis/nodejs-bigquery/blob/bebe6fb1a817542d2359a8abcff0d5756a1941ac/protos/protos.d.ts#L22872-L22882) to the `getModel` call on the `BigQueryClient`
+
 ##### Before
 
 ```javascript
+// Import the Google Cloud client library
+const {BigQuery} = require('@google-cloud/bigquery');
+const bigquery = new BigQuery();
+
+async function getModel() {
+  // Retrieves model named "my_existing_model" in "my_dataset".
+
+  
+  const datasetId = "my_dataset";
+  const modelId = "my_existing_model";
+
+  const dataset = bigquery.dataset(datasetId);
+  const [model] = await dataset.model(modelId).get();
+
+  console.log('Model:');
+  console.log(model.metadata.modelReference);
+}
+getModel()
+
 ```
 
 ##### After
-TODO link to full sample
+[Full sample](/samples/models/getModel.js)
 
 ```javascript
+// Import the Google Cloud client library
+const {BigQueryClient} = require('@google-cloud/bigquery');
+
+async function getModel() {
+  // Retrieves model named "my_existing_model" in "my_dataset".
+
+  const datasetId = "my_dataset";
+  const modelId = "my_existing_model";
+
+  const bigqueryClient = new BigQueryClient();
+
+  const request = {
+    projectId: projectId,
+    datasetId: datasetId,
+    modelId: modelId,
+  };
+
+  const [model] = await bigqueryClient.getModel(request);
+
+  console.log('Model:');
+  console.log(model);
+}
+getModel();
 ```
-<!-- TODO(coleleah) -->
+
+
 #### List
 **Key differences**
-TODO(coleleah) update text
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
-In the BigQueryClient, there are [three options for every list method](https://github.com/googleapis/gax-nodejs/blob/main/client-libraries.md#auto-pagination). For datasets, there is `listDatasets` (least efficient, but supports manual paging), `listDatasetsAsync` (returns an iterable, recommended over the non-async method) and `listDatasetsStream` (returns results as a stream)
-* Any of these list methods take in a [request object](https://github.com/googleapis/nodejs-bigquery/blob/5e17911a35e76677705c6227dd896fb1ffc39b0e/protos/protos.d.ts#L1853-L1868) that must minimally takes in the `projectId`
+* Instead of calling `getModels` on a `dataset` object, we call the one of the `listModels*` functions using the `BigQueryClient`
+* In the BigQueryClient, there are [three options for every list method](https://github.com/googleapis/gax-nodejs/blob/main/client-libraries.md#auto-pagination). For models, there is `listModels` (least efficient, but supports manual paging), `listModelsAsync` (returns an iterable, recommended over the non-async method) and `listModelsStream` (returns results as a stream)
+* Any of these list methods take in a [request object](https://github.com/googleapis/nodejs-bigquery/blob/bebe6fb1a817542d2359a8abcff0d5756a1941ac/protos/protos.d.ts#L23205-L23218) that must minimally takes in the `projectId` and `datasetId`
+
 ##### Before
 
 ```javascript
+// Import the Google Cloud client library
+const {BigQuery} = require('@google-cloud/bigquery');
+const bigquery = new BigQuery();
+
+async function listModels() {
+  // Lists all existing models in the dataset.
+
+
+  const datasetId = "my_dataset";
+
+  const dataset = bigquery.dataset(datasetId);
+
+  dataset.getModels().then(data => {
+    const models = data[0];
+    console.log('Models:');
+    models.forEach(model => console.log(model.metadata));
+  });
+}
+listModels()
 ```
 
 ##### After
-TODO link to full sample
+[Full sample](/samples/models/listModels.js)
 
 ```javascript
+// Import the Google Cloud client library
+const {BigQueryClient} = require('@google-cloud/bigquery');
+
+async function listModels() {
+  // Lists all existing models in the dataset.
+  const projectId = "my_project";
+  const datasetId = "my_dataset";
+
+  const bigqueryClient = new BigQueryClient();
+
+  const request = {
+    projectId: projectId,
+    datasetId: datasetId,
+  };
+
+  // limit results to 10
+  const maxResults = 10;
+  const iterable = bigqueryClient.listModelsAsync(request);
+  console.log('Models:');
+  let i = 0;
+  for await (const model of iterable) {
+    if (i >= maxResults) {
+      break;
+    }
+    console.log(model);
+    i++;
+  }
+}
+listModels();
 ```
-<!-- TODO(coleleah) -->
+
+#### List Streaming
+**Key differences**
+* Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
+* Instead of calling `getModelsStream` on a `dataset` object, we call the `listModelsStream` function using the `BigQueryClient`
+* Instead of passing a `datasetId` to the `dataset` object, we construct a [`request`](https://github.com/googleapis/nodejs-bigquery/blob/bebe6fb1a817542d2359a8abcff0d5756a1941ac/protos/protos.d.ts#L23205-L23218) that contains the `projectId` and `datasetId` and pass that to the `listModelsStream` function
+
+##### Before
+
+```javascript
+// Import the Google Cloud client library
+const {BigQuery} = require('@google-cloud/bigquery');
+const bigquery = new BigQuery();
+
+async function listModels() {
+  // Lists all existing models in the dataset using streaming method.
+
+
+  const datasetId = "my_dataset";
+
+  const dataset = bigquery.dataset(datasetId);
+
+  dataset
+    .getModelsStream()
+    .on('error', console.error)
+    .on('data', model => {
+      console.log(model.metadata);
+    })
+    .on('end', () => {
+      console.log('All models have been retrieved.');
+    });
+}
+```
+
+##### After
+[Full sample](/samples/models/listModelsStreaming.js)
+
+```javascript
+// Import the Google Cloud client library
+const {BigQueryClient} = require('@google-cloud/bigquery');
+
+async function listModels() {
+  // Lists all existing models in the dataset using streaming method.
+
+ const projectId = "my_project";
+ const datasetId = "my_dataset";
+
+  const bigqueryClient = new BigQueryClient();
+
+  const request = {
+    projectId: projectId,
+    datasetId: datasetId,
+  };
+
+  const stream = bigqueryClient.listModelsStream(request);
+  console.log('Models:')
+
+  stream.on('error', err => {
+    console.error(err);
+  });
+
+  stream
+    .on('data', model => {
+      console.log(model);
+    })
+    .on('end', () => {
+      console.log('All models have been retrieved.');
+    });
+}
+
+```
+
 #### Update
 **Key differences**
 
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
+* The dataset description is now set with the `patchModel` function rather than with `setMetadata`
+* `updateDataset` takes in a [`request` object](https://github.com/googleapis/nodejs-bigquery/blob/bebe6fb1a817542d2359a8abcff0d5756a1941ac/protos/protos.d.ts#L22981-L22994) - this contains a [`model` object](https://github.com/googleapis/nodejs-bigquery/blob/bebe6fb1a817542d2359a8abcff0d5756a1941ac/protos/protos.d.ts#L16315-L16376) that at minimum must contain a [`modelReference` object](https://github.com/googleapis/nodejs-bigquery/blob/bebe6fb1a817542d2359a8abcff0d5756a1941ac/protos/protos.d.ts#L16315-L16376)
+
 ##### Before
 
 ```javascript
+// Import the Google Cloud client library
+const {BigQuery} = require('@google-cloud/bigquery');
+const bigquery = new BigQuery();
+
+async function updateModel() {
+  // Updates a model's metadata.
+
+  const datasetId = "my_dataset";
+  const modelId = "my__model";
+
+  const metadata = {
+    description: 'A really great model.',
+  };
+
+  const dataset = bigquery.dataset(datasetId);
+  const [apiResponse] = await dataset.model(modelId).setMetadata(metadata);
+  const newDescription = apiResponse.description;
+
+  console.log(`${modelId} description: ${newDescription}`);
+}
 ```
 
 ##### After
-TODO link to full sample
+[Full sample](/samples/models/updateModel.js)
 
 ```javascript
+// Import the Google Cloud client library
+const {BigQueryClient} = require('@google-cloud/bigquery');
+
+async function updateModel() {
+  // Updates a model's metadata.
+
+  const projectId = "my_project"
+  const datasetId = "my_dataset";
+  const modelId = "my__model";
+
+  const description = 'A really great model.';
+
+  // known limitation: patchModel must be called in REST fallback mode, not with gRPC
+  const bigqueryClient = new BigQueryClient({fallback: true});
+
+  const request = {
+    projectId: projectId,
+    datasetId: datasetId,
+    modelId: modelId,
+    model: {
+      modelReference:{
+        projectId: projectId,
+        datasetId: datasetId,
+        modelId: modelId
+      },
+      description: description,
+    },
+  };
+
+  const [model] = await bigqueryClient.patchModel(request);
+
+  console.log(`${modelId} description: ${model.description}`);
+}
 ```
 </details>
 
