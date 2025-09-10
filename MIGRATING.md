@@ -356,49 +356,195 @@ await updateDatasetDescription();
 <details open>
 <summary>Code snippets and explanations for Tables CRUDL methods</summary>
 
-<!-- TODO(coleleah) -->
 #### Create
 **Key differences**
 
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
+* Instead of calling `createTable` on a `dataset` object, the `insertTable` method is called using the client
+* Instead of the method taking in a `tableId` and `options` it takes in a [`request` object](https://github.com/googleapis/nodejs-bigquery/blob/4f95cabbd2dbb5c749a158b57ba95b1905429c57/protos/protos.d.ts#L29250-L29260), which contains a the `datasetId` as well as the [`table` object](https://github.com/googleapis/nodejs-bigquery/blob/4f95cabbd2dbb5c749a158b57ba95b1905429c57/protos/protos.d.ts#L28721-L28875) as one of the parameters
+
 ##### Before
 
 ```javascript
+const datasetId = 'my_dataset'; // Existing dataset
+const tableId = 'my_new_table'; // Table to be created
+const schema = [
+  {name: 'Name', type: 'STRING', mode: 'REQUIRED'},
+  {name: 'Age', type: 'INTEGER'},
+  {name: 'Weight', type: 'FLOAT'},
+  {name: 'IsMagic', type: 'BOOLEAN'},
+];
+// Import the Google Cloud client library and create a client
+const {BigQuery} = require('@google-cloud/bigquery');
+const bigquery = new BigQuery();
+
+async function createTable() {
+  const options = {
+    schema: schema,
+    location: 'US',
+  };
+
+  // Create a new table in the dataset
+  const [table] = await bigquery
+    .dataset(datasetId)
+    .createTable(tableId, options);
+
+  console.log(`Table ${table.id} created.`);
+}
+createTable();
 ```
 
 ##### After
-TODO link to full sample
+[Full sample](/samples/tables/createTable.js)
+
 ```javascript
+// Import the Google Cloud client library and create a client
+const {BigQueryClient} = require('@google-cloud/bigquery');
+const projectId = 'my-project';
+const datasetId = 'my_dataset'; // Existing dataset
+const tableId = 'my_new_table'; // Table to be created
+const schema = [
+  {name: 'Name', type: 'STRING', mode: 'REQUIRED'},
+  {name: 'Age', type: 'INTEGER'},
+  {name: 'Weight', type: 'FLOAT'},
+  {name: 'IsMagic', type: 'BOOLEAN'},
+],;  const bigquery = new BigQueryClient();
+
+async function createTable() {
+  // For all options, see https://cloud.google.com/bigquery/docs/reference/v2/tables#resource
+  const request = {
+    projectId,
+    datasetId,
+    table: {
+      tableReference: {
+        projectId,
+        datasetId,
+        tableId,
+      },
+      schema: {fields: schema},
+      location: 'US',
+    },
+  };
+
+  // Create a new table in the dataset
+  const [table] = await bigquery.insertTable(request);
+
+  console.log(`Table ${table.tableReference.tableId} created.`);
+}
+createTable();
 ```
-<!-- TODO(coleleah) -->
+
 #### Delete
 **Key differences**
 
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
+* Previously we called `.delete()` on a dataset/table object - now, we call `deleteTable()` using the client
+* Instead of passing a `datasetId` and `tableId` to the `dataset` and `table` objects respectively, we pass a single [`request` object](https://github.com/googleapis/nodejs-bigquery/blob/4f95cabbd2dbb5c749a158b57ba95b1905429c57/protos/protos.d.ts#L29480-L29490) that takes in a `projectId`, `datasetId` and `tableId`
+
 ##### Before
 
 ```javascript
+// Import the Google Cloud client library
+const {BigQuery} = require('@google-cloud/bigquery');
+const bigquery = new BigQuery();
+
+async function deleteTable() {
+  // Deletes "my_table" from "my_dataset".
+
+  const datasetId = "my_dataset";
+  const tableId = "my_table";
+
+  // Delete the table
+  await bigquery.dataset(datasetId).table(tableId).delete();
+
+  console.log(`Table ${tableId} deleted.`);
+}
+deleteTable();
 ```
 
 ##### After
-TODO link to full sample
+[Full sample](/samples/tables/deleteTable.js)
 
 ```javascript
+// Import the Google Cloud client library
+const {BigQueryClient} = require('@google-cloud/bigquery');
+const bigquery = new BigQueryClient();
+
+async function deleteTable() {
+  // Deletes "my_table" from "my_dataset".
+  const projectId = "my_project";
+  const datasetId = "my_dataset";
+  const tableId = "my_table";
+
+  const request = {
+    projectId: projectId,
+    datasetId: datasetId,
+    tableId: tableId,
+  };
+
+  // Delete the table
+  await bigquery.deleteTable(request);
+
+  console.log(`Table ${tableId} deleted.`);
+}
+deleteTable();
 ```
-<!-- TODO(coleleah) -->
+
 #### Get
 **Key differences**
 
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
+* Previously, we called `.table().get` on a `dataset` object. Now, we call the `getTable()` method using the client
+* Instead of passing a `tableId` to the `.table()` function, we pass a [`request` object](https://github.com/googleapis/nodejs-bigquery/blob/4f95cabbd2dbb5c749a158b57ba95b1905429c57/protos/protos.d.ts#L29118-L29134) that contains the `projectId`, `datasetId` and `tableId`
+
 ##### Before
 
 ```javascript
+// Import the Google Cloud client library
+const {BigQuery} = require('@google-cloud/bigquery');
+const bigquery = new BigQuery();
+
+async function getTable() {
+  // Retrieves table named "my_table" in "my_dataset".
+  const datasetId = "my_dataset";
+  const tableId = "my_table";
+
+  // Retrieve table reference
+  const dataset = bigquery.dataset(datasetId);
+  const [table] = await dataset.table(tableId).get();
+
+  console.log('Table:');
+  console.log(table.metadata.tableReference);
+}
+getTable();
 ```
 
 ##### After
-TODO link to full sample
+[Full sample](/samples/tables/getTable.js)
 
 ```javascript
+const {BigQueryClient} = require('@google-cloud/bigquery');
+const bigquery = new BigQueryClient();
+
+async function getTable() {
+  // Retrieves table named "my_table" in "my_dataset".
+
+  const projectId = "my_project";
+  const datasetId = "my_dataset";
+  const tableId = "my_table";
+
+  const request = {
+    projectId: projectId,
+    datasetId: datasetId,
+    tableId: tableId
+  };
+
+  const [table] = await bigquery.getTable(request);
+
+  console.log('Table:');
+  console.log(table.id);
+}
+getTable();
 ```
 <!-- TODO(coleleah) -->
 #### List
