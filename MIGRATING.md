@@ -1,6 +1,6 @@
 # Migrating to BigQuery 9.x
 
-This version of BigQuery is currently in preview. Improvements are planned for subsequent releases.
+This version of BigQuery is currently in preview. Improvements are planned for subsequent releases, in particular with regard to query user experience. 
 
 <!-- TODO(coleleah) -->
 Blurb about holistic changes related to code generation, ensuring faster updates, and availability of gRPC
@@ -36,6 +36,8 @@ const bigquery = new BigQueryClient();
 
 <!-- TODO(coleleah) wait until talking to Alvaro -->
 ### Instantiating a client with custom options
+TODO(coleleah) note about fallback transport
+TODO(coleleah) note about other options
 
 <!-- TODO(coleleah) wait until talking to Alvaro -->
 ### Instantiating subclients
@@ -62,10 +64,27 @@ import type * as BigQueryType from '@google-cloud/bigquery';
 <!-- TODO(coleleah) -->
 ## Known issues
 
-<!-- TODO(coleleah) -->
-## Migration using Gemini
+This library is in preview and there are a few known issues. If you come across other problems, please open a "Bug Report" issue in this repository and fill out all parts of the template! Thank you for any feedback.
+
+1. When using REST transport, error messages are not surfacing from the underlying surface. Proper HTTP error codes *are* surfaced, but the error message will only read, "Request failed with status code: xxx." **Workaround**: Use gRPC. Verbose error messages with their error codes are properly surfaced when using gRPC as the transport. gRPC is enabled by default in this version of the library.
+1. The `patchModel` RPC will fail with an `INVALID_ARGUMENT: No fields found to patch/update.` error when run using gRPC transport. **Workaround**: use REST transport for this RPC.
+1. A warning about autopagination is being thrown when using all `*Async` list methods (the ones whose names end in "Async" and return an iterable, not asynchronous calls to the `*Stream` or regular list calls.) This warning is non-blocking and there is currently no workaround.
+
+TODO(coleleah) - add the bit about cancelJob?
+
 
 <!-- TODO(coleleah) -->
+## Migration using Gemini
+TODO(coleleah) test this prompt
+
+We highly encourage you to utilize the [Gemini CLI](https://github.com/google-gemini/gemini-cli) to migrate your code. We recommend to minimally pass this migration guide and the `samples` directory as context, though passing the entire repo as context will likely be helpful to Gemini as well. Additionally, we recommend strictly specifying the files that the Gemini CLI should modify to ensure that it does not modify code you do not want it to.
+
+An example prompt to modify a file in your repo called `mybigquery.js` might be:
+
+```text
+Following the user guide found in the NodeJS BigQuery repository on the preview-9.x branch: https://github.com/googleapis/nodejs-bigquery/blob/preview-9.x/MIGRATING.md, using the samples found in its samples directory: https://github.com/googleapis/nodejs-bigquery/tree/preview-9.x/samples and the code found in src https://github.com/googleapis/nodejs-bigquery/tree/preview-9.x/src, migrate the code found in @mybigquery.js to use the 9.0.0-alpha.x version of @google-cloud-bigquery - you will only need to touch this file.
+```
+
 ## Code Samples
 
 Note: The code snippets in this guide are written in Javascript, not Typescript, and are meant to be a quick way of comparing the differences between the 8.x.x and 9.x.x packages; they may not compile as is. Complete samples can be found in the `samples` directory.
