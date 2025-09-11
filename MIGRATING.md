@@ -70,7 +70,6 @@ import type * as BigQueryType from '@google-cloud/bigquery';
 
 Note: The code snippets in this guide are written in Javascript, not Typescript, and are meant to be a quick way of comparing the differences between the 8.x.x and 9.x.x packages; they may not compile as is. Complete samples can be found in the `samples` directory.
 
-<!-- TODO(coleleah) -->
 ### Datasets
 
 <details open>
@@ -360,7 +359,6 @@ await updateDatasetDescription();
 
 </details>
 
-<!-- TODO(coleleah) -->
 ### Tables
 
 <details open>
@@ -704,7 +702,6 @@ updateTableDescription();
 
 </details>
 
-<!-- TODO(coleleah) -->
 ### Routines
 
 <details open>
@@ -1082,12 +1079,10 @@ async function updateRoutine() {
 
 </details>
 
-<!-- TODO(coleleah) -->
 ### Models
 
 <details open>
 <summary>Code snippets and explanations for Models CRUDL methods</summary>
-TODO(coleleah) - note about this likely changing?
 
 #### Create model
 
@@ -1154,11 +1149,8 @@ const bigquery = new BigQueryClient();
 async function createModel() {
   // Creates a model named "my_model" in "my_dataset".
 
-  /**
-   * TODO(developer): Uncomment the following lines before running the sample
-   */
-  // const datasetId = "my_dataset";
-  // const modelId = "my_model";
+  const datasetId = "my_dataset";
+  const modelId = "my_model";
 
   const query = `CREATE OR REPLACE MODEL \`${projectId}.${datasetId}.${modelId}\`
         OPTIONS(model_type='logistic_reg') AS
@@ -1554,7 +1546,6 @@ async function updateModel() {
 
 </details>
 
-<!-- TODO(coleleah) -->
 ### Jobs
 
 <details open>
@@ -1686,10 +1677,7 @@ const bigquery = new BigQuery();
 async function getJob() {
   // Get job properties.
 
-  /**
-   * TODO(developer): Uncomment the following lines before running the sample.
-   */
-  // const jobId = "existing-job-id";
+  const jobId = "existing-job-id";
 
   // Create a job reference
   const job = bigquery.job(jobId);
@@ -1747,10 +1735,7 @@ const bigquery = new BigQuery();
 async function cancelJob() {
   // Attempts to cancel a job.
 
-  /**
-   * TODO(developer): Uncomment the following lines before running the sample.
-   */
-  // const jobId = "existing-job-id";
+  const jobId = "existing-job-id";
 
   // Create a job reference
   const job = bigquery.job(jobId);
