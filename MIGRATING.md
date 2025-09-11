@@ -62,7 +62,6 @@ import type * as BigQueryType from '@google-cloud/bigquery';
 <!-- TODO(coleleah) -->
 ## Known issues
 
-
 <!-- TODO(coleleah) -->
 ## Migration using Gemini
 
@@ -77,7 +76,7 @@ Note: The code snippets in this guide are written in Javascript, not Typescript,
 <details open>
 <summary>Code snippets and explanations for Datasets CRUDL methods</summary>
 
-#### Create
+#### Create dataset
 
 ##### Key differences
 
@@ -134,7 +133,7 @@ async function createDataset() {
 await createDataset();
 ```
 
-#### Delete
+#### Delete dataset
 
 ##### Key differences
 
@@ -185,7 +184,7 @@ async function deleteDataset() {
 await deleteDataset();
 ```
 
-#### Get
+#### Get dataset
 
 ##### Key differences
 
@@ -233,14 +232,14 @@ async function getDataset() {
 await getDataset();
 ```
 
-#### List
+#### List datasets
 
 ##### Key differences
 
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
 * `getDatasets` no longer exists
 * In the BigQueryClient, there are [three options for every list method](https://github.com/googleapis/gax-nodejs/blob/main/client-libraries.md#auto-pagination). For datasets, there is `listDatasets` (least efficient, but supports manual paging), `listDatasetsAsync` (returns an iterable, recommended over the non-async method) and `listDatasetsStream` (returns results as a stream)
-* Any of these list methods take in a [request object](https://github.com/googleapis/nodejs-bigquery/blob/5e17911a35e76677705c6227dd896fb1ffc39b0e/protos/protos.d.ts#L1853-L1868) that must minimally takes in the `projectId`
+* Any of these list methods take in a [request object](https://github.com/googleapis/nodejs-bigquery/blob/5e17911a35e76677705c6227dd896fb1ffc39b0e/protos/protos.d.ts#L1853-L1868) that must minimally take in the `projectId`
 
 ##### Before
 
@@ -290,7 +289,7 @@ await listDatasets();
 
 ```
 
-#### Update
+#### Update dataset
 
 ##### Key differences
 
@@ -367,7 +366,7 @@ await updateDatasetDescription();
 <details open>
 <summary>Code snippets and explanations for Tables CRUDL methods</summary>
 
-#### Create
+#### Create table
 
 ##### Key differences
 
@@ -447,7 +446,7 @@ async function createTable() {
 createTable();
 ```
 
-#### Delete
+#### Delete table
 
 ##### Key differences
 
@@ -505,7 +504,7 @@ async function deleteTable() {
 deleteTable();
 ```
 
-#### Get
+#### Get table
 
 ##### Key differences
 
@@ -564,14 +563,14 @@ async function getTable() {
 getTable();
 ```
 
-#### List
+#### List tables
 
 ##### Key differences
 
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
 * Previously we called the `.getTables()` method on a `dataset` object, now we call the one of the `listTables*` methods on the client
 * In the BigQueryClient, there are [three options for every list method](https://github.com/googleapis/gax-nodejs/blob/main/client-libraries.md#auto-pagination). For tables, there is `listTables` (least efficient, but supports manual paging), `listTablesAsync` (returns an iterable, recommended over the non-async method) and `listTablesStream` (returns results as a stream)
-* Any of these list methods take in a [request object](https://github.com/googleapis/nodejs-bigquery/blob/4f95cabbd2dbb5c749a158b57ba95b1905429c57/protos/protos.d.ts#L29589-L29602) that must minimally takes in the `projectId` and the `datasetId`
+* Any of these list methods take in a [request object](https://github.com/googleapis/nodejs-bigquery/blob/4f95cabbd2dbb5c749a158b57ba95b1905429c57/protos/protos.d.ts#L29589-L29602) that must minimally take in the `projectId` and the `datasetId`
 
 ##### Before
 
@@ -632,7 +631,7 @@ async function listTables() {
 listTables();
 ```
 
-#### Update
+#### Update table
 
 ##### Key differences
 
@@ -711,7 +710,7 @@ updateTableDescription();
 <details open>
 <summary>Code snippets and explanations for Routines CRUDL methods</summary>
 
-#### Create
+#### Create routine
 
 ##### Key differences
 
@@ -807,7 +806,7 @@ async function createRoutine() {
 createRoutine();
 ```
 
-#### Delete
+#### Delete routine
 
 ##### Key differences
 
@@ -873,7 +872,7 @@ async function deleteRoutine() {
 }
 ```
 
-#### Get
+#### Get routine
 
 ##### Key differences
 
@@ -935,14 +934,14 @@ async function getRoutine() {
 }
 ```
 
-#### List
+#### List routines
 
 ##### Key differences
 
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
 * Instead of calling `getRoutines` on the `dataset` object, we call one of the `listRoutines*` methods using the `BigQueryClient`
 * In the BigQueryClient, there are [three options for every list method](https://github.com/googleapis/gax-nodejs/blob/main/client-libraries.md#auto-pagination). For datasets, there is `listRoutines` (least efficient, but supports manual paging), `listRoutinesAsync` (returns an iterable, recommended over the non-async method) and `listRoutinesStream` (returns results as a stream)
-* Any of these list methods take in a [request object](https://github.com/googleapis/nodejs-bigquery/blob/11b16d84aef3ff09bb99d37ab103b0a04969b4b7/protos/protos.d.ts#L26351-L26367) that must minimally takes in the `projectId` and `datasetId`
+* Any of these list methods take in a [request object](https://github.com/googleapis/nodejs-bigquery/blob/11b16d84aef3ff09bb99d37ab103b0a04969b4b7/protos/protos.d.ts#L26351-L26367) that must minimally take in the `projectId` and `datasetId`
 
 ##### Before
 
@@ -1002,7 +1001,7 @@ async function listRoutines() {
 listRoutines();
 ```
 
-#### Update
+#### Update routine
 
 ##### Key differences
 
@@ -1090,7 +1089,7 @@ async function updateRoutine() {
 <summary>Code snippets and explanations for Models CRUDL methods</summary>
 TODO(coleleah) - note about this likely changing?
 
-#### Create
+#### Create model
 
 ##### Key differences
 
@@ -1215,7 +1214,8 @@ createModel();
 
 ```
 
-#### Delete
+#### Delete model
+
 ##### Key differences
 
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
@@ -1274,7 +1274,7 @@ async function deleteModel() {
 deleteModel();
 ```
 
-#### Get
+#### Get model
 
 ##### Key differences
 
@@ -1336,14 +1336,14 @@ async function getModel() {
 getModel();
 ```
 
-#### List
+#### List models
 
 ##### Key differences
 
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
 * Instead of calling `getModels` on a `dataset` object, we call the one of the `listModels*` functions using the `BigQueryClient`
 * In the BigQueryClient, there are [three options for every list method](https://github.com/googleapis/gax-nodejs/blob/main/client-libraries.md#auto-pagination). For models, there is `listModels` (least efficient, but supports manual paging), `listModelsAsync` (returns an iterable, recommended over the non-async method) and `listModelsStream` (returns results as a stream)
-* Any of these list methods take in a [request object](https://github.com/googleapis/nodejs-bigquery/blob/bebe6fb1a817542d2359a8abcff0d5756a1941ac/protos/protos.d.ts#L23205-L23218) that must minimally takes in the `projectId` and `datasetId`
+* Any of these list methods take in a [request object](https://github.com/googleapis/nodejs-bigquery/blob/bebe6fb1a817542d2359a8abcff0d5756a1941ac/protos/protos.d.ts#L23205-L23218) that must minimally take in the `projectId` and `datasetId`
 
 ##### Before
 
@@ -1405,7 +1405,7 @@ async function listModels() {
 listModels();
 ```
 
-#### List Streaming
+#### List models streaming
 
 ##### Key differences
 
@@ -1479,7 +1479,7 @@ async function listModels() {
 
 ```
 
-#### Update
+#### Update model
 
 ##### Key differences
 
@@ -1560,98 +1560,289 @@ async function updateModel() {
 <details open>
 <summary>Code snippets and explanations for Jobs CRUDL methods</summary>
 
-<!-- TODO(coleleah) -->
-#### Create
+#### Create job
 
 ##### Key differences
 
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
+* Calling `insertJob` with an [`insertJobRequest`](https://github.com/googleapis/nodejs-bigquery/blob/bebe6fb1a817542d2359a8abcff0d5756a1941ac/protos/protos.d.ts#L6180-L6187) instead of `createQueryJob`
+  * In this request, we need to manually specify the `useLegacySql` value as `false` in order for the underlying BigQuery engine to properly parse the creation query
+* Accessing the underlying `jobClient` that is part of the `BigQueryClient` to call `getQueryResults`
+* `getQueryResults` takes in a [`getQueryResultsRequest`](https://github.com/googleapis/nodejs-bigquery/blob/bebe6fb1a817542d2359a8abcff0d5756a1941ac/protos/protos.d.ts#L6830-L6855)
+* We manually poll `getQueryResults` periodically to await the results of the model creation job
 
 ##### Before
 
 ```javascript
+// Import the Google Cloud client library and create a client
+const {BigQuery} = require('@google-cloud/bigquery');
+const bigquery = new BigQuery();
+
+async function createJob() {
+  // Run a BigQuery query job.
+
+  // For all options, see https://cloud.google.com/bigquery/docs/reference/rest/v2/Job
+  const options = {
+    // Specify a job configuration to set optional job resource properties.
+    configuration: {
+      query: {
+        query: `SELECT country_name
+              FROM \`bigquery-public-data.utility_us.country_code_iso\`
+              LIMIT 10`,
+        useLegacySql: false,
+      },
+      labels: {'example-label': 'example-value'},
+    },
+  };
+
+  // Make API request.
+  const response = await bigquery.createJob(options);
+  const job = response[0];
+
+  // Wait for the query to finish
+  const [rows] = await job.getQueryResults(job);
+
+  // Print the results
+  console.log('Rows:');
+  rows.forEach(row => console.log(row));
+}
 ```
 
 ##### After
 
-TODO link to full sample
+[Full sample](/samples/jobs/createJob.js)
 
 ```javascript
+const {BigQueryClient} = require('@google-cloud/bigquery');
+const {setInterval} = require('node:timers/promises');
+
+const bigquery = new BigQueryClient();
+
+async function createJob() {
+  // Run a BigQuery query job.
+  const projectId = "my_project"
+
+  const query = `SELECT country_name
+          FROM
+            bigquery-public-data.utility_us.country_code_iso
+          LIMIT 10`;
+
+  const request = {
+    projectId: projectId,
+    job: {
+      configuration: {
+        query: {
+          query: query,
+          useLegacySql: {value: false},
+        },
+        labels: {'example-label': 'example-value'},
+      },
+    },
+  };
+
+  // Make API request.
+  const [job] = await bigquery.insertJob(request);
+  const jobReference = job.jobReference;
+  const jobId = jobReference.jobId;
+  const getQueryResultsRequest = {
+    projectId: projectId,
+    jobId: jobId,
+    location: jobReference.location.value,
+  };
+    // poll the job status every 3 seconds until complete
+    // eslint-disable-next-line
+    for await (const t of setInterval(3000)) { // no-unused-vars - this is the syntax for promise based setInterval
+      const [resp] = await bigquery.jobClient.getQueryResults(
+        getQueryResultsRequest,
+      );
+      if (resp.errors.length !== 0) {
+        throw new Error('Something failed in job creation');
+      }
+      if (resp.jobComplete.value) {
+        const rows = resp.rows
+        console.log("Rows:")
+        rows.forEach(row => console.log(JSON.stringify(row)))
+        break;
+      }
+    }
+}
 ```
-<!-- TODO(coleleah) -->
-#### Delete
+
+#### Get job
 
 ##### Key differences
 
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
+* Instead of calling `.get` on a `job` object, we call `getJob` using the `BigQueryClient`
+* Instead of passing the `jobId` to the `job` object, we pass a [`GetJobRequest`](https://github.com/googleapis/nodejs-bigquery/blob/bebe6fb1a817542d2359a8abcff0d5756a1941ac/protos/protos.d.ts#L6071-L6081) to the `getJob` call on the `BigQueryClient`
 
 ##### Before
 
 ```javascript
+// Import the Google Cloud client library
+const {BigQuery} = require('@google-cloud/bigquery');
+const bigquery = new BigQuery();
+
+async function getJob() {
+  // Get job properties.
+
+  /**
+   * TODO(developer): Uncomment the following lines before running the sample.
+   */
+  // const jobId = "existing-job-id";
+
+  // Create a job reference
+  const job = bigquery.job(jobId);
+
+  // Retrieve job
+  const [jobResult] = await job.get();
+
+  console.log(jobResult.metadata.jobReference);
+}
+
 ```
 
 ##### After
 
-TODO link to full sample
+[Full sample](/samples/jobs/getJob.js)
 
 ```javascript
+// Import the Google Cloud client library
+const {BigQueryClient} = require('@google-cloud/bigquery');
+const bigquery = new BigQueryClient();
+
+async function getJob() {
+  // Get job properties.
+
+  const projectId = "my_project";
+  const jobId = "existing-job-id";
+
+  const request = {
+    projectId,
+    jobId,
+    location: 'US'  
+  };
+  const [job] = await bigquery.getJob(request);
+
+  console.log(`Job ${job.id} status: ${job.status.state}`);
+}
+getJob();
 ```
-<!-- TODO(coleleah) -->
-#### Get
+
+#### Cancel job
 
 ##### Key differences
 
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
+* Instead of calling `.cancel` on a `job` object, we call `cancelJob` using the `BigQueryClient`
+* Instead of passing the `jobId` to the `job` object, we pass a [`CancelJobRequest`](https://github.com/googleapis/nodejs-bigquery/blob/bebe6fb1a817542d2359a8abcff0d5756a1941ac/protos/protos.d.ts#L5859-L5869) to the `cancelJob` call on the `BigQueryClient`. It must minimally contain the `projectId` and `jobId`
 
 ##### Before
 
 ```javascript
+// Import the Google Cloud client library
+const {BigQuery} = require('@google-cloud/bigquery');
+const bigquery = new BigQuery();
+
+async function cancelJob() {
+  // Attempts to cancel a job.
+
+  /**
+   * TODO(developer): Uncomment the following lines before running the sample.
+   */
+  // const jobId = "existing-job-id";
+
+  // Create a job reference
+  const job = bigquery.job(jobId);
+
+  // Attempt to cancel job
+  const [apiResult] = await job.cancel();
+
+  console.log(apiResult.job.status);
+}
 ```
 
 ##### After
 
-TODO link to full sample
+[Full sample](/samples/jobs/cancelJob.js)
 
 ```javascript
+ // Import the Google Cloud client library
+const {BigQueryClient} = require('@google-cloud/bigquery');
+const bigqueryClient = new BigQueryClient();
+
+async function cancelJob() {
+  // Attempts to cancel a job.
+  const projectId = "my-project";
+  const jobId = "existing-job-id";
+
+  const request = {
+    projectId,
+    jobId,
+  };
+
+  // Attempt to cancel job
+  const [response] = await bigqueryClient.cancelJob(request);
+
+  console.log(response.job.status);
+}
 ```
-<!-- TODO(coleleah) -->
-#### List
+
+#### List jobs
 
 ##### Key differences
 
-TODO(coleleah) update text
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
-In the BigQueryClient, there are [three options for every list method](https://github.com/googleapis/gax-nodejs/blob/main/client-libraries.md#auto-pagination). For datasets, there is `listDatasets` (least efficient, but supports manual paging), `listDatasetsAsync` (returns an iterable, recommended over the non-async method) and `listDatasetsStream` (returns results as a stream)
-* Any of these list methods take in a [request object](https://github.com/googleapis/nodejs-bigquery/blob/5e17911a35e76677705c6227dd896fb1ffc39b0e/protos/protos.d.ts#L1853-L1868) that must minimally takes in the `projectId`
+* Instead of calling `getJobs`, we call the `listJobsAsync` function using the `BigQueryClient`
+* In the BigQueryClient, there are [three options for every list method](https://github.com/googleapis/gax-nodejs/blob/main/client-libraries.md#auto-pagination). For jobs, there is `listJobs` (least efficient, but supports manual paging), `listJobsAsync` (returns an iterable, recommended over the non-async method) and `listJobsStream` (returns results as a stream)
+* Instead of passing in an options `object`, any of these list methods take in a [request object](https://github.com/googleapis/nodejs-bigquery/blob/bebe6fb1a817542d2359a8abcff0d5756a1941ac/protos/protos.d.ts#L6392-L6420) that must minimally take in the `projectId`
 
 ##### Before
 
 ```javascript
+// Import the Google Cloud client library
+const {BigQuery} = require('@google-cloud/bigquery');
+const bigquery = new BigQuery();
+
+async function listJobs() {
+  // Lists all jobs in current GCP project.
+
+  // List the 10 most recent jobs in reverse chronological order.
+  //  Omit the max_results parameter to list jobs from the past 6 months.
+  const options = {maxResults: 10};
+  const [jobs] = await bigquery.getJobs(options);
+
+  console.log('Jobs:');
+  jobs.forEach(job => console.log(job.id));
+}
 ```
 
 ##### After
 
-TODO link to full sample
+[Full sample](/samples/jobs/listJobs.js)
 
 ```javascript
-```
-<!-- TODO(coleleah) -->
-#### Update
+// Import the Google Cloud client library
+const {BigQueryClient} = require('@google-cloud/bigquery');
+const bigquery = new BigQueryClient();
 
-##### Key differences
-
-* Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
-
-##### Before
-
-```javascript
-```
-
-##### After
-
-TODO link to full sample
-
-```javascript
+async function listJobs() {
+  // Lists all jobs in current GCP project.
+  const projectId = "my-project";
+  const request = {projectId: projectId};
+  // limit results to 10
+  const maxResults = 10;
+  const iterable = bigquery.listJobsAsync(request);
+  console.log('Jobs:');
+  let i = 0;
+  for await (const job of iterable) {
+    if (i >= maxResults) {
+      break;
+    }
+    console.log(job.id);
+    i++;
+  }
+}
 ```
 
 </details>
