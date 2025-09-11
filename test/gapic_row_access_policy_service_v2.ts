@@ -20,12 +20,12 @@ import * as protos from '../protos/protos';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import {SinonStub} from 'sinon';
-import {describe, it, beforeEach, afterEach} from 'mocha';
+import {describe, it} from 'mocha';
 import * as rowaccesspolicyserviceModule from '../src';
 
 import {PassThrough} from 'stream';
 
-import {GoogleAuth, protobuf} from 'google-gax';
+import {protobuf} from 'google-gax';
 
 // Dynamically loaded proto JSON is needed to get the type information
 // to fill in default values for request objects
@@ -128,19 +128,6 @@ function stubAsyncIterationCall<ResponseType>(
 }
 
 describe('v2.RowAccessPolicyServiceClient', () => {
-  let googleAuth: GoogleAuth;
-  beforeEach(() => {
-    googleAuth = {
-      getClient: sinon.stub().resolves({
-        getRequestHeaders: sinon
-          .stub()
-          .resolves({Authorization: 'Bearer SOME_TOKEN'}),
-      }),
-    } as unknown as GoogleAuth;
-  });
-  afterEach(() => {
-    sinon.restore();
-  });
   describe('Common methods', () => {
     it('has apiEndpoint', () => {
       const client =
@@ -264,7 +251,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
     it('has initialize method and supports deferred initialization', async () => {
       const client =
         new rowaccesspolicyserviceModule.v2.RowAccessPolicyServiceClient({
-          auth: googleAuth,
+          credentials: {client_email: 'bogus', private_key: 'bogus'},
           projectId: 'bogus',
         });
       assert.strictEqual(client.rowAccessPolicyServiceStub, undefined);
@@ -275,7 +262,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
     it('has close method for the initialized client', done => {
       const client =
         new rowaccesspolicyserviceModule.v2.RowAccessPolicyServiceClient({
-          auth: googleAuth,
+          credentials: {client_email: 'bogus', private_key: 'bogus'},
           projectId: 'bogus',
         });
       client.initialize().catch(err => {
@@ -295,7 +282,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
     it('has close method for the non-initialized client', done => {
       const client =
         new rowaccesspolicyserviceModule.v2.RowAccessPolicyServiceClient({
-          auth: googleAuth,
+          credentials: {client_email: 'bogus', private_key: 'bogus'},
           projectId: 'bogus',
         });
       assert.strictEqual(client.rowAccessPolicyServiceStub, undefined);
@@ -313,7 +300,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
       const fakeProjectId = 'fake-project-id';
       const client =
         new rowaccesspolicyserviceModule.v2.RowAccessPolicyServiceClient({
-          auth: googleAuth,
+          credentials: {client_email: 'bogus', private_key: 'bogus'},
           projectId: 'bogus',
         });
       client.auth.getProjectId = sinon.stub().resolves(fakeProjectId);
@@ -326,7 +313,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
       const fakeProjectId = 'fake-project-id';
       const client =
         new rowaccesspolicyserviceModule.v2.RowAccessPolicyServiceClient({
-          auth: googleAuth,
+          credentials: {client_email: 'bogus', private_key: 'bogus'},
           projectId: 'bogus',
         });
       client.auth.getProjectId = sinon
@@ -350,7 +337,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
     it('invokes getRowAccessPolicy without error', async () => {
       const client =
         new rowaccesspolicyserviceModule.v2.RowAccessPolicyServiceClient({
-          auth: googleAuth,
+          credentials: {client_email: 'bogus', private_key: 'bogus'},
           projectId: 'bogus',
         });
       await client.initialize();
@@ -398,7 +385,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
     it('invokes getRowAccessPolicy without error using callback', async () => {
       const client =
         new rowaccesspolicyserviceModule.v2.RowAccessPolicyServiceClient({
-          auth: googleAuth,
+          credentials: {client_email: 'bogus', private_key: 'bogus'},
           projectId: 'bogus',
         });
       await client.initialize();
@@ -461,7 +448,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
     it('invokes getRowAccessPolicy with error', async () => {
       const client =
         new rowaccesspolicyserviceModule.v2.RowAccessPolicyServiceClient({
-          auth: googleAuth,
+          credentials: {client_email: 'bogus', private_key: 'bogus'},
           projectId: 'bogus',
         });
       await client.initialize();
@@ -508,7 +495,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
     it('invokes getRowAccessPolicy with closed client', async () => {
       const client =
         new rowaccesspolicyserviceModule.v2.RowAccessPolicyServiceClient({
-          auth: googleAuth,
+          credentials: {client_email: 'bogus', private_key: 'bogus'},
           projectId: 'bogus',
         });
       await client.initialize();
@@ -547,7 +534,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
     it('invokes createRowAccessPolicy without error', async () => {
       const client =
         new rowaccesspolicyserviceModule.v2.RowAccessPolicyServiceClient({
-          auth: googleAuth,
+          credentials: {client_email: 'bogus', private_key: 'bogus'},
           projectId: 'bogus',
         });
       await client.initialize();
@@ -590,7 +577,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
     it('invokes createRowAccessPolicy without error using callback', async () => {
       const client =
         new rowaccesspolicyserviceModule.v2.RowAccessPolicyServiceClient({
-          auth: googleAuth,
+          credentials: {client_email: 'bogus', private_key: 'bogus'},
           projectId: 'bogus',
         });
       await client.initialize();
@@ -648,7 +635,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
     it('invokes createRowAccessPolicy with error', async () => {
       const client =
         new rowaccesspolicyserviceModule.v2.RowAccessPolicyServiceClient({
-          auth: googleAuth,
+          credentials: {client_email: 'bogus', private_key: 'bogus'},
           projectId: 'bogus',
         });
       await client.initialize();
@@ -693,7 +680,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
     it('invokes createRowAccessPolicy with closed client', async () => {
       const client =
         new rowaccesspolicyserviceModule.v2.RowAccessPolicyServiceClient({
-          auth: googleAuth,
+          credentials: {client_email: 'bogus', private_key: 'bogus'},
           projectId: 'bogus',
         });
       await client.initialize();
@@ -730,7 +717,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
     it('invokes updateRowAccessPolicy without error', async () => {
       const client =
         new rowaccesspolicyserviceModule.v2.RowAccessPolicyServiceClient({
-          auth: googleAuth,
+          credentials: {client_email: 'bogus', private_key: 'bogus'},
           projectId: 'bogus',
         });
       await client.initialize();
@@ -778,7 +765,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
     it('invokes updateRowAccessPolicy without error using callback', async () => {
       const client =
         new rowaccesspolicyserviceModule.v2.RowAccessPolicyServiceClient({
-          auth: googleAuth,
+          credentials: {client_email: 'bogus', private_key: 'bogus'},
           projectId: 'bogus',
         });
       await client.initialize();
@@ -841,7 +828,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
     it('invokes updateRowAccessPolicy with error', async () => {
       const client =
         new rowaccesspolicyserviceModule.v2.RowAccessPolicyServiceClient({
-          auth: googleAuth,
+          credentials: {client_email: 'bogus', private_key: 'bogus'},
           projectId: 'bogus',
         });
       await client.initialize();
@@ -891,7 +878,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
     it('invokes updateRowAccessPolicy with closed client', async () => {
       const client =
         new rowaccesspolicyserviceModule.v2.RowAccessPolicyServiceClient({
-          auth: googleAuth,
+          credentials: {client_email: 'bogus', private_key: 'bogus'},
           projectId: 'bogus',
         });
       await client.initialize();
@@ -933,7 +920,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
     it('invokes deleteRowAccessPolicy without error', async () => {
       const client =
         new rowaccesspolicyserviceModule.v2.RowAccessPolicyServiceClient({
-          auth: googleAuth,
+          credentials: {client_email: 'bogus', private_key: 'bogus'},
           projectId: 'bogus',
         });
       await client.initialize();
@@ -981,7 +968,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
     it('invokes deleteRowAccessPolicy without error using callback', async () => {
       const client =
         new rowaccesspolicyserviceModule.v2.RowAccessPolicyServiceClient({
-          auth: googleAuth,
+          credentials: {client_email: 'bogus', private_key: 'bogus'},
           projectId: 'bogus',
         });
       await client.initialize();
@@ -1044,7 +1031,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
     it('invokes deleteRowAccessPolicy with error', async () => {
       const client =
         new rowaccesspolicyserviceModule.v2.RowAccessPolicyServiceClient({
-          auth: googleAuth,
+          credentials: {client_email: 'bogus', private_key: 'bogus'},
           projectId: 'bogus',
         });
       await client.initialize();
@@ -1094,7 +1081,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
     it('invokes deleteRowAccessPolicy with closed client', async () => {
       const client =
         new rowaccesspolicyserviceModule.v2.RowAccessPolicyServiceClient({
-          auth: googleAuth,
+          credentials: {client_email: 'bogus', private_key: 'bogus'},
           projectId: 'bogus',
         });
       await client.initialize();
@@ -1136,7 +1123,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
     it('invokes batchDeleteRowAccessPolicies without error', async () => {
       const client =
         new rowaccesspolicyserviceModule.v2.RowAccessPolicyServiceClient({
-          auth: googleAuth,
+          credentials: {client_email: 'bogus', private_key: 'bogus'},
           projectId: 'bogus',
         });
       await client.initialize();
@@ -1179,7 +1166,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
     it('invokes batchDeleteRowAccessPolicies without error using callback', async () => {
       const client =
         new rowaccesspolicyserviceModule.v2.RowAccessPolicyServiceClient({
-          auth: googleAuth,
+          credentials: {client_email: 'bogus', private_key: 'bogus'},
           projectId: 'bogus',
         });
       await client.initialize();
@@ -1237,7 +1224,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
     it('invokes batchDeleteRowAccessPolicies with error', async () => {
       const client =
         new rowaccesspolicyserviceModule.v2.RowAccessPolicyServiceClient({
-          auth: googleAuth,
+          credentials: {client_email: 'bogus', private_key: 'bogus'},
           projectId: 'bogus',
         });
       await client.initialize();
@@ -1282,7 +1269,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
     it('invokes batchDeleteRowAccessPolicies with closed client', async () => {
       const client =
         new rowaccesspolicyserviceModule.v2.RowAccessPolicyServiceClient({
-          auth: googleAuth,
+          credentials: {client_email: 'bogus', private_key: 'bogus'},
           projectId: 'bogus',
         });
       await client.initialize();
@@ -1624,7 +1611,7 @@ describe('v2.RowAccessPolicyServiceClient', () => {
     it('uses async iteration with listRowAccessPolicies without error', async () => {
       const client =
         new rowaccesspolicyserviceModule.v2.RowAccessPolicyServiceClient({
-          auth: googleAuth,
+          credentials: {client_email: 'bogus', private_key: 'bogus'},
           projectId: 'bogus',
         });
       await client.initialize();

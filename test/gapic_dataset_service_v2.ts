@@ -20,12 +20,12 @@ import * as protos from '../protos/protos';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import {SinonStub} from 'sinon';
-import {describe, it, beforeEach, afterEach} from 'mocha';
+import {describe, it} from 'mocha';
 import * as datasetserviceModule from '../src';
 
 import {PassThrough} from 'stream';
 
-import {GoogleAuth, protobuf} from 'google-gax';
+import {protobuf} from 'google-gax';
 
 // Dynamically loaded proto JSON is needed to get the type information
 // to fill in default values for request objects
@@ -128,19 +128,6 @@ function stubAsyncIterationCall<ResponseType>(
 }
 
 describe('v2.DatasetServiceClient', () => {
-  let googleAuth: GoogleAuth;
-  beforeEach(() => {
-    googleAuth = {
-      getClient: sinon.stub().resolves({
-        getRequestHeaders: sinon
-          .stub()
-          .resolves({Authorization: 'Bearer SOME_TOKEN'}),
-      }),
-    } as unknown as GoogleAuth;
-  });
-  afterEach(() => {
-    sinon.restore();
-  });
   describe('Common methods', () => {
     it('has apiEndpoint', () => {
       const client = new datasetserviceModule.v2.DatasetServiceClient();
@@ -252,7 +239,7 @@ describe('v2.DatasetServiceClient', () => {
 
     it('has initialize method and supports deferred initialization', async () => {
       const client = new datasetserviceModule.v2.DatasetServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       assert.strictEqual(client.datasetServiceStub, undefined);
@@ -262,7 +249,7 @@ describe('v2.DatasetServiceClient', () => {
 
     it('has close method for the initialized client', done => {
       const client = new datasetserviceModule.v2.DatasetServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       client.initialize().catch(err => {
@@ -281,7 +268,7 @@ describe('v2.DatasetServiceClient', () => {
 
     it('has close method for the non-initialized client', done => {
       const client = new datasetserviceModule.v2.DatasetServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       assert.strictEqual(client.datasetServiceStub, undefined);
@@ -298,7 +285,7 @@ describe('v2.DatasetServiceClient', () => {
     it('has getProjectId method', async () => {
       const fakeProjectId = 'fake-project-id';
       const client = new datasetserviceModule.v2.DatasetServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       client.auth.getProjectId = sinon.stub().resolves(fakeProjectId);
@@ -310,7 +297,7 @@ describe('v2.DatasetServiceClient', () => {
     it('has getProjectId method with callback', async () => {
       const fakeProjectId = 'fake-project-id';
       const client = new datasetserviceModule.v2.DatasetServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       client.auth.getProjectId = sinon
@@ -333,7 +320,7 @@ describe('v2.DatasetServiceClient', () => {
   describe('getDataset', () => {
     it('invokes getDataset without error', async () => {
       const client = new datasetserviceModule.v2.DatasetServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -369,7 +356,7 @@ describe('v2.DatasetServiceClient', () => {
 
     it('invokes getDataset without error using callback', async () => {
       const client = new datasetserviceModule.v2.DatasetServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -421,7 +408,7 @@ describe('v2.DatasetServiceClient', () => {
 
     it('invokes getDataset with error', async () => {
       const client = new datasetserviceModule.v2.DatasetServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -457,7 +444,7 @@ describe('v2.DatasetServiceClient', () => {
 
     it('invokes getDataset with closed client', async () => {
       const client = new datasetserviceModule.v2.DatasetServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -485,7 +472,7 @@ describe('v2.DatasetServiceClient', () => {
   describe('insertDataset', () => {
     it('invokes insertDataset without error', async () => {
       const client = new datasetserviceModule.v2.DatasetServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -516,7 +503,7 @@ describe('v2.DatasetServiceClient', () => {
 
     it('invokes insertDataset without error using callback', async () => {
       const client = new datasetserviceModule.v2.DatasetServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -563,7 +550,7 @@ describe('v2.DatasetServiceClient', () => {
 
     it('invokes insertDataset with error', async () => {
       const client = new datasetserviceModule.v2.DatasetServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -594,7 +581,7 @@ describe('v2.DatasetServiceClient', () => {
 
     it('invokes insertDataset with closed client', async () => {
       const client = new datasetserviceModule.v2.DatasetServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -617,7 +604,7 @@ describe('v2.DatasetServiceClient', () => {
   describe('patchDataset', () => {
     it('invokes patchDataset without error', async () => {
       const client = new datasetserviceModule.v2.DatasetServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -653,7 +640,7 @@ describe('v2.DatasetServiceClient', () => {
 
     it('invokes patchDataset without error using callback', async () => {
       const client = new datasetserviceModule.v2.DatasetServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -705,7 +692,7 @@ describe('v2.DatasetServiceClient', () => {
 
     it('invokes patchDataset with error', async () => {
       const client = new datasetserviceModule.v2.DatasetServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -741,7 +728,7 @@ describe('v2.DatasetServiceClient', () => {
 
     it('invokes patchDataset with closed client', async () => {
       const client = new datasetserviceModule.v2.DatasetServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -769,7 +756,7 @@ describe('v2.DatasetServiceClient', () => {
   describe('updateDataset', () => {
     it('invokes updateDataset without error', async () => {
       const client = new datasetserviceModule.v2.DatasetServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -805,7 +792,7 @@ describe('v2.DatasetServiceClient', () => {
 
     it('invokes updateDataset without error using callback', async () => {
       const client = new datasetserviceModule.v2.DatasetServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -857,7 +844,7 @@ describe('v2.DatasetServiceClient', () => {
 
     it('invokes updateDataset with error', async () => {
       const client = new datasetserviceModule.v2.DatasetServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -893,7 +880,7 @@ describe('v2.DatasetServiceClient', () => {
 
     it('invokes updateDataset with closed client', async () => {
       const client = new datasetserviceModule.v2.DatasetServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -921,7 +908,7 @@ describe('v2.DatasetServiceClient', () => {
   describe('deleteDataset', () => {
     it('invokes deleteDataset without error', async () => {
       const client = new datasetserviceModule.v2.DatasetServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -957,7 +944,7 @@ describe('v2.DatasetServiceClient', () => {
 
     it('invokes deleteDataset without error using callback', async () => {
       const client = new datasetserviceModule.v2.DatasetServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -1009,7 +996,7 @@ describe('v2.DatasetServiceClient', () => {
 
     it('invokes deleteDataset with error', async () => {
       const client = new datasetserviceModule.v2.DatasetServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -1045,7 +1032,7 @@ describe('v2.DatasetServiceClient', () => {
 
     it('invokes deleteDataset with closed client', async () => {
       const client = new datasetserviceModule.v2.DatasetServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -1073,7 +1060,7 @@ describe('v2.DatasetServiceClient', () => {
   describe('undeleteDataset', () => {
     it('invokes undeleteDataset without error', async () => {
       const client = new datasetserviceModule.v2.DatasetServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -1109,7 +1096,7 @@ describe('v2.DatasetServiceClient', () => {
 
     it('invokes undeleteDataset without error using callback', async () => {
       const client = new datasetserviceModule.v2.DatasetServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -1161,7 +1148,7 @@ describe('v2.DatasetServiceClient', () => {
 
     it('invokes undeleteDataset with error', async () => {
       const client = new datasetserviceModule.v2.DatasetServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -1197,7 +1184,7 @@ describe('v2.DatasetServiceClient', () => {
 
     it('invokes undeleteDataset with closed client', async () => {
       const client = new datasetserviceModule.v2.DatasetServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
@@ -1465,7 +1452,7 @@ describe('v2.DatasetServiceClient', () => {
 
     it('uses async iteration with listDatasets without error', async () => {
       const client = new datasetserviceModule.v2.DatasetServiceClient({
-        auth: googleAuth,
+        credentials: {client_email: 'bogus', private_key: 'bogus'},
         projectId: 'bogus',
       });
       await client.initialize();
