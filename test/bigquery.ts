@@ -474,6 +474,18 @@ describe('BigQuery', () => {
       assert.deepEqual(schemaFields, [schema.fields![1]]);
       assert.deepEqual(nextFields, []);
     });
+
+    it('should filter fields having spaces', () => {
+      const selectedFields = [' age'];
+      const schemaFields = BigQuery.filterSchema_(
+        schema.fields,
+        selectedFields,
+      );
+      const nextFields = BigQuery.nextFields_(selectedFields);
+
+      assert.deepEqual(schemaFields, [schema.fields![1]]);
+      assert.deepEqual(nextFields, []);
+    });
   });
 
   describe('mergeSchemaWithRows_', () => {

@@ -989,6 +989,23 @@ describe('BigQuery', () => {
         },
         age: 10,
       });
+
+      [rows] = await table.getRows({
+        selectedFields: 'data.nested.object.a, age',
+      });
+      console.log('rows filter with space', rows);
+      assert.deepEqual(rows[0], {
+        data: {
+          nested: [
+            {
+              object: {
+                a: '1',
+              },
+            },
+          ],
+        },
+        age: 10,
+      });
     });
 
     it('should get the rows in a table via stream', done => {

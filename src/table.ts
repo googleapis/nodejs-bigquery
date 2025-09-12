@@ -1853,7 +1853,7 @@ class Table extends ServiceObject {
     const parseJSON = options.parseJSON ? options.parseJSON : false;
     delete options.parseJSON;
     const selectedFields = options.selectedFields
-      ? options.selectedFields.split(',')
+      ? options.selectedFields.split(',').map(c => c.trim())
       : [];
     const onComplete = (
       err: Error | null,

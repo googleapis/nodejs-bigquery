@@ -658,7 +658,8 @@ export class BigQuery extends Service {
     const currentFields = selected
       .map(c => c.split('.'))
       .map(c => c.shift())
-      .filter(c => c !== undefined);
+      .filter(c => c !== undefined)
+      .map(c => c.trim());
 
     //filter schema fields based on selected fields.
     return tableFields.filter(
