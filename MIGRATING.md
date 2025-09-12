@@ -1,6 +1,6 @@
 # Migrating to BigQuery 9.x
 
-This version of BigQuery is currently in preview. Improvements are planned for subsequent releases, in particular with regard to query user experience. 
+This version of BigQuery is currently in preview. Improvements are planned for subsequent releases, in particular with regard to query user experience.
 
 <!-- TODO(coleleah) -->
 Blurb about holistic changes related to code generation, ensuring faster updates, and availability of gRPC
@@ -17,6 +17,8 @@ This code is published to `npm` with the version naming convention `9.0.0-alpha.
 <!-- TODO(coleleah) -->
 ## Instantiating preview SDK clients
 
+Previously, all BigQuery operations were instantiated using a client initialized with `BigQuery()`. Now, there exists a central BigQueryClient class, `BigQueryClient`, that is comprised of multiple "subclient" classes that perform operations on different BigQuery services (Datasets, Tables, etc.) and enables you to acccess the majority of operations of the subclient classes. These client classes have the same attributes and take in the same options ([`ClientOptions`](https://github.com/googleapis/gax-nodejs/blob/3b341da012d96271dd588f832281bfbc056641ef/gax/src/clientInterface.ts#L31-L45)) that client classes found in other Google Cloud libraries do. By default, the `BigQueryClient` class initializes these subclients with identical default settings, but users are free to pass in custom settings that can be shared across subclients, or to initialize and access the subclients on their own. Source code for the underlying subclients is found in the [`src/v2`](/src/v2) directory.
+
 <!-- TODO(coleleah) - note about various subclients -->
 ### Instantiating a client with default settings
 
@@ -30,7 +32,7 @@ const bigquery = new BigQuery();
 #### After
 
 ```javascript
-const {BigQuery} = require('@google-cloud/bigquery');
+const {BigQueryClient} = require('@google-cloud/bigquery');
 const bigquery = new BigQueryClient();
 ```
 
@@ -61,29 +63,28 @@ The import stays the same, but these types are defined in the [protos.d.ts](/pro
 ```typescript
 import type * as BigQueryType from '@google-cloud/bigquery';
 ```
-<!-- TODO(coleleah) -->
+
 ## Known issues
 
 This library is in preview and there are a few known issues. If you come across other problems, please open a "Bug Report" issue in this repository and fill out all parts of the template! Thank you for any feedback.
 
 1. When using REST transport, error messages are not surfacing from the underlying surface. Proper HTTP error codes *are* surfaced, but the error message will only read, "Request failed with status code: xxx." **Workaround**: Use gRPC. Verbose error messages with their error codes are properly surfaced when using gRPC as the transport. gRPC is enabled by default in this version of the library.
 1. The `patchModel` RPC will fail with an `INVALID_ARGUMENT: No fields found to patch/update.` error when run using gRPC transport. **Workaround**: use REST transport for this RPC.
+1. The `cancelJob` RPC will fail with a 400 code when run using REST transport. **Workaround**: Use gRPC. Verbose error messages with their error codes are properly surfaced when using gRPC as the transport. gRPC is enabled by default in this version of the library.
 1. A warning about autopagination is being thrown when using all `*Async` list methods (the ones whose names end in "Async" and return an iterable, not asynchronous calls to the `*Stream` or regular list calls.) This warning is non-blocking and there is currently no workaround.
 
-TODO(coleleah) - add the bit about cancelJob?
-
-
-<!-- TODO(coleleah) -->
 ## Migration using Gemini
-TODO(coleleah) test this prompt
 
 We highly encourage you to utilize the [Gemini CLI](https://github.com/google-gemini/gemini-cli) to migrate your code. We recommend to minimally pass this migration guide and the `samples` directory as context, though passing the entire repo as context will likely be helpful to Gemini as well. Additionally, we recommend strictly specifying the files that the Gemini CLI should modify to ensure that it does not modify code you do not want it to.
 
-An example prompt to modify a file in your repo called `mybigquery.js` might be:
+An example prompt to modify a file in your repo called `mybigquery.js` might be and validate it using your predefined test session would be:
 
 ```text
-Following the user guide found in the NodeJS BigQuery repository on the preview-9.x branch: https://github.com/googleapis/nodejs-bigquery/blob/preview-9.x/MIGRATING.md, using the samples found in its samples directory: https://github.com/googleapis/nodejs-bigquery/tree/preview-9.x/samples and the code found in src https://github.com/googleapis/nodejs-bigquery/tree/preview-9.x/src, migrate the code found in @mybigquery.js to use the 9.0.0-alpha.x version of @google-cloud-bigquery - you will only need to touch this file.
+Following the user guide found in the NodeJS BigQuery repository on the preview-9.x branch: https://github.com/googleapis/nodejs-bigquery/blob/preview-9.x/MIGRATING.md, using the samples found in its samples directory: https://github.com/googleapis/nodejs-bigquery/tree/preview-9.x/samples and the code found in src https://github.com/googleapis/nodejs-bigquery/tree/preview-9.x/src, migrate the code found in @mybigquery.js to use the 9.0.0-alpha.x version of @google-cloud-bigquery - you will only need to touch this file. Use `npm run test` to verify proper migration. 
 ```
+
+If you are migrating Typescript code, we especially recommend some kind of verification step (for example, having Gemini run `npm run compile`) so that Gemini can iterate and properly migrate types.
+
 
 ## Code Samples
 
