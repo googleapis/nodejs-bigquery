@@ -908,6 +908,89 @@ describe('BigQuery', () => {
       assert.equal(rows.length, 0);
     });
 
+    it('should get rows from a query via table.getRows', async () => {
+      const query = `
+        SELECT STRUCT([STRUCT(STRUCT('1' as a, '2' as b) as object)] as nested) as data, 10 as age
+        UNION ALL
+        SELECT STRUCT([STRUCT(STRUCT('3' as a, '4' as b) as object)] as nested) as data, 20 as age
+        UNION ALL
+        SELECT STRUCT([STRUCT(STRUCT('5' as a, '6' as b) as object)] as nested) as data, 30 as age
+        UNION ALL
+        SELECT STRUCT([STRUCT(STRUCT('7' as a, '8' as b) as object)] as nested) as data, 40 as age
+      `;
+      const [_a, _b, res] = await bigquery.query(query);
+      const jobRef = res?.jobReference;
+      console.log('jobRef', jobRef);
+      const job = bigquery.job(jobRef!.jobId!, {
+        projectId: jobRef?.projectId,
+        location: jobRef?.location,
+      });
+      const [jobMd] = await job.getMetadata();
+      const tableRef = jobMd.configuration.query.destinationTable;
+      console.log('tableRef', tableRef);
+      const table = bigquery
+        .dataset(tableRef!.datasetId!)
+        .table(tableRef!.tableId!);
+
+      let [rows] = await table.getRows({
+        selectedFields: 'data.nested.object.a,data.nested.object.b',
+      });
+      console.log('rows', rows);
+      assert.deepEqual(rows[0], {
+        data: {
+          nested: [
+            {
+              object: {
+                a: '1',
+                b: '2',
+              },
+            },
+          ],
+        },
+      });
+
+      [rows] = await table.getRows({
+        selectedFields: 'data.nested.object.b,age',
+      });
+      console.log('rows 2', rows);
+      assert.deepEqual(rows[0], {
+        data: {
+          nested: [
+            {
+              object: {
+                b: '2',
+              },
+            },
+          ],
+        },
+        age: 10,
+      });
+
+      [rows] = await table.getRows({
+        selectedFields: 'age',
+      });
+      console.log('rows 3', rows);
+      assert.deepEqual(rows, [{age: 10}, {age: 20}, {age: 30}, {age: 40}]);
+
+      [rows] = await table.getRows({
+        selectedFields: 'data.nested.object.a,data.nested.object.b,age',
+      });
+      console.log('rows 4', rows);
+      assert.deepEqual(rows[0], {
+        data: {
+          nested: [
+            {
+              object: {
+                a: '1',
+                b: '2',
+              },
+            },
+          ],
+        },
+        age: 10,
+      });
+    });
+
     it('should get the rows in a table via stream', done => {
       table
         .createReadStream()
