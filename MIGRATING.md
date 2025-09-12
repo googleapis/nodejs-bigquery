@@ -139,7 +139,8 @@ We highly encourage you to utilize the [Gemini CLI](https://github.com/google-ge
 An example prompt to modify a file in your repo called `mybigquery.js` might be and validate it using your predefined test session would be:
 
 ```text
-Following the user guide found in the NodeJS BigQuery repository on the preview-9.x branch: https://github.com/googleapis/nodejs-bigquery/blob/preview-9.x/MIGRATING.md,
+Following the user guide found in the NodeJS BigQuery repository
+on the preview-9.x branch: https://github.com/googleapis/nodejs-bigquery/blob/preview-9.x/MIGRATING.md,
 using the samples found in its samples directory: https://github.com/googleapis/nodejs-bigquery/tree/preview-9.x/samples
 and the code found in src https://github.com/googleapis/nodejs-bigquery/tree/preview-9.x/src,
 migrate the code found in @mybigquery.js to use the 9.0.0-alpha.x version of @google-cloud-bigquery -
