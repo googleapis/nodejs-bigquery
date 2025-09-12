@@ -602,24 +602,8 @@ export class BigQuery extends Service {
     let schemaFields: TableField[] = extend(true, [], schema?.fields);
     let selectedFields: string[] = extend(true, [], options.selectedFields);
     if (options.selectedFields && options.selectedFields!.length > 0) {
-      const selectedFieldsArray = options.selectedFields!.map(c => {
-        return c.split('.');
-      });
-
-      const currentFields = selectedFieldsArray
-        .map(c => c.shift())
-        .filter(c => c !== undefined);
-
-      //filter schema fields based on selected fields.
-      schemaFields = schemaFields.filter(
-        field =>
-          currentFields
-            .map(c => c!.toLowerCase())
-            .indexOf(field.name!.toLowerCase()) >= 0,
-      );
-      selectedFields = selectedFieldsArray
-        .filter(c => c.length > 0)
-        .map(c => c.join('.'));
+      schemaFields = this.filterSchema_(schemaFields, selectedFields);
+      selectedFields = this.nextFields_(selectedFields);
     }
 
     return toArray(rows).map(mergeSchema).map(flattenRows);
@@ -656,6 +640,47 @@ export class BigQuery extends Service {
         return acc;
       }, {});
     }
+  }
+
+  /**
+   * Filter table schema fields based on selectedFields.
+   *
+   * @private
+   *
+   * @param {TableField[]} tableFields
+   * @param {string[]} selected
+   * @returns Subset of fields that match selectedFields param.
+   */
+  static filterSchema_(
+    tableFields: TableField[],
+    selected: string[],
+  ): TableField[] {
+    const currentFields = selected
+      .map(c => c.split('.'))
+      .map(c => c.shift())
+      .filter(c => c !== undefined);
+
+    //filter schema fields based on selected fields.
+    return tableFields.filter(
+      field =>
+        currentFields
+          .map(c => c!.toLowerCase())
+          .indexOf(field.name!.toLowerCase()) >= 0,
+    );
+  }
+
+  /**
+   * Move selected fields one level for filtering schema.
+   *
+   * @private
+   *
+   * @param {string[]} fields
+   */
+  static nextFields_(fields: string[]): string[] {
+    const splitFields = fields.map(c => c.split('.'));
+    splitFields.forEach(c => c.shift());
+
+    return splitFields.filter(c => c.length > 0).map(c => c.join('.'));
   }
 
   /**

@@ -42,6 +42,7 @@ import {
   TableField,
   Query,
   QueryResultsOptions,
+  TableSchema,
 } from '../src';
 import {SinonStub} from 'sinon';
 import {PreciseDate} from '@google-cloud/precise-date';
@@ -425,6 +426,53 @@ describe('BigQuery', () => {
         assert.deepStrictEqual(requestInterceptor(reqOpts), expectedReqOpts);
         assert.notDeepStrictEqual(reqOpts, expectedReqOpts);
       });
+    });
+  });
+
+  describe('filterSchema_ and nextFields_', () => {
+    const schema: TableSchema = {
+      fields: [
+        {
+          name: 'data',
+          type: 'RECORD',
+          mode: 'NULLABLE',
+          fields: [
+            {
+              name: 'nested',
+              type: 'RECORD',
+              mode: 'REPEATED',
+              fields: [
+                {
+                  name: 'object',
+                  type: 'RECORD',
+                  mode: 'NULLABLE',
+                  fields: [
+                    {name: 'a', type: 'STRING', mode: 'NULLABLE'},
+                    {name: 'b', type: 'STRING', mode: 'NULLABLE'},
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        {name: 'age', type: 'INTEGER', mode: 'NULLABLE'},
+      ],
+    };
+
+    it('should filter nested fields', () => {
+      let selectedFields = ['data.nested.object.b', 'age'];
+      let schemaFields = BigQuery.filterSchema_(schema.fields, selectedFields);
+      let nextFields = BigQuery.nextFields_(selectedFields);
+
+      assert.deepEqual(schemaFields, schema.fields);
+      assert.deepEqual(nextFields, ['nested.object.b']);
+
+      selectedFields = ['age'];
+      schemaFields = BigQuery.filterSchema_(schema.fields, selectedFields);
+      nextFields = BigQuery.nextFields_(selectedFields);
+
+      assert.deepEqual(schemaFields, [schema.fields![1]]);
+      assert.deepEqual(nextFields, []);
     });
   });
 
