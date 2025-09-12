@@ -15,11 +15,11 @@
 import {protos} from '../';
 
 /**
- * QueryFromSQL creates a query configuration from a SQL string.
+ * fromSQL creates a query configuration from a SQL string.
  * @param {string} sql The SQL query.
  * @returns {protos.google.cloud.bigquery.v2.IPostQueryRequest}
  */
-export function queryFromSQL(
+export function fromSQL(
   projectId: string,
   sql: string,
 ): protos.google.cloud.bigquery.v2.IPostQueryRequest {

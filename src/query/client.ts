@@ -15,11 +15,10 @@
 import {
   BigQueryClient,
   BigQueryClientOptions,
-  SubClientOptions,
 } from '../bigquery';
 import {QueryJob, CallOptions} from './job';
 import {protos} from '../';
-import {queryFromSQL as builderQueryFromSQL} from './builder';
+import {fromSQL as builderFromSQL} from './builder';
 
 /**
  * QueryClient is a client for running queries in BigQuery.
@@ -34,9 +33,8 @@ export class QueryClient {
    */
   constructor(
     options?: BigQueryClientOptions,
-    subClientOptions?: SubClientOptions,
   ) {
-    this.client = new BigQueryClient(options, subClientOptions);
+    this.client = new BigQueryClient(options);
     this.projectId = '';
     this.billingProjectId = '';
     void this.initialize();
@@ -80,12 +78,12 @@ export class QueryClient {
   }
 
   /**
-   * QueryFromSQL creates a query configuration from a SQL string.
+   * fromSQL creates a query configuration from a SQL string.
    * @param {string} sql The SQL query.
    * @returns {protos.google.cloud.bigquery.v2.IPostQueryRequest}
    */
-  queryFromSQL(sql: string): protos.google.cloud.bigquery.v2.IPostQueryRequest {
-    const req = builderQueryFromSQL(this.projectId, sql);
+  fromSQL(sql: string): protos.google.cloud.bigquery.v2.IPostQueryRequest {
+    const req = builderFromSQL(this.projectId, sql);
     return req;
   }
 

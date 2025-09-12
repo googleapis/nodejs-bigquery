@@ -37,7 +37,7 @@ describeWithBothTransports('Run Query', client => {
   });
 
   it('should run a stateless query', async () => {
-    const req = client.queryFromSQL(
+    const req = client.fromSQL(
       'SELECT CURRENT_TIMESTAMP() as foo, SESSION_USER() as bar',
     );
     req.queryRequest!.jobCreationMode =
@@ -55,7 +55,7 @@ describeWithBothTransports('Run Query', client => {
   });
 
   it('should stop waiting for query to complete', async () => {
-    const req = client.queryFromSQL(
+    const req = client.fromSQL(
       'SELECT num FROM UNNEST(GENERATE_ARRAY(1,1000000)) as num',
     );
     req.queryRequest!.useQueryCache = {value: false};
@@ -78,7 +78,7 @@ describeWithBothTransports('Run Query', client => {
   }).timeout(5000);
 
   it('should read a query job without cache', async () => {
-    const req = client.queryFromSQL(
+    const req = client.fromSQL(
       'SELECT CURRENT_TIMESTAMP() as foo, SESSION_USER() as bar',
     );
     req.queryRequest!.jobCreationMode =

@@ -19,22 +19,14 @@ import { QueryClient } from '../../src/query';
 export const describeWithBothTransports = (title: string, fn: (client: QueryClient) => void) => {
   describe(title, () => {    
     describe("REST", () => {        
-        const client = new query.QueryClient({}, {
-            opts: {
-                fallback: true,
-            }
-        });
+        const client = new query.QueryClient({ fallback: true });
         before(async () => {
             await client.initialize();
         });
         fn(client);
     });
     describe("GRPC", () => {
-        const client = new query.QueryClient({}, {
-            opts: {
-                fallback: false,
-            }
-        });
+        const client = new query.QueryClient({ fallback: false });
         before(async () => {
             await client.initialize();
         });

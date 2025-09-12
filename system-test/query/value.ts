@@ -22,7 +22,7 @@ describeWithBothTransports('Read Query Values', client => {
   describe('types', () => {
     for (const tc of queryParameterTestCases()) {
       it(tc.name, async () => {
-        const req = client.queryFromSQL(tc.query);
+        const req = client.fromSQL(tc.query);
         req.queryRequest!.queryParameters = tc.parameters;
 
         const q = await client.startQuery(req);
@@ -40,7 +40,7 @@ describeWithBothTransports('Read Query Values', client => {
   });
 
   it('should read nested objects', async () => {
-    const req = client.queryFromSQL(
+    const req = client.fromSQL(
       "SELECT 40 as age, [STRUCT(STRUCT('1' as a, '2' as b) as object)] as nested",
     );
     const q = await client.startQuery(req);

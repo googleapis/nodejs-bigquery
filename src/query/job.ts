@@ -29,7 +29,7 @@ export interface CallOptions extends GaxCallOptions {
  */
 export class QueryJob {
   private client: QueryClient;
-  private complete: boolean;
+  private jobComplete: boolean;
   private projectId: string;
   private jobId: string;
   private location: string;
@@ -49,7 +49,7 @@ export class QueryJob {
     this.cachedSchema = {};
     this.cachedPageToken = '';
     this.cachedTotalRows = 0;
-    this.complete = false;
+    this.jobComplete = false;
 
     this.consumeQueryResponse({
       jobComplete: response.jobComplete,
@@ -84,6 +84,10 @@ export class QueryJob {
     return this.cachedSchema;
   }
 
+  get complete(): boolean {
+    return this.jobComplete
+  }
+
   /**
    * Waits for the query to complete.
    *
@@ -101,6 +105,22 @@ export class QueryJob {
         await this.waitFor(signal);
       }
     }
+  }
+
+  /**
+   * Cancel a running query.
+   *
+   * @param {CallOptions} [options]
+   *   Call options. See {@link https://googleapis.dev/nodejs/google-gax/latest/interfaces/CallOptions.html|CallOptions} for more details.
+   */
+  async cancel(options?: CallOptions): Promise<protos.google.cloud.bigquery.v2.IJobCancelResponse> {
+     const {jobClient} = this.client.getBigQueryClient();
+     const [response] = await jobClient.cancelJob({
+      projectId: this.projectId,
+      jobId: this.jobId,
+      location: this.location,      
+     }, options);
+     return response;
   }
 
   private async waitFor(signal?: AbortSignal): Promise<void> {
@@ -156,7 +176,7 @@ export class QueryJob {
   private consumeQueryResponse(
     response: protos.google.cloud.bigquery.v2.IGetQueryResultsResponse,
   ) {
-    this.complete = response.jobComplete?.value ?? false;
+    this.jobComplete = response.jobComplete?.value ?? false;
     this.cachedSchema = response.schema!;
     this.cachedPageToken = response.pageToken!;
     this.cachedTotalRows = Number(response.totalRows);
