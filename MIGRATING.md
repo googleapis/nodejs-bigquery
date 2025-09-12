@@ -1,9 +1,25 @@
 # Migrating to BigQuery 9.x
 
-This version of BigQuery is currently in preview. Improvements are planned for subsequent releases, in particular with regard to query user experience.
+## Overview
 
-<!-- TODO(coleleah) -->
-Blurb about holistic changes related to code generation, ensuring faster updates, and availability of gRPC
+We're releasing new preview versions of "Cloud Client Libraries" for the main BigQuery service API as discussed in the [Client libraries explained documentation](https://cloud.google.com/apis/docs/client-libraries-explained).
+
+Prior to this effort, programmatic access to BigQuery was exposed via a different set of "Google API Client Libraries" style libraries, which are based upon an older set of technologies.
+
+Changes to client libraries can take a while to adopt, and we're taking a phased approach to how we deliver these updates, allowing us to collect feedback and iterate on how we deliver updates.
+
+The first major update for each existing language is to first provide the new generated clients.  These new clients, based on the protocol-buffer representation of the API, expose the base functionality of the API.  Early adopters of this client are recommended to focus on control-plane and resource operations.  This generated layer will expose the underlying RPCs used to build query experiences, but will not include the higher level abstractions for executing queries in a performant way.
+
+Our next task is to leverage the generated code layer to deliver updated query abstractions which make it easy to run SQL queries in a performant manner, and read the results from these queries. Further iterations on the new client libraries will be focused on stability and maturation of the new client, based on feedback from users.
+
+### Benefits
+
+Providing these new SDKs solves some important issues that BigQuery users and developers have communicated are important to them.
+
+* **More idiomatic experience.**  The updated client libraries provide a more consistent and idiomatic experience, particularly for more typical resource management operations like creating/listing/updating core BigQuery resources like datasets and tables.
+* **Faster access to new functionality.**  Updating how we publish the BigQuery SDKs yields significant improvements to how quickly new features are made available to end users.   In particular, relying more heavily on code generation reduces the need for hand curating changes to make functionality more accessible.
+* **Support for higher performance via newer transports.**  Historically, the main BigQuery V2 API was only made available via HTTP REST.  We've updated the service to also include support for the gRPC protocol, which provides for more efficient and performant communication between clients and the BigQuery service.
+* **Platform consistency.**  The transition to the preview libraries means that BigQuery is more consistent in how it exposes functionality for users of multiple Google Cloud services.  This consistency should make it easier to use multiple GCP services in concert with one another as a developer.
 
 ## Accessing preview functionality
 
