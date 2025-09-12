@@ -14,12 +14,11 @@ This code is published to `npm` with the version naming convention `9.0.0-alpha.
     "@google-cloud/bigquery": "^9.0.0-alpha.0"
   },
 ```
-<!-- TODO(coleleah) -->
+
 ## Instantiating preview SDK clients
 
-Previously, all BigQuery operations were instantiated using a client initialized with `BigQuery()`. Now, there exists a central BigQueryClient class, `BigQueryClient`, that is comprised of multiple "subclient" classes that perform operations on different BigQuery services (Datasets, Tables, etc.) and enables you to acccess the majority of operations of the subclient classes. These client classes have the same attributes and take in the same options ([`ClientOptions`](https://github.com/googleapis/gax-nodejs/blob/3b341da012d96271dd588f832281bfbc056641ef/gax/src/clientInterface.ts#L31-L45)) that client classes found in other Google Cloud libraries do. By default, the `BigQueryClient` class initializes these subclients with identical default settings, but users are free to pass in custom settings that can be shared across subclients, or to initialize and access the subclients on their own. Source code for the underlying subclients is found in the [`src/v2`](/src/v2) directory.
+Previously, all BigQuery operations were instantiated using a client initialized with `BigQuery()`. Now, there exists a central BigQueryClient class, `BigQueryClient`, that is comprised of multiple "subclient" classes that perform operations on different BigQuery services (Datasets, Tables, etc.) and enables you to acccess the majority of operations of the subclient classes. These client classes have the same attributes and take in the same options that client classes found in other Google Cloud libraries do (see [this documentation](https://github.com/googleapis/gax-nodejs/blob/main/client-libraries.md#constructor-options) for more details about constructor options). By default, the `BigQueryClient` class initializes these subclients with identical default settings, but users are free to pass in custom settings that can be shared across subclients, or to [initialize and access the subclients on their own](#instantiating-subclients). Source code for the underlying subclients is found in the [`src/v2`](/src/v2) directory.
 
-<!-- TODO(coleleah) - note about various subclients -->
 ### Instantiating a client with default settings
 
 #### Before
@@ -36,13 +35,56 @@ const {BigQueryClient} = require('@google-cloud/bigquery');
 const bigquery = new BigQueryClient();
 ```
 
-<!-- TODO(coleleah) wait until talking to Alvaro -->
 ### Instantiating a client with custom options
-TODO(coleleah) note about fallback transport
-TODO(coleleah) note about other options
 
-<!-- TODO(coleleah) wait until talking to Alvaro -->
+Users can pass in custom options to the `BigQueryClient` constructor; the options that can be passed in are the same as those found in other Google Cloud Client libraries and are describedin detail in [this documentation](https://github.com/googleapis/gax-nodejs/blob/main/client-libraries.md#constructor-options). Details about the options are also found in `src/bigquery.ts`.
+
+The following example shows how to instantiate a client with custom options:
+
+```javascript
+const {BigQueryClient} = require('@google-cloud/bigquery');
+
+// regional endpoints are currently only available in REST transport mode
+const options = {apiEndpoint: "bigquery.us-central1.rep.googleapis.com", fallback: true}
+const bigquery = new BigQueryClient(options);
+```
+
+#### Using REST transport
+
+The BigQuery client library now supports the use of gRPC transport. This is enabled by default when instantiating a client. To use REST as the transport, set the `fallback` option to `true` when instantiating a client.
+
+```javascript
+const {BigQueryClient} = require('@google-cloud/bigquery');
+const options = {fallback: true}
+const bigquery = new BigQueryClient(options);
+```
+
 ### Instantiating subclients
+
+The `BigQueryClient` is comprised of multiple "subclient" classes that perform operations on different BigQuery services (Datasets, Tables, etc.). These subclients are exposed as properties on the `BigQueryClient` instance, for example, `bigqueryClient.datasetClient` or `bigqueryClient.tableClient`.
+
+Each subclient has its own set of methods that correspond to the operations available for that service. For example, `bigqueryClient.datasetClient.getDataset()` would be used to retrieve a dataset.
+
+You can also initialize and access these subclients directly if you only need to interact with a specific BigQuery service.
+
+```javascript
+const {DatasetServiceClient} = require('@google-cloud/bigquery');
+const datasetClient = new DatasetServiceClient();
+```
+
+Subclients you initialize with custom options can also be passed to the `BigQueryClient` constructor
+
+```javascript
+const {DatasetServiceClient, TableServiceClient, BigQueryClient} = require('@google-cloud/bigquery');
+const datasetClientOptions = {apiEndpoint: "bigquery.us-central1.rep.googleapis.com", fallback: true}
+const tableClientOptions = {fallback: true}
+const datasetClient = new DatasetServiceClient(datasetClientOptions);
+const tableClient = new TableServiceClient(tableClientOptions);
+const bigQueryOptions = {datasetClient: datasetClient, tableClient: tableClient}
+// all other subclients will be created with default values
+cont bigQueryClient = new BigQueryClient(bigqueryOptions)
+
+```
 
 ## Importing types
 
@@ -72,6 +114,7 @@ This library is in preview and there are a few known issues. If you come across 
 1. The `patchModel` RPC will fail with an `INVALID_ARGUMENT: No fields found to patch/update.` error when run using gRPC transport. **Workaround**: use REST transport for this RPC.
 1. The `cancelJob` RPC will fail with a 400 code when run using REST transport. **Workaround**: Use gRPC. Verbose error messages with their error codes are properly surfaced when using gRPC as the transport. gRPC is enabled by default in this version of the library.
 1. A warning about autopagination is being thrown when using all `*Async` list methods (the ones whose names end in "Async" and return an iterable, not asynchronous calls to the `*Stream` or regular list calls.) This warning is non-blocking and there is currently no workaround.
+1. [Regional endpoints](http://cloud.google.com/bigquery/docs/regional-endpoints) are not yet available using gRPC transport. **Workaround**: use REST transport to use regional endpoints
 
 ## Migration using Gemini
 
@@ -84,7 +127,6 @@ Following the user guide found in the NodeJS BigQuery repository on the preview-
 ```
 
 If you are migrating Typescript code, we especially recommend some kind of verification step (for example, having Gemini run `npm run compile`) so that Gemini can iterate and properly migrate types.
-
 
 ## Code Samples
 
