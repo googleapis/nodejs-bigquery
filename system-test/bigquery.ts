@@ -933,7 +933,9 @@ describe('BigQuery', () => {
         .table(tableRef!.tableId!);
 
       let [rows] = await table.getRows({
-        selectedFields: 'data.nested.object.a,data.nested.object.b',
+        selectedFields: ['data.nested.object.a', 'data.nested.object.b'].join(
+          ',',
+        ),
       });
       console.log('rows', rows);
       assert.deepEqual(rows[0], {
@@ -973,7 +975,11 @@ describe('BigQuery', () => {
       assert.deepEqual(rows, [{age: 10}, {age: 20}, {age: 30}, {age: 40}]);
 
       [rows] = await table.getRows({
-        selectedFields: 'data.nested.object.a,data.nested.object.b,age',
+        selectedFields: [
+          'data.nested.object.a',
+          'data.nested.object.b',
+          'age',
+        ].join(','),
       });
       console.log('rows 4', rows);
       assert.deepEqual(rows[0], {
@@ -1006,6 +1012,20 @@ describe('BigQuery', () => {
         },
         age: 10,
       });
+
+      [rows] = await table.getRows({
+        selectedFields: undefined,
+        startIndex: '1',
+        maxResults: 1,
+      });
+      console.log('rows start index 1 and max results 1', JSON.stringify(rows));
+
+      [rows] = await table.getRows({
+        selectedFields: undefined,
+        startIndex: '2',
+        maxResults: 2,
+      });
+      console.log('rows start index 2 and max results 2', JSON.stringify(rows));
     });
 
     it('should get the rows in a table via stream', done => {
