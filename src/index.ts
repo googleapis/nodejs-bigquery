@@ -46,3 +46,4 @@ export {
 };
 import * as protos from '../protos/protos';
 export {protos};
+export * as query from './query';
