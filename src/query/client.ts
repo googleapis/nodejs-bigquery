@@ -12,10 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {
-  BigQueryClient,
-  BigQueryClientOptions,
-} from '../bigquery';
+import {BigQueryClient, BigQueryClientOptions} from '../bigquery';
 import {Query} from './query';
 import {CallOptions} from './options';
 import {protos} from '../';
@@ -30,9 +27,7 @@ export class QueryClient {
   /**
    * @param {BigQueryClientOptions} options - The configuration object.
    */
-  constructor(
-    options?: BigQueryClientOptions,
-  ) {
+  constructor(options?: BigQueryClientOptions) {
     this.client = new BigQueryClient(options);
     this.projectId = '';
     void this.initialize();
@@ -105,7 +100,7 @@ export class QueryClient {
       },
       options,
     );
-    const { jobReference } = response;
+    const {jobReference} = response;
     return new Query(this, {jobReference});
   }
 

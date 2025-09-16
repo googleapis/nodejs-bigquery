@@ -15,7 +15,7 @@
 import {QueryClient} from './client';
 import {protos} from '../';
 import {RowIterator} from './iterator';
-import { CallOptions } from './options';
+import {CallOptions} from './options';
 
 /**
  * Query represents a query job.
@@ -68,7 +68,7 @@ export class Query {
   }
 
   get complete(): boolean {
-    return this.jobComplete
+    return this.jobComplete;
   }
 
   /**
@@ -107,14 +107,14 @@ export class Query {
    * @returns {RowIterator}
    */
   async read(): Promise<RowIterator> {
-    const it = new RowIterator(this);    
+    const it = new RowIterator(this);
     return it;
   }
 
   private consumeQueryResponse(
     response: protos.google.cloud.bigquery.v2.IGetQueryResultsResponse,
   ) {
-    this.jobComplete = response.jobComplete?.value ?? false;    
+    this.jobComplete = response.jobComplete?.value ?? false;
   }
 
   private async checkStatus(options?: CallOptions): Promise<void> {

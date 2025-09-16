@@ -15,5 +15,4 @@
 /**
  * Represents a row in a query result.
  */
-export class Row {  
-}
+export class Row {}

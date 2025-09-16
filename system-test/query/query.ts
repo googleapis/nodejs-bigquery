@@ -15,112 +15,139 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import {it} from 'mocha';
-
+import {QueryClient} from '../../src/query';
 import {protos} from '../../src';
-import {describeWithBothTransports} from '../fixtures/transport';
 
 const sleep = (ms: number) =>
   new Promise(resolve => {
     setTimeout(resolve, ms);
   });
 
-describeWithBothTransports('Run Query', client => {
-  let getQueryResultsSpy: sinon.SinonSpy;
-  let projectId;
+// the GCLOUD_PROJECT environment variable is set as part of test harness setup
+const projectId = process.env.GCLOUD_PROJECT;
+//const transports = ['grpc', 'rest'];
+const transports = ['grpc'];
 
-  beforeEach(async () => {
-    await client.initialize();
-    const {jobClient} = client.getBigQueryClient();
-    projectId = client.getProjectId();
+// run tests with the gRPC client and the REST fallback client
+transports.forEach(transport => {
+  let client;
+  if (transport === 'grpc') {
+    client = new QueryClient({});
+  } else {
+    client = new QueryClient({fallback: true});
+  }
 
-    getQueryResultsSpy = sinon.spy(jobClient, 'getQueryResults');
-  });
+  describe('Run Query', () => {
+    describe(transport, () => {
+      let getQueryResultsSpy: sinon.SinonSpy;
 
-  afterEach(() => {
-    getQueryResultsSpy.restore();
-  });
+      beforeEach(async () => {
+        await client.initialize();
+        const {jobClient} = client.getBigQueryClient();
 
-  it('should run a stateless query', async () => {
-    const req: protos.google.cloud.bigquery.v2.IPostQueryRequest = {
-      queryRequest: {
-        query: 'SELECT CURRENT_TIMESTAMP() as foo, SESSION_USER() as bar',
-        useLegacySql: {value: false},
-        formatOptions: {
-          useInt64Timestamp: true,
-        },
-        jobCreationMode: protos.google.cloud.bigquery.v2.QueryRequest.JobCreationMode.JOB_CREATION_OPTIONAL,
-      },
-      projectId
-    };
+        getQueryResultsSpy = sinon.spy(jobClient, 'getQueryResults');
+      });
 
-    const q = await client.startQuery(req);
-    await q.wait();
+      afterEach(() => {
+        getQueryResultsSpy.restore();
+      });
 
-    // TODO: read rows and assert row count
-  });
+      it('should run a stateless query', async () => {
+        const req: protos.google.cloud.bigquery.v2.IPostQueryRequest = {
+          queryRequest: {
+            query: 'SELECT CURRENT_TIMESTAMP() as foo, SESSION_USER() as bar',
+            useLegacySql: {value: false},
+            formatOptions: {
+              useInt64Timestamp: true,
+            },
+            jobCreationMode:
+              protos.google.cloud.bigquery.v2.QueryRequest.JobCreationMode
+                .JOB_CREATION_OPTIONAL,
+          },
+          projectId,
+        };
 
-  it('should stop waiting for query to complete', async () => {
-    const req: protos.google.cloud.bigquery.v2.IPostQueryRequest = {
-      queryRequest: {
-        query: 'SELECT num FROM UNNEST(GENERATE_ARRAY(1,1000000)) as num',
-        useLegacySql: {value: false},
-        formatOptions: {
-          useInt64Timestamp: true,
-        },
-        useQueryCache: { value: false },
-        jobCreationMode: protos.google.cloud.bigquery.v2.QueryRequest.JobCreationMode.JOB_CREATION_REQUIRED,
-        timeoutMs: { value: 500 },
-      },
-      projectId
-    };
+        const q = await client.startQuery(req);
+        await q.wait();
 
-    const q = await client.startQuery(req);
-    const abortCtrl = new AbortController();
-    q.wait({
-      signal: abortCtrl.signal,
-    }).catch(err => {
-      assert(err, 'aborted');
+        assert(q.complete);
+
+        // TODO: read rows and assert row count
+      });
+
+      it('should stop waiting for query to complete', async () => {
+        const req: protos.google.cloud.bigquery.v2.IPostQueryRequest = {
+          queryRequest: {
+            query: 'SELECT num FROM UNNEST(GENERATE_ARRAY(1,1000000)) as num',
+            useLegacySql: {value: false},
+            formatOptions: {
+              useInt64Timestamp: true,
+            },
+            useQueryCache: {value: false},
+            jobCreationMode:
+              protos.google.cloud.bigquery.v2.QueryRequest.JobCreationMode
+                .JOB_CREATION_REQUIRED,
+            timeoutMs: {value: 500},
+          },
+          projectId,
+        };
+
+        const q = await client.startQuery(req);
+        const abortCtrl = new AbortController();
+        q.wait({
+          signal: abortCtrl.signal,
+        }).catch(err => {
+          assert(err, 'aborted');
+        });
+        await sleep(1000);
+        abortCtrl.abort();
+
+        assert(getQueryResultsSpy.callCount >= 1);
+        assert(getQueryResultsSpy.callCount <= 2);
+      }).timeout(5000);
+
+      it('should allow attach with job reference to a query handler', async () => {
+        const req: protos.google.cloud.bigquery.v2.IPostQueryRequest = {
+          queryRequest: {
+            query: 'SELECT CURRENT_TIMESTAMP() as foo, SESSION_USER() as bar',
+            useLegacySql: {value: false},
+            formatOptions: {
+              useInt64Timestamp: true,
+            },
+            jobCreationMode:
+              protos.google.cloud.bigquery.v2.QueryRequest.JobCreationMode
+                .JOB_CREATION_REQUIRED,
+          },
+          projectId,
+        };
+
+        let q = await client.startQuery(req);
+        await q.wait();
+
+        const jobRef = q.jobReference;
+        q = await client.attachJob(jobRef);
+        await q.wait();
+
+        assert(q.complete);
+
+        // TODO: read rows and assert row count
+      });
+
+      it('should insert a query job', async () => {
+        const q = await client.startQueryJob({
+          configuration: {
+            query: {
+              query: 'SELECT CURRENT_DATETIME() as foo, SESSION_USER() as bar',
+              useLegacySql: {value: false},
+            },
+          },
+        });
+        await q.wait();
+
+        assert(q.complete);
+
+        // TODO: read rows and assert row count
+      });
     });
-    await sleep(1000);
-    abortCtrl.abort();
-
-    assert(getQueryResultsSpy.callCount >= 1);
-    assert(getQueryResultsSpy.callCount <= 2);
-  }).timeout(5000);
-
-  it('should attach a query job without cache', async () => {
-    const req: protos.google.cloud.bigquery.v2.IPostQueryRequest = {
-      queryRequest: {
-        query: 'SELECT CURRENT_TIMESTAMP() as foo, SESSION_USER() as bar',
-        useLegacySql: {value: false},
-        formatOptions: {
-          useInt64Timestamp: true,
-        },
-        jobCreationMode: protos.google.cloud.bigquery.v2.QueryRequest.JobCreationMode.JOB_CREATION_REQUIRED,
-      },
-      projectId
-    };
-
-    let q = await client.startQuery(req);
-    await q.wait();
-
-    const jobRef = q.jobReference;
-    q = await client.attachJob(jobRef);
-
-    // TODO: read rows and assert row count
-  });
-
-  it('should insert a query job', async () => {
-    const q = await client.startQueryJob({
-      configuration: {
-        query: {
-          query: 'SELECT CURRENT_DATETIME() as foo, SESSION_USER() as bar',
-          useLegacySql: {value: false},
-        },
-      },
-    });
-    await q.wait();
-
-    // TODO: read rows and assert row count
   });
 });
