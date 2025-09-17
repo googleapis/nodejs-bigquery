@@ -126,23 +126,49 @@ import type * as BigQueryType from '@google-cloud/bigquery';
 
 This library is in preview and there are a few known issues. If you come across other problems, please open a "Bug Report" issue in this repository and fill out all parts of the template! Thank you for any feedback.
 
-1. When using REST transport, error messages are not surfacing from the underlying surface. Proper HTTP error codes *are* surfaced, but the error message will only read, "Request failed with status code: xxx." **Workaround**: Use gRPC. Verbose error messages with their error codes are properly surfaced when using gRPC as the transport. gRPC is enabled by default in this version of the library.
-1. The `patchModel` RPC will fail with an `INVALID_ARGUMENT: No fields found to patch/update.` error when run using gRPC transport. **Workaround**: use REST transport for this RPC.
-1. The `cancelJob` RPC will fail with a 400 code when run using REST transport. **Workaround**: Use gRPC. Verbose error messages with their error codes are properly surfaced when using gRPC as the transport. gRPC is enabled by default in this version of the library.
-1. A warning about autopagination is being thrown when using all `*Async` list methods (the ones whose names end in "Async" and return an iterable, not asynchronous calls to the `*Stream` or regular list calls.) This warning is non-blocking and there is currently no workaround.
-1. [Regional endpoints](http://cloud.google.com/bigquery/docs/regional-endpoints) are not yet available using gRPC transport. **Workaround**: use REST transport to use regional endpoints
+1. When using REST transport, error messages are not surfacing from the underlying surface. Proper HTTP error codes *are* surfaced, but the error message will only read, "Request failed with status code: xxx." **Workarounds**: Use gRPC. Verbose error messages with their error codes are properly surfaced when using gRPC as the transport. gRPC is enabled by default in this version of the library. Users can also use the non-preview version of the client which is not impacted by this issue.
+1. The `patchModel` RPC will fail with an `INVALID_ARGUMENT: No fields found to patch/update.` error when run using gRPC transport. **Workarounds**: use REST transport for this RPC. Users can also use the non-preview version of the client which is not impacted by this issue.
+1. The `cancelJob` RPC will fail with a 400 code when run using REST transport. **Workarounds**: Use gRPC. Verbose error messages with their error codes are properly surfaced when using gRPC as the transport. gRPC is enabled by default in this version of the library. Users can also use the non-preview version of the client which is not impacted by this issue.
+1. A warning about autopagination is being thrown when using all `*Async` list methods (the ones whose names end in "Async" and return an iterable, not asynchronous calls to the `*Stream` or regular list calls.) This warning is non-blocking and the only workaround is to use the non-preview version of the clinet which is not impacted by this issue.
+1. [Regional endpoints](http://cloud.google.com/bigquery/docs/regional-endpoints) are not yet available using gRPC transport. **Workarounds**: Use REST transport to use regional endpoints. Users can also use the non-preview version of the client which is not impacted by this issue.
+
+## Partially migrating
+
+Node allows users to import multiple versions of a library. Given that updates to query operations are not yet stable in this verison of the client, you may want to use the preview version for certain admin plane operations (CRUDL operations on certain clients) while preserving your workflow for data plane operations (executing queries.)
+
+In order to do so you would need to make the following changes to your code:
+
+1. Modify your `package.json` file to add the preview BigQuery package
+
+```json
+  "dependencies": {
+    "@google-cloud/bigquery": "^8.1.1",
+    "@google-cloud/bigquery-preview": "^9.0.0-alpha.0"
+  },
+```
+
+1. Add imports to the preview package and types as needed
+
+```javascript
+import {BigQuery} from '@google-cloud/bigquery';
+import type * as BigQueryType from '@google-cloud/bigquery';
+import {BigQueryClient} from '@google-cloud/bigquery-preview';
+import type * as BigQueryPreviewType from '@google-cloud/bigquery-preview'
+```
+
+1. Utilize instructions and [samples](#code-samples) found in other sections of this guide to [instantiate clients](#instantiating-preview-sdk-clients) and to learn about the key differences.
 
 ## Migration using Gemini
 
-We highly encourage you to utilize the [Gemini CLI](https://github.com/google-gemini/gemini-cli) to migrate your code. We recommend to minimally pass this migration guide and the `samples` directory as context, though passing the entire repo as context will likely be helpful to Gemini as well. Additionally, we recommend strictly specifying the files that the Gemini CLI should modify to ensure that it does not modify code you do not want it to.
+We highly encourage you to utilize the [Gemini CLI](https://github.com/google-gemini/gemini-cli) to migrate your code. We recommend that you clone the to [`nodejs-bigquery` repo](https://github.com/googleapis/nodejs-bigquery/) and change to the `preview-9.x` branch. This way you can minimally pass this migration guide and the `samples` directory as context, though passing the entire repo as context will likely be helpful to Gemini as well. Additionally, we recommend strictly specifying the files that the Gemini CLI should modify to ensure that it does not modify code you do not want it to.
 
 An example prompt to modify a file in your repo called `mybigquery.js` might be and validate it using your predefined test session would be:
 
 ```text
 Following the user guide found in the NodeJS BigQuery repository
-on the preview-9.x branch: https://github.com/googleapis/nodejs-bigquery/blob/preview-9.x/MIGRATING.md,
-using the samples found in its samples directory: https://github.com/googleapis/nodejs-bigquery/tree/preview-9.x/samples
-and the code found in src https://github.com/googleapis/nodejs-bigquery/tree/preview-9.x/src,
+on the preview-9.x branch: MIGRATING.md,
+using the samples found in its samples directory: samples/
+and the code found in src: src/,
 migrate the code found in @mybigquery.js to use the 9.0.0-alpha.x version of @google-cloud-bigquery -
 you will only need to touch this file. Use `npm run test` to verify proper migration.
 ```
@@ -1169,6 +1195,10 @@ async function updateRoutine() {
 
 #### Create model
 
+<details>
+<summary>Create model utilizes the query interface, which is not yet stable in this version of the client - it is likely that this code snippet will change.</summary>
+
+
 ##### Key differences
 
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
@@ -1288,6 +1318,8 @@ async function createModel() {
 createModel();
 
 ```
+
+</details>
 
 #### Delete model
 
@@ -1636,6 +1668,9 @@ async function updateModel() {
 
 #### Create job
 
+<details>
+<summary>Creating jobs utilizes the query interface, which is not yet stable in this version of the client - it is likely that this code snippet will change. </summary>
+
 ##### Key differences
 
 * Client is [instantiated](#instantiating-preview-sdk-clients) with the `BigQueryClient()` method, not `BigQuery()`
@@ -1741,6 +1776,7 @@ async function createJob() {
     }
 }
 ```
+</details>
 
 #### Get job
 
