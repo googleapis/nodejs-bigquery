@@ -77,7 +77,7 @@ export class QueryClient {
     options?: CallOptions,
   ): Promise<Query> {
     const [response] = await this.client.jobClient.query(request, options);
-    return new Query(this, response);
+    return Query.fromResponse_(this, response, options);
   }
 
   /**
@@ -101,24 +101,26 @@ export class QueryClient {
       options,
     );
     const {jobReference} = response;
-    return new Query(this, {jobReference});
+    if (!jobReference) {
+      throw new Error('Failed to insert job. Missing job reference.');
+    }
+    return Query.fromJobRef_(this, jobReference, options);
   }
 
   /**
    * Create a managed Query from a job reference.
    *
-   * @param {protos.google.cloud.bigquery.v2.IJob} job
+   * @param {protos.google.cloud.bigquery.v2.IJobReference} jobReference
    *   A job resource to insert
    * @param {CallOptions} [options]
    *   Call options. See {@link https://googleapis.dev/nodejs/google-gax/latest/interfaces/CallOptions.html|CallOptions} for more details.
    * @returns {Promise<QueryJob>}
    */
   async attachJob(
-    jobRef: protos.google.cloud.bigquery.v2.IJobReference,
+    jobReference: protos.google.cloud.bigquery.v2.IJobReference,
+    options?: CallOptions,
   ): Promise<Query> {
-    return new Query(this, {
-      jobReference: jobRef,
-    });
+    return Query.fromJobRef_(this, jobReference, options);
   }
 
   getBigQueryClient(): BigQueryClient {

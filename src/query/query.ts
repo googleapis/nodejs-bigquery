@@ -16,6 +16,8 @@ import {QueryClient} from './client';
 import {protos} from '../';
 import {RowIterator} from './iterator';
 import {CallOptions} from './options';
+import {setInterval} from 'timers/promises';
+import {EventEmitter} from 'stream';
 
 /**
  * Query represents a query job.
@@ -23,36 +25,55 @@ import {CallOptions} from './options';
 export class Query {
   private client: QueryClient;
   private jobComplete: boolean;
+
+  private _queryId: string;
   private projectId: string;
   private jobId: string;
   private location: string;
 
-  constructor(
-    client: QueryClient,
-    response: protos.google.cloud.bigquery.v2.IQueryResponse,
-  ) {
+  private emitter: EventEmitter;
+
+  constructor(client: QueryClient) {
     this.client = client;
     this.jobComplete = false;
-
-    this.consumeQueryResponse({
-      jobComplete: response.jobComplete,
-      schema: response.schema,
-      pageToken: response.pageToken,
-      totalRows: response.totalRows,
-      rows: response.rows,
-    });
+    this.emitter = new EventEmitter();
 
     this.jobId = '';
-    this.location = response.location ?? '';
+    this.location = '';
     this.projectId = '';
-    if (response.jobReference) {
-      this.projectId = response.jobReference.projectId!;
-      this.jobId = response.jobReference.jobId!;
-      this.location = response.jobReference.location?.value || '';
-    }
+    this._queryId = '';
+  }
+
+  /**
+   * Internal method to instantiate Query handler from jobs.query response
+   * @internal
+   */
+  static fromResponse_(
+    client: QueryClient,
+    response: protos.google.cloud.bigquery.v2.IQueryResponse,
+    options?: CallOptions,
+  ): Query {
+    const q = new Query(client);
+    q.location = response.location ?? '';
     if (response.queryId) {
-      this.jobId = response.queryId;
+      q._queryId = response.queryId;
     }
+    q.consumeQueryResponse({...response});
+    void q.waitQueryBackground(options);
+
+    return q;
+  }
+
+  /**
+   * Internal method to instantiate Query handler from job reference
+   * @internal
+   */
+  static fromJobRef_(
+    client: QueryClient,
+    jobReference: protos.google.cloud.bigquery.v2.IJobReference,
+    options?: CallOptions,
+  ): Query {
+    return this.fromResponse_(client, {jobReference}, options);
   }
 
   get jobReference(): protos.google.cloud.bigquery.v2.IJobReference {
@@ -71,6 +92,26 @@ export class Query {
     return this.jobComplete;
   }
 
+  get queryId(): string {
+    return this._queryId;
+  }
+
+  private async waitQueryBackground(options?: CallOptions) {
+    if (this.complete) {
+      return;
+    }
+    const signal = options?.signal;
+    let waitTime = 1;
+    for await (const _ of setInterval(waitTime, undefined, {signal})) {
+      await this.checkStatus(options);
+      if (this.complete) {
+        this.emitter.emit('done');
+        break;
+      }
+      waitTime = 1000;
+    }
+  }
+
   /**
    * Waits for the query to complete.
    *
@@ -78,25 +119,19 @@ export class Query {
    *   Call options. See {@link https://googleapis.dev/nodejs/google-gax/latest/interfaces/CallOptions.html|CallOptions} for more details.
    */
   async wait(options?: CallOptions): Promise<void> {
-    const signal = options?.signal;
-    while (!this.complete) {
-      if (signal?.aborted) {
-        throw new Error('The operation was aborted.');
-      }
-      await this.checkStatus(options);
-      if (!this.complete) {
-        await this.waitFor(signal);
-      }
+    if (this.complete) {
+      return;
     }
-  }
-
-  private async waitFor(signal?: AbortSignal): Promise<void> {
-    const delay = 1000; // TODO: backoff settings
+    const signal = options?.signal;
     return new Promise((resolve, reject) => {
-      const timeout = setTimeout(resolve, delay);
+      const callback = () => {
+        resolve();
+        this.emitter.removeListener('done', callback);
+      };
+      this.emitter.addListener('done', callback);
       signal?.addEventListener('abort', () => {
-        clearTimeout(timeout);
         reject(new Error('The operation was aborted.'));
+        this.emitter.removeListener('done', callback);
       });
     });
   }
@@ -114,6 +149,11 @@ export class Query {
   private consumeQueryResponse(
     response: protos.google.cloud.bigquery.v2.IGetQueryResultsResponse,
   ) {
+    if (response.jobReference) {
+      this.projectId = response.jobReference.projectId!;
+      this.jobId = response.jobReference.jobId!;
+      this.location = response.jobReference.location?.value || '';
+    }
     this.jobComplete = response.jobComplete?.value ?? false;
   }
 

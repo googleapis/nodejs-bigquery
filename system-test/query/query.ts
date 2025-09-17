@@ -25,8 +25,7 @@ const sleep = (ms: number) =>
 
 // the GCLOUD_PROJECT environment variable is set as part of test harness setup
 const projectId = process.env.GCLOUD_PROJECT;
-//const transports = ['grpc', 'rest'];
-const transports = ['grpc'];
+const transports = ['grpc', 'rest'];
 
 // run tests with the gRPC client and the REST fallback client
 transports.forEach(transport => {
