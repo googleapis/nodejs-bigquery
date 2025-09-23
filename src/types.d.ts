@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * Discovery Revision: 20250816
+ * Discovery Revision: 20250912
  */
 
 /**
@@ -1753,7 +1753,7 @@ declare namespace bigquery {
    */
   type IExternalServiceCost = {
     /**
-     * The billing method used for the external job. This field is only used when billed on the services sku, set to "SERVICES_SKU". Otherwise, it is unspecified for backward compatibility.
+     * The billing method used for the external job. This field, set to `SERVICES_SKU`, is only used when billing under the services SKU. Otherwise, it is unspecified for backward compatibility.
      */
     billingMethod?: string;
     /**
@@ -2128,6 +2128,42 @@ declare namespace bigquery {
   };
 
   /**
+   * Statistics related to Incremental Query Results. Populated as part of JobStatistics2. This feature is not yet available.
+   */
+  type IIncrementalResultStats = {
+    /**
+     * Reason why incremental query results are/were not written by the query.
+     */
+    disabledReason?: 'DISABLED_REASON_UNSPECIFIED' | 'OTHER';
+    /**
+     * The time at which the result table's contents were modified. May be absent if no results have been written or the query has completed.
+     */
+    resultSetLastModifyTime?: string;
+    /**
+     * The time at which the result table's contents were completely replaced. May be absent if no results have been written or the query has completed.
+     */
+    resultSetLastReplaceTime?: string;
+  };
+
+  /**
+   * Statistics for index pruning.
+   */
+  type IIndexPruningStats = {
+    /**
+     * The base table reference.
+     */
+    baseTable?: ITableReference;
+    /**
+     * The number of parallel inputs after index pruning.
+     */
+    postIndexPruningParallelInputCount?: string;
+    /**
+     * The number of parallel inputs before index pruning.
+     */
+    preIndexPruningParallelInputCount?: string;
+  };
+
+  /**
    * Reason about why no search index was used in the search query (or sub-query).
    */
   type IIndexUnusedReason = {
@@ -2352,7 +2388,7 @@ declare namespace bigquery {
      */
     extract?: IJobConfigurationExtract;
     /**
-     * Optional. Job timeout in milliseconds. If this time limit is exceeded, BigQuery will attempt to stop a longer job, but may not always succeed in canceling it before the job completes. For example, a job that takes more than 60 seconds to complete has a better chance of being stopped than a job that takes 10 seconds to complete.
+     * Optional. Job timeout in milliseconds relative to the job creation time. If this time limit is exceeded, BigQuery attempts to stop the job, but might not always succeed in canceling it before the job completes. For example, a job that takes more than 60 seconds to complete has a better chance of being stopped than a job that takes 10 seconds to complete.
      */
     jobTimeoutMs?: string;
     /**
@@ -2572,7 +2608,7 @@ declare namespace bigquery {
      */
     schemaInlineFormat?: string;
     /**
-     * Allows the schema of the destination table to be updated as a side effect of the load job if a schema is autodetected or supplied in the job configuration. Schema update options are supported in two cases: when writeDisposition is WRITE_APPEND; when writeDisposition is WRITE_TRUNCATE and the destination table is a partition of a table, specified by partition decorators. For normal tables, WRITE_TRUNCATE will always overwrite the schema. One or more of the following values are specified: * ALLOW_FIELD_ADDITION: allow adding a nullable field to the schema. * ALLOW_FIELD_RELAXATION: allow relaxing a required field in the original schema to nullable.
+     * Allows the schema of the destination table to be updated as a side effect of the load job if a schema is autodetected or supplied in the job configuration. Schema update options are supported in three cases: when writeDisposition is WRITE_APPEND; when writeDisposition is WRITE_TRUNCATE_DATA; when writeDisposition is WRITE_TRUNCATE and the destination table is a partition of a table, specified by partition decorators. For normal tables, WRITE_TRUNCATE will always overwrite the schema. One or more of the following values are specified: * ALLOW_FIELD_ADDITION: allow adding a nullable field to the schema. * ALLOW_FIELD_RELAXATION: allow relaxing a required field in the original schema to nullable.
      */
     schemaUpdateOptions?: Array<string>;
     /**
@@ -2694,7 +2730,7 @@ declare namespace bigquery {
      */
     rangePartitioning?: IRangePartitioning;
     /**
-     * Allows the schema of the destination table to be updated as a side effect of the query job. Schema update options are supported in two cases: when writeDisposition is WRITE_APPEND; when writeDisposition is WRITE_TRUNCATE and the destination table is a partition of a table, specified by partition decorators. For normal tables, WRITE_TRUNCATE will always overwrite the schema. One or more of the following values are specified: * ALLOW_FIELD_ADDITION: allow adding a nullable field to the schema. * ALLOW_FIELD_RELAXATION: allow relaxing a required field in the original schema to nullable.
+     * Allows the schema of the destination table to be updated as a side effect of the query job. Schema update options are supported in three cases: when writeDisposition is WRITE_APPEND; when writeDisposition is WRITE_TRUNCATE_DATA; when writeDisposition is WRITE_TRUNCATE and the destination table is a partition of a table, specified by partition decorators. For normal tables, WRITE_TRUNCATE will always overwrite the schema. One or more of the following values are specified: * ALLOW_FIELD_ADDITION: allow adding a nullable field to the schema. * ALLOW_FIELD_RELAXATION: allow relaxing a required field in the original schema to nullable.
      */
     schemaUpdateOptions?: Array<string>;
     /**
@@ -3058,6 +3094,10 @@ declare namespace bigquery {
      */
     externalServiceCosts?: Array<IExternalServiceCost>;
     /**
+     * Output only. Statistics related to incremental query results, if enabled for the query. This feature is not yet available.
+     */
+    incrementalResultStats?: IIncrementalResultStats;
+    /**
      * Output only. Statistics for a LOAD query.
      */
     loadQueryStatistics?: ILoadQueryStatistics;
@@ -3159,7 +3199,7 @@ declare namespace bigquery {
      */
     totalPartitionsProcessed?: string;
     /**
-     * Output only. Total slot-milliseconds for the job that run on external services and billed on the service SKU. This field is only populated for jobs that have external service costs, and is the total of the usage for costs whose billing method is "SERVICES_SKU".
+     * Output only. Total slot milliseconds for the job that ran on external services and billed on the services SKU. This field is only populated for jobs that have external service costs, and is the total of the usage for costs whose billing method is `"SERVICES_SKU"`.
      */
     totalServicesSkuSlotMs?: string;
     /**
@@ -3901,6 +3941,24 @@ declare namespace bigquery {
      * Required. ID of the project. Can be either the numeric ID or the assigned ID of the project.
      */
     projectId?: string;
+  };
+
+  /**
+   * The column metadata index pruning statistics.
+   */
+  type IPruningStats = {
+    /**
+     * The number of parallel inputs matched.
+     */
+    postCmetaPruningParallelInputCount?: string;
+    /**
+     * The number of partitions matched.
+     */
+    postCmetaPruningPartitionCount?: string;
+    /**
+     * The number of parallel inputs scanned.
+     */
+    preCmetaPruningParallelInputCount?: string;
   };
 
   /**
@@ -4649,6 +4707,10 @@ declare namespace bigquery {
    * Statistics for a search query. Populated as part of JobStatistics2.
    */
   type ISearchStatistics = {
+    /**
+     * Search index pruning statistics, one for each base table that has a search index. If a base table does not have a search index or the index does not help with pruning on the base table, then there is no pruning statistics for that table.
+     */
+    indexPruningStats?: Array<IIndexPruningStats>;
     /**
      * When `indexUsageMode` is `UNUSED` or `PARTIALLY_USED`, this field explains why indexes were not used in all or part of the search query. If `indexUsageMode` is `FULLY_USED`, this field is not populated.
      */
@@ -5566,6 +5628,10 @@ declare namespace bigquery {
      */
     explanation?: string;
     /**
+     * The column metadata index pruning statistics.
+     */
+    pruningStats?: IPruningStats;
+    /**
      * Duration since last refresh as of this job for managed tables (indicates metadata cache staleness as seen by this job).
      */
     staleness?: string;
@@ -5839,6 +5905,10 @@ declare namespace bigquery {
      */
     enableGlobalExplain?: boolean;
     /**
+     * The idle TTL of the endpoint before the resources get destroyed. The default value is 6.5 hours.
+     */
+    endpointIdleTtl?: string;
+    /**
      * Feedback type that specifies which algorithm to run for matrix factorization.
      */
     feedbackType?: 'FEEDBACK_TYPE_UNSPECIFIED' | 'IMPLICIT' | 'EXPLICIT';
@@ -6032,6 +6102,10 @@ declare namespace bigquery {
       | 'AVERAGE_RANK'
     >;
     /**
+     * The id of a Hugging Face model. For example, `google/gemma-2-2b-it`.
+     */
+    huggingFaceModelId?: string;
+    /**
      * Include drift when fitting an ARIMA model.
      */
     includeDrift?: boolean;
@@ -6103,6 +6177,10 @@ declare namespace bigquery {
      */
     lossType?: 'LOSS_TYPE_UNSPECIFIED' | 'MEAN_SQUARED_LOSS' | 'MEAN_LOG_LOSS';
     /**
+     * The type of the machine used to deploy and serve the model.
+     */
+    machineType?: string;
+    /**
      * The maximum number of iterations in training. Used only for iterative training algorithms.
      */
     maxIterations?: string;
@@ -6110,6 +6188,10 @@ declare namespace bigquery {
      * Maximum number of trials to run in parallel.
      */
     maxParallelTrials?: string;
+    /**
+     * The maximum number of machine replicas that will be deployed on an endpoint. The default value is equal to min_replica_count.
+     */
+    maxReplicaCount?: string;
     /**
      * The maximum number of time points in a time series that can be used in modeling the trend component of the time series. Don't use this option with the `timeSeriesLengthFraction` or `minTimeSeriesLength` options.
      */
@@ -6127,6 +6209,10 @@ declare namespace bigquery {
      */
     minRelativeProgress?: number;
     /**
+     * The minimum number of machine replicas that will be always deployed on an endpoint. This value must be greater than or equal to 1. The default value is 1.
+     */
+    minReplicaCount?: string;
+    /**
      * Minimum split loss for boosted tree models.
      */
     minSplitLoss?: number;
@@ -6138,6 +6224,10 @@ declare namespace bigquery {
      * Minimum sum of instance weight needed in a child for boosted tree models.
      */
     minTreeChildWeight?: string;
+    /**
+     * The name of a Vertex model garden publisher model. Format is `publishers/{publisher}/models/{model}@{optional_version_id}`.
+     */
+    modelGardenModelName?: string;
     /**
      * The model registry.
      */
@@ -6189,6 +6279,22 @@ declare namespace bigquery {
      * The solver for PCA.
      */
     pcaSolver?: 'UNSPECIFIED' | 'FULL' | 'RANDOMIZED' | 'AUTO';
+    /**
+     * Corresponds to the label key of a reservation resource used by Vertex AI. To target a SPECIFIC_RESERVATION by name, use `compute.googleapis.com/reservation-name` as the key and specify the name of your reservation as its value.
+     */
+    reservationAffinityKey?: string;
+    /**
+     * Specifies the reservation affinity type used to configure a Vertex AI resource. The default value is `NO_RESERVATION`.
+     */
+    reservationAffinityType?:
+      | 'RESERVATION_AFFINITY_TYPE_UNSPECIFIED'
+      | 'NO_RESERVATION'
+      | 'ANY_RESERVATION'
+      | 'SPECIFIC_RESERVATION';
+    /**
+     * Corresponds to the label values of a reservation resource used by Vertex AI. This must be the full resource name of the reservation or reservation block.
+     */
+    reservationAffinityValues?: Array<string>;
     /**
      * Number of paths for the sampled Shapley explain method.
      */
