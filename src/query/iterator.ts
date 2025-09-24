@@ -29,6 +29,6 @@ export class RowIterator {
    * Asynchronously iterates over the rows in the query result.
    */
   async *[Symbol.asyncIterator](): AsyncGenerator<Row> {
-    // TODO: implement iterator
+    // TODO(#1541): implement iterator
   }
 }

@@ -71,7 +71,7 @@ transports.forEach(transport => {
 
         assert(q.complete);
 
-        // TODO: read rows and assert row count
+        // TODO(#1541): read rows and assert row count
       });
 
       it('should stop waiting for query to complete', async () => {
@@ -129,7 +129,7 @@ transports.forEach(transport => {
 
         assert(q.complete);
 
-        // TODO: read rows and assert row count
+        // TODO(#1541): read rows and assert row count
       });
 
       it('should insert a query job', async () => {
@@ -145,7 +145,7 @@ transports.forEach(transport => {
 
         assert(q.complete);
 
-        // TODO: read rows and assert row count
+        // TODO(#1541): read rows and assert row count
       });
     });
   });

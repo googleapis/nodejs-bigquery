@@ -37,7 +37,7 @@ export class QueryClient {
     if (this.projectId) {
       return this.projectId;
     }
-    const {jobClient} = this.getBigQueryClient();
+    const {jobClient} = this.getBigQueryClient();    
     const projectId = await jobClient.getProjectId();
     this.projectId = projectId;
     return projectId;
