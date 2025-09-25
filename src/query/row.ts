@@ -13,6 +13,6 @@
 // limitations under the License.
 
 /**
- * Represents a row in a query result.
+ * Represents a row in a BigQuery query result.
  */
 export class Row {}

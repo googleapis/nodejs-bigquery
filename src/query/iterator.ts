@@ -16,17 +16,24 @@ import {Query} from './query';
 import {Row} from './row';
 
 /**
- * RowIterator iterates over the results of a query.
+ * The RowIterator provides a way to iterate over the rows of a query result.
+ * It can be used with `for await...of` loops.
  */
 export class RowIterator {
   private query: Query;
 
+  /**
+   * @param {Query} query - The Query instance to iterate over.
+   * @internal
+   */
   constructor(query: Query) {
     this.query = query;
   }
 
   /**
    * Asynchronously iterates over the rows in the query result.
+   *
+   * @yields {Row} A row from the query result.
    */
   async *[Symbol.asyncIterator](): AsyncGenerator<Row> {
     // TODO(#1541): implement iterator

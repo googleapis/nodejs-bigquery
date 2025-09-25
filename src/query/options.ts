@@ -14,6 +14,12 @@
 
 import {CallOptions as GaxCallOptions} from 'google-gax';
 
+/**
+ * Extended call options that include an AbortSignal.
+ */
 export interface CallOptions extends GaxCallOptions {
+  /**
+   * An AbortSignal to cancel the operation.
+   */
   signal?: AbortSignal;
 }

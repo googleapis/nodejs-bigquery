@@ -20,7 +20,8 @@ import {setInterval} from 'timers/promises';
 import {EventEmitter} from 'stream';
 
 /**
- * Query represents a query job.
+ * The Query object provides a handle to a BigQuery query job. It allows you to
+ * wait for the job to complete, retrieve results, and access job metadata.
  */
 export class Query {
   private helper: QueryHelper;
@@ -43,6 +44,16 @@ export class Query {
     this.jobId = null;
   }
 
+  /**
+   * Creates a Query instance from a query request.
+   *
+   * @internal
+   *
+   * @param {QueryHelper} helper - The QueryHelper instance.
+   * @param {protos.google.cloud.bigquery.v2.IPostQueryRequest} request - The query request.
+   * @param {CallOptions} [options] - Call options.
+   * @returns {Promise<Query>} A promise that resolves with a Query instance.
+   */
   static fromQueryRequest_(
     helper: QueryHelper,
     request: protos.google.cloud.bigquery.v2.IPostQueryRequest,
@@ -54,6 +65,17 @@ export class Query {
     return Promise.resolve(q);
   }
 
+  /**
+   * Creates a Query instance from a job request.
+   *
+   * @internal
+   *
+   * @param {QueryHelper} helper - The QueryHelper instance.
+   * @param {protos.google.cloud.bigquery.v2.IJob} job - The job object.
+   * @param {string} [projectId] - The project ID.
+   * @param {CallOptions} [options] - Call options.
+   * @returns {Promise<Query>} A promise that resolves with a Query instance.
+   */
   static fromJobRequest_(
     helper: QueryHelper,
     job: protos.google.cloud.bigquery.v2.IJob,
@@ -67,8 +89,14 @@ export class Query {
   }
 
   /**
-   * Internal method to instantiate Query handler from job reference
+   * Creates a Query instance from a job reference.
+   *
    * @internal
+   *
+   * @param {QueryHelper} helper - The QueryHelper instance.
+   * @param {protos.google.cloud.bigquery.v2.IJobReference} jobReference - The job reference.
+   * @param {CallOptions} [options] - Call options.
+   * @returns {Promise<Query>} A promise that resolves with a Query instance.
    */
   static fromJobRef_(
     helper: QueryHelper,
@@ -82,6 +110,12 @@ export class Query {
     return Promise.resolve(q);
   }
 
+  /**
+   * Returns a job reference for the query job.
+   * This will be null until the query job has been successfully submitted.
+   *
+   * @returns {protos.google.cloud.bigquery.v2.IJobReference | null} The job reference, or null if not available.
+   */
   get jobReference(): protos.google.cloud.bigquery.v2.IJobReference | null {
     if (!this.jobId) {
       return null;
@@ -93,14 +127,32 @@ export class Query {
     };
   }
 
+  /**
+   * Returns the schema of the query results.
+   * This will be null until the query has completed and the schema is available.
+   *
+   * @returns {protos.google.cloud.bigquery.v2.ITableSchema | null} The schema, or null if not available.
+   */
   get schema(): protos.google.cloud.bigquery.v2.ITableSchema | null {
     return null;
   }
 
+  /**
+   * Whether the query job is complete.
+   *
+   * @returns {boolean} True if the job is complete, false otherwise.
+   */
   get complete(): boolean {
     return this.jobComplete;
   }
 
+  /**
+   * Returns the auto-generated ID for the query.
+   * This is only populated for stateless queries (i.e. those started via jobs.query)
+   * after the query has been submitted.
+   *
+   * @returns {string | null} The query ID, or null if not available.
+   */
   get queryId(): string | null {
     return this._queryId;
   }
@@ -170,6 +222,7 @@ export class Query {
    *
    * @param {CallOptions} [options]
    *   Call options. See {@link https://googleapis.dev/nodejs/google-gax/latest/interfaces/CallOptions.html|CallOptions} for more details.
+   * @returns {Promise<void>}
    */
   async wait(options?: CallOptions): Promise<void> {
     if (this.complete) {
@@ -196,7 +249,7 @@ export class Query {
   /**
    * Returns a RowIterator for the query results.
    *
-   * @returns {RowIterator}
+   * @returns {Promise<RowIterator>} A promise that resolves with a RowIterator.
    */
   async read(): Promise<RowIterator> {
     const it = new RowIterator(this);

@@ -19,14 +19,18 @@ import {protos} from '..';
 import {randomUUID} from 'crypto';
 
 /**
- * QueryHelper is a helper for running queries in BigQuery.
+ * The QueryHelper provides a simplified interface for interacting with BigQuery
+ * queries. It handles the lifecycle of query jobs, from creation to result
+ * retrieval.
  */
 export class QueryHelper {
   private client: BigQueryClient;
   private projectId?: string;
 
   /**
-   * @param {BigQueryClientOptions} options - The configuration object.
+   * @param {object} opts - The configuration object.
+   * @param {BigQueryClient} opts.client - A BigQueryClient instance.
+   * @param {string} [opts.projectId] - The project ID to use. Optional.
    */
   constructor(opts: {client: BigQueryClient; projectId?: string}) {
     this.client = opts.client;
@@ -34,6 +38,11 @@ export class QueryHelper {
     void this.initialize();
   }
 
+  /**
+   * Retrieves the project ID from the client.
+   *
+   * @returns {Promise<string>} A promise that resolves with the project ID.
+   */
   async getProjectId(): Promise<string> {
     if (this.projectId) {
       return this.projectId;
@@ -55,7 +64,7 @@ export class QueryHelper {
    *
    * @returns {Promise} A promise that resolves when auth is complete.
    */
-  initialize = async (): Promise<void> => {
+  async initialize(): Promise<void> {
     if (this.projectId) {
       return;
     }
@@ -63,16 +72,16 @@ export class QueryHelper {
     await jobClient.initialize();
     const projectId = await this.getProjectId();
     this.projectId = projectId;
-  };
+  }
 
   /**
-   * Runs a query and returns a QueryJob handle.
+   * Starts a query job using the `jobs.query` API.
    *
    * @param {protos.google.cloud.bigquery.v2.IPostQueryRequest} request
    *   The request object that will be sent.
    * @param {CallOptions} [options]
    *   Call options. See {@link https://googleapis.dev/nodejs/google-gax/latest/interfaces/CallOptions.html|CallOptions} for more details.
-   * @returns {Promise<Query>}
+   * @returns {Promise<Query>} A promise that resolves with a Query instance.
    */
   async startQuery(
     request: protos.google.cloud.bigquery.v2.IPostQueryRequest,
@@ -91,13 +100,13 @@ export class QueryHelper {
   }
 
   /**
-   * Starts a new asynchronous job.
+   * Starts a new asynchronous query job using the `jobs.insert` API.
    *
    * @param {protos.google.cloud.bigquery.v2.IJob} job
-   *   A job resource to insert
+   *   A job resource to insert.
    * @param {CallOptions} [options]
    *   Call options. See {@link https://googleapis.dev/nodejs/google-gax/latest/interfaces/CallOptions.html|CallOptions} for more details.
-   * @returns {Promise<Query>}
+   * @returns {Promise<Query>} A promise that resolves with a Query instance.
    */
   async startQueryJob(
     job: protos.google.cloud.bigquery.v2.IJob,
@@ -120,13 +129,13 @@ export class QueryHelper {
   }
 
   /**
-   * Create a managed Query from a job reference.
+   * Attaches to an existing query job.
    *
    * @param {protos.google.cloud.bigquery.v2.IJobReference} jobReference
-   *   A job resource to insert
+   *   A job reference object.
    * @param {CallOptions} [options]
    *   Call options. See {@link https://googleapis.dev/nodejs/google-gax/latest/interfaces/CallOptions.html|CallOptions} for more details.
-   * @returns {Promise<QueryJob>}
+   * @returns {Promise<Query>} A promise that resolves with a Query instance.
    */
   async attachJob(
     jobReference: protos.google.cloud.bigquery.v2.IJobReference,
@@ -142,6 +151,11 @@ export class QueryHelper {
     return Query.fromJobRef_(this, jobReference, options);
   }
 
+  /**
+   * Returns the BigQueryClient instance.
+   *
+   * @returns {BigQueryClient} The BigQueryClient instance.
+   */
   getBigQueryClient(): BigQueryClient {
     return this.client;
   }
