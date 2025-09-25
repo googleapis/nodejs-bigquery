@@ -10,6 +10,9 @@ Changes to client libraries can take a while to adopt, and we're taking a phased
 
 The first major update for each existing language is to first provide the new generated clients.  These new clients, based on the protocol-buffer representation of the API, expose the base functionality of the API.  Early adopters of this client are recommended to focus on control-plane and resource operations.  This generated layer will expose the underlying RPCs used to build query experiences, but will not include the higher level abstractions for executing queries in a performant way.
 
+### Running queries
+
+[!CAUTION]
 Our next task is to leverage the generated code layer to deliver updated query abstractions which make it easy to run SQL queries in a performant manner, and read the results from these queries. Further iterations on the new client libraries will be focused on stability and maturation of the new client, based on feedback from users.
 
 ### Benefits
