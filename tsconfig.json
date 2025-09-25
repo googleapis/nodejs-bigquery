@@ -22,5 +22,8 @@
     "benchmark/*.ts",
     "scripts/*.ts",
     "samples/**/*.json"
+  ],
+  "exclude": [
+    "system-test/fixtures/sample/**/*.ts"
   ]
 }

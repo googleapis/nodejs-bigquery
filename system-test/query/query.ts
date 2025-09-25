@@ -15,8 +15,8 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import {it} from 'mocha';
-import {QueryClient} from '../../src/query';
-import {protos} from '../../src';
+import {QueryHelper} from '../../src/query';
+import {BigQueryClient, protos} from '../../src';
 
 const sleep = (ms: number) =>
   new Promise(resolve => {
@@ -25,24 +25,29 @@ const sleep = (ms: number) =>
 
 // the GCLOUD_PROJECT environment variable is set as part of test harness setup
 const projectId = process.env.GCLOUD_PROJECT;
+if (!projectId) {
+  throw new Error('GCLOUD_PROJECT environment variable is not set');
+}
+
 const transports = ['grpc', 'rest'];
 
 // run tests with the gRPC client and the REST fallback client
 transports.forEach(transport => {
-  let client;
+  let client: BigQueryClient;
   if (transport === 'grpc') {
-    client = new QueryClient({});
+    client = new BigQueryClient({});
   } else {
-    client = new QueryClient({fallback: true});
+    client = new BigQueryClient({fallback: true});
   }
+  const helper = new QueryHelper({client, projectId});
 
   describe('Run Query', () => {
     describe(transport, () => {
       let getQueryResultsSpy: sinon.SinonSpy;
 
       beforeEach(async () => {
-        await client.initialize();
-        const {jobClient} = client.getBigQueryClient();
+        await helper.initialize();
+        const {jobClient} = helper.getBigQueryClient();
 
         getQueryResultsSpy = sinon.spy(jobClient, 'getQueryResults');
       });
@@ -66,7 +71,7 @@ transports.forEach(transport => {
           projectId,
         };
 
-        const q = await client.startQuery(req);
+        const q = await helper.startQuery(req);
         await q.wait();
 
         assert(q.complete);
@@ -91,14 +96,14 @@ transports.forEach(transport => {
           projectId,
         };
 
-        const q = await client.startQuery(req);
+        const q = await helper.startQuery(req);
         const abortCtrl = new AbortController();
         q.wait({
           signal: abortCtrl.signal,
         }).catch(err => {
           assert(err, 'aborted');
         });
-        await sleep(1000);
+        await sleep(2000);
         abortCtrl.abort();
 
         assert(getQueryResultsSpy.callCount >= 1);
@@ -120,11 +125,14 @@ transports.forEach(transport => {
           projectId,
         };
 
-        let q = await client.startQuery(req);
+        let q = await helper.startQuery(req);
         await q.wait();
 
         const jobRef = q.jobReference;
-        q = await client.attachJob(jobRef);
+        if (!jobRef) {
+          throw new Error('jobRef is null');
+        }
+        q = await helper.attachJob(jobRef);
         await q.wait();
 
         assert(q.complete);
@@ -133,7 +141,7 @@ transports.forEach(transport => {
       });
 
       it('should insert a query job', async () => {
-        const q = await client.startQueryJob({
+        const q = await helper.startQueryJob({
           configuration: {
             query: {
               query: 'SELECT CURRENT_DATETIME() as foo, SESSION_USER() as bar',

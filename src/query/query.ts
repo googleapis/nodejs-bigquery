@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {QueryClient} from './client';
+import {QueryHelper} from './helper';
 import {protos} from '../';
 import {RowIterator} from './iterator';
 import {CallOptions} from './options';
@@ -23,45 +23,47 @@ import {EventEmitter} from 'stream';
  * Query represents a query job.
  */
 export class Query {
-  private client: QueryClient;
+  private helper: QueryHelper;
   private jobComplete: boolean;
 
-  private _queryId: string;
-  private projectId: string;
-  private jobId: string;
-  private location: string;
+  private _queryId: string | null;
+  private projectId?: string;
+  private jobId: string | null;
+  private location?: string | null;
 
   private emitter: EventEmitter;
 
-  constructor(client: QueryClient) {
-    this.client = client;
+  private constructor(helper: QueryHelper, projectId?: string) {
+    this.helper = helper;
     this.jobComplete = false;
     this.emitter = new EventEmitter();
 
-    this.jobId = '';
-    this.location = '';
-    this.projectId = '';
-    this._queryId = '';
+    this.projectId = projectId;
+    this._queryId = null;
+    this.jobId = null;
   }
 
-  /**
-   * Internal method to instantiate Query handler from jobs.query response
-   * @internal
-   */
-  static fromResponse_(
-    client: QueryClient,
-    response: protos.google.cloud.bigquery.v2.IQueryResponse,
+  static fromQueryRequest_(
+    helper: QueryHelper,
+    request: protos.google.cloud.bigquery.v2.IPostQueryRequest,
     options?: CallOptions,
-  ): Query {
-    const q = new Query(client);
-    q.location = response.location ?? '';
-    if (response.queryId) {
-      q._queryId = response.queryId;
-    }
-    q.consumeQueryResponse({...response});
-    void q.waitQueryBackground(options);
+  ): Promise<Query> {
+    const q = new Query(helper, request.projectId ?? undefined);
+    void q.runQuery(request, options);
 
-    return q;
+    return Promise.resolve(q);
+  }
+
+  static fromJobRequest_(
+    helper: QueryHelper,
+    job: protos.google.cloud.bigquery.v2.IJob,
+    projectId?: string,
+    options?: CallOptions,
+  ): Promise<Query> {
+    const q = new Query(helper, projectId);
+    void q.insertQuery(job, options);
+
+    return Promise.resolve(q);
   }
 
   /**
@@ -69,14 +71,21 @@ export class Query {
    * @internal
    */
   static fromJobRef_(
-    client: QueryClient,
+    helper: QueryHelper,
     jobReference: protos.google.cloud.bigquery.v2.IJobReference,
     options?: CallOptions,
-  ): Query {
-    return this.fromResponse_(client, {jobReference}, options);
+  ): Promise<Query> {
+    const q = new Query(helper, jobReference.projectId || undefined);
+
+    q.consumeQueryResponse({jobReference});
+    void q.waitQueryBackground(options);
+    return Promise.resolve(q);
   }
 
-  get jobReference(): protos.google.cloud.bigquery.v2.IJobReference {
+  get jobReference(): protos.google.cloud.bigquery.v2.IJobReference | null {
+    if (!this.jobId) {
+      return null;
+    }
     return {
       jobId: this.jobId,
       projectId: this.projectId,
@@ -92,12 +101,52 @@ export class Query {
     return this.jobComplete;
   }
 
-  get queryId(): string {
+  get queryId(): string | null {
     return this._queryId;
+  }
+
+  private async runQuery(
+    request: protos.google.cloud.bigquery.v2.IPostQueryRequest,
+    options?: CallOptions,
+  ) {
+    const {jobClient} = this.helper.getBigQueryClient();
+    try {
+      const [response] = await jobClient.query(request, options);
+      this.location = response.location;
+      if (response.queryId) {
+        this._queryId = response.queryId;
+      }
+      this.consumeQueryResponse(response);
+      void this.waitQueryBackground(options);
+    } catch (err) {
+      this.markDone(err as Error);
+    }
+  }
+
+  private async insertQuery(
+    job: protos.google.cloud.bigquery.v2.IJob,
+    options?: CallOptions,
+  ) {
+    const {jobClient} = this.helper.getBigQueryClient();
+    try {
+      const [response] = await jobClient.insertJob(
+        {
+          job: job,
+          projectId: this.projectId,
+        },
+        options,
+      );
+      this.emitter.emit('query:created', response);
+      this.consumeQueryResponse(response);
+      void this.waitQueryBackground(options);
+    } catch (err) {
+      this.markDone(err as Error);
+    }
   }
 
   private async waitQueryBackground(options?: CallOptions) {
     if (this.complete) {
+      this.markDone();
       return;
     }
     const signal = options?.signal;
@@ -105,11 +154,15 @@ export class Query {
     for await (const _ of setInterval(waitTime, undefined, {signal})) {
       await this.checkStatus(options);
       if (this.complete) {
-        this.emitter.emit('done');
+        this.markDone();
         break;
       }
       waitTime = 1000;
     }
+  }
+
+  private markDone(err?: Error) {
+    this.emitter.emit('done', err);
   }
 
   /**
@@ -124,9 +177,13 @@ export class Query {
     }
     const signal = options?.signal;
     return new Promise((resolve, reject) => {
-      const callback = () => {
-        resolve();
+      const callback = (err: Error) => {
         this.emitter.removeListener('done', callback);
+        if (err) {
+          reject(err);
+          return;
+        }
+        resolve();
       };
       this.emitter.addListener('done', callback);
       signal?.addEventListener('abort', () => {
@@ -158,19 +215,17 @@ export class Query {
   }
 
   private async checkStatus(options?: CallOptions): Promise<void> {
-    const {jobClient} = this.client.getBigQueryClient();
-    const [response] = await jobClient.getQueryResults(
-      {
-        projectId: this.projectId,
-        jobId: this.jobId,
-        location: this.location,
-        maxResults: {value: 0},
-        formatOptions: {
-          useInt64Timestamp: true,
-        },
+    const {jobClient} = this.helper.getBigQueryClient();
+    const req: protos.google.cloud.bigquery.v2.IGetQueryResultsRequest = {
+      projectId: this.projectId,
+      jobId: this.jobId,
+      location: this.location,
+      maxResults: {value: 0},
+      formatOptions: {
+        useInt64Timestamp: true,
       },
-      options,
-    );
+    };
+    const [response] = await jobClient.getQueryResults(req, options);
     this.consumeQueryResponse(response);
   }
 }

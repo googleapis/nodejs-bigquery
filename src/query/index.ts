@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export {QueryClient} from './client';
+export {QueryHelper} from './helper';
 export {Query} from './query';
 export {Row} from './row';
 export {RowIterator} from './iterator';

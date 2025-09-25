@@ -15,21 +15,22 @@
 import {BigQueryClient, BigQueryClientOptions} from '../bigquery';
 import {Query} from './query';
 import {CallOptions} from './options';
-import {protos} from '../';
+import {protos} from '..';
+import {randomUUID} from 'crypto';
 
 /**
- * QueryClient is a client for running queries in BigQuery.
+ * QueryHelper is a helper for running queries in BigQuery.
  */
-export class QueryClient {
+export class QueryHelper {
   private client: BigQueryClient;
-  private projectId: string;
+  private projectId?: string;
 
   /**
    * @param {BigQueryClientOptions} options - The configuration object.
    */
-  constructor(options?: BigQueryClientOptions) {
-    this.client = new BigQueryClient(options);
-    this.projectId = '';
+  constructor(opts: {client: BigQueryClient; projectId?: string}) {
+    this.client = opts.client;
+    this.projectId = opts.projectId;
     void this.initialize();
   }
 
@@ -37,11 +38,12 @@ export class QueryClient {
     if (this.projectId) {
       return this.projectId;
     }
-    const {jobClient} = this.getBigQueryClient();    
+    const {jobClient} = this.getBigQueryClient();
     const projectId = await jobClient.getProjectId();
     this.projectId = projectId;
     return projectId;
   }
+
   /**
    * Initialize the client.
    * Performs asynchronous operations (such as authentication) and prepares the client.
@@ -76,8 +78,16 @@ export class QueryClient {
     request: protos.google.cloud.bigquery.v2.IPostQueryRequest,
     options?: CallOptions,
   ): Promise<Query> {
-    const [response] = await this.client.jobClient.query(request, options);
-    return Query.fromResponse_(this, response, options);
+    if (!request.projectId) {
+      request.projectId = this.projectId;
+    }
+    if (!request.queryRequest) {
+      throw new Error('queryRequest is required');
+    }
+    if (!request.queryRequest.requestId) {
+      request.queryRequest.requestId = randomUUID();
+    }
+    return Query.fromQueryRequest_(this, request, options);
   }
 
   /**
@@ -93,18 +103,20 @@ export class QueryClient {
     job: protos.google.cloud.bigquery.v2.IJob,
     options?: CallOptions,
   ): Promise<Query> {
-    const [response] = await this.client.jobClient.insertJob(
-      {
-        projectId: this.projectId,
-        job,
-      },
-      options,
-    );
-    const {jobReference} = response;
-    if (!jobReference) {
-      throw new Error('Failed to insert job. Missing job reference.');
+    const config = job.configuration;
+    if (!config) {
+      throw new Error('job is missing configuration');
     }
-    return Query.fromJobRef_(this, jobReference, options);
+    const queryConfig = config.query;
+    if (!queryConfig) {
+      throw new Error('job is not a query');
+    }
+    job.jobReference ||= {};
+    if (!job.jobReference.jobId) {
+      job.jobReference.jobId = randomUUID();
+    }
+
+    return Query.fromJobRequest_(this, job, this.projectId, options);
   }
 
   /**
@@ -120,6 +132,13 @@ export class QueryClient {
     jobReference: protos.google.cloud.bigquery.v2.IJobReference,
     options?: CallOptions,
   ): Promise<Query> {
+    if (!jobReference.jobId) {
+      throw new Error('attachJob requires a non-empty JobReference.JobId');
+    }
+    if (!jobReference.projectId) {
+      jobReference.projectId = this.projectId;
+    }
+
     return Query.fromJobRef_(this, jobReference, options);
   }
 
