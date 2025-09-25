@@ -14,7 +14,8 @@ The first major update for each existing language is to first provide the new ge
 
 > [!WARNING]
 > Our next task is to leverage the generated code layer to deliver updated query abstractions which make it easy to run SQL queries in a performant
-> manner, and read the results from these queries. Further iterations on the new client libraries will be focused on stability and maturation of the > new client, based on feedback from users.
+> manner, and read the results from these queries. Further iterations on the new client libraries will be focused on stability and maturation of the
+> new client, based on feedback from users.
 
 ### Benefits
 
