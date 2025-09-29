@@ -8,8 +8,9 @@
 [![npm version](https://img.shields.io/npm/v/@google-cloud/bigquery.svg)](https://www.npmjs.org/package/@google-cloud/bigquery)
 
 > [!CAUTION]
-> This branch contains experimental and unreleased work that is not yet supported.
-> Switch to the `main` branch for release and pre-release code.
+> This branch contains experimental work that is only in preview.
+> See the [migration guide](MIGRATING.md) for usage info, or
+> switch to the `main` branch for release and pre-release code.
 
 
 Bigquery client for Node.js
