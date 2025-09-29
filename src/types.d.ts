@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * Discovery Revision: 20250919
+ * Discovery Revision: 20250912
  */
 
 /**
@@ -5525,10 +5525,6 @@ declare namespace bigquery {
      * Optional. See documentation for precision.
      */
     scale?: string;
-    /**
-     * Optional. Precision (maximum number of total digits in base 10) for seconds of TIMESTAMP type. Possible values include: * 6 (Default, for TIMESTAMP type with microsecond precision) * 12 (For TIMESTAMP type with picosecond precision)
-     */
-    timestampPrecision?: string;
     /**
      * Required. The field data type. Possible values include: * STRING * BYTES * INTEGER (or INT64) * FLOAT (or FLOAT64) * BOOLEAN (or BOOL) * TIMESTAMP * DATE * TIME * DATETIME * GEOGRAPHY * NUMERIC * BIGNUMERIC * JSON * RECORD (or STRUCT) * RANGE Use of RECORD/STRUCT indicates that the field contains a nested schema.
      */
