@@ -2,7 +2,6 @@ branches:
 - branch: preview-9.x
   bumpMinorPreMajor: false
   handleGHRelease: true
-  prerelease: true
   versioningStratetgy: prerelease
 handleGHRelease: true
 releaseType: node
