@@ -1,2 +1,6 @@
+branches:
+- branch: preview-9.x
+  bumpMinorPreMajor: false
+  handleGHRelease: true
 handleGHRelease: true
 releaseType: node
