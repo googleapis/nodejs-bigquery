@@ -9,7 +9,7 @@
 
 > [!CAUTION]
 > This branch contains experimental work that is only in preview.
-> See the [migration guide](MIGRATING.md) for usage info, or
+> See the [migration guide](https://github.com/googleapis/nodejs-bigquery/blob/preview-9.x/MIGRATING.md) for usage info, or
 > switch to the `main` branch for release and pre-release code.
 
 
