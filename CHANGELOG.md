@@ -4,6 +4,18 @@
 
 [1]: https://www.npmjs.com/package/@google-cloud/bigquery?activeTab=versions
 
+## [8.2.0](https://github.com/googleapis/nodejs-bigquery/compare/v8.1.1...v8.2.0) (2025-10-01)
+
+
+### Features
+
+* Next release from preview-9.x branch is v9.0.0-alpha.0 ([#1558](https://github.com/googleapis/nodejs-bigquery/issues/1558)) ([a3f94ca](https://github.com/googleapis/nodejs-bigquery/commit/a3f94ca5e63090aed6d032490b77767b62d1250d))
+
+
+### Bug Fixes
+
+* **deps:** Update dependency big.js to v7 ([#1469](https://github.com/googleapis/nodejs-bigquery/issues/1469)) ([06625f7](https://github.com/googleapis/nodejs-bigquery/commit/06625f7aba9dfe5d4a9baefb9f9242e618bc2734))
+
 ## [8.1.1](https://github.com/googleapis/nodejs-bigquery/compare/v8.1.0...v8.1.1) (2025-07-23)
 
 
