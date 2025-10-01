@@ -1,5 +1,18 @@
 # Changelog
 
+## [9.0.0-alpha.0](https://github.com/googleapis/nodejs-bigquery/compare/v9.0.0-alpha.0...v9.0.0-alpha.0) (2025-10-01)
+
+
+### Features
+
+* Add release please config ([#1549](https://github.com/googleapis/nodejs-bigquery/issues/1549)) ([9799e2f](https://github.com/googleapis/nodejs-bigquery/commit/9799e2f6cc0892abf72b58200faa0462d99e8957))
+
+
+### Bug Fixes
+
+* Library should be released as 9.0.0-alpha.0 ([#1552](https://github.com/googleapis/nodejs-bigquery/issues/1552)) ([18f6930](https://github.com/googleapis/nodejs-bigquery/commit/18f6930811574282c21d60b82705eea09fd8c6ee))
+* Link to migrating guide from README ([#1564](https://github.com/googleapis/nodejs-bigquery/issues/1564)) ([32fa559](https://github.com/googleapis/nodejs-bigquery/commit/32fa559ce4888e4482f8cfb9135739754047efed))
+
 ## [9.0.0-alpha.0](https://github.com/googleapis/nodejs-bigquery/compare/v7.9.1...v9.0.0-alpha.0) (2025-10-01)
 
 
