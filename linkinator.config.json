@@ -6,6 +6,10 @@
     "http://goo.gl/f2SXcb",
     "img.shields.io"
   ],
+  "statusCodes": {
+    "403": "warn",
+    "429": "warn"
+  },
   "silent": true,
   "concurrency": 10
 }
