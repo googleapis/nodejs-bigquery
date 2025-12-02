@@ -12,7 +12,7 @@ jobs:
         node: [18, 20, 22, 24]
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node }}
       - run: node --version
@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: 18
       - run: node --version
@@ -44,7 +44,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: 18
       - run: npm install --engine-strict
@@ -55,21 +55,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: 18
       - run: npm install
       - run: npm run lint
-  # TODO(https://github.com/googleapis/nodejs-bigquery/issues/1582) 
-  # docs:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v5
-  #     - uses: actions/setup-node@v4
-  #       with:
-  #         node-version: 18
-  #     - run: npm install
-  #     - run: npm run docs
-  #     - uses: JustinBeckwith/linkinator-action@v1
-  #       with:
-  #         paths: docs/
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 18
+      - run: npm install
+      - run: npm run docs
+      - uses: JustinBeckwith/linkinator-action@v1
+        with:
+          paths: docs/
