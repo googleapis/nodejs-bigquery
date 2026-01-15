@@ -998,6 +998,28 @@ describe('BigQuery', () => {
       assert.strictEqual(basicMetadata.metadata.lastModifiedTime, undefined);
     });
 
+    it('should create a table with numeric precision', async () => {
+      const table = dataset.table(generateName('numeric-precision-table'));
+      const schema = {
+        fields: [
+          {
+            name: 'numeric_field',
+            type: 'NUMERIC',
+            precision: 12,
+            scale: 2,
+          },
+        ],
+      };
+      try {
+        await table.create({schema});
+        const [metadata] = await table.getMetadata();
+        assert.deepStrictEqual(metadata.schema.fields[0].precision, '12');
+        assert.deepStrictEqual(metadata.schema.fields[0].scale, '2');
+      } catch (e) {
+        assert.ifError(e);
+      }
+    });
+
     describe('copying', () => {
       interface TableItem {
         data?: {tableId?: number};
