@@ -998,14 +998,14 @@ describe('BigQuery', () => {
       assert.strictEqual(basicMetadata.metadata.lastModifiedTime, undefined);
     });
 
-    it('should create a table with numeric precision', async () => {
+    it('should create a table with a numeric field having picosecond precision', async () => {
       const table = dataset.table(generateName('numeric-precision-table'));
       const schema = {
         fields: [
           {
             name: 'numeric_field',
             type: 'NUMERIC',
-            precision: 12,
+            precision: 12, // 12 indicates picosecond precision
             scale: 2,
           },
         ],
