@@ -1020,6 +1020,29 @@ describe('BigQuery', () => {
       }
     });
 
+    it.only('should create a table with timestampPrecision', async () => {
+      const table = dataset.table(generateName('timestamp-precision-table'));
+      const schema = {
+        fields: [
+          {
+            name: 'ts_field',
+            type: 'TIMESTAMP',
+            timestampPrecision: 12,
+          },
+        ],
+      };
+      try {
+        await table.create({schema});
+        const [metadata] = await table.getMetadata();
+        assert.deepStrictEqual(
+          metadata.schema.fields[0].timestampPrecision,
+          '12'
+        );
+      } catch (e) {
+        assert.ifError(e);
+      }
+    });
+
     describe('copying', () => {
       interface TableItem {
         data?: {tableId?: number};
