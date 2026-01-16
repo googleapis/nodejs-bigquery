@@ -575,9 +575,8 @@ describe('BigQuery', () => {
       const QUERY = `SELECT * FROM \`${table.id}\``;
       // eslint-disable-next-line @typescript-eslint/no-var-requires
       const SCHEMA = require('../../system-test/data/schema.json');
-      const TEST_DATA_FILE = require.resolve(
-        '../../system-test/data/location-test-data.json',
-      );
+      const TEST_DATA_FILE =
+        require.resolve('../../system-test/data/location-test-data.json');
 
       before(async () => {
         // create a dataset in a certain location will cascade the location
@@ -880,9 +879,8 @@ describe('BigQuery', () => {
   });
 
   describe('BigQuery/Table', () => {
-    const TEST_DATA_JSON_PATH = require.resolve(
-      '../../system-test/data/kitten-test-data.json',
-    );
+    const TEST_DATA_JSON_PATH =
+      require.resolve('../../system-test/data/kitten-test-data.json');
 
     it('should have created the correct schema', () => {
       assert.deepStrictEqual(table.metadata.schema.fields, SCHEMA);
@@ -1020,7 +1018,7 @@ describe('BigQuery', () => {
       }
     });
 
-    it.only('should create a table with timestampPrecision', async () => {
+    it('should create a table with timestampPrecision', async () => {
       const table = dataset.table(generateName('timestamp-precision-table'));
       const schema = {
         fields: [
@@ -1036,7 +1034,7 @@ describe('BigQuery', () => {
         const [metadata] = await table.getMetadata();
         assert.deepStrictEqual(
           metadata.schema.fields[0].timestampPrecision,
-          '12'
+          '12',
         );
       } catch (e) {
         assert.ifError(e);
