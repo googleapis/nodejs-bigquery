@@ -1687,6 +1687,10 @@ declare namespace bigquery {
      */
     schema?: ITableSchema;
     /**
+     * Optional. Controls the strategy used to match loaded columns to the schema. If not set, a sensible default is chosen based on how the schema is provided. If autodetect is used, then columns are matched by name. Otherwise, columns are matched by position. This is done to keep the behavior backward-compatible.
+     */
+    sourceColumnMatch?: 'SOURCE_COLUMN_MATCH_UNSPECIFIED' | 'POSITION' | 'NAME';
+    /**
      * [Required] The data format. For CSV files, specify "CSV". For Google sheets, specify "GOOGLE_SHEETS". For newline-delimited JSON, specify "NEWLINE_DELIMITED_JSON". For Avro files, specify "AVRO". For Google Cloud Datastore backups, specify "DATASTORE_BACKUP". For Apache Iceberg tables, specify "ICEBERG". For ORC files, specify "ORC". For Parquet files, specify "PARQUET". [Beta] For Google Cloud Bigtable, specify "BIGTABLE".
      */
     sourceFormat?: string;
