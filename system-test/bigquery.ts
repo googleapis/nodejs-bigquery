@@ -37,6 +37,7 @@ import {
   QueryOptions,
 } from '../src';
 import bq from '../src/types';
+import {PreciseDate} from '@google-cloud/precise-date';
 
 const bigquery = new BigQuery();
 const storage = new Storage();
@@ -1195,6 +1196,83 @@ describe('BigQuery', () => {
 
       describe('SQL parameters', () => {
         describe('positional', () => {
+          it('should run a query and return results', async () => {
+            const queryString = 'SELECT url FROM `publicdata.samples.github_nested` LIMIT 10';
+            const query = {
+              query: queryString,
+              params: [],
+              types: [],
+            };
+            const [rows] = await bigquery.query(query);
+            assert.strictEqual(rows.length, 10);
+          });
+          it.only('should work with a timestamp', done => {
+            const myConstantDate = new PreciseDate('2024-07-15T10:00:00.123456789Z');
+            bigquery.query(
+                {
+                  query: 'SELECT ? timestamp',
+                  params: [myConstantDate],
+                  types: ['TIMESTAMP'],
+                },
+                (err, rows) => {
+                  assert.ifError(err);
+                  assert.strictEqual(rows!.length, 1);
+                  done();
+                },
+            );
+          });
+          it('should work with structs and a nested timestamp', done => {
+            const myConstantDate = new PreciseDate('2024-07-15T10:00:00.123456789Z');
+            bigquery.query(
+                {
+                  query: 'SELECT @obj obj',
+                  params: {
+                    obj: {
+                      timestamp: myConstantDate,
+                      b: true,
+                      arr: [2, 3, 4],
+                      d: bigquery.date('2016-12-7'),
+                      f: 3.14,
+                      nested: {
+                        a: 3,
+                      },
+                    },
+                  },
+                  types: {
+                    obj: {
+                      timestamp: 'TIMESTAMP',
+                      b: 'BOOL',
+                      arr: ['INT64'],
+                      d: 'DATE',
+                      f: 'FLOAT64',
+                      nested: {
+                        a: 'INT64',
+                      },
+                    },
+                  },
+                },
+                (err, rows) => {
+                  assert.ifError(err);
+                  assert.strictEqual(rows!.length, 1);
+                  done();
+                },
+            );
+          });
+          it('should run a query with a high precision BigInt', async () => {
+            const query = `SELECT @high_precision_value AS result`;
+            const highPrecisionValue = new Big('12345678901234567890.123456789');
+            const options = {
+              query: query,
+              params: {high_precision_value: highPrecisionValue},
+            };
+            try {
+              const [rows] = await bigquery.query(options);
+              const result = rows[0].result;
+              console.log('Result: ', result);
+            } catch (err) {
+              console.error('ERROR:', err);
+            }
+          })
           it('should work with strings', done => {
             bigquery.query(
               {
