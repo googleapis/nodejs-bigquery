@@ -1096,6 +1096,11 @@ export class BigQuery extends Service {
           };
         }),
       };
+    } else if ((providedType as string).toUpperCase() === 'TIMESTAMP') {
+      return {
+        type: 'TIMESTAMP',
+        timestampPrecision: '12',
+      }
     }
 
     providedType = (providedType as string).toUpperCase();
@@ -1134,7 +1139,10 @@ export class BigQuery extends Service {
     } else if (value instanceof BigQueryTime) {
       typeName = 'TIME';
     } else if (value instanceof BigQueryTimestamp) {
-      typeName = 'TIMESTAMP';
+      return {
+        type: 'TIMESTAMP', // Was typeName = 'TIMESTAMP', but now we need better timestamp precision;
+        timestampPrecision: '12'
+      }
     } else if (value instanceof Buffer) {
       typeName = 'BYTES';
     } else if (value instanceof Big) {
