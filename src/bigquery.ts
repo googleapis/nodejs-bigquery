@@ -2530,6 +2530,10 @@ function convertSchemaFieldValue(
       break;
     }
     case 'TIMESTAMP': {
+      if (schemaField.timestampPrecision === '12') {
+        value = String(value);
+        break;
+      }
       const pd = new PreciseDate();
       pd.setFullTime(PreciseDate.parseFull(BigInt(value) * BigInt(1000)));
       value = BigQuery.timestamp(pd);

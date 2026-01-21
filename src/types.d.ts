@@ -5506,6 +5506,10 @@ declare namespace bigquery {
      */
     precision?: string;
     /**
+     * Optional. Precision (maximum number of total digits in base 10) for seconds of TIMESTAMP type. Possible values include: * 6 (Default, for TIMESTAMP type with microsecond precision) * 12 (For TIMESTAMP type with picosecond precision)
+     */
+    timestampPrecision?: string;
+    /**
      * Represents the type of a field element.
      */
     rangeElementType?: {
