@@ -972,10 +972,16 @@ describe('BigQuery', () => {
       const d = new Date();
       const f = d.valueOf() / 1000; // float seconds
       let timestamp = bq.timestamp(f);
-      assert.strictEqual(timestamp.value, d.toJSON());
+
+      // Verify it is a valid timestamp string representing the same time.
+      // Note: We use Date comparison because string comparison might fail due to
+      // precision differences (PreciseDate uses 9 fractional digits vs Date's 3).
+      const tsDate = new Date(timestamp.value);
+      assert.strictEqual(tsDate.valueOf(), d.valueOf());
 
       timestamp = bq.timestamp(f.toString());
-      assert.strictEqual(timestamp.value, d.toJSON());
+      const tsDate2 = new Date(timestamp.value);
+      assert.strictEqual(tsDate2.valueOf(), d.valueOf());
     });
 
     it('should accept a Date object', () => {

@@ -2720,40 +2720,101 @@ export class BigQueryTimestamp {
   value: string;
   constructor(value: Date | PreciseDate | string | number) {
     let pd: PreciseDate;
+    let originalValue: string | undefined;
+
     if (value instanceof PreciseDate) {
       pd = value;
     } else if (value instanceof Date) {
       pd = new PreciseDate(value);
     } else if (typeof value === 'string') {
+      originalValue = value;
       if (/^\d{4}-\d{1,2}-\d{1,2}/.test(value)) {
-        pd = new PreciseDate(value);
-      } else {
-        const floatValue = Number.parseFloat(value);
-        if (!Number.isNaN(floatValue)) {
-          pd = this.fromFloatValue_(floatValue);
+        // If the string has more than 9 fractional digits, PreciseDate parsing
+        // might fail or misinterpret it (e.g. treating excess digits as seconds).
+        // We truncate to 9 digits for the PreciseDate object.
+        const match = value.match(/\.(\d+)/);
+        if (match && match[1].length > 9) {
+          const truncatedValue = value.replace(
+            match[1],
+            match[1].slice(0, 9)
+          );
+          pd = new PreciseDate(truncatedValue);
         } else {
           pd = new PreciseDate(value);
         }
+      } else {
+        // Numeric string (epoch seconds).
+        // Parse manually to avoid precision loss from parseFloat.
+        pd = this.fromNumericString_(value);
       }
     } else {
       pd = this.fromFloatValue_(value);
     }
+
     // to keep backward compatibility, only converts with microsecond
     // precision if needed.
-    if (pd.getMicroseconds() > 0) {
+    if (pd.getMicroseconds() > 0 || pd.getNanoseconds() > 0) {
       this.value = pd.toISOString();
     } else {
       this.value = new Date(pd.getTime()).toJSON();
+    }
+
+    // If the original input string had higher precision than what PreciseDate
+    // could store (nanoseconds), or if we parsed a high-precision numeric string,
+    // we should try to preserve that precision in the string representation.
+    if (typeof originalValue === 'string') {
+      if (/^\d{4}-\d{1,2}-\d{1,2}/.test(originalValue)) {
+        // ISO string. If it had > 9 fractional digits, restore them.
+        const match = originalValue.match(/\.(\d+)/);
+        if (match && match[1].length > 9) {
+          this.value = originalValue;
+        }
+      } else {
+        // Numeric string.
+        // We want to verify if the original numeric string had more precision
+        // than the generated ISO string.
+        // Note: originalValue might be scientific notation or just large fraction.
+        // We only replace if we successfully identified it as decimal fraction > 9 digits.
+        const parts = originalValue.split('.');
+        if (
+          parts.length === 2 &&
+          parts[1].length > 9 &&
+          !/e/i.test(originalValue)
+        ) {
+          // We have > 9 digits of fraction.
+          // Replace the fraction in the generated ISO string.
+          // pd.toISOString() returns 9 digits of fraction.
+          this.value = this.value.replace(/\.\d+Z$/, `.${parts[1]}Z`);
+        }
+      }
     }
   }
 
   fromFloatValue_(value: number): PreciseDate {
     const secs = Math.trunc(value);
-    // Timestamps in BigQuery have microsecond precision, so we must
-    // return a round number of microseconds.
-    const micros = Math.trunc((value - secs) * 1e6 + 0.5);
-    const pd = new PreciseDate([secs, micros * 1000]);
+    // Timestamps in BigQuery can have picosecond precision, but float only supports
+    // limited precision. We use best effort here (nanoseconds).
+    const nanos = Math.trunc((value - secs) * 1e9 + 0.5);
+    const pd = new PreciseDate([secs, nanos]);
     return pd;
+  }
+
+  fromNumericString_(value: string): PreciseDate {
+    // Use big.js to handle precision if possible, otherwise fallback.
+    try {
+      const bigVal = new Big(value);
+      // round(0, 0) rounds to 0 decimal places, rounding down (towards zero).
+      const secsBig = bigVal.round(0, 0);
+      const secsNum = secsBig.toNumber();
+      const subSeconds = bigVal.minus(secsBig);
+      // subSeconds is e.g. 0.123456789123
+      const nanos = subSeconds.times(1e9).toNumber();
+      return new PreciseDate([secsNum, Math.trunc(nanos)]);
+    } catch (e) {
+      // If parsing fails (e.g. not a valid number), fallback to PreciseDate default
+      // which might result in Invalid Date.
+      return new PreciseDate(value);
+    }
   }
 }
 
