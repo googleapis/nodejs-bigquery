@@ -987,6 +987,31 @@ describe('BigQuery', () => {
       const timestamp = bq.timestamp(INPUT_PRECISE_DATE);
       assert.strictEqual(timestamp.value, EXPECTED_VALUE_MICROS);
     });
+
+    it('should preserve picosecond precision', () => {
+      const input = '2020-01-01T12:00:00.123456789123Z';
+      const timestamp = bq.timestamp(input);
+      assert.strictEqual(timestamp.value, input);
+    });
+
+    it('should preserve nanosecond precision', () => {
+      const input = '2020-01-01T12:00:00.123456789Z';
+      const timestamp = bq.timestamp(input);
+      assert.strictEqual(timestamp.value, input);
+    });
+
+    it('should handle invalid high-precision timestamps gracefully', () => {
+      // Month 13 is invalid
+      const input = '2020-13-01T12:00:00.123456789123Z';
+
+      // It should fall back to PreciseDate which will likely result in an invalid date or similar behavior
+      // PreciseDate('invalid') results in NaN time.
+      // BigQueryTimestamp constructor uses:
+      // this.value = new Date(pd.getTime()).toJSON(); which for NaN time results in null
+
+      const timestamp = bq.timestamp(input);
+      assert.strictEqual(timestamp.value, null);
+    });
   });
 
   describe('range', () => {

@@ -2725,6 +2725,23 @@ export class BigQueryTimestamp {
     } else if (value instanceof Date) {
       pd = new PreciseDate(value);
     } else if (typeof value === 'string') {
+      // Check for high precision timestamp (more than 9 fractional digits)
+      const match = value.match(
+        /^(\d{4}-\d{1,2}-\d{1,2}[T ]\d{1,2}:\d{1,2}:\d{1,2}\.)(\d{10,})((?:Z|[\+\-]\d{1,2}:?(\d{1,2})?)?)$/
+      );
+      if (match) {
+        const fractional = match[2];
+        // Truncate to nanoseconds (9 digits) for validation
+        const truncatedFractional = fractional.substring(0, 9);
+        const truncatedValue = match[1] + truncatedFractional + match[3];
+        const tempPd = new PreciseDate(truncatedValue);
+        // If the date is valid, use the original string to preserve precision
+        if (!Number.isNaN(tempPd.getTime())) {
+          this.value = value;
+          return;
+        }
+      }
+
       if (/^\d{4}-\d{1,2}-\d{1,2}/.test(value)) {
         pd = new PreciseDate(value);
       } else {
