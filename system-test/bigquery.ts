@@ -1210,7 +1210,7 @@ describe('BigQuery', () => {
             const myConstantDate = new PreciseDate('2024-07-15T10:00:00.123456789Z');
             bigquery.query(
                 {
-                  query: 'SELECT ? timestamp',
+                  query: 'SELECT ?',
                   params: [myConstantDate],
                   types: ['TIMESTAMP'],
                 },

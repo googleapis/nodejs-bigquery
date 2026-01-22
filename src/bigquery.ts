@@ -2385,6 +2385,8 @@ export class BigQuery extends Service {
     callback?: JobsQueryCallback,
   ): void | Promise<JobsQueryResponse> {
     this.trace_('[runJobsQuery]', req, callback);
+    // @ts-ignore
+    req.queryParameters[0].parameterType.timestampPrecision = 12;
     this.request(
       {
         method: 'POST',
