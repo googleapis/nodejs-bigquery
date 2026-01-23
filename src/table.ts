@@ -1865,11 +1865,16 @@ class Table extends ServiceObject {
         callback!(err, null, null, resp);
         return;
       }
-      rows = BigQuery.mergeSchemaWithRows_(this.metadata.schema, rows || [], {
-        wrapIntegers,
-        selectedFields,
-        parseJSON,
-      });
+      try {
+        rows = BigQuery.mergeSchemaWithRows_(this.metadata.schema, rows || [], {
+          wrapIntegers,
+          selectedFields,
+          parseJSON,
+        });
+      } catch (err) {
+        callback!(err as Error | null, null, null, resp);
+        return;
+      }
       callback!(null, rows, nextQuery, resp);
     };
 
