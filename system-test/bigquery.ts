@@ -575,9 +575,8 @@ describe('BigQuery', () => {
       const QUERY = `SELECT * FROM \`${table.id}\``;
       // eslint-disable-next-line @typescript-eslint/no-var-requires
       const SCHEMA = require('../../system-test/data/schema.json');
-      const TEST_DATA_FILE = require.resolve(
-        '../../system-test/data/location-test-data.json',
-      );
+      const TEST_DATA_FILE =
+        require.resolve('../../system-test/data/location-test-data.json');
 
       before(async () => {
         // create a dataset in a certain location will cascade the location
@@ -880,9 +879,8 @@ describe('BigQuery', () => {
   });
 
   describe('BigQuery/Table', () => {
-    const TEST_DATA_JSON_PATH = require.resolve(
-      '../../system-test/data/kitten-test-data.json',
-    );
+    const TEST_DATA_JSON_PATH =
+      require.resolve('../../system-test/data/kitten-test-data.json');
 
     it('should have created the correct schema', () => {
       assert.deepStrictEqual(table.metadata.schema.fields, SCHEMA);
@@ -996,6 +994,51 @@ describe('BigQuery', () => {
         false,
       );
       assert.strictEqual(basicMetadata.metadata.lastModifiedTime, undefined);
+    });
+
+    it('should create a table with a numeric field having picosecond precision', async () => {
+      const table = dataset.table(generateName('numeric-precision-table'));
+      const schema = {
+        fields: [
+          {
+            name: 'numeric_field',
+            type: 'NUMERIC',
+            precision: 12, // 12 indicates picosecond precision
+            scale: 2,
+          },
+        ],
+      };
+      try {
+        await table.create({schema});
+        const [metadata] = await table.getMetadata();
+        assert.deepStrictEqual(metadata.schema.fields[0].precision, '12');
+        assert.deepStrictEqual(metadata.schema.fields[0].scale, '2');
+      } catch (e) {
+        assert.ifError(e);
+      }
+    });
+
+    it('should create a table with timestampPrecision', async () => {
+      const table = dataset.table(generateName('timestamp-precision-table'));
+      const schema = {
+        fields: [
+          {
+            name: 'ts_field',
+            type: 'TIMESTAMP',
+            timestampPrecision: 12,
+          },
+        ],
+      };
+      try {
+        await table.create({schema});
+        const [metadata] = await table.getMetadata();
+        assert.deepStrictEqual(
+          metadata.schema.fields[0].timestampPrecision,
+          '12',
+        );
+      } catch (e) {
+        assert.ifError(e);
+      }
     });
 
     describe('copying', () => {

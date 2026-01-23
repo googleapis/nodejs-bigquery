@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * Discovery Revision: 20250912
+ * Discovery Revision: 20260118
  */
 
 /**
@@ -458,7 +458,7 @@ declare namespace bigquery {
    */
   type IBigtableColumn = {
     /**
-     * Optional. The encoding of the values when the type is not STRING. Acceptable encoding values are: TEXT - indicates values are alphanumeric text strings. BINARY - indicates values are encoded using HBase Bytes.toBytes family of functions. 'encoding' can also be set at the column family level. However, the setting at this level takes precedence if 'encoding' is set at both levels.
+     * Optional. The encoding of the values when the type is not STRING. Acceptable encoding values are: TEXT - indicates values are alphanumeric text strings. BINARY - indicates values are encoded using HBase Bytes.toBytes family of functions. PROTO_BINARY - indicates values are encoded using serialized proto messages. This can only be used in combination with JSON type. 'encoding' can also be set at the column family level. However, the setting at this level takes precedence if 'encoding' is set at both levels.
      */
     encoding?: string;
     /**
@@ -469,6 +469,10 @@ declare namespace bigquery {
      * Optional. If this is set, only the latest version of value in this column are exposed. 'onlyReadLatest' can also be set at the column family level. However, the setting at this level takes precedence if 'onlyReadLatest' is set at both levels.
      */
     onlyReadLatest?: boolean;
+    /**
+     * Optional. Protobuf-specific configurations, only takes effect when the encoding is PROTO_BINARY.
+     */
+    protoConfig?: IBigtableProtoConfig;
     /**
      * [Required] Qualifier of the column. Columns in the parent column family that has this exact qualifier are exposed as `.` field. If the qualifier is valid UTF-8 string, it can be specified in the qualifier_string field. Otherwise, a base-64 encoded value must be set to qualifier_encoded. The column field name is the same as the column qualifier. However, if the qualifier is not a valid BigQuery field identifier i.e. does not match a-zA-Z*, a valid identifier must be provided as field_name.
      */
@@ -492,7 +496,7 @@ declare namespace bigquery {
      */
     columns?: Array<IBigtableColumn>;
     /**
-     * Optional. The encoding of the values when the type is not STRING. Acceptable encoding values are: TEXT - indicates values are alphanumeric text strings. BINARY - indicates values are encoded using HBase Bytes.toBytes family of functions. This can be overridden for a specific column by listing that column in 'columns' and specifying an encoding for it.
+     * Optional. The encoding of the values when the type is not STRING. Acceptable encoding values are: TEXT - indicates values are alphanumeric text strings. BINARY - indicates values are encoded using HBase Bytes.toBytes family of functions. PROTO_BINARY - indicates values are encoded using serialized proto messages. This can only be used in combination with JSON type. This can be overridden for a specific column by listing that column in 'columns' and specifying an encoding for it.
      */
     encoding?: string;
     /**
@@ -503,6 +507,10 @@ declare namespace bigquery {
      * Optional. If this is set only the latest version of value are exposed for all columns in this column family. This can be overridden for a specific column by listing that column in 'columns' and specifying a different setting for that column.
      */
     onlyReadLatest?: boolean;
+    /**
+     * Optional. Protobuf-specific configurations, only takes effect when the encoding is PROTO_BINARY.
+     */
+    protoConfig?: IBigtableProtoConfig;
     /**
      * Optional. The type to convert the value in cells of this column family. The values are expected to be encoded using HBase Bytes.toBytes function when using the BINARY encoding value. Following BigQuery types are allowed (case-sensitive): * BYTES * STRING * INTEGER * FLOAT * BOOLEAN * JSON Default type is BYTES. This can be overridden for a specific column by listing that column in 'columns' and specifying a type for it.
      */
@@ -529,6 +537,20 @@ declare namespace bigquery {
      * Optional. If field is true, then the rowkey column families will be read and converted to string. Otherwise they are read with BYTES type values and users need to manually cast them with CAST if necessary. The default value is false.
      */
     readRowkeyAsString?: boolean;
+  };
+
+  /**
+   * Information related to a Bigtable protobuf column.
+   */
+  type IBigtableProtoConfig = {
+    /**
+     * Optional. The fully qualified proto message name of the protobuf. In the format of "foo.bar.Message".
+     */
+    protoMessageName?: string;
+    /**
+     * Optional. The ID of the Bigtable SchemaBundle resource associated with this protobuf. The ID should be referred to within the parent table, e.g., `foo` rather than `projects/{project}/instances/{instance}/tables/{table}/schemaBundles/foo`. See [more details on Bigtable SchemaBundles](https://docs.cloud.google.com/bigtable/docs/create-manage-protobuf-schemas).
+     */
+    schemaBundleId?: string;
   };
 
   /**
@@ -1706,6 +1728,10 @@ declare namespace bigquery {
      * Optional. Format used to parse TIMESTAMP values. Supports C-style and SQL-style values.
      */
     timestampFormat?: string;
+    /**
+     * Precisions (maximum number of total digits in base 10) for seconds of TIMESTAMP types that are allowed to the destination table for autodetection mode. Available for the formats: CSV. For the CSV Format, Possible values include: Not Specified, [], or [6]: timestamp(6) for all auto detected TIMESTAMP columns [6, 12]: timestamp(6) for all auto detected TIMESTAMP columns that have less than 6 digits of subseconds. timestamp(12) for all auto detected TIMESTAMP columns that have more than 6 digits of subseconds. [12]: timestamp(12) for all auto detected TIMESTAMP columns. The order of the elements in this array is ignored. Inputs that have higher precision than the highest target precision in this array will be truncated.
+     */
+    timestampTargetPrecision?: Array<number>;
   };
 
   /**
@@ -2132,15 +2158,18 @@ declare namespace bigquery {
    */
   type IIncrementalResultStats = {
     /**
-     * Reason why incremental query results are/were not written by the query.
+     * Output only. Reason why incremental query results are/were not written by the query.
      */
-    disabledReason?: 'DISABLED_REASON_UNSPECIFIED' | 'OTHER';
+    disabledReason?:
+      | 'DISABLED_REASON_UNSPECIFIED'
+      | 'OTHER'
+      | 'UNSUPPORTED_OPERATOR';
     /**
-     * The time at which the result table's contents were modified. May be absent if no results have been written or the query has completed.
+     * Output only. The time at which the result table's contents were modified. May be absent if no results have been written or the query has completed.
      */
     resultSetLastModifyTime?: string;
     /**
-     * The time at which the result table's contents were completely replaced. May be absent if no results have been written or the query has completed.
+     * Output only. The time at which the result table's contents were completely replaced. May be absent if no results have been written or the query has completed.
      */
     resultSetLastReplaceTime?: string;
   };
@@ -2153,6 +2182,10 @@ declare namespace bigquery {
      * The base table reference.
      */
     baseTable?: ITableReference;
+    /**
+     * The index id.
+     */
+    indexId?: string;
     /**
      * The number of parallel inputs after index pruning.
      */
@@ -2404,7 +2437,7 @@ declare namespace bigquery {
      */
     load?: IJobConfigurationLoad;
     /**
-     * Optional. INTERNAL: DO NOT USE. The maximum rate of slot consumption to allow for this job. If set, the number of slots used to execute the job will be throttled to try and keep its slot consumption below the requested rate.
+     * Optional. A target limit on the rate of slot consumption by this job. If set to a value > 0, BigQuery will attempt to limit the rate of slot consumption by this job to keep it below the configured limit, even if the job is eligible for more slots based on fair scheduling. The unused slots will be available for other jobs and queries to use. Note: This feature is not yet generally available.
      */
     maxSlots?: number;
     /**
@@ -2644,6 +2677,10 @@ declare namespace bigquery {
      */
     timestampFormat?: string;
     /**
+     * Precisions (maximum number of total digits in base 10) for seconds of TIMESTAMP types that are allowed to the destination table for autodetection mode. Available for the formats: CSV. For the CSV Format, Possible values include: Not Specified, [], or [6]: timestamp(6) for all auto detected TIMESTAMP columns [6, 12]: timestamp(6) for all auto detected TIMESTAMP columns that have less than 6 digits of subseconds. timestamp(12) for all auto detected TIMESTAMP columns that have more than 6 digits of subseconds. [12]: timestamp(12) for all auto detected TIMESTAMP columns. The order of the elements in this array is ignored. Inputs that have higher precision than the highest target precision in this array will be truncated.
+     */
+    timestampTargetPrecision?: Array<number>;
+    /**
      * Optional. If sourceFormat is set to "AVRO", indicates whether to interpret logical types as the corresponding BigQuery data type (for example, TIMESTAMP), instead of using the raw type (for example, INTEGER).
      */
     useAvroLogicalTypes?: boolean;
@@ -2750,7 +2787,7 @@ declare namespace bigquery {
      */
     timePartitioning?: ITimePartitioning;
     /**
-     * Optional. Specifies whether to use BigQuery's legacy SQL dialect for this query. The default value is true. If set to false, the query will use BigQuery's GoogleSQL: https://cloud.google.com/bigquery/sql-reference/ When useLegacySql is set to false, the value of flattenResults is ignored; query will be run as if flattenResults is false.
+     * Optional. Specifies whether to use BigQuery's legacy SQL dialect for this query. The default value is true. If set to false, the query uses BigQuery's [GoogleSQL](https://docs.cloud.google.com/bigquery/docs/introduction-sql). When useLegacySql is set to false, the value of flattenResults is ignored; query will be run as if flattenResults is false.
      */
     useLegacySql?: boolean;
     /**
@@ -2974,6 +3011,10 @@ declare namespace bigquery {
      * Output only. Quotas which delayed this job's start time.
      */
     quotaDeferments?: Array<string>;
+    /**
+     * Output only. The reservation group path of the reservation assigned to this job. This field has a limit of 10 nested reservation groups. This is to maintain consistency between reservatins info schema and jobs info schema. The first reservation group is the root reservation group and the last is the leaf or lowest level reservation group.
+     */
+    reservationGroupPath?: Array<string>;
     /**
      * Output only. Job resource usage breakdown by reservation. This field reported misleading information and will no longer be populated.
      */
@@ -4124,7 +4165,7 @@ declare namespace bigquery {
      */
     maxResults?: number;
     /**
-     * Optional. INTERNAL: DO NOT USE. The maximum rate of slot consumption to allow for this job. If set, the number of slots used to execute the job will be throttled to try and keep its slot consumption below the requested rate. This limit is best effort.
+     * Optional. A target limit on the rate of slot consumption by this query. If set to a value > 0, BigQuery will attempt to limit the rate of slot consumption by this query to keep it below the configured limit, even if the query is eligible for more slots based on fair scheduling. The unused slots will be available for other jobs and queries to use. Note: This feature is not yet generally available.
      */
     maxSlots?: number;
     /**
@@ -4160,7 +4201,7 @@ declare namespace bigquery {
      */
     timeoutMs?: number;
     /**
-     * Specifies whether to use BigQuery's legacy SQL dialect for this query. The default value is true. If set to false, the query will use BigQuery's GoogleSQL: https://cloud.google.com/bigquery/sql-reference/ When useLegacySql is set to false, the value of flattenResults is ignored; query will be run as if flattenResults is false.
+     * Specifies whether to use BigQuery's legacy SQL dialect for this query. The default value is true. If set to false, the query uses BigQuery's [GoogleSQL](https://docs.cloud.google.com/bigquery/docs/introduction-sql). When useLegacySql is set to false, the value of flattenResults is ignored; query will be run as if flattenResults is false.
      */
     useLegacySql?: boolean;
     /**
@@ -5526,6 +5567,10 @@ declare namespace bigquery {
      */
     scale?: string;
     /**
+     * Optional. Precision (maximum number of total digits in base 10) for seconds of TIMESTAMP type. Possible values include: * 6 (Default, for TIMESTAMP type with microsecond precision) * 12 (For TIMESTAMP type with picosecond precision)
+     */
+    timestampPrecision?: string;
+    /**
      * Required. The field data type. Possible values include: * STRING * BYTES * INTEGER (or INT64) * FLOAT (or FLOAT64) * BOOLEAN (or BOOL) * TIMESTAMP * DATE * TIME * DATETIME * GEOGRAPHY * NUMERIC * BIGNUMERIC * JSON * RECORD (or STRUCT) * RANGE Use of RECORD/STRUCT indicates that the field contains a nested schema.
      */
     type?: string;
@@ -6511,7 +6556,7 @@ declare namespace bigquery {
      */
     useExplicitColumnNames?: boolean;
     /**
-     * Specifies whether to use BigQuery's legacy SQL for this view. The default value is true. If set to false, the view will use BigQuery's GoogleSQL: https://cloud.google.com/bigquery/sql-reference/ Queries and views that reference this view must use the same flag value. A wrapper is used here because the default value is True.
+     * Specifies whether to use BigQuery's legacy SQL for this view. The default value is true. If set to false, the view uses BigQuery's [GoogleSQL](https://docs.cloud.google.com/bigquery/docs/introduction-sql). Queries and views that reference this view must use the same flag value. A wrapper is used here because the default value is True.
      */
     useLegacySql?: boolean;
     /**
