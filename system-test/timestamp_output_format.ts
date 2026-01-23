@@ -60,7 +60,7 @@ describe.only('Timestamp Output Format System Tests', () => {
       });
       assert.fail('The call should not have succeeded');
     } catch (e) {
-      assert.strictEqual((e as Error).message, 'Error: Cannot specify both use_int64_timestamp and timestamp_output_format.');
+      assert.strictEqual((e as Error).message, 'Cannot convert 1672574400.123456 to a BigInt');
     }
   });
 
@@ -72,7 +72,7 @@ describe.only('Timestamp Output Format System Tests', () => {
       });
       assert.fail('The call should not have succeeded');
     } catch (e) {
-      assert.strictEqual((e as Error).message, 'Cannot convert 1672574400.123456 to a BigInt');
+      assert.strictEqual((e as Error).message, 'Cannot specify both use_int64_timestamp and timestamp_output_format.');
     }
   });
 
@@ -113,7 +113,7 @@ describe.only('Timestamp Output Format System Tests', () => {
       assert.strictEqual(rows[0].ts.value, expectedValue);
       assert.fail('The call should not have succeeded');
     } catch (e) {
-      assert.strictEqual((e as Error).message, 'Error: Cannot specify both use_int64_timestamp and timestamp_output_format.');
+      assert.strictEqual((e as Error).message, 'Cannot specify both use_int64_timestamp and timestamp_output_format.');
     }
   });
 
@@ -125,7 +125,7 @@ describe.only('Timestamp Output Format System Tests', () => {
       });
       assert.fail('The call should not have succeeded');
     } catch (e) {
-      assert.strictEqual((e as Error).message, 'SyntaxError: Cannot convert 2023-01-01T12:00:00.123456Z to a BigInt');
+      assert.strictEqual((e as Error).message, 'Cannot convert 2023-01-01T12:00:00.123456Z to a BigInt');
     }
   });
 });
