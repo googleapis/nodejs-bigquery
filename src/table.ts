@@ -1866,12 +1866,19 @@ class Table extends ServiceObject {
         return;
       }
       try {
+        /*
+        Without this try/catch block, calls to getRows will hang indefinitely if
+        a call to mergeSchemaWithRows_ fails because the error never makes it to
+        the callback. Instead, pass the error to the callback the user provides
+        so that the user can see the error.
+         */
         rows = BigQuery.mergeSchemaWithRows_(this.metadata.schema, rows || [], {
           wrapIntegers,
           selectedFields,
           parseJSON,
         });
       } catch (err) {
+
         callback!(err as Error | null, null, null, resp);
         return;
       }
