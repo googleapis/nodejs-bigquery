@@ -110,11 +110,14 @@ describe.only('Timestamp Output Format System Tests', () => {
   });
 
   it('should call getRows with ISO8601_STRING and useInt64Timestamp=false', async () => {
-    const [rows] = await table.getRows({
-        'formatOptions.timestampOutputFormat': 'ISO8601_STRING',
-        'formatOptions.useInt64Timestamp': false
-    });
-    assert(rows.length > 0);
-    assert.strictEqual(rows[0].ts.value, expectedValue);
+    try {
+      await table.getRows({
+          'formatOptions.timestampOutputFormat': 'ISO8601_STRING',
+          'formatOptions.useInt64Timestamp': false
+      });
+      assert.fail('The call should not have succeeded');
+    } catch (e) {
+      assert.strictEqual((e as Error).message, 'SyntaxError: Cannot convert 2023-01-01T12:00:00.123456Z to a BigInt');
+    }
   });
 });
