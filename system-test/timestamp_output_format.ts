@@ -77,12 +77,17 @@ describe.only('Timestamp Output Format System Tests', () => {
   });
 
   it('should call getRows with FLOAT64 and useInt64Timestamp=false', async () => {
-    const [rows] = await table.getRows({
-        'formatOptions.timestampOutputFormat': 'FLOAT64',
-        'formatOptions.useInt64Timestamp': false
-    });
-    assert(rows.length > 0);
-    assert.strictEqual(rows[0].ts.value, expectedValue);
+    try {
+      const [rows] = await table.getRows({
+          'formatOptions.timestampOutputFormat': 'FLOAT64',
+          'formatOptions.useInt64Timestamp': false
+      });
+      assert(rows.length > 0);
+      assert.strictEqual(rows[0].ts.value, expectedValue);
+      assert.fail('The call should not have succeeded');
+    } catch (e) {
+      assert.strictEqual((e as Error).message, 'Cannot convert 1672574400.123456 to a BigInt');
+    }
   });
 
   it('should call getRows with INT64 and useInt64Timestamp=true', async () => {
