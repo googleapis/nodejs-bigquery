@@ -72,7 +72,7 @@ describe.only('Timestamp Output Format System Tests', () => {
       });
       assert.fail('The call should not have succeeded');
     } catch (e) {
-      assert.strictEqual((e as Error).message, 'Cannot convert 1672574400.123456 to a BigInt');
+      assert.strictEqual((e as Error).message, 'Cannot specify both use_int64_timestamp and timestamp_output_format.');
     }
   });
 
