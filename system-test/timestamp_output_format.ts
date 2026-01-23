@@ -24,6 +24,7 @@ describe('Timestamp Output Format System Tests', () => {
   const tableId = `timestamp_table_${randomUUID().replace(/-/g, '_')}`;
   const dataset = bigquery.dataset(datasetId);
   const table = dataset.table(tableId);
+  const expectedValue = '2023-01-01T12:00:00.123456Z';
 
   before(async () => {
     await dataset.create();
@@ -31,7 +32,7 @@ describe('Timestamp Output Format System Tests', () => {
       schema: [{name: 'ts', type: 'TIMESTAMP'}],
     });
     // Insert a row to test retrieval
-    await table.insert([{ts: '2023-01-01T12:00:00.123456Z'}]);
+    await table.insert([{ts: '2023-01-01T12:00:00.123456789123Z'}]);
   });
 
   after(async () => {
@@ -48,6 +49,7 @@ describe('Timestamp Output Format System Tests', () => {
         'formatOptions.useInt64Timestamp': true
     });
     assert(rows.length > 0);
+    assert.strictEqual(rows[0].ts.value, expectedValue);
   });
 
   it('should call getRows with TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED and useInt64Timestamp=false', async () => {
@@ -56,6 +58,7 @@ describe('Timestamp Output Format System Tests', () => {
         'formatOptions.useInt64Timestamp': false
     });
     assert(rows.length > 0);
+    assert.strictEqual(rows[0].ts.value, expectedValue);
   });
 
   it('should call getRows with FLOAT64 and useInt64Timestamp=true', async () => {
@@ -64,6 +67,7 @@ describe('Timestamp Output Format System Tests', () => {
         'formatOptions.useInt64Timestamp': true
     });
     assert(rows.length > 0);
+    assert.strictEqual(rows[0].ts.value, expectedValue);
   });
 
   it('should call getRows with FLOAT64 and useInt64Timestamp=false', async () => {
@@ -72,6 +76,7 @@ describe('Timestamp Output Format System Tests', () => {
         'formatOptions.useInt64Timestamp': false
     });
     assert(rows.length > 0);
+    assert.strictEqual(rows[0].ts.value, expectedValue);
   });
 
   it('should call getRows with INT64 and useInt64Timestamp=true', async () => {
@@ -80,6 +85,7 @@ describe('Timestamp Output Format System Tests', () => {
         'formatOptions.useInt64Timestamp': true
     });
     assert(rows.length > 0);
+    assert.strictEqual(rows[0].ts.value, expectedValue);
   });
 
   it('should call getRows with INT64 and useInt64Timestamp=false', async () => {
@@ -88,6 +94,7 @@ describe('Timestamp Output Format System Tests', () => {
         'formatOptions.useInt64Timestamp': false
     });
     assert(rows.length > 0);
+    assert.strictEqual(rows[0].ts.value, expectedValue);
   });
 
   it('should call getRows with ISO8601_STRING and useInt64Timestamp=true', async () => {
@@ -96,6 +103,7 @@ describe('Timestamp Output Format System Tests', () => {
         'formatOptions.useInt64Timestamp': true
     });
     assert(rows.length > 0);
+    assert.strictEqual(rows[0].ts.value, expectedValue);
   });
 
   it('should call getRows with ISO8601_STRING and useInt64Timestamp=false', async () => {
@@ -104,5 +112,6 @@ describe('Timestamp Output Format System Tests', () => {
         'formatOptions.useInt64Timestamp': false
     });
     assert(rows.length > 0);
+    assert.strictEqual(rows[0].ts.value, expectedValue);
   });
 });
