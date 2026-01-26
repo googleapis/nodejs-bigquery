@@ -114,7 +114,7 @@ describe.only('Timestamp Output Format System Tests', () => {
     }
   });
 
-  it.skip('should call getRows with ISO8601_STRING and useInt64Timestamp=false', async () => {
+  it('should call getRows with ISO8601_STRING and useInt64Timestamp=false', async () => {
     const [rows] = await table.getRows({
       'formatOptions.timestampOutputFormat': 'ISO8601_STRING',
       'formatOptions.useInt64Timestamp': false

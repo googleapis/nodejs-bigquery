@@ -987,6 +987,12 @@ describe('BigQuery', () => {
       const timestamp = bq.timestamp(INPUT_PRECISE_DATE);
       assert.strictEqual(timestamp.value, EXPECTED_VALUE_MICROS);
     });
+
+    it('should accept a high precision string', () => {
+      const INPUT_STRING_HIGH_PRECISION = '2023-01-01T12:00:00.123456789123Z';
+      const timestamp = bq.timestamp(INPUT_STRING_HIGH_PRECISION);
+      assert.strictEqual(timestamp.value, INPUT_STRING_HIGH_PRECISION);
+    });
   });
 
   describe('range', () => {

@@ -2749,8 +2749,11 @@ export class BigQueryTimestamp {
       pd = new PreciseDate(value);
     } else if (typeof value === 'string') {
       if (/^\d{4}-\d{1,2}-\d{1,2}/.test(value)) {
-        // TODO: Replace with logic here that allows for higher precision.
         pd = new PreciseDate(value);
+        if (value.match(/\.\d{10,}/) && !Number.isNaN(pd.getTime())) {
+          this.value = value;
+          return;
+        }
       } else {
         const floatValue = Number.parseFloat(value);
         if (!Number.isNaN(floatValue)) {
