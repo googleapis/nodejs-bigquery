@@ -598,6 +598,7 @@ class Job extends Operation {
           rows = BigQuery.mergeSchemaWithRows_(resp.schema, resp.rows, {
             wrapIntegers,
             parseJSON,
+            useInt64Timestamp: qs['formatOptions.useInt64Timestamp']
           });
         }
 

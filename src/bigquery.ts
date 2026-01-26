@@ -596,6 +596,7 @@ export class BigQuery extends Service {
       wrapIntegers: boolean | IntegerTypeCastOptions;
       selectedFields?: string[];
       parseJSON?: boolean;
+      useInt64Timestamp?: boolean;
     },
   ) {
     // deep copy schema fields to avoid mutation
@@ -2471,6 +2472,7 @@ function convertSchemaFieldValue(
     wrapIntegers: boolean | IntegerTypeCastOptions;
     selectedFields?: string[];
     parseJSON?: boolean;
+    useInt64Timestamp?: boolean;
   },
 ) {
   if (value === null) {
@@ -2530,6 +2532,14 @@ function convertSchemaFieldValue(
       break;
     }
     case 'TIMESTAMP': {
+      /*
+      At this point, 'value' will equal the timestamp value returned from the
+      server. We need to parse this value differently depending on its format.
+      For example, value could be any of the following:
+      1672574400123456
+      1672574400.123456
+      2023-01-01T12:00:00.123456789123Z
+       */
       const pd = new PreciseDate();
       pd.setFullTime(PreciseDate.parseFull(BigInt(value) * BigInt(1000)));
       value = BigQuery.timestamp(pd);

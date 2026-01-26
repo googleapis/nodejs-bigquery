@@ -1876,6 +1876,7 @@ class Table extends ServiceObject {
           wrapIntegers,
           selectedFields,
           parseJSON,
+          useInt64Timestamp: qs['formatOptions.useInt64Timestamp'],
         });
       } catch (err) {
 
