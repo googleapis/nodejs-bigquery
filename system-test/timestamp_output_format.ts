@@ -133,4 +133,67 @@ describe.only('Timestamp Output Format System Tests', () => {
       assert.strictEqual((e as Error).message, 'Cannot convert 2023-01-01T12:00:00.123456789123Z to a BigInt');
     }
   });
+
+  it('should call getRows with timestampOutputFormat undefined and useInt64Timestamp=true', async () => {
+    const [rows] = await table.getRows({
+        'formatOptions.useInt64Timestamp': true
+    });
+    assert(rows.length > 0);
+    assert.strictEqual(rows[0].ts.value, expectedValue);
+  });
+
+  it('should call getRows with timestampOutputFormat undefined and useInt64Timestamp=false', async () => {
+    try {
+      await table.getRows({
+        'formatOptions.useInt64Timestamp': false
+      });
+      assert.fail('The call should not have succeeded');
+    } catch (e) {
+      assert.strictEqual((e as Error).message, 'Cannot convert 1672574400.123456 to a BigInt');
+    }
+  });
+
+  it('should call getRows with TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED and useInt64Timestamp undefined', async () => {
+    const [rows] = await table.getRows({
+        'formatOptions.timestampOutputFormat': 'TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED'
+    });
+    assert(rows.length > 0);
+    assert.strictEqual(rows[0].ts.value, expectedValue);
+  });
+
+  it('should call getRows with FLOAT64 and useInt64Timestamp undefined', async () => {
+    try {
+      const [rows] = await table.getRows({
+          'formatOptions.timestampOutputFormat': 'FLOAT64'
+      });
+      assert.fail('The call should not have succeeded');
+    } catch (e) {
+      assert.strictEqual((e as Error).message, 'Cannot specify both use_int64_timestamp and timestamp_output_format.');
+    }
+  });
+
+  it('should call getRows with INT64 and useInt64Timestamp undefined', async () => {
+    const [rows] = await table.getRows({
+        'formatOptions.timestampOutputFormat': 'INT64'
+    });
+    assert(rows.length > 0);
+    assert.strictEqual(rows[0].ts.value, expectedValue);
+  });
+
+  it('should call getRows with ISO8601_STRING and useInt64Timestamp undefined', async () => {
+    try {
+      const [rows] = await table.getRows({
+          'formatOptions.timestampOutputFormat': 'ISO8601_STRING'
+      });
+      assert.fail('The call should not have succeeded');
+    } catch (e) {
+      assert.strictEqual((e as Error).message, 'Cannot specify both use_int64_timestamp and timestamp_output_format.');
+    }
+  });
+
+  it('should call getRows with timestampOutputFormat undefined and useInt64Timestamp undefined', async () => {
+    const [rows] = await table.getRows({});
+    assert(rows.length > 0);
+    assert.strictEqual(rows[0].ts.value, expectedValue);
+  });
 });
