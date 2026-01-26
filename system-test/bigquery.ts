@@ -996,6 +996,51 @@ describe('BigQuery', () => {
       assert.strictEqual(basicMetadata.metadata.lastModifiedTime, undefined);
     });
 
+    it('should create a table with a numeric field having picosecond precision', async () => {
+      const table = dataset.table(generateName('numeric-precision-table'));
+      const schema = {
+        fields: [
+          {
+            name: 'numeric_field',
+            type: 'NUMERIC',
+            precision: 12, // 12 indicates picosecond precision
+            scale: 2,
+          },
+        ],
+      };
+      try {
+        await table.create({schema});
+        const [metadata] = await table.getMetadata();
+        assert.deepStrictEqual(metadata.schema.fields[0].precision, '12');
+        assert.deepStrictEqual(metadata.schema.fields[0].scale, '2');
+      } catch (e) {
+        assert.ifError(e);
+      }
+    });
+
+    it('should create a table with timestampPrecision', async () => {
+      const table = dataset.table(generateName('timestamp-precision-table'));
+      const schema = {
+        fields: [
+          {
+            name: 'ts_field',
+            type: 'TIMESTAMP',
+            timestampPrecision: 12,
+          },
+        ],
+      };
+      try {
+        await table.create({schema});
+        const [metadata] = await table.getMetadata();
+        assert.deepStrictEqual(
+          metadata.schema.fields[0].timestampPrecision,
+          '12',
+        );
+      } catch (e) {
+        assert.ifError(e);
+      }
+    });
+
     describe('copying', () => {
       interface TableItem {
         data?: {tableId?: number};
