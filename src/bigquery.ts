@@ -56,6 +56,7 @@ import {
 } from '@google-cloud/common/build/src/util';
 import bigquery from './types';
 import {logger, setLogFunction} from './logger';
+import IListParams = bigquery.jobs.IListParams;
 
 // Third-Party Re-exports
 export {common};
@@ -596,7 +597,7 @@ export class BigQuery extends Service {
       wrapIntegers: boolean | IntegerTypeCastOptions;
       selectedFields?: string[];
       parseJSON?: boolean;
-      formatOptions?: bigquery.IDataFormatOptions;
+      listParams?: bigquery.tabledata.IListParams;
     },
   ) {
     // deep copy schema fields to avoid mutation
@@ -2472,7 +2473,7 @@ function convertSchemaFieldValue(
     wrapIntegers: boolean | IntegerTypeCastOptions;
     selectedFields?: string[];
     parseJSON?: boolean;
-    formatOptions?: bigquery.IDataFormatOptions;
+    listParams?: bigquery.tabledata.IListParams;
   },
 ) {
   if (value === null) {
@@ -2540,11 +2541,13 @@ function convertSchemaFieldValue(
       1672574400.123456
       2023-01-01T12:00:00.123456789123Z
        */
-      const {formatOptions} = options;
-      if (formatOptions?.timestampOutputFormat === 'ISO8601_STRING') {
+      const listParams = options.listParams;
+      const timestampOutputFormat = listParams ? listParams['formatOptions.timestampOutputFormat'] : undefined;
+      const useInt64Timestamp = listParams ? listParams['formatOptions.useInt64Timestamp'] : undefined;
+      if (timestampOutputFormat === 'ISO8601_STRING') {
         // value is ISO string, create BigQueryTimestamp wrapping the string
         value = BigQuery.timestamp(value);
-      } else if (formatOptions?.useInt64Timestamp === false && formatOptions?.timestampOutputFormat !== 'INT64') {
+      } else if (useInt64Timestamp === false && timestampOutputFormat !== 'INT64') {
         // value is float seconds, convert to BigQueryTimestamp
         value = BigQuery.timestamp(Number(value));
       } else {
@@ -2746,6 +2749,7 @@ export class BigQueryTimestamp {
       pd = new PreciseDate(value);
     } else if (typeof value === 'string') {
       if (/^\d{4}-\d{1,2}-\d{1,2}/.test(value)) {
+        // TODO: Replace with logic here that allows for higher precision.
         pd = new PreciseDate(value);
       } else {
         const floatValue = Number.parseFloat(value);
