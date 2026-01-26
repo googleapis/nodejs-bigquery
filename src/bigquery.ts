@@ -596,7 +596,9 @@ export class BigQuery extends Service {
       wrapIntegers: boolean | IntegerTypeCastOptions;
       selectedFields?: string[];
       parseJSON?: boolean;
-      listParams?: bigquery.tabledata.IListParams | bigquery.jobs.IGetQueryResultsParams;
+      listParams?:
+        | bigquery.tabledata.IListParams
+        | bigquery.jobs.IGetQueryResultsParams;
     },
   ) {
     // deep copy schema fields to avoid mutation
@@ -2472,7 +2474,9 @@ function convertSchemaFieldValue(
     wrapIntegers: boolean | IntegerTypeCastOptions;
     selectedFields?: string[];
     parseJSON?: boolean;
-    listParams?: bigquery.tabledata.IListParams | bigquery.jobs.IGetQueryResultsParams;
+    listParams?:
+      | bigquery.tabledata.IListParams
+      | bigquery.jobs.IGetQueryResultsParams;
   },
 ) {
   if (value === null) {
