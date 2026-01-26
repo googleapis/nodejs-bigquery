@@ -53,18 +53,15 @@ describe.only('Timestamp Output Format System Tests', () => {
   });
 
   it('should call getRows with TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED and useInt64Timestamp=false', async () => {
-    try {
-      await table.getRows({
-        'formatOptions.timestampOutputFormat': 'TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED',
-        'formatOptions.useInt64Timestamp': false
-      });
-      assert.fail('The call should not have succeeded');
-    } catch (e) {
-      assert.strictEqual((e as Error).message, 'Cannot convert 1672574400.123456 to a BigInt');
-    }
+    const [rows] = await table.getRows({
+      'formatOptions.timestampOutputFormat': 'TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED',
+      'formatOptions.useInt64Timestamp': false
+    });
+    assert.strictEqual(rows[0].ts.value, expectedValue);
   });
 
   it('should call getRows with FLOAT64 and useInt64Timestamp=true', async () => {
+    // Step through this one.
     try {
       const [rows] = await table.getRows({
           'formatOptions.timestampOutputFormat': 'FLOAT64',
@@ -77,17 +74,12 @@ describe.only('Timestamp Output Format System Tests', () => {
   });
 
   it('should call getRows with FLOAT64 and useInt64Timestamp=false', async () => {
-    try {
-      const [rows] = await table.getRows({
-          'formatOptions.timestampOutputFormat': 'FLOAT64',
-          'formatOptions.useInt64Timestamp': false
-      });
-      assert(rows.length > 0);
-      assert.strictEqual(rows[0].ts.value, expectedValue);
-      assert.fail('The call should not have succeeded');
-    } catch (e) {
-      assert.strictEqual((e as Error).message, 'Cannot convert 1672574400.123456 to a BigInt');
-    }
+    const [rows] = await table.getRows({
+        'formatOptions.timestampOutputFormat': 'FLOAT64',
+        'formatOptions.useInt64Timestamp': false
+    });
+    assert(rows.length > 0);
+    assert.strictEqual(rows[0].ts.value, expectedValue);
   });
 
   it('should call getRows with INT64 and useInt64Timestamp=true', async () => {
@@ -124,7 +116,7 @@ describe.only('Timestamp Output Format System Tests', () => {
 
   it('should call getRows with ISO8601_STRING and useInt64Timestamp=false', async () => {
     try {
-      await table.getRows({
+      const [rows] = await table.getRows({
           'formatOptions.timestampOutputFormat': 'ISO8601_STRING',
           'formatOptions.useInt64Timestamp': false
       });
@@ -143,14 +135,10 @@ describe.only('Timestamp Output Format System Tests', () => {
   });
 
   it('should call getRows with timestampOutputFormat undefined and useInt64Timestamp=false', async () => {
-    try {
-      await table.getRows({
-        'formatOptions.useInt64Timestamp': false
-      });
-      assert.fail('The call should not have succeeded');
-    } catch (e) {
-      assert.strictEqual((e as Error).message, 'Cannot convert 1672574400.123456 to a BigInt');
-    }
+    const [rows] = await table.getRows({
+      'formatOptions.useInt64Timestamp': false
+    });
+    assert.strictEqual(rows[0].ts.value, expectedValue);
   });
 
   it('should call getRows with TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED and useInt64Timestamp undefined', async () => {
