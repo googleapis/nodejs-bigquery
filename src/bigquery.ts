@@ -2542,12 +2542,19 @@ function convertSchemaFieldValue(
       2023-01-01T12:00:00.123456789123Z
        */
       const listParams = options.listParams;
-      const timestampOutputFormat = listParams ? listParams['formatOptions.timestampOutputFormat'] : undefined;
-      const useInt64Timestamp = listParams ? listParams['formatOptions.useInt64Timestamp'] : undefined;
+      const timestampOutputFormat = listParams
+        ? listParams['formatOptions.timestampOutputFormat']
+        : undefined;
+      const useInt64Timestamp = listParams
+        ? listParams['formatOptions.useInt64Timestamp']
+        : undefined;
       if (timestampOutputFormat === 'ISO8601_STRING') {
         // value is ISO string, create BigQueryTimestamp wrapping the string
         value = BigQuery.timestamp(value);
-      } else if (useInt64Timestamp === false && timestampOutputFormat !== 'INT64') {
+      } else if (
+        useInt64Timestamp === false &&
+        timestampOutputFormat !== 'INT64'
+      ) {
         // value is float seconds, convert to BigQueryTimestamp
         value = BigQuery.timestamp(Number(value));
       } else {

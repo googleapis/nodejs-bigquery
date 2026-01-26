@@ -1880,7 +1880,6 @@ class Table extends ServiceObject {
           listParams: qs,
         });
       } catch (err) {
-
         callback!(err as Error | null, null, null, resp);
         return;
       }
