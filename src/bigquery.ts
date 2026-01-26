@@ -596,7 +596,7 @@ export class BigQuery extends Service {
       wrapIntegers: boolean | IntegerTypeCastOptions;
       selectedFields?: string[];
       parseJSON?: boolean;
-      useInt64Timestamp?: boolean;
+      formatOptions?: bigquery.IDataFormatOptions;
     },
   ) {
     // deep copy schema fields to avoid mutation
@@ -2472,7 +2472,7 @@ function convertSchemaFieldValue(
     wrapIntegers: boolean | IntegerTypeCastOptions;
     selectedFields?: string[];
     parseJSON?: boolean;
-    useInt64Timestamp?: boolean;
+    formatOptions?: bigquery.IDataFormatOptions;
   },
 ) {
   if (value === null) {
@@ -2540,9 +2540,19 @@ function convertSchemaFieldValue(
       1672574400.123456
       2023-01-01T12:00:00.123456789123Z
        */
-      const pd = new PreciseDate();
-      pd.setFullTime(PreciseDate.parseFull(BigInt(value) * BigInt(1000)));
-      value = BigQuery.timestamp(pd);
+      const {formatOptions} = options;
+      if (formatOptions?.timestampOutputFormat === 'ISO8601_STRING') {
+        // value is ISO string, create BigQueryTimestamp wrapping the string
+        value = BigQuery.timestamp(value);
+      } else if (formatOptions?.useInt64Timestamp === false && formatOptions?.timestampOutputFormat !== 'INT64') {
+        // value is float seconds, convert to BigQueryTimestamp
+        value = BigQuery.timestamp(Number(value));
+      } else {
+        // Expect int64 micros (default or explicit INT64)
+        const pd = new PreciseDate();
+        pd.setFullTime(PreciseDate.parseFull(BigInt(value) * BigInt(1000)));
+        value = BigQuery.timestamp(pd);
+      }
       break;
     }
     case 'GEOGRAPHY': {
