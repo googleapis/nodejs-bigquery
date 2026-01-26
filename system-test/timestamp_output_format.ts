@@ -127,7 +127,7 @@ describe.only('Timestamp Output Format System Tests', () => {
       'formatOptions.timestampOutputFormat': 'ISO8601_STRING',
       'formatOptions.useInt64Timestamp': false,
     });
-    assert.strictEqual(rows[0].ts.value, '2023-01-01T12:00:00.123456789123');
+    assert.strictEqual(rows[0].ts.value, '2023-01-01T12:00:00.123456789123Z');
   });
 
   it('should call getRows with timestampOutputFormat undefined and useInt64Timestamp=true', async () => {
