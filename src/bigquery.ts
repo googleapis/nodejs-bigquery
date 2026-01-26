@@ -56,7 +56,6 @@ import {
 } from '@google-cloud/common/build/src/util';
 import bigquery from './types';
 import {logger, setLogFunction} from './logger';
-import IListParams = bigquery.jobs.IListParams;
 
 // Third-Party Re-exports
 export {common};
