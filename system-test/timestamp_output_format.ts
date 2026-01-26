@@ -24,12 +24,12 @@ describe.only('Timestamp Output Format System Tests', () => {
   const tableId = `timestamp_table_${randomUUID().replace(/-/g, '_')}`;
   const dataset = bigquery.dataset(datasetId);
   const table = dataset.table(tableId);
-  const expectedValue = '2023-01-01T12:00:00.123456Z';
+  const expectedValue = '2023-01-01T12:00:00.123456000Z';
 
   before(async () => {
     await dataset.create();
     await table.create({
-      schema: [{name: 'ts', type: 'TIMESTAMP'}],
+      schema: [{name: 'ts', type: 'TIMESTAMP', timestampPrecision: '12'}],
     });
     // Insert a row to test retrieval
     await table.insert([{ts: '2023-01-01T12:00:00.123456789123Z'}]);
@@ -43,7 +43,7 @@ describe.only('Timestamp Output Format System Tests', () => {
     }
   });
 
-  it.skip('should call getRows with TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED and useInt64Timestamp=true', async () => {
+  it('should call getRows with TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED and useInt64Timestamp=true', async () => {
     const [rows] = await table.getRows({
         'formatOptions.timestampOutputFormat': 'TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED',
         'formatOptions.useInt64Timestamp': true
@@ -130,7 +130,7 @@ describe.only('Timestamp Output Format System Tests', () => {
       });
       assert.fail('The call should not have succeeded');
     } catch (e) {
-      assert.strictEqual((e as Error).message, 'Cannot convert 2023-01-01T12:00:00.123456Z to a BigInt');
+      assert.strictEqual((e as Error).message, 'Cannot convert 2023-01-01T12:00:00.123456789123Z to a BigInt');
     }
   });
 });
