@@ -55,6 +55,7 @@ import {JobMetadata, JobOptions} from './job';
 import bigquery from './types';
 import {IntegerTypeCastOptions} from './bigquery';
 import {RowQueue} from './rowQueue';
+import IDataFormatOptions = bigquery.IDataFormatOptions;
 
 // This is supposed to be a @google-cloud/storage `File` type. The storage npm
 // module includes these types, but is current installed as a devDependency.
@@ -1876,7 +1877,7 @@ class Table extends ServiceObject {
           wrapIntegers,
           selectedFields,
           parseJSON,
-          useInt64Timestamp: qs['formatOptions.useInt64Timestamp'],
+          listParams: qs,
         });
       } catch (err) {
 
