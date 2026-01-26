@@ -19,7 +19,7 @@ import {randomUUID} from 'crypto';
 
 const bigquery = new BigQuery();
 
-describe.only('Timestamp Output Format System Tests', () => {
+describe('Timestamp Output Format System Tests', () => {
   const datasetId = `timestamp_test_${randomUUID().replace(/-/g, '_')}`;
   const tableId = `timestamp_table_${randomUUID().replace(/-/g, '_')}`;
   const dataset = bigquery.dataset(datasetId);
