@@ -104,6 +104,51 @@ describe('Timestamp Output Format System Tests', () => {
       useInt64Timestamp: false,
       expectedTsValue: expectedTsValueNanoseconds,
     },
+    // Additional test cases for undefined combinations
+    {
+      name: 'should call getRows with timestampOutputFormat undefined and useInt64Timestamp undefined',
+      timestampOutputFormat: undefined,
+      useInt64Timestamp: undefined,
+      expectedTsValue: expectedTsValueMicroseconds,
+    },
+    {
+      name: 'should call getRows with timestampOutputFormat undefined and useInt64Timestamp=true',
+      timestampOutputFormat: undefined,
+      useInt64Timestamp: true,
+      expectedTsValue: expectedTsValueMicroseconds,
+    },
+    {
+      name: 'should call getRows with timestampOutputFormat undefined and useInt64Timestamp=false',
+      timestampOutputFormat: undefined,
+      useInt64Timestamp: false,
+      expectedTsValue: expectedTsValueMicroseconds,
+    },
+    {
+      name: 'should call getRows with TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED and useInt64Timestamp undefined',
+      timestampOutputFormat: 'TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED',
+      useInt64Timestamp: undefined,
+      expectedTsValue: expectedTsValueMicroseconds,
+    },
+    {
+      name: 'should call getRows with FLOAT64 and useInt64Timestamp undefined (expect error)',
+      timestampOutputFormat: 'FLOAT64',
+      useInt64Timestamp: undefined,
+      expectedError:
+        'Cannot specify both use_int64_timestamp and timestamp_output_format.',
+    },
+    {
+      name: 'should call getRows with INT64 and useInt64Timestamp undefined',
+      timestampOutputFormat: 'INT64',
+      useInt64Timestamp: undefined,
+      expectedTsValue: expectedTsValueMicroseconds,
+    },
+    {
+      name: 'should call getRows with ISO8601_STRING and useInt64Timestamp undefined (expect error)',
+      timestampOutputFormat: 'ISO8601_STRING',
+      useInt64Timestamp: undefined,
+      expectedError:
+        'Cannot specify both use_int64_timestamp and timestamp_output_format.',
+    },
   ];
 
   testCases.forEach(
