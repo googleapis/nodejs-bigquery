@@ -1877,9 +1877,9 @@ class Table extends ServiceObject {
           wrapIntegers,
           selectedFields,
           parseJSON,
-          listParams: qs,
         });
       } catch (err) {
+
         callback!(err as Error | null, null, null, resp);
         return;
       }
