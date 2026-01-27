@@ -1885,10 +1885,11 @@ class Table extends ServiceObject {
       }
       callback!(null, rows, nextQuery, resp);
     };
-
+    const defaultToInt64Timestamp = options['formatOptions.timestampOutputFormat'] === 'TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED' || options['formatOptions.timestampOutputFormat'] === 'INT64';
     const qs = extend(
       {
-        'formatOptions.useInt64Timestamp': true,
+        'formatOptions.useInt64Timestamp': defaultToInt64Timestamp,
+        'formatOptions.timestampOutputFormat': 'ISO8601_STRING',
       },
       options,
     );
