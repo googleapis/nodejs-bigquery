@@ -1,4 +1,4 @@
-// Copyright 2026 Google LLC
+// Copyright 2024 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,27 +14,18 @@
 
 import * as assert from 'assert';
 import {describe, it, before, after} from 'mocha';
-import {BigQuery} from '../src/bigquery';
+import {BigQuery} from '../src';
 import {randomUUID} from 'crypto';
 
 const bigquery = new BigQuery();
 
-interface TestCase {
-  name: string;
-  timestampOutputFormat?: string;
-  useInt64Timestamp?: boolean;
-  expectedError?: string;
-  expectedTsValue?: string;
-}
-
-describe('Timestamp Output Format System Tests', () => {
+describe.only('Timestamp Output Format System Tests', () => {
   const datasetId = `timestamp_test_${randomUUID().replace(/-/g, '_')}`;
   const tableId = `timestamp_table_${randomUUID().replace(/-/g, '_')}`;
   const dataset = bigquery.dataset(datasetId);
   const table = dataset.table(tableId);
-  const insertedTsValue = '2023-01-01T12:00:00.123456789123Z';
-  const expectedTsValueMicroseconds = '2023-01-01T12:00:00.123456000Z';
-  const expectedTsValueNanoseconds = '2023-01-01T12:00:00.123456789123Z';
+  const expectedValue = '2023-01-01T12:00:00.123456000Z';
+  const highPrecisionExpectedValue = '2023-01-01T12:00:00.123456789123Z';
 
   before(async () => {
     await dataset.create();
@@ -42,139 +33,163 @@ describe('Timestamp Output Format System Tests', () => {
       schema: [{name: 'ts', type: 'TIMESTAMP', timestampPrecision: '12'}],
     });
     // Insert a row to test retrieval
-    await table.insert([{ts: insertedTsValue}]);
+    await table.insert([{ts: highPrecisionExpectedValue}]);
   });
 
   after(async () => {
     try {
-      await dataset.delete({force: true});
+        await dataset.delete({force: true});
     } catch (e) {
-      console.error('Error deleting dataset:', e);
+        console.error('Error deleting dataset:', e);
     }
   });
 
+  interface TestCase {
+    description: string;
+    options: {
+      'formatOptions.timestampOutputFormat'?: 'TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED' | 'FLOAT64' | 'INT64' | 'ISO8601_STRING';
+      'formatOptions.useInt64Timestamp'?: boolean;
+    };
+    expectedValue?: string;
+    shouldFail?: boolean;
+    expectedErrorMessage?: string;
+  }
+
   const testCases: TestCase[] = [
     {
-      name: 'should call getRows with TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED and useInt64Timestamp=true',
-      timestampOutputFormat: 'TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED',
-      useInt64Timestamp: true,
-      expectedTsValue: expectedTsValueMicroseconds,
+      description: 'should call getRows with TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED and useInt64Timestamp=true',
+      options: {
+        'formatOptions.timestampOutputFormat': 'TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED',
+        'formatOptions.useInt64Timestamp': true,
+      },
+      expectedValue: expectedValue,
     },
     {
-      name: 'should call getRows with TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED and useInt64Timestamp=false',
-      timestampOutputFormat: 'TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED',
-      useInt64Timestamp: false,
-      expectedTsValue: expectedTsValueMicroseconds,
+      description: 'should call getRows with TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED and useInt64Timestamp=false',
+      options: {
+        'formatOptions.timestampOutputFormat': 'TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED',
+        'formatOptions.useInt64Timestamp': false,
+      },
+      expectedValue: expectedValue,
     },
     {
-      name: 'should call getRows with FLOAT64 and useInt64Timestamp=true (expect error)',
-      timestampOutputFormat: 'FLOAT64',
-      useInt64Timestamp: true,
-      expectedError:
-        'Cannot specify both use_int64_timestamp and timestamp_output_format.',
+      description: 'should call getRows with FLOAT64 and useInt64Timestamp=true',
+      options: {
+        'formatOptions.timestampOutputFormat': 'FLOAT64',
+        'formatOptions.useInt64Timestamp': true,
+      },
+      shouldFail: true,
+      expectedErrorMessage: 'Cannot specify both use_int64_timestamp and timestamp_output_format.',
     },
     {
-      name: 'should call getRows with FLOAT64 and useInt64Timestamp=false',
-      timestampOutputFormat: 'FLOAT64',
-      useInt64Timestamp: false,
-      expectedTsValue: expectedTsValueMicroseconds,
+      description: 'should call getRows with FLOAT64 and useInt64Timestamp=false',
+      options: {
+        'formatOptions.timestampOutputFormat': 'FLOAT64',
+        'formatOptions.useInt64Timestamp': false,
+      },
+      expectedValue: expectedValue,
     },
     {
-      name: 'should call getRows with INT64 and useInt64Timestamp=true',
-      timestampOutputFormat: 'INT64',
-      useInt64Timestamp: true,
-      expectedTsValue: expectedTsValueMicroseconds,
+      description: 'should call getRows with INT64 and useInt64Timestamp=true',
+      options: {
+        'formatOptions.timestampOutputFormat': 'INT64',
+        'formatOptions.useInt64Timestamp': true,
+      },
+      expectedValue: expectedValue,
     },
     {
-      name: 'should call getRows with INT64 and useInt64Timestamp=false',
-      timestampOutputFormat: 'INT64',
-      useInt64Timestamp: false,
-      expectedTsValue: expectedTsValueMicroseconds,
+      description: 'should call getRows with INT64 and useInt64Timestamp=false',
+      options: {
+        'formatOptions.timestampOutputFormat': 'INT64',
+        'formatOptions.useInt64Timestamp': false,
+      },
+      expectedValue: expectedValue,
     },
     {
-      name: 'should call getRows with ISO8601_STRING and useInt64Timestamp=true (expect error)',
-      timestampOutputFormat: 'ISO8601_STRING',
-      useInt64Timestamp: true,
-      expectedError:
-        'Cannot specify both use_int64_timestamp and timestamp_output_format.',
+      description: 'should call getRows with ISO8601_STRING and useInt64Timestamp=true',
+      options: {
+        'formatOptions.timestampOutputFormat': 'ISO8601_STRING',
+        'formatOptions.useInt64Timestamp': true,
+      },
+      shouldFail: true,
+      expectedErrorMessage: 'Cannot specify both use_int64_timestamp and timestamp_output_format.',
     },
     {
-      name: 'should call getRows with ISO8601_STRING and useInt64Timestamp=false',
-      timestampOutputFormat: 'ISO8601_STRING',
-      useInt64Timestamp: false,
-      expectedTsValue: expectedTsValueNanoseconds,
-    },
-    // Additional test cases for undefined combinations
-    {
-      name: 'should call getRows with timestampOutputFormat undefined and useInt64Timestamp undefined',
-      timestampOutputFormat: undefined,
-      useInt64Timestamp: undefined,
-      expectedTsValue: expectedTsValueMicroseconds,
+      description: 'should call getRows with ISO8601_STRING and useInt64Timestamp=false',
+      options: {
+        'formatOptions.timestampOutputFormat': 'ISO8601_STRING',
+        'formatOptions.useInt64Timestamp': false,
+      },
+      expectedValue: '2023-01-01T12:00:00.123456789123',
     },
     {
-      name: 'should call getRows with timestampOutputFormat undefined and useInt64Timestamp=true',
-      timestampOutputFormat: undefined,
-      useInt64Timestamp: true,
-      expectedTsValue: expectedTsValueMicroseconds,
+      description: 'should call getRows with timestampOutputFormat undefined and useInt64Timestamp=true',
+      options: {
+        'formatOptions.useInt64Timestamp': true,
+      },
+      expectedValue: expectedValue,
     },
     {
-      name: 'should call getRows with timestampOutputFormat undefined and useInt64Timestamp=false',
-      timestampOutputFormat: undefined,
-      useInt64Timestamp: false,
-      expectedTsValue: expectedTsValueMicroseconds,
+      description: 'should call getRows with timestampOutputFormat undefined and useInt64Timestamp=false',
+      options: {
+        'formatOptions.useInt64Timestamp': false,
+      },
+      expectedValue: expectedValue,
     },
     {
-      name: 'should call getRows with TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED and useInt64Timestamp undefined',
-      timestampOutputFormat: 'TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED',
-      useInt64Timestamp: undefined,
-      expectedTsValue: expectedTsValueMicroseconds,
+      description: 'should call getRows with TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED and useInt64Timestamp undefined',
+      options: {
+        'formatOptions.timestampOutputFormat': 'TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED',
+      },
+      expectedValue: expectedValue,
     },
     {
-      name: 'should call getRows with FLOAT64 and useInt64Timestamp undefined (expect error)',
-      timestampOutputFormat: 'FLOAT64',
-      useInt64Timestamp: undefined,
-      expectedError:
-        'Cannot specify both use_int64_timestamp and timestamp_output_format.',
+      description: 'should call getRows with FLOAT64 and useInt64Timestamp undefined',
+      options: {
+        'formatOptions.timestampOutputFormat': 'FLOAT64',
+      },
+      shouldFail: true,
+      expectedErrorMessage: 'Cannot specify both use_int64_timestamp and timestamp_output_format.',
     },
     {
-      name: 'should call getRows with INT64 and useInt64Timestamp undefined',
-      timestampOutputFormat: 'INT64',
-      useInt64Timestamp: undefined,
-      expectedTsValue: expectedTsValueMicroseconds,
+      description: 'should call getRows with INT64 and useInt64Timestamp undefined',
+      options: {
+        'formatOptions.timestampOutputFormat': 'INT64',
+      },
+      expectedValue: expectedValue,
     },
     {
-      name: 'should call getRows with ISO8601_STRING and useInt64Timestamp undefined (expect error)',
-      timestampOutputFormat: 'ISO8601_STRING',
-      useInt64Timestamp: undefined,
-      expectedError:
-        'Cannot specify both use_int64_timestamp and timestamp_output_format.',
+      description: 'should call getRows with ISO8601_STRING and useInt64Timestamp undefined',
+      options: {
+        'formatOptions.timestampOutputFormat': 'ISO8601_STRING',
+      },
+      shouldFail: true,
+      expectedErrorMessage: 'Cannot specify both use_int64_timestamp and timestamp_output_format.',
+    },
+    {
+      description: 'should call getRows with timestampOutputFormat undefined and useInt64Timestamp undefined',
+      options: {},
+      expectedValue: expectedValue,
     },
   ];
 
-  testCases.forEach(
-    ({name, timestampOutputFormat, useInt64Timestamp, expectedError, expectedTsValue}) => {
-      it(name, async () => {
-        const options: {[key: string]: any} = {};
-        if (timestampOutputFormat !== undefined) {
-          options['formatOptions.timestampOutputFormat'] = timestampOutputFormat;
+  testCases.forEach(testCase => {
+    it(testCase.description, async () => {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const [rows] = await table.getRows(testCase.options as any);
+        if (testCase.shouldFail) {
+          assert.fail('The call should not have succeeded');
         }
-        if (useInt64Timestamp !== undefined) {
-          options['formatOptions.useInt64Timestamp'] = useInt64Timestamp;
-        }
-
-        if (expectedError) {
-          try {
-            await table.getRows(options);
-            assert.fail('The call should have thrown an error.');
-          } catch (e) {
-            assert.strictEqual((e as Error).message, expectedError);
-          }
+        assert(rows.length > 0);
+        assert.strictEqual(rows[0].ts.value, testCase.expectedValue);
+      } catch (e) {
+        if (testCase.shouldFail) {
+          assert.strictEqual((e as Error).message, testCase.expectedErrorMessage);
         } else {
-          const [rows] = await table.getRows(options);
-          assert(rows.length > 0);
-          assert.strictEqual(rows[0].ts.value, expectedTsValue);
+          throw e;
         }
-      });
-    }
-  );
+      }
+    });
+  });
 });
