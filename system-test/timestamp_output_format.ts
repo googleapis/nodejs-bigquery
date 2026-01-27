@@ -19,12 +19,22 @@ import {randomUUID} from 'crypto';
 
 const bigquery = new BigQuery();
 
+interface TestCase {
+  name: string;
+  timestampOutputFormat?: string;
+  useInt64Timestamp?: boolean;
+  expectedError?: string;
+  expectedTsValue?: string;
+}
+
 describe('Timestamp Output Format System Tests', () => {
   const datasetId = `timestamp_test_${randomUUID().replace(/-/g, '_')}`;
   const tableId = `timestamp_table_${randomUUID().replace(/-/g, '_')}`;
   const dataset = bigquery.dataset(datasetId);
   const table = dataset.table(tableId);
-  const expectedValue = '2023-01-01T12:00:00.123456000Z';
+  const insertedTsValue = '2023-01-01T12:00:00.123456789123Z';
+  const expectedTsValueMicroseconds = '2023-01-01T12:00:00.123456000Z';
+  const expectedTsValueNanoseconds = '2023-01-01T12:00:00.123456789123Z';
 
   before(async () => {
     await dataset.create();
@@ -32,7 +42,7 @@ describe('Timestamp Output Format System Tests', () => {
       schema: [{name: 'ts', type: 'TIMESTAMP', timestampPrecision: '12'}],
     });
     // Insert a row to test retrieval
-    await table.insert([{ts: '2023-01-01T12:00:00.123456789123Z'}]);
+    await table.insert([{ts: insertedTsValue}]);
   });
 
   after(async () => {
@@ -43,156 +53,83 @@ describe('Timestamp Output Format System Tests', () => {
     }
   });
 
-  it('should call getRows with TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED and useInt64Timestamp=true', async () => {
-    const [rows] = await table.getRows({
-      'formatOptions.timestampOutputFormat':
-        'TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED',
-      'formatOptions.useInt64Timestamp': true,
-    });
-    assert(rows.length > 0);
-    assert.strictEqual(rows[0].ts.value, expectedValue);
-  });
-
-  it('should call getRows with TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED and useInt64Timestamp=false', async () => {
-    const [rows] = await table.getRows({
-      'formatOptions.timestampOutputFormat':
-        'TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED',
-      'formatOptions.useInt64Timestamp': false,
-    });
-    assert.strictEqual(rows[0].ts.value, expectedValue);
-  });
-
-  it('should call getRows with FLOAT64 and useInt64Timestamp=true', async () => {
-    // Step through this one.
-    try {
-      const [rows] = await table.getRows({
-        'formatOptions.timestampOutputFormat': 'FLOAT64',
-        'formatOptions.useInt64Timestamp': true,
-      });
-      assert.fail('The call should not have succeeded');
-    } catch (e) {
-      assert.strictEqual(
-        (e as Error).message,
+  const testCases: TestCase[] = [
+    {
+      name: 'should call getRows with TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED and useInt64Timestamp=true',
+      timestampOutputFormat: 'TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED',
+      useInt64Timestamp: true,
+      expectedTsValue: expectedTsValueMicroseconds,
+    },
+    {
+      name: 'should call getRows with TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED and useInt64Timestamp=false',
+      timestampOutputFormat: 'TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED',
+      useInt64Timestamp: false,
+      expectedTsValue: expectedTsValueMicroseconds,
+    },
+    {
+      name: 'should call getRows with FLOAT64 and useInt64Timestamp=true (expect error)',
+      timestampOutputFormat: 'FLOAT64',
+      useInt64Timestamp: true,
+      expectedError:
         'Cannot specify both use_int64_timestamp and timestamp_output_format.',
-      );
-    }
-  });
-
-  it('should call getRows with FLOAT64 and useInt64Timestamp=false', async () => {
-    const [rows] = await table.getRows({
-      'formatOptions.timestampOutputFormat': 'FLOAT64',
-      'formatOptions.useInt64Timestamp': false,
-    });
-    assert(rows.length > 0);
-    assert.strictEqual(rows[0].ts.value, expectedValue);
-  });
-
-  it('should call getRows with INT64 and useInt64Timestamp=true', async () => {
-    const [rows] = await table.getRows({
-      'formatOptions.timestampOutputFormat': 'INT64',
-      'formatOptions.useInt64Timestamp': true,
-    });
-    assert(rows.length > 0);
-    assert.strictEqual(rows[0].ts.value, expectedValue);
-  });
-
-  it('should call getRows with INT64 and useInt64Timestamp=false', async () => {
-    const [rows] = await table.getRows({
-      'formatOptions.timestampOutputFormat': 'INT64',
-      'formatOptions.useInt64Timestamp': false,
-    });
-    assert(rows.length > 0);
-    assert.strictEqual(rows[0].ts.value, expectedValue);
-  });
-
-  it('should call getRows with ISO8601_STRING and useInt64Timestamp=true', async () => {
-    try {
-      const [rows] = await table.getRows({
-        'formatOptions.timestampOutputFormat': 'ISO8601_STRING',
-        'formatOptions.useInt64Timestamp': true,
-      });
-      assert(rows.length > 0);
-      assert.strictEqual(rows[0].ts.value, expectedValue);
-      assert.fail('The call should not have succeeded');
-    } catch (e) {
-      assert.strictEqual(
-        (e as Error).message,
+    },
+    {
+      name: 'should call getRows with FLOAT64 and useInt64Timestamp=false',
+      timestampOutputFormat: 'FLOAT64',
+      useInt64Timestamp: false,
+      expectedTsValue: expectedTsValueMicroseconds,
+    },
+    {
+      name: 'should call getRows with INT64 and useInt64Timestamp=true',
+      timestampOutputFormat: 'INT64',
+      useInt64Timestamp: true,
+      expectedTsValue: expectedTsValueMicroseconds,
+    },
+    {
+      name: 'should call getRows with INT64 and useInt64Timestamp=false',
+      timestampOutputFormat: 'INT64',
+      useInt64Timestamp: false,
+      expectedTsValue: expectedTsValueMicroseconds,
+    },
+    {
+      name: 'should call getRows with ISO8601_STRING and useInt64Timestamp=true (expect error)',
+      timestampOutputFormat: 'ISO8601_STRING',
+      useInt64Timestamp: true,
+      expectedError:
         'Cannot specify both use_int64_timestamp and timestamp_output_format.',
-      );
-    }
-  });
+    },
+    {
+      name: 'should call getRows with ISO8601_STRING and useInt64Timestamp=false',
+      timestampOutputFormat: 'ISO8601_STRING',
+      useInt64Timestamp: false,
+      expectedTsValue: expectedTsValueNanoseconds,
+    },
+  ];
 
-  it('should call getRows with ISO8601_STRING and useInt64Timestamp=false', async () => {
-    const [rows] = await table.getRows({
-      'formatOptions.timestampOutputFormat': 'ISO8601_STRING',
-      'formatOptions.useInt64Timestamp': false,
-    });
-    assert.strictEqual(rows[0].ts.value, '2023-01-01T12:00:00.123456789123Z');
-  });
+  testCases.forEach(
+    ({name, timestampOutputFormat, useInt64Timestamp, expectedError, expectedTsValue}) => {
+      it(name, async () => {
+        const options: {[key: string]: any} = {};
+        if (timestampOutputFormat !== undefined) {
+          options['formatOptions.timestampOutputFormat'] = timestampOutputFormat;
+        }
+        if (useInt64Timestamp !== undefined) {
+          options['formatOptions.useInt64Timestamp'] = useInt64Timestamp;
+        }
 
-  it('should call getRows with timestampOutputFormat undefined and useInt64Timestamp=true', async () => {
-    const [rows] = await table.getRows({
-      'formatOptions.useInt64Timestamp': true,
-    });
-    assert(rows.length > 0);
-    assert.strictEqual(rows[0].ts.value, expectedValue);
-  });
-
-  it('should call getRows with timestampOutputFormat undefined and useInt64Timestamp=false', async () => {
-    const [rows] = await table.getRows({
-      'formatOptions.useInt64Timestamp': false,
-    });
-    assert.strictEqual(rows[0].ts.value, expectedValue);
-  });
-
-  it('should call getRows with TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED and useInt64Timestamp undefined', async () => {
-    const [rows] = await table.getRows({
-      'formatOptions.timestampOutputFormat':
-        'TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED',
-    });
-    assert(rows.length > 0);
-    assert.strictEqual(rows[0].ts.value, expectedValue);
-  });
-
-  it('should call getRows with FLOAT64 and useInt64Timestamp undefined', async () => {
-    try {
-      const [rows] = await table.getRows({
-        'formatOptions.timestampOutputFormat': 'FLOAT64',
+        if (expectedError) {
+          try {
+            await table.getRows(options);
+            assert.fail('The call should have thrown an error.');
+          } catch (e) {
+            assert.strictEqual((e as Error).message, expectedError);
+          }
+        } else {
+          const [rows] = await table.getRows(options);
+          assert(rows.length > 0);
+          assert.strictEqual(rows[0].ts.value, expectedTsValue);
+        }
       });
-      assert.fail('The call should not have succeeded');
-    } catch (e) {
-      assert.strictEqual(
-        (e as Error).message,
-        'Cannot specify both use_int64_timestamp and timestamp_output_format.',
-      );
     }
-  });
-
-  it('should call getRows with INT64 and useInt64Timestamp undefined', async () => {
-    const [rows] = await table.getRows({
-      'formatOptions.timestampOutputFormat': 'INT64',
-    });
-    assert(rows.length > 0);
-    assert.strictEqual(rows[0].ts.value, expectedValue);
-  });
-
-  it('should call getRows with ISO8601_STRING and useInt64Timestamp undefined', async () => {
-    try {
-      const [rows] = await table.getRows({
-        'formatOptions.timestampOutputFormat': 'ISO8601_STRING',
-      });
-      assert.fail('The call should not have succeeded');
-    } catch (e) {
-      assert.strictEqual(
-        (e as Error).message,
-        'Cannot specify both use_int64_timestamp and timestamp_output_format.',
-      );
-    }
-  });
-
-  it('should call getRows with timestampOutputFormat undefined and useInt64Timestamp undefined', async () => {
-    const [rows] = await table.getRows({});
-    assert(rows.length > 0);
-    assert.strictEqual(rows[0].ts.value, expectedValue);
-  });
+  );
 });
