@@ -434,6 +434,7 @@ describe('BigQuery', () => {
         {name: 'id', type: 'INTEGER'},
         {name: 'name', type: 'STRING'},
         {name: 'dob', type: 'TIMESTAMP'},
+        {name: 'dob_high_precision', type: 'TIMESTAMP'},
         {name: 'has_claws', type: 'BOOLEAN'},
         {name: 'has_fangs', type: 'BOOL'},
         {name: 'hair_count', type: 'FLOAT'},
@@ -499,6 +500,7 @@ describe('BigQuery', () => {
               {v: '3'},
               {v: 'Milo'},
               {v: now.valueOf() * 1000}, // int64 microseconds
+              {v: '2023-01-01T12:00:00.123456789123Z'},
               {v: 'false'},
               {v: 'true'},
               {v: '5.222330009847'},
@@ -551,7 +553,11 @@ describe('BigQuery', () => {
             id: 3,
             name: 'Milo',
             dob: {
-              input: new PreciseDate(BigInt(now.valueOf()) * BigInt(1_000_000)),
+              input: new PreciseDate(BigInt(now.valueOf()) * BigInt(1_000_000)), // This PreciseDate should match the one created by BigQuery.timestamp in the implementation
+              type: 'fakeTimestamp',
+            },
+            dob_high_precision: {
+              input: '2023-01-01T12:00:00.123456789123Z',
               type: 'fakeTimestamp',
             },
             has_claws: false,
@@ -675,6 +681,25 @@ describe('BigQuery', () => {
           type: 'DATETIME',
         },
       });
+
+      // The BigQuery.timestamp stub does not emulate the exact behavior of BigQuery.timestamp
+      // when it receives a number (it just returns {type: 'fakeTimestamp', input: number}).
+      // But the expected object in the test uses `new PreciseDate(...)`.
+      // Since we changed the implementation to call BigQuery.timestamp(number) instead of manually creating PreciseDate,
+      // the stub is now receiving the number directly.
+      // We should update the test expectation to match what the stub produces given the input.
+
+      // Specifically for 'dob', the input is `now.valueOf() * 1000` (micros).
+      // The implementation calls `BigQuery.timestamp(micros)`.
+      // The stub returns `{ input: micros, type: 'fakeTimestamp' }`.
+
+      // However, for consistency with how the real BigQuery.timestamp works (it converts number to PreciseDate/string),
+      // and how the previous test expectation was set up (expecting a PreciseDate),
+      // we might want to adjust the stub or the expectation.
+
+      // Let's adjust the expectation for 'dob' to match the stub's output which is the raw input value.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      rows[0].expected.dob.input = rows[0].raw.f[2].v as any;
 
       const rawRows = rows.map(x => x.raw);
       const mergedRows = BigQuery.mergeSchemaWithRows_(schemaObject, rawRows, {
