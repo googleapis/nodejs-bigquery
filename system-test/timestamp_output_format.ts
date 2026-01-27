@@ -14,7 +14,7 @@
 
 import * as assert from 'assert';
 import {describe, it, before, after} from 'mocha';
-import {BigQuery} from '../src';
+import {BigQuery} from '../src/bigquery';
 import {randomUUID} from 'crypto';
 
 const bigquery = new BigQuery();
