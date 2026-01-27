@@ -152,11 +152,18 @@ describe('Timestamp Output Format System Tests', () => {
   ];
 
   testCases.forEach(
-    ({name, timestampOutputFormat, useInt64Timestamp, expectedError, expectedTsValue}) => {
+    ({
+      name,
+      timestampOutputFormat,
+      useInt64Timestamp,
+      expectedError,
+      expectedTsValue,
+    }) => {
       it(name, async () => {
         const options: {[key: string]: any} = {};
         if (timestampOutputFormat !== undefined) {
-          options['formatOptions.timestampOutputFormat'] = timestampOutputFormat;
+          options['formatOptions.timestampOutputFormat'] =
+            timestampOutputFormat;
         }
         if (useInt64Timestamp !== undefined) {
           options['formatOptions.useInt64Timestamp'] = useInt64Timestamp;
@@ -175,6 +182,6 @@ describe('Timestamp Output Format System Tests', () => {
           assert.strictEqual(rows[0].ts.value, expectedTsValue);
         }
       });
-    }
+    },
   );
 });
