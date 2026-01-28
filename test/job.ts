@@ -327,10 +327,11 @@ describe('BigQuery/Job', () => {
 
       sandbox
         .stub(BigQuery, 'mergeSchemaWithRows_')
-        .callsFake((schema, rows, {wrapIntegers}) => {
+        .callsFake((schema, rows, {wrapIntegers, skipWrapCustomTypes}) => {
           assert.strictEqual(schema, response.schema);
           assert.strictEqual(rows, response.rows);
           assert.strictEqual(wrapIntegers, false);
+          assert.strictEqual(skipWrapCustomTypes, false);
           return mergedRows;
         });
 
@@ -366,6 +367,37 @@ describe('BigQuery/Job', () => {
           assert.strictEqual(schema, response.schema);
           assert.strictEqual(rows, response.rows);
           assert.strictEqual(wrapIntegers, true);
+          return mergedRows;
+        });
+
+      job.getQueryResults(options, assert.ifError);
+    });
+
+    it('it should skip wrapping with custom types', done => {
+      const response = {
+        schema: {},
+        rows: [],
+      };
+
+      const mergedRows: Array<{}> = [];
+
+      const options = {skipWrapCustomTypes: true};
+      const expectedOptions = Object.assign({
+        location: undefined,
+        'formatOptions.useInt64Timestamp': true,
+      });
+
+      BIGQUERY.request = (reqOpts: DecorateRequestOptions) => {
+        assert.deepStrictEqual(reqOpts.qs, expectedOptions);
+        done();
+      };
+
+      sandbox
+        .stub(BigQuery, 'mergeSchemaWithRows_')
+        .callsFake((schema, rows, {skipWrapCustomTypes}) => {
+          assert.strictEqual(schema, response.schema);
+          assert.strictEqual(rows, response.rows);
+          assert.strictEqual(skipWrapCustomTypes, true);
           return mergedRows;
         });
 
