@@ -1885,7 +1885,7 @@ class Table extends ServiceObject {
       }
       callback!(null, rows, nextQuery, resp);
     };
-    const defaultToInt64Timestamp = options['formatOptions.timestampOutputFormat'] === 'TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED' || options['formatOptions.timestampOutputFormat'] === 'INT64';
+    const defaultToInt64Timestamp = ['INT64', 'TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED'].includes(options['formatOptions.timestampOutputFormat'] as string);
     const qs = extend(
       {
         'formatOptions.useInt64Timestamp': defaultToInt64Timestamp,
