@@ -2544,7 +2544,7 @@ function convertSchemaFieldValue(
         value = BigQuery.timestamp(value);
       } else if (typeof value === 'number') {
         // value is float seconds, convert to BigQueryTimestamp
-        value = BigQuery.timestamp(value);
+        value = BigQuery.timestamp(Number(value));
       } else {
         // Expect int64 micros (default or explicit INT64)
         const pd = new PreciseDate();
