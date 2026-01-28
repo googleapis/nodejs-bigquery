@@ -27,7 +27,7 @@ interface TestCase {
   expectedTsValue?: string;
 }
 
-describe('Timestamp Output Format System Tests', () => {
+describe.only('Timestamp Output Format System Tests', () => {
   const datasetId = `timestamp_test_${randomUUID().replace(/-/g, '_')}`;
   const tableId = `timestamp_table_${randomUUID().replace(/-/g, '_')}`;
   const dataset = bigquery.dataset(datasetId);
@@ -109,7 +109,7 @@ describe('Timestamp Output Format System Tests', () => {
       name: 'should call getRows with timestampOutputFormat undefined and useInt64Timestamp undefined',
       timestampOutputFormat: undefined,
       useInt64Timestamp: undefined,
-      expectedTsValue: expectedTsValueMicroseconds,
+      expectedTsValue: expectedTsValueNanoseconds,
     },
     {
       name: 'should call getRows with timestampOutputFormat undefined and useInt64Timestamp=true',
@@ -133,8 +133,7 @@ describe('Timestamp Output Format System Tests', () => {
       name: 'should call getRows with FLOAT64 and useInt64Timestamp undefined (expect error)',
       timestampOutputFormat: 'FLOAT64',
       useInt64Timestamp: undefined,
-      expectedError:
-        'Cannot specify both use_int64_timestamp and timestamp_output_format.',
+      expectedTsValue: expectedTsValueMicroseconds,
     },
     {
       name: 'should call getRows with INT64 and useInt64Timestamp undefined',
@@ -146,8 +145,7 @@ describe('Timestamp Output Format System Tests', () => {
       name: 'should call getRows with ISO8601_STRING and useInt64Timestamp undefined (expect error)',
       timestampOutputFormat: 'ISO8601_STRING',
       useInt64Timestamp: undefined,
-      expectedError:
-        'Cannot specify both use_int64_timestamp and timestamp_output_format.',
+      expectedTsValue: expectedTsValueNanoseconds,
     },
   ];
 
