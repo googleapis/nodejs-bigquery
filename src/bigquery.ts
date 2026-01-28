@@ -2348,7 +2348,8 @@ export class BigQuery extends Service {
       timeoutMs: options.timeoutMs,
       location: queryObj.location || options.location,
       formatOptions: {
-        useInt64Timestamp: true,
+        timestampOutputFormat: options['formatOptions.timestampOutputFormat'],
+        useInt64Timestamp: options['formatOptions.useInt64Timestamp'] ?? true,
       },
       maxResults: queryObj.maxResults || options.maxResults,
       query: queryObj.query,
