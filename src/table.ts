@@ -1890,7 +1890,7 @@ class Table extends ServiceObject {
     const qs = extend(
       {
         'formatOptions.useInt64Timestamp': defaultToInt64Timestamp,
-        'formatOptions.timestampOutputFormat': 'ISO8601_STRING',
+        'formatOptions.timestampOutputFormat': options['formatOptions.useInt64Timestamp'] === undefined ? 'ISO8601_STRING' : undefined,
       },
       options,
     );
