@@ -1880,17 +1880,22 @@ class Table extends ServiceObject {
           listParams: qs,
         });
       } catch (err) {
-
         callback!(err as Error | null, null, null, resp);
         return;
       }
       callback!(null, rows, nextQuery, resp);
     };
-    const defaultToInt64Timestamp = ['INT64', 'TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED'].includes(options['formatOptions.timestampOutputFormat'] as string);
+    const defaultToInt64Timestamp = [
+      'INT64',
+      'TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED',
+    ].includes(options['formatOptions.timestampOutputFormat'] as string);
     const qs = extend(
       {
         'formatOptions.useInt64Timestamp': defaultToInt64Timestamp,
-        'formatOptions.timestampOutputFormat': options['formatOptions.useInt64Timestamp'] === undefined ? 'ISO8601_STRING' : undefined,
+        'formatOptions.timestampOutputFormat':
+          options['formatOptions.useInt64Timestamp'] === undefined
+            ? 'ISO8601_STRING'
+            : undefined,
       },
       options,
     );

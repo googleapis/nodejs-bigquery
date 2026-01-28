@@ -598,8 +598,8 @@ export class BigQuery extends Service {
       selectedFields?: string[];
       parseJSON?: boolean;
       listParams?:
-          | bigquery.tabledata.IListParams
-          | bigquery.jobs.IGetQueryResultsParams;
+        | bigquery.tabledata.IListParams
+        | bigquery.jobs.IGetQueryResultsParams;
     },
   ) {
     // deep copy schema fields to avoid mutation
@@ -2476,8 +2476,8 @@ function convertSchemaFieldValue(
     selectedFields?: string[];
     parseJSON?: boolean;
     listParams?:
-        | bigquery.tabledata.IListParams
-        | bigquery.jobs.IGetQueryResultsParams;
+      | bigquery.tabledata.IListParams
+      | bigquery.jobs.IGetQueryResultsParams;
   },
 ) {
   if (value === null) {
@@ -2547,17 +2547,17 @@ function convertSchemaFieldValue(
        */
       const listParams = options.listParams;
       const timestampOutputFormat = listParams
-          ? listParams['formatOptions.timestampOutputFormat']
-          : undefined;
+        ? listParams['formatOptions.timestampOutputFormat']
+        : undefined;
       const useInt64Timestamp = listParams
-          ? listParams['formatOptions.useInt64Timestamp']
-          : undefined;
+        ? listParams['formatOptions.useInt64Timestamp']
+        : undefined;
       if (timestampOutputFormat === 'ISO8601_STRING') {
         // value is ISO string, create BigQueryTimestamp wrapping the string
         value = BigQuery.timestamp(value);
       } else if (
-          useInt64Timestamp === false &&
-          timestampOutputFormat !== 'INT64'
+        useInt64Timestamp === false &&
+        timestampOutputFormat !== 'INT64'
       ) {
         // value is float seconds, convert to BigQueryTimestamp
         value = BigQuery.timestamp(Number(value));
