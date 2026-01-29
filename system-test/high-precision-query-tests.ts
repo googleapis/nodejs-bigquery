@@ -16,97 +16,171 @@ import * as assert from 'assert';
 import {describe, it, before} from 'mocha';
 import {BigQuery} from '../src';
 
-describe('High Precision Query System Tests', () => {
+describe.only('High Precision Query System Tests', () => {
   let bigquery: BigQuery;
 
   before(function () {
     bigquery = new BigQuery();
   });
 
-  const timestampOutputFormats = [
-    undefined,
-    'TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED',
-    'FLOAT64',
-    'INT64',
-    'ISO8601_STRING',
+  const testCases = [
+    {
+      name: 'TOF: omitted, UI64: omitted (default INT64)',
+      timestampOutputFormat: undefined,
+      useInt64Timestamp: undefined,
+      expectedTsValue: '1721037600123456789',
+      expectedError: undefined,
+    },
+    {
+      name: 'TOF: omitted, UI64: true',
+      timestampOutputFormat: undefined,
+      useInt64Timestamp: true,
+      expectedTsValue: '1721037600123456789',
+      expectedError: undefined,
+    },
+    {
+      name: 'TOF: omitted, UI64: false (default ISO8601_STRING)',
+      timestampOutputFormat: undefined,
+      useInt64Timestamp: false,
+      expectedTsValue: '2024-07-15T10:00:00.123456789Z',
+      expectedError: undefined,
+    },
+    {
+      name: 'TOF: TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED, UI64: omitted (default INT64)',
+      timestampOutputFormat: 'TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED',
+      useInt64Timestamp: undefined,
+      expectedTsValue: '1721037600123456789',
+      expectedError: undefined,
+    },
+    {
+      name: 'TOF: TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED, UI64: true',
+      timestampOutputFormat: 'TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED',
+      useInt64Timestamp: true,
+      expectedTsValue: '1721037600123456789',
+      expectedError: undefined,
+    },
+    {
+      name: 'TOF: TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED, UI64: false (default ISO8601_STRING)',
+      timestampOutputFormat: 'TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED',
+      useInt64Timestamp: false,
+      expectedTsValue: '2024-07-15T10:00:00.123456789Z',
+      expectedError: undefined,
+    },
+    {
+      name: 'TOF: FLOAT64, UI64: omitted (error)',
+      timestampOutputFormat: 'FLOAT64',
+      useInt64Timestamp: undefined,
+      expectedTsValue: undefined,
+      expectedError: 400,
+    },
+    {
+      name: 'TOF: FLOAT64, UI64: true (error)',
+      timestampOutputFormat: 'FLOAT64',
+      useInt64Timestamp: true,
+      expectedTsValue: undefined,
+      expectedError: 400,
+    },
+    {
+      name: 'TOF: FLOAT64, UI64: false',
+      timestampOutputFormat: 'FLOAT64',
+      useInt64Timestamp: false,
+      expectedTsValue: 1721037600.123456789,
+      expectedError: undefined,
+    },
+    {
+      name: 'TOF: INT64, UI64: omitted',
+      timestampOutputFormat: 'INT64',
+      useInt64Timestamp: undefined,
+      expectedTsValue: '1721037600123456789',
+      expectedError: undefined,
+    },
+    {
+      name: 'TOF: INT64, UI64: true',
+      timestampOutputFormat: 'INT64',
+      useInt64Timestamp: true,
+      expectedTsValue: '1721037600123456789',
+      expectedError: undefined,
+    },
+    {
+      name: 'TOF: INT64, UI64: false (error)',
+      timestampOutputFormat: 'INT64',
+      useInt64Timestamp: false,
+      expectedTsValue: undefined,
+      expectedError: 400,
+    },
+    {
+      name: 'TOF: ISO8601_STRING, UI64: omitted (error)',
+      timestampOutputFormat: 'ISO8601_STRING',
+      useInt64Timestamp: undefined,
+      expectedTsValue: undefined,
+      expectedError: 400,
+    },
+    {
+      name: 'TOF: ISO8601_STRING, UI64: true (error)',
+      timestampOutputFormat: 'ISO8601_STRING',
+      useInt64Timestamp: true,
+      expectedTsValue: undefined,
+      expectedError: 400,
+    },
+    {
+      name: 'TOF: ISO8601_STRING, UI64: false',
+      timestampOutputFormat: 'ISO8601_STRING',
+      useInt64Timestamp: false,
+      expectedTsValue: '2024-07-15T10:00:00.123456789Z',
+      expectedError: undefined,
+    },
   ];
 
-  const useInt64Timestamps = [undefined, true, false];
+  testCases.forEach(testCase => {
+    it(`should handle ${testCase.name}`, async function () {
+      const query = {
+        query: 'SELECT ? as ts',
+        params: [bigquery.timestamp('2024-07-15 10:00:00.123456789123')],
+      };
 
-  timestampOutputFormats.forEach(TOF => {
-    useInt64Timestamps.forEach(UI64 => {
-      const testName = `TOF: ${TOF ?? 'omitted'}, UI64: ${UI64 ?? 'omitted'}`;
-
-      // Logic to determine expected success based on BigQuery API validation:
-      // - FLOAT64 and ISO8601_STRING require useInt64Timestamp to be false.
-      // - INT64 requires useInt64Timestamp to be true (or omitted).
-      // - Default useInt64Timestamp is true.
-      let expectedSuccess = true;
-      const actualUI64 = UI64 ?? true;
-
-      if (TOF === 'FLOAT64' || TOF === 'ISO8601_STRING') {
-        if (actualUI64 === true) {
-          expectedSuccess = false;
-        }
-      } else if (TOF === 'INT64') {
-        if (actualUI64 === false) {
-          expectedSuccess = false;
-        }
+      const options: any = {};
+      if (testCase.timestampOutputFormat !== undefined) {
+        options['formatOptions.timestampOutputFormat'] =
+          testCase.timestampOutputFormat;
+      }
+      if (testCase.useInt64Timestamp !== undefined) {
+        options['formatOptions.useInt64Timestamp'] =
+          testCase.useInt64Timestamp;
       }
 
-      it(`should handle ${testName}`, async function () {
-        // Use a parameter to avoid potential library bugs with simple query strings
-        // and to ensure we are testing the high-precision path.
-        const query = {
-          query: 'SELECT ? as ts',
-          params: [bigquery.timestamp('2024-07-15 10:00:00.123456789123')],
-        };
-
-        // The library currently expects flattened keys for formatOptions in bigquery.query
-        // to match the underlying API's query parameter names.
-        const options: any = {};
-        if (TOF !== undefined) {
-          options['formatOptions.timestampOutputFormat'] = TOF;
-        }
-        if (UI64 !== undefined) {
-          options['formatOptions.useInt64Timestamp'] = UI64;
-        }
-
-        try {
-          const [rows] = await bigquery.query(query, options);
-          if (!expectedSuccess) {
-            assert.fail(
-              `Query should have failed for ${testName}, but succeeded`
-            );
-          }
-          assert.ok(rows.length > 0);
-          assert.ok(rows[0].ts);
-        } catch (err: any) {
-          // Check for authentication or environment errors
-          const isAuthError =
-            err.message.includes('unauthenticated') ||
-            err.message.includes('permission denied') ||
-            err.message.includes('Could not load the default credentials') ||
-            err.message.includes('Unable to detect a Project Id');
-
-          if (isAuthError) {
-            this.skip();
-          }
-
-          if (expectedSuccess) {
-            throw err;
-          }
-
-          // If expected to fail, it should be a validation error (e.g., 400 Bad Request)
-          const statusCode =
-            err.code || (err.response && err.response.statusCode);
-          assert.strictEqual(
-            statusCode,
-            400,
-            `Expected 400 error for ${testName}, got ${statusCode} (${err.message})`
+      try {
+        const [rows] = await bigquery.query(query, options);
+        if (testCase.expectedError) {
+          assert.fail(
+            `Query should have failed for ${testCase.name}, but succeeded`
           );
         }
-      });
+        assert.ok(rows.length > 0);
+        assert.ok(rows[0].ts !== undefined);
+        assert.strictEqual(rows[0].ts, testCase.expectedTsValue);
+      } catch (err: any) {
+        const isAuthError =
+          err.message.includes('unauthenticated') ||
+          err.message.includes('permission denied') ||
+          err.message.includes('Could not load the default credentials') ||
+          err.message.includes('Unable to detect a Project Id');
+
+        if (isAuthError) {
+          this.skip();
+        }
+
+        if (!testCase.expectedError) {
+          throw err;
+        }
+
+        const statusCode =
+          err.code || (err.response && err.response.statusCode);
+        assert.strictEqual(
+          statusCode,
+          testCase.expectedError,
+          `Expected ${testCase.expectedError} error for ${testCase.name}, got ${statusCode} (${err.message})`
+        );
+      }
     });
   });
 });
