@@ -122,7 +122,6 @@ describe.only('High Precision Query Server Results', () => {
   });
 
   const testCases = [
-      /*
     {
       name: 'TOF: omitted, UI64: omitted (default INT64)',
       timestampOutputFormat: undefined,
@@ -141,7 +140,7 @@ describe.only('High Precision Query Server Results', () => {
       name: 'TOF: omitted, UI64: false (default ISO8601_STRING)',
       timestampOutputFormat: undefined,
       useInt64Timestamp: false,
-      expectedTsValue: '1721052000123456',
+      expectedTsValue: '1.721052000123456E9',
       expectedError: undefined,
     },
     {
@@ -162,28 +161,28 @@ describe.only('High Precision Query Server Results', () => {
       name: 'TOF: TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED, UI64: false (default ISO8601_STRING)',
       timestampOutputFormat: 'TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED',
       useInt64Timestamp: false,
-      expectedTsValue: '1721052000123456',
+      expectedTsValue: '1.721052000123456E9',
       expectedError: undefined,
     },
     {
       name: 'TOF: FLOAT64, UI64: omitted (error)',
       timestampOutputFormat: 'FLOAT64',
       useInt64Timestamp: undefined,
-      expectedTsValue: '1721052000123456',
-      expectedError: undefined,
+      expectedTsValue: undefined,
+      expectedError: 'Cannot specify both timestamp_as_int and timestamp_output_format.',
     },
     {
       name: 'TOF: FLOAT64, UI64: true (error)',
       timestampOutputFormat: 'FLOAT64',
       useInt64Timestamp: true,
-      expectedTsValue: '1721052000123456',
-      expectedError: undefined,
+      expectedTsValue: undefined,
+      expectedError: 'Cannot specify both timestamp_as_int and timestamp_output_format.',
     },
     {
       name: 'TOF: FLOAT64, UI64: false',
       timestampOutputFormat: 'FLOAT64',
       useInt64Timestamp: false,
-      expectedTsValue: '1721052000123456',
+      expectedTsValue: '1.721052000123456E9',
       expectedError: undefined,
     },
     {
@@ -211,17 +210,16 @@ describe.only('High Precision Query Server Results', () => {
       name: 'TOF: ISO8601_STRING, UI64: omitted (error)',
       timestampOutputFormat: 'ISO8601_STRING',
       useInt64Timestamp: undefined,
-      expectedTsValue: '1721052000123456',
-      expectedError: undefined,
+      expectedTsValue: undefined,
+      expectedError: 'Cannot specify both timestamp_as_int and timestamp_output_format.',
     },
     {
       name: 'TOF: ISO8601_STRING, UI64: true (error)',
       timestampOutputFormat: 'ISO8601_STRING',
       useInt64Timestamp: true,
-      expectedTsValue: '1721052000123456',
-      expectedError: undefined,
+      expectedTsValue: undefined,
+      expectedError: 'Cannot specify both timestamp_as_int and timestamp_output_format.',
     },
-      */
     {
       name: 'TOF: ISO8601_STRING, UI64: false',
       timestampOutputFormat: 'ISO8601_STRING',
