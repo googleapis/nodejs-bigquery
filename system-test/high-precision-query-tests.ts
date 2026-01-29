@@ -38,7 +38,6 @@ describe('High Precision Query System Tests', () => {
       expectedTsValue: '2024-07-15T14:00:00.123Z',
       expectedError: undefined,
     },
-      /*
     {
       name: 'TOF: omitted, UI64: false (default ISO8601_STRING)',
       timestampOutputFormat: undefined,
@@ -130,7 +129,6 @@ describe('High Precision Query System Tests', () => {
       expectedTsValue: '2024-07-15T10:00:00.123456789Z',
       expectedError: undefined,
     },
-           */
   ];
 
   testCases.forEach(testCase => {
