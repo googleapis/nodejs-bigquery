@@ -16,6 +16,7 @@ import * as assert from 'assert';
 import {describe, it, before, after} from 'mocha';
 import {BigQuery} from '../src/bigquery';
 import {randomUUID} from 'crypto';
+import {RequestResponse} from '@google-cloud/common/build/src/service-object';
 
 const bigquery = new BigQuery();
 
@@ -182,4 +183,27 @@ describe('Timestamp Output Format System Tests', () => {
       });
     },
   );
+
+  it.only('should make a request with ISO8601_STRING when no format options are being used', done => {
+    (async () => {
+      const originalRequest = table.request;
+      const requestPromise: Promise<RequestResponse> = new Promise((resolve, reject) => {
+        const innerPromise = new Promise((innerResolve, innerReject) => {
+          innerResolve({});
+        });
+        resolve(innerPromise as Promise<RequestResponse>);
+      })
+      table.request = (reqOpts) => {
+        table.request = originalRequest;
+        if (reqOpts.qs['formatOptions.timestampOutputFormat'] === 'ISO8601_STRING') {
+          done();
+        } else {
+          const errorMessage = 'The default timestampOutputFormat should be ISO8601_STRING';
+          done(errorMessage);
+        }
+        return requestPromise;
+      }
+      await table.getRows({});
+    })();
+  });
 });
