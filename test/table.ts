@@ -2047,7 +2047,7 @@ describe('BigQuery/Table', () => {
         assert.deepStrictEqual(reqOpts.qs, {
           ...options,
           'formatOptions.useInt64Timestamp': false,
-          'formatOptions.timestampOutputFormat': 'ISO8601_STRING'
+          'formatOptions.timestampOutputFormat': 'ISO8601_STRING',
         });
         callback(null, {});
       };
