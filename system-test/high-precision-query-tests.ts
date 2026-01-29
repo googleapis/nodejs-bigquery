@@ -16,7 +16,7 @@ import * as assert from 'assert';
 import {describe, it, before} from 'mocha';
 import {BigQuery} from '../src';
 
-describe.only('High Precision Query System Tests', () => {
+describe('High Precision Query System Tests', () => {
   let bigquery: BigQuery;
 
   before(function () {

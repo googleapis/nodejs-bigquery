@@ -1206,7 +1206,7 @@ describe('BigQuery', () => {
             const [rows] = await bigquery.query(query);
             assert.strictEqual(rows.length, 10);
           });
-          it.only('should work with a timestamp', done => {
+          it('should work with a timestamp', done => {
             const myConstantDate = new PreciseDate('2024-07-15T10:00:00.123456789Z');
             bigquery.query(
                 {
