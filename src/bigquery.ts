@@ -2762,6 +2762,12 @@ export class BigQueryTimestamp {
       if (/^\d{4}-\d{1,2}-\d{1,2}/.test(value)) {
         pd = new PreciseDate(value);
         if (value.match(/\.\d{10,}/) && !Number.isNaN(pd.getTime())) {
+          /*
+          TODO:
+          When https://github.com/googleapis/nodejs-precise-date/pull/302
+          is released and we have full support for picoseconds in PreciseData
+          then we can remove this if block.
+           */
           this.value = value;
           return;
         }
