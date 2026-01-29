@@ -137,7 +137,7 @@ describe.only('High Precision Query Server Results', () => {
       expectedError: undefined,
     },
     {
-      name: 'TOF: omitted, UI64: false (default ISO8601_STRING)',
+      name: 'TOF: omitted, UI64: false',
       timestampOutputFormat: undefined,
       useInt64Timestamp: false,
       expectedTsValue: '1.721052000123456E9',
