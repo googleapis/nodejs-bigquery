@@ -17,7 +17,13 @@
 import synthtool.languages.node as node
 from synthtool import shell
 
-node.owlbot_main(templates_excludes=['.github/bug-report.md', '.github/release-please.yml'])
+node.owlbot_main(
+    templates_excludes=[
+        '.github/bug-report.md',
+        '.github/release-please.yml',
+        '.github/workflows/ci.yaml',
+    ]
+)
 
 # Regenerate Discovery types.
 shell.run(('npm','run','types'))
