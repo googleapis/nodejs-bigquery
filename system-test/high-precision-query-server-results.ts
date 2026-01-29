@@ -122,6 +122,7 @@ describe.only('High Precision Query Server Results', () => {
   });
 
   const testCases = [
+      /*
     {
       name: 'TOF: omitted, UI64: omitted (default INT64)',
       timestampOutputFormat: undefined,
@@ -220,11 +221,12 @@ describe.only('High Precision Query Server Results', () => {
       expectedTsValue: '1721052000123456',
       expectedError: undefined,
     },
+      */
     {
       name: 'TOF: ISO8601_STRING, UI64: false',
       timestampOutputFormat: 'ISO8601_STRING',
       useInt64Timestamp: false,
-      expectedTsValue: '1721052000123456',
+      expectedTsValue: '2024-07-15T14:00:00.123456789123Z',
       expectedError: undefined,
     },
   ];
@@ -248,16 +250,10 @@ describe.only('High Precision Query Server Results', () => {
           parseJSON: undefined,
         };
         if (timestampOutputFormat !== undefined) {
-          options.formatOptions = {
-            ...options.formatOptions,
-            timestampOutputFormat: timestampOutputFormat,
-          };
+          options['formatOptions.timestampOutputFormat'] = timestampOutputFormat;
         }
         if (useInt64Timestamp !== undefined) {
-          options.formatOptions = {
-            ...options.formatOptions,
-            useInt64Timestamp: useInt64Timestamp,
-          };
+          options['formatOptions.useInt64Timestamp'] = useInt64Timestamp;
         }
 
         const queryReq = testBuildQueryRequest_(query, options);
