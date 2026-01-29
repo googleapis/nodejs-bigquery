@@ -15,7 +15,98 @@
 import * as assert from 'assert';
 import {describe, it, before, afterEach} from 'mocha';
 import * as sinon from 'sinon';
-import {BigQuery} from '../src';
+import {BigQuery, Query, QueryOptions} from '../src';
+import bigquery from '../src/types';
+import {randomUUID} from 'crypto';
+import {Service} from '@google-cloud/common';
+
+function testBuildQueryRequest_(
+    query: string | Query,
+    options: QueryOptions,
+): bigquery.IQueryRequest | undefined {
+  if (process.env.FAST_QUERY_PATH === 'DISABLED') {
+    return undefined;
+  }
+  const queryObj: Query =
+      typeof query === 'string'
+          ? {
+            query: query,
+          }
+          : query;
+  // This is a denylist of settings which prevent us from composing an equivalent
+  // bq.QueryRequest due to differences between configuration parameters accepted
+  // by jobs.insert vs jobs.query.
+  if (
+      !!queryObj.destination ||
+      !!queryObj.tableDefinitions ||
+      !!queryObj.createDisposition ||
+      !!queryObj.writeDisposition ||
+      (!!queryObj.priority && queryObj.priority !== 'INTERACTIVE') ||
+      queryObj.useLegacySql ||
+      !!queryObj.maximumBillingTier ||
+      !!queryObj.timePartitioning ||
+      !!queryObj.rangePartitioning ||
+      !!queryObj.clustering ||
+      !!queryObj.destinationEncryptionConfiguration ||
+      !!queryObj.schemaUpdateOptions ||
+      !!queryObj.jobTimeoutMs ||
+      // User has defined the jobID generation behavior
+      !!queryObj.jobId
+  ) {
+    return undefined;
+  }
+
+  if (queryObj.dryRun) {
+    return undefined;
+  }
+
+  if (options.job) {
+    return undefined;
+  }
+  const req: bigquery.IQueryRequest = {
+    useQueryCache: queryObj.useQueryCache,
+    labels: queryObj.labels,
+    defaultDataset: queryObj.defaultDataset,
+    createSession: queryObj.createSession,
+    maximumBytesBilled: queryObj.maximumBytesBilled,
+    timeoutMs: options.timeoutMs,
+    location: queryObj.location || options.location,
+    formatOptions: {
+      timestampOutputFormat: options['formatOptions.timestampOutputFormat'],
+      useInt64Timestamp: options['formatOptions.useInt64Timestamp'] ?? true,
+    },
+    maxResults: queryObj.maxResults || options.maxResults,
+    query: queryObj.query,
+    useLegacySql: false,
+    requestId: randomUUID(),
+    jobCreationMode: undefined,
+    reservation: queryObj.reservation,
+    continuous: queryObj.continuous,
+    destinationEncryptionConfiguration:
+    queryObj.destinationEncryptionConfiguration,
+    writeIncrementalResults: queryObj.writeIncrementalResults,
+    connectionProperties: queryObj.connectionProperties,
+    preserveNulls: queryObj.preserveNulls,
+  };
+  if (queryObj.jobCreationMode) {
+    // override default job creation mode
+    req.jobCreationMode = queryObj.jobCreationMode;
+  }
+  const parameterMode = 'positional';
+  const params = [
+    {
+      parameterType: {type: 'TIMESTAMP', timestampPrecision: '12'},
+      parameterValue: {value: '2024-07-15T14:00:00.123456789123Z'}
+    }
+  ]
+  if (params) {
+    req.queryParameters = params;
+  }
+  if (parameterMode) {
+    req.parameterMode = parameterMode;
+  }
+  return req;
+}
 
 describe.only('High Precision Query Server Results', () => {
   let bigquery: BigQuery;
@@ -138,62 +229,58 @@ describe.only('High Precision Query Server Results', () => {
     },
   ];
 
-  testCases.forEach(testCase => {
-    it(`should handle ${testCase.name}`, done => {
-      const query = {
-        query: 'SELECT ? as ts',
-        params: [bigquery.timestamp('2024-07-15 10:00:00.123456789123')],
-      };
-
-      const options: any = {};
-      if (testCase.timestampOutputFormat !== undefined) {
-        options.formatOptions = {
-          ...options.formatOptions,
-          timestampOutputFormat: testCase.timestampOutputFormat,
+  testCases.forEach(
+    ({
+      expectedError,
+      expectedTsValue,
+      name,
+      timestampOutputFormat,
+      useInt64Timestamp,
+    }) => {
+      it(`should handle ${name}`, done => {
+        const query = {
+          query: 'SELECT ? as ts',
+          params: [bigquery.timestamp('2024-07-15 10:00:00.123456789123')],
         };
-      }
-      if (testCase.useInt64Timestamp !== undefined) {
-        options.formatOptions = {
-          ...options.formatOptions,
-          useInt64Timestamp: testCase.useInt64Timestamp,
+
+        const options: any = {
+          wrapIntegers: undefined,
+          parseJSON: undefined,
         };
-      }
-
-      const mockRes = {
-        rows: [{f: [{v: testCase.expectedTsValue}]}],
-        schema: {
-          fields: [{name: 'ts', type: 'TIMESTAMP'}],
-        },
-      };
-
-      // bigquery.runJobsQuery
-      // @ts-ignore
-      sandbox.stub(bigquery, 'runJobsQuery').callsFake((req, opts, callback) => {
-        if (testCase.expectedError) {
-          const err: any = new Error('mock error');
-          err.code = testCase.expectedError;
-          callback(err, undefined);
-        } else {
-          callback(null, mockRes);
+        if (timestampOutputFormat !== undefined) {
+          options.formatOptions = {
+            ...options.formatOptions,
+            timestampOutputFormat: timestampOutputFormat,
+          };
         }
-        return {
-            abort: () => {},
-        } as any;
-      });
-
-      bigquery.query(query, options, (err, rows) => {
-        if (testCase.expectedError) {
-          assert.ok(err);
-          assert.strictEqual(err!.message, testCase.expectedError);
-        } else {
-          assert.ifError(err);
-          assert.ok(rows);
-          assert.ok(rows!.length > 0);
-          assert.ok(rows![0].ts.value !== undefined);
-          assert.strictEqual(rows![0].ts.value, testCase.expectedTsValue);
+        if (useInt64Timestamp !== undefined) {
+          options.formatOptions = {
+            ...options.formatOptions,
+            useInt64Timestamp: useInt64Timestamp,
+          };
         }
-        done();
+
+        const queryReq = testBuildQueryRequest_(query, options);
+        bigquery.request(
+          {
+            method: 'POST',
+            uri: '/queries',
+            json: queryReq,
+          },
+          async (err, res: bigquery.IQueryResponse) => {
+            try {
+              if (!err) {
+                const rowValue = res.rows?.at(0)?.f?.at(0)?.v;
+                assert.strictEqual(rowValue, expectedTsValue);
+              }
+              assert.strictEqual(err?.message, expectedError);
+              done();
+            } catch (e) {
+              done(e);
+            }
+          },
+        );
       });
-    });
-  });
+    },
+  );
 });
