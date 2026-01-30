@@ -2257,11 +2257,24 @@ export class BigQuery extends Service {
       if (res && res.jobComplete) {
         let rows: any = [];
         if (res.schema && res.rows) {
-          rows = BigQuery.mergeSchemaWithRows_(res.schema, res.rows, {
-            wrapIntegers: options.wrapIntegers || false,
-            parseJSON: options.parseJSON,
-          });
-          delete res.rows;
+          try {
+            /*
+            Without this try/catch block, calls to getRows will hang indefinitely if
+            a call to mergeSchemaWithRows_ fails because the error never makes it to
+            the callback. Instead, pass the error to the callback the user provides
+            so that the user can see the error.
+             */
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            rows = BigQuery.mergeSchemaWithRows_(res.schema, res.rows, {
+              wrapIntegers: options.wrapIntegers || false,
+              parseJSON: options.parseJSON,
+              listParams: options,
+            });
+            delete res.rows;
+          } catch (e) {
+            (callback as SimpleQueryRowsCallback)(e as Error, null, job)
+            return;
+          }
         }
         this.trace_('[runJobsQuery] job complete');
         options._cachedRows = rows;
@@ -2278,7 +2291,7 @@ export class BigQuery extends Service {
       // If timeout override was provided, return error.
       if (queryReq.timeoutMs) {
         const err = new Error(
-          `The query did not complete before ${queryReq.timeoutMs}ms`,
+            `The query did not complete before ${queryReq.timeoutMs}ms`,
         );
         (callback as SimpleQueryRowsCallback)(err, null, job);
         return;
