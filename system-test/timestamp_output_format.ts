@@ -198,8 +198,7 @@ describe('Timestamp Output Format System Tests', () => {
         if (reqOpts.qs['formatOptions.timestampOutputFormat'] === 'ISO8601_STRING') {
           done();
         } else {
-          const errorMessage = 'The default timestampOutputFormat should be ISO8601_STRING';
-          done(errorMessage);
+          done(new Error('The default timestampOutputFormat should be ISO8601_STRING'));
         }
         return requestPromise;
       }
