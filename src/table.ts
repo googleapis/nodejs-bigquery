@@ -1885,11 +1885,15 @@ class Table extends ServiceObject {
       }
       callback!(null, rows, nextQuery, resp);
     };
-    const hasAnyFormatOpts = options['formatOptions.timestampOutputFormat'] !== undefined || options['formatOptions.useInt64Timestamp'] !== undefined;
-    const defaultOpts = hasAnyFormatOpts ? {} : {
-      'formatOptions.timestampOutputFormat': 'ISO8601_STRING'
-    };
-    const qs = extend(defaultOpts, options)
+    const hasAnyFormatOpts =
+      options['formatOptions.timestampOutputFormat'] !== undefined ||
+      options['formatOptions.useInt64Timestamp'] !== undefined;
+    const defaultOpts = hasAnyFormatOpts
+      ? {}
+      : {
+          'formatOptions.timestampOutputFormat': 'ISO8601_STRING',
+        };
+    const qs = extend(defaultOpts, options);
     this.request(
       {
         uri: '/data',

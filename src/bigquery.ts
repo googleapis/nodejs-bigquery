@@ -2555,7 +2555,7 @@ function convertSchemaFieldValue(
         // value is ISO string, create BigQueryTimestamp wrapping the string
         value = BigQuery.timestamp(value);
       } else if (
-        useInt64Timestamp !== true  &&
+        useInt64Timestamp !== true &&
         timestampOutputFormat !== 'INT64' &&
         (useInt64Timestamp !== undefined || timestampOutputFormat !== undefined)
       ) {

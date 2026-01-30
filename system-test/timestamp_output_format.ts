@@ -187,21 +187,29 @@ describe.only('Timestamp Output Format System Tests', () => {
   it('should make a request with ISO8601_STRING when no format options are being used', done => {
     (async () => {
       const originalRequest = table.request;
-      const requestPromise: Promise<RequestResponse> = new Promise((resolve, reject) => {
-        const innerPromise = new Promise((innerResolve, innerReject) => {
-          innerResolve({});
-        });
-        resolve(innerPromise as Promise<RequestResponse>);
-      })
-      table.request = (reqOpts) => {
+      const requestPromise: Promise<RequestResponse> = new Promise(
+        (resolve, reject) => {
+          const innerPromise = new Promise((innerResolve, innerReject) => {
+            innerResolve({});
+          });
+          resolve(innerPromise as Promise<RequestResponse>);
+        },
+      );
+      table.request = reqOpts => {
         table.request = originalRequest;
-        if (reqOpts.qs['formatOptions.timestampOutputFormat'] === 'ISO8601_STRING') {
+        if (
+          reqOpts.qs['formatOptions.timestampOutputFormat'] === 'ISO8601_STRING'
+        ) {
           done();
         } else {
-          done(new Error('The default timestampOutputFormat should be ISO8601_STRING'));
+          done(
+            new Error(
+              'The default timestampOutputFormat should be ISO8601_STRING',
+            ),
+          );
         }
         return requestPromise;
-      }
+      };
       await table.getRows({});
     })();
   });
