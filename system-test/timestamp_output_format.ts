@@ -185,7 +185,7 @@ describe('Timestamp Output Format System Tests', () => {
   );
 
   it('should make a request with ISO8601_STRING when no format options are being used', done => {
-    (async () => {
+    void (async () => {
       const originalRequest = table.request;
       const requestPromise: Promise<RequestResponse> = new Promise(
         (resolve, reject) => {
