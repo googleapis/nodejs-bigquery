@@ -2556,9 +2556,16 @@ function convertSchemaFieldValue(
         value = BigQuery.timestamp(value);
       } else if (
         useInt64Timestamp !== true  &&
-        timestampOutputFormat !== 'INT64'
+        timestampOutputFormat !== 'INT64' &&
+        (useInt64Timestamp !== undefined || timestampOutputFormat !== undefined)
       ) {
-        // value is float seconds, convert to BigQueryTimestamp
+        // NOTE: The additional
+        // (useInt64Timestamp !== undefined || timestampOutputFormat !== und...)
+        // check is to ensure that calls to the /query endpoint remain
+        // unaffected as they will not be providing any listParams.
+        //
+        // If the program reaches this point in time then
+        // value is float seconds so convert to BigQueryTimestamp
         value = BigQuery.timestamp(Number(value));
       } else {
         // Expect int64 micros (default or explicit INT64)
