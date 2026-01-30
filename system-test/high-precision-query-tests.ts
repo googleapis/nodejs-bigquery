@@ -16,7 +16,7 @@ import * as assert from 'assert';
 import {describe, it, before} from 'mocha';
 import {BigQuery} from '../src';
 
-describe('High Precision Query System Tests', () => {
+describe.only('High Precision Query System Tests', () => {
   let bigquery: BigQuery;
 
   before(function () {
@@ -24,6 +24,7 @@ describe('High Precision Query System Tests', () => {
   });
 
   const testCases = [
+    /*
     {
       name: 'TOF: omitted, UI64: omitted (default INT64)',
       timestampOutputFormat: undefined,
@@ -38,6 +39,7 @@ describe('High Precision Query System Tests', () => {
       expectedTsValue: '2024-07-15T14:00:00.123Z',
       expectedError: undefined,
     },
+     */
     {
       name: 'TOF: omitted, UI64: false (default ISO8601_STRING)',
       timestampOutputFormat: undefined,

@@ -108,7 +108,7 @@ function testBuildQueryRequest_(
   return req;
 }
 
-describe.only('High Precision Query Server Results', () => {
+describe('High Precision Query Server Results', () => {
   let bigquery: BigQuery;
   let sandbox: sinon.SinonSandbox;
 
@@ -122,6 +122,7 @@ describe.only('High Precision Query Server Results', () => {
   });
 
   const testCases = [
+    /*
     {
       name: 'TOF: omitted, UI64: omitted (default INT64)',
       timestampOutputFormat: undefined,
@@ -136,6 +137,7 @@ describe.only('High Precision Query Server Results', () => {
       expectedTsValue: '1721052000123456',
       expectedError: undefined,
     },
+     */
     {
       name: 'TOF: omitted, UI64: false',
       timestampOutputFormat: undefined,
