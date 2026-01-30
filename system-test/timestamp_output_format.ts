@@ -28,7 +28,7 @@ interface TestCase {
   expectedTsValue?: string;
 }
 
-describe('Timestamp Output Format System Tests', () => {
+describe.only('Timestamp Output Format System Tests', () => {
   const datasetId = `timestamp_test_${randomUUID().replace(/-/g, '_')}`;
   const tableId = `timestamp_table_${randomUUID().replace(/-/g, '_')}`;
   const dataset = bigquery.dataset(datasetId);
@@ -184,7 +184,7 @@ describe('Timestamp Output Format System Tests', () => {
     },
   );
 
-  it.only('should make a request with ISO8601_STRING when no format options are being used', done => {
+  it('should make a request with ISO8601_STRING when no format options are being used', done => {
     (async () => {
       const originalRequest = table.request;
       const requestPromise: Promise<RequestResponse> = new Promise((resolve, reject) => {
