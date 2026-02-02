@@ -149,16 +149,6 @@ describe.only('High Precision Query System Tests', () => {
         assert.ok(rows[0].ts.value !== undefined);
         assert.strictEqual(rows[0].ts.value, testCase.expectedTsValue);
       } catch (err: any) {
-        const isAuthError =
-          err.message.includes('unauthenticated') ||
-          err.message.includes('permission denied') ||
-          err.message.includes('Could not load the default credentials') ||
-          err.message.includes('Unable to detect a Project Id');
-
-        if (isAuthError) {
-          this.skip();
-        }
-
         if (!testCase.expectedError) {
           throw err;
         }
