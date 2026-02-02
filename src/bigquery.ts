@@ -1103,7 +1103,7 @@ export class BigQuery extends Service {
       return {
         type: 'TIMESTAMP',
         timestampPrecision: '12',
-      }
+      };
     }
 
     providedType = (providedType as string).toUpperCase();
@@ -1144,8 +1144,8 @@ export class BigQuery extends Service {
     } else if (value instanceof BigQueryTimestamp) {
       return {
         type: 'TIMESTAMP', // Was typeName = 'TIMESTAMP', but now we need better timestamp precision;
-        timestampPrecision: '12'
-      }
+        timestampPrecision: '12',
+      };
     } else if (value instanceof Buffer) {
       typeName = 'BYTES';
     } else if (value instanceof Big) {
@@ -2266,9 +2266,11 @@ export class BigQuery extends Service {
              */
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const listParams = {
-              'formatOptions.timestampOutputFormat': queryReq.formatOptions?.timestampOutputFormat,
-              'formatOptions.useInt64Timestamp': queryReq.formatOptions?.useInt64Timestamp,
-            }
+              'formatOptions.timestampOutputFormat':
+                queryReq.formatOptions?.timestampOutputFormat,
+              'formatOptions.useInt64Timestamp':
+                queryReq.formatOptions?.useInt64Timestamp,
+            };
             rows = BigQuery.mergeSchemaWithRows_(res.schema, res.rows, {
               wrapIntegers: options.wrapIntegers || false,
               parseJSON: options.parseJSON,
@@ -2276,7 +2278,7 @@ export class BigQuery extends Service {
             });
             delete res.rows;
           } catch (e) {
-            (callback as SimpleQueryRowsCallback)(e as Error, null, job)
+            (callback as SimpleQueryRowsCallback)(e as Error, null, job);
             return;
           }
         }
@@ -2295,7 +2297,7 @@ export class BigQuery extends Service {
       // If timeout override was provided, return error.
       if (queryReq.timeoutMs) {
         const err = new Error(
-            `The query did not complete before ${queryReq.timeoutMs}ms`,
+          `The query did not complete before ${queryReq.timeoutMs}ms`,
         );
         (callback as SimpleQueryRowsCallback)(err, null, job);
         return;
@@ -2360,17 +2362,17 @@ export class BigQuery extends Service {
       return undefined;
     }
     const hasAnyFormatOpts =
-        options['formatOptions.timestampOutputFormat'] !== undefined ||
-        options['formatOptions.useInt64Timestamp'] !== undefined;
+      options['formatOptions.timestampOutputFormat'] !== undefined ||
+      options['formatOptions.useInt64Timestamp'] !== undefined;
     const defaultOpts = hasAnyFormatOpts
-        ? {}
-        : {
+      ? {}
+      : {
           timestampOutputFormat: 'ISO8601_STRING',
         };
     const formatOptions = extend(defaultOpts, {
       timestampOutputFormat: options['formatOptions.timestampOutputFormat'],
-      useInt64Timestamp: options['formatOptions.useInt64Timestamp']
-    })
+      useInt64Timestamp: options['formatOptions.useInt64Timestamp'],
+    });
     const req: bigquery.IQueryRequest = {
       useQueryCache: queryObj.useQueryCache,
       labels: queryObj.labels,

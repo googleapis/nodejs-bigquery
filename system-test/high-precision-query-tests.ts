@@ -20,9 +20,10 @@ describe.only('High Precision Query System Tests', () => {
   let bigquery: BigQuery;
   const expectedTsValueMicroseconds = '2023-01-01T12:00:00.123456000Z';
   const expectedTsValueNanoseconds = '2023-01-01T12:00:00.123456789123Z';
-  const expectedErrorMessage = 'Cannot specify both timestamp_as_int and timestamp_output_format.';
+  const expectedErrorMessage =
+    'Cannot specify both timestamp_as_int and timestamp_output_format.';
 
-  before(function () {
+  before(() => {
     bigquery = new BigQuery();
   });
 
@@ -134,15 +135,14 @@ describe.only('High Precision Query System Tests', () => {
           testCase.timestampOutputFormat;
       }
       if (testCase.useInt64Timestamp !== undefined) {
-        options['formatOptions.useInt64Timestamp'] =
-          testCase.useInt64Timestamp;
+        options['formatOptions.useInt64Timestamp'] = testCase.useInt64Timestamp;
       }
 
       try {
         const [rows] = await bigquery.query(query, options);
         if (testCase.expectedError) {
           assert.fail(
-            `Query should have failed for ${testCase.name}, but succeeded`
+            `Query should have failed for ${testCase.name}, but succeeded`,
           );
         }
         assert.ok(rows.length > 0);
@@ -167,7 +167,7 @@ describe.only('High Precision Query System Tests', () => {
         assert.strictEqual(
           message,
           testCase.expectedError,
-          `Expected ${testCase.expectedError} error for ${testCase.name}, got ${message} (${err.message})`
+          `Expected ${testCase.expectedError} error for ${testCase.name}, got ${message} (${err.message})`,
         );
       }
     });

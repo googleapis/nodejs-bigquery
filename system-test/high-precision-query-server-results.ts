@@ -21,37 +21,37 @@ import {randomUUID} from 'crypto';
 import {Service} from '@google-cloud/common';
 
 function testBuildQueryRequest_(
-    query: string | Query,
-    options: QueryOptions,
+  query: string | Query,
+  options: QueryOptions,
 ): bigquery.IQueryRequest | undefined {
   if (process.env.FAST_QUERY_PATH === 'DISABLED') {
     return undefined;
   }
   const queryObj: Query =
-      typeof query === 'string'
-          ? {
-            query: query,
-          }
-          : query;
+    typeof query === 'string'
+      ? {
+          query: query,
+        }
+      : query;
   // This is a denylist of settings which prevent us from composing an equivalent
   // bq.QueryRequest due to differences between configuration parameters accepted
   // by jobs.insert vs jobs.query.
   if (
-      !!queryObj.destination ||
-      !!queryObj.tableDefinitions ||
-      !!queryObj.createDisposition ||
-      !!queryObj.writeDisposition ||
-      (!!queryObj.priority && queryObj.priority !== 'INTERACTIVE') ||
-      queryObj.useLegacySql ||
-      !!queryObj.maximumBillingTier ||
-      !!queryObj.timePartitioning ||
-      !!queryObj.rangePartitioning ||
-      !!queryObj.clustering ||
-      !!queryObj.destinationEncryptionConfiguration ||
-      !!queryObj.schemaUpdateOptions ||
-      !!queryObj.jobTimeoutMs ||
-      // User has defined the jobID generation behavior
-      !!queryObj.jobId
+    !!queryObj.destination ||
+    !!queryObj.tableDefinitions ||
+    !!queryObj.createDisposition ||
+    !!queryObj.writeDisposition ||
+    (!!queryObj.priority && queryObj.priority !== 'INTERACTIVE') ||
+    queryObj.useLegacySql ||
+    !!queryObj.maximumBillingTier ||
+    !!queryObj.timePartitioning ||
+    !!queryObj.rangePartitioning ||
+    !!queryObj.clustering ||
+    !!queryObj.destinationEncryptionConfiguration ||
+    !!queryObj.schemaUpdateOptions ||
+    !!queryObj.jobTimeoutMs ||
+    // User has defined the jobID generation behavior
+    !!queryObj.jobId
   ) {
     return undefined;
   }
@@ -83,7 +83,7 @@ function testBuildQueryRequest_(
     reservation: queryObj.reservation,
     continuous: queryObj.continuous,
     destinationEncryptionConfiguration:
-    queryObj.destinationEncryptionConfiguration,
+      queryObj.destinationEncryptionConfiguration,
     writeIncrementalResults: queryObj.writeIncrementalResults,
     connectionProperties: queryObj.connectionProperties,
     preserveNulls: queryObj.preserveNulls,
@@ -96,9 +96,9 @@ function testBuildQueryRequest_(
   const params = [
     {
       parameterType: {type: 'TIMESTAMP', timestampPrecision: '12'},
-      parameterValue: {value: '2024-07-15T14:00:00.123456789123Z'}
-    }
-  ]
+      parameterValue: {value: '2024-07-15T14:00:00.123456789123Z'},
+    },
+  ];
   if (params) {
     req.queryParameters = params;
   }
@@ -171,14 +171,16 @@ describe('High Precision Query Server Results', () => {
       timestampOutputFormat: 'FLOAT64',
       useInt64Timestamp: undefined,
       expectedTsValue: undefined,
-      expectedError: 'Cannot specify both timestamp_as_int and timestamp_output_format.',
+      expectedError:
+        'Cannot specify both timestamp_as_int and timestamp_output_format.',
     },
     {
       name: 'TOF: FLOAT64, UI64: true (error)',
       timestampOutputFormat: 'FLOAT64',
       useInt64Timestamp: true,
       expectedTsValue: undefined,
-      expectedError: 'Cannot specify both timestamp_as_int and timestamp_output_format.',
+      expectedError:
+        'Cannot specify both timestamp_as_int and timestamp_output_format.',
     },
     {
       name: 'TOF: FLOAT64, UI64: false',
@@ -213,14 +215,16 @@ describe('High Precision Query Server Results', () => {
       timestampOutputFormat: 'ISO8601_STRING',
       useInt64Timestamp: undefined,
       expectedTsValue: undefined,
-      expectedError: 'Cannot specify both timestamp_as_int and timestamp_output_format.',
+      expectedError:
+        'Cannot specify both timestamp_as_int and timestamp_output_format.',
     },
     {
       name: 'TOF: ISO8601_STRING, UI64: true (error)',
       timestampOutputFormat: 'ISO8601_STRING',
       useInt64Timestamp: true,
       expectedTsValue: undefined,
-      expectedError: 'Cannot specify both timestamp_as_int and timestamp_output_format.',
+      expectedError:
+        'Cannot specify both timestamp_as_int and timestamp_output_format.',
     },
     {
       name: 'TOF: ISO8601_STRING, UI64: false',
@@ -250,7 +254,8 @@ describe('High Precision Query Server Results', () => {
           parseJSON: undefined,
         };
         if (timestampOutputFormat !== undefined) {
-          options['formatOptions.timestampOutputFormat'] = timestampOutputFormat;
+          options['formatOptions.timestampOutputFormat'] =
+            timestampOutputFormat;
         }
         if (useInt64Timestamp !== undefined) {
           options['formatOptions.useInt64Timestamp'] = useInt64Timestamp;
