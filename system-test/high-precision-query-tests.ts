@@ -20,7 +20,7 @@ describe.only('High Precision Query System Tests', () => {
   let bigquery: BigQuery;
   const expectedTsValueMicroseconds = '2023-01-01T12:00:00.123456000Z';
   const expectedTsValueNanoseconds = '2023-01-01T12:00:00.123456789123Z';
-  const expectedErrorMessage = 'Cannot specify both use_int64_timestamp and timestamp_output_format.';
+  const expectedErrorMessage = 'Cannot specify both timestamp_as_int and timestamp_output_format.';
 
   before(function () {
     bigquery = new BigQuery();
@@ -69,7 +69,7 @@ describe.only('High Precision Query System Tests', () => {
       timestampOutputFormat: 'ISO8601_STRING',
       useInt64Timestamp: true,
       expectedTsValue: undefined,
-      expectedError: 'Cannot specify both use_int64_timestamp and timestamp_output_format.',
+      expectedError: expectedErrorMessage,
     },
     {
       name: 'TOF: ISO8601_STRING, UI64: false',
