@@ -2355,6 +2355,18 @@ export class BigQuery extends Service {
     if (options.job) {
       return undefined;
     }
+    const hasAnyFormatOpts =
+        options['formatOptions.timestampOutputFormat'] !== undefined ||
+        options['formatOptions.useInt64Timestamp'] !== undefined;
+    const defaultOpts = hasAnyFormatOpts
+        ? {}
+        : {
+          timestampOutputFormat: 'ISO8601_STRING',
+        };
+    const formatOptions = extend(defaultOpts, {
+      timestampOutputFormat: options['formatOptions.timestampOutputFormat'],
+      useInt64Timestamp: options['formatOptions.useInt64Timestamp']
+    })
     const req: bigquery.IQueryRequest = {
       useQueryCache: queryObj.useQueryCache,
       labels: queryObj.labels,
@@ -2363,10 +2375,7 @@ export class BigQuery extends Service {
       maximumBytesBilled: queryObj.maximumBytesBilled,
       timeoutMs: options.timeoutMs,
       location: queryObj.location || options.location,
-      formatOptions: {
-        timestampOutputFormat: options['formatOptions.timestampOutputFormat'],
-        useInt64Timestamp: options['formatOptions.useInt64Timestamp'] ?? true,
-      },
+      formatOptions,
       maxResults: queryObj.maxResults || options.maxResults,
       query: queryObj.query,
       useLegacySql: false,
