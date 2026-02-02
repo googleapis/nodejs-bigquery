@@ -2268,7 +2268,7 @@ export class BigQuery extends Service {
             rows = BigQuery.mergeSchemaWithRows_(res.schema, res.rows, {
               wrapIntegers: options.wrapIntegers || false,
               parseJSON: options.parseJSON,
-              listParams: options,
+              listParams: queryReq,
             });
             delete res.rows;
           } catch (e) {
