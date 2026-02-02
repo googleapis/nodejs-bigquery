@@ -2265,10 +2265,14 @@ export class BigQuery extends Service {
             so that the user can see the error.
              */
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const listParams = {
+              'formatOptions.timestampOutputFormat': queryReq.formatOptions?.timestampOutputFormat,
+              'formatOptions.useInt64Timestamp': queryReq.formatOptions?.useInt64Timestamp,
+            }
             rows = BigQuery.mergeSchemaWithRows_(res.schema, res.rows, {
               wrapIntegers: options.wrapIntegers || false,
               parseJSON: options.parseJSON,
-              listParams: queryReq,
+              listParams,
             });
             delete res.rows;
           } catch (e) {
