@@ -1,4 +1,4 @@
-// Copyright 2024 Google LLC
+// Copyright 2026 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ import * as sinon from 'sinon';
 import {BigQuery, Query, QueryOptions} from '../src';
 import bigquery from '../src/types';
 import {randomUUID} from 'crypto';
-import {Service} from '@google-cloud/common';
 
 function testBuildQueryRequest_(
   query: string | Query,
@@ -122,7 +121,6 @@ describe('High Precision Query Server Results', () => {
   });
 
   const testCases = [
-    /*
     {
       name: 'TOF: omitted, UI64: omitted (default INT64)',
       timestampOutputFormat: undefined,
@@ -137,7 +135,6 @@ describe('High Precision Query Server Results', () => {
       expectedTsValue: '1721052000123456',
       expectedError: undefined,
     },
-     */
     {
       name: 'TOF: omitted, UI64: false',
       timestampOutputFormat: undefined,
