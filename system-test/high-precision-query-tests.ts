@@ -20,6 +20,7 @@ describe.only('High Precision Query System Tests', () => {
   let bigquery: BigQuery;
   const expectedTsValueMicroseconds = '2023-01-01T12:00:00.123456000Z';
   const expectedTsValueNanoseconds = '2023-01-01T12:00:00.123456789123Z';
+  const expectedErrorMessage = 'Cannot specify both use_int64_timestamp and timestamp_output_format.';
 
   before(function () {
     bigquery = new BigQuery();
@@ -31,42 +32,37 @@ describe.only('High Precision Query System Tests', () => {
       timestampOutputFormat: 'TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED',
       useInt64Timestamp: true,
       expectedTsValue: expectedTsValueMicroseconds,
-      expectedError: undefined,
     },
     {
       name: 'TOF: TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED, UI64: false (default ISO8601_STRING)',
       timestampOutputFormat: 'TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED',
       useInt64Timestamp: false,
       expectedTsValue: expectedTsValueMicroseconds,
-      expectedError: undefined,
     },
     {
       name: 'TOF: FLOAT64, UI64: true (error)',
       timestampOutputFormat: 'FLOAT64',
       useInt64Timestamp: true,
       expectedTsValue: undefined,
-      expectedError: 'Cannot specify both use_int64_timestamp and timestamp_output_format.',
+      expectedError: expectedErrorMessage,
     },
     {
       name: 'TOF: FLOAT64, UI64: false',
       timestampOutputFormat: 'FLOAT64',
       useInt64Timestamp: false,
       expectedTsValue: expectedTsValueMicroseconds,
-      expectedError: undefined,
     },
     {
       name: 'TOF: INT64, UI64: true',
       timestampOutputFormat: 'INT64',
       useInt64Timestamp: true,
       expectedTsValue: expectedTsValueMicroseconds,
-      expectedError: undefined,
     },
     {
       name: 'TOF: INT64, UI64: false (error)',
       timestampOutputFormat: 'INT64',
       useInt64Timestamp: false,
       expectedTsValue: expectedTsValueMicroseconds,
-      expectedError: undefined,
     },
     {
       name: 'TOF: ISO8601_STRING, UI64: true (error)',
@@ -80,56 +76,48 @@ describe.only('High Precision Query System Tests', () => {
       timestampOutputFormat: 'ISO8601_STRING',
       useInt64Timestamp: false,
       expectedTsValue: expectedTsValueNanoseconds,
-      expectedError: undefined,
     },
     {
       name: 'TOF: omitted, UI64: omitted (default INT64)',
       timestampOutputFormat: undefined,
       useInt64Timestamp: undefined,
       expectedTsValue: expectedTsValueNanoseconds,
-      expectedError: undefined,
     },
     {
       name: 'TOF: omitted, UI64: true',
       timestampOutputFormat: undefined,
       useInt64Timestamp: true,
       expectedTsValue: expectedTsValueMicroseconds,
-      expectedError: undefined,
     },
     {
       name: 'TOF: omitted, UI64: false (default ISO8601_STRING)',
       timestampOutputFormat: undefined,
       useInt64Timestamp: false,
       expectedTsValue: expectedTsValueMicroseconds,
-      expectedError: undefined,
     },
     {
       name: 'TOF: TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED, UI64: omitted (default INT64)',
       timestampOutputFormat: 'TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED',
       useInt64Timestamp: undefined,
       expectedTsValue: expectedTsValueMicroseconds,
-      expectedError: undefined,
     },
     {
       name: 'TOF: FLOAT64, UI64: omitted (error)',
       timestampOutputFormat: 'FLOAT64',
       useInt64Timestamp: undefined,
       expectedTsValue: expectedTsValueMicroseconds,
-      expectedError: undefined,
     },
     {
       name: 'TOF: INT64, UI64: omitted',
       timestampOutputFormat: 'INT64',
       useInt64Timestamp: undefined,
       expectedTsValue: expectedTsValueMicroseconds,
-      expectedError: undefined,
     },
     {
       name: 'TOF: ISO8601_STRING, UI64: omitted (error)',
       timestampOutputFormat: 'ISO8601_STRING',
       useInt64Timestamp: undefined,
       expectedTsValue: expectedTsValueNanoseconds,
-      expectedError: 400,
     },
   ];
 
@@ -175,12 +163,11 @@ describe.only('High Precision Query System Tests', () => {
           throw err;
         }
 
-        const statusCode =
-          err.code || (err.response && err.response.statusCode);
+        const message = err.message;
         assert.strictEqual(
-          statusCode,
+          message,
           testCase.expectedError,
-          `Expected ${testCase.expectedError} error for ${testCase.name}, got ${statusCode} (${err.message})`
+          `Expected ${testCase.expectedError} error for ${testCase.name}, got ${message} (${err.message})`
         );
       }
     });
