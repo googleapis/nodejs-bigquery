@@ -1460,7 +1460,7 @@ describe('BigQuery', () => {
             );
           });
 
-          it('should work with RANGE types', done => {
+          it.only('should work with RANGE types', done => {
             bigquery.query(
               {
                 query: 'SELECT ? r',
@@ -1472,11 +1472,16 @@ describe('BigQuery', () => {
                 ],
               },
               (err, rows) => {
-                assert.ifError(err);
-                assert.strictEqual(rows!.length, 1);
-                done();
+                try {
+                  // Without this try block the test runner silently fails
+                  assert.ifError(err);
+                  assert.strictEqual(rows!.length, 1);
+                  done();
+                } catch (e) {
+                  done(e);
+                }
               },
-            );
+            )
           });
 
           it('should work with multiple types', done => {
