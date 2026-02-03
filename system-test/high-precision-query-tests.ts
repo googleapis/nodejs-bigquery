@@ -16,7 +16,7 @@ import * as assert from 'assert';
 import {describe, it, before} from 'mocha';
 import {BigQuery} from '../src';
 
-describe.only('High Precision Query System Tests', () => {
+describe('High Precision Query System Tests', () => {
   let bigquery: BigQuery;
   const expectedTsValueMicroseconds = '2023-01-01T12:00:00.123456000Z';
   const expectedTsValueNanoseconds = '2023-01-01T12:00:00.123456789123Z';
