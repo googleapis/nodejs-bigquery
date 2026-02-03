@@ -127,6 +127,7 @@ describe.only('High Precision Query System Tests', () => {
       const query = {
         query: 'SELECT ? as ts',
         params: [bigquery.timestamp('2023-01-01T12:00:00.123456789123Z')],
+        types: ['TIMESTAMP(12)']
       };
 
       const options: any = {};
@@ -158,6 +159,53 @@ describe.only('High Precision Query System Tests', () => {
           message,
           testCase.expectedError,
           `Expected ${testCase.expectedError} error for ${testCase.name}, got ${message} (${err.message})`,
+        );
+      }
+    });
+    it(`should handle nested ${testCase.name}`, async function () {
+      const query = {
+        query: 'SELECT ? obj',
+        params: [{
+          nested: {
+            a: bigquery.timestamp('2023-01-01T12:00:00.123456789123Z')
+          }
+        }],
+        types: [{
+          nested: {
+            a: 'TIMESTAMP(12)'
+          }
+        }]
+      };
+
+      const options: any = {};
+      if (testCase.timestampOutputFormat !== undefined) {
+        options['formatOptions.timestampOutputFormat'] =
+            testCase.timestampOutputFormat;
+      }
+      if (testCase.useInt64Timestamp !== undefined) {
+        options['formatOptions.useInt64Timestamp'] = testCase.useInt64Timestamp;
+      }
+
+      try {
+        const [rows] = await bigquery.query(query, options);
+        if (testCase.expectedError) {
+          assert.fail(
+              `Query should have failed for ${testCase.name}, but succeeded`,
+          );
+        }
+        assert.ok(rows.length > 0);
+        assert.ok(rows[0].obj.nested.a.value !== undefined);
+        assert.strictEqual(rows[0].obj.nested.a.value, testCase.expectedTsValue);
+      } catch (err: any) {
+        if (!testCase.expectedError) {
+          throw err;
+        }
+
+        const message = err.message;
+        assert.strictEqual(
+            message,
+            testCase.expectedError,
+            `Expected ${testCase.expectedError} error for ${testCase.name}, got ${message} (${err.message})`,
         );
       }
     });
