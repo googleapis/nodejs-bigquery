@@ -124,6 +124,13 @@ describe.only('High Precision Query System Tests', () => {
 
   testCases.forEach(testCase => {
     it(`should handle ${testCase.name}`, async function () {
+      /*
+      The users use the new TIMESTAMP(12) type to indicate they want to
+      opt in to using timestampPrecision=12. The reason is that some queries
+      like `SELECT CAST(? as TIMESTAMP(12))` will fail if we set
+      timestampPrecision=12 and we don't want this code change to affect
+      existing users. Queries using TIMESTAMP_ADD are another example.
+       */
       const query = {
         query: 'SELECT ? as ts',
         params: [bigquery.timestamp('2023-01-01T12:00:00.123456789123Z')],
@@ -163,6 +170,13 @@ describe.only('High Precision Query System Tests', () => {
       }
     });
     it(`should handle nested ${testCase.name}`, async function () {
+      /*
+      The users use the new TIMESTAMP(12) type to indicate they want to
+      opt in to using timestampPrecision=12. The reason is that some queries
+      like `SELECT CAST(? as TIMESTAMP(12))` will fail if we set
+      timestampPrecision=12 and we don't want this code change to affect
+      existing users.
+       */
       const query = {
         query: 'SELECT ? obj',
         params: [{
